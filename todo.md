@@ -87,3 +87,12 @@
 - [x] Create /docs/operations-manual.md
 - [x] Create /docs/customer-success-playbook.md
 - [x] Create /docs/template-roadmap.md
+
+## Pricing Implementation (Execution-Ready)
+
+- [x] Update homepage pricing section with Founding Client Beta copy
+- [x] Add "Apply for LaunchBase" CTA button
+- [x] Create /whats-included page with full delivery plan
+- [x] Update onboarding confirmation with expanded pricing summary
+- [x] Add FAQ section under pricing (answers objections)
+- [x] Ensure testimonial placeholders are below pricing
