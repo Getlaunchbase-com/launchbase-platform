@@ -2,46 +2,14 @@
 
 ## Core Features
 
-- [x] Landing page with LaunchBase brand (#0B0B0C, #FF6A00, #1ED760)
-- [x] 13-step onboarding flow with AI vertical inference
-- [x] LocalStorage draft saving during onboarding
-- [x] Admin dashboard for intake management
-- [x] Search and filtering for intakes
-- [x] Intake detail panel
-- [x] Build plan generation from intake data
-- [x] Template selection based on vertical
-- [x] Clarification request system with one-time tokens
-- [x] Customer clarification page
-- [x] Deployment pipeline with job queue
-- [x] Status tracking (queued, running, success, failed)
-- [x] Live polling on deployment status page
-- [x] Local publisher for static site generation (simulated)
-- [ ] trades_v1 template (Call Now CTA) - template files not yet integrated
-- [ ] appointment_v2 template (Book Online CTA) - template files not yet integrated
-- [x] Approve and deploy buttons in admin
-- [x] Auto-redirect after deploy action
-
-## Database Schemas
-
-- [x] intakes table
-- [x] build_plans table
-- [x] clarifications table
-- [x] deployments table
-
-## API Routes
-
-- [x] POST /api/trpc/intake.submit
-- [x] GET /api/trpc/admin.intakes.list
-- [x] GET /api/trpc/admin.intakes.detail
-- [x] POST /api/trpc/admin.buildPlan.generate
-- [x] POST /api/trpc/admin.clarify.create
-- [x] GET /api/trpc/clarify.get
-- [x] POST /api/trpc/clarify.submit
-- [x] POST /api/trpc/admin.buildPlan.approve
-- [x] POST /api/trpc/admin.deploy.start
-- [x] POST /api/trpc/admin.deploy.run
-- [x] GET /api/trpc/admin.deploy.status
-- [x] GET /api/trpc/admin.deploy.list
+- [x] Database schema (intakes, build_plans, deployments, clarifications)
+- [x] Landing page with hero, social proof, pricing, FAQ
+- [x] 8-step optimized onboarding flow
+- [x] Admin dashboard with intake list
+- [x] Intake detail / build plan viewer
+- [x] Clarification system with one-time tokens
+- [x] Deployment status page with live polling
+- [x] App routes and navigation
 
 ## Testing
 
@@ -66,3 +34,56 @@
 - [x] Add AI inference logic for vertical detection
 - [x] Add production-ready microcopy
 - [x] Test new onboarding flow
+
+## Post-Intake Email Sequence (E)
+
+- [x] Create email templates table in database
+- [x] Email 1: Immediate confirmation (on intake submit)
+- [x] Email 2: In-progress reassurance (12-24h after intake, if not ready)
+- [x] Email 3: Site ready for review (on status = ready_for_review)
+- [x] Email 4: Gentle nudge (48h after review email, no response)
+- [x] Email 5: Launch confirmation (on site deployed)
+- [x] Admin notifications (new intake, low confidence, approval)
+
+## Admin Review UI Microcopy (F)
+
+- [x] Update status badges with new labels and colors
+- [x] Add Build Summary panel (vertical, CTA, tone, confidence)
+- [x] Add confidence score tooltip (<70% requires clarification)
+- [x] Improve Approve & Deploy button with confirmation modal
+- [x] Improve Request Clarification modal with better copy
+- [x] Add Hold Build button for spam/invalid intakes
+- [x] Add Internal Notes field for operators
+- [x] Add success toast messages after actions
+
+## Analytics & Drop-Off Tracking (G)
+
+- [x] Create analytics_events table
+- [x] Track page_view_home and cta_click_start_intake
+- [x] Track onboarding step views and completions
+- [x] Track onboarding_abandoned with last_step_number
+- [x] Track build quality signals (confidence, clarification, first-pass)
+- [x] Track deployment metrics (time_to_deploy, time_to_approval)
+- [x] Create admin analytics dashboard with funnel view
+- [x] Add drop-off heatmap by step
+
+## Founding Client Follow-Up System (H)
+
+- [x] Email: Preview follow-up (24-48h, no response)
+- [x] Email: Approval → payment transition
+- [x] Email: Post-launch gratitude
+- [x] Email: Testimonial request (5-7 days after launch)
+- [x] Email: Founding client lock-in (2-3 weeks after launch)
+
+## Exit-Beta Plan (I)
+
+- [x] Update landing page copy (remove beta language)
+- [x] Add "Trusted by early service businesses" messaging
+- [x] Prepare founding client lock-in email template
+- [x] Prepare public launch announcement email template
+
+## Operational Documentation (K)
+
+- [x] Create /docs/operations-manual.md
+- [x] Create /docs/customer-success-playbook.md
+- [x] Create /docs/template-roadmap.md

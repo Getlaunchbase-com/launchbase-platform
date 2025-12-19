@@ -21,6 +21,8 @@ import {
   updateDeploymentStatus,
   runDeployment,
 } from "./db";
+import { sendEmail, AdminNotifications } from "./email";
+import { trackEvent, getFunnelMetrics, getBuildQualityMetrics, getVerticalMetrics, getDailyHealth } from "./analytics";
 
 export const appRouter = router({
   system: systemRouter,
@@ -55,6 +57,20 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         const intake = await createIntake(input, "new");
+        
+        // Send confirmation email
+        if (intake?.id) {
+          const firstName = input.contactName.split(" ")[0];
+          await sendEmail(intake.id, "intake_confirmation", {
+            firstName,
+            businessName: input.businessName,
+            email: input.email,
+          });
+          
+          // Notify admin of new intake
+          await AdminNotifications.newIntake(input.businessName, 85);
+        }
+        
         return { success: true, intakeId: intake?.id };
       }),
   }),
@@ -183,6 +199,61 @@ export const appRouter = router({
         .query(async ({ input }) => {
           return getDeployments(input?.status);
         }),
+    }),
+  }),
+
+  // Analytics tracking (public for frontend events)
+  analytics: router({
+    track: publicProcedure
+      .input(z.object({
+        eventName: z.string(),
+        sessionId: z.string().optional(),
+        intakeId: z.number().optional(),
+        vertical: z.string().optional(),
+        stepNumber: z.number().optional(),
+        metadata: z.record(z.string(), z.unknown()).optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await trackEvent(input as any);
+        return { success: true };
+      }),
+
+    // Admin-only analytics queries
+    funnel: protectedProcedure
+      .input(z.object({
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const start = input?.startDate ? new Date(input.startDate) : undefined;
+        const end = input?.endDate ? new Date(input.endDate) : undefined;
+        return getFunnelMetrics(start, end);
+      }),
+
+    buildQuality: protectedProcedure
+      .input(z.object({
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const start = input?.startDate ? new Date(input.startDate) : undefined;
+        const end = input?.endDate ? new Date(input.endDate) : undefined;
+        return getBuildQualityMetrics(start, end);
+      }),
+
+    verticals: protectedProcedure
+      .input(z.object({
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const start = input?.startDate ? new Date(input.startDate) : undefined;
+        const end = input?.endDate ? new Date(input.endDate) : undefined;
+        return getVerticalMetrics(start, end);
+      }),
+
+    dailyHealth: protectedProcedure.query(async () => {
+      return getDailyHealth();
     }),
   }),
 

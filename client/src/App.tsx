@@ -11,6 +11,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import IntakeDetail from "./pages/IntakeDetail";
 import DeploymentStatus from "./pages/DeploymentStatus";
 import Clarify from "./pages/Clarify";
+import AdminAnalytics from "./pages/AdminAnalytics";
 
 function Router() {
   return (
@@ -25,6 +26,7 @@ function Router() {
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/intake/:id" component={IntakeDetail} />
       <Route path="/admin/deploy/:id" component={DeploymentStatus} />
+      <Route path="/admin/analytics" component={AdminAnalytics} />
       
       {/* Fallback routes */}
       <Route path="/404" component={NotFound} />

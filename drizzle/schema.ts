@@ -124,3 +124,70 @@ export const deployments = mysqlTable("deployments", {
 
 export type Deployment = typeof deployments.$inferSelect;
 export type InsertDeployment = typeof deployments.$inferInsert;
+
+/**
+ * Analytics events for funnel tracking
+ */
+export const analyticsEvents = mysqlTable("analytics_events", {
+  id: int("id").autoincrement().primaryKey(),
+  // Event identification
+  eventName: varchar("eventName", { length: 64 }).notNull(),
+  sessionId: varchar("sessionId", { length: 64 }),
+  // Context
+  intakeId: int("intakeId"),
+  vertical: varchar("vertical", { length: 32 }),
+  stepNumber: int("stepNumber"),
+  // Metadata
+  metadata: json("metadata").$type<Record<string, unknown>>(),
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AnalyticsEvent = typeof analyticsEvents.$inferSelect;
+export type InsertAnalyticsEvent = typeof analyticsEvents.$inferInsert;
+
+/**
+ * Email logs for tracking sent emails
+ */
+export const emailLogs = mysqlTable("email_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  intakeId: int("intakeId").notNull(),
+  // Email details
+  emailType: mysqlEnum("emailType", [
+    "intake_confirmation",
+    "in_progress",
+    "ready_for_review",
+    "review_nudge",
+    "launch_confirmation",
+    "preview_followup",
+    "testimonial_request",
+    "founding_client_lockin",
+    "day7_checkin",
+    "day30_value"
+  ]).notNull(),
+  recipientEmail: varchar("recipientEmail", { length: 320 }).notNull(),
+  subject: varchar("subject", { length: 255 }).notNull(),
+  // Status
+  status: mysqlEnum("status", ["sent", "failed", "opened", "clicked"]).default("sent").notNull(),
+  // Timestamps
+  sentAt: timestamp("sentAt").defaultNow().notNull(),
+  openedAt: timestamp("openedAt"),
+  clickedAt: timestamp("clickedAt"),
+});
+
+export type EmailLog = typeof emailLogs.$inferSelect;
+export type InsertEmailLog = typeof emailLogs.$inferInsert;
+
+/**
+ * Internal notes for admin operators
+ */
+export const internalNotes = mysqlTable("internal_notes", {
+  id: int("id").autoincrement().primaryKey(),
+  intakeId: int("intakeId").notNull(),
+  userId: int("userId").notNull(),
+  note: text("note").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type InternalNote = typeof internalNotes.$inferSelect;
+export type InsertInternalNote = typeof internalNotes.$inferInsert;
