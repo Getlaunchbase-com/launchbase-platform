@@ -2,8 +2,32 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
 
+// Mock the email module
+vi.mock("./email", () => ({
+  sendEmail: vi.fn().mockResolvedValue(true),
+  AdminNotifications: {
+    newIntake: vi.fn().mockResolvedValue(true),
+    lowConfidence: vi.fn().mockResolvedValue(true),
+    siteApproved: vi.fn().mockResolvedValue(true),
+  },
+}));
+
+// Mock the analytics module
+vi.mock("./analytics", () => ({
+  trackEvent: vi.fn().mockResolvedValue(true),
+  getFunnelMetrics: vi.fn().mockResolvedValue(null),
+  getBuildQualityMetrics: vi.fn().mockResolvedValue(null),
+  getVerticalMetrics: vi.fn().mockResolvedValue(null),
+  getDailyHealth: vi.fn().mockResolvedValue(null),
+}));
+
 // Mock the database module
 vi.mock("./db", () => ({
+  getDb: vi.fn().mockResolvedValue({
+    insert: vi.fn().mockReturnValue({
+      values: vi.fn().mockResolvedValue(undefined),
+    }),
+  }),
   createIntake: vi.fn().mockResolvedValue({ id: 1 }),
   getIntakes: vi.fn().mockResolvedValue([]),
   getIntakeById: vi.fn().mockResolvedValue(null),

@@ -15,6 +15,13 @@
       "when": 1766180908960,
       "tag": "0001_fresh_puma",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1766185382788,
+      "tag": "0002_free_the_executioner",
+      "breakpoints": true
     }
   ]
 }
