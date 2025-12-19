@@ -47,3 +47,8 @@
 
 - [x] Write vitest tests for intake submission
 - [x] Write vitest tests for clarification one-time token
+
+## Landing Page Improvements (from feedback)
+
+- [x] Add social proof line ("Used by early service businesses...")
+- [x] Add "What You Get" snapshot section (3 bullets)

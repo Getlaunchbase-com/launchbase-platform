@@ -55,6 +55,43 @@ export default function Home() {
             </Link>
             <p className="text-sm text-gray-500">Takes about 5 minutes</p>
           </div>
+          
+          {/* Social Proof */}
+          <p className="mt-8 text-sm text-gray-500">
+            Used by early service businesses across trades, appointments, and professional services.
+          </p>
+        </div>
+      </section>
+
+      {/* What You Get Section */}
+      <section className="py-16 px-4 border-b border-white/10">
+        <div className="container max-w-4xl mx-auto">
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
+            <h3 className="text-xl font-semibold mb-6 text-center">What You Get</h3>
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="w-5 h-5 text-[#1ED760] mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-medium text-white">Professional website</p>
+                  <p className="text-sm text-gray-400">Custom-built for your business</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="w-5 h-5 text-[#1ED760] mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-medium text-white">Lead capture</p>
+                  <p className="text-sm text-gray-400">Calls, bookings, or forms</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="w-5 h-5 text-[#1ED760] mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-medium text-white">LaunchBase dashboard</p>
+                  <p className="text-sm text-gray-400">Updates & future changes</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
