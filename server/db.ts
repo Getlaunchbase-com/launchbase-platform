@@ -1,7 +1,14 @@
-import { eq } from "drizzle-orm";
+import { eq, like, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { 
+  InsertUser, users,
+  intakes, InsertIntake, Intake,
+  buildPlans, InsertBuildPlan, BuildPlan,
+  clarifications, InsertClarification, Clarification,
+  deployments, InsertDeployment, Deployment,
+} from "../drizzle/schema";
 import { ENV } from './_core/env';
+import { randomBytes } from 'crypto';
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -17,6 +24,8 @@ export async function getDb() {
   }
   return _db;
 }
+
+// ============ USER FUNCTIONS ============
 
 export async function upsertUser(user: InsertUser): Promise<void> {
   if (!user.openId) {
@@ -85,8 +94,371 @@ export async function getUserByOpenId(openId: string) {
   }
 
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
-
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// ============ INTAKE FUNCTIONS ============
+
+export async function createIntake(data: {
+  businessName: string;
+  contactName: string;
+  email: string;
+  phone?: string;
+  vertical: "trades" | "appointments" | "professional";
+  services?: string[];
+  serviceArea?: string[];
+  primaryCTA?: string;
+  bookingLink?: string;
+  tagline?: string;
+  brandColors?: { primary?: string; secondary?: string };
+  rawPayload?: Record<string, unknown>;
+}, status: "new" | "review" | "needs_info" | "ready" | "approved" = "new") {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create intake: database not available");
+    return null;
+  }
+
+  const values: InsertIntake = {
+    businessName: data.businessName,
+    contactName: data.contactName,
+    email: data.email,
+    phone: data.phone || null,
+    vertical: data.vertical,
+    services: data.services || null,
+    serviceArea: data.serviceArea || null,
+    primaryCTA: data.primaryCTA || null,
+    bookingLink: data.bookingLink || null,
+    tagline: data.tagline || null,
+    brandColors: data.brandColors || null,
+    rawPayload: data.rawPayload || null,
+    status,
+  };
+
+  const result = await db.insert(intakes).values(values);
+  const insertId = result[0].insertId;
+  
+  return { id: insertId, ...values };
+}
+
+export async function getIntakes(status?: string, search?: string): Promise<Intake[]> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get intakes: database not available");
+    return [];
+  }
+
+  const conditions = [];
+  if (status) {
+    conditions.push(eq(intakes.status, status as Intake['status']));
+  }
+  if (search) {
+    conditions.push(like(intakes.businessName, `%${search}%`));
+  }
+
+  const query = conditions.length > 0
+    ? db.select().from(intakes).where(and(...conditions)).orderBy(desc(intakes.createdAt))
+    : db.select().from(intakes).orderBy(desc(intakes.createdAt));
+
+  return await query;
+}
+
+export async function getIntakeById(id: number): Promise<Intake | null> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get intake: database not available");
+    return null;
+  }
+
+  const result = await db.select().from(intakes).where(eq(intakes.id, id)).limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function updateIntakeStatus(id: number, status: Intake['status']) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update intake: database not available");
+    return;
+  }
+
+  await db.update(intakes).set({ status }).where(eq(intakes.id, id));
+}
+
+// ============ BUILD PLAN FUNCTIONS ============
+
+export async function createBuildPlan(data: {
+  intakeId: number;
+  templateId: string;
+  plan: BuildPlan['plan'];
+  status?: BuildPlan['status'];
+}) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create build plan: database not available");
+    return null;
+  }
+
+  const values: InsertBuildPlan = {
+    intakeId: data.intakeId,
+    templateId: data.templateId,
+    plan: data.plan,
+    status: data.status || "draft",
+  };
+
+  const result = await db.insert(buildPlans).values(values);
+  const insertId = result[0].insertId;
+  
+  return { id: insertId, ...values };
+}
+
+export async function getBuildPlanById(id: number): Promise<BuildPlan | null> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get build plan: database not available");
+    return null;
+  }
+
+  const result = await db.select().from(buildPlans).where(eq(buildPlans.id, id)).limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function getBuildPlanByIntakeId(intakeId: number): Promise<BuildPlan | null> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get build plan: database not available");
+    return null;
+  }
+
+  const result = await db.select().from(buildPlans).where(eq(buildPlans.intakeId, intakeId)).limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function updateBuildPlanStatus(id: number, status: BuildPlan['status']) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update build plan: database not available");
+    return;
+  }
+
+  await db.update(buildPlans).set({ status }).where(eq(buildPlans.id, id));
+}
+
+// ============ CLARIFICATION FUNCTIONS ============
+
+function generateToken(): string {
+  return randomBytes(32).toString('hex');
+}
+
+export async function createClarification(data: {
+  intakeId: number;
+  questionKey: string;
+  questionText: string;
+  inputType?: "text" | "select" | "multitag";
+  options?: string[];
+}) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create clarification: database not available");
+    return null;
+  }
+
+  const token = generateToken();
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+  const values: InsertClarification = {
+    intakeId: data.intakeId,
+    token,
+    questionKey: data.questionKey,
+    questionText: data.questionText,
+    inputType: data.inputType || "text",
+    options: data.options || null,
+    status: "pending",
+    used: false,
+    expiresAt,
+  };
+
+  const result = await db.insert(clarifications).values(values);
+  const insertId = result[0].insertId;
+  
+  return { id: insertId, ...values };
+}
+
+export async function getClarificationByToken(token: string): Promise<Clarification | null> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get clarification: database not available");
+    return null;
+  }
+
+  const result = await db.select().from(clarifications).where(eq(clarifications.token, token)).limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function submitClarificationAnswer(token: string, answer: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot submit clarification: database not available");
+    return { success: false, error: "Database not available" };
+  }
+
+  // Get the clarification
+  const clar = await getClarificationByToken(token);
+  if (!clar) {
+    return { success: false, error: "Clarification not found" };
+  }
+
+  // Check if already used (one-time token)
+  if (clar.used) {
+    return { success: false, error: "This link has already been used" };
+  }
+
+  // Check if expired
+  if (clar.expiresAt && new Date(clar.expiresAt) < new Date()) {
+    return { success: false, error: "This link has expired" };
+  }
+
+  // Update the clarification
+  await db.update(clarifications).set({
+    answer,
+    answeredAt: new Date(),
+    status: "answered",
+    used: true,
+  }).where(eq(clarifications.token, token));
+
+  return { success: true };
+}
+
+// ============ DEPLOYMENT FUNCTIONS ============
+
+export async function createDeployment(data: {
+  buildPlanId: number;
+  intakeId: number;
+  status?: Deployment['status'];
+}) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create deployment: database not available");
+    return null;
+  }
+
+  const values: InsertDeployment = {
+    buildPlanId: data.buildPlanId,
+    intakeId: data.intakeId,
+    status: data.status || "queued",
+    logs: [],
+  };
+
+  const result = await db.insert(deployments).values(values);
+  const insertId = result[0].insertId;
+  
+  return { id: insertId, ...values };
+}
+
+export async function getDeploymentById(id: number): Promise<Deployment | null> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get deployment: database not available");
+    return null;
+  }
+
+  const result = await db.select().from(deployments).where(eq(deployments.id, id)).limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function getDeployments(status?: string): Promise<Deployment[]> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get deployments: database not available");
+    return [];
+  }
+
+  const query = status
+    ? db.select().from(deployments).where(eq(deployments.status, status as Deployment['status'])).orderBy(desc(deployments.createdAt))
+    : db.select().from(deployments).orderBy(desc(deployments.createdAt));
+
+  return await query;
+}
+
+export async function updateDeploymentStatus(
+  id: number, 
+  status: Deployment['status'],
+  extra?: Partial<Pick<Deployment, 'siteId' | 'previewUrl' | 'productionUrl' | 'logs' | 'errorMessage' | 'startedAt' | 'completedAt'>>
+) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update deployment: database not available");
+    return;
+  }
+
+  await db.update(deployments).set({ status, ...extra }).where(eq(deployments.id, id));
+}
+
+export async function runDeployment(id: number) {
+  const db = await getDb();
+  if (!db) {
+    return { success: false, error: "Database not available" };
+  }
+
+  // Get deployment
+  const deployment = await getDeploymentById(id);
+  if (!deployment) {
+    return { success: false, error: "Deployment not found" };
+  }
+
+  // Get build plan
+  const buildPlan = await getBuildPlanById(deployment.buildPlanId);
+  if (!buildPlan) {
+    return { success: false, error: "Build plan not found" };
+  }
+
+  // Get intake
+  const intake = await getIntakeById(deployment.intakeId);
+  if (!intake) {
+    return { success: false, error: "Intake not found" };
+  }
+
+  // Update status to running
+  await updateDeploymentStatus(id, "running", { startedAt: new Date() });
+
+  try {
+    // Simulate deployment process
+    const logs: string[] = [];
+    logs.push(`[${new Date().toISOString()}] Starting deployment for ${intake.businessName}`);
+    logs.push(`[${new Date().toISOString()}] Using template: ${buildPlan.templateId}`);
+    logs.push(`[${new Date().toISOString()}] Generating site files...`);
+    
+    // Generate a unique site ID
+    const siteId = `site-${intake.businessName.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${Date.now()}`;
+    const previewUrl = `https://${siteId}.launchbase.dev`;
+    
+    logs.push(`[${new Date().toISOString()}] Site generated successfully`);
+    logs.push(`[${new Date().toISOString()}] Preview URL: ${previewUrl}`);
+
+    // Update deployment with success
+    await updateDeploymentStatus(id, "success", {
+      siteId,
+      previewUrl,
+      logs,
+      completedAt: new Date(),
+    });
+
+    // Update build plan status
+    await updateBuildPlanStatus(deployment.buildPlanId, "deployed");
+
+    // Update intake status
+    await updateIntakeStatus(deployment.intakeId, "approved");
+
+    return { 
+      success: true, 
+      siteId,
+      previewUrl,
+    };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    await updateDeploymentStatus(id, "failed", {
+      errorMessage,
+      completedAt: new Date(),
+    });
+    return { success: false, error: errorMessage };
+  }
+}
