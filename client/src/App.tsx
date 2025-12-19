@@ -12,6 +12,7 @@ import IntakeDetail from "./pages/IntakeDetail";
 import DeploymentStatus from "./pages/DeploymentStatus";
 import Clarify from "./pages/Clarify";
 import AdminAnalytics from "./pages/AdminAnalytics";
+import WhatsIncluded from "./pages/WhatsIncluded";
 
 function Router() {
   return (
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/onboarding" component={Onboarding} />
       <Route path="/onboarding/success" component={OnboardingSuccess} />
       <Route path="/clarify/:token" component={Clarify} />
+      <Route path="/whats-included" component={WhatsIncluded} />
       
       {/* Admin routes (protected by DashboardLayout) */}
       <Route path="/admin" component={AdminDashboard} />

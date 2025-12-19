@@ -291,19 +291,29 @@ export default function Home() {
       {/* Pricing Section */}
       <section id="pricing" className="py-20 px-4">
         <div className="container max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Simple, transparent pricing. No surprises.
+          <div className="text-center mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold mb-3">
+              Founding Client Pricing
             </h2>
+            <p className="text-gray-400 text-lg">Limited beta access for early service businesses</p>
+          </div>
+          
+          {/* Beta Context */}
+          <div className="text-center mb-10 max-w-2xl mx-auto">
+            <p className="text-gray-400 text-sm leading-relaxed">
+              LaunchBase is currently accepting a limited number of founding clients.
+              Early customers receive discounted beta pricing in exchange for feedback and testimonials.
+            </p>
+            <p className="text-gray-500 text-sm mt-2">
+              Once beta closes, pricing will increase for new customers.
+            </p>
           </div>
           
           <Card className="bg-white/5 border-white/10 max-w-lg mx-auto overflow-hidden">
             <div className="bg-[#FF6A00]/20 px-6 py-3 border-b border-white/10">
-              <span className="text-[#FF6A00] font-semibold text-sm">🟠 Founding Client Offer — Limited Availability</span>
+              <span className="text-[#FF6A00] font-semibold text-sm">Founding Client (Beta)</span>
             </div>
             <CardContent className="pt-8 pb-8">
-              <h3 className="text-2xl font-bold mb-6 text-center">Founding Client Beta</h3>
-              
               <div className="text-center mb-8">
                 <div className="flex items-baseline justify-center gap-2 mb-2">
                   <span className="text-4xl font-bold">$499</span>
@@ -311,44 +321,49 @@ export default function Home() {
                 </div>
                 <div className="flex items-baseline justify-center gap-2">
                   <span className="text-2xl font-bold">$79</span>
-                  <span className="text-gray-400">/month hosting & updates</span>
+                  <span className="text-gray-400">/ month ongoing</span>
                 </div>
               </div>
               
               <div className="space-y-3 mb-8">
-                <p className="text-sm text-gray-400 mb-4">Includes:</p>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-[#1ED760] flex-shrink-0" />
-                  <span>Custom-built professional website</span>
+                  <span>Professional website</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-[#1ED760] flex-shrink-0" />
-                  <span>Industry-specific copy & layout</span>
+                  <span>Industry-specific structure</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-[#1ED760] flex-shrink-0" />
-                  <span>Lead capture (calls, bookings, forms)</span>
+                  <span>Lead capture & conversion setup</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-[#1ED760] flex-shrink-0" />
-                  <span>LaunchBase dashboard access</span>
+                  <span>Hosting, updates & support included</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-[#1ED760] flex-shrink-0" />
-                  <span>Human review before launch</span>
+                  <span>Cancel anytime</span>
                 </div>
               </div>
               
+              <p className="text-xs text-gray-500 text-center mb-6">
+                Beta pricing is limited and subject to change.
+              </p>
+              
               <Link href="/onboarding">
                 <Button className="w-full bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white py-6 text-lg">
-                  Complete Your Launch Intake <ArrowRight className="w-5 h-5 ml-2" />
+                  Apply for LaunchBase <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </Link>
-              <p className="text-center text-sm text-gray-500 mt-4">
-                Takes about 5 minutes. No payment required to start.
-              </p>
             </CardContent>
           </Card>
+          
+          {/* Link to What's Included */}
+          <p className="text-center text-sm text-gray-500 mt-6">
+            <Link href="/whats-included" className="text-[#FF6A00] hover:underline">See what's included →</Link>
+          </p>
         </div>
       </section>
 
@@ -495,19 +510,21 @@ export default function Home() {
       {/* Footer */}
       <footer className="py-12 px-4 border-t border-white/10">
         <div className="container max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 bg-[#FF6A00] rounded flex items-center justify-center">
                 <Rocket className="w-4 h-4 text-white" />
               </div>
               <span className="font-semibold">LAUNCHBASE</span>
             </div>
+            <div className="flex items-center gap-6 text-sm text-gray-400">
+              <Link href="/whats-included" className="hover:text-white transition">What's Included</Link>
+              <a href="#pricing" className="hover:text-white transition">Pricing</a>
+              <a href="mailto:hello@getlaunchbase.com" className="hover:text-white transition">Contact</a>
+            </div>
             <p className="text-sm text-gray-500">
-              © 2025 LaunchBase. The operating system for launching service businesses.
+              © 2025 LaunchBase
             </p>
-            <a href="mailto:hello@getlaunchbase.com" className="text-sm text-gray-400 hover:text-white">
-              hello@getlaunchbase.com
-            </a>
           </div>
         </div>
       </footer>

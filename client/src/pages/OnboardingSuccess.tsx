@@ -5,8 +5,8 @@ import { Link } from "wouter";
 
 export default function OnboardingSuccess() {
   return (
-    <div className="min-h-screen bg-[#0B0B0C] text-white flex items-center justify-center px-4">
-      <div className="max-w-lg w-full text-center">
+    <div className="min-h-screen bg-[#0B0B0C] text-white py-16 px-4">
+      <div className="max-w-lg w-full mx-auto text-center">
         {/* Success Icon */}
         <div className="w-20 h-20 bg-[#1ED760]/20 rounded-full flex items-center justify-center mx-auto mb-8">
           <Sparkles className="w-10 h-10 text-[#1ED760]" />
@@ -90,6 +90,55 @@ export default function OnboardingSuccess() {
             </li>
           </ul>
         </div>
+
+        {/* Pricing Summary (Expanded) */}
+        <Card className="bg-white/5 border-white/10 mb-8">
+          <CardContent className="pt-6 pb-6 text-left">
+            <h3 className="font-semibold mb-4 text-center">Pricing Summary</h3>
+            
+            <div className="text-center mb-6">
+              <p className="text-[#FF6A00] text-sm font-medium mb-2">Founding Client Pricing</p>
+              <div className="flex items-baseline justify-center gap-2 mb-1">
+                <span className="text-2xl font-bold">$499</span>
+                <span className="text-gray-400 text-sm">one-time setup</span>
+              </div>
+              <div className="flex items-baseline justify-center gap-2">
+                <span className="text-xl font-bold">$79</span>
+                <span className="text-gray-400 text-sm">/month ongoing</span>
+              </div>
+            </div>
+            
+            <div className="border-t border-white/10 pt-4 mt-4">
+              <p className="text-sm text-gray-400 mb-3">This includes:</p>
+              <ul className="space-y-1.5 text-sm text-gray-300">
+                <li>• Website build & deployment</li>
+                <li>• Hosting & infrastructure</li>
+                <li>• Ongoing updates and support</li>
+                <li>• Platform improvements over time</li>
+              </ul>
+            </div>
+            
+            <div className="border-t border-white/10 pt-4 mt-4">
+              <p className="text-sm text-gray-400 mb-3">There are:</p>
+              <ul className="space-y-1.5 text-sm text-gray-300">
+                <li>• No contracts</li>
+                <li>• No hidden fees</li>
+                <li>• No long-term commitments</li>
+              </ul>
+            </div>
+            
+            <p className="text-xs text-gray-500 text-center mt-4">
+              Founding client pricing is locked for as long as the account remains active.
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Link to What's Included */}
+        <p className="text-sm text-gray-500 mb-8">
+          <Link href="/whats-included" className="text-[#FF6A00] hover:underline">
+            See everything that's included →
+          </Link>
+        </p>
 
         <Link href="/">
           <Button variant="outline" className="border-white/20 hover:bg-white/10">
