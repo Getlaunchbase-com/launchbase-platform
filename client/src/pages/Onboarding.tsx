@@ -2,76 +2,107 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ArrowRight, Rocket, Check, X } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowLeft, ArrowRight, Rocket, Check, Sparkles, Building2, Users, Briefcase } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
+import { cn } from "@/lib/utils";
 
 const STORAGE_KEY = "launchbase_onboarding_draft";
+const TOTAL_STEPS = 8;
 
 interface OnboardingData {
-  // Step 1-3: Business basics
-  businessName: string;
-  contactName: string;
-  email: string;
-  phone: string;
-  // Step 4-5: What you do
+  // Step 1: Business description (AI infers vertical)
   businessDescription: string;
-  services: string[];
-  // Step 6-7: Who you serve
-  serviceArea: string[];
-  targetCustomer: string;
-  // Step 8-9: How customers reach you
-  primaryCTA: "call" | "book" | "consult" | "";
-  bookingLink: string;
-  // Step 10-11: Branding
-  tagline: string;
-  brandColors: { primary: string; secondary: string };
-  // Step 12-13: Final details
-  competitors: string;
-  additionalNotes: string;
+  // Step 2: Customer type
+  customerType: "homeowners" | "businesses" | "both" | "";
+  // Step 3: Website goals (multi-select)
+  websiteGoals: string[];
+  // Step 4: Contact preference
+  contactPreference: "phone" | "form" | "booking" | "recommend" | "";
+  // Step 5: Service area
+  serviceArea: string;
+  serviceRadius: string;
+  // Step 6: Business info
+  businessName: string;
+  phone: string;
+  email: string;
+  // Step 7: Brand feel
+  brandFeel: "clean" | "bold" | "friendly" | "auto" | "";
 }
 
 const initialData: OnboardingData = {
-  businessName: "",
-  contactName: "",
-  email: "",
-  phone: "",
   businessDescription: "",
-  services: [],
-  serviceArea: [],
-  targetCustomer: "",
-  primaryCTA: "",
-  bookingLink: "",
-  tagline: "",
-  brandColors: { primary: "", secondary: "" },
-  competitors: "",
-  additionalNotes: "",
+  customerType: "",
+  websiteGoals: [],
+  contactPreference: "",
+  serviceArea: "",
+  serviceRadius: "",
+  businessName: "",
+  phone: "",
+  email: "",
+  brandFeel: "",
 };
 
-const steps = [
-  { id: 1, title: "Business Name", field: "businessName" },
-  { id: 2, title: "Your Name", field: "contactName" },
-  { id: 3, title: "Contact Info", field: "email" },
-  { id: 4, title: "What You Do", field: "businessDescription" },
-  { id: 5, title: "Your Services", field: "services" },
-  { id: 6, title: "Service Area", field: "serviceArea" },
-  { id: 7, title: "Target Customer", field: "targetCustomer" },
-  { id: 8, title: "How Customers Reach You", field: "primaryCTA" },
-  { id: 9, title: "Booking Link", field: "bookingLink" },
-  { id: 10, title: "Tagline", field: "tagline" },
-  { id: 11, title: "Brand Colors", field: "brandColors" },
-  { id: 12, title: "Competitors", field: "competitors" },
-  { id: 13, title: "Additional Notes", field: "additionalNotes" },
-];
+// AI Inference functions
+function inferVertical(description: string, customerType: string, contactPreference: string): "trades" | "appointments" | "professional" {
+  const desc = description.toLowerCase();
+  
+  // Trades keywords
+  const tradesKeywords = ["plumber", "plumbing", "hvac", "electrician", "electrical", "roofing", "roofer", "concrete", "landscaping", "landscaper", "contractor", "repair", "install", "emergency", "service call", "24/7", "same-day", "handyman", "painting", "flooring", "remodel"];
+  
+  // Appointment keywords
+  const appointmentKeywords = ["salon", "barber", "stylist", "therapist", "trainer", "massage", "spa", "beauty", "hair", "nail", "fitness", "yoga", "pilates", "coach", "session", "appointment", "schedule", "book", "availability"];
+  
+  // Professional keywords
+  const professionalKeywords = ["consultant", "consulting", "lawyer", "attorney", "accountant", "accounting", "advisor", "advisory", "strategy", "expertise", "firm", "practice", "discovery call", "consultation"];
+  
+  let tradesScore = 0;
+  let appointmentScore = 0;
+  let professionalScore = 0;
+  
+  tradesKeywords.forEach(kw => { if (desc.includes(kw)) tradesScore += 10; });
+  appointmentKeywords.forEach(kw => { if (desc.includes(kw)) appointmentScore += 10; });
+  professionalKeywords.forEach(kw => { if (desc.includes(kw)) professionalScore += 10; });
+  
+  // Behavioral signals
+  if (contactPreference === "phone") tradesScore += 15;
+  if (contactPreference === "booking") appointmentScore += 20;
+  if (contactPreference === "form") professionalScore += 10;
+  
+  if (customerType === "homeowners") tradesScore += 10;
+  if (customerType === "businesses") professionalScore += 10;
+  
+  if (appointmentScore > tradesScore && appointmentScore > professionalScore) return "appointments";
+  if (professionalScore > tradesScore && professionalScore > appointmentScore) return "professional";
+  return "trades";
+}
+
+function inferCTA(contactPreference: string, vertical: string): "call" | "book" | "consult" {
+  if (contactPreference === "phone") return "call";
+  if (contactPreference === "booking") return "book";
+  if (contactPreference === "form") return "consult";
+  
+  // Defaults by vertical
+  if (vertical === "trades") return "call";
+  if (vertical === "appointments") return "book";
+  return "consult";
+}
+
+function inferTone(brandFeel: string, vertical: string): "professional" | "bold" | "friendly" {
+  if (brandFeel === "clean") return "professional";
+  if (brandFeel === "bold") return "bold";
+  if (brandFeel === "friendly") return "friendly";
+  
+  // Default by vertical
+  if (vertical === "professional") return "professional";
+  if (vertical === "appointments") return "friendly";
+  return "professional";
+}
 
 export default function Onboarding() {
   const [currentStep, setCurrentStep] = useState(1);
   const [data, setData] = useState<OnboardingData>(initialData);
-  const [serviceInput, setServiceInput] = useState("");
-  const [areaInput, setAreaInput] = useState("");
   const [, setLocation] = useLocation();
 
   const submitMutation = trpc.intake.submit.useMutation({
@@ -87,6 +118,14 @@ export default function Onboarding() {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
+        // Migrate old data format: serviceArea was array, now string
+        if (Array.isArray(parsed.serviceArea)) {
+          parsed.serviceArea = parsed.serviceArea.join(', ');
+        }
+        // Ensure serviceArea is a string
+        if (typeof parsed.serviceArea !== 'string') {
+          parsed.serviceArea = '';
+        }
         setData({ ...initialData, ...parsed });
       } catch {
         // Invalid data, ignore
@@ -99,55 +138,36 @@ export default function Onboarding() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   }, [data]);
 
-  const progress = (currentStep / steps.length) * 100;
+  const progress = (currentStep / TOTAL_STEPS) * 100;
 
   const updateField = (field: keyof OnboardingData, value: unknown) => {
     setData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const addService = () => {
-    if (serviceInput.trim() && !data.services.includes(serviceInput.trim())) {
-      updateField("services", [...data.services, serviceInput.trim()]);
-      setServiceInput("");
+  const toggleGoal = (goal: string) => {
+    if (data.websiteGoals.includes(goal)) {
+      updateField("websiteGoals", data.websiteGoals.filter(g => g !== goal));
+    } else {
+      updateField("websiteGoals", [...data.websiteGoals, goal]);
     }
-  };
-
-  const removeService = (service: string) => {
-    updateField("services", data.services.filter((s) => s !== service));
-  };
-
-  const addArea = () => {
-    if (areaInput.trim() && !data.serviceArea.includes(areaInput.trim())) {
-      updateField("serviceArea", [...data.serviceArea, areaInput.trim()]);
-      setAreaInput("");
-    }
-  };
-
-  const removeArea = (area: string) => {
-    updateField("serviceArea", data.serviceArea.filter((a) => a !== area));
   };
 
   const canProceed = () => {
     switch (currentStep) {
-      case 1: return data.businessName.trim().length > 0;
-      case 2: return data.contactName.trim().length > 0;
-      case 3: return data.email.trim().length > 0 && data.email.includes("@");
-      case 4: return data.businessDescription.trim().length > 0;
-      case 5: return data.services.length > 0;
-      case 6: return data.serviceArea.length > 0;
-      case 7: return data.targetCustomer.trim().length > 0;
-      case 8: return data.primaryCTA !== "";
-      case 9: return true; // Optional
-      case 10: return true; // Optional
-      case 11: return true; // Optional
-      case 12: return true; // Optional
-      case 13: return true; // Optional
+      case 1: return data.businessDescription.trim().length >= 20;
+      case 2: return data.customerType !== "";
+      case 3: return data.websiteGoals.length > 0;
+      case 4: return data.contactPreference !== "";
+      case 5: return typeof data.serviceArea === 'string' && data.serviceArea.trim().length > 0;
+      case 6: return data.businessName.trim().length > 0 && data.email.includes("@");
+      case 7: return data.brandFeel !== "";
+      case 8: return true;
       default: return false;
     }
   };
 
   const handleNext = () => {
-    if (currentStep < steps.length) {
+    if (currentStep < TOTAL_STEPS) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -159,40 +179,28 @@ export default function Onboarding() {
   };
 
   const handleSubmit = () => {
-    // Infer vertical based on primaryCTA and business description
-    let vertical: "trades" | "appointments" | "professional" = "trades";
-    const desc = data.businessDescription.toLowerCase();
+    const vertical = inferVertical(data.businessDescription, data.customerType, data.contactPreference);
+    const primaryCTA = inferCTA(data.contactPreference, vertical);
+    const tone = inferTone(data.brandFeel, vertical);
     
-    if (data.primaryCTA === "book" || 
-        desc.includes("salon") || desc.includes("spa") || 
-        desc.includes("therapy") || desc.includes("trainer") ||
-        desc.includes("coach") || desc.includes("massage")) {
-      vertical = "appointments";
-    } else if (data.primaryCTA === "consult" ||
-               desc.includes("consult") || desc.includes("lawyer") ||
-               desc.includes("attorney") || desc.includes("accountant") ||
-               desc.includes("advisor") || desc.includes("firm")) {
-      vertical = "professional";
-    } else if (data.primaryCTA === "call" ||
-               desc.includes("plumb") || desc.includes("electric") ||
-               desc.includes("hvac") || desc.includes("roof") ||
-               desc.includes("landscape") || desc.includes("contractor")) {
-      vertical = "trades";
-    }
-
+    // Build services from goals
+    const services = data.websiteGoals;
+    
     submitMutation.mutate({
       businessName: data.businessName,
-      contactName: data.contactName,
+      contactName: data.businessName, // Use business name as contact for now
       email: data.email,
       phone: data.phone || undefined,
       vertical,
-      services: data.services,
-      serviceArea: data.serviceArea,
-      primaryCTA: data.primaryCTA || undefined,
-      bookingLink: data.bookingLink || undefined,
-      tagline: data.tagline || undefined,
-      brandColors: data.brandColors.primary ? data.brandColors : undefined,
-      rawPayload: JSON.parse(JSON.stringify(data)),
+      services,
+      serviceArea: data.serviceArea ? [data.serviceArea] : [],
+      primaryCTA,
+      rawPayload: {
+        ...data,
+        inferredVertical: vertical,
+        inferredCTA: primaryCTA,
+        inferredTone: tone,
+      },
     });
   };
 
@@ -200,259 +208,294 @@ export default function Onboarding() {
     switch (currentStep) {
       case 1:
         return (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">What's your business name?</h2>
-            <p className="text-gray-400">This will appear on your website.</p>
-            <Input
-              value={data.businessName}
-              onChange={(e) => updateField("businessName", e.target.value)}
-              placeholder="e.g., Smith Plumbing Co."
-              className="text-lg py-6"
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold mb-2">Tell us about your business</h2>
+              <p className="text-gray-400">This helps us understand what to build for you.</p>
+            </div>
+            <Textarea
+              value={data.businessDescription}
+              onChange={(e) => updateField("businessDescription", e.target.value)}
+              placeholder="Example: I run a residential plumbing company helping homeowners with repairs and installs."
+              className="min-h-40 text-lg"
               autoFocus
             />
+            <p className="text-sm text-gray-500">
+              No need to be perfect — we'll handle wording and structure.
+            </p>
           </div>
         );
 
       case 2:
         return (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">What's your name?</h2>
-            <p className="text-gray-400">So we know who to contact.</p>
-            <Input
-              value={data.contactName}
-              onChange={(e) => updateField("contactName", e.target.value)}
-              placeholder="e.g., John Smith"
-              className="text-lg py-6"
-              autoFocus
-            />
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold mb-2">Who do you mainly work with?</h2>
+              <p className="text-gray-400">This helps us shape the messaging on your site.</p>
+            </div>
+            <div className="grid gap-4">
+              {[
+                { value: "homeowners", label: "Homeowners", icon: Building2 },
+                { value: "businesses", label: "Businesses", icon: Briefcase },
+                { value: "both", label: "Both", icon: Users },
+              ].map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => updateField("customerType", option.value)}
+                  className={cn(
+                    "flex items-center gap-4 p-5 rounded-xl border-2 transition-all text-left",
+                    data.customerType === option.value
+                      ? "border-[#FF6A00] bg-[#FF6A00]/10"
+                      : "border-white/10 hover:border-white/30 bg-white/5"
+                  )}
+                >
+                  <option.icon className={cn(
+                    "w-6 h-6",
+                    data.customerType === option.value ? "text-[#FF6A00]" : "text-gray-400"
+                  )} />
+                  <span className="text-lg font-medium">{option.label}</span>
+                  {data.customerType === option.value && (
+                    <Check className="w-5 h-5 text-[#FF6A00] ml-auto" />
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
         );
 
       case 3:
         return (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">How can we reach you?</h2>
-            <p className="text-gray-400">We'll send updates about your site here.</p>
-            <Input
-              type="email"
-              value={data.email}
-              onChange={(e) => updateField("email", e.target.value)}
-              placeholder="you@example.com"
-              className="text-lg py-6 mb-4"
-              autoFocus
-            />
-            <Input
-              type="tel"
-              value={data.phone}
-              onChange={(e) => updateField("phone", e.target.value)}
-              placeholder="Phone (optional)"
-              className="text-lg py-6"
-            />
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold mb-2">What should your website help you do?</h2>
+              <p className="text-gray-400">Choose what matters most. We'll handle the rest.</p>
+            </div>
+            <div className="grid gap-3">
+              {[
+                { value: "phone_calls", label: "Get phone calls", desc: "Customers call you directly" },
+                { value: "leads", label: "Capture leads", desc: "Forms and quote requests" },
+                { value: "bookings", label: "Book appointments", desc: "Customers schedule online" },
+                { value: "professional", label: "Look more professional", desc: "Build trust instantly" },
+                { value: "services", label: "Explain services", desc: "Clear, simple descriptions" },
+              ].map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => toggleGoal(option.value)}
+                  className={cn(
+                    "flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left",
+                    data.websiteGoals.includes(option.value)
+                      ? "border-[#FF6A00] bg-[#FF6A00]/10"
+                      : "border-white/10 hover:border-white/30 bg-white/5"
+                  )}
+                >
+                  <div className={cn(
+                    "w-6 h-6 rounded-md border-2 flex items-center justify-center",
+                    data.websiteGoals.includes(option.value)
+                      ? "border-[#FF6A00] bg-[#FF6A00]"
+                      : "border-gray-500"
+                  )}>
+                    {data.websiteGoals.includes(option.value) && (
+                      <Check className="w-4 h-4 text-white" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-medium">{option.label}</p>
+                    <p className="text-sm text-gray-400">{option.desc}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
         );
 
       case 4:
         return (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Tell us about your business</h2>
-            <p className="text-gray-400">In a few sentences, what do you do?</p>
-            <Textarea
-              value={data.businessDescription}
-              onChange={(e) => updateField("businessDescription", e.target.value)}
-              placeholder="e.g., We're a family-owned plumbing company serving the Dallas area for over 20 years..."
-              className="min-h-32"
-              autoFocus
-            />
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold mb-2">How should customers reach you?</h2>
+              <p className="text-gray-400">We'll design your site around this.</p>
+            </div>
+            <div className="grid gap-4">
+              {[
+                { value: "phone", label: "Phone call" },
+                { value: "form", label: "Online form" },
+                { value: "booking", label: "Appointment booking" },
+                { value: "recommend", label: "Not sure — recommend for me" },
+              ].map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => updateField("contactPreference", option.value)}
+                  className={cn(
+                    "flex items-center gap-4 p-5 rounded-xl border-2 transition-all text-left",
+                    data.contactPreference === option.value
+                      ? "border-[#FF6A00] bg-[#FF6A00]/10"
+                      : "border-white/10 hover:border-white/30 bg-white/5"
+                  )}
+                >
+                  <span className="text-lg font-medium">{option.label}</span>
+                  {data.contactPreference === option.value && (
+                    <Check className="w-5 h-5 text-[#FF6A00] ml-auto" />
+                  )}
+                </button>
+              ))}
+            </div>
+            {data.contactPreference === "recommend" && (
+              <p className="text-sm text-gray-500">
+                We'll suggest what works best for your business type.
+              </p>
+            )}
           </div>
         );
 
       case 5:
         return (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">What services do you offer?</h2>
-            <p className="text-gray-400">Add your main services (3-6 recommended).</p>
-            <div className="flex gap-2">
-              <Input
-                value={serviceInput}
-                onChange={(e) => setServiceInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addService())}
-                placeholder="e.g., Emergency Repairs"
-                className="flex-1"
-              />
-              <Button onClick={addService} variant="secondary">Add</Button>
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold mb-2">Where do you provide services?</h2>
+              <p className="text-gray-400">This helps with local search and clarity for customers.</p>
             </div>
-            <div className="flex flex-wrap gap-2 mt-4">
-              {data.services.map((service) => (
-                <Badge key={service} variant="secondary" className="py-2 px-3 text-sm">
-                  {service}
-                  <button onClick={() => removeService(service)} className="ml-2">
-                    <X className="w-3 h-3" />
-                  </button>
-                </Badge>
-              ))}
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm text-gray-400 mb-2 block">City / State</label>
+                <Input
+                  value={data.serviceArea}
+                  onChange={(e) => updateField("serviceArea", e.target.value)}
+                  placeholder="e.g., Austin, TX"
+                  className="text-lg py-6"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-2 block">Service radius (optional)</label>
+                <Input
+                  value={data.serviceRadius}
+                  onChange={(e) => updateField("serviceRadius", e.target.value)}
+                  placeholder="e.g., 25 miles"
+                  className="text-lg py-6"
+                />
+              </div>
             </div>
+            <p className="text-sm text-gray-500">You can update this anytime.</p>
           </div>
         );
 
       case 6:
         return (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Where do you serve?</h2>
-            <p className="text-gray-400">Add cities, neighborhoods, or regions.</p>
-            <div className="flex gap-2">
-              <Input
-                value={areaInput}
-                onChange={(e) => setAreaInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addArea())}
-                placeholder="e.g., Dallas, TX"
-                className="flex-1"
-              />
-              <Button onClick={addArea} variant="secondary">Add</Button>
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold mb-2">Basic business details</h2>
+              <p className="text-gray-400">So customers know how to reach you.</p>
             </div>
-            <div className="flex flex-wrap gap-2 mt-4">
-              {data.serviceArea.map((area) => (
-                <Badge key={area} variant="secondary" className="py-2 px-3 text-sm">
-                  {area}
-                  <button onClick={() => removeArea(area)} className="ml-2">
-                    <X className="w-3 h-3" />
-                  </button>
-                </Badge>
-              ))}
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm text-gray-400 mb-2 block">Business name</label>
+                <Input
+                  value={data.businessName}
+                  onChange={(e) => updateField("businessName", e.target.value)}
+                  placeholder="e.g., Smith Plumbing Co."
+                  className="text-lg py-6"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-2 block">Phone number</label>
+                <Input
+                  type="tel"
+                  value={data.phone}
+                  onChange={(e) => updateField("phone", e.target.value)}
+                  placeholder="(555) 123-4567"
+                  className="text-lg py-6"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-2 block">Email address</label>
+                <Input
+                  type="email"
+                  value={data.email}
+                  onChange={(e) => updateField("email", e.target.value)}
+                  placeholder="you@example.com"
+                  className="text-lg py-6"
+                />
+              </div>
             </div>
+            <p className="text-sm text-gray-500">We'll never share your contact info.</p>
           </div>
         );
 
       case 7:
         return (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Who's your ideal customer?</h2>
-            <p className="text-gray-400">Describe who you want to attract.</p>
-            <Textarea
-              value={data.targetCustomer}
-              onChange={(e) => updateField("targetCustomer", e.target.value)}
-              placeholder="e.g., Homeowners in suburban areas who need reliable, same-day plumbing service..."
-              className="min-h-32"
-              autoFocus
-            />
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold mb-2">How should your site feel?</h2>
+              <p className="text-gray-400">This helps us match the look and tone to your business.</p>
+            </div>
+            <div className="grid gap-4">
+              {[
+                { value: "clean", label: "Clean & professional", desc: "Simple, trustworthy" },
+                { value: "bold", label: "Bold & modern", desc: "Confident, high-impact" },
+                { value: "friendly", label: "Friendly & approachable", desc: "Warm and personal" },
+                { value: "auto", label: "Let LaunchBase decide", desc: "We'll choose what fits best" },
+              ].map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => updateField("brandFeel", option.value)}
+                  className={cn(
+                    "flex items-center gap-4 p-5 rounded-xl border-2 transition-all text-left",
+                    data.brandFeel === option.value
+                      ? "border-[#FF6A00] bg-[#FF6A00]/10"
+                      : "border-white/10 hover:border-white/30 bg-white/5"
+                  )}
+                >
+                  <div className="flex-1">
+                    <p className="text-lg font-medium">{option.label}</p>
+                    <p className="text-sm text-gray-400">{option.desc}</p>
+                  </div>
+                  {data.brandFeel === option.value && (
+                    <Check className="w-5 h-5 text-[#FF6A00]" />
+                  )}
+                </button>
+              ))}
+            </div>
+            <p className="text-sm text-gray-500">This is just a preference — not a commitment.</p>
           </div>
         );
 
       case 8:
         return (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">How do customers typically reach you?</h2>
-            <p className="text-gray-400">This helps us design the right call-to-action.</p>
-            <div className="grid gap-4 mt-4">
-              {[
-                { value: "call", label: "Phone Call", desc: "They call for quotes or emergencies" },
-                { value: "book", label: "Online Booking", desc: "They schedule appointments online" },
-                { value: "consult", label: "Consultation Request", desc: "They request a consultation first" },
-              ].map((option) => (
-                <Card
-                  key={option.value}
-                  className={`cursor-pointer transition-all ${
-                    data.primaryCTA === option.value
-                      ? "border-[#FF6A00] bg-[#FF6A00]/10"
-                      : "hover:border-gray-600"
-                  }`}
-                  onClick={() => updateField("primaryCTA", option.value)}
-                >
-                  <CardContent className="flex items-center gap-4 py-4">
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                      data.primaryCTA === option.value ? "border-[#FF6A00] bg-[#FF6A00]" : "border-gray-500"
-                    }`}>
-                      {data.primaryCTA === option.value && <Check className="w-4 h-4 text-white" />}
-                    </div>
-                    <div>
-                      <p className="font-semibold">{option.label}</p>
-                      <p className="text-sm text-gray-400">{option.desc}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+          <div className="space-y-8 text-center">
+            <div className="w-20 h-20 bg-[#FF6A00]/20 rounded-full flex items-center justify-center mx-auto">
+              <Sparkles className="w-10 h-10 text-[#FF6A00]" />
             </div>
-          </div>
-        );
-
-      case 9:
-        return (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Do you have an online booking link?</h2>
-            <p className="text-gray-400">Calendly, Square, Acuity, etc. (optional)</p>
-            <Input
-              value={data.bookingLink}
-              onChange={(e) => updateField("bookingLink", e.target.value)}
-              placeholder="https://calendly.com/yourbusiness"
-              className="text-lg py-6"
-            />
-          </div>
-        );
-
-      case 10:
-        return (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Got a tagline?</h2>
-            <p className="text-gray-400">A short phrase that captures your business. (optional)</p>
-            <Input
-              value={data.tagline}
-              onChange={(e) => updateField("tagline", e.target.value)}
-              placeholder="e.g., Your trusted local plumber since 2005"
-              className="text-lg py-6"
-            />
-          </div>
-        );
-
-      case 11:
-        return (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Any brand colors?</h2>
-            <p className="text-gray-400">If you have existing colors, we'll use them. (optional)</p>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm text-gray-400 mb-2 block">Primary Color</label>
-                <Input
-                  value={data.brandColors.primary}
-                  onChange={(e) => updateField("brandColors", { ...data.brandColors, primary: e.target.value })}
-                  placeholder="#FF6A00"
-                />
-              </div>
-              <div>
-                <label className="text-sm text-gray-400 mb-2 block">Secondary Color</label>
-                <Input
-                  value={data.brandColors.secondary}
-                  onChange={(e) => updateField("brandColors", { ...data.brandColors, secondary: e.target.value })}
-                  placeholder="#0B0B0C"
-                />
-              </div>
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">You're all set</h2>
+              <p className="text-gray-400 text-lg max-w-md mx-auto">
+                We'll build your website and notify you when it's ready to review.
+                A real human checks everything before it goes live.
+              </p>
             </div>
-          </div>
-        );
-
-      case 12:
-        return (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Any competitors we should know about?</h2>
-            <p className="text-gray-400">Links to sites you like or want to differentiate from. (optional)</p>
-            <Textarea
-              value={data.competitors}
-              onChange={(e) => updateField("competitors", e.target.value)}
-              placeholder="e.g., www.competitor1.com - I like their clean design..."
-              className="min-h-32"
-            />
-          </div>
-        );
-
-      case 13:
-        return (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Anything else we should know?</h2>
-            <p className="text-gray-400">Special features, certifications, unique selling points. (optional)</p>
-            <Textarea
-              value={data.additionalNotes}
-              onChange={(e) => updateField("additionalNotes", e.target.value)}
-              placeholder="e.g., We're BBB accredited, offer 24/7 emergency service, and have been in business for 20 years..."
-              className="min-h-32"
-            />
+            <Button
+              onClick={handleSubmit}
+              disabled={submitMutation.isPending}
+              size="lg"
+              className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white text-lg px-10 py-7"
+            >
+              {submitMutation.isPending ? (
+                "Building..."
+              ) : (
+                <>
+                  <Rocket className="w-5 h-5 mr-2" />
+                  Build My Website
+                </>
+              )}
+            </Button>
+            <p className="text-sm text-gray-500">
+              No payment required to review your site.
+            </p>
+            {submitMutation.isError && (
+              <p className="text-red-500 text-sm">
+                Something went wrong. Please try again.
+              </p>
+            )}
           </div>
         );
 
@@ -465,68 +508,70 @@ export default function Onboarding() {
     <div className="min-h-screen bg-[#0B0B0C] text-white">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-[#0B0B0C]/95 backdrop-blur-sm border-b border-white/10">
-        <div className="container max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-[#FF6A00] rounded-lg flex items-center justify-center">
-              <Rocket className="w-5 h-5 text-white" />
+        <div className="container max-w-3xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <a href="/" className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-[#FF6A00] rounded-lg flex items-center justify-center">
+                <Rocket className="w-5 h-5 text-white" />
+              </div>
+              <span className="font-bold">LAUNCHBASE</span>
+            </a>
+            <div className="text-sm text-gray-400">
+              Step {currentStep} of {TOTAL_STEPS}
             </div>
-            <span className="text-xl font-bold tracking-tight">LAUNCHBASE</span>
           </div>
-          <div className="text-sm text-gray-400">
-            Step {currentStep} of {steps.length}
+          {/* Progress bar */}
+          <div className="mt-4 h-1 bg-white/10 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-[#FF6A00] transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            />
           </div>
         </div>
-        <Progress value={progress} className="h-1" />
       </header>
 
-      {/* Main Content */}
-      <main className="pt-24 pb-32 px-4">
+      {/* Main content */}
+      <main className="pt-32 pb-32 px-4">
         <div className="container max-w-2xl mx-auto">
           <Card className="bg-white/5 border-white/10">
-            <CardHeader>
-              <CardTitle className="text-sm text-[#FF6A00] uppercase tracking-wide">
-                {steps[currentStep - 1]?.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+            <CardContent className="p-8 md:p-12">
               {renderStep()}
             </CardContent>
           </Card>
         </div>
       </main>
 
-      {/* Footer Navigation */}
-      <footer className="fixed bottom-0 left-0 right-0 bg-[#0B0B0C]/95 backdrop-blur-sm border-t border-white/10">
-        <div className="container max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Button
-            variant="ghost"
-            onClick={handleBack}
-            disabled={currentStep === 1}
-            className="text-gray-400 hover:text-white"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" /> Back
-          </Button>
-
-          {currentStep < steps.length ? (
-            <Button
-              onClick={handleNext}
-              disabled={!canProceed()}
-              className="bg-[#FF6A00] hover:bg-[#FF6A00]/90"
-            >
-              Continue <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          ) : (
-            <Button
-              onClick={handleSubmit}
-              disabled={submitMutation.isPending}
-              className="bg-[#1ED760] hover:bg-[#1ED760]/90"
-            >
-              {submitMutation.isPending ? "Submitting..." : "Submit Intake"} 
-              <Check className="w-4 h-4 ml-2" />
-            </Button>
-          )}
-        </div>
-      </footer>
+      {/* Footer navigation */}
+      {currentStep < 8 && (
+        <footer className="fixed bottom-0 left-0 right-0 bg-[#0B0B0C]/95 backdrop-blur-sm border-t border-white/10">
+          <div className="container max-w-3xl mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <Button
+                variant="ghost"
+                onClick={handleBack}
+                disabled={currentStep === 1}
+                className="text-gray-400 hover:text-white"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+              
+              <p className="text-xs text-gray-500 hidden sm:block">
+                You can change anything later. Nothing is final yet.
+              </p>
+              
+              <Button
+                onClick={handleNext}
+                disabled={!canProceed()}
+                className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white"
+              >
+                Continue
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          </div>
+        </footer>
+      )}
     </div>
   );
 }
