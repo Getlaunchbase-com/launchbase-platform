@@ -52,3 +52,9 @@
 
 - [x] Add social proof line ("Used by early service businesses...")
 - [x] Add "What You Get" snapshot section (3 bullets)
+
+## Landing Page - Conversion Optimization
+
+- [x] Add Pricing section with Founding Client Beta offer
+- [x] Add FAQ section (6 questions)
+- [x] Add Testimonial placeholders (3 cards)

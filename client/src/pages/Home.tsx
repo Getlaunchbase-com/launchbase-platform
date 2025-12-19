@@ -1,6 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, Zap, Clock, Shield, CheckCircle, Rocket, Users, Building2 } from "lucide-react";
+import { ArrowRight, Zap, Clock, Shield, CheckCircle, Rocket, Users, Building2, Star, ChevronDown } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Link } from "wouter";
 
 export default function Home() {
@@ -282,15 +288,201 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Pricing Section */}
+      <section id="pricing" className="py-20 px-4">
+        <div className="container max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Simple, transparent pricing. No surprises.
+            </h2>
+          </div>
+          
+          <Card className="bg-white/5 border-white/10 max-w-lg mx-auto overflow-hidden">
+            <div className="bg-[#FF6A00]/20 px-6 py-3 border-b border-white/10">
+              <span className="text-[#FF6A00] font-semibold text-sm">🟠 Founding Client Offer — Limited Availability</span>
+            </div>
+            <CardContent className="pt-8 pb-8">
+              <h3 className="text-2xl font-bold mb-6 text-center">Founding Client Beta</h3>
+              
+              <div className="text-center mb-8">
+                <div className="flex items-baseline justify-center gap-2 mb-2">
+                  <span className="text-4xl font-bold">$499</span>
+                  <span className="text-gray-400">one-time setup</span>
+                </div>
+                <div className="flex items-baseline justify-center gap-2">
+                  <span className="text-2xl font-bold">$79</span>
+                  <span className="text-gray-400">/month hosting & updates</span>
+                </div>
+              </div>
+              
+              <div className="space-y-3 mb-8">
+                <p className="text-sm text-gray-400 mb-4">Includes:</p>
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-[#1ED760] flex-shrink-0" />
+                  <span>Custom-built professional website</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-[#1ED760] flex-shrink-0" />
+                  <span>Industry-specific copy & layout</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-[#1ED760] flex-shrink-0" />
+                  <span>Lead capture (calls, bookings, forms)</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-[#1ED760] flex-shrink-0" />
+                  <span>LaunchBase dashboard access</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-[#1ED760] flex-shrink-0" />
+                  <span>Human review before launch</span>
+                </div>
+              </div>
+              
+              <Link href="/onboarding">
+                <Button className="w-full bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white py-6 text-lg">
+                  Complete Your Launch Intake <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+              <p className="text-center text-sm text-gray-500 mt-4">
+                Takes about 5 minutes. No payment required to start.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 px-4 bg-white/[0.02]">
+        <div className="container max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Built for real service businesses
+            </h2>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="bg-white/5 border-white/10">
+              <CardContent className="pt-6">
+                <div className="flex gap-1 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 fill-[#FF6A00] text-[#FF6A00]" />
+                  ))}
+                </div>
+                <p className="text-gray-300 mb-4">
+                  "LaunchBase took everything I was putting off and just handled it. My site looks professional and customers actually contact me now."
+                </p>
+                <p className="text-sm text-gray-500">— Local Trades Business Owner (Beta)</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-white/5 border-white/10">
+              <CardContent className="pt-6">
+                <div className="flex gap-1 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 fill-[#FF6A00] text-[#FF6A00]" />
+                  ))}
+                </div>
+                <p className="text-gray-300 mb-4">
+                  "I spent months avoiding my website. LaunchBase got me online in a day. The booking integration alone was worth it."
+                </p>
+                <p className="text-sm text-gray-500">— Appointment Business Owner (Beta)</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-white/5 border-white/10">
+              <CardContent className="pt-6">
+                <div className="flex gap-1 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 fill-[#FF6A00] text-[#FF6A00]" />
+                  ))}
+                </div>
+                <p className="text-gray-300 mb-4">
+                  "Finally, a site that looks like I paid an agency — without the agency price or timeline. Highly recommend."
+                </p>
+                <p className="text-sm text-gray-500">— Professional Services Consultant (Beta)</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
       <section className="py-20 px-4">
+        <div className="container max-w-3xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Frequently Asked Questions
+            </h2>
+          </div>
+          
+          <Accordion type="single" collapsible className="space-y-4">
+            <AccordionItem value="item-1" className="bg-white/5 border border-white/10 rounded-lg px-6">
+              <AccordionTrigger className="text-left hover:no-underline">
+                How long does it take to launch?
+              </AccordionTrigger>
+              <AccordionContent className="text-gray-400">
+                Most sites are ready within 24–72 hours after intake. Complex requests may take slightly longer.
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="item-2" className="bg-white/5 border border-white/10 rounded-lg px-6">
+              <AccordionTrigger className="text-left hover:no-underline">
+                Can I make changes later?
+              </AccordionTrigger>
+              <AccordionContent className="text-gray-400">
+                Yes. You can request updates anytime through your LaunchBase dashboard.
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="item-3" className="bg-white/5 border border-white/10 rounded-lg px-6">
+              <AccordionTrigger className="text-left hover:no-underline">
+                Is this just a template?
+              </AccordionTrigger>
+              <AccordionContent className="text-gray-400">
+                No. We generate a custom site based on your business, industry, and goals — then a human reviews it before launch.
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="item-4" className="bg-white/5 border border-white/10 rounded-lg px-6">
+              <AccordionTrigger className="text-left hover:no-underline">
+                Do I own my website?
+              </AccordionTrigger>
+              <AccordionContent className="text-gray-400">
+                Yes. It's your site, your content, your business.
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="item-5" className="bg-white/5 border border-white/10 rounded-lg px-6">
+              <AccordionTrigger className="text-left hover:no-underline">
+                What if I don't like the first version?
+              </AccordionTrigger>
+              <AccordionContent className="text-gray-400">
+                We'll revise it. The goal is a site you're proud to share.
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="item-6" className="bg-white/5 border border-white/10 rounded-lg px-6">
+              <AccordionTrigger className="text-left hover:no-underline">
+                Who is this for?
+              </AccordionTrigger>
+              <AccordionContent className="text-gray-400">
+                Service businesses — trades, appointments, and professional services — that want a professional online presence without hiring an agency.
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      </section>
+
+      {/* Final CTA Section */}
+      <section className="py-20 px-4 bg-white/[0.02]">
         <div className="container max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready to launch your business online?
           </h2>
           <p className="text-gray-400 text-lg mb-8">
             Join our founding client program and get your professional website 
-            at a steep discount while we perfect the platform.
+            at beta pricing while we perfect the platform.
           </p>
           <Link href="/onboarding">
             <Button size="lg" className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white text-lg px-8 py-6">
