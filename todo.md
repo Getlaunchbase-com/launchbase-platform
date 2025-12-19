@@ -58,3 +58,11 @@
 - [x] Add Pricing section with Founding Client Beta offer
 - [x] Add FAQ section (6 questions)
 - [x] Add Testimonial placeholders (3 cards)
+
+## Onboarding Optimization (v1 → 8 steps)
+
+- [x] Rewrite Onboarding.tsx with 8-step flow
+- [x] Update intake submission to match new structure
+- [x] Add AI inference logic for vertical detection
+- [x] Add production-ready microcopy
+- [x] Test new onboarding flow
