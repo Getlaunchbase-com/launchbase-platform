@@ -13,6 +13,8 @@ import DeploymentStatus from "./pages/DeploymentStatus";
 import Clarify from "./pages/Clarify";
 import AdminAnalytics from "./pages/AdminAnalytics";
 import WhatsIncluded from "./pages/WhatsIncluded";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentCancel from "./pages/PaymentCancel";
 
 function Router() {
   return (
@@ -23,6 +25,8 @@ function Router() {
       <Route path="/onboarding/success" component={OnboardingSuccess} />
       <Route path="/clarify/:token" component={Clarify} />
       <Route path="/whats-included" component={WhatsIncluded} />
+      <Route path="/payment/success" component={PaymentSuccess} />
+      <Route path="/payment/cancel" component={PaymentCancel} />
       
       {/* Admin routes (protected by DashboardLayout) */}
       <Route path="/admin" component={AdminDashboard} />

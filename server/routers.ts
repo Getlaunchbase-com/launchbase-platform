@@ -23,6 +23,8 @@ import {
 } from "./db";
 import { sendEmail, AdminNotifications } from "./email";
 import { trackEvent, getFunnelMetrics, getBuildQualityMetrics, getVerticalMetrics, getDailyHealth } from "./analytics";
+import { createSetupCheckoutSession, getCheckoutSession } from "./stripe/checkout";
+import { generatePlatformGuidePDF } from "./pdfGuide";
 
 export const appRouter = router({
   system: systemRouter,
@@ -255,6 +257,52 @@ export const appRouter = router({
     dailyHealth: protectedProcedure.query(async () => {
       return getDailyHealth();
     }),
+  }),
+
+  // Stripe payment routes
+  payment: router({
+    createCheckout: publicProcedure
+      .input(z.object({
+        intakeId: z.number(),
+        email: z.string().email(),
+        name: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const origin = ctx.req.headers.origin || "http://localhost:3000";
+        const { url, sessionId } = await createSetupCheckoutSession({
+          intakeId: input.intakeId,
+          customerEmail: input.email,
+          customerName: input.name,
+          origin,
+        });
+        return { checkoutUrl: url, sessionId };
+      }),
+
+    getSession: publicProcedure
+      .input(z.object({ sessionId: z.string() }))
+      .query(async ({ input }) => {
+        const session = await getCheckoutSession(input.sessionId);
+        return {
+          status: session.payment_status,
+          customerEmail: session.customer_email,
+          amountTotal: session.amount_total,
+          intakeId: session.metadata?.intake_id,
+        };
+      }),
+  }),
+
+  // PDF Guide generation
+  guide: router({
+    generate: publicProcedure
+      .input(z.object({
+        businessName: z.string(),
+        contactName: z.string(),
+        vertical: z.enum(["trades", "appointments", "professional"]),
+      }))
+      .mutation(async ({ input }) => {
+        const { content, filename } = await generatePlatformGuidePDF(input);
+        return { content, filename };
+      }),
   }),
 
   // Public clarification routes

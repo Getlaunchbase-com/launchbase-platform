@@ -41,7 +41,11 @@ export const intakes = mysqlTable("intakes", {
   // Raw payload from onboarding
   rawPayload: json("rawPayload").$type<Record<string, unknown>>(),
   // Status workflow
-  status: mysqlEnum("status", ["new", "review", "needs_info", "ready", "approved"]).default("new").notNull(),
+  status: mysqlEnum("status", ["new", "review", "needs_info", "ready", "approved", "paid", "deployed"]).default("new").notNull(),
+  // Payment tracking
+  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
+  stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }),
+  paidAt: timestamp("paidAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -191,3 +195,26 @@ export const internalNotes = mysqlTable("internal_notes", {
 
 export type InternalNote = typeof internalNotes.$inferSelect;
 export type InsertInternalNote = typeof internalNotes.$inferInsert;
+
+/**
+ * Payments for tracking Stripe transactions
+ */
+export const payments = mysqlTable("payments", {
+  id: int("id").autoincrement().primaryKey(),
+  intakeId: int("intakeId").notNull(),
+  // Stripe IDs
+  stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }).notNull(),
+  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
+  // Payment type
+  paymentType: mysqlEnum("paymentType", ["setup", "monthly"]).default("setup").notNull(),
+  // Amount in cents
+  amountCents: int("amountCents").notNull(),
+  // Status
+  status: mysqlEnum("status", ["pending", "succeeded", "failed", "refunded"]).default("pending").notNull(),
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  paidAt: timestamp("paidAt"),
+});
+
+export type Payment = typeof payments.$inferSelect;
+export type InsertPayment = typeof payments.$inferInsert;
