@@ -516,16 +516,28 @@ export default function Onboarding() {
               </div>
               <span className="font-bold">LAUNCHBASE</span>
             </a>
-            <div className="text-sm text-gray-400">
-              Step {currentStep} of {TOTAL_STEPS}
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-gray-400">
+                Step {currentStep} of {TOTAL_STEPS}
+              </span>
+              <span className="text-sm font-medium text-[#FF6A00]">
+                {Math.round(progress)}% done
+              </span>
             </div>
           </div>
           {/* Progress bar */}
-          <div className="mt-4 h-1 bg-white/10 rounded-full overflow-hidden">
+          <div className="mt-4 h-2 bg-white/10 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-[#FF6A00] transition-all duration-300"
+              className="h-full bg-gradient-to-r from-[#FF6A00] to-[#FF8A33] transition-all duration-500 ease-out"
               style={{ width: `${progress}%` }}
             />
+          </div>
+          {/* Progress milestones */}
+          <div className="mt-2 flex justify-between text-xs text-gray-500">
+            <span className={currentStep >= 1 ? "text-[#FF6A00]" : ""}>Start</span>
+            <span className={currentStep >= 4 ? "text-[#FF6A00]" : ""}>Details</span>
+            <span className={currentStep >= 6 ? "text-[#FF6A00]" : ""}>Contact</span>
+            <span className={currentStep >= 8 ? "text-[#FF6A00]" : ""}>Done</span>
           </div>
         </div>
       </header>

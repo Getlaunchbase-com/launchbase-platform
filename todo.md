@@ -96,3 +96,13 @@
 - [x] Update onboarding confirmation with expanded pricing summary
 - [x] Add FAQ section under pricing (answers objections)
 - [x] Ensure testimonial placeholders are below pricing
+
+## Payment, PDF Guide & Progress Bar
+
+- [x] Add Stripe integration via webdev_add_feature
+- [x] Create payment page for $499 setup fee
+- [x] Add payment flow after site approval
+- [x] Generate downloadable PDF guide ("The LaunchBase Platform Guide")
+- [x] Email PDF after onboarding completion
+- [x] Add progress bar to onboarding (Step X of 8)
+- [x] Show percentage completion indicator
