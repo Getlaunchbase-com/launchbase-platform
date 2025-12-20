@@ -93,6 +93,9 @@ export default function PaymentSuccess() {
             Next step: <span className="text-foreground font-medium">deployment</span>.
             We'll email you when your site is live.
           </p>
+          <p className="text-sm text-muted-foreground/80">
+            Your preview link has been emailed to you for reference.
+          </p>
 
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-3 justify-center">

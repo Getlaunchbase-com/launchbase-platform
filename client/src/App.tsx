@@ -19,6 +19,7 @@ import CustomerPreview from "./pages/CustomerPreview";
 import Terms from "./pages/Terms";
 import Referrals from "./pages/Referrals";
 import Privacy from "./pages/Privacy";
+import AdminReferrals from "./pages/AdminReferrals";
 
 function Router() {
   return (
@@ -41,6 +42,7 @@ function Router() {
       <Route path="/admin/intake/:id" component={IntakeDetail} />
       <Route path="/admin/deploy/:id" component={DeploymentStatus} />
       <Route path="/admin/analytics" component={AdminAnalytics} />
+      <Route path="/admin/referrals" component={AdminReferrals} />
       
       {/* Fallback routes */}
       <Route path="/404" component={NotFound} />

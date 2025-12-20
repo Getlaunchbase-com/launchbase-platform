@@ -72,6 +72,10 @@ Estimated turnaround: 24–72 hours
 If you have questions in the meantime, just reply to this email.
 
 —
+💰 Know someone who needs a website? Refer a friend and you'll both save $50.
+https://getlaunchbase.com/referrals
+
+—
 LaunchBase
 The operating system for launching service businesses`
       };
@@ -149,7 +153,13 @@ From here:
 • Start sending traffic
 • Request updates anytime
 
-Thanks for trusting LaunchBase with your launch. We're excited to support you going forward.
+—
+
+💰 Refer a friend, get $50
+
+Know another business owner who needs a website? Share your referral link and you'll both save $50.
+
+👉 Get your referral code: https://getlaunchbase.com/referrals
 
 —
 LaunchBase`
