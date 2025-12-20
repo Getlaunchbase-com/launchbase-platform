@@ -5,7 +5,7 @@ import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { getDb } from "./db";
 import { intakes, approvals, buildPlans, referrals } from "../drizzle/schema";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { 
   createIntake, 
   getIntakes, 
@@ -541,6 +541,49 @@ export const appRouter = router({
         }).optional())
         .query(async ({ input }) => {
           return getDeployments(input?.status);
+        }),
+    }),
+
+    referrals: router({
+      list: protectedProcedure
+        .query(async () => {
+          const db = await getDb();
+          if (!db) return [];
+          
+          const allReferrals = await db
+            .select()
+            .from(referrals)
+            .orderBy(desc(referrals.createdAt));
+          
+          return allReferrals;
+        }),
+
+      stats: protectedProcedure
+        .query(async () => {
+          const db = await getDb();
+          if (!db) return { total: 0, pending: 0, used: 0, totalEarnings: 0 };
+          
+          const allReferrals = await db.select().from(referrals);
+          
+          const total = allReferrals.length;
+          const pending = allReferrals.filter(r => r.status === "pending").length;
+          const used = allReferrals.filter(r => r.status === "used").length;
+          const totalEarnings = used * 50; // $50 per successful referral
+          
+          return { total, pending, used, totalEarnings };
+        }),
+
+      markPaid: protectedProcedure
+        .input(z.object({ id: z.number() }))
+        .mutation(async ({ input }) => {
+          const db = await getDb();
+          if (!db) throw new Error("Database not available");
+          
+          await db.update(referrals)
+            .set({ referrerRewardApplied: true })
+            .where(eq(referrals.id, input.id));
+          
+          return { success: true };
         }),
     }),
   }),

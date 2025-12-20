@@ -233,3 +233,20 @@
 - [x] Request RESEND_API_KEY from user
 - [x] Link to /referrals from payment success page
 - [x] Add "Refer a Friend" link to footer
+
+
+## Trust Micro-Copy
+
+- [x] Add "Your preview link has been emailed to you" to payment success page
+
+## Email Referral Integration
+
+- [x] Add referral program mention to launch confirmation email
+- [x] Include referral link in intake confirmation email footer
+
+## Admin Referrals View
+
+- [x] Create admin referrals page
+- [x] Show all referral codes and their status
+- [x] Track conversions and payouts
+- [x] Add to admin sidebar navigation
