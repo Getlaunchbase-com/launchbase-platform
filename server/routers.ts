@@ -332,6 +332,7 @@ export const appRouter = router({
         intakeId: z.number(),
         email: z.string().email(),
         name: z.string(),
+        modules: z.array(z.enum(["google_ads", "quickbooks"])).optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         const origin = ctx.req.headers.origin || "http://localhost:3000";
@@ -340,6 +341,7 @@ export const appRouter = router({
           customerEmail: input.email,
           customerName: input.name,
           origin,
+          modules: input.modules,
         });
         return { checkoutUrl: url, sessionId };
       }),

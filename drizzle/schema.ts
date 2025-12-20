@@ -222,3 +222,29 @@ export const payments = mysqlTable("payments", {
 
 export type Payment = typeof payments.$inferSelect;
 export type InsertPayment = typeof payments.$inferInsert;
+
+/**
+ * Business module orders (Google Ads, QuickBooks, etc.)
+ */
+export const moduleOrders = mysqlTable("module_orders", {
+  id: int("id").autoincrement().primaryKey(),
+  intakeId: int("intakeId").notNull(),
+  // Module type
+  moduleType: mysqlEnum("moduleType", ["google_ads", "quickbooks"]).notNull(),
+  // Pricing
+  setupFeeCents: int("setupFeeCents").notNull(),
+  monthlyFeeCents: int("monthlyFeeCents").default(0),
+  // Status
+  status: mysqlEnum("status", ["pending", "paid", "setup_in_progress", "active", "cancelled"]).default("pending").notNull(),
+  // Stripe
+  stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }),
+  // Setup details
+  setupNotes: text("setupNotes"),
+  setupCompletedAt: timestamp("setupCompletedAt"),
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ModuleOrder = typeof moduleOrders.$inferSelect;
+export type InsertModuleOrder = typeof moduleOrders.$inferInsert;

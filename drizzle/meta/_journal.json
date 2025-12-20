@@ -36,6 +36,13 @@
       "when": 1766189892410,
       "tag": "0004_normal_punisher",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1766191276704,
+      "tag": "0005_crazy_archangel",
+      "breakpoints": true
     }
   ]
 }

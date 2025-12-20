@@ -232,6 +232,28 @@ export default function IntakeDetail() {
               <Badge variant="outline" className="capitalize">
                 {intake.vertical}
               </Badge>
+              {/* Payment Status */}
+              {(intake as any).paymentStatus && (
+                <Badge className={`${
+                  (intake as any).paymentStatus === 'paid' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
+                  (intake as any).paymentStatus === 'refunded' ? 'bg-red-500/20 text-red-400 border-red-500/30' :
+                  'bg-gray-500/20 text-gray-400 border-gray-500/30'
+                }`}>
+                  {(intake as any).paymentStatus === 'paid' ? 'Paid' :
+                   (intake as any).paymentStatus === 'refunded' ? 'Refunded' : 'Unpaid'}
+                </Badge>
+              )}
+              {/* Module Status Tags */}
+              {(intake as any).modules?.includes('quickbooks') && (
+                <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                  QB: {(intake as any).modulesActivated?.includes('quickbooks') ? 'Active' : 'Pending'}
+                </Badge>
+              )}
+              {(intake as any).modules?.includes('google_ads') && (
+                <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                  Ads: {(intake as any).modulesActivated?.includes('google_ads') ? 'Active' : 'Pending'}
+                </Badge>
+              )}
             </div>
           </div>
 

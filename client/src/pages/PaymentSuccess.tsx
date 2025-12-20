@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import { useLocation, Link } from "wouter";
+import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, Loader2, ArrowRight, Mail, Clock, Sparkles } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { CheckCircle, Loader2, ArrowRight, Sparkles, Rocket, FileText } from "lucide-react";
 
 export default function PaymentSuccess() {
-  const [, setLocation] = useLocation();
   const [sessionId, setSessionId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -44,95 +43,78 @@ export default function PaymentSuccess() {
         </div>
       </header>
 
-      <main className="container max-w-2xl py-16">
-        <Card className="border-green-500/20 bg-green-500/5">
-          <CardHeader className="text-center pb-4">
-            <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-green-500/10 flex items-center justify-center">
-              <CheckCircle className="h-10 w-10 text-green-500" />
-            </div>
-            <CardTitle className="text-2xl">Payment Successful!</CardTitle>
-            <CardDescription className="text-base">
-              Thank you for choosing LaunchBase. Your website build is now in progress.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Payment Details */}
-            <div className="rounded-lg bg-muted/50 p-4 space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Amount paid</span>
-                <span className="font-medium">
-                  ${((session?.amountTotal || 0) / 100).toFixed(2)}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Email</span>
-                <span className="font-medium">{session?.customerEmail}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Status</span>
-                <span className="font-medium text-green-500 capitalize">
-                  {session?.status || "Paid"}
-                </span>
-              </div>
-            </div>
+      <main className="container max-w-xl py-16">
+        <div className="text-center space-y-6">
+          {/* Success Icon */}
+          <div className="mx-auto h-20 w-20 rounded-full bg-green-500/10 flex items-center justify-center">
+            <CheckCircle className="h-12 w-12 text-green-500" />
+          </div>
 
-            {/* What's Next */}
-            <div className="space-y-4">
-              <h3 className="font-semibold">What happens next?</h3>
+          {/* Title */}
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Payment Confirmed ✅</h1>
+            <p className="text-muted-foreground text-lg">
+              You're officially queued for launch.
+            </p>
+          </div>
+
+          {/* Status Card */}
+          <Card className="border-green-500/20 bg-green-500/5">
+            <CardContent className="p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="font-medium">Status</span>
+                <span className="text-green-500 font-semibold flex items-center gap-2">
+                  <Rocket className="h-4 w-4" />
+                  Ready to Deploy
+                </span>
+              </div>
+              <div className="text-sm text-muted-foreground">
+                <p>Estimated time: We'll deploy within 24–48 hours</p>
+              </div>
               
-              <div className="space-y-3">
-                <div className="flex gap-3">
-                  <div className="h-8 w-8 rounded-full bg-orange-500/10 flex items-center justify-center flex-shrink-0">
-                    <Mail className="h-4 w-4 text-orange-500" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-sm">Confirmation email sent</p>
-                    <p className="text-sm text-muted-foreground">
-                      Check your inbox for payment confirmation and next steps.
-                    </p>
-                  </div>
+              {/* Payment Details */}
+              <div className="border-t pt-4 space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Amount paid</span>
+                  <span className="font-medium">
+                    ${((session?.amountTotal || 0) / 100).toFixed(2)}
+                  </span>
                 </div>
-                
-                <div className="flex gap-3">
-                  <div className="h-8 w-8 rounded-full bg-orange-500/10 flex items-center justify-center flex-shrink-0">
-                    <Clock className="h-4 w-4 text-orange-500" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-sm">Site build begins</p>
-                    <p className="text-sm text-muted-foreground">
-                      Our team will start building your website within 24 hours.
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex gap-3">
-                  <div className="h-8 w-8 rounded-full bg-orange-500/10 flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="h-4 w-4 text-orange-500" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-sm">Preview & launch</p>
-                    <p className="text-sm text-muted-foreground">
-                      You'll receive a preview link within 24-72 hours to review before launch.
-                    </p>
-                  </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Email</span>
+                  <span className="font-medium">{session?.customerEmail}</span>
                 </div>
               </div>
-            </div>
+            </CardContent>
+          </Card>
 
-            {/* CTA */}
-            <div className="pt-4 border-t border-border">
-              <Button asChild className="w-full bg-orange-500 hover:bg-orange-600">
-                <Link href="/">
-                  Return to Home
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-              <p className="text-center text-sm text-muted-foreground mt-3">
-                Questions? Email us at support@launchbase.com
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+          {/* Next Step */}
+          <p className="text-muted-foreground">
+            Next step: <span className="text-foreground font-medium">deployment</span>.
+            We'll email you when your site is live.
+          </p>
+
+          {/* CTAs */}
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Button asChild className="bg-orange-500 hover:bg-orange-600">
+              <Link href="/">
+                Go to Dashboard
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <a href={`mailto:support@launchbase.com?subject=Receipt Request`}>
+                <FileText className="mr-2 h-4 w-4" />
+                View Receipt
+              </a>
+            </Button>
+          </div>
+
+          {/* Help */}
+          <p className="text-xs text-muted-foreground pt-4">
+            Questions? Email support@launchbase.com
+          </p>
+        </div>
       </main>
     </div>
   );
