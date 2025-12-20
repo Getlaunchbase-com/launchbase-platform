@@ -45,9 +45,15 @@ export default function Home() {
             <span className="text-[#FF6A00]">Launch everything.</span>
           </h1>
           
-          <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-10">
+          <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-8">
             One intake. One conversation. A complete website built for your business — 
             ready to attract customers and grow your revenue.
+          </p>
+          
+          {/* Secondary hero line - preview as reassurance */}
+          <p className="text-sm text-gray-500 mb-8">
+            Preview your real website before you launch.
+            <span className="text-gray-600"> No mockups. No templates. No surprises.</span>
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -174,8 +180,8 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-semibold mb-3">We Build Your Site</h3>
               <p className="text-gray-400">
-                Our system generates a custom website with professional copy, 
-                optimized for your specific business type.
+                Our system generates your actual website with professional copy.
+                You preview it exactly as it will launch — before you pay.
               </p>
             </div>
             
@@ -497,10 +503,11 @@ export default function Home() {
             
             <AccordionItem value="item-5" className="bg-white/5 border border-white/10 rounded-lg px-6">
               <AccordionTrigger className="text-left hover:no-underline">
-                What if I don't like the first version?
+                What if I don't like it?
               </AccordionTrigger>
               <AccordionContent className="text-gray-400">
-                We'll revise it. The goal is a site you're proud to share.
+                You preview your real site first — not a mockup, not a template.
+                If it's not right, request changes before approving. We revise until you're proud to share it.
               </AccordionContent>
             </AccordionItem>
             
@@ -547,6 +554,8 @@ export default function Home() {
             <div className="flex items-center gap-6 text-sm text-gray-400">
               <Link href="/whats-included" className="hover:text-white transition">What's Included</Link>
               <a href="#pricing" className="hover:text-white transition">Pricing</a>
+              <Link href="/terms" className="hover:text-white transition">Terms</Link>
+              <Link href="/privacy" className="hover:text-white transition">Privacy</Link>
               <a href="mailto:hello@getlaunchbase.com" className="hover:text-white transition">Contact</a>
             </div>
             <p className="text-sm text-gray-500">

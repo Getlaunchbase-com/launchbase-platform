@@ -207,3 +207,22 @@
 - [x] Add bulk approve action
 - [x] Add bulk export to CSV
 - [x] Add bulk status update
+
+## Strategic Preview Positioning (Homepage)
+
+- [x] Add secondary hero line: "Preview your real website before you launch"
+- [x] Update How It Works Step 2 with preview copy
+- [x] Add objection-crushing FAQ: "What if I don't like it?"
+
+## Referral Dashboard UI
+
+- [x] Create referral dashboard page for customers
+- [x] Show referral code with copy button
+- [x] Display successful referrals count
+- [x] Show total earnings/credits
+
+## Privacy Policy
+
+- [x] Create Privacy Policy page
+- [x] Add route to App.tsx
+- [x] Link from footer
