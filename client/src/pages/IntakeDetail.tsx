@@ -26,6 +26,7 @@ import { trpc } from "@/lib/trpc";
 import { Link, useParams, useLocation } from "wouter";
 import DashboardLayout from "@/components/DashboardLayout";
 import { toast } from "sonner";
+import { generatePreviewHTML } from "@/lib/previewGenerator";
 import {
   Dialog,
   DialogContent,
@@ -416,7 +417,19 @@ export default function IntakeDetail() {
                     )}
 
                     {/* Preview button */}
-                    <Button variant="outline" className="w-full" onClick={() => toast.info("Preview coming soon")}>
+                    <Button 
+                      variant="outline" 
+                      className="w-full" 
+                      onClick={() => {
+                        // Generate preview HTML based on intake data
+                        const previewHTML = generatePreviewHTML(intake, buildPlan);
+                        const newWindow = window.open('', '_blank');
+                        if (newWindow) {
+                          newWindow.document.write(previewHTML);
+                          newWindow.document.close();
+                        }
+                      }}
+                    >
                       <ExternalLink className="w-4 h-4 mr-2" />
                       Open Preview in New Tab
                     </Button>

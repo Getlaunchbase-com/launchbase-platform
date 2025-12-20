@@ -225,30 +225,41 @@ export default function CustomerPreview() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Preview */}
-                <div className="aspect-video bg-muted rounded-lg flex items-center justify-center border">
-                  {intake.previewUrl ? (
+                {/* Live Preview */}
+                <div className="aspect-video bg-muted rounded-lg overflow-hidden border">
+                  {(intake as any).previewHTML ? (
                     <iframe 
-                      src={intake.previewUrl} 
-                      className="w-full h-full rounded-lg"
+                      srcDoc={(intake as any).previewHTML}
+                      className="w-full h-full"
                       title="Website Preview"
+                      sandbox="allow-same-origin"
                     />
                   ) : (
-                    <div className="text-center p-8">
-                      <Globe className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                      <p className="text-muted-foreground">
-                        Preview will appear here once your site is ready
-                      </p>
+                    <div className="flex items-center justify-center h-full text-center p-8">
+                      <div>
+                        <Globe className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <p className="text-muted-foreground">
+                          Preview will appear here once your site is ready
+                        </p>
+                      </div>
                     </div>
                   )}
                 </div>
 
-                {intake.previewUrl && (
-                  <Button variant="outline" asChild className="w-full">
-                    <a href={intake.previewUrl} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="h-4 w-4 mr-2" />
-                      Open Full Preview
-                    </a>
+                {(intake as any).previewHTML && (
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => {
+                      const newWindow = window.open('', '_blank');
+                      if (newWindow) {
+                        newWindow.document.write((intake as any).previewHTML);
+                        newWindow.document.close();
+                      }
+                    }}
+                  >
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Open Full Preview
                   </Button>
                 )}
 

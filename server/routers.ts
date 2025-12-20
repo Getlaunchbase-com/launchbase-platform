@@ -28,6 +28,7 @@ import { sendEmail, AdminNotifications } from "./email";
 import { trackEvent, getFunnelMetrics, getBuildQualityMetrics, getVerticalMetrics, getDailyHealth } from "./analytics";
 import { createSetupCheckoutSession, getCheckoutSession } from "./stripe/checkout";
 import { generatePlatformGuidePDF } from "./pdfGuide";
+import { generatePreviewHTML, generateBuildPlan as generatePreviewBuildPlan } from "./previewTemplates";
 
 export const appRouter = router({
   system: systemRouter,
@@ -90,7 +91,30 @@ export const appRouter = router({
           .from(intakes)
           .where(eq(intakes.previewToken, input.token));
         
-        return intake || null;
+        if (!intake) return null;
+        
+        // Generate preview HTML based on intake data
+        const rawPayload = intake.rawPayload as Record<string, unknown> || {};
+        const intakeData = {
+          businessName: intake.businessName,
+          businessDescription: (rawPayload.businessDescription as string) || '',
+          customerType: (rawPayload.customerType as string) || '',
+          websiteGoals: (rawPayload.websiteGoals as string[]) || [],
+          contactPreference: (rawPayload.contactPreference as string) || '',
+          serviceArea: (rawPayload.serviceArea as string) || '',
+          phone: intake.phone || '',
+          email: intake.email,
+          brandFeel: (rawPayload.brandFeel as string) || 'clean',
+        };
+        
+        const previewBuildPlan = generatePreviewBuildPlan(intakeData);
+        const previewHTML = generatePreviewHTML(intakeData, previewBuildPlan);
+        
+        return {
+          ...intake,
+          previewHTML,
+          buildPlan: previewBuildPlan,
+        };
       }),
 
     // Submit feedback/revision request from customer
