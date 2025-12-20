@@ -118,6 +118,29 @@ export const appRouter = router({
         
         return { success: true };
       }),
+
+    // Log approval event with legal details
+    logApproval: publicProcedure
+      .input(z.object({
+        intakeId: z.number(),
+        userAgent: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // Log the approval event for legal protection
+        await trackEvent({
+          eventName: "build_plan_approved",
+          intakeId: input.intakeId,
+          metadata: {
+            timestamp: new Date().toISOString(),
+            userAgent: input.userAgent,
+            ip: ctx.req?.ip || ctx.req?.headers?.['x-forwarded-for'] || 'unknown',
+            action: "clickwrap_acceptance",
+            terms_version: "1.0",
+          },
+        });
+        
+        return { success: true, timestamp: new Date().toISOString() };
+      }),
   }),
 
   // Admin routes (protected)

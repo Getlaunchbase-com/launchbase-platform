@@ -23,6 +23,7 @@ export type AnalyticsEventName =
   | "clarification_requested"
   | "build_approved_first_pass"
   | "build_revision_requested"
+  | "build_plan_approved"
   // Deployment
   | "site_deployed"
   // Email engagement

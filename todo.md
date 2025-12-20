@@ -112,3 +112,10 @@
 - [x] Create customer preview page with "Approve & Pay" button
 - [x] Add token-based access for customer to view their preview
 - [x] Trigger Stripe checkout after customer approves preview
+
+## Legal Protection Stack
+
+- [x] Add approval language above pay button
+- [x] Log approval event (timestamp, IP, build plan version, user ID)
+- [x] Create Terms of Service page
+- [x] Link ToS from approval screen

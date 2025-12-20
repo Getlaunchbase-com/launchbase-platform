@@ -30,6 +30,9 @@ export default function CustomerPreview() {
     { enabled: !!token }
   );
 
+  // Log approval event
+  const logApprovalMutation = trpc.intake.logApproval.useMutation();
+
   // Create checkout session
   const checkoutMutation = trpc.payment.createCheckout.useMutation({
     onSuccess: (data) => {
@@ -54,9 +57,16 @@ export default function CustomerPreview() {
     },
   });
 
-  const handleApproveAndPay = () => {
+  const handleApproveAndPay = async () => {
     if (!intake) return;
     
+    // Log the approval event with legal details
+    await logApprovalMutation.mutateAsync({
+      intakeId: intake.id,
+      userAgent: navigator.userAgent,
+    });
+    
+    // Proceed to checkout
     checkoutMutation.mutate({
       intakeId: intake.id,
       email: intake.email,
@@ -291,26 +301,31 @@ export default function CustomerPreview() {
                 </div>
 
                 {isReadyForReview && !isPaid && (
-                  <Button 
-                    onClick={handleApproveAndPay}
-                    disabled={checkoutMutation.isPending}
-                    className="w-full bg-orange-500 hover:bg-orange-600"
-                    size="lg"
-                  >
-                    {checkoutMutation.isPending ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Loading...
-                      </>
-                    ) : (
-                      <>
-                        Approve & Pay $499
-                        <ArrowRight className="h-4 w-4 ml-2" />
-                      </>
-                    )}
-                  </Button>
+                  <>
+                    <p className="text-xs text-muted-foreground text-center">
+                      By proceeding, you confirm approval of your build plan and agree to LaunchBase's{" "}
+                      <Link href="/terms" className="text-orange-500 hover:underline">terms of service</Link>.
+                    </p>
+                    <Button 
+                      onClick={handleApproveAndPay}
+                      disabled={checkoutMutation.isPending || logApprovalMutation.isPending}
+                      className="w-full bg-orange-500 hover:bg-orange-600"
+                      size="lg"
+                    >
+                      {(checkoutMutation.isPending || logApprovalMutation.isPending) ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Loading...
+                        </>
+                      ) : (
+                        <>
+                          Approve & Pay $499
+                          <ArrowRight className="h-4 w-4 ml-2" />
+                        </>
+                      )}
+                    </Button>
+                  </>
                 )}
-
                 {isPaid && (
                   <div className="text-center py-2">
                     <CheckCircle className="h-8 w-8 text-green-500 mx-auto mb-2" />
