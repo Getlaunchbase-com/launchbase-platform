@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { 
   Search, 
   Filter, 
@@ -14,7 +15,9 @@ import {
   Rocket,
   RefreshCw,
   Eye,
-  HelpCircle
+  Download,
+  CheckSquare,
+  Square
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Link } from "wouter";
@@ -25,6 +28,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 
 // Status configuration with improved labels and helper text
 const statusConfig: Record<string, {
@@ -80,10 +91,22 @@ const statusConfig: Record<string, {
 export default function AdminDashboard() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | undefined>();
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   const { data: intakes, isLoading, refetch } = trpc.admin.intakes.list.useQuery({
     status: statusFilter as "new" | "review" | "needs_info" | "ready_for_review" | "approved" | "paid" | "deployed" | undefined,
     search: search || undefined,
+  });
+
+  const bulkUpdateMutation = trpc.admin.intakes.bulkUpdateStatus.useMutation({
+    onSuccess: (data) => {
+      toast.success(`Updated ${data.updated} intake(s)`);
+      setSelectedIds([]);
+      refetch();
+    },
+    onError: (error) => {
+      toast.error("Failed to update: " + error.message);
+    },
   });
 
   const filteredIntakes = intakes || [];
@@ -101,6 +124,53 @@ export default function AdminDashboard() {
 
   const totalIntakes = filteredIntakes.length;
   const pendingAction = statusCounts.new + statusCounts.needs_info;
+
+  const toggleSelect = (id: number, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const selectAll = () => {
+    if (selectedIds.length === filteredIntakes.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredIntakes.map(i => i.id));
+    }
+  };
+
+  const handleBulkStatusUpdate = (status: string) => {
+    if (selectedIds.length === 0) return;
+    bulkUpdateMutation.mutate({
+      ids: selectedIds,
+      status: status as "new" | "review" | "needs_info" | "ready_for_review" | "approved" | "paid" | "deployed",
+    });
+  };
+
+  const handleExport = async () => {
+    try {
+      const response = await fetch(`/api/trpc/admin.intakes.export?input=${encodeURIComponent(JSON.stringify({
+        ids: selectedIds.length > 0 ? selectedIds : undefined,
+        status: statusFilter,
+      }))}`);
+      const data = await response.json();
+      
+      if (data.result?.data?.csv) {
+        const blob = new Blob([data.result.data.csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `launchbase-intakes-${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast.success(`Exported ${data.result.data.count} intake(s)`);
+      }
+    } catch (error) {
+      toast.error("Failed to export");
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -186,8 +256,8 @@ export default function AdminDashboard() {
             ))}
           </div>
 
-          {/* Search and Filter */}
-          <div className="flex gap-4">
+          {/* Search, Filter, and Bulk Actions */}
+          <div className="flex gap-4 items-center">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
@@ -206,7 +276,71 @@ export default function AdminDashboard() {
                 <Filter className="w-4 h-4 mr-2" /> Clear Filter
               </Button>
             )}
+            
+            {/* Bulk Actions */}
+            {selectedIds.length > 0 && (
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="px-3 py-1">
+                  {selectedIds.length} selected
+                </Badge>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      Bulk Actions
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handleBulkStatusUpdate("review")}>
+                      <Eye className="w-4 h-4 mr-2" /> Mark as In Review
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleBulkStatusUpdate("ready_for_review")}>
+                      <CheckCircle className="w-4 h-4 mr-2" /> Mark as Ready for Review
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleBulkStatusUpdate("approved")}>
+                      <Rocket className="w-4 h-4 mr-2" /> Mark as Approved
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleExport}>
+                      <Download className="w-4 h-4 mr-2" /> Export Selected
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setSelectedIds([])}
+                >
+                  Clear
+                </Button>
+              </div>
+            )}
+            
+            {/* Export All Button */}
+            {selectedIds.length === 0 && (
+              <Button variant="outline" size="sm" onClick={handleExport}>
+                <Download className="w-4 h-4 mr-2" /> Export
+              </Button>
+            )}
           </div>
+
+          {/* Select All */}
+          {filteredIntakes.length > 0 && (
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={selectAll}
+                className="text-gray-400 hover:text-white"
+              >
+                {selectedIds.length === filteredIntakes.length ? (
+                  <CheckSquare className="w-4 h-4 mr-2" />
+                ) : (
+                  <Square className="w-4 h-4 mr-2" />
+                )}
+                {selectedIds.length === filteredIntakes.length ? "Deselect All" : "Select All"}
+              </Button>
+            </div>
+          )}
 
           {/* Intake List */}
           <div className="space-y-3">
@@ -225,46 +359,60 @@ export default function AdminDashboard() {
             ) : (
               filteredIntakes.map((intake) => {
                 const config = statusConfig[intake.status];
+                const isSelected = selectedIds.includes(intake.id);
                 return (
-                  <Link key={intake.id} href={`/admin/intake/${intake.id}`}>
-                    <Card className="bg-white/5 border-white/10 hover:border-[#FF6A00]/50 transition-all cursor-pointer">
-                      <CardContent className="py-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-[#FF6A00]/20 rounded-lg flex items-center justify-center">
-                              <Building2 className="w-6 h-6 text-[#FF6A00]" />
+                  <div key={intake.id} className="flex items-center gap-3">
+                    <div 
+                      onClick={(e) => toggleSelect(intake.id, e)}
+                      className="cursor-pointer p-1"
+                    >
+                      <Checkbox 
+                        checked={isSelected}
+                        className="data-[state=checked]:bg-[#FF6A00] data-[state=checked]:border-[#FF6A00]"
+                      />
+                    </div>
+                    <Link href={`/admin/intake/${intake.id}`} className="flex-1">
+                      <Card className={`bg-white/5 border-white/10 hover:border-[#FF6A00]/50 transition-all cursor-pointer ${
+                        isSelected ? "ring-1 ring-[#FF6A00]/50" : ""
+                      }`}>
+                        <CardContent className="py-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 bg-[#FF6A00]/20 rounded-lg flex items-center justify-center">
+                                <Building2 className="w-6 h-6 text-[#FF6A00]" />
+                              </div>
+                              <div>
+                                <h3 className="font-semibold">{intake.businessName}</h3>
+                                <p className="text-sm text-gray-400">
+                                  {intake.contactName} • {intake.email}
+                                </p>
+                              </div>
                             </div>
-                            <div>
-                              <h3 className="font-semibold">{intake.businessName}</h3>
-                              <p className="text-sm text-gray-400">
-                                {intake.contactName} • {intake.email}
-                              </p>
+                            <div className="flex items-center gap-4">
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <Badge className={`${config.color} flex items-center gap-1`}>
+                                    {config.icon}
+                                    <span>{config.label}</span>
+                                  </Badge>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>{config.helperText}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                              <Badge variant="outline" className="capitalize">
+                                {intake.vertical}
+                              </Badge>
+                              <span className="text-sm text-gray-500">
+                                {new Date(intake.createdAt).toLocaleDateString()}
+                              </span>
+                              <ChevronRight className="w-5 h-5 text-gray-500" />
                             </div>
                           </div>
-                          <div className="flex items-center gap-4">
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <Badge className={`${config.color} flex items-center gap-1`}>
-                                  {config.icon}
-                                  <span>{config.label}</span>
-                                </Badge>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>{config.helperText}</p>
-                              </TooltipContent>
-                            </Tooltip>
-                            <Badge variant="outline" className="capitalize">
-                              {intake.vertical}
-                            </Badge>
-                            <span className="text-sm text-gray-500">
-                              {new Date(intake.createdAt).toLocaleDateString()}
-                            </span>
-                            <ChevronRight className="w-5 h-5 text-gray-500" />
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  </div>
                 );
               })
             )}

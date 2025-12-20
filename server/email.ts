@@ -6,6 +6,15 @@
 import { getDb } from "./db";
 import { emailLogs } from "../drizzle/schema";
 import { notifyOwner } from "./_core/notification";
+import { Resend } from "resend";
+
+// Initialize Resend client (will be null if no API key)
+const resendApiKey = process.env.RESEND_API_KEY;
+const resend = resendApiKey ? new Resend(resendApiKey) : null;
+
+// Email configuration
+const FROM_EMAIL = process.env.FROM_EMAIL || "LaunchBase <noreply@launchbase.app>";
+const REPLY_TO_EMAIL = process.env.REPLY_TO_EMAIL || "support@launchbase.app";
 
 // Email template types
 export type EmailType = 
@@ -266,6 +275,60 @@ export async function sendEmail(
       console.error("[Email] Database not available");
       return false;
     }
+    
+    // Try to send via Resend if configured
+    let emailSent = false;
+    if (resend) {
+      try {
+        const result = await resend.emails.send({
+          from: FROM_EMAIL,
+          to: data.email,
+          replyTo: REPLY_TO_EMAIL,
+          subject: template.subject,
+          text: template.body,
+          // HTML version with basic formatting
+          html: `
+            <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+              ${template.body.split('\n').map(line => 
+                line.startsWith('•') 
+                  ? `<p style="margin: 8px 0; padding-left: 16px;">${line}</p>`
+                  : line === '' 
+                    ? '<br/>'
+                    : `<p style="margin: 16px 0; line-height: 1.6;">${line}</p>`
+              ).join('')}
+            </div>
+          `,
+        });
+        
+        if (result.data?.id) {
+          emailSent = true;
+          console.log(`[Email] Sent via Resend: ${type} to ${data.email} (ID: ${result.data.id})`);
+        }
+      } catch (resendError) {
+        console.error(`[Email] Resend failed, falling back to notification:`, resendError);
+      }
+    }
+    
+    // Fallback: Use notification system if Resend not configured or failed
+    if (!emailSent) {
+      const emailContent = `
+**To:** ${data.email}
+**Subject:** ${template.subject}
+
+---
+
+${template.body}
+      `.trim();
+      
+      await notifyOwner({
+        title: `📧 ${template.subject}`,
+        content: emailContent,
+      });
+      
+      console.log(`[Email] Sent via notification: ${type} to ${data.email}`);
+    }
+    
+    // Log success
     await db.insert(emailLogs).values({
       intakeId,
       emailType: type,
@@ -273,25 +336,7 @@ export async function sendEmail(
       subject: template.subject,
       status: "sent",
     });
-
-    // Use built-in notification system to send emails
-    // This delivers to the owner's Manus notification inbox
-    const emailContent = `
-**To:** ${data.email}
-**Subject:** ${template.subject}
-
----
-
-${template.body}
-    `.trim();
     
-    // Send via notification system
-    await notifyOwner({
-      title: `📧 ${template.subject}`,
-      content: emailContent,
-    });
-    
-    console.log(`[Email] Sent ${type} to ${data.email}`);
     console.log(`[Email] Subject: ${template.subject}`);
     
     // Additional owner notification for important events
