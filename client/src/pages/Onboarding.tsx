@@ -222,6 +222,7 @@ export default function Onboarding() {
             />
             <p className="text-sm text-gray-500">
               No need to be perfect — we'll handle wording and structure.
+              <span className="block mt-1 text-[#FF6A00]/70">✓ You can edit this later</span>
             </p>
           </div>
         );
@@ -232,6 +233,7 @@ export default function Onboarding() {
             <div>
               <h2 className="text-2xl md:text-3xl font-bold mb-2">Who do you mainly work with?</h2>
               <p className="text-gray-400">This helps us shape the messaging on your site.</p>
+              <p className="text-xs text-[#FF6A00]/70 mt-1">✓ You can change this later</p>
             </div>
             <div className="grid gap-4">
               {[
@@ -269,6 +271,7 @@ export default function Onboarding() {
             <div>
               <h2 className="text-2xl md:text-3xl font-bold mb-2">What should your website help you do?</h2>
               <p className="text-gray-400">Choose what matters most. We'll handle the rest.</p>
+              <p className="text-xs text-[#FF6A00]/70 mt-1">✓ Select as many as you want — you can adjust later</p>
             </div>
             <div className="grid gap-3">
               {[
@@ -314,6 +317,7 @@ export default function Onboarding() {
             <div>
               <h2 className="text-2xl md:text-3xl font-bold mb-2">How should customers reach you?</h2>
               <p className="text-gray-400">We'll design your site around this.</p>
+              <p className="text-xs text-[#FF6A00]/70 mt-1">✓ Not sure? Pick one — we can always add more options</p>
             </div>
             <div className="grid gap-4">
               {[
@@ -375,7 +379,9 @@ export default function Onboarding() {
                 />
               </div>
             </div>
-            <p className="text-sm text-gray-500">You can update this anytime.</p>
+            <p className="text-sm text-gray-500">
+              <span className="text-[#FF6A00]/70">✓</span> You can update this anytime.
+            </p>
           </div>
         );
 
@@ -418,7 +424,10 @@ export default function Onboarding() {
                 />
               </div>
             </div>
-            <p className="text-sm text-gray-500">We'll never share your contact info.</p>
+            <p className="text-sm text-gray-500">
+              We'll never share your contact info.
+              <span className="block mt-1 text-[#FF6A00]/70">✓ You can update these details later</span>
+            </p>
           </div>
         );
 
@@ -456,7 +465,9 @@ export default function Onboarding() {
                 </button>
               ))}
             </div>
-            <p className="text-sm text-gray-500">This is just a preference — not a commitment.</p>
+            <p className="text-sm text-gray-500">
+              <span className="text-[#FF6A00]/70">✓</span> This is just a preference — not a commitment.
+            </p>
           </div>
         );
 

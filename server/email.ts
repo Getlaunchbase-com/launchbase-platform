@@ -274,17 +274,30 @@ export async function sendEmail(
       status: "sent",
     });
 
-    // In production, integrate with SendGrid/Postmark/Resend here
-    // For now, we'll use the built-in notification system to notify the owner
-    // and log the email for tracking
+    // Use built-in notification system to send emails
+    // This delivers to the owner's Manus notification inbox
+    const emailContent = `
+**To:** ${data.email}
+**Subject:** ${template.subject}
+
+---
+
+${template.body}
+    `.trim();
+    
+    // Send via notification system
+    await notifyOwner({
+      title: `📧 ${template.subject}`,
+      content: emailContent,
+    });
     
     console.log(`[Email] Sent ${type} to ${data.email}`);
     console.log(`[Email] Subject: ${template.subject}`);
     
-    // Notify owner about the email being sent (for monitoring)
+    // Additional owner notification for important events
     if (type === "intake_confirmation") {
       await notifyOwner({
-        title: `New intake: ${data.businessName}`,
+        title: `🎉 New intake: ${data.businessName}`,
         content: `${data.firstName} (${data.email}) just completed an intake for ${data.businessName}. Ready for build plan generation.`,
       });
     }

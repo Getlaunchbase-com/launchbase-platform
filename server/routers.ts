@@ -167,6 +167,33 @@ export const appRouter = router({
           status: z.enum(["new", "review", "needs_info", "ready_for_review", "approved", "paid", "deployed"]),
         }))
         .mutation(async ({ input }) => {
+          // If marking as ready_for_review, generate preview token and send email
+          if (input.status === "ready_for_review") {
+            const intake = await getIntakeById(input.id);
+            if (intake) {
+              // Generate preview token
+              const previewToken = `preview_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+              
+              // Update status and set preview token
+              const db = await getDb();
+              if (!db) throw new Error("Database not available");
+              await db.update(intakes)
+                .set({ status: input.status, previewToken })
+                .where(eq(intakes.id, input.id));
+              
+              // Send ready for review email with preview link
+              const firstName = intake.contactName?.split(" ")[0] || "there";
+              await sendEmail(intake.id, "ready_for_review", {
+                firstName,
+                businessName: intake.businessName,
+                email: intake.email,
+                previewUrl: `/preview/${previewToken}`,
+              });
+              
+              return { success: true, previewToken };
+            }
+          }
+          
           await updateIntakeStatus(input.id, input.status);
           return { success: true };
         }),
