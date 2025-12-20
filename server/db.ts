@@ -112,7 +112,7 @@ export async function createIntake(data: {
   tagline?: string;
   brandColors?: { primary?: string; secondary?: string };
   rawPayload?: Record<string, unknown>;
-}, status: "new" | "review" | "needs_info" | "ready" | "approved" = "new") {
+}, status: Intake['status'] = "new") {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot create intake: database not available");

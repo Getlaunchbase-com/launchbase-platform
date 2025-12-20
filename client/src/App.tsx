@@ -15,6 +15,7 @@ import AdminAnalytics from "./pages/AdminAnalytics";
 import WhatsIncluded from "./pages/WhatsIncluded";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancel from "./pages/PaymentCancel";
+import CustomerPreview from "./pages/CustomerPreview";
 
 function Router() {
   return (
@@ -27,6 +28,7 @@ function Router() {
       <Route path="/whats-included" component={WhatsIncluded} />
       <Route path="/payment/success" component={PaymentSuccess} />
       <Route path="/payment/cancel" component={PaymentCancel} />
+      <Route path="/preview/:token" component={CustomerPreview} />
       
       {/* Admin routes (protected by DashboardLayout) */}
       <Route path="/admin" component={AdminDashboard} />

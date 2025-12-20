@@ -106,3 +106,9 @@
 - [x] Email PDF after onboarding completion
 - [x] Add progress bar to onboarding (Step X of 8)
 - [x] Show percentage completion indicator
+
+## Customer Payment Flow Fix
+
+- [x] Create customer preview page with "Approve & Pay" button
+- [x] Add token-based access for customer to view their preview
+- [x] Trigger Stripe checkout after customer approves preview

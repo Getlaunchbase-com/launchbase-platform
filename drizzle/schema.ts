@@ -41,7 +41,11 @@ export const intakes = mysqlTable("intakes", {
   // Raw payload from onboarding
   rawPayload: json("rawPayload").$type<Record<string, unknown>>(),
   // Status workflow
-  status: mysqlEnum("status", ["new", "review", "needs_info", "ready", "approved", "paid", "deployed"]).default("new").notNull(),
+  status: mysqlEnum("status", ["new", "review", "needs_info", "ready_for_review", "approved", "paid", "deployed"]).default("new").notNull(),
+  // Preview and feedback
+  previewToken: varchar("previewToken", { length: 64 }),
+  previewUrl: varchar("previewUrl", { length: 512 }),
+  internalNotes: text("internalNotes"),
   // Payment tracking
   stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
   stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }),
