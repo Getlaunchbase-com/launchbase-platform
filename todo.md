@@ -119,3 +119,26 @@
 - [x] Log approval event (timestamp, IP, build plan version, user ID)
 - [x] Create Terms of Service page
 - [x] Link ToS from approval screen
+
+## Business Modules System
+
+- [x] Create modules database table (google_ads, quickbooks)
+- [x] Add modules selection to customer preview page
+- [x] Create "Recommended Business Modules" UI block
+- [x] Update Stripe checkout to handle module add-ons
+- [x] Add Google Ads Lead Engine module ($499 setup)
+- [x] Add QuickBooks Integration module ($499 setup + $39/mo)
+- [ ] Create admin view for module orders
+
+## Production UI Copy (Approve → Activate → Pay → Deploy)
+
+- [x] Update CustomerPreview with multi-step flow (Review → Activate → Pay)
+- [x] Add "Review Your Build Plan" page with production copy
+- [x] Add "Activate Your Business Systems" step with module cards
+- [x] Add "Review & Pay" checkout pre-screen
+- [x] Update module cards with detailed includes and disclaimers
+- [x] Add approval confirmation banner
+- [x] Update payment success page with new copy
+- [x] Add "Skip for Now" option for modules
+- [x] Add dashboard banner for approved-but-unpaid state
+- [x] Add admin module status tags (QB: Active/Pending, Ads: Active/Pending)
