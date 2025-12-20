@@ -288,6 +288,36 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Business Modules Teaser */}
+      <section className="py-16 px-4">
+        <div className="container max-w-4xl mx-auto">
+          <div className="bg-gradient-to-r from-[#FF6A00]/10 to-transparent border border-[#FF6A00]/20 rounded-2xl p-8">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+              <div className="flex-1">
+                <p className="text-sm text-[#FF6A00] font-medium mb-2">COMING SOON</p>
+                <h3 className="text-xl md:text-2xl font-bold mb-2">Works with the tools you already use</h3>
+                <p className="text-gray-400">
+                  Connect your website to Google Ads, QuickBooks, and more. 
+                  Optional add-ons available after your site launches.
+                </p>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center" title="Google Ads">
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
+                    <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z" fill="currentColor"/>
+                  </svg>
+                </div>
+                <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center" title="QuickBooks">
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.568 16.8H15.84c-.384 0-.672-.288-.672-.672v-4.8c0-1.056-.864-1.92-1.92-1.92H9.84c-.384 0-.672.288-.672.672v6.048c0 .384-.288.672-.672.672H6.768c-.384 0-.672-.288-.672-.672V7.872c0-.384.288-.672.672-.672h3.408c.384 0 .672.288.672.672v4.8c0 1.056.864 1.92 1.92 1.92h3.408c.384 0 .672-.288.672-.672V7.872c0-.384.288-.672.672-.672h1.728c.384 0 .672.288.672.672v8.256c0 .384-.288.672-.672.672z" fill="#2CA01C"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Pricing Section */}
       <section id="pricing" className="py-20 px-4">
         <div className="container max-w-4xl mx-auto">

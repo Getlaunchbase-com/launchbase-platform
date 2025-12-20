@@ -142,3 +142,20 @@
 - [x] Add "Skip for Now" option for modules
 - [x] Add dashboard banner for approved-but-unpaid state
 - [x] Add admin module status tags (QB: Active/Pending, Ads: Active/Pending)
+
+## Auto-generate Preview Tokens & Email Delivery
+
+- [x] Auto-generate previewToken when admin marks intake as ready_for_review
+- [x] Include preview link in ready_for_review email
+- [x] Connect email delivery via built-in notification system
+
+## Inline Reassurance (Onboarding)
+
+- [x] Add "You can edit later" tooltips on each onboarding step
+- [x] Add reassurance text below input fields
+
+## Strategic Module Promotion (Landing Page)
+
+- [x] Add "Works with the tools you already use" messaging to homepage
+- [x] Add "Optional System Activations" teaser to /whats-included page
+- [x] Keep messaging outcome-focused, no feature names or prices
