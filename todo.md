@@ -159,3 +159,21 @@
 - [x] Add "Works with the tools you already use" messaging to homepage
 - [x] Add "Optional System Activations" teaser to /whats-included page
 - [x] Keep messaging outcome-focused, no feature names or prices
+
+## Logo System
+
+- [x] Generate primary logo (rocket + base concept)
+- [x] Generate icon-only version (favicon, app icon)
+- [x] Create light + dark variants
+- [x] Implement logo in header
+- [x] Add favicon
+
+## Site Preview Rendering (High ROI)
+
+- [x] Create preview template system
+- [x] Build trades vertical template
+- [x] Build appointments vertical template
+- [x] Build professional services template
+- [x] Render preview based on intake data
+- [x] Display preview in CustomerPreview page
+- [x] Add Open Preview in New Tab button in admin
