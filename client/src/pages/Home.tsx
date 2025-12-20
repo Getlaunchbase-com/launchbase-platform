@@ -554,6 +554,7 @@ export default function Home() {
             <div className="flex items-center gap-6 text-sm text-gray-400">
               <Link href="/whats-included" className="hover:text-white transition">What's Included</Link>
               <a href="#pricing" className="hover:text-white transition">Pricing</a>
+              <Link href="/referrals" className="hover:text-white transition">Refer a Friend</Link>
               <Link href="/terms" className="hover:text-white transition">Terms</Link>
               <Link href="/privacy" className="hover:text-white transition">Privacy</Link>
               <a href="mailto:hello@getlaunchbase.com" className="hover:text-white transition">Contact</a>

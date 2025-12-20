@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, Loader2, ArrowRight, Sparkles, Rocket, FileText } from "lucide-react";
+import { CheckCircle, Loader2, ArrowRight, Sparkles, Rocket, FileText, Gift } from "lucide-react";
 
 export default function PaymentSuccess() {
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -109,6 +109,24 @@ export default function PaymentSuccess() {
               </a>
             </Button>
           </div>
+
+          {/* Referral CTA */}
+          <Card className="border-orange-500/20 bg-orange-500/5 mt-6">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-orange-500/20 flex items-center justify-center flex-shrink-0">
+                  <Gift className="h-5 w-5 text-orange-500" />
+                </div>
+                <div className="flex-1 text-left">
+                  <p className="font-medium text-sm">Refer a friend, get $50</p>
+                  <p className="text-xs text-muted-foreground">Share LaunchBase and both save $50</p>
+                </div>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/referrals">Get Code</Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Help */}
           <p className="text-xs text-muted-foreground pt-4">

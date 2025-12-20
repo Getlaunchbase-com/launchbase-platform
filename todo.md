@@ -226,3 +226,10 @@
 - [x] Create Privacy Policy page
 - [x] Add route to App.tsx
 - [x] Link from footer
+
+
+## Referral Discoverability
+
+- [x] Request RESEND_API_KEY from user
+- [x] Link to /referrals from payment success page
+- [x] Add "Refer a Friend" link to footer
