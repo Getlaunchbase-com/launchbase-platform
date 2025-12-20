@@ -51,16 +51,28 @@ const statusConfig: Record<string, {
     color: "bg-orange-500/20 text-orange-400 border-orange-500/30",
     icon: <AlertCircle className="w-4 h-4" />,
   },
-  ready: {
-    label: "Ready for Deployment",
-    helperText: "Ready to deploy when you are.",
+  ready_for_review: {
+    label: "Ready for Review",
+    helperText: "Site ready for customer review.",
     color: "bg-green-500/20 text-green-400 border-green-500/30",
     icon: <CheckCircle className="w-4 h-4" />,
   },
   approved: {
+    label: "Approved",
+    helperText: "Customer approved, awaiting payment.",
+    color: "bg-purple-500/20 text-purple-400 border-purple-500/30",
+    icon: <Rocket className="w-4 h-4" />,
+  },
+  paid: {
+    label: "Paid",
+    helperText: "Payment received, deploying.",
+    color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+    icon: <CheckCircle className="w-4 h-4" />,
+  },
+  deployed: {
     label: "Deployed",
     helperText: "Website is live and accessible.",
-    color: "bg-purple-500/20 text-purple-400 border-purple-500/30",
+    color: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
     icon: <Rocket className="w-4 h-4" />,
   },
 };
@@ -70,7 +82,7 @@ export default function AdminDashboard() {
   const [statusFilter, setStatusFilter] = useState<string | undefined>();
 
   const { data: intakes, isLoading, refetch } = trpc.admin.intakes.list.useQuery({
-    status: statusFilter as "new" | "review" | "needs_info" | "ready" | "approved" | undefined,
+    status: statusFilter as "new" | "review" | "needs_info" | "ready_for_review" | "approved" | "paid" | "deployed" | undefined,
     search: search || undefined,
   });
 
@@ -81,7 +93,9 @@ export default function AdminDashboard() {
     new: filteredIntakes.filter(i => i.status === "new").length,
     review: filteredIntakes.filter(i => i.status === "review").length,
     needs_info: filteredIntakes.filter(i => i.status === "needs_info").length,
-    ready: filteredIntakes.filter(i => i.status === "ready").length,
+    ready_for_review: filteredIntakes.filter(i => i.status === "ready_for_review").length,
+    paid: filteredIntakes.filter(i => i.status === "paid").length,
+    deployed: filteredIntakes.filter(i => i.status === "deployed").length,
     approved: filteredIntakes.filter(i => i.status === "approved").length,
   };
 
@@ -127,8 +141,8 @@ export default function AdminDashboard() {
                     <p className="text-2xl font-bold text-blue-400">{statusCounts.new}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-400">Ready to Deploy</p>
-                    <p className="text-2xl font-bold text-green-400">{statusCounts.ready}</p>
+                    <p className="text-sm text-gray-400">Ready for Review</p>
+                    <p className="text-2xl font-bold text-green-400">{statusCounts.ready_for_review}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-400">Live Sites</p>

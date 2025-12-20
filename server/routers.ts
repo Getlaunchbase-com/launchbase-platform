@@ -3,6 +3,9 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
+import { getDb } from "./db";
+import { intakes } from "../drizzle/schema";
+import { eq } from "drizzle-orm";
 import { 
   createIntake, 
   getIntakes, 
@@ -75,6 +78,46 @@ export const appRouter = router({
         
         return { success: true, intakeId: intake?.id };
       }),
+    // Get intake by preview token (for customer preview page)
+    getByPreviewToken: publicProcedure
+      .input(z.object({ token: z.string() }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return null;
+        
+        const [intake] = await db
+          .select()
+          .from(intakes)
+          .where(eq(intakes.previewToken, input.token));
+        
+        return intake || null;
+      }),
+
+    // Submit feedback/revision request from customer
+    submitFeedback: publicProcedure
+      .input(z.object({
+        intakeId: z.number(),
+        feedback: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        // Update intake with feedback and set status back to needs_info
+        await db
+          .update(intakes)
+          .set({
+            status: "needs_info",
+            internalNotes: `Customer feedback: ${input.feedback}`,
+            updatedAt: new Date(),
+          })
+          .where(eq(intakes.id, input.intakeId));
+        
+        // Notify admin
+        await AdminNotifications.newIntake(`Revision requested for intake #${input.intakeId}`, 100);
+        
+        return { success: true };
+      }),
   }),
 
   // Admin routes (protected)
@@ -82,7 +125,7 @@ export const appRouter = router({
     intakes: router({
       list: protectedProcedure
         .input(z.object({
-          status: z.enum(["new", "review", "needs_info", "ready", "approved"]).optional(),
+          status: z.enum(["new", "review", "needs_info", "ready_for_review", "approved", "paid", "deployed"]).optional(),
           search: z.string().optional(),
         }).optional())
         .query(async ({ input }) => {
@@ -98,7 +141,7 @@ export const appRouter = router({
       updateStatus: protectedProcedure
         .input(z.object({
           id: z.number(),
-          status: z.enum(["new", "review", "needs_info", "ready", "approved"]),
+          status: z.enum(["new", "review", "needs_info", "ready_for_review", "approved", "paid", "deployed"]),
         }))
         .mutation(async ({ input }) => {
           await updateIntakeStatus(input.id, input.status);
