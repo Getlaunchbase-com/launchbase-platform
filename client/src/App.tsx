@@ -17,6 +17,8 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancel from "./pages/PaymentCancel";
 import CustomerPreview from "./pages/CustomerPreview";
 import Terms from "./pages/Terms";
+import Referrals from "./pages/Referrals";
+import Privacy from "./pages/Privacy";
 
 function Router() {
   return (
@@ -31,6 +33,8 @@ function Router() {
       <Route path="/payment/cancel" component={PaymentCancel} />
       <Route path="/preview/:token" component={CustomerPreview} />
       <Route path="/terms" component={Terms} />
+      <Route path="/referrals" component={Referrals} />
+      <Route path="/privacy" component={Privacy} />
       
       {/* Admin routes (protected by DashboardLayout) */}
       <Route path="/admin" component={AdminDashboard} />
