@@ -4,7 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { getDb } from "./db";
-import { intakes } from "../drizzle/schema";
+import { intakes, approvals, buildPlans, referrals } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { 
   createIntake, 
@@ -29,6 +29,26 @@ import { trackEvent, getFunnelMetrics, getBuildQualityMetrics, getVerticalMetric
 import { createSetupCheckoutSession, getCheckoutSession } from "./stripe/checkout";
 import { generatePlatformGuidePDF } from "./pdfGuide";
 import { generatePreviewHTML, generateBuildPlan as generatePreviewBuildPlan } from "./previewTemplates";
+import { createHash } from "crypto";
+
+// Generate a hash of the build plan for version locking
+function generateBuildPlanHash(buildPlan: { id: number; plan: unknown }): string {
+  const content = JSON.stringify({
+    id: buildPlan.id,
+    plan: buildPlan.plan,
+  });
+  return createHash('sha256').update(content).digest('hex').substring(0, 16);
+}
+
+// Generate a referral code
+function generateReferralCode(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 8; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+}
 
 export const appRouter = router({
   system: systemRouter,
@@ -60,9 +80,36 @@ export const appRouter = router({
           secondary: z.string().optional(),
         }).optional(),
         rawPayload: z.record(z.string(), z.unknown()).optional(),
+        referralCode: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
         const intake = await createIntake(input, "new");
+        
+        // Handle referral code if provided
+        let referralDiscount = 0;
+        if (input.referralCode && intake?.id) {
+          const [referral] = await db
+            .select()
+            .from(referrals)
+            .where(eq(referrals.code, input.referralCode.toUpperCase()));
+          
+          if (referral && referral.status === "pending") {
+            // Mark referral as used and link to this intake
+            await db.update(referrals)
+              .set({
+                refereeIntakeId: intake.id,
+                refereeEmail: input.email,
+                status: "used",
+                usedAt: new Date(),
+              })
+              .where(eq(referrals.id, referral.id));
+            
+            referralDiscount = referral.refereeDiscountCents || 5000; // $50 default
+          }
+        }
         
         // Send confirmation email
         if (intake?.id) {
@@ -77,7 +124,7 @@ export const appRouter = router({
           await AdminNotifications.newIntake(input.businessName, 85);
         }
         
-        return { success: true, intakeId: intake?.id };
+        return { success: true, intakeId: intake?.id, referralDiscount };
       }),
     // Get intake by preview token (for customer preview page)
     getByPreviewToken: publicProcedure
@@ -143,27 +190,153 @@ export const appRouter = router({
         return { success: true };
       }),
 
-    // Log approval event with legal details
+    // Log approval event with legal details and build plan hash
     logApproval: publicProcedure
       .input(z.object({
         intakeId: z.number(),
         userAgent: z.string(),
       }))
       .mutation(async ({ input, ctx }) => {
-        // Log the approval event for legal protection
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        // Get the build plan for this intake
+        const buildPlan = await getBuildPlanByIntakeId(input.intakeId);
+        if (!buildPlan) {
+          throw new Error("No build plan found for this intake");
+        }
+        
+        // Generate hash of the build plan for version locking
+        const buildPlanHash = generateBuildPlanHash(buildPlan);
+        
+        // Get IP address
+        const ipAddress = ctx.req?.ip || 
+          (ctx.req?.headers?.['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 
+          'unknown';
+        
+        // Store approval in database
+        await db.insert(approvals).values({
+          intakeId: input.intakeId,
+          buildPlanId: buildPlan.id,
+          buildPlanHash,
+          userAgent: input.userAgent,
+          ipAddress,
+        });
+        
+        // Log the approval event for analytics
         await trackEvent({
           eventName: "build_plan_approved",
           intakeId: input.intakeId,
           metadata: {
             timestamp: new Date().toISOString(),
             userAgent: input.userAgent,
-            ip: ctx.req?.ip || ctx.req?.headers?.['x-forwarded-for'] || 'unknown',
+            ip: ipAddress,
             action: "clickwrap_acceptance",
             terms_version: "1.0",
+            buildPlanId: buildPlan.id,
+            buildPlanHash,
           },
         });
         
-        return { success: true, timestamp: new Date().toISOString() };
+        return { success: true, timestamp: new Date().toISOString(), buildPlanHash };
+      }),
+  }),
+
+  // Referral program routes
+  referral: router({
+    // Create a referral code for an existing customer
+    create: publicProcedure
+      .input(z.object({
+        intakeId: z.number(),
+        email: z.string().email(),
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        // Check if referral already exists for this intake
+        const [existing] = await db
+          .select()
+          .from(referrals)
+          .where(eq(referrals.referrerIntakeId, input.intakeId));
+        
+        if (existing) {
+          return { code: existing.code, alreadyExists: true };
+        }
+        
+        // Generate unique code
+        let code = generateReferralCode();
+        let attempts = 0;
+        while (attempts < 10) {
+          const [existingCode] = await db
+            .select()
+            .from(referrals)
+            .where(eq(referrals.code, code));
+          if (!existingCode) break;
+          code = generateReferralCode();
+          attempts++;
+        }
+        
+        // Create referral
+        await db.insert(referrals).values({
+          referrerIntakeId: input.intakeId,
+          referrerEmail: input.email,
+          code,
+        });
+        
+        return { code, alreadyExists: false };
+      }),
+    
+    // Validate a referral code
+    validate: publicProcedure
+      .input(z.object({ code: z.string() }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return { valid: false, discount: 0 };
+        
+        const [referral] = await db
+          .select()
+          .from(referrals)
+          .where(eq(referrals.code, input.code.toUpperCase()));
+        
+        if (!referral || referral.status !== "pending") {
+          return { valid: false, discount: 0 };
+        }
+        
+        return { 
+          valid: true, 
+          discount: (referral.refereeDiscountCents || 5000) / 100 // Return in dollars
+        };
+      }),
+    
+    // Get referral stats for a user
+    getStats: publicProcedure
+      .input(z.object({ intakeId: z.number() }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return null;
+        
+        const [referral] = await db
+          .select()
+          .from(referrals)
+          .where(eq(referrals.referrerIntakeId, input.intakeId));
+        
+        if (!referral) return null;
+        
+        // Count successful referrals
+        const usedReferrals = await db
+          .select()
+          .from(referrals)
+          .where(eq(referrals.referrerIntakeId, input.intakeId));
+        
+        const successfulReferrals = usedReferrals.filter(r => r.status === "used").length;
+        
+        return {
+          code: referral.code,
+          successfulReferrals,
+          totalEarnings: successfulReferrals * 50, // $50 per referral
+          rewardApplied: referral.referrerRewardApplied,
+        };
       }),
   }),
 
@@ -220,6 +393,57 @@ export const appRouter = router({
           
           await updateIntakeStatus(input.id, input.status);
           return { success: true };
+        }),
+      
+      // Bulk update status
+      bulkUpdateStatus: protectedProcedure
+        .input(z.object({
+          ids: z.array(z.number()),
+          status: z.enum(["new", "review", "needs_info", "ready_for_review", "approved", "paid", "deployed"]),
+        }))
+        .mutation(async ({ input }) => {
+          const db = await getDb();
+          if (!db) throw new Error("Database not available");
+          
+          let updated = 0;
+          for (const id of input.ids) {
+            await db.update(intakes)
+              .set({ status: input.status })
+              .where(eq(intakes.id, id));
+            updated++;
+          }
+          
+          return { success: true, updated };
+        }),
+      
+      // Export intakes to CSV format
+      export: protectedProcedure
+        .input(z.object({
+          ids: z.array(z.number()).optional(),
+          status: z.enum(["new", "review", "needs_info", "ready_for_review", "approved", "paid", "deployed"]).optional(),
+        }).optional())
+        .query(async ({ input }) => {
+          const allIntakes = await getIntakes(input?.status);
+          const filtered = input?.ids?.length 
+            ? allIntakes.filter(i => input.ids!.includes(i.id))
+            : allIntakes;
+          
+          // Generate CSV data
+          const headers = ["ID", "Business Name", "Contact Name", "Email", "Phone", "Vertical", "Status", "Created At"];
+          const rows = filtered.map(i => [
+            i.id,
+            i.businessName,
+            i.contactName,
+            i.email,
+            i.phone || "",
+            i.vertical,
+            i.status,
+            new Date(i.createdAt).toISOString(),
+          ]);
+          
+          const csv = [headers.join(","), ...rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(","))].join("\n");
+          
+          return { csv, count: filtered.length };
         }),
     }),
 

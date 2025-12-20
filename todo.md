@@ -177,3 +177,33 @@
 - [x] Render preview based on intake data
 - [x] Display preview in CustomerPreview page
 - [x] Add Open Preview in New Tab button in admin
+
+## Trust & Legal Protection (User Feedback)
+
+- [x] Improve "Request Changes" button with better copy
+- [x] Add reassurance copy: "Want changes before launch? Request edits — no charge before approval."
+- [x] Lock preview to build plan version (build_plan_id)
+- [x] Add build plan hash for approval verification
+- [x] Add approval + payment copy under button
+- [x] Include terms agreement in approval flow
+
+## Referral Program
+
+- [x] Create referrals database table
+- [x] Add referral code to intake form
+- [x] Track referrer and referee
+- [x] Apply $50 discount for both parties
+- [ ] Add referral dashboard for users (UI)
+
+## Email Delivery (Production)
+
+- [x] Set up Resend integration
+- [x] Connect email templates to real delivery
+- [ ] Add RESEND_API_KEY secret (user action required)
+
+## Admin Bulk Actions
+
+- [x] Add checkbox selection to intake list
+- [x] Add bulk approve action
+- [x] Add bulk export to CSV
+- [x] Add bulk status update

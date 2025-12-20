@@ -248,3 +248,51 @@ export const moduleOrders = mysqlTable("module_orders", {
 
 export type ModuleOrder = typeof moduleOrders.$inferSelect;
 export type InsertModuleOrder = typeof moduleOrders.$inferInsert;
+
+/**
+ * Approval logs for legal protection
+ * Tracks when customers approve build plans with version hash
+ */
+export const approvals = mysqlTable("approvals", {
+  id: int("id").autoincrement().primaryKey(),
+  intakeId: int("intakeId").notNull(),
+  buildPlanId: int("buildPlanId").notNull(),
+  // Build plan version hash for verification
+  buildPlanHash: varchar("buildPlanHash", { length: 64 }).notNull(),
+  // Legal details
+  userAgent: text("userAgent"),
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  // Timestamps
+  approvedAt: timestamp("approvedAt").defaultNow().notNull(),
+});
+
+export type Approval = typeof approvals.$inferSelect;
+export type InsertApproval = typeof approvals.$inferInsert;
+
+/**
+ * Referrals for tracking referral program
+ */
+export const referrals = mysqlTable("referrals", {
+  id: int("id").autoincrement().primaryKey(),
+  // Referrer info
+  referrerIntakeId: int("referrerIntakeId").notNull(),
+  referrerEmail: varchar("referrerEmail", { length: 320 }).notNull(),
+  // Referral code
+  code: varchar("code", { length: 16 }).notNull().unique(),
+  // Referee tracking
+  refereeIntakeId: int("refereeIntakeId"),
+  refereeEmail: varchar("refereeEmail", { length: 320 }),
+  // Rewards
+  referrerDiscountCents: int("referrerDiscountCents").default(5000), // $50
+  refereeDiscountCents: int("refereeDiscountCents").default(5000), // $50
+  referrerRewardApplied: boolean("referrerRewardApplied").default(false),
+  refereeRewardApplied: boolean("refereeRewardApplied").default(false),
+  // Status
+  status: mysqlEnum("status", ["pending", "used", "expired"]).default("pending").notNull(),
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  usedAt: timestamp("usedAt"),
+});
+
+export type Referral = typeof referrals.$inferSelect;
+export type InsertReferral = typeof referrals.$inferInsert;

@@ -43,6 +43,13 @@
       "when": 1766191276704,
       "tag": "0005_crazy_archangel",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1766194400365,
+      "tag": "0006_needy_taskmaster",
+      "breakpoints": true
     }
   ]
 }

@@ -103,7 +103,7 @@ describe("intake.submit", () => {
       tagline: "Your trusted local plumber since 2005",
     });
 
-    expect(result).toEqual({ success: true, intakeId: 1 });
+    expect(result).toEqual({ success: true, intakeId: 1, referralDiscount: 0 });
   });
 
   it("accepts minimal required fields", async () => {
@@ -117,7 +117,7 @@ describe("intake.submit", () => {
       vertical: "appointments",
     });
 
-    expect(result).toEqual({ success: true, intakeId: 1 });
+    expect(result).toEqual({ success: true, intakeId: 1, referralDiscount: 0 });
   });
 
   it("rejects invalid email", async () => {

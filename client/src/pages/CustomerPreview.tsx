@@ -318,14 +318,19 @@ export default function CustomerPreview() {
 
             {/* Request Changes */}
             {isReadyForReview && !showFeedback && (
-              <Button 
-                variant="outline" 
-                onClick={() => setShowFeedback(true)}
-                className="w-full"
-              >
-                <MessageSquare className="h-4 w-4 mr-2" />
-                Request a Change
-              </Button>
+              <div className="space-y-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowFeedback(true)}
+                  className="w-full"
+                >
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Request Changes
+                </Button>
+                <p className="text-xs text-muted-foreground text-center">
+                  Want changes before launch? Request edits — no charge before approval.
+                </p>
+              </div>
             )}
 
             {showFeedback && (
@@ -386,7 +391,11 @@ export default function CustomerPreview() {
                   )}
                 </Button>
                 <p className="text-xs text-muted-foreground text-center">
-                  Approving confirms your scope and unlocks the next step.
+                  By proceeding, you approve this build plan and agree to{" "}
+                  <Link href="/terms" className="underline hover:text-foreground">
+                    LaunchBase's terms
+                  </Link>.
+                  Your site will be deployed immediately after payment.
                 </p>
               </div>
             )}
