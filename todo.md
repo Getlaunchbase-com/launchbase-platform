@@ -250,3 +250,8 @@
 - [x] Show all referral codes and their status
 - [x] Track conversions and payouts
 - [x] Add to admin sidebar navigation
+
+
+## Mobile UI Fixes
+
+- [x] Make logo much bigger on mobile navigation

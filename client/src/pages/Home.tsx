@@ -15,8 +15,8 @@ export default function Home() {
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0B0B0C]/95 backdrop-blur-sm border-b border-white/10">
         <div className="container max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center">
-            <img src="/logo-full-dark.png" alt="LaunchBase" className="h-8" />
+          <div className="flex items-center flex-1 mr-4 md:flex-none md:mr-0">
+            <img src="/logo-cropped.png" alt="LaunchBase" className="h-10 w-auto md:h-8" />
           </div>
           <div className="hidden md:flex items-center gap-8">
             <a href="#how-it-works" className="text-sm text-gray-400 hover:text-white transition">How It Works</a>
