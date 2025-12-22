@@ -2,9 +2,10 @@ import { Request, Response } from "express";
 import Stripe from "stripe";
 import { constructWebhookEvent } from "./checkout";
 import { getDb } from "../db";
-import { intakes, payments, intelligenceLayers } from "../../drizzle/schema";
+import { intakes, payments, intelligenceLayers, buildPlans, approvals, deployments } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { sendEmail } from "../email";
+import { notifyOwner } from "../_core/notification";
 import { Cadence, LayerKey } from "./intelligenceCheckout";
 
 /**
@@ -404,12 +405,116 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   if (intake) {
     console.log(`[Stripe Webhook] Intake ${intakeId} marked as paid`);
     
-    // Send payment confirmation email
     const firstName = intake.contactName?.split(" ")[0] || "there";
-    await sendEmail(intakeIdNum, "launch_confirmation", {
+    
+    // Send "deployment started" email
+    await sendEmail(intakeIdNum, "deployment_started", {
       firstName,
       businessName: intake.businessName,
       email: intake.email,
     });
+    
+    // Trigger deployment with safety gates
+    await triggerDeploymentWithSafetyGates(intakeIdNum, intake, db);
   }
+}
+
+/**
+ * Trigger deployment with safety gates
+ * Only deploys if all prerequisites are met
+ */
+async function triggerDeploymentWithSafetyGates(
+  intakeId: number, 
+  intake: typeof intakes.$inferSelect,
+  db: Awaited<ReturnType<typeof getDb>>
+) {
+  const safetyChecks: { check: string; passed: boolean; reason?: string }[] = [];
+  
+  // Safety gate 1: Intake exists (already passed since we have it)
+  safetyChecks.push({ check: "intake_exists", passed: true });
+  
+  // Safety gate 2: Build plan exists
+  const [buildPlan] = await db!
+    .select()
+    .from(buildPlans)
+    .where(eq(buildPlans.intakeId, intakeId))
+    .limit(1);
+  safetyChecks.push({ 
+    check: "build_plan_exists", 
+    passed: !!buildPlan,
+    reason: buildPlan ? undefined : "No build plan found for this intake"
+  });
+  
+  // Safety gate 3: Preview token exists
+  safetyChecks.push({ 
+    check: "preview_token_exists", 
+    passed: !!intake.previewToken,
+    reason: intake.previewToken ? undefined : "No preview token found"
+  });
+  
+  // Safety gate 4: Approval event exists
+  const [approval] = await db!
+    .select()
+    .from(approvals)
+    .where(eq(approvals.intakeId, intakeId))
+    .limit(1);
+  safetyChecks.push({ 
+    check: "approval_exists", 
+    passed: !!approval,
+    reason: approval ? undefined : "Customer has not approved the build plan"
+  });
+  
+  // Safety gate 5: Not already deployed/deploying
+  const [existingDeployment] = await db!
+    .select()
+    .from(deployments)
+    .where(eq(deployments.intakeId, intakeId))
+    .limit(1);
+  const notAlreadyDeployed = !existingDeployment || 
+    (existingDeployment.status !== "running" && existingDeployment.status !== "success");
+  safetyChecks.push({ 
+    check: "not_already_deployed", 
+    passed: notAlreadyDeployed,
+    reason: notAlreadyDeployed ? undefined : "Deployment already in progress or completed"
+  });
+  
+  // Check if all gates passed
+  const allPassed = safetyChecks.every(c => c.passed);
+  const failedChecks = safetyChecks.filter(c => !c.passed);
+  
+  if (!allPassed) {
+    console.error(`[Stripe Webhook] Deployment safety gates failed for intake ${intakeId}:`, failedChecks);
+    
+    // Update intake status to needs_attention
+    await db!
+      .update(intakes)
+      .set({
+        status: "paid", // Keep as paid but add internal note
+        internalNotes: `[AUTO] Deployment blocked - safety gates failed: ${failedChecks.map(c => c.reason).join(", ")}`,
+        updatedAt: new Date(),
+      })
+      .where(eq(intakes.id, intakeId));
+    
+    // Notify admin
+    await notifyOwner({
+      title: `Deployment blocked for ${intake.businessName}`,
+      content: `Safety gates failed:\n${failedChecks.map(c => `- ${c.check}: ${c.reason}`).join("\n")}`,
+    });
+    
+    return;
+  }
+  
+  // All gates passed - create deployment
+  console.log(`[Stripe Webhook] All safety gates passed for intake ${intakeId}, creating deployment`);
+  
+  const [deployment] = await db!.insert(deployments).values({
+    intakeId,
+    buildPlanId: buildPlan!.id,
+    status: "queued",
+  }).$returningId();
+  
+  console.log(`[Stripe Webhook] Deployment ${deployment.id} queued for intake ${intakeId}`);
+  
+  // Note: Actual deployment execution would be handled by a separate worker/job
+  // For now, we just queue it and admin can trigger manually or set up a cron job
 }

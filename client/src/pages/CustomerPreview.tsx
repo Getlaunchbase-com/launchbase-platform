@@ -21,6 +21,8 @@ import {
   Zap
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 // Business module definitions with production copy
@@ -62,6 +64,7 @@ export default function CustomerPreview() {
   const [selectedModules, setSelectedModules] = useState<("google_ads" | "quickbooks")[]>([]);
   const [currentStep, setCurrentStep] = useState<FlowStep>("review");
   const [isApproved, setIsApproved] = useState(false);
+  const [checkoutApprovalChecked, setCheckoutApprovalChecked] = useState(false);
 
   // Fetch intake by preview token
   const { data: intake, isLoading, error } = trpc.intake.getByPreviewToken.useQuery(
@@ -569,19 +572,31 @@ export default function CustomerPreview() {
               </div>
             </div>
 
-            {/* Payment Agreement */}
-            <div className="text-center space-y-4">
-              <p className="text-sm text-muted-foreground">
-                By proceeding, you confirm approval of your build plan and agree to LaunchBase's{" "}
-                <Link href="/terms" className="text-orange-500 hover:underline">Terms of Service</Link>
-                {" "}and{" "}
-                <Link href="/privacy" className="text-orange-500 hover:underline">Privacy Policy</Link>.
-              </p>
+            {/* Approval Checkbox - Required before payment */}
+            <div className="p-4 rounded-lg border border-orange-500/30 bg-orange-500/5">
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  id="checkoutApproval"
+                  checked={checkoutApprovalChecked}
+                  onCheckedChange={(checked) => setCheckoutApprovalChecked(checked === true)}
+                  className="mt-0.5 border-orange-500/50 data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500"
+                />
+                <Label htmlFor="checkoutApproval" className="text-sm cursor-pointer leading-relaxed">
+                  I approve this preview and understand my site will be deployed after payment.
+                  I agree to LaunchBase's{" "}
+                  <Link href="/terms" className="text-orange-500 hover:underline">Terms of Service</Link>
+                  {" "}and{" "}
+                  <Link href="/refunds" className="text-orange-500 hover:underline">Refund Policy</Link>.
+                </Label>
+              </div>
+            </div>
 
+            {/* Payment Button */}
+            <div className="text-center space-y-4">
               <Button 
                 onClick={handlePaySecurely}
-                disabled={checkoutMutation.isPending}
-                className="w-full bg-orange-500 hover:bg-orange-600"
+                disabled={!checkoutApprovalChecked || checkoutMutation.isPending}
+                className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 size="lg"
               >
                 {checkoutMutation.isPending ? (
@@ -591,7 +606,7 @@ export default function CustomerPreview() {
                   </>
                 ) : (
                   <>
-                    Pay Securely
+                    Approve & Pay
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </>
                 )}
