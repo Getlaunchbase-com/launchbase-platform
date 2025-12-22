@@ -51,9 +51,9 @@ describe("Email Service", () => {
         previewUrl: "https://preview.launchbase.com/abc123",
       });
       
-      expect(template.subject).toBe("🚀 Your website is ready to review");
+      expect(template.subject).toBe("Your site preview is ready");
       expect(template.body).toContain("preview.launchbase.com/abc123");
-      expect(template.body).toContain("approve");
+      expect(template.body).toContain("Nothing is published yet");
     });
 
     it("should generate review nudge email", () => {

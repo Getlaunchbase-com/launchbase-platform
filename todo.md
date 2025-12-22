@@ -546,3 +546,18 @@
 - [x] Update admin page Approve button to use new flow with modal
 - [x] Show intake link if already approved
 - [ ] Trigger build plan generation after intake creation (future enhancement)
+
+
+## Pipeline Enhancement (Beta Ready)
+
+- [x] Audit: Intake → Build Plan connection
+- [x] Audit: Build Plan → Preview connection
+- [x] Audit: Preview → Stripe connection
+- [x] Audit: Payment → Deploy connection
+- [x] Enhance approve modal with prefill (business name, city, CTA, phone)
+- [x] Add auto-generate build plan checkbox (default ON)
+- [x] Add missing-fields safety gate (warn if incomplete)
+- [x] Wire build plan auto-generation on approval
+- [x] Add Beta/Founding Client toggle
+- [x] Update ready_for_review email with Stripe-clean copy
+- [ ] Add activity log timeline on application
