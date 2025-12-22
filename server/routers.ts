@@ -1470,6 +1470,11 @@ export const appRouter = router({
       .input(z.object({
         id: z.number(),
         businessName: z.string().min(1).max(255),
+        serviceArea: z.string().optional(),
+        primaryCTA: z.enum(["call", "book", "quote", "contact"]).optional(),
+        phone: z.string().optional(),
+        autoBuildPlan: z.boolean().default(true),
+        isBetaCustomer: z.boolean().default(false),
       }))
       .mutation(async ({ input, ctx }) => {
         const db = await getDb();
@@ -1493,15 +1498,40 @@ export const appRouter = router({
         };
         const intakeVertical = verticalMap[app.vertical] || "trades";
 
+        // Use provided values or fall back to application data
+        const serviceArea = input.serviceArea || app.cityZip;
+        const phone = input.phone || app.contactPhone;
+        const hasEmail = !!app.contactEmail;
+        const hasPhone = !!phone;
+        const hasLocation = !!serviceArea;
+
+        // Check required fields for auto-build-plan
+        const missingFields: string[] = [];
+        if (!input.businessName?.trim()) missingFields.push("businessName");
+        if (!input.primaryCTA) missingFields.push("primaryCTA");
+        if (!hasEmail && !hasPhone) missingFields.push("contact"); // Need at least one contact method
+        if (!hasLocation) missingFields.push("serviceArea");
+
+        // If auto-build requested but fields missing, return structured error
+        if (input.autoBuildPlan && missingFields.length > 0) {
+          return {
+            success: false,
+            code: "MISSING_FIELDS" as const,
+            missing: missingFields,
+            message: `Missing required fields: ${missingFields.join(", ")}`,
+          };
+        }
+
         // Create the intake
         const intake = await createIntake({
           businessName: input.businessName,
           contactName: app.contactName,
           email: app.contactEmail,
-          phone: app.contactPhone,
+          phone: phone,
           vertical: intakeVertical,
           services: app.industry ? [app.industry.replace(/_/g, " ")] : [],
-          serviceArea: [app.cityZip],
+          serviceArea: serviceArea ? [serviceArea] : [],
+          primaryCTA: input.primaryCTA || "call",
           rawPayload: {
             source: "suite_application",
             suiteApplicationId: app.id,
@@ -1511,10 +1541,33 @@ export const appRouter = router({
             layers: app.layers,
             pricing: app.pricing,
             startTiming: app.startTiming,
+            isBetaCustomer: input.isBetaCustomer,
           },
         }, "review");
 
         if (!intake) throw new Error("Failed to create intake");
+
+        let buildPlanId: number | null = null;
+        let previewToken: string | null = null;
+
+        // Auto-generate build plan if requested
+        if (input.autoBuildPlan) {
+          const plan = generateBuildPlan(intake);
+          const buildPlan = await createBuildPlan({
+            intakeId: intake.id,
+            templateId: intakeVertical === "trades" ? "trades_v1" : 
+                        intakeVertical === "appointments" ? "appointment_v2" : "professional_v1",
+            plan,
+            status: "draft",
+          });
+          buildPlanId = buildPlan?.id || null;
+
+          // Generate preview token and update intake to ready_for_review
+          previewToken = `preview_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+          await db.update(intakes)
+            .set({ status: "ready_for_review", previewToken })
+            .where(eq(intakes.id, intake.id));
+        }
 
         // Update the suite application with intake ID and status
         await db
@@ -1526,16 +1579,31 @@ export const appRouter = router({
           })
           .where(eq(suiteApplications.id, input.id));
 
-        // Send confirmation email to customer
-        await sendEmail(
-          intake.id,
-          "intake_confirmation",
-          {
-            firstName: app.contactName.split(" ")[0],
-            businessName: input.businessName,
-            email: app.contactEmail,
-          }
-        );
+        // Send appropriate email based on whether build plan was generated
+        if (input.autoBuildPlan && previewToken) {
+          // Send ready for review email with preview link
+          await sendEmail(
+            intake.id,
+            "ready_for_review",
+            {
+              firstName: app.contactName.split(" ")[0],
+              businessName: input.businessName,
+              email: app.contactEmail,
+              previewUrl: `/preview/${previewToken}`,
+            }
+          );
+        } else {
+          // Send confirmation email
+          await sendEmail(
+            intake.id,
+            "intake_confirmation",
+            {
+              firstName: app.contactName.split(" ")[0],
+              businessName: input.businessName,
+              email: app.contactEmail,
+            }
+          );
+        }
 
         // Notify admin
         await AdminNotifications.newIntake(input.businessName, 100);
@@ -1543,6 +1611,9 @@ export const appRouter = router({
         return {
           success: true,
           intakeId: intake.id,
+          buildPlanId,
+          previewToken,
+          autoBuildPlan: input.autoBuildPlan,
         };
       }),
   }),

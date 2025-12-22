@@ -25,6 +25,8 @@ import {
   Check,
   Sparkles,
   ExternalLink,
+  AlertTriangle,
+  Zap,
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import DashboardLayout from "@/components/DashboardLayout";
@@ -48,6 +50,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -167,6 +170,11 @@ export default function AdminSuiteApplications() {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [businessName, setBusinessName] = useState("");
+  const [serviceArea, setServiceArea] = useState("");
+  const [primaryCTA, setPrimaryCTA] = useState<"call" | "book" | "quote" | "contact">("call");
+  const [phone, setPhone] = useState("");
+  const [autoBuildPlan, setAutoBuildPlan] = useState(true);
+  const [isBetaCustomer, setIsBetaCustomer] = useState(false);
 
   const { data: applications, isLoading, refetch } = trpc.suiteApply.list.useQuery({
     status: statusFilter !== "all" ? statusFilter as any : undefined,
@@ -194,9 +202,26 @@ export default function AdminSuiteApplications() {
 
   const approveAndCreate = trpc.suiteApply.approveAndCreateIntake.useMutation({
     onSuccess: (data) => {
-      toast.success(`Intake created! ID: ${data.intakeId}`);
+      // Handle missing fields response
+      if ('code' in data && data.code === 'MISSING_FIELDS') {
+        const missing = (data as { missing: string[] }).missing;
+        toast.error(`Missing required fields: ${missing.join(', ')}`);
+        return;
+      }
+      
+      // Success - intake created
+      if (data.autoBuildPlan && data.previewToken) {
+        toast.success(`Intake created with preview ready! Customer will receive email.`);
+      } else {
+        toast.success(`Intake created! ID: ${data.intakeId}`);
+      }
       setShowApproveModal(false);
       setBusinessName("");
+      setServiceArea("");
+      setPhone("");
+      setPrimaryCTA("call");
+      setAutoBuildPlan(true);
+      setIsBetaCustomer(false);
       setSelectedApp(null);
       refetch();
     },
@@ -221,7 +246,13 @@ export default function AdminSuiteApplications() {
       if (e.key === "a" || e.key === "A") {
         e.preventDefault();
         if (!selectedApp.intakeId) {
+          // Prefill modal with application data
           setBusinessName("");
+          setServiceArea(selectedApp.cityZip || "");
+          setPhone(selectedApp.contactPhone || "");
+          setPrimaryCTA("call");
+          setAutoBuildPlan(true);
+          setIsBetaCustomer(false);
           setShowApproveModal(true);
         } else {
           toast.info("Already has an intake");
@@ -577,7 +608,13 @@ export default function AdminSuiteApplications() {
                   <div className="flex gap-2">
                     <Button
                       onClick={() => {
+                        // Prefill modal with application data
                         setBusinessName("");
+                        setServiceArea(selectedApp.cityZip || "");
+                        setPhone(selectedApp.contactPhone || "");
+                        setPrimaryCTA("call");
+                        setAutoBuildPlan(true);
+                        setIsBetaCustomer(false);
                         setShowApproveModal(true);
                       }}
                       className="flex-1 bg-green-600 hover:bg-green-700"
@@ -766,35 +803,137 @@ export default function AdminSuiteApplications() {
 
         {/* Approve Modal */}
         <Dialog open={showApproveModal} onOpenChange={setShowApproveModal}>
-          <DialogContent className="bg-[#0B0B0C] border-white/10">
+          <DialogContent className="bg-[#0B0B0C] border-white/10 max-w-lg">
             <DialogHeader>
-              <DialogTitle className="text-white">Approve & Create Intake</DialogTitle>
+              <DialogTitle className="text-white text-lg">Approve and create intake</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4 py-4">
+            <div className="space-y-5 py-2">
               <p className="text-sm text-gray-400">
-                This will create an intake record and start the build process for this customer.
+                This creates an intake and prepares a preview link for the customer to review before anything goes live.
               </p>
+
+              {/* Business Name - Required */}
               <div className="space-y-2">
-                <Label htmlFor="businessName" className="text-gray-300">Business Name</Label>
+                <Label htmlFor="businessName" className="text-gray-300">
+                  Business name <span className="text-red-400">*</span>
+                </Label>
                 <Input
                   id="businessName"
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
-                  placeholder="Enter business name"
+                  placeholder="e.g., Smith Custom Cabinets"
                   className="bg-white/5 border-white/10"
                   autoFocus
                 />
               </div>
+
+              {/* Primary CTA - Required */}
+              <div className="space-y-2">
+                <Label className="text-gray-300">
+                  Primary CTA <span className="text-red-400">*</span>
+                </Label>
+                <div className="flex gap-2">
+                  {(["call", "book", "quote", "contact"] as const).map((cta) => (
+                    <Button
+                      key={cta}
+                      type="button"
+                      variant={primaryCTA === cta ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setPrimaryCTA(cta)}
+                      className={primaryCTA === cta 
+                        ? "bg-[#FF6A00] hover:bg-[#FF6A00]/90 border-[#FF6A00]" 
+                        : "border-white/10 text-gray-400 hover:text-white hover:border-white/20"
+                      }
+                    >
+                      {cta === "call" ? "Call" : cta === "book" ? "Book" : cta === "quote" ? "Request Quote" : "Contact"}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Service Area - Recommended */}
+              <div className="space-y-2">
+                <Label htmlFor="serviceArea" className="text-gray-300">
+                  Service area <span className="text-gray-500 text-xs">(recommended)</span>
+                </Label>
+                <Input
+                  id="serviceArea"
+                  value={serviceArea}
+                  onChange={(e) => setServiceArea(e.target.value)}
+                  placeholder="e.g., Des Plaines + 15 miles"
+                  className="bg-white/5 border-white/10"
+                />
+              </div>
+
+              {/* Phone - Recommended */}
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="text-gray-300">
+                  Phone <span className="text-gray-500 text-xs">(recommended)</span>
+                </Label>
+                <Input
+                  id="phone"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="e.g., (847) 555-1234"
+                  className="bg-white/5 border-white/10"
+                />
+              </div>
+
+              {/* Toggles */}
+              <div className="space-y-3 pt-2 border-t border-white/10">
+                <div className="flex items-center gap-3">
+                  <Checkbox
+                    id="autoBuildPlan"
+                    checked={autoBuildPlan}
+                    onCheckedChange={(checked) => setAutoBuildPlan(checked === true)}
+                    className="border-white/20 data-[state=checked]:bg-[#FF6A00] data-[state=checked]:border-[#FF6A00]"
+                  />
+                  <Label htmlFor="autoBuildPlan" className="text-gray-300 cursor-pointer flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-[#FF6A00]" />
+                    Auto-generate build plan + preview
+                  </Label>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Checkbox
+                    id="isBetaCustomer"
+                    checked={isBetaCustomer}
+                    onCheckedChange={(checked) => setIsBetaCustomer(checked === true)}
+                    className="border-white/20 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
+                  />
+                  <Label htmlFor="isBetaCustomer" className="text-gray-300 cursor-pointer">
+                    Mark as beta customer
+                  </Label>
+                </div>
+              </div>
+
+              {/* Missing Fields Warning */}
+              {autoBuildPlan && (!businessName.trim() || !serviceArea.trim()) && (
+                <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                  <div className="flex items-start gap-2">
+                    <AlertTriangle className="w-4 h-4 text-yellow-400 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-sm text-yellow-400 font-medium">Missing info for auto-preview</p>
+                      <ul className="text-xs text-yellow-400/80 mt-1 space-y-0.5">
+                        {!businessName.trim() && <li>• Business name required</li>}
+                        {!serviceArea.trim() && <li>• Service area recommended</li>}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Application Info */}
               {selectedApp && (
-                <div className="text-sm text-gray-500 space-y-1">
-                  <p><strong>Contact:</strong> {selectedApp.contactName}</p>
-                  <p><strong>Email:</strong> {selectedApp.contactEmail}</p>
-                  <p><strong>Vertical:</strong> {verticalLabels[selectedApp.vertical] || selectedApp.vertical}</p>
-                  {selectedApp.industry && <p><strong>Industry:</strong> {selectedApp.industry.replace(/_/g, " ")}</p>}
+                <div className="text-xs text-gray-500 pt-2 border-t border-white/10 space-y-1">
+                  <p><span className="text-gray-400">Contact:</span> {selectedApp.contactName} ({selectedApp.contactEmail})</p>
+                  <p><span className="text-gray-400">Vertical:</span> {verticalLabels[selectedApp.vertical] || selectedApp.vertical}
+                    {selectedApp.industry && ` → ${selectedApp.industry.replace(/_/g, " ")}`}
+                  </p>
                 </div>
               )}
             </div>
-            <DialogFooter>
+
+            <DialogFooter className="gap-2">
               <Button
                 variant="outline"
                 onClick={() => setShowApproveModal(false)}
@@ -808,13 +947,23 @@ export default function AdminSuiteApplications() {
                     approveAndCreate.mutate({
                       id: selectedApp.id,
                       businessName: businessName.trim(),
+                      serviceArea: serviceArea.trim() || undefined,
+                      primaryCTA,
+                      phone: phone.trim() || undefined,
+                      autoBuildPlan,
+                      isBetaCustomer,
                     });
                   }
                 }}
                 disabled={!businessName.trim() || approveAndCreate.isPending}
                 className="bg-green-600 hover:bg-green-700"
               >
-                {approveAndCreate.isPending ? "Creating..." : "Approve & Create Intake"}
+                {approveAndCreate.isPending 
+                  ? "Creating..." 
+                  : autoBuildPlan 
+                    ? "Approve & Generate Preview" 
+                    : "Create Intake Only"
+                }
               </Button>
             </DialogFooter>
           </DialogContent>

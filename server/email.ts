@@ -98,25 +98,22 @@ LaunchBase`
 
     case "ready_for_review":
       return {
-        subject: "🚀 Your website is ready to review",
-        previewText: "Take a look and let us know what you think.",
+        subject: "Your site preview is ready",
+        previewText: "Nothing is published yet — review your preview and let us know.",
         body: `Hi ${firstName},
 
-Your website is ready to review 🎉
+Your LaunchBase preview is ready to review.
 
-👉 Preview your site:
+Nothing is published yet — this is your chance to confirm everything looks right.
+
+👉 Review your preview:
 ${previewUrl || "[Preview URL]"}
 
-Take a look and let us know:
-• 👍 If you're happy and ready to launch
-• ✏️ Or if you'd like any changes
-
-Nothing goes live until you approve it.
-
-If you have feedback, just reply to this email — a real person will take care of it.
+If you want changes, reply to this email and we'll adjust it before launch.
 
 —
-LaunchBase`
+LaunchBase
+Workflows that give you back your life.`
       };
 
     case "review_nudge":
