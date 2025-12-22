@@ -519,8 +519,15 @@ export const suiteApplications = mysqlTable("suite_applications", {
   contactName: varchar("contactName", { length: 255 }).notNull(),
   contactEmail: varchar("contactEmail", { length: 320 }).notNull(),
   contactPhone: varchar("contactPhone", { length: 64 }).notNull(),
-  // Business info
-  businessType: mysqlEnum("businessType", ["TRADES", "FOOD", "RETAIL", "PRO", "OTHER"]).notNull(),
+  // Language preference (intake language - website is always English)
+  language: mysqlEnum("language", ["en", "es", "pl"]).default("en").notNull(),
+  // Business info - expanded verticals
+  vertical: mysqlEnum("vertical", [
+    "trades", "health", "beauty", "food", "cannabis", "professional", "fitness", "automotive"
+  ]).notNull(),
+  industry: varchar("industry", { length: 64 }), // specific industry within vertical
+  // Legacy field - keeping for backward compatibility
+  businessType: mysqlEnum("businessType", ["TRADES", "FOOD", "RETAIL", "PRO", "OTHER"]),
   cityZip: varchar("cityZip", { length: 128 }).notNull(),
   radiusMiles: int("radiusMiles").notNull(),
   // Module configuration

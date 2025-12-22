@@ -136,7 +136,7 @@ export default function Home() {
             <div>
               <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 text-sm text-gray-400 mb-6">
                 <Sparkles className="w-4 h-4 text-[#FF6A00]" />
-                <span>Websites for service businesses</span>
+              <span>Websites for local businesses</span>
               </div>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 leading-tight">
@@ -146,9 +146,9 @@ export default function Home() {
               </h1>
               
               <p className="text-lg md:text-xl text-gray-400 mb-6 leading-relaxed">
-                LaunchBase builds professional websites for service businesses — 
-                plumbers, HVAC, landscapers, contractors. Fast setup, no maintenance headaches, 
-                and workflows that grow with you.
+                LaunchBase builds professional websites for local businesses — 
+                trades, health & wellness, beauty, restaurants, fitness, automotive, and more. 
+                Fast setup, no maintenance headaches, and workflows that grow with you.
               </p>
               
               <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-8">
@@ -526,9 +526,11 @@ export default function Home() {
                 What kind of businesses is LaunchBase for?
               </AccordionTrigger>
               <AccordionContent className="text-gray-400 pb-6">
-                LaunchBase is built for service businesses — plumbers, HVAC technicians, electricians, 
-                landscapers, contractors, and similar trades. We understand your industry and build 
-                websites that convert visitors into customers.
+                LaunchBase serves a wide range of local businesses: trades (plumbers, HVAC, electricians, 
+                contractors), health & wellness (dentists, chiropractors, med spas), beauty (salons, barbers, 
+                spas), food & beverage (restaurants, cafés, bars), fitness (gyms, trainers, yoga studios), 
+                automotive (repair shops, detailing), professional services (lawyers, accountants), and more. 
+                We build websites that convert visitors into customers for your specific industry.
               </AccordionContent>
             </AccordionItem>
             
