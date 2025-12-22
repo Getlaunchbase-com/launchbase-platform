@@ -348,10 +348,22 @@ export type InsertIntelligenceLayer = typeof intelligenceLayers.$inferInsert;
  */
 export const socialPosts = mysqlTable("social_posts", {
   id: int("id").autoincrement().primaryKey(),
-  intakeId: int("intakeId").notNull(),
+  userId: int("userId").notNull(),
   // Post content
   content: text("content").notNull(),
   headline: varchar("headline", { length: 255 }),
+  // Post type for categorization
+  postType: mysqlEnum("postType", [
+    "ALL_CLEAR",
+    "MONITORING",
+    "ACTIVE_STORM",
+    "WEATHER_UPDATE",
+    "GAME_DAY",
+    "COMMUNITY_EVENT",
+    "LOCAL_TREND",
+    "SEASONAL",
+    "MANUAL"
+  ]).default("MANUAL").notNull(),
   // Context that triggered this post
   triggerContext: mysqlEnum("triggerContext", [
     "weather_storm",
@@ -363,9 +375,15 @@ export const socialPosts = mysqlTable("social_posts", {
     "seasonal",
     "manual"
   ]).notNull(),
+  // Reason chips (which layers contributed)
+  reasonChips: json("reasonChips").$type<string[]>(), // ['weather', 'sports', 'community', 'trends']
+  // Why we wrote this (AI explanation)
+  whyWeWroteThis: text("whyWeWroteThis"),
+  // Suggested alternative versions
+  suggestedAlts: json("suggestedAlts").$type<string[]>(),
   // Confidence score (0-100)
   confidenceScore: int("confidenceScore").default(0),
-  // Decision reasoning
+  // Decision reasoning (internal)
   decisionReason: text("decisionReason"),
   // Weather data snapshot (if weather-triggered)
   weatherData: json("weatherData").$type<{
@@ -375,13 +393,19 @@ export const socialPosts = mysqlTable("social_posts", {
     forecast?: string;
   }>(),
   // Status workflow
-  status: mysqlEnum("status", ["pending", "approved", "rejected", "published", "failed"]).default("pending").notNull(),
+  status: mysqlEnum("status", ["needs_review", "approved", "rejected", "published", "failed", "expired"]).default("needs_review").notNull(),
+  // Auto-approve settings
+  autoApproveType: boolean("autoApproveType").default(false),
+  // Image attachment (optional)
+  imageUrl: varchar("imageUrl", { length: 512 }),
   // Publishing details
   publishedTo: json("publishedTo").$type<string[]>(), // ['facebook', 'website']
   facebookPostId: varchar("facebookPostId", { length: 255 }),
   // Timestamps
   scheduledFor: timestamp("scheduledFor"),
+  expiresAt: timestamp("expiresAt"), // For Guided mode expiry
   approvedAt: timestamp("approvedAt"),
+  approvedBy: int("approvedBy"), // User ID who approved
   publishedAt: timestamp("publishedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -413,3 +437,73 @@ export const postUsage = mysqlTable("post_usage", {
 
 export type PostUsage = typeof postUsage.$inferSelect;
 export type InsertPostUsage = typeof postUsage.$inferInsert;
+
+
+/**
+ * Module setup steps - tracks customer progress through each module's setup
+ * Each module has specific steps that need to be completed
+ */
+export const moduleSetupSteps = mysqlTable("module_setup_steps", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  // Which module this belongs to
+  moduleKey: mysqlEnum("moduleKey", [
+    "social_media_intelligence",
+    "quickbooks_sync",
+    "google_business"
+  ]).notNull(),
+  // Step identification
+  stepKey: varchar("stepKey", { length: 64 }).notNull(), // e.g., "connect_facebook", "set_preferences"
+  stepOrder: int("stepOrder").notNull(), // 1, 2, 3...
+  // Step details
+  stepTitle: varchar("stepTitle", { length: 255 }).notNull(),
+  stepDescription: text("stepDescription"),
+  // Completion status
+  isCompleted: boolean("isCompleted").default(false).notNull(),
+  completedAt: timestamp("completedAt"),
+  // Data collected at this step (JSON)
+  stepData: json("stepData").$type<Record<string, unknown>>(),
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ModuleSetupStep = typeof moduleSetupSteps.$inferSelect;
+export type InsertModuleSetupStep = typeof moduleSetupSteps.$inferInsert;
+
+/**
+ * Module connections - stores OAuth tokens and connection details per module
+ */
+export const moduleConnections = mysqlTable("module_connections", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  // Which module
+  moduleKey: mysqlEnum("moduleKey", [
+    "social_media_intelligence",
+    "quickbooks_sync",
+    "google_business"
+  ]).notNull(),
+  // Connection type
+  connectionType: mysqlEnum("connectionType", [
+    "facebook_page",
+    "quickbooks_oauth",
+    "google_business_profile"
+  ]).notNull(),
+  // Connection details (encrypted in production)
+  accessToken: text("accessToken"),
+  refreshToken: text("refreshToken"),
+  tokenExpiresAt: timestamp("tokenExpiresAt"),
+  // External IDs
+  externalId: varchar("externalId", { length: 255 }), // Page ID, QB Company ID, etc.
+  externalName: varchar("externalName", { length: 255 }), // Page name, Company name
+  // Connection status
+  status: mysqlEnum("status", ["active", "expired", "revoked", "error"]).default("active").notNull(),
+  lastSyncAt: timestamp("lastSyncAt"),
+  lastError: text("lastError"),
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ModuleConnection = typeof moduleConnections.$inferSelect;
+export type InsertModuleConnection = typeof moduleConnections.$inferInsert;

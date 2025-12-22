@@ -43,7 +43,17 @@ export type AnalyticsEventName =
   | "smi_checkout_completed"
   | "smi_subscription_activated"
   | "smi_subscription_cancelled"
-  | "smi_subscription_reactivated";
+  | "smi_subscription_reactivated"
+  // Post Queue events
+  | "post_approved"
+  | "post_rejected"
+  | "post_edited"
+  | "post_published"
+  // Module Setup events
+  | "module_step_completed"
+  | "module_setup_initialized"
+  | "module_disconnected"
+  | "module_connected";
 
 interface TrackEventParams {
   eventName: AnalyticsEventName;
