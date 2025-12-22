@@ -6,6 +6,9 @@ import {
   buildPlans, InsertBuildPlan, BuildPlan,
   clarifications, InsertClarification, Clarification,
   deployments, InsertDeployment, Deployment,
+  intelligenceLayers, InsertIntelligenceLayer, IntelligenceLayer,
+  socialPosts, InsertSocialPost, SocialPost,
+  postUsage, InsertPostUsage, PostUsage,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { randomBytes } from 'crypto';

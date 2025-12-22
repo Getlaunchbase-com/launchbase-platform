@@ -29,7 +29,15 @@ export type AnalyticsEventName =
   // Email engagement
   | "email_opened"
   | "preview_link_clicked"
-  | "approval_action";
+  | "approval_action"
+  // Intelligence Layers
+  | "intelligence_config_saved"
+  | "expand_viewed"
+  | "social_toggled"
+  | "mode_changed"
+  | "depth_changed"
+  | "layer_toggled"
+  | "sample_week_opened";
 
 interface TrackEventParams {
   eventName: AnalyticsEventName;

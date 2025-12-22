@@ -50,6 +50,13 @@
       "when": 1766194400365,
       "tag": "0006_needy_taskmaster",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1766367519319,
+      "tag": "0007_ordinary_kronos",
+      "breakpoints": true
     }
   ]
 }

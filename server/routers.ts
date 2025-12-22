@@ -4,7 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { getDb } from "./db";
-import { intakes, approvals, buildPlans, referrals } from "../drizzle/schema";
+import { intakes, approvals, buildPlans, referrals, intelligenceLayers } from "../drizzle/schema";
 import { eq, desc } from "drizzle-orm";
 import { 
   createIntake, 
@@ -707,6 +707,214 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         const result = await submitClarificationAnswer(input.token, input.answer);
         return result;
+      }),
+  }),
+
+  // Intelligence Layers for Social Media Intelligence module
+  intelligenceLayers: router({
+    // Get current configuration for the logged-in user's business
+    getConfig: protectedProcedure.query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) return null;
+
+      // For now, get config for the first intake associated with this user
+      // In production, this would be linked to the user's account
+      const [config] = await db
+        .select()
+        .from(intelligenceLayers)
+        .limit(1);
+
+      if (!config) {
+        // Return default configuration
+        return {
+          id: 0,
+          depthLevel: "medium" as const,
+          tuningMode: "auto" as const,
+          weatherEnabled: true,
+          sportsEnabled: true,
+          communityEnabled: false,
+          trendsEnabled: false,
+          approvalRequired: true,
+          monthlyPriceCents: 12900,
+          status: "active" as const,
+        };
+      }
+
+      return config;
+    }),
+
+    // Save configuration
+    saveConfig: protectedProcedure
+      .input(z.object({
+        depthLevel: z.enum(["low", "medium", "high"]),
+        sportsEnabled: z.boolean(),
+        communityEnabled: z.boolean(),
+        trendsEnabled: z.boolean(),
+        tuningMode: z.enum(["auto", "guided", "custom"]).optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        // Calculate monthly price based on depth and layers
+        const basePrices = { low: 7900, medium: 12900, high: 19900 };
+        let monthlyPrice = basePrices[input.depthLevel];
+
+        // Add layer prices (sports included in medium/high)
+        if (input.depthLevel === "low" && input.sportsEnabled) {
+          monthlyPrice += 2900;
+        }
+        if (input.communityEnabled) monthlyPrice += 3900;
+        if (input.trendsEnabled) monthlyPrice += 4900;
+
+        // Check if config exists
+        const [existing] = await db
+          .select()
+          .from(intelligenceLayers)
+          .limit(1);
+
+        if (existing) {
+          // Update existing
+          await db
+            .update(intelligenceLayers)
+            .set({
+              depthLevel: input.depthLevel,
+              sportsEnabled: input.sportsEnabled,
+              communityEnabled: input.communityEnabled,
+              trendsEnabled: input.trendsEnabled,
+              tuningMode: input.tuningMode || "auto",
+              monthlyPriceCents: monthlyPrice,
+              updatedAt: new Date(),
+            })
+            .where(eq(intelligenceLayers.id, existing.id));
+        } else {
+          // Create new - for demo, use intakeId 1
+          await db.insert(intelligenceLayers).values({
+            intakeId: 1,
+            depthLevel: input.depthLevel,
+            sportsEnabled: input.sportsEnabled,
+            communityEnabled: input.communityEnabled,
+            trendsEnabled: input.trendsEnabled,
+            tuningMode: input.tuningMode || "auto",
+            monthlyPriceCents: monthlyPrice,
+          });
+        }
+
+        // Track analytics event
+        await trackEvent({
+          eventName: "intelligence_config_saved",
+          metadata: {
+            depthLevel: input.depthLevel,
+            sportsEnabled: input.sportsEnabled,
+            communityEnabled: input.communityEnabled,
+            trendsEnabled: input.trendsEnabled,
+            monthlyPrice,
+          },
+        });
+
+        return { success: true, monthlyPriceCents: monthlyPrice };
+      }),
+
+    // Get recommendations based on vertical
+    getRecommendations: publicProcedure
+      .input(z.object({
+        vertical: z.enum(["trades", "appointments", "professional"]),
+        location: z.string().optional(),
+      }))
+      .query(({ input }) => {
+        // Deterministic recommendations based on vertical
+        const recommendations: Record<string, {
+          depth: "low" | "medium" | "high";
+          layers: string[];
+          explanation: string;
+        }> = {
+          trades: {
+            depth: "medium",
+            layers: ["weather", "sports", "community"],
+            explanation: "Weather and community events drive demand for trades businesses. Sports events affect traffic and scheduling.",
+          },
+          appointments: {
+            depth: "medium",
+            layers: ["weather", "community"],
+            explanation: "Weather affects appointment attendance. Community events help with local engagement.",
+          },
+          professional: {
+            depth: "low",
+            layers: ["weather"],
+            explanation: "Professional services benefit from conservative posting. Weather awareness prevents irrelevant content.",
+          },
+        };
+
+        return recommendations[input.vertical] || recommendations.professional;
+      }),
+
+    // Generate sample week preview
+    getSampleWeek: publicProcedure
+      .input(z.object({
+        depthLevel: z.enum(["low", "medium", "high"]),
+        sportsEnabled: z.boolean(),
+        communityEnabled: z.boolean(),
+        trendsEnabled: z.boolean(),
+      }))
+      .query(({ input }) => {
+        // Generate sample posts based on configuration
+        const samplePosts = [];
+
+        // Weather-triggered post (always included)
+        samplePosts.push({
+          id: 1,
+          type: "weather",
+          content: "❄️ Snow expected tonight. Our crews are ready to keep your property clear and safe. Stay warm!",
+          trigger: "Winter storm advisory",
+          day: "Monday",
+          time: "6:00 PM",
+        });
+
+        if (input.depthLevel !== "low") {
+          samplePosts.push({
+            id: 2,
+            type: "weather",
+            content: "☀️ Beautiful day ahead! Perfect weather for outdoor projects. How can we help?",
+            trigger: "Clear skies, 65°F",
+            day: "Wednesday",
+            time: "9:00 AM",
+          });
+        }
+
+        if (input.sportsEnabled) {
+          samplePosts.push({
+            id: 3,
+            type: "sports",
+            content: "🏈 Big game today! We'll have your property cleared before kickoff. Go Bears! 🐻",
+            trigger: "Bears home game",
+            day: "Sunday",
+            time: "10:00 AM",
+          });
+        }
+
+        if (input.communityEnabled) {
+          samplePosts.push({
+            id: 4,
+            type: "community",
+            content: "🎄 Holiday market this weekend! We'll make sure your walkways are safe for all the visitors.",
+            trigger: "Local holiday event",
+            day: "Friday",
+            time: "3:00 PM",
+          });
+        }
+
+        if (input.trendsEnabled && input.depthLevel === "high") {
+          samplePosts.push({
+            id: 5,
+            type: "trends",
+            content: "Lots of folks talking about ice on the roads today. We're on it! Stay safe out there.",
+            trigger: "Local trending topic: road conditions",
+            day: "Thursday",
+            time: "7:00 AM",
+          });
+        }
+
+        return samplePosts;
       }),
   }),
 });
