@@ -583,4 +583,7 @@
 - [x] Mark deployment success/failed after execution
 - [x] Send "site is live" email on success
 - [x] Add manual "Run Next Job" button in admin (AdminDeployments page)
-- [ ] Set up Manus cron to ping endpoint every 2 minutes
+- [x] Set up WORKER_TOKEN environment variable
+- [ ] Set up external cron to ping endpoint every 2 minutes (user action)
+
+- [x] Add worker busy safeguard (prevent double-runs)

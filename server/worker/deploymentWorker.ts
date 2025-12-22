@@ -11,15 +11,21 @@ import { eq, asc } from "drizzle-orm";
 import { sendEmail } from "../email";
 import { notifyOwner } from "../_core/notification";
 
-// Worker secret token (should be set in environment)
-const WORKER_SECRET = process.env.WORKER_SECRET || "launchbase-worker-secret-2024";
+// Worker secret token - MUST be set in environment for production
+// Generate a strong token like: lb_worker_7f3c2d... (32-64 chars)
+const WORKER_TOKEN = process.env.WORKER_TOKEN;
 
 /**
  * Verify worker request has valid secret token
  */
 function verifyWorkerToken(req: Request): boolean {
+  // Reject if no token configured (security: don't allow default)
+  if (!WORKER_TOKEN) {
+    console.error("[Worker] WORKER_TOKEN not configured - rejecting all requests");
+    return false;
+  }
   const token = req.headers["x-worker-token"] || req.headers["authorization"]?.replace("Bearer ", "");
-  return token === WORKER_SECRET;
+  return token === WORKER_TOKEN;
 }
 
 /**
@@ -40,6 +46,23 @@ export async function handleDeploymentWorker(req: Request, res: Response) {
   }
 
   try {
+    // Check if any deployment is already running (prevent double-runs)
+    const [runningJob] = await db
+      .select()
+      .from(deployments)
+      .where(eq(deployments.status, "running"))
+      .limit(1);
+
+    if (runningJob) {
+      console.log(`[Worker] Worker busy - deployment ${runningJob.id} is already running`);
+      return res.json({
+        success: true,
+        message: "Worker busy",
+        processed: 0,
+        runningDeploymentId: runningJob.id,
+      });
+    }
+
     // Find the oldest queued deployment
     const [queuedDeployment] = await db
       .select()
