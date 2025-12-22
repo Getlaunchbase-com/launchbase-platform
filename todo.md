@@ -601,3 +601,45 @@
 - [x] Create hosting integration documentation
 - [ ] Test end-to-end deployment with cabinet maker beta
 - [ ] Plan Phase 2 custom domain support
+
+
+## Deployment Worker Cron Automation
+
+- [x] Create CRON_SETUP.md documentation
+- [ ] Choose external cron service (EasyCron recommended)
+- [ ] Configure cron to POST to /api/worker/run-next-deploy every 2 minutes
+- [ ] Test cron endpoint with curl
+- [ ] Monitor admin dashboard for 24 hours
+- [ ] Set up alerts for cron failures (if service supports)
+
+
+## Facebook Integration (Vince Pilot)
+
+- [x] Create FACEBOOK_INTEGRATION.md documentation
+- [ ] Get Vince's Facebook page ID
+- [ ] Generate long-lived page access token
+- [ ] Add META_PAGE_ID secret to LaunchBase
+- [ ] Add META_PAGE_ACCESS_TOKEN secret to LaunchBase
+- [ ] Implement POST /api/facebook/post endpoint
+- [ ] Create facebook.ts helper functions
+- [ ] Test endpoint with curl
+- [ ] Verify post appears on Vince's page
+- [ ] Wire to Social Media Intelligence module (auto-post approved posts)
+
+
+## Cabinet Maker Beta Smoke Test
+
+- [ ] Run full end-to-end flow (Apply → Approve → Deploy)
+- [ ] Verify generated URL resolves
+- [ ] Check page loads on mobile and desktop
+- [ ] Confirm content matches intake (name/services/CTA)
+- [ ] Verify no mixed-content or blocked assets
+- [ ] Test "Powered by LaunchBase" footer link
+
+
+## Phase 2 Custom Domain Planning
+
+- [ ] Confirm *.getlaunchbase.com wildcard DNS setup
+- [ ] Test wildcard subdomain routing
+- [ ] Plan customer site domain migration
+- [ ] Update deployment worker for getlaunchbase.com URLs
