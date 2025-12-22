@@ -24,6 +24,7 @@ import {
   Copy,
   Check,
   Sparkles,
+  ExternalLink,
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import DashboardLayout from "@/components/DashboardLayout";
@@ -39,6 +40,14 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -143,6 +152,7 @@ type Application = {
   previewToken: string | null;
   adminNotes: string | null;
   reviewedBy: string | null;
+  intakeId: number | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -155,6 +165,8 @@ export default function AdminSuiteApplications() {
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [notes, setNotes] = useState("");
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [showApproveModal, setShowApproveModal] = useState(false);
+  const [businessName, setBusinessName] = useState("");
 
   const { data: applications, isLoading, refetch } = trpc.suiteApply.list.useQuery({
     status: statusFilter !== "all" ? statusFilter as any : undefined,
@@ -180,6 +192,19 @@ export default function AdminSuiteApplications() {
     },
   });
 
+  const approveAndCreate = trpc.suiteApply.approveAndCreateIntake.useMutation({
+    onSuccess: (data) => {
+      toast.success(`Intake created! ID: ${data.intakeId}`);
+      setShowApproveModal(false);
+      setBusinessName("");
+      setSelectedApp(null);
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`Failed to approve: ${error.message}`);
+    },
+  });
+
   // Update notes when selected app changes
   useEffect(() => {
     if (selectedApp) {
@@ -195,7 +220,12 @@ export default function AdminSuiteApplications() {
       
       if (e.key === "a" || e.key === "A") {
         e.preventDefault();
-        updateStatus.mutate({ id: selectedApp.id, status: "approved" });
+        if (!selectedApp.intakeId) {
+          setBusinessName("");
+          setShowApproveModal(true);
+        } else {
+          toast.info("Already has an intake");
+        }
       } else if (e.key === "n" || e.key === "N") {
         e.preventDefault();
         updateStatus.mutate({ id: selectedApp.id, status: "ready_for_review" });
@@ -525,14 +555,36 @@ export default function AdminSuiteApplications() {
 
                 <div className="space-y-6">
                   {/* Quick Actions */}
+                  {selectedApp.intakeId ? (
+                    <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-green-400 font-medium">Approved & Intake Created</p>
+                          <p className="text-sm text-gray-400">Intake ID: {selectedApp.intakeId}</p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-green-500/30 text-green-400"
+                          onClick={() => window.location.href = `/admin/intake/${selectedApp.intakeId}`}
+                        >
+                          <ExternalLink className="w-4 h-4 mr-2" />
+                          View Intake
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
                   <div className="flex gap-2">
                     <Button
-                      onClick={() => updateStatus.mutate({ id: selectedApp.id, status: "approved" })}
+                      onClick={() => {
+                        setBusinessName("");
+                        setShowApproveModal(true);
+                      }}
                       className="flex-1 bg-green-600 hover:bg-green-700"
-                      disabled={updateStatus.isPending}
+                      disabled={approveAndCreate.isPending}
                     >
                       <CheckCircle className="w-4 h-4 mr-2" />
-                      Approve (A)
+                      Approve & Create Intake (A)
                     </Button>
                     <Button
                       onClick={() => updateStatus.mutate({ id: selectedApp.id, status: "ready_for_review" })}
@@ -552,6 +604,7 @@ export default function AdminSuiteApplications() {
                       <X className="w-4 h-4" />
                     </Button>
                   </div>
+                  )}
 
                   {/* Status */}
                   <div className="flex items-center gap-2">
@@ -710,6 +763,62 @@ export default function AdminSuiteApplications() {
             )}
           </SheetContent>
         </Sheet>
+
+        {/* Approve Modal */}
+        <Dialog open={showApproveModal} onOpenChange={setShowApproveModal}>
+          <DialogContent className="bg-[#0B0B0C] border-white/10">
+            <DialogHeader>
+              <DialogTitle className="text-white">Approve & Create Intake</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <p className="text-sm text-gray-400">
+                This will create an intake record and start the build process for this customer.
+              </p>
+              <div className="space-y-2">
+                <Label htmlFor="businessName" className="text-gray-300">Business Name</Label>
+                <Input
+                  id="businessName"
+                  value={businessName}
+                  onChange={(e) => setBusinessName(e.target.value)}
+                  placeholder="Enter business name"
+                  className="bg-white/5 border-white/10"
+                  autoFocus
+                />
+              </div>
+              {selectedApp && (
+                <div className="text-sm text-gray-500 space-y-1">
+                  <p><strong>Contact:</strong> {selectedApp.contactName}</p>
+                  <p><strong>Email:</strong> {selectedApp.contactEmail}</p>
+                  <p><strong>Vertical:</strong> {verticalLabels[selectedApp.vertical] || selectedApp.vertical}</p>
+                  {selectedApp.industry && <p><strong>Industry:</strong> {selectedApp.industry.replace(/_/g, " ")}</p>}
+                </div>
+              )}
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setShowApproveModal(false)}
+                className="border-white/10"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  if (selectedApp && businessName.trim()) {
+                    approveAndCreate.mutate({
+                      id: selectedApp.id,
+                      businessName: businessName.trim(),
+                    });
+                  }
+                }}
+                disabled={!businessName.trim() || approveAndCreate.isPending}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                {approveAndCreate.isPending ? "Creating..." : "Approve & Create Intake"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   );

@@ -564,6 +564,8 @@ export const suiteApplications = mysqlTable("suite_applications", {
   // Admin fields
   adminNotes: text("admin_notes"),
   reviewedBy: varchar("reviewed_by", { length: 255 }),
+  // Link to created intake (after approval)
+  intakeId: int("intake_id"),
   // Timestamps
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

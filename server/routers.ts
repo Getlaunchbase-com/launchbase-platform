@@ -1464,6 +1464,87 @@ export const appRouter = router({
 
         return { success: true };
       }),
+
+    // Admin: Approve application and create intake + build plan
+    approveAndCreateIntake: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        businessName: z.string().min(1).max(255),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        // Get the application
+        const [app] = await db.select().from(suiteApplications).where(eq(suiteApplications.id, input.id)).limit(1);
+        if (!app) throw new Error("Application not found");
+        if (app.intakeId) throw new Error("Application already has an intake");
+
+        // Map suite vertical to intake vertical
+        const verticalMap: Record<string, "trades" | "appointments" | "professional"> = {
+          trades: "trades",
+          health: "appointments",
+          beauty: "appointments",
+          food: "trades",
+          cannabis: "trades",
+          professional: "professional",
+          fitness: "appointments",
+          automotive: "trades",
+        };
+        const intakeVertical = verticalMap[app.vertical] || "trades";
+
+        // Create the intake
+        const intake = await createIntake({
+          businessName: input.businessName,
+          contactName: app.contactName,
+          email: app.contactEmail,
+          phone: app.contactPhone,
+          vertical: intakeVertical,
+          services: app.industry ? [app.industry.replace(/_/g, " ")] : [],
+          serviceArea: [app.cityZip],
+          rawPayload: {
+            source: "suite_application",
+            suiteApplicationId: app.id,
+            language: app.language,
+            cadence: app.cadence,
+            mode: app.mode,
+            layers: app.layers,
+            pricing: app.pricing,
+            startTiming: app.startTiming,
+          },
+        }, "review");
+
+        if (!intake) throw new Error("Failed to create intake");
+
+        // Update the suite application with intake ID and status
+        await db
+          .update(suiteApplications)
+          .set({ 
+            status: "approved",
+            intakeId: intake.id,
+            reviewedBy: ctx.user?.name || ctx.user?.email || "Admin",
+          })
+          .where(eq(suiteApplications.id, input.id));
+
+        // Send confirmation email to customer
+        await sendEmail(
+          intake.id,
+          "intake_confirmation",
+          {
+            firstName: app.contactName.split(" ")[0],
+            businessName: input.businessName,
+            email: app.contactEmail,
+          }
+        );
+
+        // Notify admin
+        await AdminNotifications.newIntake(input.businessName, 100);
+
+        return {
+          success: true,
+          intakeId: intake.id,
+        };
+      }),
   }),
 
   // Weather Intelligence Router - NWS API integration
