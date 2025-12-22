@@ -23,6 +23,9 @@ import AdminReferrals from "./pages/AdminReferrals";
 import ExpandLaunchBase from "./pages/ExpandLaunchBase";
 import PostQueue from "./pages/PostQueue";
 import ModuleSetup from "./pages/ModuleSetup";
+import Apply from "./pages/Apply";
+import ApplySuccess from "./pages/ApplySuccess";
+import HowItWorks from "./pages/HowItWorks";
 
 function Router() {
   return (
@@ -39,6 +42,9 @@ function Router() {
       <Route path="/terms" component={Terms} />
       <Route path="/referrals" component={Referrals} />
       <Route path="/privacy" component={Privacy} />
+      <Route path="/apply" component={Apply} />
+      <Route path="/apply/success" component={ApplySuccess} />
+      <Route path="/how-it-works" component={HowItWorks} />
       
       {/* Admin routes (protected by DashboardLayout) */}
       <Route path="/admin" component={AdminDashboard} />

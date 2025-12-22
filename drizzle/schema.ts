@@ -507,3 +507,57 @@ export const moduleConnections = mysqlTable("module_connections", {
 
 export type ModuleConnection = typeof moduleConnections.$inferSelect;
 export type InsertModuleConnection = typeof moduleConnections.$inferInsert;
+
+
+/**
+ * Suite applications - new customer applications from /apply flow
+ * Captures all configuration choices before payment
+ */
+export const suiteApplications = mysqlTable("suite_applications", {
+  id: int("id").autoincrement().primaryKey(),
+  // Contact info
+  contactName: varchar("contactName", { length: 255 }).notNull(),
+  contactEmail: varchar("contactEmail", { length: 320 }).notNull(),
+  contactPhone: varchar("contactPhone", { length: 64 }).notNull(),
+  // Business info
+  businessType: mysqlEnum("businessType", ["TRADES", "FOOD", "RETAIL", "PRO", "OTHER"]).notNull(),
+  cityZip: varchar("cityZip", { length: 128 }).notNull(),
+  radiusMiles: int("radiusMiles").notNull(),
+  // Module configuration
+  cadence: mysqlEnum("cadence", ["LOW", "MEDIUM", "HIGH"]).notNull(),
+  mode: mysqlEnum("mode", ["AUTO", "GUIDED", "CUSTOM"]).notNull(),
+  layers: json("layers").$type<{
+    weather: true;
+    sports: boolean;
+    community: boolean;
+    trends: boolean;
+  }>().notNull(),
+  // Pricing snapshot (what they agreed to at submit time)
+  pricing: json("pricing").$type<{
+    cadenceMonthly: number;
+    layersMonthly: number;
+    monthlyTotal: number;
+    setupFee: number;
+    enabledLayers: Array<"sports" | "community" | "trends">;
+  }>().notNull(),
+  // Start timing
+  startTiming: mysqlEnum("startTiming", ["NOW", "TWO_WEEKS", "EXPLORING"]).notNull(),
+  // Lifecycle status
+  status: mysqlEnum("status", [
+    "submitted",
+    "ready_for_review",
+    "preview_ready",
+    "approved",
+    "paid",
+    "active",
+    "rejected"
+  ]).default("submitted").notNull(),
+  // Preview token for customer link
+  previewToken: varchar("previewToken", { length: 64 }),
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SuiteApplication = typeof suiteApplications.$inferSelect;
+export type InsertSuiteApplication = typeof suiteApplications.$inferInsert;

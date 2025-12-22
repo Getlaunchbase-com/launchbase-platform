@@ -408,3 +408,30 @@
 
 ## Documentation
 - [x] Create MODULE_SETUP_CHECKLISTS.md with complete customer checklists
+
+
+## Stripe Product Auto-Creation
+
+- [ ] Create script to auto-create all Stripe products via API
+- [ ] Create 3 cadence tier products (Low/Medium/High)
+- [ ] Create 3 layer add-on products (Sports/Community/Trends)
+- [ ] Create 2 setup fee products (Base/Per-layer)
+- [ ] Output Price IDs for env vars
+
+## Facebook Posting Endpoint
+
+- [ ] Create POST /api/facebook/post endpoint
+- [ ] Add Meta Graph API integration
+- [ ] Handle page token authentication
+- [ ] Return post ID and screenshot URL
+
+## Homepage Top 1% Redesign
+
+- [ ] Update hero with "Workflows that give you back your life"
+- [ ] Add Live Intelligence panel (context detection)
+- [ ] Add "Automation without abdication" section
+- [ ] Add "You're Always in Control" 3-column section
+- [ ] Add "This is what control looks like" artifacts section
+- [ ] Update pricing with approval workflow messaging
+- [ ] Add new FAQ questions about approval and control
+- [ ] Update CTA language (no "Get Started", use "See how it works")

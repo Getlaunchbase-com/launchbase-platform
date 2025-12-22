@@ -4,7 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { getDb } from "./db";
-import { intakes, approvals, buildPlans, referrals, intelligenceLayers, socialPosts, moduleSetupSteps, moduleConnections } from "../drizzle/schema";
+import { intakes, approvals, buildPlans, referrals, intelligenceLayers, socialPosts, moduleSetupSteps, moduleConnections, suiteApplications } from "../drizzle/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { 
   createIntake, 
@@ -1298,6 +1298,103 @@ export const appRouter = router({
         });
 
         return { success: true };
+      }),
+  }),
+
+  // Suite Apply Router - handles new customer applications from /apply flow
+  suiteApply: router({
+    submit: publicProcedure
+      .input(z.object({
+        businessType: z.enum(["TRADES", "FOOD", "RETAIL", "PRO", "OTHER"]),
+        location: z.object({
+          cityZip: z.string().min(3).max(128),
+          radiusMiles: z.number().int().min(5).max(30),
+        }),
+        module: z.object({
+          name: z.literal("SOCIAL_MEDIA_INTELLIGENCE"),
+          cadence: z.enum(["LOW", "MEDIUM", "HIGH"]),
+          mode: z.enum(["AUTO", "GUIDED", "CUSTOM"]),
+          layers: z.object({
+            weather: z.literal(true),
+            sports: z.boolean(),
+            community: z.boolean(),
+            trends: z.boolean(),
+          }),
+        }),
+        startTiming: z.enum(["NOW", "TWO_WEEKS", "EXPLORING"]),
+        contact: z.object({
+          name: z.string().min(2).max(255),
+          email: z.string().email().max(320),
+          phone: z.string().min(7).max(64),
+        }),
+        pricing: z.object({
+          cadenceMonthly: z.number().int().min(0),
+          layersMonthly: z.number().int().min(0),
+          monthlyTotal: z.number().int().min(0),
+          setupFee: z.number().int().min(0),
+          enabledLayers: z.array(z.enum(["sports", "community", "trends"])),
+        }),
+        termsAccepted: z.literal(true),
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        // Generate preview token
+        const crypto = await import("crypto");
+        const previewToken = crypto.randomBytes(18).toString("hex");
+
+        // Insert application
+        const [row] = await db.insert(suiteApplications).values({
+          contactName: input.contact.name,
+          contactEmail: input.contact.email,
+          contactPhone: input.contact.phone,
+          businessType: input.businessType,
+          cityZip: input.location.cityZip,
+          radiusMiles: input.location.radiusMiles,
+          cadence: input.module.cadence,
+          mode: input.module.mode,
+          layers: input.module.layers,
+          pricing: input.pricing,
+          startTiming: input.startTiming,
+          status: "submitted",
+          previewToken,
+        }).$returningId();
+
+        // Track analytics
+        await trackEvent({
+          eventName: "suite_application_submitted",
+          metadata: {
+            applicationId: row.id,
+            businessType: input.businessType,
+            cadence: input.module.cadence,
+            mode: input.module.mode,
+            enabledLayers: input.pricing.enabledLayers,
+            monthlyTotal: input.pricing.monthlyTotal,
+            startTiming: input.startTiming,
+          },
+        });
+
+        return {
+          applicationId: row.id,
+          previewToken,
+        };
+      }),
+
+    // Get application by ID (for success page)
+    getById: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return null;
+
+        const [app] = await db
+          .select()
+          .from(suiteApplications)
+          .where(eq(suiteApplications.id, input.id))
+          .limit(1);
+
+        return app ?? null;
       }),
   }),
 });
