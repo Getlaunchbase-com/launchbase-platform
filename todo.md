@@ -275,3 +275,42 @@
 - [ ] Admin UI: Module subscriptions management
 - [ ] Admin UI: Customer intelligence layer overview
 - [ ] Stripe products: Setup fees + monthly tiers (Low/Medium/High)
+
+
+## Expand LaunchBase - Top 1% Polish
+
+### Guided Expertise
+- [x] Add "Recommended Setup" strip with industry/location context
+- [x] Add "Apply recommendation" one-click button
+- [x] Add impact labels (High/Medium/Low) to each context layer
+
+### Billing Clarity
+- [x] Add collapsible billing explanation (posts/month, intelligence checks)
+- [x] Add "Overages: blocked by default" policy line
+- [x] Add "Founder pricing locked for 12 months" badge
+
+### Live Context Preview
+- [x] Add "Today's Context Snapshot" to Sample Week modal
+- [x] Show weather summary, next local event, posting cadence
+
+### Safety & Guardrails
+- [x] Add "Safety Rules" sheet (clean popup with rules list)
+- [ ] Add "Quiet hours" preview for Custom mode
+- [ ] Show timezone chip + next allowed posting window
+
+### Growth Path
+- [x] Add "Most businesses add these next" section below modules
+- [x] Position as suite upsell with outcome-focused copy
+
+### Auto Mode Explanation
+- [x] Add 2-line explanation when Auto is selected
+- [x] Explain why layers were picked/excluded based on vertical
+
+### Critical Unit Tests
+- [x] Test: Weather always locked on when Social enabled
+- [x] Test: Price updates deterministically for each layer/depth combo
+- [x] Test: Mode changes do not alter price unless config changes
+- [x] Test: Dirty state triggers Save button
+- [ ] Test: Mobile summary bar matches rail totals
+- [x] Test: Trends cannot activate if weather gating fails
+- [x] Test: Zero scheduled posts is valid without error
