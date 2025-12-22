@@ -222,7 +222,7 @@ export default function ExpandLaunchBase() {
   const { data: config } = trpc.intelligenceLayers.getConfig.useQuery();
   const saveMutation = trpc.intelligenceLayers.saveConfig.useMutation();
   const { data: samplePosts } = trpc.intelligenceLayers.getSampleWeek.useQuery({
-    depthLevel: cadence,
+    cadence: cadence,
     sportsEnabled: enabledLayers.includes("sports"),
     communityEnabled: enabledLayers.includes("community"),
     trendsEnabled: enabledLayers.includes("trends"),
@@ -231,7 +231,7 @@ export default function ExpandLaunchBase() {
   // Initialize from server
   useEffect(() => {
     if (config) {
-      setCadence(config.depthLevel as "low" | "medium" | "high");
+      setCadence(config.cadence as "low" | "medium" | "high");
       setTuningMode((config.tuningMode as "auto" | "guided" | "custom") || "auto");
       const layers = ["weather"];
       if (config.sportsEnabled) layers.push("sports");
@@ -303,7 +303,7 @@ export default function ExpandLaunchBase() {
     setIsSaving(true);
     try {
       await saveMutation.mutateAsync({
-        depthLevel: cadence,
+        cadence: cadence,
         tuningMode,
         sportsEnabled: enabledLayers.includes("sports"),
         communityEnabled: enabledLayers.includes("community"),

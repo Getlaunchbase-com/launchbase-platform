@@ -57,6 +57,13 @@
       "when": 1766367519319,
       "tag": "0007_ordinary_kronos",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1766370152340,
+      "tag": "0008_add_smi_fields",
+      "breakpoints": true
     }
   ]
 }

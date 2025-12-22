@@ -314,3 +314,42 @@
 - [ ] Test: Mobile summary bar matches rail totals
 - [x] Test: Trends cannot activate if weather gating fails
 - [x] Test: Zero scheduled posts is valid without error
+
+
+## Stripe Wiring - Social Media Intelligence
+
+### Phase 1: Stripe Products
+- [x] Create Social Media Intelligence - LOW ($79/mo)
+- [x] Create Social Media Intelligence - MEDIUM ($129/mo)
+- [x] Create Social Media Intelligence - HIGH ($199/mo)
+- [x] Create Local Context - Sports & Events ($29/mo)
+- [x] Create Local Context - Community & Schools ($39/mo)
+- [x] Create Local Context - Local Trends ($49/mo)
+- [x] Create Base Setup Fee ($249 one-time)
+- [x] Create Per-Layer Setup Fee ($99 one-time)
+- [x] Add metadata to all products (module, type, layer_key, etc.)
+
+### Phase 2: Checkout Flow
+- [x] Build tRPC endpoint for creating Stripe checkout session
+- [x] Wire "Confirm & Activate" button to checkout
+- [x] Pass subscriptions + add-ons + setup fees to checkout
+- [x] Handle checkout success redirect
+
+### Phase 3: Webhooks & Activation
+- [x] Create webhook endpoint for checkout.session.completed
+- [x] Activate intelligence_layers record on payment success
+- [x] Send activation confirmation email
+- [x] Handle subscription.updated for upgrades/downgrades
+
+### Phase 4: Subscription Management
+- [x] Enable Stripe Customer Portal
+- [x] Add "Manage Subscription" link to Expand LaunchBase
+- [x] Handle layer add/remove mid-cycle
+
+## Facebook Automation (Vince Pilot)
+
+- [ ] Add META_PAGE_TOKEN secret
+- [ ] Add META_PAGE_ID secret
+- [ ] Build POST /api/facebook/post endpoint
+- [ ] Create scheduled task for automated posting
+- [ ] Capture screenshot proof of first live post
