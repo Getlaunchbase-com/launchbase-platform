@@ -587,3 +587,17 @@
 - [ ] Set up external cron to ping endpoint every 2 minutes (user action)
 
 - [x] Add worker busy safeguard (prevent double-runs)
+
+
+## Real Hosting Integration (Customer Sites)
+
+- [x] Research hosting APIs (Vercel, Netlify, Cloudflare Pages)
+- [x] Select best option for programmatic site deployment (Manus subdomains Phase 1)
+- [x] Implement deployment integration in LaunchBase
+- [x] Update deployment worker to use Manus subdomains
+- [x] Add reachability verification before marking Live
+- [x] Update deployment status UI (Provisioning Link)
+- [x] Add comprehensive tests for URL generation
+- [x] Create hosting integration documentation
+- [ ] Test end-to-end deployment with cabinet maker beta
+- [ ] Plan Phase 2 custom domain support

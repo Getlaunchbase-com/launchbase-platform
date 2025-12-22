@@ -28,14 +28,14 @@ const statusConfig: Record<string, { color: string; icon: React.ReactNode; label
   running: { 
     color: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30", 
     icon: <Loader2 className="w-5 h-5 animate-spin" />,
-    label: "Deploying",
-    message: "Deployment is running now. This can take a few minutes. You can leave this page—we'll keep working."
+    label: "Provisioning Link",
+    message: "Deployment is running now. We're provisioning your live link and verifying it's reachable. This can take a few minutes. You can leave this page—we'll keep working."
   },
   success: { 
     color: "bg-green-500/20 text-green-400 border-green-500/30", 
     icon: <CheckCircle className="w-5 h-5" />,
     label: "Live ✅",
-    message: "Your website is live."
+    message: "Your website is live and ready to go."
   },
   failed: { 
     color: "bg-red-500/20 text-red-400 border-red-500/30", 
@@ -155,7 +155,7 @@ export default function DeploymentStatus() {
               <div className="flex items-center gap-4">
                 {[
                   { key: "queued", label: "Queued" },
-                  { key: "running", label: "Deploying" },
+                  { key: "running", label: "Provisioning" },
                   { key: "success", label: "Live ✅" }
                 ].map((step, index) => {
                   const isActive = deployment.status === step.key;
