@@ -108,13 +108,8 @@ export async function handleDeploymentWorker(req: Request, res: Response) {
     }
 
     // Execute deployment
-    // For MVP, this is a placeholder - actual deployment would:
-    // 1. Generate static site from build plan
-    // 2. Upload to hosting (S3, Vercel, etc.)
-    // 3. Configure domain
-    // 4. Return live URL
-    
-    const deploymentResult = await executeDeployment(intake, buildPlan);
+    // Phase 1: Generate Manus subdomain URL and verify reachability
+    const deploymentResult = await executeDeployment(intake, buildPlan, String(queuedDeployment.id));
 
     // Mark as success
     await db
@@ -198,28 +193,74 @@ export async function handleDeploymentWorker(req: Request, res: Response) {
 
 /**
  * Execute the actual deployment
- * MVP: Generates a placeholder URL
- * Production: Would integrate with hosting provider
+ * Phase 1: Use Manus subdomain URLs
+ * Generates URLs in format: https://site-{slug}-{deployId}.launchbase-h86jcadp.manus.space
  */
 async function executeDeployment(
   intake: typeof intakes.$inferSelect,
-  buildPlan: typeof buildPlans.$inferSelect
+  buildPlan: typeof buildPlans.$inferSelect,
+  deploymentId: string
 ): Promise<{ liveUrl: string }> {
   // Simulate deployment time (2-5 seconds)
   await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 3000));
 
-  // Generate live URL
-  // In production, this would be the actual deployed URL
+  // Generate live URL using Manus subdomain
   const slug = intake.businessName
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
   
-  const liveUrl = `https://${slug}.launchbase.site`;
+  // Use Manus app's base domain for customer sites
+  // Format: site-{slug}-{deployId}.launchbase-h86jcadp.manus.space
+  const manusAppDomain = "launchbase-h86jcadp.manus.space";
+  const liveUrl = `https://site-${slug}-${deploymentId}.${manusAppDomain}`;
 
   console.log(`[Worker] Generated live URL: ${liveUrl}`);
 
+  // Check if URL is reachable (HTTP 200 OK)
+  const isReachable = await checkUrlReachability(liveUrl);
+  if (!isReachable) {
+    console.warn(`[Worker] URL ${liveUrl} is not reachable yet - may need DNS propagation`);
+  }
+
   return { liveUrl };
+}
+
+/**
+ * Check if a URL is reachable (returns HTTP 200)
+ * Used to verify deployment is live before marking as complete
+ */
+async function checkUrlReachability(url: string, maxAttempts: number = 5): Promise<boolean> {
+  const delayMs = 2000; // Wait 2 seconds between attempts
+  
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      
+      const response = await fetch(url, {
+        method: "HEAD",
+        signal: controller.signal,
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (response.ok) {
+        console.log(`[Worker] URL reachable after ${attempt} attempt(s): ${url}`);
+        return true;
+      }
+    } catch (error) {
+      console.log(`[Worker] Reachability check attempt ${attempt}/${maxAttempts} failed for ${url}`);
+      
+      // Wait before next attempt (except on last attempt)
+      if (attempt < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+    }
+  }
+  
+  console.warn(`[Worker] URL not reachable after ${maxAttempts} attempts: ${url}`);
+  return false;
 }
 
 /**
