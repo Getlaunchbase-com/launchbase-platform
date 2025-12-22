@@ -1307,10 +1307,12 @@ export const appRouter = router({
   suiteApply: router({
     submit: publicProcedure
       .input(z.object({
-        businessType: z.enum(["TRADES", "FOOD", "RETAIL", "PRO", "OTHER"]),
+        language: z.enum(["en", "es", "pl"]).default("en"),
+        vertical: z.enum(["trades", "health", "beauty", "food", "cannabis", "professional", "fitness", "automotive"]),
+        industry: z.string().max(64).optional(),
         location: z.object({
           cityZip: z.string().min(3).max(128),
-          radiusMiles: z.number().int().min(5).max(30),
+          radiusMiles: z.number().int().min(5).max(50),
         }),
         module: z.object({
           name: z.literal("SOCIAL_MEDIA_INTELLIGENCE"),
@@ -1351,7 +1353,9 @@ export const appRouter = router({
           contactName: input.contact.name,
           contactEmail: input.contact.email,
           contactPhone: input.contact.phone,
-          businessType: input.businessType,
+          language: input.language,
+          vertical: input.vertical,
+          industry: input.industry,
           cityZip: input.location.cityZip,
           radiusMiles: input.location.radiusMiles,
           cadence: input.module.cadence,
@@ -1368,7 +1372,9 @@ export const appRouter = router({
           eventName: "suite_application_submitted",
           metadata: {
             applicationId: row.id,
-            businessType: input.businessType,
+            vertical: input.vertical,
+            industry: input.industry,
+            language: input.language,
             cadence: input.module.cadence,
             mode: input.module.mode,
             enabledLayers: input.pricing.enabledLayers,

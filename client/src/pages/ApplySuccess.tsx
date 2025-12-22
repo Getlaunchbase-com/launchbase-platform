@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { Link } from "wouter";
 import { Check, Clock, Mail, ArrowRight } from "lucide-react";
@@ -49,22 +49,22 @@ export default function ApplySuccess() {
             <h2 className="text-lg font-medium mb-4">What happens next</h2>
             
             <div className="space-y-4">
-              <Step
-                number={1}
-                title="We review your configuration"
-                description="Our team reviews your business type, location, and module settings."
+              <Step 
+                number={1} 
+                title="We review your application" 
+                description="Our team reviews your business details and configuration."
                 status="in_progress"
               />
-              <Step
-                number={2}
-                title="We generate your preview"
-                description="You'll see exactly what LaunchBase would post for your business."
+              <Step 
+                number={2} 
+                title="Preview your setup" 
+                description="You'll receive a link to preview sample posts before anything goes live."
                 status="upcoming"
               />
-              <Step
-                number={3}
-                title="You approve and activate"
-                description="Once you're happy, we'll set up billing and go live."
+              <Step 
+                number={3} 
+                title="Approve & launch" 
+                description="Once you approve, we activate your LaunchBase system."
                 status="upcoming"
               />
             </div>
@@ -76,7 +76,7 @@ export default function ApplySuccess() {
               <h2 className="text-lg font-medium mb-4">Your configuration</h2>
               
               <div className="grid gap-2 text-sm">
-                <Row label="Business" value={formatBusinessType(application.businessType)} />
+                <Row label="Business" value={formatVertical(application.vertical)} />
                 <Row label="Location" value={`${application.cityZip} (${application.radiusMiles} mi)`} />
                 <Row label="Cadence" value={application.cadence} />
                 <Row label="Mode" value={application.mode} />
@@ -167,15 +167,18 @@ function Row({ label, value, highlight }: { label: string; value: string; highli
   );
 }
 
-function formatBusinessType(type: string): string {
+function formatVertical(vertical: string): string {
   const map: Record<string, string> = {
-    TRADES: "Trades & Services",
-    FOOD: "Restaurant / Bar / Café",
-    RETAIL: "Retail / Shop",
-    PRO: "Professional Services",
-    OTHER: "Other",
+    trades: "Trades & Home Services",
+    health: "Health & Wellness",
+    beauty: "Beauty & Personal Care",
+    food: "Food & Beverage",
+    cannabis: "Cannabis",
+    professional: "Professional Services",
+    fitness: "Fitness & Recreation",
+    automotive: "Automotive",
   };
-  return map[type] || type;
+  return map[vertical] || vertical;
 }
 
 function formatLayers(layers: { weather: true; sports: boolean; community: boolean; trends: boolean }): string {

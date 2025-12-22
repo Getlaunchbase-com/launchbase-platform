@@ -463,3 +463,58 @@
 - [x] Add website showcase/preview section
 - [x] Position Suite as expansion, not the main product
 - [x] Keep trust anchors but contextualize for website first
+
+
+## Vertical Categories Expansion
+
+### Configuration
+- [ ] Create verticals config with categories and industries
+- [ ] Define Suite relevance per vertical (which layers matter)
+- [ ] Add industry-specific copy/messaging
+
+### Homepage
+- [ ] Update hero to show broader verticals (not just trades)
+- [ ] Add vertical showcase section with category cards
+- [ ] Update copy to be industry-agnostic
+
+### Apply Flow
+- [ ] Add vertical category selection step
+- [ ] Show relevant industries per category
+- [ ] Customize Suite recommendations based on vertical
+
+### Database
+- [ ] Add vertical field to intake/applications
+- [ ] Store vertical for intelligence recommendations
+
+
+## Multi-Language Support (Spanish, Polish, English)
+
+### Language Selection
+- [ ] Add language preference to /apply flow
+- [ ] Store preferred language in database
+- [ ] Show language selector in intake form
+
+### Translations
+- [ ] Create Spanish translations for intake form
+- [ ] Create Polish translations for intake form
+- [ ] Add i18n configuration
+
+### Translation Service
+- [ ] Build AI translation layer for intake responses
+- [ ] Convert customer input to professional English copy
+- [ ] Preserve original language in database for reference
+
+
+## Expanded Verticals & Multi-Language Support
+
+- [x] Update database schema with language and vertical fields
+- [x] Add 8 vertical categories (trades, health, beauty, food, cannabis, professional, fitness, automotive)
+- [x] Update suiteApply router to accept new fields
+- [x] Update Apply.tsx with language selection step (English/Spanish/Polish)
+- [x] Add industry sub-selection within each vertical
+- [x] Translate intake form labels for Spanish and Polish
+- [x] Update homepage to show broader vertical categories
+- [x] Update FAQ with expanded vertical list
+- [x] Update ApplySuccess.tsx to display vertical instead of businessType
+- [x] Create suite_applications table in database
+- [x] Create module_setup_steps table in database
