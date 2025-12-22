@@ -643,3 +643,51 @@
 - [ ] Test wildcard subdomain routing
 - [ ] Plan customer site domain migration
 - [ ] Update deployment worker for getlaunchbase.com URLs
+
+
+## Intelligence Core Architecture (Locked Foundation)
+
+- [x] Create INTELLIGENCE_CORE.md specification
+- [x] Define non-negotiable safety rules
+- [x] Define canonical intelligence schema
+- [x] Define versioning system (MAJOR/MINOR/PATCH)
+- [x] Define intelligence pipeline (10-step locked order)
+- [x] Define layer interface and capabilities
+- [ ] Add intelligence_version field to social_posts table
+- [ ] Add intelligence_version field to deployments table
+- [ ] Create IntelligenceCore service class
+- [ ] Implement Intelligence Pipeline (steps 1-10)
+- [ ] Implement Safety Gates module
+- [ ] Implement Industry Matrix
+- [ ] Implement Layer evaluation
+- [ ] Create audit trail logging
+- [ ] Add version migration tests
+- [ ] Document all layers
+- [ ] Create rollback procedures
+- [ ] Set up version monitoring
+
+
+## Control UI (Customer-Facing Layer)
+
+- [x] Create CONTROL_UI_SPEC.md specification
+- [x] Define three modes (Auto/Guided/Custom)
+- [x] Define controls (cadence, layers, boosts)
+- [x] Define approval workflow
+- [x] Define pricing UX
+- [x] Define mobile app upsell
+- [ ] Create /suite/social/controls page
+- [ ] Implement cadence selector (radio cards)
+- [ ] Implement layer toggles and sliders
+- [ ] Implement seasonal boost toggles
+- [ ] Implement sample week preview modal
+- [ ] Implement pricing rail
+- [ ] Create /suite/social/queue page
+- [ ] Implement post approval workflow
+- [ ] Implement edit and rewrite buttons
+- [ ] Implement feedback collection
+- [ ] Create mobile-responsive layout
+- [ ] Add mobile app shell (approval only)
+- [ ] Write unit tests for all controls
+- [ ] Write integration tests for approval workflow
+- [ ] Create user documentation
+- [ ] Create admin documentation
