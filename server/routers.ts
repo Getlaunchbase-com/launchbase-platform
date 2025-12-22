@@ -27,6 +27,7 @@ import {
 import { sendEmail, AdminNotifications } from "./email";
 import { trackEvent, getFunnelMetrics, getBuildQualityMetrics, getVerticalMetrics, getDailyHealth } from "./analytics";
 import { createSetupCheckoutSession, getCheckoutSession } from "./stripe/checkout";
+import { createSMICheckoutSession, getSMISubscriptionStatus, cancelSMISubscription } from "./stripe/intelligenceCheckout";
 import { generatePlatformGuidePDF } from "./pdfGuide";
 import { generatePreviewHTML, generateBuildPlan as generatePreviewBuildPlan } from "./previewTemplates";
 import { createHash } from "crypto";
@@ -717,18 +718,18 @@ export const appRouter = router({
       const db = await getDb();
       if (!db) return null;
 
-      // For now, get config for the first intake associated with this user
-      // In production, this would be linked to the user's account
+      // Get config for the logged-in user
       const [config] = await db
         .select()
         .from(intelligenceLayers)
+        .where(eq(intelligenceLayers.userId, ctx.user.id))
         .limit(1);
 
       if (!config) {
         // Return default configuration
         return {
           id: 0,
-          depthLevel: "medium" as const,
+          cadence: "medium" as const,
           tuningMode: "auto" as const,
           weatherEnabled: true,
           sportsEnabled: true,
@@ -736,7 +737,8 @@ export const appRouter = router({
           trendsEnabled: false,
           approvalRequired: true,
           monthlyPriceCents: 12900,
-          status: "active" as const,
+          moduleStatus: "pending_activation" as const,
+          isFounder: false,
         };
       }
 
@@ -746,7 +748,7 @@ export const appRouter = router({
     // Save configuration
     saveConfig: protectedProcedure
       .input(z.object({
-        depthLevel: z.enum(["low", "medium", "high"]),
+        cadence: z.enum(["low", "medium", "high"]),
         sportsEnabled: z.boolean(),
         communityEnabled: z.boolean(),
         trendsEnabled: z.boolean(),
@@ -756,21 +758,20 @@ export const appRouter = router({
         const db = await getDb();
         if (!db) throw new Error("Database not available");
 
-        // Calculate monthly price based on depth and layers
+        // Calculate monthly price based on cadence and layers
         const basePrices = { low: 7900, medium: 12900, high: 19900 };
-        let monthlyPrice = basePrices[input.depthLevel];
+        let monthlyPrice = basePrices[input.cadence];
 
-        // Add layer prices (sports included in medium/high)
-        if (input.depthLevel === "low" && input.sportsEnabled) {
-          monthlyPrice += 2900;
-        }
+        // Add layer prices (all layers are add-ons in Model A)
+        if (input.sportsEnabled) monthlyPrice += 2900;
         if (input.communityEnabled) monthlyPrice += 3900;
         if (input.trendsEnabled) monthlyPrice += 4900;
 
-        // Check if config exists
+        // Check if config exists for this user
         const [existing] = await db
           .select()
           .from(intelligenceLayers)
+          .where(eq(intelligenceLayers.userId, ctx.user.id))
           .limit(1);
 
         if (existing) {
@@ -778,7 +779,7 @@ export const appRouter = router({
           await db
             .update(intelligenceLayers)
             .set({
-              depthLevel: input.depthLevel,
+              cadence: input.cadence,
               sportsEnabled: input.sportsEnabled,
               communityEnabled: input.communityEnabled,
               trendsEnabled: input.trendsEnabled,
@@ -788,10 +789,10 @@ export const appRouter = router({
             })
             .where(eq(intelligenceLayers.id, existing.id));
         } else {
-          // Create new - for demo, use intakeId 1
+          // Create new config for this user
           await db.insert(intelligenceLayers).values({
-            intakeId: 1,
-            depthLevel: input.depthLevel,
+            userId: ctx.user.id,
+            cadence: input.cadence,
             sportsEnabled: input.sportsEnabled,
             communityEnabled: input.communityEnabled,
             trendsEnabled: input.trendsEnabled,
@@ -804,7 +805,7 @@ export const appRouter = router({
         await trackEvent({
           eventName: "intelligence_config_saved",
           metadata: {
-            depthLevel: input.depthLevel,
+            cadence: input.cadence,
             sportsEnabled: input.sportsEnabled,
             communityEnabled: input.communityEnabled,
             trendsEnabled: input.trendsEnabled,
@@ -851,7 +852,7 @@ export const appRouter = router({
     // Generate sample week preview
     getSampleWeek: publicProcedure
       .input(z.object({
-        depthLevel: z.enum(["low", "medium", "high"]),
+        cadence: z.enum(["low", "medium", "high"]),
         sportsEnabled: z.boolean(),
         communityEnabled: z.boolean(),
         trendsEnabled: z.boolean(),
@@ -870,7 +871,7 @@ export const appRouter = router({
           time: "6:00 PM",
         });
 
-        if (input.depthLevel !== "low") {
+        if (input.cadence !== "low") {
           samplePosts.push({
             id: 2,
             type: "weather",
@@ -903,7 +904,7 @@ export const appRouter = router({
           });
         }
 
-        if (input.trendsEnabled && input.depthLevel === "high") {
+        if (input.trendsEnabled && input.cadence === "high") {
           samplePosts.push({
             id: 5,
             type: "trends",
@@ -916,6 +917,55 @@ export const appRouter = router({
 
         return samplePosts;
       }),
+
+    // Create Stripe checkout session for SMI subscription
+    createCheckout: protectedProcedure
+      .input(z.object({
+        cadence: z.enum(["low", "medium", "high"]),
+        layers: z.array(z.enum(["sports", "community", "trends"])),
+        successUrl: z.string(),
+        cancelUrl: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { url } = await createSMICheckoutSession({
+          userId: ctx.user.id.toString(),
+          cadence: input.cadence,
+          layers: input.layers,
+          successUrl: input.successUrl,
+          cancelUrl: input.cancelUrl,
+        });
+
+        // Track analytics
+        await trackEvent({
+          eventName: "smi_checkout_started",
+          metadata: {
+            cadence: input.cadence,
+            layers: input.layers.join(","),
+            userId: ctx.user.id,
+          },
+        });
+
+        return { url };
+      }),
+
+    // Get subscription status
+    getSubscriptionStatus: protectedProcedure.query(async ({ ctx }) => {
+      return getSMISubscriptionStatus(ctx.user.id.toString());
+    }),
+
+    // Cancel subscription
+    cancelSubscription: protectedProcedure.mutation(async ({ ctx }) => {
+      const result = await cancelSMISubscription(ctx.user.id.toString());
+      
+      if (result.success) {
+        await trackEvent({
+          eventName: "smi_subscription_cancelled",
+          metadata: { userId: ctx.user.id },
+        });
+      }
+
+      return result;
+    }),
   }),
 });
 

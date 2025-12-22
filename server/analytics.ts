@@ -37,7 +37,13 @@ export type AnalyticsEventName =
   | "mode_changed"
   | "depth_changed"
   | "layer_toggled"
-  | "sample_week_opened";
+  | "sample_week_opened"
+  // SMI Stripe events
+  | "smi_checkout_started"
+  | "smi_checkout_completed"
+  | "smi_subscription_activated"
+  | "smi_subscription_cancelled"
+  | "smi_subscription_reactivated";
 
 interface TrackEventParams {
   eventName: AnalyticsEventName;

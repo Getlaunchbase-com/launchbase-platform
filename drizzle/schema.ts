@@ -304,9 +304,11 @@ export type InsertReferral = typeof referrals.$inferInsert;
  */
 export const intelligenceLayers = mysqlTable("intelligence_layers", {
   id: int("id").autoincrement().primaryKey(),
-  intakeId: int("intakeId").notNull(),
-  // Depth level controls posting frequency
-  depthLevel: mysqlEnum("depthLevel", ["low", "medium", "high"]).default("medium").notNull(),
+  // Link to user (for logged-in customers) or intake (for legacy)
+  userId: int("userId"),
+  intakeId: int("intakeId"),
+  // Cadence controls posting frequency (renamed from depthLevel)
+  cadence: mysqlEnum("cadence", ["low", "medium", "high"]).default("medium").notNull(),
   // Message tuning mode
   tuningMode: mysqlEnum("tuningMode", ["auto", "guided", "custom"]).default("auto").notNull(),
   // Context layers (weather is always on)
@@ -316,11 +318,21 @@ export const intelligenceLayers = mysqlTable("intelligence_layers", {
   trendsEnabled: boolean("trendsEnabled").default(false).notNull(),
   // Approval mode
   approvalRequired: boolean("approvalRequired").default(true).notNull(),
-  // Pricing (in cents)
-  monthlyPriceCents: int("monthlyPriceCents").default(12900).notNull(), // $129 default (medium)
+  // Pricing (in cents) - calculated from cadence + layers
+  monthlyPriceCents: int("monthlyPriceCents").default(12900).notNull(),
   // Service area for weather monitoring
   serviceAreaZips: json("serviceAreaZips").$type<string[]>(),
-  // Status
+  // Stripe integration
+  stripeSubscriptionId: varchar("stripeSubscriptionId", { length: 255 }),
+  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
+  // Module status (tracks subscription state)
+  moduleStatus: mysqlEnum("moduleStatus", ["pending_activation", "active", "past_due", "canceled", "pending_cancellation"]).default("pending_activation").notNull(),
+  // Founder pricing flag
+  isFounder: boolean("isFounder").default(false).notNull(),
+  // Billing period tracking
+  currentPeriodEnd: timestamp("currentPeriodEnd"),
+  lastInvoiceStatus: varchar("lastInvoiceStatus", { length: 32 }),
+  // Legacy status (for backward compatibility)
   status: mysqlEnum("status", ["active", "paused", "cancelled"]).default("active").notNull(),
   // Timestamps
   createdAt: timestamp("createdAt").defaultNow().notNull(),
