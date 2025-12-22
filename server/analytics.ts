@@ -53,7 +53,9 @@ export type AnalyticsEventName =
   | "module_step_completed"
   | "module_setup_initialized"
   | "module_disconnected"
-  | "module_connected";
+  | "module_connected"
+  // Suite Application events
+  | "suite_application_submitted";
 
 interface TrackEventParams {
   eventName: AnalyticsEventName;
