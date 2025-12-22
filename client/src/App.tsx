@@ -21,6 +21,8 @@ import Referrals from "./pages/Referrals";
 import Privacy from "./pages/Privacy";
 import AdminReferrals from "./pages/AdminReferrals";
 import ExpandLaunchBase from "./pages/ExpandLaunchBase";
+import PostQueue from "./pages/PostQueue";
+import ModuleSetup from "./pages/ModuleSetup";
 
 function Router() {
   return (
@@ -46,6 +48,8 @@ function Router() {
       <Route path="/admin/referrals" component={AdminReferrals} />
       <Route path="/admin/expand" component={ExpandLaunchBase} />
       <Route path="/expand" component={ExpandLaunchBase} />
+      <Route path="/dashboard/social/queue" component={PostQueue} />
+      <Route path="/dashboard/modules" component={ModuleSetup} />
       
       {/* Fallback routes */}
       <Route path="/404" component={NotFound} />

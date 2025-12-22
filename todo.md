@@ -353,3 +353,58 @@
 - [ ] Build POST /api/facebook/post endpoint
 - [ ] Create scheduled task for automated posting
 - [ ] Capture screenshot proof of first live post
+
+
+## Post Approval Queue (Guided Mode Killer Feature) ✅
+
+### Database & Backend
+- [x] Update social_posts schema with approval workflow fields
+- [x] Add status enum: needs_review, approved, posted, rejected, expired
+- [x] Add post_type enum: ALL_CLEAR, MONITORING, ACTIVE_STORM, etc.
+- [x] Add reason_chips JSON field (weather, sports, community, trends)
+- [x] Add scheduled_for timestamp
+- [x] Add why_we_wrote_this text field
+- [x] Add suggested_alts JSON field for alternative versions
+- [x] Create tRPC router for post queue operations (list, approve, reject, edit)
+
+### UI Components
+- [x] Create /dashboard/social/queue page
+- [x] Build queue list (left panel) with status pills and preview snippets
+- [x] Build review panel (right panel) with editable post text
+- [x] Add "Why we wrote this" explanation box
+- [x] Add safety gates display
+- [x] Add approval controls (Approve & Post, Approve & Schedule, Reject)
+- [x] Add "Auto-approve this post type" toggle for advanced users
+- [x] Add expiry logic for stale posts in Guided mode
+
+### Unit Tests
+- [x] Test: Post approval updates status correctly
+- [x] Test: Rejected posts don't get posted
+- [x] Test: Expired posts are filtered from queue
+- [x] Test: Edit saves changes to post content
+
+
+## Module Setup Dashboard ✅
+
+### Database & Backend
+- [x] Create module_setup_steps table
+- [x] Create module_connections table for OAuth tokens
+- [x] Create moduleSetupConfig.ts with all module definitions
+- [x] Add tRPC router for module setup operations
+
+### UI Components
+- [x] Create /dashboard/modules page
+- [x] Build module cards with progress bars
+- [x] Show steps with completion status
+- [x] Add "Start This Step" button for next incomplete step
+- [x] Show "What We Already Know" section (from intake)
+- [x] Add pricing display per module
+
+### Unit Tests
+- [x] Test: Module configs have valid structure
+- [x] Test: Progress calculation is correct
+- [x] Test: Next incomplete step is identified correctly
+- [x] Test: Pricing helpers return correct values
+
+## Documentation
+- [x] Create MODULE_SETUP_CHECKLISTS.md with complete customer checklists

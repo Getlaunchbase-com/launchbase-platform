@@ -4,8 +4,8 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { getDb } from "./db";
-import { intakes, approvals, buildPlans, referrals, intelligenceLayers } from "../drizzle/schema";
-import { eq, desc } from "drizzle-orm";
+import { intakes, approvals, buildPlans, referrals, intelligenceLayers, socialPosts, moduleSetupSteps, moduleConnections } from "../drizzle/schema";
+import { eq, desc, and } from "drizzle-orm";
 import { 
   createIntake, 
   getIntakes, 
@@ -966,6 +966,339 @@ export const appRouter = router({
 
       return result;
     }),
+  }),
+
+  // Post Queue Router - Approval workflow for social posts
+  postQueue: router({
+    // Get posts in queue for current user
+    list: protectedProcedure
+      .input(z.object({
+        status: z.enum(["all", "needs_review", "approved", "published", "rejected", "expired"]).optional(),
+        limit: z.number().min(1).max(100).default(50),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) return [];
+
+        const filter = input?.status && input.status !== "all" 
+          ? eq(socialPosts.status, input.status)
+          : undefined;
+
+        const posts = await db
+          .select()
+          .from(socialPosts)
+          .where(filter)
+          .orderBy(desc(socialPosts.createdAt))
+          .limit(input?.limit || 50);
+
+        return posts;
+      }),
+
+    // Get single post by ID
+    getById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return null;
+
+        const [post] = await db
+          .select()
+          .from(socialPosts)
+          .where(eq(socialPosts.id, input.id))
+          .limit(1);
+
+        return post || null;
+      }),
+
+    // Approve a post
+    approve: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        editedContent: z.string().optional(),
+        scheduleNow: z.boolean().default(false),
+        autoApproveType: z.boolean().default(false),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        const updateData: Record<string, unknown> = {
+          status: "approved",
+          approvedAt: new Date(),
+          approvedBy: ctx.user.id,
+          autoApproveType: input.autoApproveType,
+        };
+
+        if (input.editedContent) {
+          updateData.content = input.editedContent;
+        }
+
+        await db
+          .update(socialPosts)
+          .set(updateData)
+          .where(eq(socialPosts.id, input.id));
+
+        await trackEvent({
+          eventName: "post_approved",
+          metadata: { postId: input.id, userId: ctx.user.id },
+        });
+
+        return { success: true };
+      }),
+
+    // Reject a post
+    reject: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        reason: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        await db
+          .update(socialPosts)
+          .set({
+            status: "rejected",
+            decisionReason: input.reason,
+          })
+          .where(eq(socialPosts.id, input.id));
+
+        await trackEvent({
+          eventName: "post_rejected",
+          metadata: { postId: input.id, userId: ctx.user.id },
+        });
+
+        return { success: true };
+      }),
+
+    // Edit post content
+    edit: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        content: z.string(),
+        headline: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        await db
+          .update(socialPosts)
+          .set({
+            content: input.content,
+            headline: input.headline,
+          })
+          .where(eq(socialPosts.id, input.id));
+
+        return { success: true };
+      }),
+  }),
+
+  // Module Setup Router - Track customer progress through module setup
+  moduleSetup: router({
+    // Get all setup steps for a module
+    getSteps: protectedProcedure
+      .input(z.object({
+        moduleKey: z.enum(["social_media_intelligence", "quickbooks_sync", "google_business"]),
+      }))
+      .query(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) return [];
+
+        const steps = await db
+          .select()
+          .from(moduleSetupSteps)
+          .where(eq(moduleSetupSteps.userId, ctx.user.id))
+          .orderBy(moduleSetupSteps.stepOrder);
+
+        return steps.filter(s => s.moduleKey === input.moduleKey);
+      }),
+
+    // Get progress for all modules
+    getProgress: protectedProcedure.query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) return {};
+
+      const steps = await db
+        .select()
+        .from(moduleSetupSteps)
+        .where(eq(moduleSetupSteps.userId, ctx.user.id));
+
+      // Group by module and calculate progress
+      const progress: Record<string, { completed: number; total: number; percentage: number }> = {};
+      
+      for (const step of steps) {
+        if (!progress[step.moduleKey]) {
+          progress[step.moduleKey] = { completed: 0, total: 0, percentage: 0 };
+        }
+        progress[step.moduleKey].total++;
+        if (step.isCompleted) {
+          progress[step.moduleKey].completed++;
+        }
+      }
+
+      // Calculate percentages
+      for (const key of Object.keys(progress)) {
+        const p = progress[key];
+        p.percentage = p.total > 0 ? Math.round((p.completed / p.total) * 100) : 0;
+      }
+
+      return progress;
+    }),
+
+    // Complete a setup step
+    completeStep: protectedProcedure
+      .input(z.object({
+        moduleKey: z.enum(["social_media_intelligence", "quickbooks_sync", "google_business"]),
+        stepKey: z.string(),
+        stepData: z.record(z.string(), z.unknown()).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        await db
+          .update(moduleSetupSteps)
+          .set({
+            isCompleted: true,
+            completedAt: new Date(),
+            stepData: input.stepData,
+          })
+          .where(and(
+            eq(moduleSetupSteps.userId, ctx.user.id),
+            eq(moduleSetupSteps.stepKey, input.stepKey)
+          ));
+
+        await trackEvent({
+          eventName: "module_step_completed",
+          metadata: {
+            moduleKey: input.moduleKey,
+            stepKey: input.stepKey,
+            userId: ctx.user.id,
+          },
+        });
+
+        return { success: true };
+      }),
+
+    // Initialize setup steps for a module (called when module is purchased)
+    initializeModule: protectedProcedure
+      .input(z.object({
+        moduleKey: z.enum(["social_media_intelligence", "quickbooks_sync", "google_business"]),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        // Import module config
+        const { moduleConfigs } = await import("../shared/moduleSetupConfig");
+        const config = moduleConfigs[input.moduleKey];
+
+        if (!config) {
+          throw new Error(`Unknown module: ${input.moduleKey}`);
+        }
+
+        // Create setup steps for this user
+        for (const step of config.steps) {
+          await db.insert(moduleSetupSteps).values({
+            userId: ctx.user.id,
+            moduleKey: input.moduleKey,
+            stepKey: step.key,
+            stepOrder: step.order,
+            stepTitle: step.title,
+            stepDescription: step.description,
+            isCompleted: false,
+          });
+        }
+
+        await trackEvent({
+          eventName: "module_setup_initialized",
+          metadata: {
+            moduleKey: input.moduleKey,
+            userId: ctx.user.id,
+            totalSteps: config.steps.length,
+          },
+        });
+
+        return { success: true, totalSteps: config.steps.length };
+      }),
+  }),
+
+  // Module Connections Router - OAuth tokens and external service connections
+  moduleConnections: router({
+    // Get all connections for current user
+    list: protectedProcedure.query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) return [];
+
+      const connections = await db
+        .select({
+          id: moduleConnections.id,
+          moduleKey: moduleConnections.moduleKey,
+          connectionType: moduleConnections.connectionType,
+          externalId: moduleConnections.externalId,
+          externalName: moduleConnections.externalName,
+          status: moduleConnections.status,
+          lastSyncAt: moduleConnections.lastSyncAt,
+          createdAt: moduleConnections.createdAt,
+        })
+        .from(moduleConnections)
+        .where(eq(moduleConnections.userId, ctx.user.id));
+
+      return connections;
+    }),
+
+    // Get connection for a specific module
+    getByModule: protectedProcedure
+      .input(z.object({
+        moduleKey: z.enum(["social_media_intelligence", "quickbooks_sync", "google_business"]),
+      }))
+      .query(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) return null;
+
+        const [connection] = await db
+          .select({
+            id: moduleConnections.id,
+            moduleKey: moduleConnections.moduleKey,
+            connectionType: moduleConnections.connectionType,
+            externalId: moduleConnections.externalId,
+            externalName: moduleConnections.externalName,
+            status: moduleConnections.status,
+            lastSyncAt: moduleConnections.lastSyncAt,
+          })
+          .from(moduleConnections)
+          .where(eq(moduleConnections.moduleKey, input.moduleKey))
+          .limit(1);
+
+        return connection || null;
+      }),
+
+    // Disconnect a module
+    disconnect: protectedProcedure
+      .input(z.object({
+        moduleKey: z.enum(["social_media_intelligence", "quickbooks_sync", "google_business"]),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        await db
+          .update(moduleConnections)
+          .set({ status: "revoked" })
+          .where(eq(moduleConnections.moduleKey, input.moduleKey));
+
+        await trackEvent({
+          eventName: "module_disconnected",
+          metadata: {
+            moduleKey: input.moduleKey,
+            userId: ctx.user.id,
+          },
+        });
+
+        return { success: true };
+      }),
   }),
 });
 
