@@ -4,8 +4,8 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { getDb } from "./db";
-import { intakes, approvals, buildPlans, referrals, intelligenceLayers, socialPosts, moduleSetupSteps, moduleConnections, suiteApplications } from "../drizzle/schema";
-import { eq, desc, and } from "drizzle-orm";
+import { intakes, approvals, buildPlans, referrals, intelligenceLayers, socialPosts, moduleSetupSteps, moduleConnections, suiteApplications, deployments } from "../drizzle/schema";
+import { eq, desc, and, asc } from "drizzle-orm";
 import { 
   createIntake, 
   getIntakes, 
@@ -544,6 +544,120 @@ export const appRouter = router({
         }).optional())
         .query(async ({ input }) => {
           return getDeployments(input?.status);
+        }),
+
+      // Worker status for admin dashboard
+      workerStatus: protectedProcedure
+        .query(async () => {
+          const db = await getDb();
+          if (!db) return { queuedCount: 0, runningCount: 0, recentDeployments: [] };
+
+          const allDeployments = await db
+            .select()
+            .from(deployments)
+            .orderBy(desc(deployments.createdAt))
+            .limit(20);
+
+          const queuedCount = allDeployments.filter(d => d.status === "queued").length;
+          const runningCount = allDeployments.filter(d => d.status === "running").length;
+
+          return {
+            queuedCount,
+            runningCount,
+            recentDeployments: allDeployments,
+          };
+        }),
+
+      // Manual trigger for running next deployment
+      runNext: protectedProcedure
+        .mutation(async () => {
+          const db = await getDb();
+          if (!db) throw new Error("Database not available");
+
+          // Find oldest queued deployment
+          const [queued] = await db
+            .select()
+            .from(deployments)
+            .where(eq(deployments.status, "queued"))
+            .orderBy(asc(deployments.createdAt))
+            .limit(1);
+
+          if (!queued) {
+            return { success: true, message: "No queued deployments", processed: 0 };
+          }
+
+          // Call the worker endpoint internally
+          const workerSecret = process.env.WORKER_SECRET || "launchbase-worker-secret-2024";
+          
+          try {
+            // Mark as running first
+            await db
+              .update(deployments)
+              .set({ status: "running", startedAt: new Date(), updatedAt: new Date() })
+              .where(eq(deployments.id, queued.id));
+
+            // Get intake and build plan
+            const [intake] = await db.select().from(intakes).where(eq(intakes.id, queued.intakeId));
+            const [buildPlan] = await db.select().from(buildPlans).where(eq(buildPlans.id, queued.buildPlanId));
+
+            if (!intake || !buildPlan) {
+              throw new Error("Intake or build plan not found");
+            }
+
+            // Generate live URL (MVP placeholder)
+            const slug = intake.businessName
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, "-")
+              .replace(/^-|-$/g, "");
+            const liveUrl = `https://${slug}.launchbase.site`;
+
+            // Mark success
+            await db
+              .update(deployments)
+              .set({ 
+                status: "success", 
+                completedAt: new Date(), 
+                productionUrl: liveUrl,
+                updatedAt: new Date() 
+              })
+              .where(eq(deployments.id, queued.id));
+
+            // Update intake status
+            await db
+              .update(intakes)
+              .set({ status: "deployed", updatedAt: new Date() })
+              .where(eq(intakes.id, intake.id));
+
+            // Send email
+            const firstName = intake.contactName?.split(" ")[0] || "there";
+            await sendEmail(intake.id, "site_live", {
+              firstName,
+              businessName: intake.businessName,
+              email: intake.email,
+              liveUrl,
+            });
+
+            return { 
+              success: true, 
+              message: "Deployment completed", 
+              processed: 1,
+              deploymentId: queued.id,
+              liveUrl,
+            };
+          } catch (error) {
+            // Mark as failed
+            await db
+              .update(deployments)
+              .set({ 
+                status: "failed", 
+                errorMessage: error instanceof Error ? error.message : "Unknown error",
+                completedAt: new Date(),
+                updatedAt: new Date() 
+              })
+              .where(eq(deployments.id, queued.id));
+
+            throw error;
+          }
         }),
     }),
 

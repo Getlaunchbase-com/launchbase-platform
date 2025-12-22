@@ -8,6 +8,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { handleStripeWebhook } from "../stripe/webhook";
+import { handleDeploymentWorker } from "../worker/deploymentWorker";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -35,6 +36,9 @@ async function startServer() {
   // Stripe webhook needs raw body for signature verification
   // MUST be registered BEFORE express.json()
   app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), handleStripeWebhook);
+  
+  // Deployment worker endpoint (protected by token)
+  app.post("/api/worker/run-next-deploy", express.json(), handleDeploymentWorker);
   
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
