@@ -20,6 +20,7 @@ import Terms from "./pages/Terms";
 import Referrals from "./pages/Referrals";
 import Privacy from "./pages/Privacy";
 import AdminReferrals from "./pages/AdminReferrals";
+import ExpandLaunchBase from "./pages/ExpandLaunchBase";
 
 function Router() {
   return (
@@ -43,6 +44,8 @@ function Router() {
       <Route path="/admin/deploy/:id" component={DeploymentStatus} />
       <Route path="/admin/analytics" component={AdminAnalytics} />
       <Route path="/admin/referrals" component={AdminReferrals} />
+      <Route path="/admin/expand" component={ExpandLaunchBase} />
+      <Route path="/expand" component={ExpandLaunchBase} />
       
       {/* Fallback routes */}
       <Route path="/404" component={NotFound} />

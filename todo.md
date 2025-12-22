@@ -255,3 +255,23 @@
 ## Mobile UI Fixes
 
 - [x] Make logo much bigger on mobile navigation
+
+
+## Social Media Intelligence Module (LaunchBase Suite)
+
+- [x] Database schema: intelligence_layers table
+- [x] Database schema: social_posts table (pending, approved, published)
+- [x] Database schema: post_usage tracking
+- [ ] Backend service: weather-intelligence.ts (NWS API integration)
+- [ ] Backend service: weather-analyzer.ts (AI post classification)
+- [ ] Backend service: context-builder.ts (temporal/sports awareness)
+- [ ] Backend service: local-intelligence.ts (Google Trends + news)
+- [ ] Backend service: post-orchestrator.ts (combines all intelligence)
+- [x] tRPC router: intelligence-layers (get/save config, pricing)
+- [ ] tRPC router: social-posts (generate, approve, publish)
+- [x] Customer UI: Expand LaunchBase page with module cards
+- [x] Customer UI: Layer selection modal with depth slider
+- [ ] Customer UI: Pending posts approval interface
+- [ ] Admin UI: Module subscriptions management
+- [ ] Admin UI: Customer intelligence layer overview
+- [ ] Stripe products: Setup fees + monthly tiers (Low/Medium/High)
