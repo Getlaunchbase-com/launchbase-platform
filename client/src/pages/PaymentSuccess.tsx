@@ -3,10 +3,21 @@ import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, Loader2, ArrowRight, Sparkles, Rocket, FileText, Gift } from "lucide-react";
+import { CheckCircle, Loader2, ArrowRight, Sparkles, FileText, Gift, Check, Circle } from "lucide-react";
+
+// Deployment steps with simulated progress
+const DEPLOYMENT_STEPS = [
+  { id: 1, label: "Payment received", duration: 0 },
+  { id: 2, label: "Provisioning template", duration: 2000 },
+  { id: 3, label: "Applying branding", duration: 3000 },
+  { id: 4, label: "Publishing to web", duration: 4000 },
+  { id: 5, label: "Connecting domain", duration: 5000 },
+];
 
 export default function PaymentSuccess() {
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isDeploying, setIsDeploying] = useState(true);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -15,6 +26,27 @@ export default function PaymentSuccess() {
       setSessionId(sid);
     }
   }, []);
+
+  // Simulate deployment progress
+  useEffect(() => {
+    if (!isDeploying) return;
+
+    const timers: NodeJS.Timeout[] = [];
+    
+    DEPLOYMENT_STEPS.forEach((step) => {
+      if (step.duration > 0) {
+        const timer = setTimeout(() => {
+          setCurrentStep(step.id);
+          if (step.id === DEPLOYMENT_STEPS.length) {
+            setIsDeploying(false);
+          }
+        }, step.duration);
+        timers.push(timer);
+      }
+    });
+
+    return () => timers.forEach(clearTimeout);
+  }, [isDeploying]);
 
   const { data: session, isLoading } = trpc.payment.getSession.useQuery(
     { sessionId: sessionId || "" },
@@ -52,28 +84,70 @@ export default function PaymentSuccess() {
 
           {/* Title */}
           <div>
-            <h1 className="text-3xl font-bold mb-2">Payment Confirmed ✅</h1>
+            <h1 className="text-3xl font-bold mb-2">Payment Confirmed</h1>
             <p className="text-muted-foreground text-lg">
-              You're officially queued for launch.
+              {isDeploying ? "We're deploying your site now..." : "Your site is ready for launch."}
             </p>
           </div>
 
-          {/* Status Card */}
-          <Card className="border-green-500/20 bg-green-500/5">
-            <CardContent className="p-6 space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="font-medium">Status</span>
-                <span className="text-green-500 font-semibold flex items-center gap-2">
-                  <Rocket className="h-4 w-4" />
-                  Ready to Deploy
-                </span>
-              </div>
-              <div className="text-sm text-muted-foreground">
-                <p>Estimated time: We'll deploy within 24–48 hours</p>
+          {/* Deployment Progress Card */}
+          <Card className="border-orange-500/20 bg-orange-500/5">
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="font-medium">Deployment Progress</span>
+                  {isDeploying ? (
+                    <span className="text-orange-500 font-semibold flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      In Progress
+                    </span>
+                  ) : (
+                    <span className="text-green-500 font-semibold flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4" />
+                      Queued
+                    </span>
+                  )}
+                </div>
+
+                {/* Progress Steps */}
+                <div className="space-y-3">
+                  {DEPLOYMENT_STEPS.map((step) => {
+                    const isCompleted = currentStep > step.id || (!isDeploying && currentStep >= step.id);
+                    const isCurrent = currentStep === step.id && isDeploying;
+                    
+                    return (
+                      <div 
+                        key={step.id} 
+                        className={`flex items-center gap-3 transition-opacity ${
+                          isCompleted || isCurrent ? "opacity-100" : "opacity-40"
+                        }`}
+                      >
+                        <div className={`h-6 w-6 rounded-full flex items-center justify-center ${
+                          isCompleted 
+                            ? "bg-green-500 text-white" 
+                            : isCurrent 
+                              ? "bg-orange-500 text-white" 
+                              : "bg-muted border border-border"
+                        }`}>
+                          {isCompleted ? (
+                            <Check className="h-4 w-4" />
+                          ) : isCurrent ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Circle className="h-3 w-3" />
+                          )}
+                        </div>
+                        <span className={`text-sm ${isCompleted ? "text-foreground" : "text-muted-foreground"}`}>
+                          {step.label}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
               
               {/* Payment Details */}
-              <div className="border-t pt-4 space-y-2 text-sm">
+              <div className="border-t mt-6 pt-4 space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Amount paid</span>
                   <span className="font-medium">
@@ -88,14 +162,18 @@ export default function PaymentSuccess() {
             </CardContent>
           </Card>
 
-          {/* Next Step */}
-          <p className="text-muted-foreground">
-            Next step: <span className="text-foreground font-medium">deployment</span>.
-            We'll email you when your site is live.
-          </p>
-          <p className="text-sm text-muted-foreground/80">
-            Your preview link has been emailed to you for reference.
-          </p>
+          {/* Status Message */}
+          <div className="text-muted-foreground space-y-2">
+            <p>
+              {isDeploying 
+                ? "Your site is being deployed. This usually takes a few minutes."
+                : "Deployment is queued. We'll email you when your site is live."
+              }
+            </p>
+            <p className="text-sm text-muted-foreground/80">
+              You can close this page — we'll send you an email when everything is ready.
+            </p>
+          </div>
 
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-3 justify-center">

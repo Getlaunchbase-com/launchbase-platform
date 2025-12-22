@@ -167,6 +167,8 @@ export const emailLogs = mysqlTable("email_logs", {
     "ready_for_review",
     "review_nudge",
     "launch_confirmation",
+    "deployment_started",
+    "site_live",
     "preview_followup",
     "testimonial_request",
     "founding_client_lockin",

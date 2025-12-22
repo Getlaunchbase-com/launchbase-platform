@@ -561,3 +561,15 @@
 - [x] Add Beta/Founding Client toggle
 - [x] Update ready_for_review email with Stripe-clean copy
 - [ ] Add activity log timeline on application
+
+
+## Preview Approval & Deploy Flow
+
+- [x] Add approval checkbox on preview page
+- [x] Log approval event (timestamp, IP, user agent, build plan hash) - already exists in logApproval mutation
+- [x] Disable Pay button until checkbox checked
+- [x] Wire deploy trigger from Stripe webhook
+- [x] Add deployment safety gates (5 gates: intake exists, build plan exists, preview token exists, approval exists, not already deployed)
+- [x] Add deployment progress UI on success page (animated step-by-step progress)
+- [x] Add "deployment started" email
+- [x] Add "site is live" email template (ready to use when deployment completes)

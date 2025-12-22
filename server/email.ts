@@ -23,6 +23,8 @@ export type EmailType =
   | "ready_for_review"
   | "review_nudge"
   | "launch_confirmation"
+  | "deployment_started"
+  | "site_live"
   | "preview_followup"
   | "testimonial_request"
   | "founding_client_lockin"
@@ -160,6 +162,48 @@ Know another business owner who needs a website? Share your referral link and yo
 
 —
 LaunchBase`
+      };
+
+    case "deployment_started":
+      return {
+        subject: "We received payment — deployment has started",
+        previewText: "Your site is being deployed now.",
+        body: `Hi ${firstName},
+
+We received your payment — thank you.
+
+Your site is now being deployed. Here's what's happening:
+
+1. Provisioning your template
+2. Applying your branding
+3. Publishing to the web
+4. Connecting your domain (if applicable)
+
+You'll receive another email as soon as your site is live.
+
+—
+LaunchBase
+Workflows that give you back your life.`
+      };
+
+    case "site_live":
+      return {
+        subject: "Your site is live",
+        previewText: "Your LaunchBase site is now published.",
+        body: `Hi ${firstName},
+
+Your site is live.
+
+👉 View your site:
+${liveUrl || "[Live URL]"}
+
+You can share this link with customers immediately.
+
+If you need any changes, reply to this email and we'll take care of it.
+
+—
+LaunchBase
+Workflows that give you back your life.`
       };
 
     // ========== FOUNDING CLIENT FOLLOW-UP ==========
