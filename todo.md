@@ -537,3 +537,12 @@
 - [x] Add click-to-copy for email/phone
 - [x] Add "New" indicator for < 24 hours
 - [x] Add admin_notes and reviewed_by columns to database
+
+
+## Approve → Generate Build Plan Flow
+
+- [x] Add tRPC mutation to convert Suite Application to Intake
+- [x] Link Suite Application to created Intake (add intakeId field)
+- [x] Update admin page Approve button to use new flow with modal
+- [x] Show intake link if already approved
+- [ ] Trigger build plan generation after intake creation (future enhancement)
