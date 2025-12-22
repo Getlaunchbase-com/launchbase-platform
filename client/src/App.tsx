@@ -27,6 +27,7 @@ import Apply from "./pages/Apply";
 import ApplySuccess from "./pages/ApplySuccess";
 import HowItWorks from "./pages/HowItWorks";
 import AdminSuiteApplications from "./pages/AdminSuiteApplications";
+import AdminDeployments from "./pages/AdminDeployments";
 
 function Router() {
   return (
@@ -54,6 +55,7 @@ function Router() {
       <Route path="/admin/analytics" component={AdminAnalytics} />
       <Route path="/admin/referrals" component={AdminReferrals} />
       <Route path="/admin/suite-applications" component={AdminSuiteApplications} />
+      <Route path="/admin/deployments" component={AdminDeployments} />
       <Route path="/admin/expand" component={ExpandLaunchBase} />
       <Route path="/expand" component={ExpandLaunchBase} />
       <Route path="/dashboard/social/queue" component={PostQueue} />

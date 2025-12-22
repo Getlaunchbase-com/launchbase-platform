@@ -573,3 +573,14 @@
 - [x] Add deployment progress UI on success page (animated step-by-step progress)
 - [x] Add "deployment started" email
 - [x] Add "site is live" email template (ready to use when deployment completes)
+
+
+## Deployment Worker (Cron-based MVP)
+
+- [x] Add /api/worker/run-next-deploy endpoint
+- [x] Protect endpoint with secret token header (x-worker-token)
+- [x] Process one job at a time (oldest queued first)
+- [x] Mark deployment success/failed after execution
+- [x] Send "site is live" email on success
+- [x] Add manual "Run Next Job" button in admin (AdminDeployments page)
+- [ ] Set up Manus cron to ping endpoint every 2 minutes
