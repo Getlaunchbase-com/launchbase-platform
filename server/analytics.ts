@@ -55,7 +55,10 @@ export type AnalyticsEventName =
   | "module_disconnected"
   | "module_connected"
   // Suite Application events
-  | "suite_application_submitted";
+  | "suite_application_submitted"
+  // Facebook & Weather events
+  | "facebook_post_published"
+  | "weather_post_published";
 
 interface TrackEventParams {
   eventName: AnalyticsEventName;

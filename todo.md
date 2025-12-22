@@ -435,3 +435,31 @@
 - [ ] Update pricing with approval workflow messaging
 - [ ] Add new FAQ questions about approval and control
 - [ ] Update CTA language (no "Get Started", use "See how it works")
+
+
+## Go-Live Checklist (72 Hours)
+
+### Stripe Setup
+- [x] Run create-stripe-products.mjs script
+- [x] Copy Price IDs to environment variables
+- [ ] Test checkout session creation end-to-end
+
+### Facebook Page Posting
+- [ ] Add META_PAGE_ID secret
+- [ ] Add META_PAGE_ACCESS_TOKEN secret (long-lived)
+- [x] Add test connection endpoint
+- [ ] Verify publish permissions
+
+### Weather Intelligence Service
+- [x] Build NWS API fetcher (conditions, forecast, alerts)
+- [x] Create deterministic rule classifier
+- [ ] Add AI copy polisher (optional)
+- [x] Format final Facebook post output
+
+
+## Homepage Fix - Core Website First
+- [x] Lead with website building (the core product)
+- [x] Establish "We build your website" before Suite features
+- [x] Add website showcase/preview section
+- [x] Position Suite as expansion, not the main product
+- [x] Keep trust anchors but contextualize for website first

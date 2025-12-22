@@ -186,3 +186,95 @@ export async function getRecentPosts(limit: number = 5): Promise<{
     };
   }
 }
+
+
+/**
+ * Test Facebook connection - comprehensive check
+ * Returns detailed status for debugging
+ */
+export async function testFacebookConnection(): Promise<{
+  configured: boolean;
+  tokenValid: boolean;
+  canPublish: boolean;
+  pageName?: string;
+  pageId?: string;
+  permissions?: string[];
+  error?: string;
+  recommendation?: string;
+}> {
+  const pageToken = process.env.META_PAGE_ACCESS_TOKEN || process.env.META_PAGE_TOKEN;
+  const pageId = process.env.META_PAGE_ID;
+
+  // Check if configured
+  if (!pageToken || !pageId) {
+    return {
+      configured: false,
+      tokenValid: false,
+      canPublish: false,
+      error: "Missing META_PAGE_ACCESS_TOKEN or META_PAGE_ID",
+      recommendation: "Add these secrets in LaunchBase Settings → Secrets",
+    };
+  }
+
+  try {
+    // Step 1: Verify token and get page info
+    const pageResponse = await fetch(
+      `${GRAPH_API_BASE}/${pageId}?fields=name,id&access_token=${pageToken}`
+    );
+    const pageData = await pageResponse.json();
+
+    if (!pageResponse.ok) {
+      return {
+        configured: true,
+        tokenValid: false,
+        canPublish: false,
+        error: pageData.error?.message || "Invalid token",
+        recommendation: "Your token may be expired. Generate a new long-lived Page Access Token from Meta Business Suite.",
+      };
+    }
+
+    // Step 2: Check permissions
+    const permResponse = await fetch(
+      `${GRAPH_API_BASE}/me/permissions?access_token=${pageToken}`
+    );
+    const permData = await permResponse.json();
+
+    const grantedPermissions = (permData.data || [])
+      .filter((p: { status: string }) => p.status === "granted")
+      .map((p: { permission: string }) => p.permission);
+
+    const requiredPermissions = ["pages_manage_posts", "pages_read_engagement"];
+    const hasPublishPermission = grantedPermissions.includes("pages_manage_posts");
+
+    if (!hasPublishPermission) {
+      return {
+        configured: true,
+        tokenValid: true,
+        canPublish: false,
+        pageName: pageData.name,
+        pageId: pageData.id,
+        permissions: grantedPermissions,
+        error: "Missing pages_manage_posts permission",
+        recommendation: "Regenerate your token with pages_manage_posts permission enabled.",
+      };
+    }
+
+    return {
+      configured: true,
+      tokenValid: true,
+      canPublish: true,
+      pageName: pageData.name,
+      pageId: pageData.id,
+      permissions: grantedPermissions,
+    };
+
+  } catch (error) {
+    return {
+      configured: true,
+      tokenValid: false,
+      canPublish: false,
+      error: error instanceof Error ? error.message : "Network error",
+      recommendation: "Check your internet connection and try again.",
+    };
+  }
+}

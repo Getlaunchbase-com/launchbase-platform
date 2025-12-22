@@ -31,6 +31,8 @@ import { createSMICheckoutSession, getSMISubscriptionStatus, cancelSMISubscripti
 import { generatePlatformGuidePDF } from "./pdfGuide";
 import { generatePreviewHTML, generateBuildPlan as generatePreviewBuildPlan } from "./previewTemplates";
 import { createHash } from "crypto";
+import { getWeatherIntelligence, formatFacebookPost } from "./services/weather-intelligence";
+import { postToFacebook, testFacebookConnection } from "./services/facebook-poster";
 
 // Generate a hash of the build plan for version locking
 function generateBuildPlanHash(buildPlan: { id: number; plan: unknown }): string {
@@ -1395,6 +1397,143 @@ export const appRouter = router({
           .limit(1);
 
         return app ?? null;
+      }),
+  }),
+
+  // Weather Intelligence Router - NWS API integration
+  weather: router({
+    // Get weather intelligence for a location
+    getIntelligence: publicProcedure
+      .input(z.object({
+        latitude: z.number().min(-90).max(90),
+        longitude: z.number().min(-180).max(180),
+        businessType: z.string().optional(),
+        businessName: z.string().optional(),
+      }))
+      .query(async ({ input }) => {
+        const result = await getWeatherIntelligence(input);
+        return result;
+      }),
+
+    // Generate a formatted Facebook post from weather intelligence
+    generatePost: publicProcedure
+      .input(z.object({
+        latitude: z.number().min(-90).max(90),
+        longitude: z.number().min(-180).max(180),
+        businessType: z.string().optional(),
+        businessName: z.string().optional(),
+        includeEmoji: z.boolean().optional().default(true),
+        includePoweredBy: z.boolean().optional().default(false),
+      }))
+      .query(async ({ input }) => {
+        const intelligence = await getWeatherIntelligence({
+          latitude: input.latitude,
+          longitude: input.longitude,
+          businessType: input.businessType,
+          businessName: input.businessName,
+        });
+
+        const post = formatFacebookPost(intelligence, {
+          includeEmoji: input.includeEmoji,
+          includePoweredBy: input.includePoweredBy,
+        });
+
+        return {
+          intelligence,
+          formattedPost: post,
+        };
+      }),
+  }),
+
+  // Facebook Router - Page posting and connection testing
+  facebook: router({
+    // Test Facebook connection
+    testConnection: protectedProcedure.query(async () => {
+      const result = await testFacebookConnection();
+      return result;
+    }),
+
+    // Post to Facebook Page
+    post: protectedProcedure
+      .input(z.object({
+        message: z.string().min(1).max(5000),
+        link: z.string().url().optional(),
+        imageUrl: z.string().url().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const result = await postToFacebook(input);
+
+        if (result.success) {
+          await trackEvent({
+            eventName: "facebook_post_published",
+            metadata: {
+              userId: ctx.user.id,
+              postId: result.postId,
+              hasImage: !!input.imageUrl,
+              hasLink: !!input.link,
+            },
+          });
+        }
+
+        return result;
+      }),
+
+    // Generate and post weather-aware content
+    postWeatherAware: protectedProcedure
+      .input(z.object({
+        latitude: z.number().min(-90).max(90),
+        longitude: z.number().min(-180).max(180),
+        businessType: z.string().optional(),
+        businessName: z.string().optional(),
+        includeEmoji: z.boolean().optional().default(true),
+        includePoweredBy: z.boolean().optional().default(false),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // Get weather intelligence
+        const intelligence = await getWeatherIntelligence({
+          latitude: input.latitude,
+          longitude: input.longitude,
+          businessType: input.businessType,
+          businessName: input.businessName,
+        });
+
+        // Check safety gate
+        if (intelligence.safetyGate) {
+          return {
+            posted: false,
+            reason: "Safety gate active - severe weather conditions",
+            intelligence,
+          };
+        }
+
+        // Format and post
+        const message = formatFacebookPost(intelligence, {
+          includeEmoji: input.includeEmoji,
+          includePoweredBy: input.includePoweredBy,
+        });
+
+        const result = await postToFacebook({ message });
+
+        if (result.success) {
+          await trackEvent({
+            eventName: "weather_post_published",
+            metadata: {
+              userId: ctx.user.id,
+              postId: result.postId,
+              postType: intelligence.postType,
+              urgency: intelligence.urgency,
+            },
+          });
+        }
+
+        return {
+          posted: result.success,
+          postId: result.postId,
+          postUrl: result.postUrl,
+          error: result.error,
+          intelligence,
+          formattedPost: message,
+        };
       }),
   }),
 });
