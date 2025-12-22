@@ -518,3 +518,9 @@
 - [x] Update ApplySuccess.tsx to display vertical instead of businessType
 - [x] Create suite_applications table in database
 - [x] Create module_setup_steps table in database
+
+
+## Beta Customer Onboarding - Carpenter
+
+- [x] Add Carpenter as industry under Trades vertical
+- [x] Add sub-specialties: Finish Carpenter, Custom Cabinetry, Trim & Molding, Furniture Maker, General Carpentry
