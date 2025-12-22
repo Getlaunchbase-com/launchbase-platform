@@ -561,6 +561,9 @@ export const suiteApplications = mysqlTable("suite_applications", {
   ]).default("submitted").notNull(),
   // Preview token for customer link
   previewToken: varchar("previewToken", { length: 64 }),
+  // Admin fields
+  adminNotes: text("admin_notes"),
+  reviewedBy: varchar("reviewed_by", { length: 255 }),
   // Timestamps
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

@@ -524,3 +524,16 @@
 
 - [x] Add Carpenter as industry under Trades vertical
 - [x] Add sub-specialties: Finish Carpenter, Custom Cabinetry, Trim & Molding, Furniture Maker, General Carpentry
+
+
+## Suite Applications Admin View
+
+- [x] Add tRPC procedures for listing suite applications
+- [x] Add tRPC procedure for updating application status
+- [x] Add tRPC procedure for admin notes
+- [x] Create SuiteApplications admin page with drawer, search, filters
+- [x] Add navigation link to admin sidebar
+- [x] Add keyboard shortcuts (A=approve, N=review, R=reject, Esc=close)
+- [x] Add click-to-copy for email/phone
+- [x] Add "New" indicator for < 24 hours
+- [x] Add admin_notes and reviewed_by columns to database

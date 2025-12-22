@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, BarChart3, Gift } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, BarChart3, Gift, Rocket } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -29,6 +29,7 @@ import { Button } from "./ui/button";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Intakes", path: "/admin" },
+  { icon: Rocket, label: "Suite Applications", path: "/admin/suite-applications" },
   { icon: BarChart3, label: "Analytics", path: "/admin/analytics" },
   { icon: Gift, label: "Referrals", path: "/admin/referrals" },
 ];

@@ -1404,6 +1404,66 @@ export const appRouter = router({
 
         return app ?? null;
       }),
+
+    // Admin: List all applications
+    list: protectedProcedure
+      .input(z.object({
+        status: z.enum(["submitted", "ready_for_review", "preview_ready", "approved", "paid", "active", "rejected"]).optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return [];
+
+        if (input?.status) {
+          const apps = await db.select().from(suiteApplications).where(eq(suiteApplications.status, input.status)).orderBy(desc(suiteApplications.createdAt));
+          return apps;
+        }
+
+        const apps = await db.select().from(suiteApplications).orderBy(desc(suiteApplications.createdAt));
+        return apps;
+      }),
+
+    // Admin: Update application status
+    updateStatus: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        status: z.enum(["submitted", "ready_for_review", "preview_ready", "approved", "paid", "active", "rejected"]),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        await db
+          .update(suiteApplications)
+          .set({ 
+            status: input.status,
+            reviewedBy: ctx.user?.name || ctx.user?.email || "Admin",
+          })
+          .where(eq(suiteApplications.id, input.id));
+
+        return { success: true };
+      }),
+
+    // Admin: Update admin notes
+    setNotes: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        adminNotes: z.string().max(5000),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        await db
+          .update(suiteApplications)
+          .set({ 
+            adminNotes: input.adminNotes,
+            reviewedBy: ctx.user?.name || ctx.user?.email || "Admin",
+          })
+          .where(eq(suiteApplications.id, input.id));
+
+        return { success: true };
+      }),
   }),
 
   // Weather Intelligence Router - NWS API integration
