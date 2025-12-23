@@ -869,3 +869,18 @@
 - [x] Add "Controls change relevance — not safety" messaging
 - [x] Add observability messaging ("You can always see what LaunchBase is doing")
 - [x] Mirror trust language from Expand page
+
+
+## Public Trust Page & Observability Panel
+
+### Public Trust Page
+- [x] Create /trust route with customer-facing commitments
+- [x] Surface key promises from Internal Contract
+- [x] Add navigation link to trust page
+
+### Observability Panel
+- [x] Create ObservabilityPanel component
+- [x] Show decision logs (posts published, silenced, reasons)
+- [x] Show upcoming scheduled posts
+- [x] Show silence reasons with context
+- [x] Integrate into customer-facing Expand page

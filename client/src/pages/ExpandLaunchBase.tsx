@@ -15,6 +15,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { ObservabilityPanel } from "@/components/ObservabilityPanel";
 
 // =============================================================================
 // PRICING MODEL A: Cadence + Layers (Clean, Transparent, Scalable)
@@ -393,6 +394,9 @@ export default function ExpandLaunchBase() {
                 You can always see what LaunchBase is doing — and change it anytime.
               </p>
             </div>
+
+            {/* OBSERVABILITY PANEL - Customer-facing activity view */}
+            <ObservabilityPanel />
 
             {/* RECOMMENDED SETUP STRIP */}
             <Card className="bg-gradient-to-r from-[#FF6A00]/10 to-[#FF6A00]/5 border-[#FF6A00]/20 rounded-[14px]">

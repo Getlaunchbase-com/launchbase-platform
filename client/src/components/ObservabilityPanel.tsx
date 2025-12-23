@@ -11,7 +11,9 @@ import {
   Eye,
   VolumeX,
   Rocket,
-  Info
+  Info,
+  Shield,
+  RefreshCw
 } from "lucide-react";
 import {
   Tooltip,
@@ -19,6 +21,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 
 // Type for observability data
 interface ObservabilityData {
@@ -52,9 +55,9 @@ interface ObservabilityData {
 
 export function ObservabilityPanel() {
   // @ts-ignore - tRPC type inference issue with nested routers
-  const { data, isLoading } = trpc.admin.observability.useQuery(undefined, {
+  const { data, isLoading, refetch } = trpc.admin.observability.useQuery(undefined, {
     refetchInterval: 30000, // Refresh every 30 seconds
-  }) as { data: ObservabilityData | undefined; isLoading: boolean };
+  }) as { data: ObservabilityData | undefined; isLoading: boolean; refetch: () => void };
 
   if (isLoading) {
     return <ObservabilityPanelSkeleton />;
@@ -66,6 +69,26 @@ export function ObservabilityPanel() {
 
   return (
     <div className="space-y-6">
+      {/* Trust Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-[#FF6A00]/10">
+            <Eye className="w-5 h-5 text-[#FF6A00]" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold">What LaunchBase is Doing</h2>
+            <p className="text-sm text-muted-foreground">You can always see — and change it anytime</p>
+          </div>
+        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => refetch()}
+          className="h-8 w-8 p-0"
+        >
+          <RefreshCw className="w-4 h-4" />
+        </Button>
+      </div>
       {/* System Status Card */}
       <Card className="border-border/50">
         <CardHeader className="pb-3">
@@ -166,7 +189,7 @@ export function ObservabilityPanel() {
         <Card className="border-border/50">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg font-medium flex items-center gap-2">
-              <Eye className="h-5 w-5 text-muted-foreground" />
+              <Activity className="h-5 w-5 text-muted-foreground" />
               Recent Decisions
             </CardTitle>
           </CardHeader>
@@ -179,6 +202,15 @@ export function ObservabilityPanel() {
           </CardContent>
         </Card>
       )}
+
+      {/* Trust Footer */}
+      <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/30 border border-border/50">
+        <Shield className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+        <div>
+          <p className="text-sm font-medium">Controls change relevance — not safety</p>
+          <p className="text-xs text-muted-foreground">Weather, safety, and brand protection are always enforced.</p>
+        </div>
+      </div>
     </div>
   );
 }
