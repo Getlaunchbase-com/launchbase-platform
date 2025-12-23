@@ -837,3 +837,20 @@
 - [x] Add Recent Decisions section (last 3 decisions with human-readable explanations)
 - [x] Integrate panel into admin dashboard
 - [ ] Integrate panel into customer Expand page
+
+
+## Trust Copy & Control Language (Observability-Enabled)
+
+### Expand LaunchBase Page Trust Copy
+- [x] Add reassurance block near top: "Nothing here is permanent..."
+- [x] Add "Turn on/off anytime" to module cards
+- [x] Add "No contracts. No penalties." to module cards
+- [x] Add pricing philosophy: "You're not buying software. You're deciding how much responsibility to hand off."
+- [x] Add "You can always see what LaunchBase is doing — and change it anytime."
+
+### Auto/Guided/Custom Mode Language
+- [x] Update Auto mode: "LaunchBase decides for you. You can review everything."
+- [x] Update Guided mode: "LaunchBase recommends. You approve."
+- [x] Update Custom mode: "You fine-tune relevance. Safety is still enforced."
+- [x] Add "Controls change relevance — not safety." everywhere
+- [x] Add "Weather, safety, and brand protection are always enforced."
