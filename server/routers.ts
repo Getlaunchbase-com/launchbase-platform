@@ -2,6 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { getDb } from "./db";
 import { intakes, approvals, buildPlans, referrals, intelligenceLayers, socialPosts, moduleSetupSteps, moduleConnections, suiteApplications, deployments } from "../drizzle/schema";
@@ -372,31 +373,47 @@ export const appRouter = router({
           status: z.enum(["new", "review", "needs_info", "ready_for_review", "approved", "paid", "deployed"]),
         }))
         .mutation(async ({ input }) => {
+          // Get current intake to validate transition
+          const intake = await getIntakeById(input.id);
+          if (!intake) {
+            throw new TRPCError({ code: "NOT_FOUND", message: "Intake not found" });
+          }
+          
+          // Enforce valid status transitions
+          const { isValidTransition } = await import("./statusTransitions");
+          const currentStatus = intake.status as "new" | "review" | "needs_info" | "ready_for_review" | "approved" | "paid" | "deployed";
+          const targetStatus = input.status;
+          
+          const transitionResult = isValidTransition(currentStatus, targetStatus, "admin");
+          if (!transitionResult.valid) {
+            throw new TRPCError({ 
+              code: "BAD_REQUEST", 
+              message: transitionResult.error || "Invalid status transition" 
+            });
+          }
+          
           // If marking as ready_for_review, generate preview token and send email
           if (input.status === "ready_for_review") {
-            const intake = await getIntakeById(input.id);
-            if (intake) {
-              // Generate preview token
-              const previewToken = `preview_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
-              
-              // Update status and set preview token
-              const db = await getDb();
-              if (!db) throw new Error("Database not available");
-              await db.update(intakes)
-                .set({ status: input.status, previewToken })
-                .where(eq(intakes.id, input.id));
-              
-              // Send ready for review email with preview link
-              const firstName = intake.contactName?.split(" ")[0] || "there";
-              await sendEmail(intake.id, "ready_for_review", {
-                firstName,
-                businessName: intake.businessName,
-                email: intake.email,
-                previewUrl: `/preview/${previewToken}`,
-              });
-              
-              return { success: true, previewToken };
-            }
+            // Generate preview token
+            const previewToken = `preview_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+            
+            // Update status and set preview token
+            const db = await getDb();
+            if (!db) throw new Error("Database not available");
+            await db.update(intakes)
+              .set({ status: input.status, previewToken })
+              .where(eq(intakes.id, input.id));
+            
+            // Send ready for review email with preview link
+            const firstName = intake.contactName?.split(" ")[0] || "there";
+            await sendEmail(intake.id, "ready_for_review", {
+              firstName,
+              businessName: intake.businessName,
+              email: intake.email,
+              previewUrl: `/preview/${previewToken}`,
+            });
+            
+            return { success: true, previewToken };
           }
           
           await updateIntakeStatus(input.id, input.status);
