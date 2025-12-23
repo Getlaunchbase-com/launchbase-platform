@@ -9,6 +9,10 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { handleStripeWebhook } from "../stripe/webhook";
 import { handleDeploymentWorker } from "../worker/deploymentWorker";
+import { logReferralEvent } from "../referral";
+import { getDb } from "../db";
+import { deployments } from "../../drizzle/schema";
+import { eq } from "drizzle-orm";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -39,6 +43,61 @@ async function startServer() {
   
   // Deployment worker endpoint (protected by token)
   app.post("/api/worker/run-next-deploy", express.json(), handleDeploymentWorker);
+
+  // Referral redirect endpoint: /r/{siteSlug}
+  // Logs badge click and redirects to homepage with UTM params
+  app.get("/r/:siteSlug", async (req, res) => {
+    try {
+      const { siteSlug } = req.params;
+      const userAgent = req.headers["user-agent"] || "";
+      const referrer = req.headers["referer"] || "";
+      const ipAddress = req.ip || req.socket.remoteAddress || "";
+
+      // Look up site ID from deployments (siteSlug is passed in URL, maps to siteId in deployments)
+      let siteId: number | undefined;
+      try {
+        const db = await getDb();
+        if (db) {
+          const [deployment] = await db
+            .select()
+            .from(deployments)
+            .where(eq(deployments.siteId, siteSlug))
+            .limit(1);
+          if (deployment) {
+            siteId = deployment.id;
+          }
+        }
+      } catch (e) {
+        console.error("[Referral] Failed to look up site:", e);
+      }
+
+      // Generate referral ID for tracking
+      const referralId = `rb_${siteSlug}_${siteId || "unknown"}`;
+
+      // Log the badge click event
+      await logReferralEvent({
+        eventType: "badge_click",
+        siteSlug,
+        siteId,
+        referralId,
+        userAgent,
+        referrer,
+        ipAddress,
+        utmSource: "launchbase_badge",
+        utmMedium: "referral",
+        utmCampaign: "powered_by",
+        utmContent: siteSlug,
+      });
+
+      // Redirect to homepage with UTM params
+      const redirectUrl = `https://getlaunchbase.com/?utm_source=launchbase_badge&utm_medium=referral&utm_campaign=powered_by&utm_content=${encodeURIComponent(siteSlug)}&ref=${encodeURIComponent(referralId)}`;
+      res.redirect(302, redirectUrl);
+    } catch (error) {
+      console.error("[Referral] Redirect error:", error);
+      // Fallback redirect without tracking
+      res.redirect(302, "https://getlaunchbase.com/");
+    }
+  });
   
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));

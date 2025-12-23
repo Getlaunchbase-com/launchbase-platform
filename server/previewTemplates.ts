@@ -101,7 +101,7 @@ export function generateBuildPlan(intake: IntakeData): BuildPlan {
 }
 
 // Generate preview HTML
-export function generatePreviewHTML(intake: IntakeData, buildPlan: BuildPlan): string {
+export function generatePreviewHTML(intake: IntakeData, buildPlan: BuildPlan, siteSlug?: string): string {
   const { businessName, businessDescription, serviceArea, phone, email } = intake;
   const { vertical, tone, primaryCTA } = buildPlan;
   
@@ -452,7 +452,7 @@ export function generatePreviewHTML(intake: IntakeData, buildPlan: BuildPlan): s
     </div>
     <div style="border-top: 1px solid rgba(255,255,255,0.2); margin-top: 2rem; padding-top: 1.5rem; text-align: center;">
       <p style="font-size: 0.85rem; opacity: 0.7;">
-        <a href="https://getlaunchbase.com" style="color: rgba(255,255,255,0.8); text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+        <a href="${siteSlug ? `https://getlaunchbase.com/r/${siteSlug}` : 'https://getlaunchbase.com'}" target="_blank" rel="noopener" style="color: rgba(255,255,255,0.8); text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
           <span>Powered by</span>
           <strong style="color: white;">LaunchBase</strong>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline;">

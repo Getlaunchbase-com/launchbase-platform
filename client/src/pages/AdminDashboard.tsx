@@ -36,6 +36,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { TrendingUp, ExternalLink, MousePointerClick } from "lucide-react";
 
 // Status configuration with improved labels and helper text
 const statusConfig: Record<string, {
@@ -222,6 +223,9 @@ export default function AdminDashboard() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Top Referrers This Week */}
+          <TopReferrersCard />
 
           {/* Status Filter Cards with Tooltips */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -420,5 +424,69 @@ export default function AdminDashboard() {
         </div>
       </TooltipProvider>
     </DashboardLayout>
+  );
+}
+
+// Top Referrers Card Component
+function TopReferrersCard() {
+  const { data: topSites, isLoading } = trpc.referralAnalytics.topSites.useQuery(
+    { limit: 3, timeWindowDays: 7, sortBy: "conversions" },
+    { enabled: true }
+  );
+
+  const { data: clicks7d } = trpc.referralAnalytics.clicks7d.useQuery();
+
+  if (isLoading) {
+    return (
+      <Card className="bg-gradient-to-r from-emerald-500/10 to-transparent border-emerald-500/20">
+        <CardContent className="py-4">
+          <div className="flex items-center justify-center h-20">
+            <div className="animate-pulse text-muted-foreground">Loading referral data...</div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="bg-gradient-to-r from-emerald-500/10 to-transparent border-emerald-500/20">
+      <CardContent className="py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-8">
+            <div>
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-emerald-400" />
+                <p className="text-sm text-gray-400">Top Referrers (7 days)</p>
+              </div>
+              <div className="mt-2 space-y-1">
+                {topSites && topSites.length > 0 ? (
+                  topSites.map((site: any, idx: number) => (
+                    <div key={site.siteId} className="flex items-center gap-3 text-sm">
+                      <span className="text-muted-foreground w-4">{idx + 1}.</span>
+                      <span className="font-medium">{site.siteSlug}</span>
+                      <span className="text-emerald-400">{site.clicks} clicks</span>
+                      <span className="text-muted-foreground">→</span>
+                      <span className="text-purple-400">{site.applySubmits} converts</span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground">No referral data yet</p>
+                )}
+              </div>
+            </div>
+            <div className="h-16 w-px bg-white/10" />
+            <div>
+              <p className="text-sm text-gray-400">7-Day Badge Clicks</p>
+              <p className="text-2xl font-bold text-emerald-400">{clicks7d || 0}</p>
+            </div>
+          </div>
+          <Link href="/admin/referral-analytics?range=7d">
+            <Button variant="outline" size="sm" className="gap-2">
+              View Analytics <ExternalLink className="w-3 h-3" />
+            </Button>
+          </Link>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
