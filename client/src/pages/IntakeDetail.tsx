@@ -20,7 +20,13 @@ import {
   Ban,
   MessageSquare,
   Info,
-  Sparkles
+  Sparkles,
+  Play,
+  Eye,
+  RefreshCw,
+  CreditCard,
+  Clock,
+  Link as LinkIcon
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Link, useParams, useLocation } from "wouter";
@@ -42,48 +48,79 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-// Status configuration with improved labels
+// Status configuration matching the state machine
 const statusConfig: Record<string, {
   label: string;
   helperText: string;
   color: string;
+  step: number;
 }> = {
   new: {
     label: "Awaiting Review",
-    helperText: "Intake complete. Ready to review.",
+    helperText: "Intake complete. Ready to start review.",
     color: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+    step: 1,
   },
   review: {
     label: "In Review",
-    helperText: "Build plan being generated.",
+    helperText: "Reviewing intake. Generate build plan and send preview.",
     color: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
+    step: 2,
   },
   needs_info: {
     label: "Needs Clarification",
     helperText: "Waiting on client response.",
     color: "bg-orange-500/20 text-orange-400 border-orange-500/30",
+    step: 2,
   },
-  ready: {
-    label: "Ready for Deployment",
-    helperText: "Ready to deploy when you are.",
-    color: "bg-green-500/20 text-green-400 border-green-500/30",
+  ready_for_review: {
+    label: "Preview Sent",
+    helperText: "Customer has preview link. Waiting for approval.",
+    color: "bg-purple-500/20 text-purple-400 border-purple-500/30",
+    step: 3,
   },
   approved: {
-    label: "Deployed",
-    helperText: "Website is live and accessible.",
-    color: "bg-purple-500/20 text-purple-400 border-purple-500/30",
+    label: "Customer Approved",
+    helperText: "Customer approved. Waiting for payment.",
+    color: "bg-indigo-500/20 text-indigo-400 border-indigo-500/30",
+    step: 4,
   },
-  draft: {
-    label: "Draft",
-    helperText: "Build plan in draft state.",
-    color: "bg-gray-500/20 text-gray-400 border-gray-500/30",
+  paid: {
+    label: "Paid",
+    helperText: "Payment received. Ready to deploy.",
+    color: "bg-green-500/20 text-green-400 border-green-500/30",
+    step: 5,
   },
   deployed: {
     label: "Live",
     helperText: "Website is live and accessible.",
     color: "bg-green-500/20 text-green-400 border-green-500/30",
+    step: 6,
+  },
+  // Legacy statuses for backwards compatibility
+  draft: {
+    label: "Draft",
+    helperText: "Build plan in draft state.",
+    color: "bg-gray-500/20 text-gray-400 border-gray-500/30",
+    step: 1,
+  },
+  ready: {
+    label: "Ready",
+    helperText: "Ready for next step.",
+    color: "bg-green-500/20 text-green-400 border-green-500/30",
+    step: 3,
   },
 };
+
+// State machine step labels for the stepper
+const STEPPER_STEPS = [
+  { key: "new", label: "New" },
+  { key: "review", label: "Review" },
+  { key: "ready_for_review", label: "Preview" },
+  { key: "approved", label: "Approved" },
+  { key: "paid", label: "Paid" },
+  { key: "deployed", label: "Live" },
+];
 
 export default function IntakeDetail() {
   const params = useParams<{ id: string }>();
@@ -96,8 +133,21 @@ export default function IntakeDetail() {
   const [showHoldModal, setShowHoldModal] = useState(false);
   const [internalNote, setInternalNote] = useState("");
 
-  const { data: intake, isLoading } = trpc.admin.intakes.detail.useQuery({ id: intakeId });
+  const { data: intake, isLoading, refetch: refetchIntake } = trpc.admin.intakes.detail.useQuery({ id: intakeId });
   const { data: buildPlan, refetch: refetchBuildPlan } = trpc.admin.buildPlan.getByIntake.useQuery({ intakeId });
+
+  // Status update mutation with transition enforcement
+  const updateStatusMutation = trpc.admin.intakes.updateStatus.useMutation({
+    onSuccess: () => {
+      refetchIntake();
+      refetchBuildPlan();
+      toast.success("Status updated successfully");
+    },
+    onError: (error) => {
+      // Show the transition error message from server
+      toast.error(error.message || "That step isn't allowed yet.");
+    },
+  });
 
   const generateBuildPlanMutation = trpc.admin.buildPlan.generate.useMutation({
     onSuccess: () => {
@@ -257,6 +307,184 @@ export default function IntakeDetail() {
               )}
             </div>
           </div>
+
+          {/* Status Stepper */}
+          <Card className="bg-white/5 border-white/10">
+            <CardContent className="py-4">
+              {/* Stepper */}
+              <div className="flex items-center justify-between mb-4">
+                {STEPPER_STEPS.map((step, index) => {
+                  const currentStep = statusConfig[intake.status]?.step || 1;
+                  const stepNumber = index + 1;
+                  const isCompleted = stepNumber < currentStep;
+                  const isCurrent = stepNumber === currentStep;
+                  const isFuture = stepNumber > currentStep;
+                  
+                  return (
+                    <div key={step.key} className="flex items-center">
+                      <div className="flex flex-col items-center">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                          isCompleted ? 'bg-green-500 text-white' :
+                          isCurrent ? 'bg-[#FF6A00] text-white' :
+                          'bg-white/10 text-gray-500'
+                        }`}>
+                          {isCompleted ? <CheckCircle className="w-4 h-4" /> : stepNumber}
+                        </div>
+                        <span className={`text-xs mt-1 ${
+                          isCurrent ? 'text-[#FF6A00] font-medium' :
+                          isCompleted ? 'text-green-400' :
+                          'text-gray-500'
+                        }`}>{step.label}</span>
+                      </div>
+                      {index < STEPPER_STEPS.length - 1 && (
+                        <div className={`w-12 h-0.5 mx-2 ${
+                          isCompleted ? 'bg-green-500' : 'bg-white/10'
+                        }`} />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              
+              {/* System rule line */}
+              <p className="text-xs text-gray-500 text-center mb-4">
+                Customers always preview before paying. Payment is required before deployment.
+              </p>
+              
+              {/* State-driven action buttons */}
+              <div className="flex items-center justify-between border-t border-white/10 pt-4">
+                <div className="text-sm text-gray-400">
+                  {intakeStatus.helperText}
+                </div>
+                <div className="flex gap-2">
+                  {/* Artifact links */}
+                  {(intake as any).previewToken && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(`/preview/${(intake as any).previewToken}`, '_blank')}
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      Open Preview
+                    </Button>
+                  )}
+                  
+                  {(intake as any).previewUrl && intake.status === 'deployed' && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open((intake as any).previewUrl, '_blank')}
+                    >
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      Open Live Site
+                    </Button>
+                  )}
+                  
+                  {/* Primary action button based on current status */}
+                  {intake.status === 'new' && (
+                    <Button
+                      onClick={() => updateStatusMutation.mutate({ id: intakeId, status: 'review' })}
+                      disabled={updateStatusMutation.isPending}
+                      className="bg-[#FF6A00] hover:bg-[#FF6A00]/90"
+                    >
+                      <Play className="w-4 h-4 mr-2" />
+                      {updateStatusMutation.isPending ? 'Starting...' : 'Start Review'}
+                    </Button>
+                  )}
+                  
+                  {intake.status === 'review' && (
+                    <Button
+                      onClick={() => updateStatusMutation.mutate({ id: intakeId, status: 'ready_for_review' })}
+                      disabled={updateStatusMutation.isPending}
+                      className="bg-[#FF6A00] hover:bg-[#FF6A00]/90"
+                    >
+                      <Send className="w-4 h-4 mr-2" />
+                      {updateStatusMutation.isPending ? 'Sending...' : 'Send Preview to Customer'}
+                    </Button>
+                  )}
+                  
+                  {intake.status === 'needs_info' && (
+                    <Button
+                      onClick={() => updateStatusMutation.mutate({ id: intakeId, status: 'ready_for_review' })}
+                      disabled={updateStatusMutation.isPending}
+                      className="bg-[#FF6A00] hover:bg-[#FF6A00]/90"
+                    >
+                      <Send className="w-4 h-4 mr-2" />
+                      {updateStatusMutation.isPending ? 'Sending...' : 'Send Preview to Customer'}
+                    </Button>
+                  )}
+                  
+                  {intake.status === 'ready_for_review' && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span>
+                          <Button
+                            disabled
+                            variant="secondary"
+                          >
+                            <Clock className="w-4 h-4 mr-2" />
+                            Awaiting Customer Approval
+                          </Button>
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Customer must approve via preview link before proceeding.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                  
+                  {intake.status === 'approved' && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span>
+                          <Button
+                            disabled
+                            variant="secondary"
+                          >
+                            <CreditCard className="w-4 h-4 mr-2" />
+                            Awaiting Payment
+                          </Button>
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Customer must complete payment via Stripe before deployment.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                  
+                  {intake.status === 'paid' && (
+                    <Button
+                      onClick={() => updateStatusMutation.mutate({ id: intakeId, status: 'deployed' })}
+                      disabled={updateStatusMutation.isPending}
+                      className="bg-green-600 hover:bg-green-600/90"
+                    >
+                      <Rocket className="w-4 h-4 mr-2" />
+                      {updateStatusMutation.isPending ? 'Deploying...' : 'Deploy Now'}
+                    </Button>
+                  )}
+                  
+                  {intake.status === 'deployed' && (
+                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30 px-4 py-2">
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Site is Live
+                    </Badge>
+                  )}
+                </div>
+              </div>
+              
+              {/* Disabled state helper text */}
+              {(intake.status === 'ready_for_review' || intake.status === 'approved') && (
+                <div className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                  <p className="text-sm text-yellow-400">
+                    {intake.status === 'ready_for_review' && 
+                      "Customer must approve the preview before you can proceed. They'll receive an email with the preview link."}
+                    {intake.status === 'approved' && 
+                      "Payment is required before deployment can start. Customer will complete checkout via Stripe."}
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Intake Details */}

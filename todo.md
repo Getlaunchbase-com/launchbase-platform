@@ -918,3 +918,13 @@
 - [x] Seed silence decisions with real reasons
 - [x] Seed post approval decisions
 - [x] Verify decisions appear in ObservabilityPanel
+
+
+## Admin UI State-Machine Buttons
+- [ ] Test status transition enforcement via admin UI
+- [ ] Update IntakeDetail.tsx with state-machine driven buttons
+- [ ] Show "Send Preview" instead of generic status dropdown
+- [ ] Show "Awaiting Customer Approval" when in ready_for_review
+- [ ] Show "Awaiting Payment" when in approved
+- [ ] Show "Deploy Site" when in paid
+- [ ] Display clear error messages for invalid transitions
