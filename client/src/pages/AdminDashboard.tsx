@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { TrendingUp, ExternalLink, MousePointerClick } from "lucide-react";
+import { ObservabilityPanel } from "@/components/ObservabilityPanel";
 
 // Status configuration with improved labels and helper text
 const statusConfig: Record<string, {
@@ -229,6 +230,11 @@ export default function AdminDashboard() {
 
           {/* Worker Status */}
           <WorkerStatusCard />
+
+          {/* System Observability */}
+          <div className="lg:col-span-2">
+            <ObservabilityPanel />
+          </div>
 
           {/* Status Filter Cards with Tooltips */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">

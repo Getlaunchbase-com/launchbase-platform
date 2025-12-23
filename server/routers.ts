@@ -35,6 +35,7 @@ import { getWeatherIntelligence, formatFacebookPost } from "./services/weather-i
 import { postToFacebook, testFacebookConnection } from "./services/facebook-poster";
 import { getTopReferringSites, getConversionFunnel, get7DayClicks, logReferralEvent } from "./referral";
 import { getLastWorkerRun } from "./worker/deploymentWorker";
+import { getObservabilityData, formatTimeAgo } from "./observability";
 
 // Generate a hash of the build plan for version locking
 function generateBuildPlanHash(buildPlan: { id: number; plan: unknown }): string {
@@ -764,6 +765,21 @@ export const appRouter = router({
 
     dailyHealth: protectedProcedure.query(async () => {
       return getDailyHealth();
+    }),
+    
+    // Full observability panel data
+    observability: protectedProcedure.query(async () => {
+      const data = await getObservabilityData();
+      return {
+        systemStatus: data.systemStatus,
+        activityMetrics: {
+          ...data.activityMetrics,
+          lastIntelligenceDecisionFormatted: formatTimeAgo(data.activityMetrics.lastIntelligenceDecision),
+          lastDeploymentRunFormatted: formatTimeAgo(data.activityMetrics.lastDeploymentRun),
+        },
+        recentDecisions: data.recentDecisions,
+        intelligenceInfo: data.intelligenceInfo,
+      };
     }),
     
     // Worker observability
