@@ -691,3 +691,31 @@
 - [ ] Write integration tests for approval workflow
 - [ ] Create user documentation
 - [ ] Create admin documentation
+
+
+## Intelligence Implementation (Three Locked Additions)
+
+### Phase 1: Silence Audit Trail
+- [ ] Create decision_logs table (additive, no existing changes)
+- [ ] Log all Intelligence Pipeline decisions (post/silence/wait)
+- [ ] Classify silence severity (hard_block/soft_block/discretionary)
+- [ ] Surface in Admin Activity tab
+- [ ] Show summary in customer dashboard
+- [ ] Test with pilot customer
+
+### Phase 2: Approval Feedback Loop
+- [ ] Create approval_feedback table
+- [ ] Capture feedback on every approval/rejection/edit
+- [ ] Normalize feedback types (too_promotional, wrong_tone, etc.)
+- [ ] Build aggregate metrics dashboard
+- [ ] Analyze feedback by layer and industry
+- [ ] Use feedback to improve industry profiles
+
+### Phase 3: Industry Profile Versioning
+- [ ] Create industry_profiles table
+- [ ] Refactor industry logic to declarative JSON
+- [ ] Implement version management (MAJOR/MINOR/PATCH)
+- [ ] Add migration strategies (auto/opt_in/frozen)
+- [ ] Build version management UI
+- [ ] Test with 2-3 industries
+- [ ] Enable instant new industry launches
