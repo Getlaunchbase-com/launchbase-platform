@@ -696,26 +696,36 @@
 ## Intelligence Implementation (Three Locked Additions)
 
 ### Phase 1: Silence Audit Trail
-- [ ] Create decision_logs table (additive, no existing changes)
-- [ ] Log all Intelligence Pipeline decisions (post/silence/wait)
-- [ ] Classify silence severity (hard_block/soft_block/discretionary)
+- [x] Create decision_logs table (additive, no existing changes)
+- [x] Create logDecision() service function
+- [x] Log all Intelligence Pipeline decisions (post/silence/wait)
+- [x] Classify silence severity (hard_block/soft_block/discretionary)
+- [x] Create getUserDecisionLogs() for Activity tab
+- [x] Create getUserSilenceStats() for dashboard
+- [x] Write unit tests (all passing)
 - [ ] Surface in Admin Activity tab
 - [ ] Show summary in customer dashboard
 - [ ] Test with pilot customer
 
 ### Phase 2: Approval Feedback Loop
-- [ ] Create approval_feedback table
-- [ ] Capture feedback on every approval/rejection/edit
-- [ ] Normalize feedback types (too_promotional, wrong_tone, etc.)
+- [x] Create approval_feedback table
+- [x] Create recordFeedback() service function
+- [x] Capture feedback on every approval/rejection/edit
+- [x] Normalize feedback types (too_promotional, wrong_tone, etc.)
+- [x] Create getUserFeedbackMetrics() for analytics
+- [x] Write unit tests (all passing)
 - [ ] Build aggregate metrics dashboard
 - [ ] Analyze feedback by layer and industry
 - [ ] Use feedback to improve industry profiles
 
 ### Phase 3: Industry Profile Versioning
-- [ ] Create industry_profiles table
-- [ ] Refactor industry logic to declarative JSON
-- [ ] Implement version management (MAJOR/MINOR/PATCH)
-- [ ] Add migration strategies (auto/opt_in/frozen)
+- [x] Create industry_profiles table
+- [x] Create getIndustryProfile() service function
+- [x] Create createIndustryProfile() for admin
+- [x] Create activateIndustryProfile() for rollouts
+- [x] Implement version management (MAJOR/MINOR/PATCH)
+- [x] Add migration strategies (auto/opt_in/frozen)
+- [x] Write unit tests (all passing)
 - [ ] Build version management UI
 - [ ] Test with 2-3 industries
 - [ ] Enable instant new industry launches
