@@ -737,3 +737,29 @@ export const referralEvents = mysqlTable("referral_events", {
 
 export type ReferralEvent = typeof referralEvents.$inferSelect;
 export type InsertReferralEvent = typeof referralEvents.$inferInsert;
+
+
+/**
+ * Worker run logs for observability
+ * Tracks each execution of the deployment worker
+ */
+export const workerRuns = mysqlTable("worker_runs", {
+  id: int("id").autoincrement().primaryKey(),
+  // Result of the run
+  result: mysqlEnum("result", ["processed", "skipped", "error"]).notNull(),
+  // How many deployments were processed
+  processedCount: int("processedCount").default(0).notNull(),
+  // Error message if any
+  errorMessage: text("errorMessage"),
+  // Additional details
+  details: json("details").$type<{
+    deploymentIds?: number[];
+    message?: string;
+  }>(),
+  // Duration in milliseconds
+  durationMs: int("durationMs"),
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type WorkerRun = typeof workerRuns.$inferSelect;
+export type InsertWorkerRun = typeof workerRuns.$inferInsert;
