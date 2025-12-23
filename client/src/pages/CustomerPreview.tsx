@@ -24,6 +24,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { ShareSiteModal } from "@/components/ShareSiteModal";
+import { Share2 } from "lucide-react";
 
 // Business module definitions with production copy
 const BUSINESS_MODULES = [
@@ -64,6 +66,7 @@ export default function CustomerPreview() {
   const [selectedModules, setSelectedModules] = useState<("google_ads" | "quickbooks")[]>([]);
   const [currentStep, setCurrentStep] = useState<FlowStep>("review");
   const [isApproved, setIsApproved] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [checkoutApprovalChecked, setCheckoutApprovalChecked] = useState(false);
 
   // Fetch intake by preview token
@@ -185,14 +188,37 @@ export default function CustomerPreview() {
       <main className="container max-w-4xl py-8 md:py-16">
         {/* Payment Complete Banner */}
         {isPaid && (
-          <div className="mb-8 rounded-lg bg-green-500/10 border border-green-500/20 p-4 flex items-center gap-3">
-            <CheckCircle className="h-5 w-5 text-green-500" />
-            <div>
-              <span className="text-green-500 font-medium">Payment Confirmed ✅</span>
-              <p className="text-sm text-muted-foreground">You're officially queued for launch.</p>
+          <div className="mb-8 rounded-lg bg-green-500/10 border border-green-500/20 p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <CheckCircle className="h-5 w-5 text-green-500" />
+                <div>
+                  <span className="text-green-500 font-medium">Payment Confirmed ✅</span>
+                  <p className="text-sm text-muted-foreground">You're officially queued for launch.</p>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowShareModal(true)}
+                className="gap-2"
+              >
+                <Share2 className="h-4 w-4" />
+                Share My Site
+              </Button>
             </div>
           </div>
         )}
+
+        {/* Share Site Modal */}
+        <ShareSiteModal
+          open={showShareModal}
+          onOpenChange={setShowShareModal}
+          siteUrl={intake?.previewHTML ? `${window.location.origin}/preview/${token}` : ''}
+          siteSlug={intake?.businessName?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').substring(0, 50) || ''}
+          siteId={intake?.id}
+          businessName={intake?.businessName || ''}
+        />
 
         {/* Approval Confirmation Banner */}
         {isApproved && !isPaid && currentStep !== "review" && (

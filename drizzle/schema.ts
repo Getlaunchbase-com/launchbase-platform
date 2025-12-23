@@ -698,3 +698,42 @@ export const suiteApplications = mysqlTable("suite_applications", {
 
 export type SuiteApplication = typeof suiteApplications.$inferSelect;
 export type InsertSuiteApplication = typeof suiteApplications.$inferInsert;
+
+
+/**
+ * Referral events from badge clicks and conversion funnel
+ * Tracks: badge_click → landing_view → apply_start → apply_submit
+ * Also tracks share events: share_opened, share_copy_link, share_qr_shown, share_social_clicked
+ */
+export const referralEvents = mysqlTable("referral_events", {
+  id: int("id").autoincrement().primaryKey(),
+  // Event type in the funnel
+  eventType: varchar("eventType", { length: 32 }).notNull(),
+  // Site identification
+  siteSlug: varchar("siteSlug", { length: 128 }),
+  siteId: int("siteId"),
+  // Referral tracking
+  referralId: varchar("referralId", { length: 64 }),
+  // Session tracking
+  sessionId: varchar("sessionId", { length: 64 }),
+  // Visitor tracking (privacy-safe hash)
+  visitorHash: varchar("visitorHash", { length: 64 }),
+  // User agent and referrer
+  userAgent: text("userAgent"),
+  referrer: varchar("referrer", { length: 512 }),
+  // UTM parameters
+  utmSource: varchar("utmSource", { length: 128 }),
+  utmMedium: varchar("utmMedium", { length: 128 }),
+  utmCampaign: varchar("utmCampaign", { length: 128 }),
+  utmContent: varchar("utmContent", { length: 128 }),
+  // Dedupe and bot flags
+  isDuplicate: boolean("isDuplicate").default(false).notNull(),
+  isBot: boolean("isBot").default(false).notNull(),
+  // Metadata
+  metadata: json("metadata").$type<Record<string, unknown>>(),
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ReferralEvent = typeof referralEvents.$inferSelect;
+export type InsertReferralEvent = typeof referralEvents.$inferInsert;

@@ -769,3 +769,28 @@
 - [x] Test badge appears on all customer sites
 - [x] Verify link functionality and styling
 - [x] All 145 tests passing
+
+
+## Admin Navigation & Share Features
+
+- [ ] Create ReferralAnalytics page with KPI strip and top sites table
+- [ ] Add Referral Analytics link to admin sidebar with 7d clicks badge
+- [ ] Add "Top Referrers This Week" card to main admin dashboard
+- [ ] Create Share My Site modal component (copy link, QR code, social share, caption templates)
+- [ ] Add share event tracking (share_opened, share_copy_link, share_qr_shown, share_social_clicked)
+- [ ] Update badge link to use /r/{siteSlug} for attribution
+- [ ] Integrate Share modal into customer preview pages
+
+
+## Referral Analytics & Share System (Growth Loop)
+
+- [x] Create referral_events database table with dedupe and bot filtering fields
+- [x] Build /r/{siteSlug} redirect endpoint with UTM tracking
+- [x] Implement logReferralEvent service with bot filtering and 30-min dedupe
+- [x] Create ReferralAnalytics page with KPI strip and top sites table
+- [x] Add Referral Analytics link to admin sidebar with 7d clicks badge
+- [x] Add "Top Referrers This Week" card to main admin dashboard
+- [x] Create Share My Site modal component (copy link, QR code, social share, caption templates)
+- [x] Add share event tracking (share_opened, share_copy_link, share_qr_shown, share_social_clicked)
+- [x] Update badge link to use /r/{siteSlug} for attribution
+- [x] Integrate Share modal into customer preview pages (after payment)

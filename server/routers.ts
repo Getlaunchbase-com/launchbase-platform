@@ -33,6 +33,7 @@ import { generatePreviewHTML, generateBuildPlan as generatePreviewBuildPlan } fr
 import { createHash } from "crypto";
 import { getWeatherIntelligence, formatFacebookPost } from "./services/weather-intelligence";
 import { postToFacebook, testFacebookConnection } from "./services/facebook-poster";
+import { getTopReferringSites, getConversionFunnel, get7DayClicks, logReferralEvent } from "./referral";
 
 // Generate a hash of the build plan for version locking
 function generateBuildPlanHash(buildPlan: { id: number; plan: unknown }): string {
@@ -158,7 +159,9 @@ export const appRouter = router({
         };
         
         const previewBuildPlan = generatePreviewBuildPlan(intakeData);
-        const previewHTML = generatePreviewHTML(intakeData, previewBuildPlan);
+        // Generate siteSlug from business name for badge tracking
+        const siteSlug = intake.businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').substring(0, 50);
+        const previewHTML = generatePreviewHTML(intakeData, previewBuildPlan, siteSlug);
         
         return {
           ...intake,
@@ -1777,6 +1780,47 @@ export const appRouter = router({
           intelligence,
           formattedPost: post,
         };
+      }),
+  }),
+
+  // Referral Analytics Router (badge clicks, conversion funnel)
+  referralAnalytics: router({
+    topSites: protectedProcedure
+      .input(z.object({
+        limit: z.number().int().min(1).max(100).default(10),
+        timeWindowDays: z.number().int().min(1).max(365).default(7),
+        sortBy: z.enum(["clicks", "conversions"]).default("clicks"),
+      }))
+      .query(async ({ input }) => {
+        return await getTopReferringSites(input.limit, input.timeWindowDays, input.sortBy);
+      }),
+
+    funnel: protectedProcedure
+      .input(z.object({
+        timeWindowDays: z.number().int().min(1).max(365).default(7),
+      }))
+      .query(async ({ input }) => {
+        return await getConversionFunnel(input.timeWindowDays);
+      }),
+
+    clicks7d: protectedProcedure.query(async () => {
+      return await get7DayClicks();
+    }),
+
+    logEvent: publicProcedure
+      .input(z.object({
+        eventType: z.enum(["share_opened", "share_copy_link", "share_qr_shown", "share_social_clicked"]),
+        siteSlug: z.string().optional(),
+        siteId: z.number().optional(),
+        metadata: z.record(z.string(), z.unknown()).optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return await logReferralEvent({
+          eventType: input.eventType,
+          siteSlug: input.siteSlug,
+          siteId: input.siteId,
+          metadata: input.metadata,
+        });
       }),
   }),
 
