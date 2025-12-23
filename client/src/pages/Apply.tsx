@@ -66,8 +66,8 @@ const translations: Record<Language, {
 }> = {
   en: {
     badge: "Founder pricing locks for 12 months",
-    title: "Apply for LaunchBase",
-    subtitle: "3–5 minutes. You'll preview what LaunchBase would run for your business before anything goes live.",
+    title: "You're not signing up for software.",
+    subtitle: "You're handing off responsibility. LaunchBase will build your site, deploy it, keep it live, handle visibility, and stay quiet when silence is the right move. You stay focused on the work.",
     steps: { language: "Language", business: "Business", location: "Location", cadence: "Cadence", context: "Context", control: "Control", start: "Start", contact: "Contact", review: "Review" },
     languageStep: { title: "Choose your language", subtitle: "Select the language you're most comfortable with. Your website will be built in English to reach local customers." },
     businessStep: { title: "What type of business?", subtitle: "This helps LaunchBase choose the right context signals for your industry." },

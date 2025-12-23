@@ -420,11 +420,13 @@ export default function CustomerPreview() {
                   )}
                 </Button>
                 <p className="text-xs text-muted-foreground text-center">
-                  By proceeding, you approve this build plan and agree to{" "}
+                  By approving this build plan, you're authorizing LaunchBase to deploy and manage your site using the same safeguards and logic used across the platform.{" "}
                   <Link href="/terms" className="underline hover:text-foreground">
-                    LaunchBase's terms
+                    Terms apply
                   </Link>.
-                  Your site will be deployed immediately after payment.
+                </p>
+                <p className="text-xs text-muted-foreground text-center italic mt-2">
+                  This is how businesses should work.
                 </p>
               </div>
             )}

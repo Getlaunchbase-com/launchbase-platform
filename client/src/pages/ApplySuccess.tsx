@@ -38,10 +38,10 @@ export default function ApplySuccess() {
           </div>
 
           <h1 className="text-3xl font-semibold tracking-tight">
-            Application received
+            You're in.
           </h1>
           <p className="mt-3 text-lg text-white/70">
-            We're building your preview now. You'll receive an email within 24 hours.
+            From here, LaunchBase handles the heavy lifting.
           </p>
 
           {/* What happens next */}
@@ -51,20 +51,20 @@ export default function ApplySuccess() {
             <div className="space-y-4">
               <Step 
                 number={1} 
-                title="We review your application" 
-                description="Our team reviews your business details and configuration."
+                title="We generate your build plan" 
+                description="LaunchBase creates a custom setup based on your business."
                 status="in_progress"
               />
               <Step 
                 number={2} 
-                title="Preview your setup" 
-                description="You'll receive a link to preview sample posts before anything goes live."
+                title="You review the preview" 
+                description="See exactly what we'll build before anything goes live."
                 status="upcoming"
               />
               <Step 
                 number={3} 
-                title="Approve & launch" 
-                description="Once you approve, we activate your LaunchBase system."
+                title="You approve once" 
+                description="One approval, then the system takes over."
                 status="upcoming"
               />
             </div>
@@ -98,8 +98,13 @@ export default function ApplySuccess() {
             </div>
           )}
 
+          {/* Closing narrative */}
+          <p className="mt-8 text-sm text-white/50 italic">
+            No contracts. No babysitting. Just systems doing what they're supposed to do.
+          </p>
+
           {/* Contact info */}
-          <div className="mt-8 flex items-center justify-center gap-2 text-sm text-white/60">
+          <div className="mt-6 flex items-center justify-center gap-2 text-sm text-white/60">
             <Mail className="h-4 w-4" />
             <span>Check your email for updates</span>
           </div>

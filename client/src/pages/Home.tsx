@@ -140,15 +140,19 @@ export default function Home() {
               </div>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 leading-tight">
-                Your website.
+                Workflows that give you
                 <br />
-                <span className="text-[#FF6A00]">Built and running.</span>
+                <span className="text-[#FF6A00]">back your life.</span>
               </h1>
               
               <p className="text-lg md:text-xl text-gray-400 mb-6 leading-relaxed">
-                LaunchBase builds professional websites for local businesses — 
-                trades, health & wellness, beauty, restaurants, fitness, automotive, and more. 
-                Fast setup, no maintenance headaches, and workflows that grow with you.
+                LaunchBase is the operating system for service businesses.
+                It handles the parts of your business that shouldn't require your attention — 
+                websites, deployments, visibility, and automation — so you can focus on the work that actually matters.
+              </p>
+              
+              <p className="text-sm text-gray-500 mb-6 italic">
+                Built by someone who needed it.
               </p>
               
               <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-8">
@@ -169,7 +173,7 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/apply">
                   <Button size="lg" className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white text-lg px-8 py-6 w-full sm:w-auto">
-                    Get your website <ArrowRight className="w-5 h-5 ml-2" />
+                    Apply to LaunchBase <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
                 </Link>
                 <Link href="/how-it-works">
@@ -187,8 +191,92 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Why We Exist */}
+      <section className="py-20 px-4 border-b border-white/5">
+        <div className="container max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+              Most tools are built by marketers.
+              <br />
+              <span className="text-gray-400">LaunchBase was built by a business owner.</span>
+            </h2>
+          </div>
+          
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-8 mb-12">
+            <p className="text-gray-400 text-lg mb-6">I was tired of:</p>
+            <ul className="space-y-3 text-gray-300 mb-8">
+              <li className="flex items-start gap-3">
+                <span className="text-[#FF6A00] mt-1">•</span>
+                <span>Babysitting deployments</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-[#FF6A00] mt-1">•</span>
+                <span>Remembering to post</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-[#FF6A00] mt-1">•</span>
+                <span>Duct-taping tools together</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-[#FF6A00] mt-1">•</span>
+                <span>Wondering if something broke overnight</span>
+              </li>
+            </ul>
+            <p className="text-white text-xl font-medium">So I built the system I wished I had.</p>
+          </div>
+          
+          <p className="text-center text-gray-400 text-lg">
+            LaunchBase isn't about doing more.<br />
+            <span className="text-white font-medium">It's about removing what doesn't need you.</span>
+          </p>
+        </div>
+      </section>
+
+      {/* What Makes LaunchBase Different */}
+      <section className="py-20 px-4 border-b border-white/5 bg-white/[0.02]">
+        <div className="container max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            Not an agency. Not another SaaS dashboard.
+          </h2>
+          <p className="text-[#FF6A00] text-xl font-medium mb-12">LaunchBase is opinionated by design.</p>
+          
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <div className="text-left">
+              <div className="w-10 h-10 bg-[#FF6A00]/20 rounded-lg flex items-center justify-center mb-4">
+                <Clock className="w-5 h-5 text-[#FF6A00]" />
+              </div>
+              <p className="text-gray-300">If it gives you back time, it belongs here</p>
+            </div>
+            <div className="text-left">
+              <div className="w-10 h-10 bg-[#FF6A00]/20 rounded-lg flex items-center justify-center mb-4">
+                <Shield className="w-5 h-5 text-[#FF6A00]" />
+              </div>
+              <p className="text-gray-300">If it creates noise, we don't ship it</p>
+            </div>
+            <div className="text-left">
+              <div className="w-10 h-10 bg-[#FF6A00]/20 rounded-lg flex items-center justify-center mb-4">
+                <Zap className="w-5 h-5 text-[#FF6A00]" />
+              </div>
+              <p className="text-gray-300">If silence is the right move, the system stays silent</p>
+            </div>
+          </div>
+          
+          <p className="text-gray-400 text-lg">
+            That's why LaunchBase feels calm when everything else feels loud.
+          </p>
+          
+          <div className="mt-8">
+            <Link href="/why">
+              <Button variant="outline" className="border-white/20 text-white hover:bg-white/5">
+                Read the full story <ChevronRight className="w-4 h-4 ml-1" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* What You Get - Core Website Features */}
-      <section className="py-20 px-4 border-y border-white/5 bg-white/[0.02]">
+      <section className="py-20 px-4 border-b border-white/5">
         <div className="container max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
