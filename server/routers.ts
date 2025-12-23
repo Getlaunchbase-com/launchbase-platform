@@ -5,7 +5,7 @@ import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { getDb } from "./db";
-import { intakes, approvals, buildPlans, referrals, intelligenceLayers, socialPosts, moduleSetupSteps, moduleConnections, suiteApplications, deployments } from "../drizzle/schema";
+import { intakes, approvals, buildPlans, referrals, intelligenceLayers, socialPosts, moduleSetupSteps, moduleConnections, suiteApplications, deployments, emailLogs } from "../drizzle/schema";
 import { eq, desc, and, asc } from "drizzle-orm";
 import { 
   createIntake, 
@@ -439,6 +439,74 @@ export const appRouter = router({
           }
           
           return { success: true, updated };
+        }),
+      
+      // Resend preview email with 60-second cooldown
+      resendPreviewEmail: protectedProcedure
+        .input(z.object({
+          intakeId: z.number(),
+        }))
+        .mutation(async ({ input }) => {
+          const db = await getDb();
+          if (!db) throw new Error("Database not available");
+          
+          // Get intake
+          const [intake] = await db.select().from(intakes).where(eq(intakes.id, input.intakeId)).limit(1);
+          
+          if (!intake) {
+            throw new TRPCError({ code: "NOT_FOUND", message: "Intake not found" });
+          }
+          
+          // Verify status is ready_for_review
+          if (intake.status !== "ready_for_review") {
+            throw new TRPCError({ 
+              code: "BAD_REQUEST", 
+              message: "Can only resend preview email when status is ready_for_review" 
+            });
+          }
+          
+          // Verify preview token exists
+          if (!intake.previewToken) {
+            throw new TRPCError({ 
+              code: "BAD_REQUEST", 
+              message: "No preview token exists for this intake" 
+            });
+          }
+          
+          // Check 60-second cooldown - find last ready_for_review email
+          const [lastEmail] = await db.select()
+            .from(emailLogs)
+            .where(and(
+              eq(emailLogs.intakeId, input.intakeId),
+              eq(emailLogs.emailType, "ready_for_review")
+            ))
+            .orderBy(desc(emailLogs.sentAt))
+            .limit(1);
+          
+          if (lastEmail) {
+            const secondsSinceLastEmail = (Date.now() - lastEmail.sentAt.getTime()) / 1000;
+            if (secondsSinceLastEmail < 60) {
+              const waitSeconds = Math.ceil(60 - secondsSinceLastEmail);
+              throw new TRPCError({ 
+                code: "TOO_MANY_REQUESTS", 
+                message: `Please wait ${waitSeconds} seconds before resending` 
+              });
+            }
+          }
+          
+          // Send the email
+          const firstName = intake.contactName?.split(" ")[0] || "there";
+          await sendEmail(intake.id, "ready_for_review", {
+            firstName,
+            businessName: intake.businessName,
+            email: intake.email,
+            previewUrl: `/preview/${intake.previewToken}`,
+          });
+          
+          // The email send is already logged in email_logs table via sendEmail
+          // This provides the audit trail we need
+          
+          return { success: true, sentTo: intake.email };
         }),
       
       // Export intakes to CSV format

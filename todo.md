@@ -928,3 +928,12 @@
 - [ ] Show "Awaiting Payment" when in approved
 - [ ] Show "Deploy Site" when in paid
 - [ ] Display clear error messages for invalid transitions
+
+
+## Admin Support Features (Dec 23, 2025)
+
+- [x] Add "Resend Preview Email" button to admin intake detail
+- [x] Add 60-second cooldown to prevent spam
+- [x] Add "Copy Preview Link" button for easy sharing
+- [x] Log email sends in email_logs table for audit trail
+- [x] Add unit tests for resend preview email functionality

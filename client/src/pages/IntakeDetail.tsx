@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -132,6 +132,7 @@ export default function IntakeDetail() {
   const [showDeployModal, setShowDeployModal] = useState(false);
   const [showHoldModal, setShowHoldModal] = useState(false);
   const [internalNote, setInternalNote] = useState("");
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   const { data: intake, isLoading, refetch: refetchIntake } = trpc.admin.intakes.detail.useQuery({ id: intakeId });
   const { data: buildPlan, refetch: refetchBuildPlan } = trpc.admin.buildPlan.getByIntake.useQuery({ intakeId });
@@ -188,6 +189,32 @@ export default function IntakeDetail() {
       }
     },
   });
+
+  // Resend preview email mutation with cooldown
+  const resendPreviewEmailMutation = trpc.admin.intakes.resendPreviewEmail.useMutation({
+    onSuccess: (data) => {
+      toast.success(`Preview email resent to ${data.sentTo}`);
+      setResendCooldown(60);
+    },
+    onError: (error) => {
+      // Handle cooldown error specially
+      if (error.data?.code === "TOO_MANY_REQUESTS") {
+        const match = error.message.match(/(\d+) seconds/);
+        if (match) {
+          setResendCooldown(parseInt(match[1]));
+        }
+      }
+      toast.error(error.message);
+    },
+  });
+
+  // Cooldown timer effect
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCooldown]);
 
   if (isLoading) {
     return (
@@ -359,14 +386,61 @@ export default function IntakeDetail() {
                 <div className="flex gap-2">
                   {/* Artifact links */}
                   {(intake as any).previewToken && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => window.open(`/preview/${(intake as any).previewToken}`, '_blank')}
-                    >
-                      <Eye className="w-4 h-4 mr-2" />
-                      Open Preview
-                    </Button>
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open(`/preview/${(intake as any).previewToken}`, '_blank')}
+                      >
+                        <Eye className="w-4 h-4 mr-2" />
+                        Open Preview
+                      </Button>
+                      
+                      {/* Copy Preview Link button */}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const previewUrl = `${window.location.origin}/preview/${(intake as any).previewToken}`;
+                              navigator.clipboard.writeText(previewUrl);
+                              toast.success("Preview link copied to clipboard");
+                            }}
+                          >
+                            <LinkIcon className="w-4 h-4 mr-2" />
+                            Copy Link
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Copy preview link to share with customer</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      
+                      {/* Resend Preview Email button - only show when ready_for_review */}
+                      {intake.status === 'ready_for_review' && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => resendPreviewEmailMutation.mutate({ intakeId })}
+                              disabled={resendPreviewEmailMutation.isPending || resendCooldown > 0}
+                            >
+                              <RefreshCw className={`w-4 h-4 mr-2 ${resendPreviewEmailMutation.isPending ? 'animate-spin' : ''}`} />
+                              {resendCooldown > 0 
+                                ? `Wait ${resendCooldown}s` 
+                                : resendPreviewEmailMutation.isPending 
+                                  ? 'Sending...' 
+                                  : 'Resend Email'}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Resend preview email to {intake.email}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </>
                   )}
                   
                   {(intake as any).previewUrl && intake.status === 'deployed' && (
