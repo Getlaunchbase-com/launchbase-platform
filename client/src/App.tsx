@@ -26,6 +26,7 @@ import ModuleSetup from "./pages/ModuleSetup";
 import Apply from "./pages/Apply";
 import ApplySuccess from "./pages/ApplySuccess";
 import HowItWorks from "./pages/HowItWorks";
+import Why from "./pages/Why";
 import AdminSuiteApplications from "./pages/AdminSuiteApplications";
 import AdminDeployments from "./pages/AdminDeployments";
 import ReferralAnalytics from "./pages/ReferralAnalytics";
@@ -48,6 +49,7 @@ function Router() {
       <Route path="/apply" component={Apply} />
       <Route path="/apply/success" component={ApplySuccess} />
       <Route path="/how-it-works" component={HowItWorks} />
+      <Route path="/why" component={Why} />
       
       {/* Admin routes (protected by DashboardLayout) */}
       <Route path="/admin" component={AdminDashboard} />

@@ -813,3 +813,14 @@
 - [x] Set up external cron (cron-job.org) every 2 minutes
 - [x] Create test deployment to validate cron automation
 - [x] Verify end-to-end cron processing (deployment #60001 → live)
+
+
+## Founder Narrative System
+
+- [x] Update homepage hero with "Workflows that give you back your life"
+- [x] Add "Why We Exist" section below the fold
+- [x] Add "What Makes LaunchBase Different" section
+- [x] Create /why page with origin story and philosophy
+- [x] Update onboarding apply page intro
+- [x] Update confirmation copy after apply
+- [x] Update preview approval language
