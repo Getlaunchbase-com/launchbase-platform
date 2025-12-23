@@ -729,3 +729,13 @@
 - [ ] Build version management UI
 - [ ] Test with 2-3 industries
 - [ ] Enable instant new industry launches
+
+
+## Onboarding Form Error Handling (P0 Fix)
+
+- [x] Replace raw validation error messages with user-friendly text
+- [x] Add field-level inline error display (no JSON blobs)
+- [x] Implement error clearing when user starts typing
+- [x] Add global error banner for submission failures
+- [x] Map all Zod validation errors to friendly messages
+- [x] Test error handling with invalid inputs
