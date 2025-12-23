@@ -51,24 +51,24 @@ const cadenceTiers = {
   },
 };
 
-// Mode descriptions
+// Mode descriptions - Trust-focused language
 const modeDescriptions = {
   auto: {
     title: "Auto",
     subtitle: "Recommended",
-    description: "We choose what matters locally. You approve before anything posts.",
+    description: "LaunchBase decides for you. You can review everything.",
     explanation: null, // Will be set dynamically based on vertical
   },
   guided: {
     title: "Guided",
     subtitle: "",
-    description: "We recommend the best setup. You fine-tune with simple toggles.",
+    description: "LaunchBase recommends. You approve.",
     explanation: null,
   },
   custom: {
     title: "Custom",
     subtitle: "",
-    description: "Full control. Built-in guardrails prevent spam and bad timing.",
+    description: "You fine-tune relevance. Safety is still enforced.",
     explanation: null,
   },
 };
@@ -384,6 +384,16 @@ export default function ExpandLaunchBase() {
               </p>
             </div>
 
+            {/* TRUST REASSURANCE BLOCK */}
+            <div className="bg-[#111113] border border-white/[0.06] rounded-[12px] p-4">
+              <p className="text-[13px] text-[#B7B7BD] leading-relaxed">
+                <span className="text-white font-medium">Nothing here is permanent.</span> You can change cadence, context, or pause posting at any time. Every decision is visible in your dashboard.
+              </p>
+              <p className="text-[12px] text-[#8B8B92] mt-2">
+                You can always see what LaunchBase is doing — and change it anytime.
+              </p>
+            </div>
+
             {/* RECOMMENDED SETUP STRIP */}
             <Card className="bg-gradient-to-r from-[#FF6A00]/10 to-[#FF6A00]/5 border-[#FF6A00]/20 rounded-[14px]">
               <CardContent className="p-5">
@@ -489,6 +499,15 @@ export default function ExpandLaunchBase() {
                     </p>
                   </div>
                 )}
+
+                {/* Trust guardrail line */}
+                <div className="mt-4 pt-4 border-t border-white/[0.04]">
+                  <p className="text-[12px] text-[#8B8B92] text-center">
+                    <span className="text-white/70">Controls change relevance — not safety.</span>
+                    <br />
+                    Weather, safety, and brand protection are always enforced.
+                  </p>
+                </div>
               </CardContent>
             </Card>
 
@@ -719,10 +738,14 @@ export default function ExpandLaunchBase() {
               </div>
 
               {/* Trust Guardrail */}
-              <p className="text-[12px] text-[#8B8B92] mt-4 text-center leading-relaxed">
-                Local Context layers are weather-aware and safety-gated.<br />
-                <span className="text-white/60">LaunchBase will never post something that feels inappropriate for the day.</span>
-              </p>
+              <div className="mt-4 text-center">
+                <p className="text-[12px] text-[#8B8B92] leading-relaxed">
+                  <span className="text-white/70">Turn on or off anytime. No contracts. No penalties.</span>
+                </p>
+                <p className="text-[11px] text-[#8B8B92] mt-1">
+                  Local Context layers are weather-aware and safety-gated.
+                </p>
+              </div>
             </div>
 
             {/* GROWTH PATH: Other Suite Modules */}
@@ -835,6 +858,11 @@ export default function ExpandLaunchBase() {
                       <span className="text-[14px] text-white">{formatPrice(calculateSetupFee())}</span>
                     </div>
                   </div>
+
+                  {/* Pricing Philosophy */}
+                  <p className="text-[11px] text-[#8B8B92] italic text-center mt-3 pt-3 border-t border-white/[0.04]">
+                    You're not buying software. You're deciding how much responsibility to hand off.
+                  </p>
 
                   {/* Billing Details Collapsible */}
                   <Collapsible open={showBillingDetails} onOpenChange={setShowBillingDetails}>
