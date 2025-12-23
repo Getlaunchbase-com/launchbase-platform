@@ -1,0 +1,106 @@
+{
+  "query": "DESCRIBE decision_logs;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute DESCRIBE decision_logs;",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "userId",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "decision",
+      "Type": "enum('post','silence','wait')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "severity",
+      "Type": "enum('hard_block','soft_block','discretionary')",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "reason",
+      "Type": "varchar(128)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "triggerContext",
+      "Type": "enum('weather_storm','weather_clear','weather_extreme','sports_event','community_event','local_trend','seasonal','manual','scheduled')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "conditions",
+      "Type": "json",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "layersEvaluated",
+      "Type": "json",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "confidenceScore",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "intelligenceVersion",
+      "Type": "varchar(16)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "v2.4.0",
+      "Extra": ""
+    },
+    {
+      "Field": "socialPostId",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "createdAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint(11)\tNO\tPRI\tNULL\tauto_increment\nuserId\tint(11)\tNO\t\tNULL\t\ndecision\tenum('post','silence','wait')\tNO\t\tNULL\t\nseverity\tenum('hard_block','soft_block','discretionary')\tYES\t\tNULL\t\nreason\tvarchar(128)\tNO\t\tNULL\t\ntriggerContext\tenum('weather_storm','weather_clear','weather_extreme','sports_event','community_event','local_trend','seasonal','manual','scheduled')\tNO\t\tNULL\t\nconditions\tjson\tYES\t\tNULL\t\nlayersEvaluated\tjson\tYES\t\tNULL\t\nconfidenceScore\tint(11)\tYES\t\t0\t\nintelligenceVersion\tvarchar(16)\tNO\t\tv2.4.0\t\nsocialPostId\tint(11)\tYES\t\tNULL\t\ncreatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}
