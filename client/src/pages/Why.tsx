@@ -172,6 +172,7 @@ export default function Why() {
             <div className="flex gap-6 text-sm text-gray-500">
               <Link href="/terms" className="hover:text-white transition">Terms</Link>
               <Link href="/privacy" className="hover:text-white transition">Privacy</Link>
+              <Link href="/trust" className="hover:text-white transition">Trust & Commitments</Link>
             </div>
           </div>
         </div>

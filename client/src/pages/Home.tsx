@@ -698,6 +698,7 @@ export default function Home() {
               <Link href="/how-it-works" className="hover:text-white transition">How It Works</Link>
               <Link href="/expand" className="hover:text-white transition">Suite</Link>
               <a href="#pricing" className="hover:text-white transition">Pricing</a>
+              <Link href="/trust" className="hover:text-white transition">Trust & Commitments</Link>
             </div>
             <p className="text-gray-600 text-sm">
               © {new Date().getFullYear()} LaunchBase. All rights reserved.

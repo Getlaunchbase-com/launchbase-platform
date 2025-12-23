@@ -194,6 +194,25 @@ export default function HowItWorks() {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="py-12 px-4 border-t border-white/10">
+        <div className="container max-w-6xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <Link href="/">
+              <img src="/logo-cropped.png" alt="LaunchBase" className="h-6 w-auto opacity-60 hover:opacity-100 transition cursor-pointer" />
+            </Link>
+            <div className="flex items-center gap-6 text-sm text-gray-500">
+              <Link href="/expand" className="hover:text-white transition">Suite</Link>
+              <a href="/#pricing" className="hover:text-white transition">Pricing</a>
+              <Link href="/trust" className="hover:text-white transition">Trust & Commitments</Link>
+            </div>
+            <p className="text-gray-600 text-sm">
+              © {new Date().getFullYear()} LaunchBase
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

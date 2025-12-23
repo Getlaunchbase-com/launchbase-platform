@@ -884,3 +884,17 @@
 - [x] Show upcoming scheduled posts
 - [x] Show silence reasons with context
 - [x] Integrate into customer-facing Expand page
+
+
+## Footer Trust Link & Observability Seeding
+
+### Footer Navigation
+- [x] Add /trust link to footer ("Trust & Commitments")
+- [x] Ensure link is visible on all public pages (Home, HowItWorks, WhatsIncluded, Why, Referrals)
+
+### Observability Seeding
+- [x] Create seed script for decision logs
+- [x] Add system initialization events
+- [x] Add weather check events
+- [x] Add silence decision events
+- [x] Label as "Recent system activity"
