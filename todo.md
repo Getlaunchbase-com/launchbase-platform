@@ -910,3 +910,11 @@
 - [x] Add "Next scheduled check" countdown
 - [x] Add guardrail footer: "You can change relevance anytime. Safety rules are always enforced."
 - [x] Add "Silence is a valid decision. We log it to protect your brand." helper text
+
+
+## Seed Real Intelligence Decisions
+- [x] Create script to run intelligence pipeline
+- [x] Seed weather check decisions
+- [x] Seed silence decisions with real reasons
+- [x] Seed post approval decisions
+- [x] Verify decisions appear in ObservabilityPanel

@@ -1,0 +1,59 @@
+{
+  "query": "SELECT id, decision, reason, triggerContext, createdAt FROM decision_logs ORDER BY createdAt DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT id, decision, reason, triggerContext, createdAt FROM decision_logs ORDER BY createdAt DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "45",
+      "decision": "silence",
+      "reason": "Weather check completed — conditions normal",
+      "triggerContext": "weather_clear",
+      "createdAt": "2025-12-23 14:13:03"
+    },
+    {
+      "id": "46",
+      "decision": "post",
+      "reason": "Game day detected — posted seasonal reminder",
+      "triggerContext": "sports_event",
+      "createdAt": "2025-12-23 10:43:03"
+    },
+    {
+      "id": "47",
+      "decision": "silence",
+      "reason": "Cadence check — maintaining balanced presence",
+      "triggerContext": "scheduled",
+      "createdAt": "2025-12-23 06:43:03"
+    },
+    {
+      "id": "48",
+      "decision": "silence",
+      "reason": "No relevant local signals — waiting for context",
+      "triggerContext": "scheduled",
+      "createdAt": "2025-12-22 22:43:03"
+    },
+    {
+      "id": "49",
+      "decision": "wait",
+      "reason": "Applied Trades profile v1.2.0",
+      "triggerContext": "seasonal",
+      "createdAt": "2025-12-22 14:43:03"
+    },
+    {
+      "id": "50",
+      "decision": "silence",
+      "reason": "Safety rules verified — all gates clear",
+      "triggerContext": "scheduled",
+      "createdAt": "2025-12-22 02:43:03"
+    },
+    {
+      "id": "51",
+      "decision": "post",
+      "reason": "Cold snap approaching — posted tip",
+      "triggerContext": "seasonal",
+      "createdAt": "2025-12-21 10:43:03"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tdecision\treason\ttriggerContext\tcreatedAt\n45\tsilence\tWeather check completed — conditions normal\tweather_clear\t2025-12-23 14:13:03\n46\tpost\tGame day detected — posted seasonal reminder\tsports_event\t2025-12-23 10:43:03\n47\tsilence\tCadence check — maintaining balanced presence\tscheduled\t2025-12-23 06:43:03\n48\tsilence\tNo relevant local signals — waiting for context\tscheduled\t2025-12-22 22:43:03\n49\twait\tApplied Trades profile v1.2.0\tseasonal\t2025-12-22 14:43:03\n50\tsilence\tSafety rules verified — all gates clear\tscheduled\t2025-12-22 02:43:03\n51\tpost\tCold snap approaching — posted tip\tseasonal\t2025-12-21 10:43:03\n",
+  "stderr": "",
+  "execution_time_ms": 95
+}

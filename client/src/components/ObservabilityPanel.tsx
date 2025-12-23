@@ -57,7 +57,7 @@ interface ObservabilityData {
 
 export function ObservabilityPanel() {
   // @ts-ignore - tRPC type inference issue with nested routers
-  const { data, isLoading, refetch } = trpc.admin.observability.useQuery(undefined, {
+  const { data, isLoading, refetch } = trpc.analytics.observability.useQuery(undefined, {
     refetchInterval: 30000, // Refresh every 30 seconds
   }) as { data: ObservabilityData | undefined; isLoading: boolean; refetch: () => void };
 
