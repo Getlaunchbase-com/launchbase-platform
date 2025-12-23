@@ -739,3 +739,22 @@
 - [x] Add global error banner for submission failures
 - [x] Map all Zod validation errors to friendly messages
 - [x] Test error handling with invalid inputs
+
+
+## Phase 1 URL Mode Enforcement (P0 - Critical Fix)
+
+- [x] Add urlMode field to deployments table (TEMP_MANUS | CUSTOM_DOMAIN)
+- [x] Add urlModeEnforcementLog field to track custom domain attempts
+- [x] Update deployment worker to enforce Manus-only URLs
+- [x] Add URL mode enforcement logging to intelligence service
+- [x] Replace old MVP launchbase.site URL generation with Manus URLs
+- [x] Update routers.ts manual deployment trigger to use Manus URLs
+- [x] Update DeploymentStatus UI to show "Temporary Site" language
+- [x] Add Phase 2 blocking message to deployment success state
+- [x] Update button labels: "Open Live Site" → "Open Temporary Site"
+- [x] Update button labels: "Copy URL" → "Copy Temporary URL"
+- [x] Add Phase 2 blocking banner: "Custom domain coming soon"
+- [x] All 145 tests passing
+- [ ] Verify cabinet maker deployment #30001 shows correct Manus URL
+- [ ] Test URL copy functionality
+- [ ] Test temporary site access

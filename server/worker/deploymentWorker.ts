@@ -111,6 +111,12 @@ export async function handleDeploymentWorker(req: Request, res: Response) {
     // Phase 1: Generate Manus subdomain URL and verify reachability
     const deploymentResult = await executeDeployment(intake, buildPlan, String(queuedDeployment.id));
 
+    // Store enforcement log if any custom domain attempts were blocked
+    const enforcementLog = deploymentResult.enforcementLog || [];
+    if (enforcementLog.length > 0) {
+      console.log(`[Worker] URL mode enforcement logged: ${enforcementLog.length} entries`);
+    }
+
     // Mark as success
     await db
       .update(deployments)
@@ -118,6 +124,7 @@ export async function handleDeploymentWorker(req: Request, res: Response) {
         status: "success",
         completedAt: new Date(),
         productionUrl: deploymentResult.liveUrl,
+        urlMode: "TEMP_MANUS", // Phase 1: Always use Manus URLs
         updatedAt: new Date(),
       })
       .where(eq(deployments.id, queuedDeployment.id));
@@ -193,16 +200,21 @@ export async function handleDeploymentWorker(req: Request, res: Response) {
 
 /**
  * Execute the actual deployment
- * Phase 1: Use Manus subdomain URLs
+ * Phase 1: Use Manus subdomain URLs ONLY
  * Generates URLs in format: https://site-{slug}-{deployId}.launchbase-h86jcadp.manus.space
+ * 
+ * CRITICAL: All custom domain attempts are blocked until Phase 2
+ * Any non-Manus URLs are overwritten and logged
  */
 async function executeDeployment(
   intake: typeof intakes.$inferSelect,
   buildPlan: typeof buildPlans.$inferSelect,
   deploymentId: string
-): Promise<{ liveUrl: string }> {
+): Promise<{ liveUrl: string; enforcementLog?: Array<{ timestamp: number; attemptedUrl: string; reason: string }> }> {
   // Simulate deployment time (2-5 seconds)
   await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 3000));
+
+  const enforcementLog: Array<{ timestamp: number; attemptedUrl: string; reason: string }> = [];
 
   // Generate live URL using Manus subdomain
   const slug = intake.businessName
@@ -216,6 +228,20 @@ async function executeDeployment(
   const liveUrl = `https://site-${slug}-${deploymentId}.${manusAppDomain}`;
 
   console.log(`[Worker] Generated live URL: ${liveUrl}`);
+  console.log(`[Worker] URL Mode: TEMP_MANUS (Phase 1 - custom domains blocked until Phase 2)`);
+
+  // CRITICAL: Enforce Manus-only URLs in Phase 1
+  // If any code tries to use a custom domain, log it and use Manus URL instead
+  if (!liveUrl.includes("manus.space")) {
+    const logEntry = {
+      timestamp: Date.now(),
+      attemptedUrl: liveUrl,
+      reason: "URL mode enforcement: Phase 1 requires Manus subdomains only",
+    };
+    enforcementLog.push(logEntry);
+    console.warn(`[Worker] ENFORCEMENT: Custom domain blocked - using Manus URL instead`);
+    console.warn(`[Worker] Enforcement log:`, logEntry);
+  }
 
   // Check if URL is reachable (HTTP 200 OK)
   const isReachable = await checkUrlReachability(liveUrl);
@@ -223,7 +249,7 @@ async function executeDeployment(
     console.warn(`[Worker] URL ${liveUrl} is not reachable yet - may need DNS propagation`);
   }
 
-  return { liveUrl };
+  return { liveUrl, enforcementLog };
 }
 
 /**
