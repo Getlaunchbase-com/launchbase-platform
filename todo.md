@@ -824,3 +824,16 @@
 - [x] Update onboarding apply page intro
 - [x] Update confirmation copy after apply
 - [x] Update preview approval language
+
+
+## Observability Panel
+
+- [x] Create observability data queries (last intelligence decision, last deployment, posts approved, silence decisions)
+- [x] Build status card with "LaunchBase is running" green dot
+- [x] Add activity metrics (last intelligence decision, last deployment, posts/silence this week)
+- [x] Add silence tooltip explaining why silence is a feature
+- [x] Show current industry profile + version
+- [x] Show intelligence version and mode
+- [x] Add Recent Decisions section (last 3 decisions with human-readable explanations)
+- [x] Integrate panel into admin dashboard
+- [ ] Integrate panel into customer Expand page
