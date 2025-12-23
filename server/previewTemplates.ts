@@ -349,6 +349,9 @@ export function generatePreviewHTML(intake: IntakeData, buildPlan: BuildPlan): s
       line-height: 1.8;
       text-decoration: none;
     }
+    .footer a {
+      transition: color 0.2s;
+    }
     .footer a:hover { color: white; }
     
     /* Preview Banner */
@@ -446,6 +449,17 @@ export function generatePreviewHTML(intake: IntakeData, buildPlan: BuildPlan): s
         <p>Saturday: 9am - 4pm</p>
         <p>Sunday: Closed</p>
       </div>
+    </div>
+    <div style="border-top: 1px solid rgba(255,255,255,0.2); margin-top: 2rem; padding-top: 1.5rem; text-align: center;">
+      <p style="font-size: 0.85rem; opacity: 0.7;">
+        <a href="https://getlaunchbase.com" style="color: rgba(255,255,255,0.8); text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+          <span>Powered by</span>
+          <strong style="color: white;">LaunchBase</strong>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline;">
+            <path d="M12 2L15.09 8.26H22L17.55 12.5L19.64 18.76L12 14.01L4.36 18.76L6.45 12.5L2 8.26H8.91L12 2Z"/>
+          </svg>
+        </a>
+      </p>
     </div>
   </footer>
 </body>

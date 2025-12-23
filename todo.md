@@ -758,3 +758,14 @@
 - [ ] Verify cabinet maker deployment #30001 shows correct Manus URL
 - [ ] Test URL copy functionality
 - [ ] Test temporary site access
+
+
+## "Powered by LaunchBase" Footer Badge
+
+- [x] Add footer badge component to preview templates
+- [x] Include LaunchBase branding with star icon
+- [x] Link to https://getlaunchbase.com for organic discovery
+- [x] Style badge to match all three verticals (trades, appointments, professional)
+- [x] Test badge appears on all customer sites
+- [x] Verify link functionality and styling
+- [x] All 145 tests passing
