@@ -33,6 +33,9 @@ export default function HowItWorks() {
             <p className="mt-4 text-lg text-white/70 max-w-2xl mx-auto">
               LaunchBase observes what's happening around your business and acts only when it matters — with your approval.
             </p>
+            <p className="mt-3 text-sm text-white/50">
+              You can always see what LaunchBase is doing — and change it anytime.
+            </p>
           </div>
 
           {/* The Loop */}
@@ -86,7 +89,7 @@ export default function HowItWorks() {
               />
               <DifferenceCard
                 title="You're always in control"
-                description="Choose Auto, Guided, or Custom mode. Approve individual posts or set rules. Change your mind anytime."
+                description="Choose Auto, Guided, or Custom mode. Every decision is visible in your dashboard. Nothing is permanent — change your mind anytime."
               />
             </div>
           </div>
@@ -98,16 +101,16 @@ export default function HowItWorks() {
             <div className="grid md:grid-cols-3 gap-6">
               <ModeCard
                 title="Auto"
-                description="LaunchBase handles everything. You approve major changes only."
+                description="LaunchBase decides for you. You can review everything."
                 features={[
                   "Hands-off operation",
-                  "Weekly summary emails",
+                  "Every decision logged",
                   "Override anytime",
                 ]}
               />
               <ModeCard
                 title="Guided"
-                description="Review and approve posts before they go live."
+                description="LaunchBase recommends. You approve."
                 features={[
                   "Preview every post",
                   "Edit before publishing",
@@ -117,13 +120,22 @@ export default function HowItWorks() {
               />
               <ModeCard
                 title="Custom"
-                description="Full control with guardrails. For advanced users."
+                description="You fine-tune relevance. Safety is still enforced."
                 features={[
                   "Set custom rules",
                   "Adjust cadence",
                   "Fine-tune triggers",
                 ]}
               />
+            </div>
+
+            {/* Trust Guardrail */}
+            <div className="mt-8 text-center">
+              <p className="text-sm text-white/60">
+                <span className="text-white/80">Controls change relevance — not safety.</span>
+                <br />
+                Weather, safety, and brand protection are always enforced.
+              </p>
             </div>
           </div>
 
@@ -160,6 +172,10 @@ export default function HowItWorks() {
               <p>Add local context layers: Sports (+$29/mo) • Community (+$39/mo) • Trends (+$49/mo)</p>
               <p className="mt-1">One-time setup: $249 base + $99 per layer</p>
             </div>
+
+            <p className="text-center text-xs text-white/40 italic mt-6">
+              You're not buying software. You're deciding how much responsibility to hand off.
+            </p>
           </div>
 
           {/* CTA */}

@@ -854,3 +854,18 @@
 - [x] Update Custom mode: "You fine-tune relevance. Safety is still enforced."
 - [x] Add "Controls change relevance — not safety." everywhere
 - [x] Add "Weather, safety, and brand protection are always enforced."
+
+
+## Internal Contract & How It Works Trust Language
+
+### Internal Contract Document
+- [x] Write INTERNAL_CONTRACT.md with philosophical and legal backing
+- [x] Define what LaunchBase commits to
+- [x] Define what customers can expect
+- [x] Document escalation paths
+- [x] Include safety guarantees and observability promises
+
+### How It Works Page Trust Language
+- [x] Add "Controls change relevance — not safety" messaging
+- [x] Add observability messaging ("You can always see what LaunchBase is doing")
+- [x] Mirror trust language from Expand page
