@@ -432,21 +432,25 @@ export async function runDeployment(id: number) {
     
     // Generate a unique site ID
     const siteId = `site-${intake.businessName.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${Date.now()}`;
-    const previewUrl = `https://${siteId}.launchbase.dev`;
+    // Use Manus subdomain for preview URL
+    const manusAppDomain = "launchbase-h86jcadp.manus.space";
+    const previewUrl = `https://${siteId}.${manusAppDomain}`;
     
-    logs.push(`[${new Date().toISOString()}] Site generated successfully`);
+    logs.push(`[${new Date().toISOString()}] Site generated successfully on Manus infrastructure`);
     logs.push(`[${new Date().toISOString()}] Preview URL: ${previewUrl}`);
 
     // Update deployment with success
     await updateDeploymentStatus(id, "success", {
       siteId,
       previewUrl,
+      productionUrl: previewUrl,
       logs,
       completedAt: new Date(),
     });
 
-    // Update build plan status
+    // Update build plan and intake status
     await updateBuildPlanStatus(deployment.buildPlanId, "deployed");
+    await updateIntakeStatus(deployment.intakeId, "deployed");
 
     // Update intake status
     await updateIntakeStatus(deployment.intakeId, "approved");
