@@ -300,6 +300,9 @@ export default function Referrals() {
             </div>
             <span className="font-semibold">LAUNCHBASE</span>
           </div>
+          <div className="flex items-center justify-center gap-4 text-sm text-gray-500 mb-2">
+            <Link href="/trust" className="hover:text-white transition">Trust & Commitments</Link>
+          </div>
           <p className="text-sm text-gray-500">© 2025 LaunchBase</p>
         </div>
       </footer>

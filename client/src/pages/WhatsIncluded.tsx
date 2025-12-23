@@ -377,7 +377,7 @@ export default function WhatsIncluded() {
             <div className="flex items-center gap-6 text-sm text-gray-400">
               <Link href="/" className="hover:text-white transition">Home</Link>
               <a href="/#pricing" className="hover:text-white transition">Pricing</a>
-              <a href="mailto:hello@getlaunchbase.com" className="hover:text-white transition">Contact</a>
+              <Link href="/trust" className="hover:text-white transition">Trust & Commitments</Link>
             </div>
             <p className="text-sm text-gray-500">
               © 2025 LaunchBase
