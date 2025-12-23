@@ -116,6 +116,8 @@ export const deployments = mysqlTable("deployments", {
   intakeId: int("intakeId").notNull(),
   // Job status
   status: mysqlEnum("status", ["queued", "running", "success", "failed"]).default("queued").notNull(),
+  // URL mode: Phase 1 = TEMP_MANUS, Phase 2 = CUSTOM_DOMAIN
+  urlMode: mysqlEnum("urlMode", ["TEMP_MANUS", "CUSTOM_DOMAIN"]).default("TEMP_MANUS").notNull(),
   // Output
   siteId: varchar("siteId", { length: 64 }),
   previewUrl: varchar("previewUrl", { length: 512 }),
@@ -123,6 +125,8 @@ export const deployments = mysqlTable("deployments", {
   // Logs
   logs: json("logs").$type<string[]>(),
   errorMessage: text("errorMessage"),
+  // URL enforcement: track if custom domain was attempted in TEMP_MANUS mode
+  urlModeEnforcementLog: json("urlModeEnforcementLog").$type<Array<{ timestamp: number; attemptedUrl: string; reason: string }>>(),
   // Timestamps
   startedAt: timestamp("startedAt"),
   completedAt: timestamp("completedAt"),

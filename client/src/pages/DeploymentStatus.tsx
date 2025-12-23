@@ -34,8 +34,8 @@ const statusConfig: Record<string, { color: string; icon: React.ReactNode; label
   success: { 
     color: "bg-green-500/20 text-green-400 border-green-500/30", 
     icon: <CheckCircle className="w-5 h-5" />,
-    label: "Live ✅",
-    message: "Your website is live and ready to go."
+    label: "Temporary Live ✅",
+    message: "Your website is live on a temporary link. Branded domain will be connected after approval."
   },
   failed: { 
     color: "bg-red-500/20 text-red-400 border-red-500/30", 
@@ -156,7 +156,7 @@ export default function DeploymentStatus() {
                 {[
                   { key: "queued", label: "Queued" },
                   { key: "running", label: "Provisioning" },
-                  { key: "success", label: "Live ✅" }
+                  { key: "success", label: "Temporary Live ✅" }
                 ].map((step, index) => {
                   const isActive = deployment.status === step.key;
                   const isPast = 
@@ -201,8 +201,8 @@ export default function DeploymentStatus() {
             {deployment.status === "success" && deployment.previewUrl && (
               <div className="bg-[#1ED760]/10 border border-[#1ED760]/30 rounded-lg p-6 text-center">
                 <CheckCircle className="w-12 h-12 text-[#1ED760] mx-auto mb-4" />
-                <h3 className="text-xl font-bold mb-2">Your website is live.</h3>
-                <p className="text-gray-400 mb-4">Here's your link:</p>
+                <h3 className="text-xl font-bold mb-2">Your temporary site is live.</h3>
+                <p className="text-gray-400 mb-4">Access it using this temporary link:</p>
                 <div className="flex items-center justify-center gap-3">
                   <a 
                     href={deployment.previewUrl} 
@@ -211,15 +211,18 @@ export default function DeploymentStatus() {
                   >
                     <Button className="bg-[#1ED760] hover:bg-[#1ED760]/90">
                       <ExternalLink className="w-4 h-4 mr-2" />
-                      Open Live Site
+                      Open Temporary Site
                     </Button>
                   </a>
                   <Button variant="outline" onClick={copyUrl}>
                     <Copy className="w-4 h-4 mr-2" />
-                    Copy URL
+                    Copy Temporary URL
                   </Button>
                 </div>
                 <p className="text-sm text-gray-500 mt-4 font-mono">{deployment.previewUrl}</p>
+                <div className="mt-6 bg-white/5 border border-white/10 rounded-lg p-4 text-center">
+                  <p className="text-sm text-gray-400">Custom domain coming soon — After approval, we will connect your branded domain (Phase 2).</p>
+                </div>
               </div>
             )}
 

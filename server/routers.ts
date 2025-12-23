@@ -586,9 +586,6 @@ export const appRouter = router({
             return { success: true, message: "No queued deployments", processed: 0 };
           }
 
-          // Call the worker endpoint internally
-          const workerSecret = process.env.WORKER_SECRET || "launchbase-worker-secret-2024";
-          
           try {
             // Mark as running first
             await db
@@ -604,12 +601,15 @@ export const appRouter = router({
               throw new Error("Intake or build plan not found");
             }
 
-            // Generate live URL (MVP placeholder)
+            // Generate live URL using Manus subdomain (Phase 1)
             const slug = intake.businessName
               .toLowerCase()
               .replace(/[^a-z0-9]+/g, "-")
               .replace(/^-|-$/g, "");
-            const liveUrl = `https://${slug}.launchbase.site`;
+            const manusAppDomain = "launchbase-h86jcadp.manus.space";
+            const liveUrl = `https://site-${slug}-${queued.id}.${manusAppDomain}`;
+            
+            console.log(`[Router] Manual deployment trigger: Generated Manus URL: ${liveUrl}`);
 
             // Mark success
             await db
@@ -618,6 +618,7 @@ export const appRouter = router({
                 status: "success", 
                 completedAt: new Date(), 
                 productionUrl: liveUrl,
+                urlMode: "TEMP_MANUS", // Phase 1: Always use Manus URLs
                 updatedAt: new Date() 
               })
               .where(eq(deployments.id, queued.id));
@@ -628,14 +629,16 @@ export const appRouter = router({
               .set({ status: "deployed", updatedAt: new Date() })
               .where(eq(intakes.id, intake.id));
 
-            // Send email
+            // Send email with Manus URL
             const firstName = intake.contactName?.split(" ")[0] || "there";
             await sendEmail(intake.id, "site_live", {
               firstName,
               businessName: intake.businessName,
               email: intake.email,
-              liveUrl,
+              liveUrl, // Manus URL only
             });
+            
+            console.log(`[Router] Deployment ${queued.id} completed with Manus URL`);
 
             return { 
               success: true, 

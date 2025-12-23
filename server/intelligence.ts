@@ -12,6 +12,45 @@ import { decisionLogs, approvalFeedback, industryProfiles } from "../drizzle/sch
 import { eq, and, lte, desc } from "drizzle-orm";
 
 /**
+ * Log URL mode enforcement (Phase 1 blocking custom domains)
+ * Tracks any attempts to use non-Manus URLs
+ */
+export async function logUrlModeEnforcement(params: {
+  deploymentId: number;
+  attemptedUrl: string;
+  reason: string;
+  enforcedUrl: string;
+}) {
+  try {
+    const db = await getDb();
+    if (!db) return;
+    
+    await db.insert(decisionLogs).values({
+      userId: 0,
+      decision: "silence",
+      severity: "hard_block",
+      reason: `URL Mode Enforcement: ${params.reason}`,
+      triggerContext: "manual",
+      conditions: {
+        deploymentId: params.deploymentId,
+        attemptedUrl: params.attemptedUrl,
+        enforcedUrl: params.enforcedUrl,
+        phase: "Phase 1",
+        urlMode: "TEMP_MANUS",
+      },
+      layersEvaluated: ["url_mode_enforcement"],
+      confidenceScore: 1.0,
+      intelligenceVersion: "v2.4.0",
+      createdAt: new Date(),
+    });
+    
+    console.log(`[Intelligence] URL Mode Enforcement logged for deployment ${params.deploymentId}`);
+  } catch (error) {
+    console.error("Failed to log URL mode enforcement:", error);
+  }
+}
+
+/**
  * Log a decision made by the Intelligence Core
  * Tracks all decisions: post, silence, wait
  */
