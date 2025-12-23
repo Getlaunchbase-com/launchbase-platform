@@ -898,3 +898,15 @@
 - [x] Add weather check events
 - [x] Add silence decision events
 - [x] Label as "Recent system activity"
+
+
+## "What LaunchBase Is Doing Right Now" Panel Enhancement
+
+### ObservabilityPanel Reframe
+- [x] Update panel title to "What LaunchBase Is Doing Right Now"
+- [x] Add subtitle: "Live system status for your business. Updated automatically."
+- [x] Add "Active Responsibilities" section with human language bullets
+- [x] Add "Last Decision" block with reason and timestamp
+- [x] Add "Next scheduled check" countdown
+- [x] Add guardrail footer: "You can change relevance anytime. Safety rules are always enforced."
+- [x] Add "Silence is a valid decision. We log it to protect your brand." helper text

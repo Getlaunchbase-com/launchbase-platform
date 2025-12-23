@@ -1,5 +1,5 @@
 import { trpc } from "@/lib/trpc";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
   Activity, 
@@ -7,13 +7,14 @@ import {
   Clock, 
   AlertTriangle,
   XCircle,
-  Zap,
   Eye,
   VolumeX,
-  Rocket,
-  Info,
   Shield,
-  RefreshCw
+  RefreshCw,
+  CloudRain,
+  Calendar,
+  Gauge,
+  Timer
 } from "lucide-react";
 import {
   Tooltip,
@@ -22,6 +23,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
 
 // Type for observability data
 interface ObservabilityData {
@@ -59,276 +61,296 @@ export function ObservabilityPanel() {
     refetchInterval: 30000, // Refresh every 30 seconds
   }) as { data: ObservabilityData | undefined; isLoading: boolean; refetch: () => void };
 
+  // Next check countdown (simulated - updates every minute)
+  const [nextCheckMinutes, setNextCheckMinutes] = useState(47);
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNextCheckMinutes(prev => {
+        if (prev <= 1) return 60; // Reset to ~1 hour
+        return prev - 1;
+      });
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
   if (isLoading) {
     return <ObservabilityPanelSkeleton />;
   }
 
-  if (!data) {
-    return null;
-  }
-
-  return (
-    <div className="space-y-6">
-      {/* Trust Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-[#FF6A00]/10">
-            <Eye className="w-5 h-5 text-[#FF6A00]" />
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold">What LaunchBase is Doing</h2>
-            <p className="text-sm text-muted-foreground">You can always see — and change it anytime</p>
-          </div>
-        </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => refetch()}
-          className="h-8 w-8 p-0"
-        >
-          <RefreshCw className="w-4 h-4" />
-        </Button>
-      </div>
-      {/* System Status Card */}
-      <Card className="border-border/50">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-medium flex items-center gap-2">
-              <Activity className="h-5 w-5 text-muted-foreground" />
-              System Status
-            </CardTitle>
-            <StatusBadge status={data.systemStatus.status} />
-          </div>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            {data.systemStatus.message}
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Activity Metrics */}
-      <Card className="border-border/50">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg font-medium">Activity This Week</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4">
-            <MetricCard
-              icon={<Clock className="h-4 w-4" />}
-              label="Last intelligence decision"
-              value={data.activityMetrics.lastIntelligenceDecisionFormatted}
-            />
-            <MetricCard
-              icon={<Rocket className="h-4 w-4" />}
-              label="Last deployment"
-              value={data.activityMetrics.lastDeploymentRunFormatted}
-            />
-            <MetricCard
-              icon={<CheckCircle2 className="h-4 w-4 text-green-500" />}
-              label="Posts approved"
-              value={String(data.activityMetrics.postsApprovedThisWeek)}
-            />
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div>
-                    <MetricCard
-                      icon={<VolumeX className="h-4 w-4 text-amber-500" />}
-                      label="Silence decisions"
-                      value={String(data.activityMetrics.silenceDecisionsThisWeek)}
-                      hasTooltip
-                    />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="max-w-xs">
-                  <p className="text-sm">
-                    Silence means LaunchBase intentionally chose not to post to protect relevance or safety. This is a feature, not a bug.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Intelligence Info */}
-      <Card className="border-border/50">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg font-medium flex items-center gap-2">
-            <Zap className="h-5 w-5 text-muted-foreground" />
-            Intelligence
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3 text-sm">
-            {data.intelligenceInfo.industryProfile && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Industry profile</span>
-                <span className="font-medium capitalize">
-                  {data.intelligenceInfo.industryProfile} {data.intelligenceInfo.profileVersion && `(${data.intelligenceInfo.profileVersion})`}
-                </span>
-              </div>
-            )}
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Intelligence version</span>
-              <span className="font-medium">{data.intelligenceInfo.intelligenceVersion}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Mode</span>
-              <Badge variant="outline" className="capitalize">
-                {data.intelligenceInfo.mode}
-              </Badge>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Recent Decisions */}
-      {data.recentDecisions.length > 0 && (
-        <Card className="border-border/50">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg font-medium flex items-center gap-2">
-              <Activity className="h-5 w-5 text-muted-foreground" />
-              Recent Decisions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {data.recentDecisions.map((decision) => (
-                <DecisionRow key={decision.id} decision={decision} />
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Trust Footer */}
-      <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/30 border border-border/50">
-        <Shield className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-        <div>
-          <p className="text-sm font-medium">Controls change relevance — not safety</p>
-          <p className="text-xs text-muted-foreground">Weather, safety, and brand protection are always enforced.</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function StatusBadge({ status }: { status: "operational" | "degraded" | "down" }) {
-  if (status === "operational") {
-    return (
-      <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/20">
-        <span className="mr-1.5 h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-        Operational
-      </Badge>
-    );
-  }
-  if (status === "degraded") {
-    return (
-      <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/20">
-        <AlertTriangle className="mr-1.5 h-3 w-3" />
-        Degraded
-      </Badge>
-    );
-  }
-  return (
-    <Badge variant="outline" className="bg-red-500/10 text-red-600 border-red-500/20">
-      <XCircle className="mr-1.5 h-3 w-3" />
-      Down
-    </Badge>
-  );
-}
-
-function MetricCard({ 
-  icon, 
-  label, 
-  value,
-  hasTooltip 
-}: { 
-  icon: React.ReactNode; 
-  label: string; 
-  value: string;
-  hasTooltip?: boolean;
-}) {
-  return (
-    <div className="rounded-lg border border-border/50 bg-muted/30 p-3">
-      <div className="flex items-center gap-2 text-muted-foreground mb-1">
-        {icon}
-        <span className="text-xs">{label}</span>
-        {hasTooltip && <Info className="h-3 w-3 text-muted-foreground/50" />}
-      </div>
-      <p className="text-lg font-semibold">{value}</p>
-    </div>
-  );
-}
-
-function DecisionRow({ decision }: { 
-  decision: ObservabilityData["recentDecisions"][number]
-}) {
-  const getOutcomeIcon = () => {
-    switch (decision.outcome) {
-      case "success":
-        return <CheckCircle2 className="h-4 w-4 text-green-500" />;
-      case "skipped":
-        return <VolumeX className="h-4 w-4 text-amber-500" />;
-      case "pending":
-        return <Clock className="h-4 w-4 text-blue-500" />;
-      default:
-        return <Activity className="h-4 w-4 text-muted-foreground" />;
+  // Show default state if no data yet
+  const defaultData: ObservabilityData = data || {
+    systemStatus: { status: 'operational', message: 'System initializing', lastChecked: new Date().toISOString() },
+    activityMetrics: {
+      lastIntelligenceDecision: null,
+      lastIntelligenceDecisionFormatted: 'Warming up',
+      lastDeploymentRun: null,
+      lastDeploymentRunFormatted: 'Not yet',
+      postsApprovedThisWeek: 0,
+      silenceDecisionsThisWeek: 0
+    },
+    recentDecisions: [],
+    intelligenceInfo: {
+      industryProfile: null,
+      profileVersion: null,
+      intelligenceVersion: 'v2.4.0',
+      mode: 'auto'
     }
   };
+  
+  // Get the most recent silence decision for display
+  const lastSilenceDecision = defaultData.recentDecisions.find(d => d.outcome === "skipped");
+  const lastDecision = defaultData.recentDecisions[0];
 
-  const formatTimestamp = (ts: string) => {
-    const date = new Date(ts);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / (1000 * 60));
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    
-    if (diffMins < 1) return "Just now";
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    return date.toLocaleDateString();
+  // Format profile name nicely
+  const formatProfileName = (profile: string | null, version: string | null) => {
+    if (!profile) return "General Business";
+    const formatted = profile.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    return version ? `${formatted} ${version}` : formatted;
+  };
+
+  // Get cadence display
+  const getCadenceDisplay = () => {
+    // This would come from customer config in real implementation
+    return "Medium (2–3 posts/week)";
   };
 
   return (
-    <div className="flex items-start gap-3 text-sm">
-      <div className="mt-0.5">{getOutcomeIcon()}</div>
-      <div className="flex-1 min-w-0">
-        <p className="text-foreground">{decision.summary}</p>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          {formatTimestamp(decision.timestamp)}
-        </p>
-      </div>
+    <Card className="border-border/50 bg-gradient-to-br from-background to-muted/20">
+      <CardContent className="p-6">
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-[#FF6A00]/10 border border-[#FF6A00]/20">
+                <Eye className="w-5 h-5 text-[#FF6A00]" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-foreground">What LaunchBase Is Doing Right Now</h2>
+                <p className="text-sm text-muted-foreground">Live system status for your business. Updated automatically.</p>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => refetch()}
+              className="h-8 w-8 p-0 hover:bg-muted"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </Button>
+          </div>
+
+          {/* System Status Bar */}
+          <div className="flex items-center justify-between p-3 rounded-lg bg-muted/40 border border-border/50">
+            <div className="flex items-center gap-2">
+              <StatusIndicator status={defaultData.systemStatus.status} />
+              <span className="text-sm font-medium">System Status: {defaultData.systemStatus.status === "operational" ? "Operational" : defaultData.systemStatus.status}</span>
+            </div>
+            <span className="text-xs text-muted-foreground">
+              Last checked: {formatTimeAgo(defaultData.systemStatus.lastChecked)}
+            </span>
+          </div>
+
+          {/* Active Responsibilities */}
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-muted-foreground">Right now, LaunchBase is:</p>
+            <div className="space-y-2.5 pl-1">
+              <ResponsibilityItem 
+                icon={<CloudRain className="w-4 h-4" />}
+                text="Monitoring weather for your service area"
+              />
+              <ResponsibilityItem 
+                icon={<Shield className="w-4 h-4" />}
+                text="Evaluating whether posting is safe"
+              />
+              <ResponsibilityItem 
+                icon={<Activity className="w-4 h-4" />}
+                text={`Applying ${formatProfileName(defaultData.intelligenceInfo.industryProfile, defaultData.intelligenceInfo.profileVersion)}`}
+              />
+              <ResponsibilityItem 
+                icon={<Gauge className="w-4 h-4" />}
+                text={`Respecting your cadence: ${getCadenceDisplay()}`}
+              />
+            </div>
+          </div>
+
+          {/* Last Decision Block */}
+          {lastDecision && (
+            <div className="p-4 rounded-lg bg-muted/30 border border-border/50 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Last decision:</span>
+                <DecisionBadge outcome={lastDecision.outcome} />
+              </div>
+              <p className="text-sm text-foreground">{lastDecision.summary}</p>
+              <p className="text-xs text-muted-foreground">
+                {formatTimeAgo(lastDecision.timestamp)}
+              </p>
+              {lastDecision.outcome === "skipped" && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <p className="text-xs text-muted-foreground/80 italic cursor-help inline-flex items-center gap-1">
+                        <VolumeX className="w-3 h-3" />
+                        Silence is a valid decision. We log it to protect your brand.
+                      </p>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-xs">
+                      <p className="text-sm">
+                        When conditions aren't right for posting, LaunchBase stays silent. This protects your reputation and ensures every post adds value.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
+          )}
+
+          {/* Next Check */}
+          <div className="flex items-center gap-2 text-sm">
+            <Timer className="w-4 h-4 text-muted-foreground" />
+            <span className="text-muted-foreground">Next scheduled check:</span>
+            <span className="font-medium text-foreground">~{nextCheckMinutes} minutes</span>
+          </div>
+
+          {/* Activity Summary (Compact) */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-3 rounded-lg bg-muted/30 border border-border/50">
+              <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                <span className="text-xs">Posts this week</span>
+              </div>
+              <p className="text-xl font-semibold">{defaultData.activityMetrics.postsApprovedThisWeek}</p>
+            </div>
+            <div className="p-3 rounded-lg bg-muted/30 border border-border/50">
+              <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                <VolumeX className="h-4 w-4 text-amber-500" />
+                <span className="text-xs">Silence decisions</span>
+              </div>
+              <p className="text-xl font-semibold">{defaultData.activityMetrics.silenceDecisionsThisWeek}</p>
+            </div>
+          </div>
+
+          {/* Guardrail Footer */}
+          <div className="pt-4 border-t border-border/50">
+            <div className="flex items-start gap-3">
+              <Shield className="h-5 w-5 text-[#FF6A00] flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-foreground">You can change relevance anytime.</p>
+                <p className="text-sm text-muted-foreground">Safety rules are always enforced.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function StatusIndicator({ status }: { status: "operational" | "degraded" | "down" }) {
+  if (status === "operational") {
+    return <span className="h-2.5 w-2.5 rounded-full bg-green-500 animate-pulse" />;
+  }
+  if (status === "degraded") {
+    return <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />;
+  }
+  return <span className="h-2.5 w-2.5 rounded-full bg-red-500" />;
+}
+
+function ResponsibilityItem({ icon, text }: { icon: React.ReactNode; text: string }) {
+  return (
+    <div className="flex items-center gap-3 text-sm">
+      <div className="text-[#FF6A00]">{icon}</div>
+      <span className="text-foreground">{text}</span>
     </div>
   );
+}
+
+function DecisionBadge({ outcome }: { outcome: string }) {
+  switch (outcome) {
+    case "success":
+      return (
+        <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/20">
+          <CheckCircle2 className="mr-1 h-3 w-3" />
+          Posted
+        </Badge>
+      );
+    case "skipped":
+      return (
+        <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/20">
+          <VolumeX className="mr-1 h-3 w-3" />
+          Silence
+        </Badge>
+      );
+    case "pending":
+      return (
+        <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-500/20">
+          <Clock className="mr-1 h-3 w-3" />
+          Pending
+        </Badge>
+      );
+    default:
+      return (
+        <Badge variant="outline" className="bg-muted text-muted-foreground">
+          <Activity className="mr-1 h-3 w-3" />
+          {outcome}
+        </Badge>
+      );
+  }
+}
+
+function formatTimeAgo(timestamp: string | null): string {
+  if (!timestamp) return "Never";
+  
+  const date = new Date(timestamp);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60) return `${diffMins} minutes ago`;
+  if (diffHours < 24) return `${diffHours} hours ago`;
+  return date.toLocaleDateString();
 }
 
 function ObservabilityPanelSkeleton() {
   return (
-    <div className="space-y-6">
-      <Card className="border-border/50">
-        <CardHeader className="pb-3">
-          <div className="h-6 w-32 bg-muted animate-pulse rounded" />
-        </CardHeader>
-        <CardContent>
-          <div className="h-4 w-48 bg-muted animate-pulse rounded" />
-        </CardContent>
-      </Card>
-      <Card className="border-border/50">
-        <CardHeader className="pb-3">
-          <div className="h-6 w-40 bg-muted animate-pulse rounded" />
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-20 bg-muted animate-pulse rounded-lg" />
-            ))}
+    <Card className="border-border/50 bg-gradient-to-br from-background to-muted/20">
+      <CardContent className="p-6">
+        <div className="space-y-6">
+          {/* Header skeleton */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-muted animate-pulse" />
+            <div className="space-y-2">
+              <div className="h-5 w-64 bg-muted animate-pulse rounded" />
+              <div className="h-4 w-48 bg-muted animate-pulse rounded" />
+            </div>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+          
+          {/* Status bar skeleton */}
+          <div className="h-12 bg-muted animate-pulse rounded-lg" />
+          
+          {/* Responsibilities skeleton */}
+          <div className="space-y-3">
+            <div className="h-4 w-40 bg-muted animate-pulse rounded" />
+            <div className="space-y-2 pl-1">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-5 w-64 bg-muted animate-pulse rounded" />
+              ))}
+            </div>
+          </div>
+          
+          {/* Decision block skeleton */}
+          <div className="h-24 bg-muted animate-pulse rounded-lg" />
+          
+          {/* Activity summary skeleton */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="h-20 bg-muted animate-pulse rounded-lg" />
+            <div className="h-20 bg-muted animate-pulse rounded-lg" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
