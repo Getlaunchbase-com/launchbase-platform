@@ -417,6 +417,48 @@ export type SocialPost = typeof socialPosts.$inferSelect;
 export type InsertSocialPost = typeof socialPosts.$inferInsert;
 
 /**
+ * Decision log for Intelligence Core - tracks all decisions including silence
+ * Provides audit trail, explainability, and learning signal
+ */
+export const decisionLogs = mysqlTable("decision_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  // Decision type
+  decision: mysqlEnum("decision", ["post", "silence", "wait"]).notNull(),
+  // Silence severity classification
+  severity: mysqlEnum("severity", ["hard_block", "soft_block", "discretionary"]),
+  // Reason for decision
+  reason: varchar("reason", { length: 128 }).notNull(),
+  // Context that triggered evaluation
+  triggerContext: mysqlEnum("triggerContext", [
+    "weather_storm",
+    "weather_clear",
+    "weather_extreme",
+    "sports_event",
+    "community_event",
+    "local_trend",
+    "seasonal",
+    "manual",
+    "scheduled"
+  ]).notNull(),
+  // Raw conditions that led to decision
+  conditions: json("conditions").$type<Record<string, unknown>>(),
+  // Which layers evaluated this
+  layersEvaluated: json("layersEvaluated").$type<string[]>(),
+  // Confidence score (0-100)
+  confidenceScore: int("confidenceScore").default(0),
+  // Intelligence version used
+  intelligenceVersion: varchar("intelligenceVersion", { length: 16 }).default("v2.4.0").notNull(),
+  // Link to generated post (if decision was "post")
+  socialPostId: int("socialPostId"),
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type DecisionLog = typeof decisionLogs.$inferSelect;
+export type InsertDecisionLog = typeof decisionLogs.$inferInsert;
+
+/**
  * Post usage tracking for billing and analytics
  */
 export const postUsage = mysqlTable("post_usage", {
@@ -439,6 +481,83 @@ export const postUsage = mysqlTable("post_usage", {
 
 export type PostUsage = typeof postUsage.$inferSelect;
 export type InsertPostUsage = typeof postUsage.$inferInsert;
+
+/**
+ * Approval feedback loop - captures customer feedback on generated posts
+ * Enables continuous improvement and learning
+ */
+export const approvalFeedback = mysqlTable("approval_feedback", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  socialPostId: int("socialPostId").notNull(),
+  // Action taken
+  action: mysqlEnum("action", ["approved", "edited", "rejected"]).notNull(),
+  // Feedback type (normalized enum)
+  feedbackType: mysqlEnum("feedbackType", [
+    "too_promotional",
+    "wrong_tone",
+    "not_relevant",
+    "too_salesy",
+    "timing_wrong",
+    "content_inaccurate",
+    "other"
+  ]),
+  // Freeform feedback
+  freeformNote: text("freeformNote"),
+  // If edited, capture the changes
+  originalContent: text("originalContent"),
+  editedContent: text("editedContent"),
+  // Which layer(s) the feedback relates to
+  relatedLayers: json("relatedLayers").$type<string[]>(),
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ApprovalFeedback = typeof approvalFeedback.$inferSelect;
+export type InsertApprovalFeedback = typeof approvalFeedback.$inferInsert;
+
+/**
+ * Industry profiles - versioned intelligence configuration per industry
+ * Enables safe rollouts, A/B testing, and continuous improvement
+ */
+export const industryProfiles = mysqlTable("industry_profiles", {
+  id: int("id").autoincrement().primaryKey(),
+  // Industry identifier
+  industry: varchar("industry", { length: 64 }).notNull(),
+  // Profile version
+  profileVersion: varchar("profileVersion", { length: 16 }).notNull(),
+  // Context weights for decision making
+  contextWeights: json("contextWeights").$type<{
+    weather: number;
+    sports: number;
+    community: number;
+    trends: number;
+  }>().notNull(),
+  // Safety gates that apply
+  safetyGates: json("safetyGates").$type<string[]>().notNull(),
+  // Tone guardrails
+  toneGuardrails: json("toneGuardrails").$type<{
+    conservative?: boolean;
+    professional?: boolean;
+    energetic?: boolean;
+  }>(),
+  // Allowed post types for this industry
+  allowedPostTypes: json("allowedPostTypes").$type<string[]>().notNull(),
+  // When this profile becomes effective
+  effectiveFrom: timestamp("effectiveFrom").notNull(),
+  // Migration strategy for existing customers
+  migrationStrategy: mysqlEnum("migrationStrategy", ["auto", "opt_in", "frozen"]).default("auto").notNull(),
+  // Description for internal use
+  description: text("description"),
+  // Status
+  status: mysqlEnum("status", ["draft", "active", "deprecated"]).default("draft").notNull(),
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type IndustryProfile = typeof industryProfiles.$inferSelect;
+export type InsertIndustryProfile = typeof industryProfiles.$inferInsert;
 
 
 /**
