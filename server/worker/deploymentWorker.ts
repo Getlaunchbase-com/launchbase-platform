@@ -6,8 +6,8 @@
 
 import { Request, Response } from "express";
 import { getDb } from "../db";
-import { deployments, intakes, buildPlans } from "../../drizzle/schema";
-import { eq, asc } from "drizzle-orm";
+import { deployments, intakes, buildPlans, workerRuns } from "../../drizzle/schema";
+import { eq, asc, desc } from "drizzle-orm";
 import { sendEmail } from "../email";
 import { notifyOwner } from "../_core/notification";
 
@@ -33,6 +33,8 @@ function verifyWorkerToken(req: Request): boolean {
  * Route: POST /api/worker/run-next-deploy
  */
 export async function handleDeploymentWorker(req: Request, res: Response) {
+  const startTime = Date.now();
+  
   // Verify token
   if (!verifyWorkerToken(req)) {
     console.error("[Worker] Unauthorized request - invalid token");
@@ -55,6 +57,13 @@ export async function handleDeploymentWorker(req: Request, res: Response) {
 
     if (runningJob) {
       console.log(`[Worker] Worker busy - deployment ${runningJob.id} is already running`);
+      
+      // Log the skipped run
+      await logWorkerRun(db, "skipped", 0, Date.now() - startTime, {
+        message: "Worker busy - another deployment running",
+        deploymentIds: [runningJob.id],
+      });
+      
       return res.json({
         success: true,
         message: "Worker busy",
@@ -73,6 +82,12 @@ export async function handleDeploymentWorker(req: Request, res: Response) {
 
     if (!queuedDeployment) {
       console.log("[Worker] No queued deployments found");
+      
+      // Log the skipped run
+      await logWorkerRun(db, "skipped", 0, Date.now() - startTime, {
+        message: "No queued deployments",
+      });
+      
       return res.json({ 
         success: true, 
         message: "No queued deployments",
@@ -155,6 +170,12 @@ export async function handleDeploymentWorker(req: Request, res: Response) {
 
     console.log(`[Worker] Deployment ${queuedDeployment.id} completed successfully`);
 
+    // Log the successful run
+    await logWorkerRun(db, "processed", 1, Date.now() - startTime, {
+      message: "Deployment completed successfully",
+      deploymentIds: [queuedDeployment.id],
+    });
+
     return res.json({
       success: true,
       message: "Deployment completed",
@@ -191,10 +212,41 @@ export async function handleDeploymentWorker(req: Request, res: Response) {
       });
     }
 
+    // Log the error
+    await logWorkerRun(db, "error", 0, Date.now() - startTime, {
+      message: error instanceof Error ? error.message : "Unknown error",
+    }, error instanceof Error ? error.message : "Unknown error");
+
     return res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : "Deployment failed",
     });
+  }
+}
+
+/**
+ * Log a worker run for observability
+ */
+async function logWorkerRun(
+  db: Awaited<ReturnType<typeof getDb>>,
+  result: "processed" | "skipped" | "error",
+  processedCount: number,
+  durationMs: number,
+  details?: { message?: string; deploymentIds?: number[] },
+  errorMessage?: string
+) {
+  if (!db) return;
+  
+  try {
+    await db.insert(workerRuns).values({
+      result,
+      processedCount,
+      durationMs,
+      details,
+      errorMessage,
+    });
+  } catch (err) {
+    console.error("[Worker] Failed to log worker run:", err);
   }
 }
 
@@ -316,5 +368,41 @@ export async function getWorkerStatus() {
     queuedCount: queued?.count || 0,
     runningCount: running?.count || 0,
     recentDeployments,
+  };
+}
+
+/**
+ * Get the last worker run for observability
+ */
+export async function getLastWorkerRun() {
+  const db = await getDb();
+  if (!db) return null;
+
+  const [lastRun] = await db
+    .select()
+    .from(workerRuns)
+    .orderBy(desc(workerRuns.createdAt))
+    .limit(1);
+
+  // Get recent runs for stats
+  const recentRuns = await db
+    .select()
+    .from(workerRuns)
+    .orderBy(desc(workerRuns.createdAt))
+    .limit(10);
+
+  // Calculate stats
+  const processedCount = recentRuns.filter(r => r.result === "processed").length;
+  const skippedCount = recentRuns.filter(r => r.result === "skipped").length;
+  const errorCount = recentRuns.filter(r => r.result === "error").length;
+
+  return {
+    lastRun,
+    recentRuns,
+    stats: {
+      processed: processedCount,
+      skipped: skippedCount,
+      errors: errorCount,
+    },
   };
 }

@@ -794,3 +794,22 @@
 - [x] Add share event tracking (share_opened, share_copy_link, share_qr_shown, share_social_clicked)
 - [x] Update badge link to use /r/{siteSlug} for attribution
 - [x] Integrate Share modal into customer preview pages (after payment)
+
+
+## Worker Observability & Test Deployment
+
+- [ ] Create worker_runs table (timestamp, result, processed_count, error_message)
+- [ ] Add logging to deployment worker endpoint
+- [ ] Add "Last Worker Run" card to admin dashboard
+- [ ] Create test deployment to validate cron automation
+- [ ] Verify test deployment auto-processes within 2 minutes
+
+
+## Worker Observability & Cron Automation
+
+- [x] Create worker_runs table for observability
+- [x] Add worker run logging to deployment worker
+- [x] Add "Worker Status" card to admin dashboard
+- [x] Set up external cron (cron-job.org) every 2 minutes
+- [x] Create test deployment to validate cron automation
+- [x] Verify end-to-end cron processing (deployment #60001 → live)

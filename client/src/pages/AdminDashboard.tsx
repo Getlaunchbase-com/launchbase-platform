@@ -227,6 +227,9 @@ export default function AdminDashboard() {
           {/* Top Referrers This Week */}
           <TopReferrersCard />
 
+          {/* Worker Status */}
+          <WorkerStatusCard />
+
           {/* Status Filter Cards with Tooltips */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {Object.entries(statusConfig).map(([status, config]) => (
@@ -486,6 +489,104 @@ function TopReferrersCard() {
             </Button>
           </Link>
         </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+
+function WorkerStatusCard() {
+  // Use the admin.deploy.workerStatus endpoint for queue status
+  const { data: deployStatus, isLoading } = trpc.admin.deploy.workerStatus.useQuery(undefined, {
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  if (isLoading) {
+    return (
+      <Card className="bg-[#1A1A1A] border-white/10">
+        <CardContent className="py-4">
+          <div className="animate-pulse">
+            <div className="h-4 bg-white/10 rounded w-32 mb-2" />
+            <div className="h-6 bg-white/10 rounded w-24" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Calculate stats from recent deployments
+  const recentDeployments = deployStatus?.recentDeployments || [];
+  const queuedCount = deployStatus?.queuedCount || 0;
+  const runningCount = deployStatus?.runningCount || 0;
+  
+  // Find the most recent completed deployment
+  const lastCompleted = recentDeployments.find(d => d.status === 'success' || d.status === 'failed');
+  const minutesAgo = lastCompleted?.completedAt 
+    ? Math.round((Date.now() - new Date(lastCompleted.completedAt).getTime()) / 60000)
+    : null;
+  const lastResult = lastCompleted?.status;
+
+  // Determine status color
+  let statusColor = "text-gray-400";
+  let statusBg = "bg-gray-500/20";
+  let statusText = "No runs yet";
+  
+  if (minutesAgo !== null && minutesAgo !== undefined) {
+    if (minutesAgo <= 5) {
+      statusColor = "text-emerald-400";
+      statusBg = "bg-emerald-500/20";
+      statusText = `${minutesAgo}m ago`;
+    } else if (minutesAgo <= 15) {
+      statusColor = "text-yellow-400";
+      statusBg = "bg-yellow-500/20";
+      statusText = `${minutesAgo}m ago`;
+    } else {
+      statusColor = "text-red-400";
+      statusBg = "bg-red-500/20";
+      statusText = `${minutesAgo}m ago`;
+    }
+  }
+
+  return (
+    <Card className="bg-[#1A1A1A] border-white/10">
+      <CardContent className="py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className={`p-2 rounded-lg ${statusBg}`}>
+              <RefreshCw className={`w-5 h-5 ${statusColor}`} />
+            </div>
+            <div>
+              <p className="text-sm text-gray-400">Last Worker Run</p>
+              <p className={`text-lg font-semibold ${statusColor}`}>{statusText}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-6 text-sm">
+            <div className="text-center">
+              <p className="text-yellow-400 font-semibold">{queuedCount}</p>
+              <p className="text-gray-500 text-xs">Queued</p>
+            </div>
+            <div className="text-center">
+              <p className="text-blue-400 font-semibold">{runningCount}</p>
+              <p className="text-gray-500 text-xs">Running</p>
+            </div>
+            <div className="text-center">
+              <p className="text-emerald-400 font-semibold">
+                {recentDeployments.filter(d => d.status === 'success').length}
+              </p>
+              <p className="text-gray-500 text-xs">Completed</p>
+            </div>
+          </div>
+        </div>
+        {lastCompleted && (
+          <div className="mt-3 pt-3 border-t border-white/5">
+            <p className="text-xs text-gray-500">
+              Last deployment: <span className={lastResult === "success" ? "text-emerald-400" : "text-red-400"}>{lastResult}</span>
+              {lastCompleted.productionUrl && (
+                <span className="ml-2 text-gray-600">— {lastCompleted.productionUrl}</span>
+              )}
+            </p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

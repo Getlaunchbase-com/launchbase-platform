@@ -34,6 +34,7 @@ import { createHash } from "crypto";
 import { getWeatherIntelligence, formatFacebookPost } from "./services/weather-intelligence";
 import { postToFacebook, testFacebookConnection } from "./services/facebook-poster";
 import { getTopReferringSites, getConversionFunnel, get7DayClicks, logReferralEvent } from "./referral";
+import { getLastWorkerRun } from "./worker/deploymentWorker";
 
 // Generate a hash of the build plan for version locking
 function generateBuildPlanHash(buildPlan: { id: number; plan: unknown }): string {
@@ -763,6 +764,30 @@ export const appRouter = router({
 
     dailyHealth: protectedProcedure.query(async () => {
       return getDailyHealth();
+    }),
+    
+    // Worker observability
+    workerStatus: protectedProcedure.query(async () => {
+      const workerData = await getLastWorkerRun();
+      if (!workerData) {
+        return {
+          lastRun: null,
+          minutesAgo: null,
+          recentRuns: [],
+          stats: { processed: 0, skipped: 0, errors: 0 },
+        };
+      }
+      
+      const minutesAgo = workerData.lastRun 
+        ? Math.round((Date.now() - new Date(workerData.lastRun.createdAt).getTime()) / 60000)
+        : null;
+      
+      return {
+        lastRun: workerData.lastRun,
+        minutesAgo,
+        recentRuns: workerData.recentRuns,
+        stats: workerData.stats,
+      };
     }),
   }),
 
