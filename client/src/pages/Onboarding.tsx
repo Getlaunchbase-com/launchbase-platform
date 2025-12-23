@@ -1,33 +1,28 @@
-import { useState, useEffect } from "react";
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, ArrowRight, Rocket, Check, Sparkles, Building2, Users, Briefcase } from "lucide-react";
+import { ArrowLeft, ArrowRight, Rocket, Check, Sparkles, Building2, Users, Briefcase, AlertCircle } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
 import { cn } from "@/lib/utils";
+import { useState, useEffect } from "react";
 
 const STORAGE_KEY = "launchbase_onboarding_draft";
 const TOTAL_STEPS = 8;
 
 interface OnboardingData {
-  // Step 1: Business description (AI infers vertical)
   businessDescription: string;
-  // Step 2: Customer type
   customerType: "homeowners" | "businesses" | "both" | "";
-  // Step 3: Website goals (multi-select)
   websiteGoals: string[];
-  // Step 4: Contact preference
   contactPreference: "phone" | "form" | "booking" | "recommend" | "";
-  // Step 5: Service area
   serviceArea: string;
   serviceRadius: string;
-  // Step 6: Business info
   businessName: string;
   phone: string;
   email: string;
-  // Step 7: Brand feel
   brandFeel: "clean" | "bold" | "friendly" | "auto" | "";
 }
 
@@ -48,13 +43,8 @@ const initialData: OnboardingData = {
 function inferVertical(description: string, customerType: string, contactPreference: string): "trades" | "appointments" | "professional" {
   const desc = description.toLowerCase();
   
-  // Trades keywords
   const tradesKeywords = ["plumber", "plumbing", "hvac", "electrician", "electrical", "roofing", "roofer", "concrete", "landscaping", "landscaper", "contractor", "repair", "install", "emergency", "service call", "24/7", "same-day", "handyman", "painting", "flooring", "remodel"];
-  
-  // Appointment keywords
   const appointmentKeywords = ["salon", "barber", "stylist", "therapist", "trainer", "massage", "spa", "beauty", "hair", "nail", "fitness", "yoga", "pilates", "coach", "session", "appointment", "schedule", "book", "availability"];
-  
-  // Professional keywords
   const professionalKeywords = ["consultant", "consulting", "lawyer", "attorney", "accountant", "accounting", "advisor", "advisory", "strategy", "expertise", "firm", "practice", "discovery call", "consultation"];
   
   let tradesScore = 0;
@@ -65,7 +55,6 @@ function inferVertical(description: string, customerType: string, contactPrefere
   appointmentKeywords.forEach(kw => { if (desc.includes(kw)) appointmentScore += 10; });
   professionalKeywords.forEach(kw => { if (desc.includes(kw)) professionalScore += 10; });
   
-  // Behavioral signals
   if (contactPreference === "phone") tradesScore += 15;
   if (contactPreference === "booking") appointmentScore += 20;
   if (contactPreference === "form") professionalScore += 10;
@@ -82,8 +71,6 @@ function inferCTA(contactPreference: string, vertical: string): "call" | "book" 
   if (contactPreference === "phone") return "call";
   if (contactPreference === "booking") return "book";
   if (contactPreference === "form") return "consult";
-  
-  // Defaults by vertical
   if (vertical === "trades") return "call";
   if (vertical === "appointments") return "book";
   return "consult";
@@ -93,22 +80,64 @@ function inferTone(brandFeel: string, vertical: string): "professional" | "bold"
   if (brandFeel === "clean") return "professional";
   if (brandFeel === "bold") return "bold";
   if (brandFeel === "friendly") return "friendly";
-  
-  // Default by vertical
   if (vertical === "professional") return "professional";
   if (vertical === "appointments") return "friendly";
   return "professional";
+}
+
+// User-friendly error messages
+function getUserFriendlyError(error: string): string {
+  if (error.includes("invalid_format") && error.includes("email")) {
+    return "Please enter a valid email address";
+  }
+  if (error.includes("invalid_format")) {
+    return "Please check the format of your input";
+  }
+  if (error.includes("too_small")) {
+    return "Please provide more information";
+  }
+  if (error.includes("too_big")) {
+    return "Your input is too long";
+  }
+  return error || "Please check this field";
 }
 
 export default function Onboarding() {
   const [currentStep, setCurrentStep] = useState(1);
   const [data, setData] = useState<OnboardingData>(initialData);
   const [, setLocation] = useLocation();
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [globalError, setGlobalError] = useState<string>("");
 
   const submitMutation = trpc.intake.submit.useMutation({
     onSuccess: () => {
       localStorage.removeItem(STORAGE_KEY);
+      setFieldErrors({});
+      setGlobalError("");
       setLocation("/onboarding/success");
+    },
+    onError: (error) => {
+      setFieldErrors({});
+      setGlobalError("");
+      
+      // Extract field errors from tRPC error
+      const errorData = (error.data as any)?.zodError;
+      if (errorData?.fieldErrors) {
+        const errors: Record<string, string> = {};
+        for (const [field, messages] of Object.entries(errorData.fieldErrors)) {
+          if (Array.isArray(messages) && messages.length > 0) {
+            errors[field] = getUserFriendlyError(String(messages[0]));
+          }
+        }
+        if (Object.keys(errors).length > 0) {
+          setFieldErrors(errors);
+          setGlobalError("Please fix the highlighted fields and try again.");
+          return;
+        }
+      }
+      
+      // Fallback error message
+      setGlobalError("Something went wrong. Please check your information and try again.");
     },
   });
 
@@ -118,11 +147,9 @@ export default function Onboarding() {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        // Migrate old data format: serviceArea was array, now string
         if (Array.isArray(parsed.serviceArea)) {
           parsed.serviceArea = parsed.serviceArea.join(', ');
         }
-        // Ensure serviceArea is a string
         if (typeof parsed.serviceArea !== 'string') {
           parsed.serviceArea = '';
         }
@@ -142,6 +169,14 @@ export default function Onboarding() {
 
   const updateField = (field: keyof OnboardingData, value: unknown) => {
     setData((prev) => ({ ...prev, [field]: value }));
+    // Clear field error when user starts typing
+    if (fieldErrors[field]) {
+      setFieldErrors((prev) => {
+        const updated = { ...prev };
+        delete updated[field];
+        return updated;
+      });
+    }
   };
 
   const toggleGoal = (goal: string) => {
@@ -179,16 +214,16 @@ export default function Onboarding() {
   };
 
   const handleSubmit = () => {
+    setGlobalError("");
     const vertical = inferVertical(data.businessDescription, data.customerType, data.contactPreference);
     const primaryCTA = inferCTA(data.contactPreference, vertical);
     const tone = inferTone(data.brandFeel, vertical);
     
-    // Build services from goals
     const services = data.websiteGoals;
     
     submitMutation.mutate({
       businessName: data.businessName,
-      contactName: data.businessName, // Use business name as contact for now
+      contactName: data.businessName,
       email: data.email,
       phone: data.phone || undefined,
       vertical,
@@ -355,32 +390,22 @@ export default function Onboarding() {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold mb-2">Where do you provide services?</h2>
-              <p className="text-gray-400">This helps with local search and clarity for customers.</p>
+              <h2 className="text-2xl md:text-3xl font-bold mb-2">Where do you serve?</h2>
+              <p className="text-gray-400">This helps us tailor local context to your site.</p>
             </div>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm text-gray-400 mb-2 block">City / State</label>
-                <Input
-                  value={data.serviceArea}
-                  onChange={(e) => updateField("serviceArea", e.target.value)}
-                  placeholder="e.g., Austin, TX"
-                  className="text-lg py-6"
-                  autoFocus
-                />
-              </div>
-              <div>
-                <label className="text-sm text-gray-400 mb-2 block">Service radius (optional)</label>
-                <Input
-                  value={data.serviceRadius}
-                  onChange={(e) => updateField("serviceRadius", e.target.value)}
-                  placeholder="e.g., 25 miles"
-                  className="text-lg py-6"
-                />
-              </div>
+            <div>
+              <label className="text-sm text-gray-400 mb-2 block">Service area</label>
+              <Input
+                type="text"
+                value={data.serviceArea}
+                onChange={(e) => updateField("serviceArea", e.target.value)}
+                placeholder="e.g., Denver, CO or Denver metro area"
+                className="text-lg py-6"
+                autoFocus
+              />
             </div>
             <p className="text-sm text-gray-500">
-              <span className="text-[#FF6A00]/70">✓</span> You can update this anytime.
+              <span className="text-[#FF6A00]/70">✓</span> This is just a preference — not a commitment.
             </p>
           </div>
         );
@@ -396,12 +421,19 @@ export default function Onboarding() {
               <div>
                 <label className="text-sm text-gray-400 mb-2 block">Business name</label>
                 <Input
+                  type="text"
                   value={data.businessName}
                   onChange={(e) => updateField("businessName", e.target.value)}
                   placeholder="e.g., Smith Plumbing Co."
-                  className="text-lg py-6"
+                  className={cn(
+                    "text-lg py-6",
+                    fieldErrors.businessName && "border-red-500 focus:ring-red-500"
+                  )}
                   autoFocus
                 />
+                {fieldErrors.businessName && (
+                  <p className="text-red-400 text-xs mt-2">{fieldErrors.businessName}</p>
+                )}
               </div>
               <div>
                 <label className="text-sm text-gray-400 mb-2 block">Phone number</label>
@@ -410,8 +442,14 @@ export default function Onboarding() {
                   value={data.phone}
                   onChange={(e) => updateField("phone", e.target.value)}
                   placeholder="(555) 123-4567"
-                  className="text-lg py-6"
+                  className={cn(
+                    "text-lg py-6",
+                    fieldErrors.phone && "border-red-500 focus:ring-red-500"
+                  )}
                 />
+                {fieldErrors.phone && (
+                  <p className="text-red-400 text-xs mt-2">{fieldErrors.phone}</p>
+                )}
               </div>
               <div>
                 <label className="text-sm text-gray-400 mb-2 block">Email address</label>
@@ -420,8 +458,14 @@ export default function Onboarding() {
                   value={data.email}
                   onChange={(e) => updateField("email", e.target.value)}
                   placeholder="you@example.com"
-                  className="text-lg py-6"
+                  className={cn(
+                    "text-lg py-6",
+                    fieldErrors.email && "border-red-500 focus:ring-red-500"
+                  )}
                 />
+                {fieldErrors.email && (
+                  <p className="text-red-400 text-xs mt-2">{fieldErrors.email}</p>
+                )}
               </div>
             </div>
             <p className="text-sm text-gray-500">
@@ -484,6 +528,17 @@ export default function Onboarding() {
                 A real human checks everything before it goes live.
               </p>
             </div>
+
+            {globalError && (
+              <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" />
+                <div className="text-left">
+                  <p className="text-red-200 text-sm font-medium">Please fix the highlighted fields</p>
+                  <p className="text-red-300/70 text-xs mt-1">{globalError}</p>
+                </div>
+              </div>
+            )}
+
             <Button
               onClick={handleSubmit}
               disabled={submitMutation.isPending}
@@ -502,11 +557,6 @@ export default function Onboarding() {
             <p className="text-sm text-gray-500">
               No payment required to review your site.
             </p>
-            {submitMutation.isError && (
-              <p className="text-red-500 text-sm">
-                Something went wrong. Please try again.
-              </p>
-            )}
           </div>
         );
 
