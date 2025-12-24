@@ -2118,6 +2118,95 @@ export const appRouter = router({
         };
       }),
   }),
+
+  // Setup Packets Router - Integration setup packets for Google, Meta, QuickBooks
+  setupPackets: router({
+    // Generate packets for an intake
+    generate: protectedProcedure
+      .input(z.object({
+        intakeId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        const { generateAllPackets } = await import("./services/setupPacketGenerator");
+        const packets = await generateAllPackets(input.intakeId);
+        
+        if (!packets.google && !packets.meta && !packets.quickbooks) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Intake not found or no packets could be generated",
+          });
+        }
+
+        return {
+          success: true,
+          packets,
+        };
+      }),
+
+    // Get packets for an intake
+    getForIntake: protectedProcedure
+      .input(z.object({
+        intakeId: z.number(),
+      }))
+      .query(async ({ input }) => {
+        const { generateAllPackets } = await import("./services/setupPacketGenerator");
+        const packets = await generateAllPackets(input.intakeId);
+        
+        return {
+          google: packets.google ? { status: "ready", packet: packets.google } : null,
+          meta: packets.meta ? { status: "ready", packet: packets.meta } : null,
+          quickbooks: packets.quickbooks ? { status: "ready", packet: packets.quickbooks } : null,
+        };
+      }),
+
+    // Get a single packet by type
+    getByType: protectedProcedure
+      .input(z.object({
+        intakeId: z.number(),
+        integration: z.enum(["google_business", "meta", "quickbooks"]),
+      }))
+      .query(async ({ input }) => {
+        const { generateSetupPacket } = await import("./services/setupPacketGenerator");
+        const packet = await generateSetupPacket(input.intakeId, input.integration);
+        
+        if (!packet) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Packet not found",
+          });
+        }
+
+        return {
+          status: "ready",
+          packet,
+        };
+      }),
+
+    // Mark packet as in progress (customer started setup)
+    markInProgress: protectedProcedure
+      .input(z.object({
+        intakeId: z.number(),
+        integration: z.enum(["google_business", "meta", "quickbooks"]),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // For now, just log the action - in future, store in DB
+        console.log(`[SetupPacket] ${ctx.user?.email} marked ${input.integration} as in progress for intake ${input.intakeId}`);
+        return { success: true, status: "in_progress" };
+      }),
+
+    // Mark packet as connected (integration complete)
+    markConnected: protectedProcedure
+      .input(z.object({
+        intakeId: z.number(),
+        integration: z.enum(["google_business", "meta", "quickbooks"]),
+        externalAccountId: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // For now, just log the action - in future, store in DB
+        console.log(`[SetupPacket] ${ctx.user?.email} marked ${input.integration} as connected for intake ${input.intakeId}`);
+        return { success: true, status: "connected", connectedAt: new Date() };
+      }),
+  }),
 });
 
 // Helper function to generate build plan from intake

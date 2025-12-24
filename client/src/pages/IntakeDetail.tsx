@@ -26,7 +26,8 @@ import {
   RefreshCw,
   CreditCard,
   Clock,
-  Link as LinkIcon
+  Link as LinkIcon,
+  Zap
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Link, useParams, useLocation } from "wouter";
@@ -334,6 +335,19 @@ export default function IntakeDetail() {
               )}
             </div>
           </div>
+
+          {/* Auto-Advanced Banner */}
+          {(intake as any).rawPayload?.autoAdvanced && (
+            <div className="flex items-center gap-3 p-4 rounded-lg bg-cyan-500/10 border border-cyan-500/30">
+              <Zap className="w-5 h-5 text-cyan-400" />
+              <div>
+                <p className="text-cyan-400 font-medium">This intake was auto-advanced</p>
+                <p className="text-cyan-400/70 text-sm">
+                  LaunchBase prepared the preview automatically after no admin action to prevent customer delays.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Status Stepper */}
           <Card className="bg-white/5 border-white/10">

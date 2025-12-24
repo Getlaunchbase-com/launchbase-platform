@@ -763,3 +763,140 @@ export const workerRuns = mysqlTable("worker_runs", {
 });
 export type WorkerRun = typeof workerRuns.$inferSelect;
 export type InsertWorkerRun = typeof workerRuns.$inferInsert;
+
+
+/**
+ * LaunchBase Rule:
+ * We prepare first.
+ * We automate second.
+ * We always show our work.
+ */
+
+/**
+ * Integration Setup Packets - Pre-generated setup data for external integrations
+ * Each packet contains everything needed to set up an integration (Google, Meta, QuickBooks)
+ * Packets are deterministic and versioned for reproducibility
+ */
+export const integrationSetupPackets = mysqlTable("integration_setup_packets", {
+  id: int("id").autoincrement().primaryKey(),
+  // Customer/account identification
+  customerId: int("customerId"), // Links to user if logged in
+  intakeId: int("intakeId"), // Links to intake
+  suiteApplicationId: int("suiteApplicationId"), // Links to suite_application if created before intake
+  // Source tracking
+  sourceType: mysqlEnum("sourceType", ["suite_application", "intake"]).notNull(),
+  // Integration type
+  integration: mysqlEnum("integration", ["google_business", "meta", "quickbooks"]).notNull(),
+  // Status workflow
+  status: mysqlEnum("status", ["ready", "in_progress", "connected", "blocked"]).default("ready").notNull(),
+  // Version tracking for reproducibility
+  packetVersion: varchar("packetVersion", { length: 16 }).default("v1.0.0").notNull(),
+  // The actual packet data (JSON)
+  packetJson: json("packetJson").$type<{
+    integration: string;
+    business: {
+      name: string;
+      phone: string;
+      website: string;
+      address: string;
+      serviceArea: string;
+      hours: Record<string, string>;
+    };
+    positioning: {
+      tone: "professional" | "friendly" | "direct";
+      primaryCta: string;
+      oneLiner: string;
+    };
+    services: Array<{
+      name: string;
+      description: string;
+      priceHint: string;
+    }>;
+    assetsNeeded: Array<{
+      item: string;
+      priority: "high" | "medium" | "low";
+      note: string;
+    }>;
+    setupSteps: Array<{
+      step: number;
+      title: string;
+      instructions: string;
+      deepLink?: string;
+    }>;
+    // Integration-specific fields
+    googleBusiness?: {
+      primaryCategory: string;
+      secondaryCategories: string[];
+      shortDescription: string;
+      longDescription: string;
+      servicesFormatted: string[];
+      suggestedPhotos: string[];
+      reviewRequestTemplate: string;
+    };
+    meta?: {
+      pageBio: string;
+      aboutText: string;
+      ctaButton: { text: string; url: string };
+      starterPosts: Array<{ content: string; type: string }>;
+      hashtags: string[];
+      coverPhotoGuidance: string;
+    };
+    quickbooks?: {
+      customerTypeTags: string[];
+      serviceItems: Array<{ name: string; slug: string; rate: number }>;
+      invoiceDefaults: { terms: string; depositRules: string; lateFeePolicy: string };
+      estimateTemplateNotes: string;
+      paymentMethodsRecommended: string[];
+    };
+  }>().notNull(),
+  // Snapshot of inputs used to generate this packet (for debugging/regeneration)
+  generatedFrom: json("generatedFrom").$type<{
+    businessName: string;
+    services: string[];
+    location: string;
+    tone: string;
+    vertical: string;
+    generatedAt: string;
+  }>(),
+  // Tracking timestamps
+  lastOpenedAt: timestamp("lastOpenedAt"),
+  connectedAt: timestamp("connectedAt"),
+  // Internal notes
+  notes: text("notes"),
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type IntegrationSetupPacket = typeof integrationSetupPackets.$inferSelect;
+export type InsertIntegrationSetupPacket = typeof integrationSetupPackets.$inferInsert;
+
+/**
+ * Integration Connections - Tracks OAuth connections to external services
+ * Separate from packets because connection state is independent of packet readiness
+ */
+export const integrationConnections = mysqlTable("integration_connections", {
+  id: int("id").autoincrement().primaryKey(),
+  customerId: int("customerId").notNull(),
+  // Integration type
+  integration: mysqlEnum("integration", ["google_business", "meta", "quickbooks"]).notNull(),
+  // Connection status
+  connectionStatus: mysqlEnum("connectionStatus", ["not_connected", "connected", "error"]).default("not_connected").notNull(),
+  // External account identifiers
+  externalAccountId: varchar("externalAccountId", { length: 255 }), // Page ID, QBO realmId, etc.
+  externalAccountName: varchar("externalAccountName", { length: 255 }), // Display name
+  // OAuth tokens (encrypted in production)
+  accessToken: text("accessToken"),
+  refreshToken: text("refreshToken"),
+  tokenExpiresAt: timestamp("tokenExpiresAt"),
+  // Sync tracking
+  lastSyncAt: timestamp("lastSyncAt"),
+  lastSyncStatus: mysqlEnum("lastSyncStatus", ["success", "partial", "failed"]),
+  lastSyncError: text("lastSyncError"),
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type IntegrationConnection = typeof integrationConnections.$inferSelect;
+export type InsertIntegrationConnection = typeof integrationConnections.$inferInsert;

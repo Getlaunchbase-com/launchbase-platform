@@ -9,6 +9,7 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { handleStripeWebhook } from "../stripe/webhook";
 import { handleDeploymentWorker } from "../worker/deploymentWorker";
+import { handleAutoAdvanceWorker } from "../worker/autoAdvanceWorker";
 import { logReferralEvent } from "../referral";
 import { getDb } from "../db";
 import { deployments } from "../../drizzle/schema";
@@ -43,6 +44,10 @@ async function startServer() {
   
   // Deployment worker endpoint (protected by token)
   app.post("/api/worker/run-next-deploy", express.json(), handleDeploymentWorker);
+  
+  // Auto-advance worker endpoint (protected by token)
+  // Automatically advances stuck suite applications after delay
+  app.post("/api/worker/auto-advance", express.json(), handleAutoAdvanceWorker);
 
   // Referral redirect endpoint: /r/{siteSlug}
   // Logs badge click and redirects to homepage with UTM params
