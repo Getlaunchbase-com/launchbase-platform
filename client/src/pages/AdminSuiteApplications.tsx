@@ -505,10 +505,22 @@ export default function AdminSuiteApplications() {
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <Badge className={`${status.color} border text-xs`}>
-                          {status.icon}
-                          <span className="ml-1">{status.label}</span>
-                        </Badge>
+                        <div className="flex flex-col gap-1">
+                          <Badge className={`${status.color} border text-xs`}>
+                            {status.icon}
+                            <span className="ml-1">{status.label}</span>
+                          </Badge>
+                          {app.adminNotes?.includes("Auto-advanced") && (
+                            <Badge 
+                              variant="outline" 
+                              className="border-cyan-500/30 text-cyan-400 text-[10px] px-1.5 py-0"
+                              title="LaunchBase prepared the preview automatically after no admin action"
+                            >
+                              <Zap className="w-3 h-3 mr-0.5" />
+                              Auto-advanced
+                            </Badge>
+                          )}
+                        </div>
                       </td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-2">

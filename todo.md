@@ -976,3 +976,201 @@
 - [x] Fix CustomerPreview to sync isApproved state with database status
 - [ ] Set up launchbase.dev email domain in Resend for customer emails
 - [ ] Verify DNS records for email delivery
+
+
+## Setup & Integrations Page (Setup Packet System)
+
+### Phase 1: UI Skeleton
+- [ ] Create /expand/integrations page with three integration cards
+- [ ] Google Business Profile card (Ready/In Progress/Connected states)
+- [ ] Facebook & Instagram card (Ready/In Progress/Connected states)
+- [ ] QuickBooks Online card (Ready/In Progress/Connected states)
+- [ ] Add navigation from Expand LaunchBase page
+
+### Phase 2: Setup Packet Generator
+- [ ] Create generateSetupPacket() function
+- [ ] Generate copy blocks from business data
+- [ ] Generate service lists
+- [ ] Generate AI-written descriptions
+- [ ] Add one-click copy buttons
+- [ ] Add downloadable PDF/ZIP packet
+
+### Phase 3: Integration-Specific Content
+- [ ] Google Business Profile: name, address, hours, description, categories, photos
+- [ ] Meta Business Suite: page bio, CTA, about section, pinned post, images
+- [ ] QuickBooks Online: customer types, service items, invoice templates, payment terms
+
+### Phase 4: OAuth (Future)
+- [ ] QuickBooks OAuth integration
+- [ ] Meta/Facebook OAuth integration
+- [ ] Google Ads suggestions (not execution)
+
+
+## Setup & Integrations System (Prepared Intelligence)
+
+> Philosophy: "LaunchBase prepares everything first — then you decide how much you want automated."
+> Rule: We prepare first. We automate second. We always show our work.
+
+### Step 1: /expand/integrations Page UI
+- [ ] Create /expand/integrations route
+- [ ] Three integration cards (Google Business Profile, Meta, QuickBooks)
+- [ ] Card states: Ready → In Progress → Connected
+- [ ] "View Setup Packet" button (works without OAuth)
+- [ ] Status badges for each state
+- [ ] "What's included" preview (3-4 bullets per card)
+- [ ] Primary CTA: "View Setup Packet" or "Connect Account"
+- [ ] Secondary CTA: "Learn more"
+- [ ] Link from ExpandLaunchBase page
+
+### Step 2: Setup Packet Generator (Backend) - DETAILED SPEC
+
+#### Database Schema
+- [x] Create integration_setup_packets table
+  - id, customer_id, intake_id, source_type, integration, status, packet_version
+  - packet_json (jsonb), generated_from (jsonb), created_at, updated_at
+  - last_opened_at, connected_at, notes
+- [x] Create integration_connections table
+  - id, customer_id, integration, connection_status, external_account_id, last_sync_at
+
+#### Packet JSON Schema (Common Base)
+- [x] business: name, phone, website, address, service_area, hours
+- [x] positioning: tone, primary_cta, one_liner
+- [x] services: name, description, price_hint
+- [x] assets_needed: item, priority, note
+- [x] setup_steps: step, title, instructions
+
+#### Generation Rules
+- [x] Deterministic by default (no creative randomness)
+- [x] If AI used, strict formatting and stored as output
+- [x] Always produce something (placeholders + assets_needed if missing data)
+- [x] status = blocked only if truly impossible
+
+#### tRPC Endpoints
+- [x] setupPackets.generate (intakeId)
+- [x] setupPackets.getForIntake (intakeId)
+- [x] setupPackets.getByType (intakeId, integration)
+- [x] setupPackets.markInProgress (intakeId, integration)
+- [x] setupPackets.markConnected (intakeId, integration)
+
+#### Auto-Triggers
+- [ ] On Admin "Approve & Create Intake" → generate 3 packets (Google, Meta, QB)
+- [ ] On Intake "ready_for_review" → refresh packets if build plan changed
+
+#### Acceptance Criteria
+- [x] Creating intake auto-creates 3 packets within 2 seconds
+- [x] Packets contain: business identity, services, CTA/tone, integration-specific steps
+- [x] Missing inputs produce placeholders + assets_needed
+- [x] Packet is versioned and re-generatable safely
+- [x] No customer can access another customer's packet (protected procedures)
+
+#### Integration-Specific Content:
+
+#### Google Business Profile Packet
+- [ ] Business name (formatted)
+- [ ] Address (formatted for GBP)
+- [ ] Business hours (GBP format)
+- [ ] AI-written description (compliant, 750 char)
+- [ ] Primary + secondary categories
+- [ ] Service list with descriptions
+- [ ] Photos/logos bundle paths
+- [ ] Review reply templates (5 templates)
+- [ ] Deep links to GBP setup screens
+
+#### Meta Business Suite Packet (Facebook/Instagram)
+- [ ] Page bio (160 char)
+- [ ] CTA button text + URL
+- [ ] About section (full)
+- [ ] Initial pinned post copy
+- [ ] Profile image specs + path
+- [ ] Cover image specs + path
+- [ ] Posting tone + cadence notes
+- [ ] First week content calendar
+- [ ] Deep links to Meta Business setup
+
+#### QuickBooks Online Packet
+- [ ] Customer types list
+- [ ] Service items with prices
+- [ ] Invoice template defaults
+- [ ] Payment terms (Net 30, etc.)
+- [ ] Chart of accounts starter
+- [ ] Tax categories mapping
+- [ ] Deep links to QBO setup screens
+
+### Step 3: Auto-Generate Packets on Approval
+- [ ] Trigger packet generation when intake approved
+- [ ] Store packets in database (setup_packets table?)
+- [ ] Customer sees "Ready" state immediately after approval
+- [ ] Packet available even without OAuth connection
+
+### Step 4: Setup Packet Viewer UI
+- [ ] Modal or page to view full packet
+- [ ] One-click copy buttons for every field
+- [ ] Downloadable PDF version
+- [ ] Downloadable ZIP with all assets
+- [ ] Human checklist ("5 minutes if you follow this order")
+- [ ] Direct deep links to correct setup screens
+
+### Step 5: OAuth Integration (Future - Not Now)
+- [ ] QuickBooks OAuth (customers + items sync)
+- [ ] Meta OAuth (posting)
+- [ ] Google Ads suggestions (not execution)
+- [ ] OAuth reads from packet (never guesses)
+
+### Backlog: External Services Setup
+- [ ] Set up launchbase.dev email domain in Resend
+- [ ] Verify DNS records for email delivery
+- [ ] Facebook API integration for auto-posting
+- [ ] Google Business Profile API
+- [ ] QuickBooks API integration
+
+
+## 72-Hour No-Regret Plan (Dec 25, 2024)
+
+### P0: Auto-Advance Safety Net (HIGHEST PRIORITY)
+> Goal: No customer can ever get stuck after submitting onboarding
+
+#### Trigger Condition
+- [ ] suite_application.status === "submitted" AND intake_id IS NULL AND created_at < now() - 5 min
+
+#### Auto-Advance Actions
+- [x] Create intake (source: suite_application, status: review, autoAdvanced: true)
+- [x] Generate build plan
+- [x] Generate preview token
+- [ ] Send preview email ("Your site preview is ready") - requires email domain setup
+- [x] Log decision: auto_advance_triggered (via console + notifyOwner)
+
+#### Admin UI
+- [x] Badge: "Auto-advanced" on suite applications table
+- [x] Tooltip: "LaunchBase prepared the preview automatically after no admin action"
+- [x] Intake detail banner: "This intake was auto-advanced to prevent delays"
+
+#### Safety Rules (Non-Negotiable)
+- [ ] Auto-advance never skips preview
+- [ ] Auto-advance never deploys
+- [ ] Auto-advance never charges
+- [ ] Customer approval always required
+- [ ] Admin can still intervene at any point
+
+#### Test Cases
+- [ ] Admin does nothing → preview sent automatically
+- [ ] Admin acts before delay → auto-advance does NOT fire
+- [ ] Customer receives preview email
+- [ ] Observability shows auto-advance event
+- [ ] No duplicate intakes created
+- [ ] Idempotent if cron runs twice
+
+### P1: Multi-Trade Support
+- [ ] Change trades from string to trades: string[]
+- [ ] Add primary_trade: string
+- [ ] Max 3 trades allowed
+- [ ] Primary drives tone + industry profile
+
+### P2: Finish Setup Packets
+- [ ] Complete Google Business Profile packet generator
+- [ ] Complete Meta (Facebook/Instagram) packet generator
+- [ ] Complete QuickBooks Online packet generator
+
+### P3: Customer Control - Relevance Bias
+- [ ] Add single slider: Conservative ← Balanced → Opportunistic
+- [ ] Adjusts thresholds internally
+- [ ] Never touches safety rules
