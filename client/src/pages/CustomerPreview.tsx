@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -74,6 +74,17 @@ export default function CustomerPreview() {
     { token: token || "" },
     { enabled: !!token }
   );
+
+  // Sync local state with database status when intake loads
+  useEffect(() => {
+    if (intake) {
+      // If intake is already approved in database, update local state
+      if (intake.status === "approved") {
+        setIsApproved(true);
+        setCurrentStep("activate");
+      }
+    }
+  }, [intake]);
 
   // Log approval event
   const logApprovalMutation = trpc.intake.logApproval.useMutation();
@@ -179,7 +190,8 @@ export default function CustomerPreview() {
   }
 
   const isReadyForReview = intake.status === "ready_for_review";
-  const isPaid = intake.status === "paid" || intake.status === "deployed";
+  // Check if actually paid (has paidAt timestamp), not just status
+  const isPaid = intake.paidAt !== null && intake.paidAt !== undefined;
 
   return (
     <div className="min-h-screen bg-background">
