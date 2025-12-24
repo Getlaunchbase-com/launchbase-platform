@@ -937,3 +937,42 @@
 - [x] Add "Copy Preview Link" button for easy sharing
 - [x] Log email sends in email_logs table for audit trail
 - [x] Add unit tests for resend preview email functionality
+
+
+## CRITICAL BUGS - Payment Flow 100% Broken (Dec 24)
+- [ ] BUG: Preview page shows "Payment Confirmed" for deployed status even when no payment was made
+- [ ] BUG: Customer preview email not being received (Resend delivery issue)
+- [ ] BUG: Preview page not showing actual website preview with Approve & Pay button
+- [ ] BUG: Status can be manually set to deployed without payment (bypasses entire flow)
+- [ ] FIX: Preview page must check intake.status and show correct UI for each state
+- [ ] FIX: Test Stripe checkout end-to-end
+- [ ] FIX: Verify Resend email delivery is working
+
+
+## CRITICAL: Auto-Intake Flow (Dec 24)
+- [ ] Save Larre Lannert - create intake for stuck suite_application ID 90001
+- [ ] Make suiteApply.submit auto-create intake immediately
+- [ ] Auto-generate preview token on submit
+- [ ] Auto-send preview email on submit
+- [ ] Test complete automatic flow end-to-end
+- [ ] Add owner notification when new applications come in
+
+
+## Backlog: External Services Setup
+- [ ] Set up launchbase.dev email domain in Resend
+- [ ] Verify DNS records for email delivery
+- [ ] Create hello@launchbase.dev sender
+- [ ] Set up Facebook Page for automated posting
+- [ ] Add META_PAGE_ID secret
+- [ ] Add META_PAGE_ACCESS_TOKEN secret
+- [ ] Test Facebook posting endpoint
+
+
+## CRITICAL FIX: Auto-Intake Flow (Dec 24, 2024)
+
+- [x] Auto-create intake when suite application is submitted (no manual admin step)
+- [x] Send owner notification on new application via Manus notification service
+- [x] Save Larre's stuck application (intake_id: 120001, preview token generated)
+- [x] Fix CustomerPreview to sync isApproved state with database status
+- [ ] Set up launchbase.dev email domain in Resend for customer emails
+- [ ] Verify DNS records for email delivery

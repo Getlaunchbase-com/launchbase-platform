@@ -37,6 +37,7 @@ import { postToFacebook, testFacebookConnection } from "./services/facebook-post
 import { getTopReferringSites, getConversionFunnel, get7DayClicks, logReferralEvent } from "./referral";
 import { getLastWorkerRun } from "./worker/deploymentWorker";
 import { getObservabilityData, formatTimeAgo } from "./observability";
+import { notifyOwner } from "./_core/notification";
 
 // Generate a hash of the build plan for version locking
 function generateBuildPlanHash(buildPlan: { id: number; plan: unknown }): string {
@@ -1590,11 +1591,57 @@ export const appRouter = router({
         const db = await getDb();
         if (!db) throw new Error("Database not available");
 
-        // Generate preview token
+        // Generate preview token for intake
         const crypto = await import("crypto");
-        const previewToken = crypto.randomBytes(18).toString("hex");
+        const intakePreviewToken = `preview_${Date.now()}_${crypto.randomBytes(8).toString("hex")}`;
+        const suitePreviewToken = crypto.randomBytes(18).toString("hex");
 
-        // Insert application
+        // Map suite vertical to intake vertical
+        const verticalMap: Record<string, "trades" | "appointments" | "professional"> = {
+          trades: "trades",
+          health: "appointments",
+          beauty: "appointments",
+          food: "trades",
+          cannabis: "trades",
+          professional: "professional",
+          fitness: "appointments",
+          automotive: "trades",
+        };
+        const intakeVertical = verticalMap[input.vertical] || "trades";
+
+        // AUTO-CREATE INTAKE IMMEDIATELY
+        // This ensures customer gets their preview without waiting for admin
+        const intake = await createIntake({
+          businessName: input.contact.name, // Use contact name as business name initially
+          contactName: input.contact.name,
+          email: input.contact.email,
+          phone: input.contact.phone,
+          vertical: intakeVertical,
+          services: input.industry ? [input.industry.replace(/_/g, " ")] : [],
+          serviceArea: [input.location.cityZip],
+          primaryCTA: "call",
+          rawPayload: {
+            source: "suite_application",
+            language: input.language,
+            cadence: input.module.cadence,
+            mode: input.module.mode,
+            layers: input.module.layers,
+            pricing: input.pricing,
+            startTiming: input.startTiming,
+          },
+        }, "review");
+
+        if (!intake) throw new Error("Failed to create intake");
+
+        // Update intake with preview token and set to ready_for_review
+        await db.update(intakes)
+          .set({ 
+            status: "ready_for_review", 
+            previewToken: intakePreviewToken 
+          })
+          .where(eq(intakes.id, intake.id));
+
+        // Insert suite application with intake reference
         const [row] = await db.insert(suiteApplications).values({
           contactName: input.contact.name,
           contactEmail: input.contact.email,
@@ -1609,15 +1656,44 @@ export const appRouter = router({
           layers: input.module.layers,
           pricing: input.pricing,
           startTiming: input.startTiming,
-          status: "submitted",
-          previewToken,
+          status: "approved", // Auto-approved since intake is created
+          previewToken: suitePreviewToken,
+          intakeId: intake.id,
         }).$returningId();
+
+        // Send preview email to customer immediately
+        try {
+          await sendEmail(
+            intake.id,
+            "ready_for_review",
+            {
+              firstName: input.contact.name.split(" ")[0],
+              businessName: input.contact.name,
+              email: input.contact.email,
+              previewUrl: `/preview/${intakePreviewToken}`,
+            }
+          );
+        } catch (emailErr) {
+          // Log but don't fail - customer can still access via success page
+          console.error("[SuiteApply] Failed to send preview email:", emailErr);
+        }
+
+        // Notify owner of new application
+        try {
+          await notifyOwner({
+            title: "New LaunchBase Application",
+            content: `${input.contact.name} (${input.contact.email}) just submitted an application.\n\nBusiness: ${input.industry || input.vertical}\nLocation: ${input.location.cityZip}\nCadence: ${input.module.cadence}\nMonthly: $${input.pricing.monthlyTotal}/mo\nSetup: $${input.pricing.setupFee}\n\nPreview: /preview/${intakePreviewToken}`,
+          });
+        } catch (notifyErr) {
+          console.error("[SuiteApply] Failed to notify owner:", notifyErr);
+        }
 
         // Track analytics
         await trackEvent({
           eventName: "suite_application_submitted",
           metadata: {
             applicationId: row.id,
+            intakeId: intake.id,
             vertical: input.vertical,
             industry: input.industry,
             language: input.language,
@@ -1631,7 +1707,8 @@ export const appRouter = router({
 
         return {
           applicationId: row.id,
-          previewToken,
+          intakeId: intake.id,
+          previewToken: intakePreviewToken,
         };
       }),
 

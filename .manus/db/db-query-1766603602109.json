@@ -1,0 +1,50 @@
+{
+  "query": "SELECT id, businessName, email, status, previewToken, previewUrl, paidAt, createdAt FROM intakes ORDER BY id DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT id, businessName, email, status, previewToken, previewUrl, paidAt, createdAt FROM intakes ORDER BY id DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "90001",
+      "businessName": "E2E Test Landscaping",
+      "email": "e2etest@launchbase.dev",
+      "status": "deployed",
+      "previewToken": "preview_1766528944486_ry0av8xx0ps",
+      "previewUrl": "NULL",
+      "paidAt": "2025-12-23 23:17:37",
+      "createdAt": "2025-12-23 22:27:21"
+    },
+    {
+      "id": "60001",
+      "businessName": "Larry cabinets",
+      "email": "vmorre@live.com",
+      "status": "approved",
+      "previewToken": "preview_1766495914228_biavdzdicho",
+      "previewUrl": "NULL",
+      "paidAt": "NULL",
+      "createdAt": "2025-12-23 13:18:34"
+    },
+    {
+      "id": "30001",
+      "businessName": "Larry's cabinets",
+      "email": "test@smoketest.com",
+      "status": "approved",
+      "previewToken": "preview_1766439529100_6p1kuew36tw",
+      "previewUrl": "NULL",
+      "paidAt": "NULL",
+      "createdAt": "2025-12-22 21:38:49"
+    },
+    {
+      "id": "1",
+      "businessName": "Vinces snow plow",
+      "email": "vmorre@live.com.com",
+      "status": "deployed",
+      "previewToken": "NULL",
+      "previewUrl": "NULL",
+      "paidAt": "NULL",
+      "createdAt": "2025-12-20 00:11:39"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tbusinessName\temail\tstatus\tpreviewToken\tpreviewUrl\tpaidAt\tcreatedAt\n90001\tE2E Test Landscaping\te2etest@launchbase.dev\tdeployed\tpreview_1766528944486_ry0av8xx0ps\tNULL\t2025-12-23 23:17:37\t2025-12-23 22:27:21\n60001\tLarry cabinets\tvmorre@live.com\tapproved\tpreview_1766495914228_biavdzdicho\tNULL\tNULL\t2025-12-23 13:18:34\n30001\tLarry's cabinets\ttest@smoketest.com\tapproved\tpreview_1766439529100_6p1kuew36tw\tNULL\tNULL\t2025-12-22 21:38:49\n1\tVinces snow plow\tvmorre@live.com.com\tdeployed\tNULL\tNULL\tNULL\t2025-12-20 00:11:39\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}
