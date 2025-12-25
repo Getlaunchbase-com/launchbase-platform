@@ -2202,9 +2202,222 @@ export const appRouter = router({
         externalAccountId: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
-        // For now, just log the action - in future, store in DB
         console.log(`[SetupPacket] ${ctx.user?.email} marked ${input.integration} as connected for intake ${input.intakeId}`);
         return { success: true, status: "connected", connectedAt: new Date() };
+      }),
+
+    // Get full checklist using the engine
+    getChecklist: protectedProcedure
+      .input(z.object({
+        intakeId: z.number(),
+      }))
+      .query(async ({ input }) => {
+        const engine = await import("./services/checklistEngine");
+        const intake = await getIntakeById(input.intakeId);
+        
+        if (!intake) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Intake not found" });
+        }
+
+        const ctx = {
+          intakeId: intake.id,
+          businessName: intake.businessName,
+          zip: undefined,
+          trades: [] as string[],
+          primaryTrade: intake.vertical,
+          phone: intake.phone || undefined,
+          email: intake.email,
+          services: intake.services || [],
+          serviceArea: intake.serviceArea || [],
+          tagline: intake.tagline || undefined,
+          tone: "balanced" as const,
+        };
+
+        const checklist = engine.computeChecklist(ctx);
+        return checklist;
+      }),
+
+    // Recompute checklist with diff summary
+    recompute: protectedProcedure
+      .input(z.object({
+        intakeId: z.number(),
+        mode: z.enum(["safe", "full"]).optional().default("safe"),
+      }))
+      .mutation(async ({ input }) => {
+        const engine = await import("./services/checklistEngine");
+        const intake = await getIntakeById(input.intakeId);
+        
+        if (!intake) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Intake not found" });
+        }
+
+        const ctx = {
+          intakeId: intake.id,
+          businessName: intake.businessName,
+          zip: undefined,
+          trades: [] as string[],
+          primaryTrade: intake.vertical,
+          phone: intake.phone || undefined,
+          email: intake.email,
+          services: intake.services || [],
+          serviceArea: intake.serviceArea || [],
+          tagline: intake.tagline || undefined,
+          tone: "balanced" as const,
+        };
+
+        // For now, compute fresh (no existing checklist persistence yet)
+        const before = null;
+        const after = engine.computeChecklist(ctx, before || undefined);
+        const diff = engine.diffChecklists(before, after);
+
+        return {
+          success: true,
+          checklist: after,
+          diff,
+        };
+      }),
+
+    // Complete a step
+    completeStep: protectedProcedure
+      .input(z.object({
+        intakeId: z.number(),
+        stepId: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const engine = await import("./services/checklistEngine");
+        const intake = await getIntakeById(input.intakeId);
+        
+        if (!intake) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Intake not found" });
+        }
+
+        const businessCtx = {
+          intakeId: intake.id,
+          businessName: intake.businessName,
+          zip: undefined,
+          trades: [] as string[],
+          primaryTrade: intake.vertical,
+          phone: intake.phone || undefined,
+          email: intake.email,
+          services: intake.services || [],
+          serviceArea: intake.serviceArea || [],
+          tagline: intake.tagline || undefined,
+          tone: "balanced" as const,
+        };
+
+        let checklist = engine.computeChecklist(businessCtx);
+        checklist = engine.completeStep(checklist, input.stepId, ctx.user ? "customer" : "system");
+
+        console.log(`[Checklist] Step ${input.stepId} completed for intake ${input.intakeId}`);
+        return { success: true, checklist };
+      }),
+
+    // Reset a step
+    resetStep: protectedProcedure
+      .input(z.object({
+        intakeId: z.number(),
+        stepId: z.string(),
+        cascade: z.boolean().optional().default(false),
+        reason: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const engine = await import("./services/checklistEngine");
+        const intake = await getIntakeById(input.intakeId);
+        
+        if (!intake) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Intake not found" });
+        }
+
+        const businessCtx = {
+          intakeId: intake.id,
+          businessName: intake.businessName,
+          zip: undefined,
+          trades: [] as string[],
+          primaryTrade: intake.vertical,
+          phone: intake.phone || undefined,
+          email: intake.email,
+          services: intake.services || [],
+          serviceArea: intake.serviceArea || [],
+          tagline: intake.tagline || undefined,
+          tone: "balanced" as const,
+        };
+
+        let checklist = engine.computeChecklist(businessCtx);
+        checklist = engine.resetStep(checklist, input.stepId, input.cascade);
+
+        console.log(`[Checklist] Step ${input.stepId} reset for intake ${input.intakeId} (cascade: ${input.cascade}, reason: ${input.reason || "none"})`);
+        return { success: true, checklist };
+      }),
+
+    // Lock a field
+    lockField: protectedProcedure
+      .input(z.object({
+        intakeId: z.number(),
+        fieldKey: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const engine = await import("./services/checklistEngine");
+        const intake = await getIntakeById(input.intakeId);
+        
+        if (!intake) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Intake not found" });
+        }
+
+        const businessCtx = {
+          intakeId: intake.id,
+          businessName: intake.businessName,
+          zip: undefined,
+          trades: [] as string[],
+          primaryTrade: intake.vertical,
+          phone: intake.phone || undefined,
+          email: intake.email,
+          services: intake.services || [],
+          serviceArea: intake.serviceArea || [],
+          tagline: intake.tagline || undefined,
+          tone: "balanced" as const,
+        };
+
+        let checklist = engine.computeChecklist(businessCtx);
+        checklist = engine.lockField(checklist, input.fieldKey, ctx.user ? "customer" : "system");
+
+        console.log(`[Checklist] Field ${input.fieldKey} locked for intake ${input.intakeId}`);
+        return { success: true, checklist };
+      }),
+
+    // Update a field value (auto-locks)
+    updateField: protectedProcedure
+      .input(z.object({
+        intakeId: z.number(),
+        fieldKey: z.string(),
+        value: z.any(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const engine = await import("./services/checklistEngine");
+        const intake = await getIntakeById(input.intakeId);
+        
+        if (!intake) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Intake not found" });
+        }
+
+        const businessCtx = {
+          intakeId: intake.id,
+          businessName: intake.businessName,
+          zip: undefined,
+          trades: [] as string[],
+          primaryTrade: intake.vertical,
+          phone: intake.phone || undefined,
+          email: intake.email,
+          services: intake.services || [],
+          serviceArea: intake.serviceArea || [],
+          tagline: intake.tagline || undefined,
+          tone: "balanced" as const,
+        };
+
+        let checklist = engine.computeChecklist(businessCtx);
+        checklist = engine.updateFieldValue(checklist, input.fieldKey, input.value, ctx.user ? "customer" : "admin");
+
+        console.log(`[Checklist] Field ${input.fieldKey} updated for intake ${input.intakeId}`);
+        return { success: true, checklist };
       }),
   }),
 });

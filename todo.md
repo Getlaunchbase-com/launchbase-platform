@@ -1266,3 +1266,42 @@
 - [ ] Step 6: Season-aware content (seasonContext object, adjust descriptions)
 - [ ] Step 7: UI polish (Refresh button, Reset menu, Blocker panel, tooltips, Copy All, ZIP)
 - [ ] Step 8: Observability hooks (CHECKLIST_RECOMPUTE_RUN, CHECKLIST_STEP_RESET, BLOCKER_RESOLVED)
+
+
+## Session Dec 25, 2025 - Checklist Engine Built
+
+### Backend Complete
+- [x] checklistEngine.ts service file (700+ lines)
+- [x] EvidencedField with confidence, source, version
+- [x] Lock semantics (isLocked, lockedBy, lockedAt)
+- [x] Evidence strings for AI tooltip
+- [x] Blocker structure (code, message, fix, severity)
+- [x] Step structure (stepId, prereqs, validation, status)
+- [x] Step statuses: ready, complete, skipped, blocked
+- [x] completedAt/completedBy tracking
+- [x] getChecklist endpoint
+- [x] completeStep endpoint (idempotent)
+- [x] resetStep endpoint (with cascade option)
+- [x] recompute endpoint (safe/full mode)
+- [x] Diff summary returns (updatedFields, blockersAdded, etc.)
+- [x] Don't overwrite locked fields
+- [x] lockField endpoint
+- [x] updateField endpoint (auto-locks)
+- [x] Guardrails: GBP 750 char limit
+- [x] Guardrails: Meta 255 bio limit
+- [x] Season-aware content detection
+
+### Tested
+- [x] Generates 19 steps across Google, Meta, QuickBooks
+- [x] Generates 18 fields with evidence
+- [x] All fields populated correctly from business context
+
+### UI Still Needed
+- [ ] Refresh button
+- [ ] Reset step menu
+- [ ] Last computed timestamp
+- [ ] Blocker display with Fix
+- [ ] AI tooltip (evidence)
+- [ ] Next step CTA
+- [ ] Copy All button
+- [ ] ZIP download
