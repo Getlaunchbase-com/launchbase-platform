@@ -1305,3 +1305,30 @@
 - [ ] Next step CTA
 - [ ] Copy All button
 - [ ] ZIP download
+
+
+## Autofill UI - Make It Magical (from paste)
+
+### Card-Level Summary (per platform)
+- [x] Status badge: Ready / In progress / Connected / Needs attention
+- [x] Progress bar: completedSteps / totalSteps
+- [x] Top blocker display: "Meta token missing — Connect to continue"
+- [x] Dynamic CTA: Fix to continue / Start setup / Continue / View details
+
+### Three Money-Maker UI Actions
+- [x] Refresh button → calls recompute → toast shows diff ("Updated 12 fields, Skipped 3 locked")
+- [x] Field rows with evidence tooltip (label, value, confidence pill, source/evidence/version)
+- [x] Lock icon on locked fields + "Unlock to update" action
+- [x] Step checklist with status icons + "Mark complete" checkbox
+
+### Copy All & Download
+- [x] Copy All button per platform (copies effective values, respects locks)
+- [ ] Download button per platform
+- [ ] All platforms ZIP button
+
+### Smart UX Tweaks
+- [ ] Required vs Optional field grouping (top 5 things first)
+- [ ] Fix-first navigation (auto-scroll to blocked step)
+
+### Layout
+- [x] Step-first design (tasks) with fields embedded under each step
