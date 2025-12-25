@@ -1,11 +1,15 @@
 # LaunchBase TODO
 
-## Session Dec 24, 2025 - Fixes Applied
+## Session Dec 24, 2025 - All Missing Features Completed
 - [x] Fixed WORKER_TOKEN for cron authentication
 - [x] Built Setup Packets UI (/expand/integrations)
 - [x] Fixed Larre's missing build plan (intake 120001)
 - [x] Tested complete customer flow (Apply → Preview → Approve → Checkout)
 - [x] Verified Stripe checkout works ($499)
+- [x] Multi-trade support (trades[] and primaryTrade columns added)
+- [x] Setup packet database persistence (markInProgress, markConnected, getStatus endpoints)
+- [x] Relevance bias slider in Custom mode (Conservative/Balanced/Opportunistic)
+- [x] Setup packet download (markdown format, uploads to S3)
 - [ ] Email Larre manually (Resend blocked)
 - [ ] Verify Resend domain DNS
 - [ ] Test Stripe webhook with real payment
@@ -1186,3 +1190,13 @@
 - [ ] Add single slider: Conservative ← Balanced → Opportunistic
 - [ ] Adjusts thresholds internally
 - [ ] Never touches safety rules
+
+
+## Session Dec 24, 2025 - Complete Missing Features (from 7 pastes)
+
+- [ ] Multi-trade support (trades[] instead of single trade)
+- [ ] Setup packet database persistence with status tracking
+- [ ] markInProgress / markConnected endpoints
+- [ ] Relevance bias slider (Conservative ← Balanced → Opportunistic)
+- [ ] PDF download for setup packets
+- [ ] Test all features end-to-end

@@ -217,6 +217,7 @@ export default function ExpandLaunchBase() {
   const [showSafetyRules, setShowSafetyRules] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [showBillingDetails, setShowBillingDetails] = useState(false);
+  const [relevanceBias, setRelevanceBias] = useState<"conservative" | "balanced" | "opportunistic">("balanced");
   const [vertical] = useState("trades"); // Would come from user's intake
 
   // tRPC queries
@@ -501,6 +502,50 @@ export default function ExpandLaunchBase() {
                     <p className="text-[11px] text-[#8B8B92] leading-relaxed mt-1">
                       <span className="text-zinc-500">—</span> {autoExplanation.excluded}
                     </p>
+                  </div>
+                )}
+
+                {/* Relevance Bias Slider - Only shown in Custom mode */}
+                {tuningMode === "custom" && (
+                  <div className="mt-4 p-4 rounded-lg bg-[#111113] border border-white/[0.04]">
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <p className="text-[13px] font-medium text-white">Relevance Bias</p>
+                        <p className="text-[11px] text-[#8B8B92]">How aggressively should LaunchBase post?</p>
+                      </div>
+                      <Badge variant="outline" className="text-[10px] bg-[#FF6A00]/10 text-[#FF6A00] border-[#FF6A00]/20 capitalize">
+                        {relevanceBias}
+                      </Badge>
+                    </div>
+                    <div className="mb-4">
+                      <div className="flex justify-between mb-2">
+                        <span className={`text-[11px] ${relevanceBias === 'conservative' ? 'text-[#FF6A00]' : 'text-[#8B8B92]'}`}>Conservative</span>
+                        <span className={`text-[11px] ${relevanceBias === 'balanced' ? 'text-[#FF6A00]' : 'text-[#8B8B92]'}`}>Balanced</span>
+                        <span className={`text-[11px] ${relevanceBias === 'opportunistic' ? 'text-[#FF6A00]' : 'text-[#8B8B92]'}`}>Opportunistic</span>
+                      </div>
+                      <Slider
+                        value={[relevanceBias === 'conservative' ? 0 : relevanceBias === 'balanced' ? 1 : 2]}
+                        onValueChange={(value) => {
+                          const levels: ('conservative' | 'balanced' | 'opportunistic')[] = ['conservative', 'balanced', 'opportunistic'];
+                          setRelevanceBias(levels[value[0]]);
+                          setHasChanges(true);
+                        }}
+                        max={2}
+                        step={1}
+                        className="[&_[role=slider]]:bg-[#FF6A00] [&_[role=slider]]:border-0 [&_[role=slider]]:w-[14px] [&_[role=slider]]:h-[14px] [&_.bg-primary]:bg-[#FF6A00]"
+                      />
+                    </div>
+                    <div className="text-[11px] text-[#8B8B92] space-y-1">
+                      {relevanceBias === 'conservative' && (
+                        <p>Posts only when highly confident. Fewer posts, higher precision.</p>
+                      )}
+                      {relevanceBias === 'balanced' && (
+                        <p>Posts when reasonably relevant. Good balance of visibility and precision.</p>
+                      )}
+                      {relevanceBias === 'opportunistic' && (
+                        <p>Posts more frequently to capture opportunities. Higher visibility, more experimental.</p>
+                      )}
+                    </div>
                   </div>
                 )}
 
