@@ -31,6 +31,7 @@ import Trust from "./pages/Trust";
 import AdminSuiteApplications from "./pages/AdminSuiteApplications";
 import AdminDeployments from "./pages/AdminDeployments";
 import ReferralAnalytics from "./pages/ReferralAnalytics";
+import Integrations from "./pages/Integrations";
 
 function Router() {
   return (
@@ -66,6 +67,7 @@ function Router() {
       <Route path="/expand" component={ExpandLaunchBase} />
       <Route path="/dashboard/social/queue" component={PostQueue} />
       <Route path="/dashboard/modules" component={ModuleSetup} />
+      <Route path="/expand/integrations" component={Integrations} />
       
       {/* Fallback routes */}
       <Route path="/404" component={NotFound} />
