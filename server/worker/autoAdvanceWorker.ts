@@ -1,5 +1,6 @@
 /**
  * Auto-Advance Worker
+ * Version: 1.0.1 - Token auth fix 2024-12-24
  * 
  * LaunchBase Rule:
  * We prepare first.
