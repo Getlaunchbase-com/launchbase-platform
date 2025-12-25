@@ -292,11 +292,20 @@ function PlatformChecklist({ platform, intakeId, autoMode }: PlatformChecklistPr
   const recomputeMutation = trpc.setupPackets.recompute.useMutation({
     onSuccess: (result) => {
       const { diff } = result;
-      let message = [];
-      if (diff.updatedFields.length) message.push(`Updated ${diff.updatedFields.length} fields`);
-      if (diff.lockedFieldsSkipped.length) message.push(`Skipped ${diff.lockedFieldsSkipped.length} locked`);
-      if (diff.blockersAdded.length) message.push(`${diff.blockersAdded.length} new blockers`);
-      toast.success(message.join(" • ") || "Already up to date");
+      // Build human-readable message
+      const parts = [];
+      if (diff.updatedFields.length) {
+        const fieldNames = diff.updatedFields.slice(0, 2).join(", ");
+        const more = diff.updatedFields.length > 2 ? ` +${diff.updatedFields.length - 2} more` : "";
+        parts.push(`Updated: ${fieldNames}${more}`);
+      }
+      if (diff.lockedFieldsSkipped.length) {
+        parts.push(`Unchanged: ${diff.lockedFieldsSkipped.length} locked by you`);
+      }
+      if (diff.blockersAdded.length) {
+        parts.push(`Found: ${diff.blockersAdded.length} issue${diff.blockersAdded.length > 1 ? 's' : ''} to fix`);
+      }
+      toast.success(parts.join(" • ") || "Everything is up to date");
       refetch();
     },
     onError: (error) => toast.error(error.message),
@@ -312,6 +321,23 @@ function PlatformChecklist({ platform, intakeId, autoMode }: PlatformChecklistPr
 
   const lockFieldMutation = trpc.setupPackets.lockField.useMutation({
     onSuccess: () => refetch(),
+    onError: (error) => toast.error(error.message),
+  });
+
+  const downloadMutation = trpc.setupPackets.downloadPacket.useMutation({
+    onSuccess: (result) => {
+      // Create blob and trigger download
+      const blob = new Blob([result.content], { type: "text/markdown" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = result.filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success("Setup packet downloaded");
+    },
     onError: (error) => toast.error(error.message),
   });
 
@@ -397,6 +423,15 @@ function PlatformChecklist({ platform, intakeId, autoMode }: PlatformChecklistPr
             <Copy className="h-4 w-4 mr-2" />
             Copy All
           </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => downloadMutation.mutate({ intakeId, platform: platform.id })}
+            disabled={downloadMutation.isPending}
+          >
+            <Download className={`h-4 w-4 mr-2 ${downloadMutation.isPending ? 'animate-pulse' : ''}`} />
+            Download
+          </Button>
         </div>
       </div>
 
@@ -411,12 +446,26 @@ function PlatformChecklist({ platform, intakeId, autoMode }: PlatformChecklistPr
         )}
       </div>
 
+      {/* Global status sentence */}
+      <div className="bg-zinc-800/50 rounded-lg p-3">
+        <p className="text-sm text-zinc-300">
+          {progress === 100 
+            ? `${platform.name} setup is complete.`
+            : progress > 0
+              ? `${platform.name} setup is ${Math.round(progress)}% complete.`
+              : topBlocker
+                ? `${platform.name} setup is prepared but needs attention.`
+                : `${platform.name} setup is ready to apply.`
+          }
+        </p>
+      </div>
+
       {/* Auto mode banner */}
       {autoMode && (
         <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-3">
           <p className="text-sm text-orange-300">
-            <span className="font-medium">Auto mode:</span> LaunchBase prepares everything automatically. 
-            Lock any field to prevent updates.
+            <span className="font-medium">Auto mode:</span> LaunchBase prepares and updates setup details automatically. 
+            You can lock or edit anything at any time.
           </p>
         </div>
       )}
@@ -446,13 +495,15 @@ export default function Integrations() {
   const [selectedPlatform, setSelectedPlatform] = useState<PlatformId | null>(null);
   const [autoMode, setAutoMode] = useState(true);
   
-  // For demo, using a fixed intake ID - in production this would come from auth context
-  const intakeId = 120001;
+  // Get the user's intake dynamically
+  const { data: myIntake, isLoading: intakeLoading } = trpc.setupPackets.getMyIntake.useQuery();
+  const intakeId = myIntake?.id;
   
-  // Get summary data for all platforms
-  const { data: summaryData, isLoading: summaryLoading } = trpc.setupPackets.getChecklist.useQuery({ 
-    intakeId
-  });
+  // Get summary data for all platforms (only when we have an intake)
+  const { data: summaryData, isLoading: summaryLoading } = trpc.setupPackets.getChecklist.useQuery(
+    { intakeId: intakeId! },
+    { enabled: !!intakeId }
+  );
 
   const getPlatformSummary = (platformId: PlatformId) => {
     // In production, you'd fetch this per platform
@@ -480,9 +531,14 @@ export default function Integrations() {
                 <p className="text-sm text-zinc-400">Everything prepared for your business tools</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-zinc-400">Auto mode</span>
-              <Switch checked={autoMode} onCheckedChange={setAutoMode} />
+            <div className="flex flex-col items-end gap-1">
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-zinc-400">Auto mode</span>
+                <Switch checked={autoMode} onCheckedChange={setAutoMode} />
+              </div>
+              <p className="text-xs text-zinc-500 max-w-[200px] text-right">
+                {autoMode ? "We prepare everything. Lock to protect." : "You review before applying."}
+              </p>
             </div>
           </div>
         </div>
@@ -506,7 +562,7 @@ export default function Integrations() {
           </p>
         </div>
 
-        {selectedPlatform ? (
+        {selectedPlatform && intakeId ? (
           /* Platform detail view */
           <div>
             <Button 
