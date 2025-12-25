@@ -1340,3 +1340,9 @@
 - [x] Human-readable diff toasts: "Updated: Business description (seasonal tone), Unchanged: Categories (locked by you)"
 - [x] Wire checklist to real intake from auth context (getMyIntake endpoint added)
 - [x] Download Packet (markdown format with values + confidence + last updated + notes)
+
+
+## Session Dec 25, 2025 - Test & Improve
+- [x] Test integrations page with real customer login (redirects to auth correctly)
+- [x] Add "Download All" button for combined packet
+- [x] Verify customer sees their own data (checklist engine tested with Larre's real data)
