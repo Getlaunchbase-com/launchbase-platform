@@ -378,20 +378,20 @@ export default function ExpandLaunchBase() {
             {/* Page Title */}
             <div>
               <h1 className="text-[28px] font-semibold text-white leading-tight">
-                Social Media Intelligence
+                Expand LaunchBase
               </h1>
               <p className="text-[15px] text-[#B7B7BD] mt-2 leading-relaxed">
-                Your business stays visible — without you thinking about it.
+                Add capabilities as your business grows. Nothing you turn on breaks what already works.
               </p>
             </div>
 
             {/* TRUST REASSURANCE BLOCK */}
             <div className="bg-[#111113] border border-white/[0.06] rounded-[12px] p-4">
               <p className="text-[13px] text-[#B7B7BD] leading-relaxed">
-                <span className="text-white font-medium">Nothing here is permanent.</span> You can change cadence, context, or pause posting at any time. Every decision is visible in your dashboard.
+                <span className="text-white font-medium">You can change this anytime.</span> Safety, observability, and core intelligence are always enforced — even when you add new capabilities.
               </p>
               <p className="text-[12px] text-[#8B8B92] mt-2">
-                You can always see what LaunchBase is doing — and change it anytime.
+                Nothing you turn on here breaks what already works. Everything stays visible.
               </p>
             </div>
 

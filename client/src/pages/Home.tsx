@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, Zap, CheckCircle, ChevronRight, Shield, Eye, Globe, Smartphone, Clock, Sparkles, TrendingUp, Users } from "lucide-react";
+import { ArrowRight, Zap, CheckCircle, ChevronRight, Shield, Eye, Globe, Smartphone, Clock, Sparkles, TrendingUp, Users, AlertCircle } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -61,7 +61,7 @@ function WebsitePreview() {
   );
 }
 
-// Live Context Panel Component (for Suite section)
+// Live Context Panel Component (Observability)
 function LiveContextPanel() {
   const [time, setTime] = useState(new Date());
   
@@ -79,26 +79,29 @@ function LiveContextPanel() {
 
   return (
     <div className="bg-[#151518] border border-white/10 rounded-2xl p-5 font-mono text-sm">
-      <div className="text-gray-500 mb-3 text-xs uppercase tracking-wider">Context detected</div>
-      <div className="space-y-1.5 text-gray-300 mb-4 text-xs">
-        <div className="flex justify-between">
-          <span className="text-gray-500">Location</span>
-          <span>Chicago, IL</span>
+      <div className="text-gray-500 mb-3 text-xs uppercase tracking-wider">What LaunchBase is doing right now</div>
+      <div className="space-y-2 text-gray-300 mb-4 text-xs">
+        <div className="flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-[#1ED760]" />
+          <span>Monitoring your service area</span>
         </div>
-        <div className="flex justify-between">
-          <span className="text-gray-500">Weather</span>
-          <span>Clear · 46°F</span>
+        <div className="flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-[#1ED760]" />
+          <span>Deciding whether posting is safe</span>
         </div>
-        <div className="flex justify-between">
-          <span className="text-gray-500">Time</span>
-          <span>{dayName} · {displayHours}:{minutes} {ampm}</span>
+        <div className="flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-[#1ED760]" />
+          <span>Applying your industry profile</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-yellow-500" />
+          <span>Waiting — intentionally</span>
         </div>
       </div>
       <div className="border-t border-white/10 pt-3">
-        <div className="text-gray-500 mb-2 text-xs uppercase tracking-wider">Decision</div>
         <div className="flex items-center gap-2 text-xs text-gray-400">
-          <div className="w-1.5 h-1.5 rounded-full bg-[#1ED760]" />
-          <span>No post required today</span>
+          <Eye className="w-3.5 h-3.5 text-[#FF6A00]" />
+          <span>You can see all of it — in plain language.</span>
         </div>
       </div>
     </div>
@@ -121,13 +124,13 @@ export default function Home() {
           </div>
           <Link href="/apply">
             <Button className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white">
-              Get started <ArrowRight className="w-4 h-4 ml-2" />
+              Apply <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </Link>
         </div>
       </nav>
 
-      {/* Hero Section - Website First */}
+      {/* Hero Section */}
       <section className="pt-32 pb-20 px-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#FF6A00]/5 via-transparent to-transparent pointer-events-none" />
         
@@ -136,7 +139,7 @@ export default function Home() {
             <div>
               <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 text-sm text-gray-400 mb-6">
                 <Sparkles className="w-4 h-4 text-[#FF6A00]" />
-              <span>Websites for local businesses</span>
+                <span>Operating system for small businesses</span>
               </div>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 leading-tight">
@@ -146,29 +149,14 @@ export default function Home() {
               </h1>
               
               <p className="text-lg md:text-xl text-gray-400 mb-6 leading-relaxed">
-                LaunchBase is the operating system for service businesses.
-                It handles the parts of your business that shouldn't require your attention — 
-                websites, deployments, visibility, and automation — so you can focus on the work that actually matters.
+                LaunchBase is an operating system for small businesses.
+                We build your website, manage your visibility, and take ongoing responsibility — safely and transparently.
               </p>
               
-              <p className="text-sm text-gray-500 mb-6 italic">
-                Built by someone who needed it.
+              <p className="text-sm text-gray-500 mb-8 flex items-center gap-2">
+                <Eye className="w-4 h-4 text-[#FF6A00]" />
+                See your real site before you pay. You can always see what LaunchBase is doing.
               </p>
-              
-              <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-8">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-[#1ED760]" />
-                  <span>Live in 48 hours</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-[#1ED760]" />
-                  <span>Mobile-optimized</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-[#1ED760]" />
-                  <span>No tech skills needed</span>
-                </div>
-              </div>
               
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/apply">
@@ -191,198 +179,94 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Why We Exist */}
+      {/* The Problem - Builder Fatigue */}
       <section className="py-20 px-4 border-b border-white/5">
+        <div className="container max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            Website builders make you decide too much, too early.
+          </h2>
+          
+          <p className="text-gray-400 text-lg mb-8 max-w-2xl mx-auto">
+            Pick a template. Pick integrations. Pick a plan.
+            <br />
+            Then your business grows — and you rebuild everything.
+          </p>
+          
+          <div className="bg-[#FF6A00]/10 border border-[#FF6A00]/20 rounded-xl px-6 py-4 inline-block">
+            <p className="text-[#FF6A00] text-xl font-medium">
+              Growth shouldn't force a restart.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* The Difference - Your Category */}
+      <section className="py-20 px-4 border-b border-white/5 bg-white/[0.02]">
         <div className="container max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Most tools are built by marketers.
-              <br />
-              <span className="text-gray-400">LaunchBase was built by a business owner.</span>
+              LaunchBase grows with you — without rebuilding.
             </h2>
-          </div>
-          
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-8 mb-12">
-            <p className="text-gray-400 text-lg mb-6">I was tired of:</p>
-            <ul className="space-y-3 text-gray-300 mb-8">
-              <li className="flex items-start gap-3">
-                <span className="text-[#FF6A00] mt-1">•</span>
-                <span>Babysitting deployments</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-[#FF6A00] mt-1">•</span>
-                <span>Remembering to post</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-[#FF6A00] mt-1">•</span>
-                <span>Duct-taping tools together</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-[#FF6A00] mt-1">•</span>
-                <span>Wondering if something broke overnight</span>
-              </li>
-            </ul>
-            <p className="text-white text-xl font-medium">So I built the system I wished I had.</p>
-          </div>
-          
-          <p className="text-center text-gray-400 text-lg">
-            LaunchBase isn't about doing more.<br />
-            <span className="text-white font-medium">It's about removing what doesn't need you.</span>
-          </p>
-        </div>
-      </section>
-
-      {/* What Makes LaunchBase Different */}
-      <section className="py-20 px-4 border-b border-white/5 bg-white/[0.02]">
-        <div className="container max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Not an agency. Not another SaaS dashboard.
-          </h2>
-          <p className="text-[#FF6A00] text-xl font-medium mb-12">LaunchBase is opinionated by design.</p>
-          
-          <div className="grid md:grid-cols-3 gap-8 mb-12">
-            <div className="text-left">
-              <div className="w-10 h-10 bg-[#FF6A00]/20 rounded-lg flex items-center justify-center mb-4">
-                <Clock className="w-5 h-5 text-[#FF6A00]" />
-              </div>
-              <p className="text-gray-300">If it gives you back time, it belongs here</p>
-            </div>
-            <div className="text-left">
-              <div className="w-10 h-10 bg-[#FF6A00]/20 rounded-lg flex items-center justify-center mb-4">
-                <Shield className="w-5 h-5 text-[#FF6A00]" />
-              </div>
-              <p className="text-gray-300">If it creates noise, we don't ship it</p>
-            </div>
-            <div className="text-left">
-              <div className="w-10 h-10 bg-[#FF6A00]/20 rounded-lg flex items-center justify-center mb-4">
-                <Zap className="w-5 h-5 text-[#FF6A00]" />
-              </div>
-              <p className="text-gray-300">If silence is the right move, the system stays silent</p>
-            </div>
-          </div>
-          
-          <p className="text-gray-400 text-lg">
-            That's why LaunchBase feels calm when everything else feels loud.
-          </p>
-          
-          <div className="mt-8">
-            <Link href="/why">
-              <Button variant="outline" className="border-white/20 text-white hover:bg-white/5">
-                Read the full story <ChevronRight className="w-4 h-4 ml-1" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* What You Get - Core Website Features */}
-      <section className="py-20 px-4 border-b border-white/5">
-        <div className="container max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Everything your business needs online
-            </h2>
+            
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              A complete website built for your industry, optimized for customers who need you now.
+              LaunchBase starts with a solid foundation: your website, hosting, and core intelligence.
+              As your business grows, you expand LaunchBase.
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card className="bg-white/5 border-white/10">
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-[#FF6A00]/20 rounded-xl flex items-center justify-center mb-4">
-                  <Globe className="w-6 h-6 text-[#FF6A00]" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2 text-white">Professional Website</h3>
-                <p className="text-gray-400 text-sm">
-                  Custom-designed for your business type. Services, about, contact — all the pages you need.
-                </p>
-              </CardContent>
-            </Card>
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-8 mb-8">
+            <p className="text-white text-xl font-medium text-center mb-6">
+              Same system. Same logic. No migrations.
+            </p>
             
-            <Card className="bg-white/5 border-white/10">
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-[#FF6A00]/20 rounded-xl flex items-center justify-center mb-4">
-                  <Smartphone className="w-6 h-6 text-[#FF6A00]" />
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="text-center">
+                <div className="w-12 h-12 bg-[#FF6A00]/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Zap className="w-6 h-6 text-[#FF6A00]" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2 text-white">Mobile-First Design</h3>
-                <p className="text-gray-400 text-sm">
-                  Looks great on every device. Your customers find you on their phones — we make sure it works.
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-white/5 border-white/10">
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-[#FF6A00]/20 rounded-xl flex items-center justify-center mb-4">
-                  <Clock className="w-6 h-6 text-[#FF6A00]" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2 text-white">Fast Turnaround</h3>
-                <p className="text-gray-400 text-sm">
-                  From intake to live in 48 hours. We handle the tech so you can focus on your work.
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-white/5 border-white/10">
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-[#FF6A00]/20 rounded-xl flex items-center justify-center mb-4">
-                  <Shield className="w-6 h-6 text-[#FF6A00]" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2 text-white">Hosting Included</h3>
-                <p className="text-gray-400 text-sm">
-                  Secure, fast hosting with SSL certificate. No separate bills, no server management.
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-white/5 border-white/10">
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-[#FF6A00]/20 rounded-xl flex items-center justify-center mb-4">
+                <p className="text-gray-300">Start simple</p>
+              </div>
+              <div className="text-center">
+                <div className="w-12 h-12 bg-[#FF6A00]/20 rounded-xl flex items-center justify-center mx-auto mb-4">
                   <TrendingUp className="w-6 h-6 text-[#FF6A00]" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2 text-white">SEO Ready</h3>
-                <p className="text-gray-400 text-sm">
-                  Built with search engines in mind. Local customers can find you when they need your services.
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-white/5 border-white/10">
-              <CardContent className="p-6">
-                <div className="w-12 h-12 bg-[#FF6A00]/20 rounded-xl flex items-center justify-center mb-4">
-                  <Users className="w-6 h-6 text-[#FF6A00]" />
+                <p className="text-gray-300">Add capabilities anytime</p>
+              </div>
+              <div className="text-center">
+                <div className="w-12 h-12 bg-[#FF6A00]/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Shield className="w-6 h-6 text-[#FF6A00]" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2 text-white">Lead Capture</h3>
-                <p className="text-gray-400 text-sm">
-                  Contact forms, click-to-call buttons, and service requests. Turn visitors into customers.
-                </p>
-              </CardContent>
-            </Card>
+                <p className="text-gray-300">Nothing breaks when you grow</p>
+              </div>
+            </div>
           </div>
+          
+          <p className="text-center text-gray-500 text-lg">
+            LaunchBase gives you a stable foundation today — and the flexibility to grow without friction tomorrow.
+          </p>
         </div>
       </section>
 
-      {/* How It Works - Simple Steps */}
-      <section className="py-20 px-4">
+      {/* How It Works */}
+      <section className="py-20 px-4 border-b border-white/5">
         <div className="container max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Three steps to your new website
+              Here's exactly what happens.
             </h2>
             <p className="text-gray-400 text-lg">
-              No meetings, no back-and-forth. Just a simple process that works.
+              No mystery. No surprises.
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             <div className="text-center">
               <div className="w-16 h-16 bg-[#FF6A00]/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-[#FF6A00]">1</span>
               </div>
-              <h3 className="text-xl font-semibold mb-3">Tell us about your business</h3>
-              <p className="text-gray-400">
-                5-minute intake form. Your services, service area, and what makes you different.
+              <h3 className="text-lg font-semibold mb-2">Tell us about your business</h3>
+              <p className="text-gray-400 text-sm">
+                Apply in English, Spanish, or Polish.
               </p>
             </div>
             
@@ -390,9 +274,9 @@ export default function Home() {
               <div className="w-16 h-16 bg-[#FF6A00]/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-[#FF6A00]">2</span>
               </div>
-              <h3 className="text-xl font-semibold mb-3">We build your site</h3>
-              <p className="text-gray-400">
-                Our team creates your website. You review it, request changes, and approve.
+              <h3 className="text-lg font-semibold mb-2">Review your real site</h3>
+              <p className="text-gray-400 text-sm">
+                Not a mockup. A live preview.
               </p>
             </div>
             
@@ -400,25 +284,70 @@ export default function Home() {
               <div className="w-16 h-16 bg-[#FF6A00]/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <span className="text-2xl font-bold text-[#FF6A00]">3</span>
               </div>
-              <h3 className="text-xl font-semibold mb-3">Go live</h3>
-              <p className="text-gray-400">
-                Your website launches. We handle hosting, updates, and support. You run your business.
+              <h3 className="text-lg font-semibold mb-2">Approve & launch</h3>
+              <p className="text-gray-400 text-sm">
+                Only after you approve do we deploy.
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 bg-[#FF6A00]/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-[#FF6A00]">4</span>
+              </div>
+              <h3 className="text-lg font-semibold mb-2">LaunchBase stays on</h3>
+              <p className="text-gray-400 text-sm">
+                Monitoring, deciding, protecting — continuously.
               </p>
             </div>
           </div>
           
-          <div className="text-center mt-12">
-            <Link href="/apply">
-              <Button size="lg" className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white">
-                Start your website <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </Link>
+          <div className="text-center">
+            <div className="bg-white/5 border border-white/10 rounded-xl px-6 py-4 inline-block">
+              <p className="text-gray-400 text-sm flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-[#FF6A00]" />
+                Silence is a valid decision. We log it.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Expand Section - LaunchBase Suite */}
-      <section className="py-20 px-4 bg-gradient-to-b from-[#0B0B0C] to-[#151518]">
+      {/* Observability - Your Secret Weapon */}
+      <section className="py-20 px-4 border-b border-white/5 bg-white/[0.02]">
+        <div className="container max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">
+                You never wonder what LaunchBase is doing.
+              </h2>
+              
+              <p className="text-gray-400 text-lg mb-6 leading-relaxed">
+                Most platforms hide their automation.
+                <br />
+                LaunchBase shows you — in plain language.
+              </p>
+              
+              <p className="text-gray-500 mb-8">
+                Right now, LaunchBase may be monitoring your service area, deciding whether posting is safe,
+                applying your industry profile, or waiting — intentionally.
+              </p>
+              
+              <Link href="/how-it-works">
+                <Button variant="outline" className="border-white/20 text-white hover:bg-white/5">
+                  See how observability works <ChevronRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+            
+            <div className="hidden lg:block">
+              <LiveContextPanel />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Expand LaunchBase */}
+      <section className="py-20 px-4 border-b border-white/5">
         <div className="container max-w-6xl mx-auto">
           <div className="text-center mb-4">
             <div className="inline-flex items-center gap-2 bg-[#FF6A00]/10 border border-[#FF6A00]/20 rounded-full px-4 py-1.5 text-sm text-[#FF6A00] mb-6">
@@ -427,85 +356,79 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                When you're ready,
-                <br />
-                <span className="text-[#FF6A00]">expand your reach.</span>
-              </h2>
-              
-              <p className="text-gray-400 text-lg mb-6 leading-relaxed">
-                Your website is just the beginning. LaunchBase Suite adds intelligent workflows 
-                that keep your business visible — without demanding your attention.
-              </p>
-              
-              <div className="space-y-4 mb-8">
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-[#FF6A00]/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <CheckCircle className="w-4 h-4 text-[#FF6A00]" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-white">Social Media Intelligence</h4>
-                    <p className="text-gray-500 text-sm">Weather-aware posts that go out when they matter. You approve, we post.</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Clock className="w-4 h-4 text-gray-500" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-gray-400">QuickBooks Sync</h4>
-                    <p className="text-gray-600 text-sm">Coming soon — invoices and payments, automated.</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Clock className="w-4 h-4 text-gray-500" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-gray-400">Google Business Assistant</h4>
-                    <p className="text-gray-600 text-sm">Coming soon — reviews and listings, managed.</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex flex-wrap gap-3 text-xs text-gray-500 mb-6">
-                <div className="flex items-center gap-1.5">
-                  <Eye className="w-3.5 h-3.5 text-[#FF6A00]" />
-                  <span>Preview before posting</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Shield className="w-3.5 h-3.5 text-[#FF6A00]" />
-                  <span>Safety-gated</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <CheckCircle className="w-3.5 h-3.5 text-[#FF6A00]" />
-                  <span>Approval always first</span>
-                </div>
-              </div>
-              
-              <Link href="/expand">
-                <Button variant="outline" className="border-[#FF6A00]/50 text-[#FF6A00] hover:bg-[#FF6A00]/10">
-                  Explore the Suite <ChevronRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
-            </div>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+              Expand when you're ready. Not before.
+            </h2>
             
-            <div className="hidden lg:block">
-              <LiveContextPanel />
-              <p className="text-gray-600 text-xs mt-4 text-center italic">
-                This is how LaunchBase thinks — so you don't have to.
-              </p>
-            </div>
+            <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-8">
+              LaunchBase isn't a bundle you're locked into.
+              It's a system you build on.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-8">
+            <Card className="bg-white/5 border-white/10">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-[#FF6A00]/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Smartphone className="w-6 h-6 text-[#FF6A00]" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2 text-white">Social Media Intelligence</h3>
+                <p className="text-gray-400 text-sm">
+                  Weather-aware posts that go out when they matter.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-white/5 border-white/10">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Globe className="w-6 h-6 text-gray-500" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2 text-gray-400">Google Business Setup</h3>
+                <p className="text-gray-500 text-sm">
+                  Coming soon
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-white/5 border-white/10">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <TrendingUp className="w-6 h-6 text-gray-500" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2 text-gray-400">QuickBooks Sync</h3>
+                <p className="text-gray-500 text-sm">
+                  Coming soon
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div className="text-center">
+            <p className="text-gray-500 text-sm mb-6">
+              You can change this anytime. Safety never changes.
+            </p>
+            <Link href="/expand">
+              <Button variant="outline" className="border-[#FF6A00]/50 text-[#FF6A00] hover:bg-[#FF6A00]/10">
+                Explore the Suite <ChevronRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
 
+      {/* Social Proof */}
+      <section className="py-12 px-4 border-b border-white/5 bg-white/[0.02]">
+        <div className="container max-w-4xl mx-auto text-center">
+          <p className="text-gray-500 text-lg">
+            Used by early service businesses across trades, appointments, and professional services.
+          </p>
+        </div>
+      </section>
+
       {/* Pricing Section */}
-      <section id="pricing" className="py-20 px-4">
+      <section id="pricing" className="py-20 px-4 border-b border-white/5">
         <div className="container max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -552,7 +475,7 @@ export default function Home() {
                 
                 <Link href="/apply">
                   <Button className="w-full bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white">
-                    Get started
+                    Apply to LaunchBase
                   </Button>
                 </Link>
               </CardContent>
@@ -614,11 +537,11 @@ export default function Home() {
                 What kind of businesses is LaunchBase for?
               </AccordionTrigger>
               <AccordionContent className="text-gray-400 pb-6">
-                LaunchBase serves a wide range of local businesses: trades (plumbers, HVAC, electricians, 
-                contractors), health & wellness (dentists, chiropractors, med spas), beauty (salons, barbers, 
-                spas), food & beverage (restaurants, cafés, bars), fitness (gyms, trainers, yoga studios), 
-                automotive (repair shops, detailing), professional services (lawyers, accountants), and more. 
-                We build websites that convert visitors into customers for your specific industry.
+                LaunchBase serves local service businesses: trades (plumbers, HVAC, electricians, 
+                contractors), health & wellness (dentists, chiropractors), beauty (salons, barbers), 
+                food & beverage (restaurants, cafés), fitness (gyms, trainers), automotive (repair shops), 
+                and professional services (lawyers, accountants). We build websites that convert visitors 
+                into customers for your specific industry.
               </AccordionContent>
             </AccordionItem>
             
@@ -627,20 +550,19 @@ export default function Home() {
                 How long does it take to get my website?
               </AccordionTrigger>
               <AccordionContent className="text-gray-400 pb-6">
-                Most websites go live within 48 hours of completing your intake form. You'll review 
+                Most websites go live within 48 hours of completing your application. You'll review 
                 a preview, request any changes, and approve before we launch. No endless back-and-forth.
               </AccordionContent>
             </AccordionItem>
             
-            <AccordionItem value="suite" className="border border-white/10 rounded-xl px-6 bg-white/[0.02]">
+            <AccordionItem value="not-builder" className="border border-white/10 rounded-xl px-6 bg-white/[0.02]">
               <AccordionTrigger className="text-left text-white hover:no-underline py-6">
-                What is LaunchBase Suite?
+                Is this a website builder?
               </AccordionTrigger>
               <AccordionContent className="text-gray-400 pb-6">
-                LaunchBase Suite is our collection of add-on modules that automate marketing and 
-                operations. Social Media Intelligence posts to your Facebook page based on local 
-                weather and events — with your approval. More modules (QuickBooks, Google Business) 
-                are coming soon. You can add them anytime after your website is live.
+                No. Builders help you create a site. LaunchBase operates it. If you want to design pages 
+                and tweak layouts yourself, use a builder. If you want your business to stay visible 
+                without thinking about it, use LaunchBase.
               </AccordionContent>
             </AccordionItem>
             
@@ -674,14 +596,17 @@ export default function Home() {
       <section className="py-20 px-4">
         <div className="container max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Ready to get your business online?
+            Stop managing tools. Start delegating responsibility.
           </h2>
-          <p className="text-gray-400 text-lg mb-8">
-            5-minute intake. 48-hour turnaround. No tech skills required.
+          <p className="text-gray-400 text-lg mb-4">
+            You're not signing up for software.
+          </p>
+          <p className="text-white text-xl font-medium mb-8">
+            You're handing off responsibility — with visibility.
           </p>
           <Link href="/apply">
             <Button size="lg" className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white text-lg px-10 py-6">
-              Get your website <ArrowRight className="w-5 h-5 ml-2" />
+              Apply to LaunchBase <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </Link>
         </div>
