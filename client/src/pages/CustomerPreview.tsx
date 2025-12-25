@@ -18,7 +18,12 @@ import {
   FileText,
   Clock,
   Shield,
-  Zap
+  Zap,
+  Eye,
+  Lock,
+  Activity,
+  Bell,
+  RefreshCw
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -68,6 +73,7 @@ export default function CustomerPreview() {
   const [isApproved, setIsApproved] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [checkoutApprovalChecked, setCheckoutApprovalChecked] = useState(false);
+  const [approvalChecked, setApprovalChecked] = useState(false);
 
   // Fetch intake by preview token
   const { data: intake, isLoading, error } = trpc.intake.getByPreviewToken.useQuery(
@@ -131,7 +137,7 @@ export default function CustomerPreview() {
   };
 
   const handleApprove = async () => {
-    if (!intake) return;
+    if (!intake || !approvalChecked) return;
     
     // Log the approval event with legal details
     await logApprovalMutation.mutateAsync({
@@ -205,7 +211,7 @@ export default function CustomerPreview() {
               <div className="flex items-center gap-3">
                 <CheckCircle className="h-5 w-5 text-green-500" />
                 <div>
-                  <span className="text-green-500 font-medium">Payment Confirmed ✅</span>
+                  <span className="text-green-500 font-medium">Payment Confirmed</span>
                   <p className="text-sm text-muted-foreground">You're officially queued for launch.</p>
                 </div>
               </div>
@@ -241,18 +247,40 @@ export default function CustomerPreview() {
           </div>
         )}
 
-        {/* Step 1: Review Build Plan */}
+        {/* ============================================ */}
+        {/* STEP 1: REVIEW YOUR SITE PREVIEW (REWRITTEN) */}
+        {/* ============================================ */}
         {currentStep === "review" && !isPaid && (
-          <div className="space-y-6">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">Review Your Build Plan</h1>
-              <p className="text-muted-foreground">
-                Everything below will be included in your LaunchBase launch.
-                If anything looks off, request a change before approving.
+          <div className="space-y-8">
+            {/* Hero Section */}
+            <div className="text-center space-y-3">
+              <h1 className="text-3xl md:text-4xl font-bold">This is your real website.</h1>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Take a moment to review everything carefully.<br />
+                Nothing goes live until you approve it.
               </p>
             </div>
 
-            {/* Build Plan Card */}
+            {/* Context Block */}
+            <Card className="bg-muted/30 border-muted">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-3">
+                  <Eye className="h-5 w-5 text-orange-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h3 className="font-semibold mb-1">What you're seeing</h3>
+                    <p className="text-sm text-muted-foreground">
+                      This preview is generated from the information you provided.
+                      It uses the same system LaunchBase will use after launch.
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-2 font-medium">
+                      You're reviewing the actual site — not a mockup.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Preview Card */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -357,6 +385,54 @@ export default function CustomerPreview() {
               </CardContent>
             </Card>
 
+            {/* What Approval Means Section */}
+            <Card className="border-orange-500/30">
+              <CardHeader>
+                <CardTitle className="text-lg">What approval means</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-3">When you approve this build:</p>
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span>You're confirming the structure, copy, and intent</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span>LaunchBase will deploy this site exactly as shown</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span>Payment will be required to proceed with launch</span>
+                    </li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <p className="text-sm text-muted-foreground mb-3">What approval does NOT mean:</p>
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-start gap-2">
+                      <span className="text-muted-foreground">•</span>
+                      <span className="text-muted-foreground">You're not locking yourself out of future changes</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-muted-foreground">•</span>
+                      <span className="text-muted-foreground">You're not giving up visibility or control</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-muted-foreground">•</span>
+                      <span className="text-muted-foreground">You're not committing to anything unseen</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <p className="text-sm text-orange-500 font-medium pt-2 border-t border-orange-500/20">
+                  LaunchBase will continue monitoring and improving safely after launch.
+                </p>
+              </CardContent>
+            </Card>
+
             {/* Request Changes */}
             {isReadyForReview && !showFeedback && (
               <div className="space-y-2">
@@ -366,10 +442,10 @@ export default function CustomerPreview() {
                   className="w-full"
                 >
                   <MessageSquare className="h-4 w-4 mr-2" />
-                  Request Changes
+                  Need a change?
                 </Button>
                 <p className="text-xs text-muted-foreground text-center">
-                  Want changes before launch? Request edits — no charge before approval.
+                  You can request edits or contact us before approving.
                 </p>
               </div>
             )}
@@ -410,13 +486,34 @@ export default function CustomerPreview() {
               </Card>
             )}
 
-            {/* Approve Button */}
+            {/* Approval Checkbox + Button */}
             {isReadyForReview && !showFeedback && (
-              <div className="space-y-3">
+              <div className="space-y-4">
+                {/* Clickwrap Checkbox */}
+                <div className="p-4 rounded-lg border border-orange-500/30 bg-orange-500/5">
+                  <div className="flex items-start gap-3">
+                    <Checkbox
+                      id="approvalCheckbox"
+                      checked={approvalChecked}
+                      onCheckedChange={(checked) => setApprovalChecked(checked === true)}
+                      className="mt-0.5 border-orange-500/50 data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500"
+                    />
+                    <div>
+                      <Label htmlFor="approvalCheckbox" className="text-sm cursor-pointer leading-relaxed font-medium">
+                        I approve this build plan and confirm it represents my business accurately.
+                      </Label>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        You'll always be able to see what LaunchBase is doing.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Approve Button */}
                 <Button 
                   onClick={handleApprove}
-                  disabled={logApprovalMutation.isPending}
-                  className="w-full bg-orange-500 hover:bg-orange-600"
+                  disabled={!approvalChecked || logApprovalMutation.isPending}
+                  className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
                   size="lg"
                 >
                   {logApprovalMutation.isPending ? (
@@ -426,22 +523,21 @@ export default function CustomerPreview() {
                     </>
                   ) : (
                     <>
-                      Approve & Continue
+                      Approve & Continue to Launch
                       <ArrowRight className="h-4 w-4 ml-2" />
                     </>
                   )}
                 </Button>
                 <p className="text-xs text-muted-foreground text-center">
-                  By approving this build plan, you're authorizing LaunchBase to deploy and manage your site using the same safeguards and logic used across the platform.{" "}
-                  <Link href="/terms" className="underline hover:text-foreground">
-                    Terms apply
-                  </Link>.
-                </p>
-                <p className="text-xs text-muted-foreground text-center italic mt-2">
-                  This is how businesses should work.
+                  You'll review pricing and confirm before anything goes live.
                 </p>
               </div>
             )}
+
+            {/* Footer Trust Line */}
+            <p className="text-xs text-muted-foreground text-center pt-4 border-t">
+              LaunchBase logs every decision — including when it stays silent — to protect your brand.
+            </p>
           </div>
         )}
 
@@ -558,16 +654,126 @@ export default function CustomerPreview() {
           </div>
         )}
 
-        {/* Step 3: Checkout Pre-Screen */}
+        {/* ============================================ */}
+        {/* STEP 3: CHECKOUT PRE-SCREEN (REWRITTEN)     */}
+        {/* ============================================ */}
         {currentStep === "checkout" && !isPaid && (
-          <div className="max-w-xl mx-auto space-y-6">
-            <div className="text-center">
-              <h1 className="text-3xl font-bold mb-2">Review & Pay</h1>
+          <div className="max-w-xl mx-auto space-y-8">
+            {/* Hero Section */}
+            <div className="text-center space-y-3">
+              <h1 className="text-3xl md:text-4xl font-bold">You're about to launch your site.</h1>
               <p className="text-muted-foreground">
-                You're about to pay for your LaunchBase setup and any selected activations.
-                After payment, we'll begin deployment.
+                Everything below reflects what you've already reviewed and approved.<br />
+                Nothing changes after payment — it simply goes live.
               </p>
             </div>
+
+            {/* What's Included Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  What's Included in This Launch
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-sm text-muted-foreground mb-4">Today's payment covers:</p>
+                <ul className="space-y-2">
+                  <li className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                    <span>Deployment of your approved website</span>
+                  </li>
+                  <li className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                    <span>Hosting and infrastructure setup</span>
+                  </li>
+                  <li className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                    <span>Secure launch on LaunchBase systems</span>
+                  </li>
+                  <li className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                    <span>Ongoing system monitoring</span>
+                  </li>
+                </ul>
+                <p className="text-xs text-muted-foreground pt-3 border-t mt-4">
+                  This is not a subscription renewal.<br />
+                  This is the one-time cost to launch what you've already approved.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* What Happens After You Pay */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-orange-500" />
+                  What Happens After You Pay
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">A simple, transparent sequence:</p>
+                <ol className="space-y-3">
+                  <li className="flex items-center gap-3 text-sm">
+                    <span className="w-6 h-6 rounded-full bg-orange-500/10 text-orange-500 flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
+                    <span>Payment confirmed</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-sm">
+                    <span className="w-6 h-6 rounded-full bg-orange-500/10 text-orange-500 flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
+                    <span>Deployment begins immediately</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-sm">
+                    <span className="w-6 h-6 rounded-full bg-orange-500/10 text-orange-500 flex items-center justify-center text-xs font-bold flex-shrink-0">3</span>
+                    <span>You'll see live progress</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-sm">
+                    <span className="w-6 h-6 rounded-full bg-orange-500/10 text-orange-500 flex items-center justify-center text-xs font-bold flex-shrink-0">4</span>
+                    <span>Your site goes live</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-sm">
+                    <span className="w-6 h-6 rounded-full bg-orange-500/10 text-orange-500 flex items-center justify-center text-xs font-bold flex-shrink-0">5</span>
+                    <span>You receive the live URL</span>
+                  </li>
+                </ol>
+                <p className="text-xs text-muted-foreground pt-3 border-t mt-4">
+                  You'll be notified at each step.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* What LaunchBase Continues to Do */}
+            <Card className="bg-muted/30 border-muted">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Activity className="h-5 w-5 text-orange-500" />
+                  What LaunchBase Continues to Do
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">Even after launch, LaunchBase remains active:</p>
+                <ul className="space-y-2">
+                  <li className="flex items-center gap-2 text-sm">
+                    <Activity className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <span className="text-muted-foreground">Monitoring system health</span>
+                  </li>
+                  <li className="flex items-center gap-2 text-sm">
+                    <Shield className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <span className="text-muted-foreground">Applying safety rules automatically</span>
+                  </li>
+                  <li className="flex items-center gap-2 text-sm">
+                    <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <span className="text-muted-foreground">Logging decisions and silences</span>
+                  </li>
+                  <li className="flex items-center gap-2 text-sm">
+                    <RefreshCw className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <span className="text-muted-foreground">Making future improvements inherit automatically</span>
+                  </li>
+                </ul>
+                <p className="text-sm text-orange-500 font-medium pt-3 border-t mt-4">
+                  You can always see what LaunchBase is doing.
+                </p>
+              </CardContent>
+            </Card>
 
             {/* Order Summary */}
             <Card>
@@ -600,19 +806,7 @@ export default function CustomerPreview() {
               </CardContent>
             </Card>
 
-            {/* Trust Signals */}
-            <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4" />
-                <span>Secure checkout</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Zap className="h-4 w-4" />
-                <span>Instant access</span>
-              </div>
-            </div>
-
-            {/* Approval Checkbox - Required before payment */}
+            {/* Clickwrap Checkbox */}
             <div className="p-4 rounded-lg border border-orange-500/30 bg-orange-500/5">
               <div className="flex items-start gap-3">
                 <Checkbox
@@ -621,13 +815,18 @@ export default function CustomerPreview() {
                   onCheckedChange={(checked) => setCheckoutApprovalChecked(checked === true)}
                   className="mt-0.5 border-orange-500/50 data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500"
                 />
-                <Label htmlFor="checkoutApproval" className="text-sm cursor-pointer leading-relaxed">
-                  I approve this preview and understand my site will be deployed after payment.
-                  I agree to LaunchBase's{" "}
-                  <Link href="/terms" className="text-orange-500 hover:underline">Terms of Service</Link>
-                  {" "}and{" "}
-                  <Link href="/refunds" className="text-orange-500 hover:underline">Refund Policy</Link>.
-                </Label>
+                <div>
+                  <Label htmlFor="checkoutApproval" className="text-sm cursor-pointer leading-relaxed font-medium">
+                    I confirm that I've reviewed and approved my site preview, and I'm ready to proceed with launch.
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    LaunchBase will deploy exactly what you approved.{" "}
+                    <Link href="/terms" className="text-orange-500 hover:underline">Terms</Link>
+                    {" "}and{" "}
+                    <Link href="/privacy" className="text-orange-500 hover:underline">Privacy</Link>
+                    {" "}apply.
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -646,18 +845,42 @@ export default function CustomerPreview() {
                   </>
                 ) : (
                   <>
-                    Approve & Pay
+                    Pay & Launch Site
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </>
                 )}
               </Button>
 
               <p className="text-xs text-muted-foreground">
-                Payments are processed by Stripe. We never see or store your card details.
+                Secure checkout powered by Stripe
               </p>
+            </div>
 
-              <p className="text-sm text-orange-500 font-medium italic">
-                You are not paying for a template. You're paying for a system that launches.
+            {/* Reassurance Strip */}
+            <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 text-xs text-muted-foreground py-4 border-t border-b">
+              <div className="flex items-center gap-1.5">
+                <Lock className="h-3.5 w-3.5" />
+                <span>Secure payment</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <RefreshCw className="h-3.5 w-3.5" />
+                <span>No hidden changes</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Eye className="h-3.5 w-3.5" />
+                <span>Full visibility after launch</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Shield className="h-3.5 w-3.5" />
+                <span>Safety rules always enforced</span>
+              </div>
+            </div>
+
+            {/* Calm Micro-Copy */}
+            <div className="text-center space-y-2">
+              <p className="text-sm text-muted-foreground">
+                Questions before launching?<br />
+                You can pause here and come back anytime.
               </p>
             </div>
 
@@ -679,7 +902,7 @@ export default function CustomerPreview() {
               <CheckCircle className="h-10 w-10 text-green-500" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold mb-2">Payment Confirmed ✅</h1>
+              <h1 className="text-3xl font-bold mb-2">Payment Confirmed</h1>
               <p className="text-muted-foreground">
                 You're officially queued for launch.
               </p>

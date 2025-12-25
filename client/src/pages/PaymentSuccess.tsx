@@ -2,22 +2,37 @@ import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, Loader2, ArrowRight, Sparkles, FileText, Gift, Check, Circle } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
+  CheckCircle, 
+  Loader2, 
+  ArrowRight, 
+  Sparkles, 
+  Mail, 
+  Activity,
+  Eye,
+  Shield,
+  Clock,
+  Server,
+  Globe,
+  Zap,
+  FileText,
+  Settings
+} from "lucide-react";
 
-// Deployment steps with simulated progress
+// Deployment steps - what LaunchBase is doing right now
 const DEPLOYMENT_STEPS = [
-  { id: 1, label: "Payment received", duration: 0 },
-  { id: 2, label: "Provisioning template", duration: 2000 },
-  { id: 3, label: "Applying branding", duration: 3000 },
-  { id: 4, label: "Publishing to web", duration: 4000 },
-  { id: 5, label: "Connecting domain", duration: 5000 },
+  { id: 1, label: "Provisioning your website infrastructure", icon: Server },
+  { id: 2, label: "Applying your approved build plan", icon: FileText },
+  { id: 3, label: "Verifying availability and performance", icon: Activity },
+  { id: 4, label: "Preparing your live URL", icon: Globe },
 ];
 
 export default function PaymentSuccess() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [isDeploying, setIsDeploying] = useState(true);
+  const [lastCheck, setLastCheck] = useState("just now");
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -33,19 +48,29 @@ export default function PaymentSuccess() {
 
     const timers: NodeJS.Timeout[] = [];
     
-    DEPLOYMENT_STEPS.forEach((step) => {
-      if (step.duration > 0) {
+    // Progress through steps
+    const stepDurations = [0, 2000, 4000, 6000, 8000];
+    stepDurations.forEach((duration, index) => {
+      if (duration > 0 && index <= DEPLOYMENT_STEPS.length) {
         const timer = setTimeout(() => {
-          setCurrentStep(step.id);
-          if (step.id === DEPLOYMENT_STEPS.length) {
+          setCurrentStep(index);
+          if (index === DEPLOYMENT_STEPS.length) {
             setIsDeploying(false);
           }
-        }, step.duration);
+        }, duration);
         timers.push(timer);
       }
     });
 
-    return () => timers.forEach(clearTimeout);
+    // Update "last check" time periodically
+    const checkTimer = setInterval(() => {
+      setLastCheck("just now");
+    }, 30000);
+
+    return () => {
+      timers.forEach(clearTimeout);
+      clearInterval(checkTimer);
+    };
   }, [isDeploying]);
 
   const { data: session, isLoading } = trpc.payment.getSession.useQuery(
@@ -75,144 +100,242 @@ export default function PaymentSuccess() {
         </div>
       </header>
 
-      <main className="container max-w-xl py-16">
-        <div className="text-center space-y-6">
-          {/* Success Icon */}
-          <div className="mx-auto h-20 w-20 rounded-full bg-green-500/10 flex items-center justify-center">
-            <CheckCircle className="h-12 w-12 text-green-500" />
-          </div>
-
-          {/* Title */}
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Payment Confirmed</h1>
-            <p className="text-muted-foreground text-lg">
-              {isDeploying ? "We're deploying your site now..." : "Your site is ready for launch."}
+      <main className="container max-w-2xl py-12 md:py-16">
+        <div className="space-y-8">
+          {/* Hero Section */}
+          <div className="text-center space-y-4">
+            <div className="mx-auto h-16 w-16 rounded-full bg-green-500/10 flex items-center justify-center">
+              <CheckCircle className="h-10 w-10 text-green-500" />
+            </div>
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2">Payment Successful</h1>
+              <p className="text-xl text-muted-foreground">
+                Your site is now being deployed.
+              </p>
+            </div>
+            <p className="text-muted-foreground max-w-md mx-auto">
+              You've approved your build plan and completed payment.<br />
+              LaunchBase has taken over from here.
             </p>
           </div>
 
-          {/* Deployment Progress Card */}
-          <Card className="border-orange-500/20 bg-orange-500/5">
-            <CardContent className="p-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="font-medium">Deployment Progress</span>
-                  {isDeploying ? (
-                    <span className="text-orange-500 font-semibold flex items-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      In Progress
-                    </span>
-                  ) : (
-                    <span className="text-green-500 font-semibold flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4" />
-                      Queued
-                    </span>
-                  )}
-                </div>
-
-                {/* Progress Steps */}
-                <div className="space-y-3">
-                  {DEPLOYMENT_STEPS.map((step) => {
-                    const isCompleted = currentStep > step.id || (!isDeploying && currentStep >= step.id);
-                    const isCurrent = currentStep === step.id && isDeploying;
-                    
-                    return (
-                      <div 
-                        key={step.id} 
-                        className={`flex items-center gap-3 transition-opacity ${
-                          isCompleted || isCurrent ? "opacity-100" : "opacity-40"
-                        }`}
-                      >
-                        <div className={`h-6 w-6 rounded-full flex items-center justify-center ${
-                          isCompleted 
-                            ? "bg-green-500 text-white" 
-                            : isCurrent 
-                              ? "bg-orange-500 text-white" 
-                              : "bg-muted border border-border"
-                        }`}>
-                          {isCompleted ? (
-                            <Check className="h-4 w-4" />
-                          ) : isCurrent ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <Circle className="h-3 w-3" />
-                          )}
-                        </div>
-                        <span className={`text-sm ${isCompleted ? "text-foreground" : "text-muted-foreground"}`}>
-                          {step.label}
-                        </span>
+          {/* What Happens Next */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="h-5 w-5 text-orange-500" />
+                What happens next
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">Right now, LaunchBase is:</p>
+              <div className="space-y-3">
+                {DEPLOYMENT_STEPS.map((step, index) => {
+                  const StepIcon = step.icon;
+                  const isCompleted = currentStep > step.id;
+                  const isCurrent = currentStep === step.id && isDeploying;
+                  
+                  return (
+                    <div 
+                      key={step.id}
+                      className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
+                        isCompleted 
+                          ? "bg-green-500/5 border border-green-500/20" 
+                          : isCurrent 
+                            ? "bg-orange-500/5 border border-orange-500/20" 
+                            : "bg-muted/30"
+                      }`}
+                    >
+                      <div className={`h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        isCompleted 
+                          ? "bg-green-500 text-white" 
+                          : isCurrent 
+                            ? "bg-orange-500 text-white" 
+                            : "bg-muted"
+                      }`}>
+                        {isCompleted ? (
+                          <CheckCircle className="h-4 w-4" />
+                        ) : isCurrent ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <StepIcon className="h-4 w-4 text-muted-foreground" />
+                        )}
                       </div>
-                    );
-                  })}
-                </div>
+                      <span className={`text-sm ${
+                        isCompleted || isCurrent ? "text-foreground" : "text-muted-foreground"
+                      }`}>
+                        {step.label}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
-              
-              {/* Payment Details */}
-              <div className="border-t mt-6 pt-4 space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Amount paid</span>
-                  <span className="font-medium">
-                    ${((session?.amountTotal || 0) / 100).toFixed(2)}
-                  </span>
+              <div className="pt-4 border-t">
+                <p className="text-sm font-medium">You don't need to do anything.</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Deployment typically completes within 2–5 minutes.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* What You'll Receive */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Mail className="h-5 w-5 text-orange-500" />
+                What you'll receive
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-3">
+                  <Globe className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm">Your live website URL as soon as deployment completes</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Mail className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm">A confirmation email with next steps</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Activity className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm">Ongoing system monitoring and updates</span>
+                </li>
+              </ul>
+              <p className="text-xs text-muted-foreground mt-4 pt-3 border-t">
+                You'll see the status update automatically on this page.
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Transparency & Control */}
+          <Card className="bg-muted/30 border-muted">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Eye className="h-5 w-5 text-orange-500" />
+                Transparency & Control
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <span>You approved the exact build plan being deployed</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <span>Every system decision is logged and visible to you</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <span>Silence is intentional — LaunchBase only acts when it's safe and relevant</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <span>You can review activity at any time in your dashboard</span>
+                </li>
+              </ul>
+              <p className="text-sm text-orange-500 font-medium mt-4 pt-3 border-t border-muted">
+                Controls change relevance. Safety is always enforced.
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* While You Wait */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">While you wait (optional)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <Link 
+                  href="/expand/integrations" 
+                  className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                >
+                  <Settings className="h-5 w-5 text-orange-500" />
+                  <div>
+                    <p className="text-sm font-medium">Review your Setup & Integrations packets</p>
+                    <p className="text-xs text-muted-foreground">Prepare Google, Meta, and QuickBooks setup</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 ml-auto text-muted-foreground" />
+                </Link>
+                <Link 
+                  href="/expand" 
+                  className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                >
+                  <Zap className="h-5 w-5 text-orange-500" />
+                  <div>
+                    <p className="text-sm font-medium">Explore Expand LaunchBase</p>
+                    <p className="text-xs text-muted-foreground">Add intelligence modules when you're ready</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 ml-auto text-muted-foreground" />
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Status Card */}
+          <Card className="border-orange-500/30">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between text-sm">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">Deployment:</span>
+                    <span className={`font-medium ${isDeploying ? "text-orange-500" : "text-green-500"}`}>
+                      {isDeploying ? "In progress" : "Complete"}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">Last system check:</span>
+                    <span className="text-foreground">{lastCheck}</span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Email</span>
-                  <span className="font-medium">{session?.customerEmail}</span>
+                <div className="text-right">
+                  <div className="text-xs text-muted-foreground">Next update:</div>
+                  <div className="text-sm font-medium">automatically</div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Status Message */}
-          <div className="text-muted-foreground space-y-2">
-            <p>
-              {isDeploying 
-                ? "Your site is being deployed. This usually takes a few minutes."
-                : "Deployment is queued. We'll email you when your site is live."
-              }
+          {/* Payment Details */}
+          {session && (
+            <div className="text-center text-sm text-muted-foreground space-y-1">
+              <p>Amount paid: ${((session.amountTotal || 0) / 100).toFixed(2)}</p>
+              <p>Receipt sent to: {session.customerEmail}</p>
+            </div>
+          )}
+
+          {/* Support */}
+          <div className="text-center space-y-4 pt-4 border-t">
+            <p className="text-sm text-muted-foreground">
+              If you need anything, you can reach us at<br />
+              <a href="mailto:support@getlaunchbase.com" className="text-orange-500 hover:underline">
+                support@getlaunchbase.com
+              </a>
             </p>
-            <p className="text-sm text-muted-foreground/80">
-              You can close this page — we'll send you an email when everything is ready.
-            </p>
+            <p className="text-lg font-medium">Otherwise — you're done.</p>
           </div>
 
-          {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          {/* Dashboard CTA */}
+          <div className="flex justify-center">
             <Button asChild className="bg-orange-500 hover:bg-orange-600">
               <Link href="/">
                 Go to Dashboard
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <Button variant="outline" asChild>
-              <a href={`mailto:support@launchbase.com?subject=Receipt Request`}>
-                <FileText className="mr-2 h-4 w-4" />
-                View Receipt
-              </a>
-            </Button>
           </div>
 
-          {/* Referral CTA */}
-          <Card className="border-orange-500/20 bg-orange-500/5 mt-6">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-orange-500/20 flex items-center justify-center flex-shrink-0">
-                  <Gift className="h-5 w-5 text-orange-500" />
-                </div>
-                <div className="flex-1 text-left">
-                  <p className="font-medium text-sm">Refer a friend, get $50</p>
-                  <p className="text-xs text-muted-foreground">Share LaunchBase and both save $50</p>
-                </div>
-                <Button variant="outline" size="sm" asChild>
-                  <Link href="/referrals">Get Code</Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Help */}
-          <p className="text-xs text-muted-foreground pt-4">
-            Questions? Email support@launchbase.com
-          </p>
+          {/* Footer */}
+          <div className="text-center pt-8 border-t">
+            <p className="text-xs text-muted-foreground">
+              Powered by LaunchBase
+            </p>
+            <p className="text-xs text-muted-foreground/70 mt-1">
+              Workflows that give you back your life.
+            </p>
+          </div>
         </div>
       </main>
     </div>

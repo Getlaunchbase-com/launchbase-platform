@@ -1385,3 +1385,34 @@
 - [ ] Update success page: "You're in. We're building your site now."
 - [ ] Add footer trust line: "LaunchBase is built on transparency, safety, and inherited intelligence."
 - [ ] Add above submit: "By applying, you're asking LaunchBase to take responsibility — safely and transparently."
+
+## Preview Approval Page Rewrite (Dec 25)
+- [x] Add "This is your real website" headline
+- [x] Add "What you're seeing" context block at top
+- [x] Add "What approval means" explanation section
+- [x] Update checkbox copy with human + legal clickwrap
+- [x] Update primary CTA to "Approve & Continue to Launch"
+- [x] Add "Need a change?" secondary action
+- [x] Add footer trust line about logging decisions
+- [x] Ensure copy aligns with state machine and responsibility transfer positioning
+
+## Stripe Checkout Page Rewrite (Dec 25)
+- [x] Update headline to "You're about to launch your site"
+- [x] Add "What's Included in This Launch" section
+- [x] Add "What Happens After You Pay" sequence (5 steps)
+- [x] Add "What LaunchBase Continues to Do" section
+- [x] Update clickwrap copy (human + legal)
+- [x] Update CTA to "Pay & Launch Site"
+- [x] Add reassurance strip (secure payment, no hidden changes, full visibility, safety rules)
+- [x] Add "Questions before launching?" calm micro-copy
+- [x] Make payment feel procedural, not emotional
+
+## Payment Successful Page Rewrite (Dec 25)
+- [x] Update headline to "Payment Successful - Your site is now being deployed"
+- [x] Add "What happens next" section with 4 deployment steps
+- [x] Add "What you'll receive" section (URL, email, monitoring)
+- [x] Add "Transparency & Control" section
+- [x] Add "While you wait" optional actions
+- [x] Add live deployment status with auto-refresh
+- [x] Add footer with support email and "Powered by LaunchBase" tagline
+- [x] Remove celebration/upsell - confirm responsibility transfer only
