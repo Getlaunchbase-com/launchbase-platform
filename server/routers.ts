@@ -2206,6 +2206,21 @@ export const appRouter = router({
         return { success: true, status: "connected", connectedAt: new Date() };
       }),
 
+    // Get the current user's intake by email
+    getMyIntake: protectedProcedure
+      .query(async ({ ctx }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const userEmail = ctx.user.email;
+        const [intake] = await db
+          .select()
+          .from(intakes)
+          .where(eq(intakes.email, userEmail as string))
+          .orderBy(desc(intakes.createdAt))
+          .limit(1);
+        return intake || null;
+      }),
+
     // Get full checklist using the engine
     getChecklist: protectedProcedure
       .input(z.object({
@@ -2418,6 +2433,101 @@ export const appRouter = router({
 
         console.log(`[Checklist] Field ${input.fieldKey} updated for intake ${input.intakeId}`);
         return { success: true, checklist };
+      }),
+
+    // Download setup packet as markdown (for PDF conversion)
+    downloadPacket: protectedProcedure
+      .input(z.object({
+        intakeId: z.number(),
+        platform: z.enum(["gbp", "meta", "qbo", "all"]),
+      }))
+      .mutation(async ({ input }) => {
+        const engine = await import("./services/checklistEngine");
+        const intake = await getIntakeById(input.intakeId);
+        
+        if (!intake) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Intake not found" });
+        }
+
+        const businessCtx = {
+          intakeId: intake.id,
+          businessName: intake.businessName,
+          zip: undefined,
+          trades: [] as string[],
+          primaryTrade: intake.vertical,
+          phone: intake.phone || undefined,
+          email: intake.email,
+          services: intake.services || [],
+          serviceArea: intake.serviceArea || [],
+          tagline: intake.tagline || undefined,
+          tone: "balanced" as const,
+        };
+
+        const checklist = engine.computeChecklist(businessCtx);
+        
+        // Generate markdown content
+        const generatePlatformMarkdown = (platformId: string, platformName: string) => {
+          const steps = checklist.steps.filter((s: any) => s.stepId.startsWith(platformId));
+          const fields = Object.entries(checklist.fields).filter(([k]) => k.startsWith(platformId));
+          
+          let md = `# ${platformName} Setup Packet\n\n`;
+          md += `**Business:** ${intake.businessName}\n`;
+          md += `**Generated:** ${new Date().toLocaleDateString()}\n\n`;
+          md += `---\n\n`;
+          
+          md += `## Fields\n\n`;
+          for (const [key, field] of fields) {
+            const f = field as any;
+            md += `### ${f.label}\n`;
+            md += `**Value:** ${f.value || "(not set)"}\n`;
+            md += `**Confidence:** ${Math.round((f.confidence || 0) * 100)}%\n`;
+            md += `**Source:** ${f.source || "system"}\n\n`;
+          }
+          
+          md += `## Setup Steps\n\n`;
+          for (const step of steps) {
+            const s = step as any;
+            md += `### ${s.title}\n`;
+            md += `${s.description}\n\n`;
+            if (s.deepLink) {
+              md += `**Link:** ${s.deepLink}\n\n`;
+            }
+          }
+          
+          md += `---\n\n`;
+          md += `*You can regenerate this packet anytime from LaunchBase.*\n`;
+          
+          return md;
+        };
+
+        const platformNames: Record<string, string> = {
+          gbp: "Google Business Profile",
+          meta: "Facebook & Instagram",
+          qbo: "QuickBooks Online",
+        };
+
+        if (input.platform === "all") {
+          // Generate combined markdown
+          let combined = `# Setup Packets for ${intake.businessName}\n\n`;
+          combined += `Generated: ${new Date().toLocaleDateString()}\n\n`;
+          combined += `---\n\n`;
+          
+          for (const [id, name] of Object.entries(platformNames)) {
+            combined += generatePlatformMarkdown(id, name);
+            combined += `\n\n`;
+          }
+          
+          return { 
+            filename: `setup-packets-${intake.businessName.toLowerCase().replace(/\s+/g, "-")}.md`,
+            content: combined,
+          };
+        } else {
+          const md = generatePlatformMarkdown(input.platform, platformNames[input.platform]);
+          return {
+            filename: `${input.platform}-setup-${intake.businessName.toLowerCase().replace(/\s+/g, "-")}.md`,
+            content: md,
+          };
+        }
       }),
   }),
 });

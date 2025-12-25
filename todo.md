@@ -1332,3 +1332,11 @@
 
 ### Layout
 - [x] Step-first design (tasks) with fields embedded under each step
+
+
+## Autofill UI Polish (from paste)
+- [x] Auto mode explanation under toggle: "LaunchBase prepares and updates setup details automatically. You can lock or edit anything at any time."
+- [x] Global status sentence per platform: "Google Business Profile setup is 80% complete"
+- [x] Human-readable diff toasts: "Updated: Business description (seasonal tone), Unchanged: Categories (locked by you)"
+- [x] Wire checklist to real intake from auth context (getMyIntake endpoint added)
+- [x] Download Packet (markdown format with values + confidence + last updated + notes)
