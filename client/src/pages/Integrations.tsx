@@ -498,6 +498,23 @@ export default function Integrations() {
   // Get the user's intake dynamically
   const { data: myIntake, isLoading: intakeLoading } = trpc.setupPackets.getMyIntake.useQuery();
   const intakeId = myIntake?.id;
+
+  // Download All mutation
+  const downloadAllMutation = trpc.setupPackets.downloadPacket.useMutation({
+    onSuccess: (result) => {
+      const blob = new Blob([result.content], { type: "text/markdown" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = result.filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success("All setup packets downloaded");
+    },
+    onError: (error) => toast.error(error.message),
+  });
   
   // Get summary data for all platforms (only when we have an intake)
   const { data: summaryData, isLoading: summaryLoading } = trpc.setupPackets.getChecklist.useQuery(
@@ -582,7 +599,23 @@ export default function Integrations() {
           </div>
         ) : (
           /* Platform cards grid */
-          <div className="grid md:grid-cols-3 gap-6">
+          <>
+            {/* Download All button */}
+            {intakeId && (
+              <div className="flex justify-end mb-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => downloadAllMutation.mutate({ intakeId, platform: "all" })}
+                  disabled={downloadAllMutation.isPending}
+                  className="border-zinc-700 hover:bg-zinc-800"
+                >
+                  <Download className={`h-4 w-4 mr-2 ${downloadAllMutation.isPending ? 'animate-pulse' : ''}`} />
+                  Download All Packets
+                </Button>
+              </div>
+            )}
+            <div className="grid md:grid-cols-3 gap-6">
             {platforms.map((platform) => {
               const summary = getPlatformSummary(platform.id);
               const Icon = platform.icon;
@@ -652,7 +685,8 @@ export default function Integrations() {
                 </Card>
               );
             })}
-          </div>
+            </div>
+          </>
         )}
       </main>
     </div>
