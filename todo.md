@@ -1,5 +1,17 @@
 # LaunchBase TODO
 
+## Session Dec 24, 2025 - Fixes Applied
+- [x] Fixed WORKER_TOKEN for cron authentication
+- [x] Built Setup Packets UI (/expand/integrations)
+- [x] Fixed Larre's missing build plan (intake 120001)
+- [x] Tested complete customer flow (Apply → Preview → Approve → Checkout)
+- [x] Verified Stripe checkout works ($499)
+- [ ] Email Larre manually (Resend blocked)
+- [ ] Verify Resend domain DNS
+- [ ] Test Stripe webhook with real payment
+
+---
+
 ## Core Features
 
 - [x] Database schema (intakes, build_plans, deployments, clarifications)
