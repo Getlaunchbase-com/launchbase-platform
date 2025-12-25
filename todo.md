@@ -1,15 +1,11 @@
 # LaunchBase TODO
 
-## Session Dec 24, 2025 - All Missing Features Completed
+## Session Dec 24, 2025 - Fixes Applied
 - [x] Fixed WORKER_TOKEN for cron authentication
 - [x] Built Setup Packets UI (/expand/integrations)
 - [x] Fixed Larre's missing build plan (intake 120001)
 - [x] Tested complete customer flow (Apply → Preview → Approve → Checkout)
 - [x] Verified Stripe checkout works ($499)
-- [x] Multi-trade support (trades[] and primaryTrade columns added)
-- [x] Setup packet database persistence (markInProgress, markConnected, getStatus endpoints)
-- [x] Relevance bias slider in Custom mode (Conservative/Balanced/Opportunistic)
-- [x] Setup packet download (markdown format, uploads to S3)
 - [ ] Email Larre manually (Resend blocked)
 - [ ] Verify Resend domain DNS
 - [ ] Test Stripe webhook with real payment
@@ -1192,11 +1188,81 @@
 - [ ] Never touches safety rules
 
 
-## Session Dec 24, 2025 - Complete Missing Features (from 7 pastes)
+## Checklist Engine - Complete Requirements (from 7 pastes)
 
-- [ ] Multi-trade support (trades[] instead of single trade)
-- [ ] Setup packet database persistence with status tracking
-- [ ] markInProgress / markConnected endpoints
-- [ ] Relevance bias slider (Conservative ← Balanced → Opportunistic)
-- [ ] PDF download for setup packets
-- [ ] Test all features end-to-end
+### Core Data Model
+- [ ] Create `checklistEngine.ts` service file
+- [ ] EvidencedField type with: value, confidence (0-100), source, lastComputedAt, version
+- [ ] Lock semantics: isLocked, lockedBy (user/admin/system), lockedAt
+- [ ] Evidence string for each field (e.g., "from onboarding Q3")
+
+### Blockers Model
+- [ ] Blocker type: code (machine-readable), message (human), fix (CTA), severity (warning/blocking)
+- [ ] createdAt / resolvedAt timestamps on blockers
+- [ ] Add blockers column to integration_setup_packets table
+
+### Checklist Steps
+- [ ] Step type: stepId, title, instructionsMarkdown, requires (prereqs), validation rules
+- [ ] Step completion: pending | complete | skipped | needs_attention
+- [ ] completedAt, completedBy fields
+- [ ] Validation rules per step (e.g., GBP description 250-750 chars)
+
+### API Endpoints
+- [ ] GET /api/setupPackets/:intakeId/checklist - all integrations + steps + blockers
+- [ ] POST /api/setupPackets/:intakeId/:integration/steps/:stepId/complete
+- [ ] POST /api/setupPackets/:intakeId/:integration/steps/:stepId/reset (with cascade option)
+- [ ] POST /api/setupPackets/:intakeId/:integration/recompute (with mode: safe|full)
+- [ ] POST /api/setupPackets/:intakeId/:integration/blockers/:code/resolve
+
+### Recompute Endpoint Rules
+- [ ] Never overwrite admin_override / user_override fields
+- [ ] Don't reset completed steps unless they no longer validate
+- [ ] Return diff summary: updatedFields, updatedSteps, addedBlockers, resolvedBlockers
+- [ ] Safe mode (default): preserves overrides + completion unless invalid
+- [ ] Full mode: regenerates everything except hard overrides
+
+### Reset Step Rules
+- [ ] Reset single step to pending by default
+- [ ] cascade option to reset dependent auto-completed steps
+- [ ] Clear completedAt, completedBy, validationResults
+- [ ] Don't clear fields that are user overrides
+
+### UI Updates
+- [ ] "Refresh suggestions" button on each integration card
+- [ ] "Reset step" in step detail / kebab menu
+- [ ] "Last computed: 12m ago" timestamp display
+- [ ] Toast after recompute: "Updated: 12 fields, 1 blocker found (View)"
+- [ ] Blocker display with "Fix" button
+- [ ] "Why we think this" tooltip on AI-generated values
+- [ ] Next step CTA (single clear action)
+- [ ] Top 3 prefilled fields preview on card
+- [ ] Copy All button per integration
+- [ ] ZIP download with all packets + images
+
+### Platform Guardrails
+- [ ] GBP: description 250-750 chars, category required
+- [ ] Meta: bio 255 chars max, about 2000 chars max
+- [ ] QuickBooks: item name 100 chars max, description 4000 chars max
+
+### Season-Aware Content
+- [ ] Detect season (winter/spring/summer/fall)
+- [ ] Adjust content mode (seasonal_urgency/early_booking/peak_season/prep_mode)
+- [ ] Apply to generated descriptions and CTAs
+
+### Observability
+- [ ] Log CHECKLIST_RECOMPUTE_RUN with counts + reason + actor
+- [ ] Log CHECKLIST_STEP_RESET with step + reason + actor
+- [ ] Decision log entries for auto-completions
+
+
+## Execution Order (from paste)
+
+- [ ] Step 0: Checkpoint current state (baseline)
+- [ ] Step 1: Restore checklistEngine.ts (single source of truth)
+- [ ] Step 2: Lock semantics (isLocked, lockedBy, lockedAt, overrideValue vs suggestedValue)
+- [ ] Step 3: Diff summary for recompute (updatedFields[], blockersAdded[], counts)
+- [ ] Step 4: Cascade reset (prereq graph, downstream auto-completed steps only)
+- [ ] Step 5: Guardrails enforcement (GBP 750, Meta 255, QBO 100)
+- [ ] Step 6: Season-aware content (seasonContext object, adjust descriptions)
+- [ ] Step 7: UI polish (Refresh button, Reset menu, Blocker panel, tooltips, Copy All, ZIP)
+- [ ] Step 8: Observability hooks (CHECKLIST_RECOMPUTE_RUN, CHECKLIST_STEP_RESET, BLOCKER_RESOLVED)

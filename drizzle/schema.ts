@@ -46,8 +46,6 @@ export const intakes = mysqlTable("intakes", {
   previewToken: varchar("previewToken", { length: 64 }),
   previewUrl: varchar("previewUrl", { length: 512 }),
   internalNotes: text("internalNotes"),
-  // Customer controls
-  relevanceBias: mysqlEnum("relevanceBias", ["conservative", "balanced", "opportunistic"]).default("balanced"),
   // Payment tracking
   stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
   stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }),
@@ -653,9 +651,6 @@ export const suiteApplications = mysqlTable("suite_applications", {
     "trades", "health", "beauty", "food", "cannabis", "professional", "fitness", "automotive"
   ]).notNull(),
   industry: varchar("industry", { length: 64 }), // specific industry within vertical
-  // Multi-trade support: array of trades, first is primary
-  trades: json("trades").$type<string[]>(),
-  primaryTrade: varchar("primaryTrade", { length: 64 }),
   // Legacy field - keeping for backward compatibility
   businessType: mysqlEnum("businessType", ["TRADES", "FOOD", "RETAIL", "PRO", "OTHER"]),
   cityZip: varchar("cityZip", { length: 128 }).notNull(),
@@ -882,8 +877,7 @@ export type InsertIntegrationSetupPacket = typeof integrationSetupPackets.$infer
  */
 export const integrationConnections = mysqlTable("integration_connections", {
   id: int("id").autoincrement().primaryKey(),
-  customerId: int("customerId"),
-  intakeId: int("intakeId"),
+  customerId: int("customerId").notNull(),
   // Integration type
   integration: mysqlEnum("integration", ["google_business", "meta", "quickbooks"]).notNull(),
   // Connection status

@@ -2189,47 +2189,7 @@ export const appRouter = router({
         integration: z.enum(["google_business", "meta", "quickbooks"]),
       }))
       .mutation(async ({ input, ctx }) => {
-        const db = await getDb();
-        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
-        
-        const { integrationSetupPackets } = await import("../drizzle/schema");
-        
-        // Check if packet exists
-        const existing = await db.select().from(integrationSetupPackets)
-          .where(and(
-            eq(integrationSetupPackets.intakeId, input.intakeId),
-            eq(integrationSetupPackets.integration, input.integration)
-          ))
-          .limit(1);
-        
-        if (existing.length > 0) {
-          // Update existing
-          await db.update(integrationSetupPackets)
-            .set({ status: "in_progress", updatedAt: new Date() })
-            .where(eq(integrationSetupPackets.id, existing[0].id));
-        } else {
-          // Create new record with in_progress status
-          const { generateSetupPacket } = await import("./services/setupPacketGenerator");
-          const packet = await generateSetupPacket(input.intakeId, input.integration);
-          
-          await db.insert(integrationSetupPackets).values({
-            intakeId: input.intakeId,
-            sourceType: "intake",
-            integration: input.integration,
-            status: "in_progress",
-            packetVersion: "v1.0.0",
-            packetJson: packet as any,
-            generatedFrom: {
-              businessName: packet?.business?.name || "",
-              services: packet?.services?.map((s: any) => s.name) || [],
-              location: Array.isArray(packet?.business?.serviceArea) ? packet.business.serviceArea.join(", ") : (packet?.business?.serviceArea || ""),
-              tone: packet?.positioning?.tone || "professional",
-              vertical: "trades",
-              generatedAt: new Date().toISOString(),
-            },
-          });
-        }
-        
+        // For now, just log the action - in future, store in DB
         console.log(`[SetupPacket] ${ctx.user?.email} marked ${input.integration} as in progress for intake ${input.intakeId}`);
         return { success: true, status: "in_progress" };
       }),
@@ -2240,143 +2200,11 @@ export const appRouter = router({
         intakeId: z.number(),
         integration: z.enum(["google_business", "meta", "quickbooks"]),
         externalAccountId: z.string().optional(),
-        externalAccountName: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
-        const db = await getDb();
-        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
-        
-        const { integrationSetupPackets, integrationConnections } = await import("../drizzle/schema");
-        const now = new Date();
-        
-        // Update setup packet status
-        const existing = await db.select().from(integrationSetupPackets)
-          .where(and(
-            eq(integrationSetupPackets.intakeId, input.intakeId),
-            eq(integrationSetupPackets.integration, input.integration)
-          ))
-          .limit(1);
-        
-        if (existing.length > 0) {
-          await db.update(integrationSetupPackets)
-            .set({ status: "connected", connectedAt: now, updatedAt: now })
-            .where(eq(integrationSetupPackets.id, existing[0].id));
-        }
-        
-        // Create or update connection record
-        const existingConn = await db.select().from(integrationConnections)
-          .where(and(
-            eq(integrationConnections.intakeId, input.intakeId),
-            eq(integrationConnections.integration, input.integration)
-          ))
-          .limit(1);
-        
-        if (existingConn.length > 0) {
-          await db.update(integrationConnections)
-            .set({
-              connectionStatus: "connected",
-              externalAccountId: input.externalAccountId,
-              externalAccountName: input.externalAccountName,
-              lastSyncAt: now,
-              updatedAt: now,
-            })
-            .where(eq(integrationConnections.id, existingConn[0].id));
-        } else {
-          await db.insert(integrationConnections).values({
-            intakeId: input.intakeId,
-            integration: input.integration,
-            connectionStatus: "connected",
-            externalAccountId: input.externalAccountId,
-            externalAccountName: input.externalAccountName,
-            lastSyncAt: now,
-          });
-        }
-        
+        // For now, just log the action - in future, store in DB
         console.log(`[SetupPacket] ${ctx.user?.email} marked ${input.integration} as connected for intake ${input.intakeId}`);
-        return { success: true, status: "connected", connectedAt: now };
-      }),
-
-    // Get status for all integrations for an intake
-    getStatus: protectedProcedure
-      .input(z.object({
-        intakeId: z.number(),
-      }))
-      .query(async ({ input }) => {
-        const db = await getDb();
-        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
-        
-        const { integrationSetupPackets, integrationConnections } = await import("../drizzle/schema");
-        
-        const packets = await db.select().from(integrationSetupPackets)
-          .where(eq(integrationSetupPackets.intakeId, input.intakeId));
-        
-        const connections = await db.select().from(integrationConnections)
-          .where(eq(integrationConnections.intakeId, input.intakeId));
-        
-        const integrations = ["google_business", "meta", "quickbooks"] as const;
-        const result: Record<string, { status: string; connectedAt?: Date; lastSyncAt?: Date; externalAccountName?: string }> = {};
-        
-        for (const integration of integrations) {
-          const packet = packets.find(p => p.integration === integration);
-          const connection = connections.find(c => c.integration === integration);
-          
-          result[integration] = {
-            status: packet?.status || "ready",
-            connectedAt: packet?.connectedAt || undefined,
-            lastSyncAt: connection?.lastSyncAt || undefined,
-            externalAccountName: connection?.externalAccountName || undefined,
-          };
-        }
-        
-        return result;
-      }),
-
-    // Generate downloadable setup packet (markdown format)
-    downloadPdf: protectedProcedure
-      .input(z.object({
-        intakeId: z.number(),
-        integration: z.enum(["google_business", "meta", "quickbooks", "all"]),
-      }))
-      .mutation(async ({ input }) => {
-        const { generateSetupPacket, generateAllPackets } = await import("./services/setupPacketGenerator");
-        const { generateSetupPacketMarkdown, generateAllPacketsMarkdown } = await import("./services/setupPacketPdf");
-        const { storagePut } = await import("./storage");
-        
-        // Get intake for business name
-        const db = await getDb();
-        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
-        
-        const intake = await db.select().from(intakes).where(eq(intakes.id, input.intakeId)).limit(1);
-        if (!intake.length) {
-          throw new TRPCError({ code: "NOT_FOUND", message: "Intake not found" });
-        }
-        
-        const businessName = intake[0].businessName;
-        let markdown: string;
-        let filename: string;
-        
-        if (input.integration === "all") {
-          const packets = await generateAllPackets(input.intakeId);
-          markdown = generateAllPacketsMarkdown({
-            google: packets.google || undefined,
-            meta: packets.meta || undefined,
-            quickbooks: packets.quickbooks || undefined,
-          }, businessName);
-          filename = `${businessName.replace(/[^a-zA-Z0-9]/g, "_")}_setup_packets.md`;
-        } else {
-          const packet = await generateSetupPacket(input.intakeId, input.integration);
-          if (!packet) {
-            throw new TRPCError({ code: "NOT_FOUND", message: "Packet not found" });
-          }
-          markdown = generateSetupPacketMarkdown(packet);
-          filename = `${businessName.replace(/[^a-zA-Z0-9]/g, "_")}_${input.integration}_setup.md`;
-        }
-        
-        // Upload markdown to S3
-        const key = `setup-packets/${input.intakeId}/${filename}`;
-        const { url } = await storagePut(key, Buffer.from(markdown, "utf-8"), "text/markdown");
-        
-        return { url, filename };
+        return { success: true, status: "connected", connectedAt: new Date() };
       }),
   }),
 });

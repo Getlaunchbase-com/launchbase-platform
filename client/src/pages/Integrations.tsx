@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { 
   ArrowLeft, Building2, Facebook, Calculator, 
-  Check, ExternalLink, Copy, Download,
+  Check, ExternalLink, Copy,
   ChevronRight, Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -96,17 +96,6 @@ function SetupPacketViewer({ intakeId, integration }: SetupPacketViewerProps) {
     integration 
   });
 
-  const downloadPdf = trpc.setupPackets.downloadPdf.useMutation({
-    onSuccess: (data) => {
-      // Open PDF in new tab
-      window.open(data.url, "_blank");
-      toast.success("PDF generated successfully");
-    },
-    onError: () => {
-      toast.error("Failed to generate PDF");
-    },
-  });
-
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     toast.success(`${label} copied to clipboard`);
@@ -132,24 +121,6 @@ function SetupPacketViewer({ intakeId, integration }: SetupPacketViewerProps) {
 
   return (
     <div className="space-y-6">
-      {/* Download PDF Button */}
-      <div className="flex justify-end">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => downloadPdf.mutate({ intakeId, integration })}
-          disabled={downloadPdf.isPending}
-          className="border-orange-500/30 text-orange-400 hover:bg-orange-500/10"
-        >
-          {downloadPdf.isPending ? (
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-          ) : (
-            <Download className="h-4 w-4 mr-2" />
-          )}
-          Download PDF
-        </Button>
-      </div>
-
       {/* Business Info Section */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-white">Business Information</h3>
