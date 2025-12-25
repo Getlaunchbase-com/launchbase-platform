@@ -51,6 +51,9 @@ const translations: Record<Language, {
   badge: string;
   title: string;
   subtitle: string;
+  trustLine: string;
+  formIntro: string;
+  microCopy: { editLater: string; noPublish: string; approvalRequired: string };
   steps: { language: string; business: string; location: string; cadence: string; context: string; control: string; start: string; contact: string; review: string };
   languageStep: { title: string; subtitle: string };
   businessStep: { title: string; subtitle: string };
@@ -60,14 +63,17 @@ const translations: Record<Language, {
   modeStep: { title: string; subtitle: string };
   timingStep: { title: string; subtitle: string };
   contactStep: { title: string; subtitle: string; nameLabel: string; emailLabel: string; phoneLabel: string };
-  reviewStep: { title: string; subtitle: string; termsLabel: string };
+  reviewStep: { title: string; subtitle: string; termsLabel: string; submitNote: string };
   buttons: { back: string; continue: string; submit: string };
   pricing: { monthly: string; setup: string; cadence: string; layers: string; total: string };
 }> = {
   en: {
     badge: "Founder pricing locks for 12 months",
     title: "You're not signing up for software.",
-    subtitle: "You're handing off responsibility. LaunchBase will build your site, deploy it, keep it live, handle visibility, and stay quiet when silence is the right move. You stay focused on the work.",
+    subtitle: "You're handing off responsibility. LaunchBase is an operating system that builds your website, manages visibility, and stays on — so you don't have to.",
+    trustLine: "See your real site before you pay. You can always see what LaunchBase is doing.",
+    formIntro: "Answer naturally. You don't need perfect wording — LaunchBase translates intent into professional output.",
+    microCopy: { editLater: "You can edit this later.", noPublish: "This does not publish anything.", approvalRequired: "Nothing goes live without approval." },
     steps: { language: "Language", business: "Business", location: "Location", cadence: "Cadence", context: "Context", control: "Control", start: "Start", contact: "Contact", review: "Review" },
     languageStep: { title: "Choose your language", subtitle: "Select the language you're most comfortable with. Your website will be built in English to reach local customers." },
     businessStep: { title: "What type of business?", subtitle: "This helps LaunchBase choose the right context signals for your industry." },
@@ -77,14 +83,17 @@ const translations: Record<Language, {
     modeStep: { title: "How hands-on do you want to be?", subtitle: "Choose how much control you want over each post." },
     timingStep: { title: "When do you want to start?", subtitle: "We'll build your website and set up your workflows." },
     contactStep: { title: "Contact information", subtitle: "We'll reach out to finalize your setup.", nameLabel: "Your name", emailLabel: "Email", phoneLabel: "Phone" },
-    reviewStep: { title: "Review & apply", subtitle: "Make sure everything looks right.", termsLabel: "I agree to the Terms of Service and Privacy Policy" },
+    reviewStep: { title: "Review & apply", subtitle: "Make sure everything looks right.", termsLabel: "I agree to the Terms of Service and Privacy Policy", submitNote: "By applying, you're asking LaunchBase to take responsibility — safely and transparently." },
     buttons: { back: "Back", continue: "Continue", submit: "Submit Application" },
     pricing: { monthly: "Monthly", setup: "Setup", cadence: "Cadence", layers: "Layers", total: "Total" },
   },
   es: {
     badge: "Precio de fundador bloqueado por 12 meses",
-    title: "Solicitar LaunchBase",
-    subtitle: "3–5 minutos. Verás una vista previa de lo que LaunchBase haría para tu negocio antes de que nada salga en vivo.",
+    title: "No te estás registrando para un software.",
+    subtitle: "Estás delegando responsabilidad. LaunchBase es un sistema operativo que construye tu sitio web, gestiona tu visibilidad y se mantiene activo — para que tú no tengas que hacerlo.",
+    trustLine: "Ve tu sitio real antes de pagar. Siempre puedes ver lo que LaunchBase está haciendo.",
+    formIntro: "Responde naturalmente. No necesitas palabras perfectas — LaunchBase traduce tu intención en resultados profesionales.",
+    microCopy: { editLater: "Puedes editar esto después.", noPublish: "Esto no publica nada.", approvalRequired: "Nada sale en vivo sin tu aprobación." },
     steps: { language: "Idioma", business: "Negocio", location: "Ubicación", cadence: "Frecuencia", context: "Contexto", control: "Control", start: "Inicio", contact: "Contacto", review: "Revisar" },
     languageStep: { title: "Elige tu idioma", subtitle: "Selecciona el idioma con el que te sientas más cómodo. Tu sitio web se construirá en inglés para llegar a clientes locales." },
     businessStep: { title: "¿Qué tipo de negocio?", subtitle: "Esto ayuda a LaunchBase a elegir las señales de contexto adecuadas para tu industria." },
@@ -94,14 +103,17 @@ const translations: Record<Language, {
     modeStep: { title: "¿Qué tan involucrado quieres estar?", subtitle: "Elige cuánto control quieres sobre cada publicación." },
     timingStep: { title: "¿Cuándo quieres empezar?", subtitle: "Construiremos tu sitio web y configuraremos tus flujos de trabajo." },
     contactStep: { title: "Información de contacto", subtitle: "Nos comunicaremos para finalizar tu configuración.", nameLabel: "Tu nombre", emailLabel: "Correo electrónico", phoneLabel: "Teléfono" },
-    reviewStep: { title: "Revisar y aplicar", subtitle: "Asegúrate de que todo se vea bien.", termsLabel: "Acepto los Términos de Servicio y la Política de Privacidad" },
+    reviewStep: { title: "Revisar y aplicar", subtitle: "Asegúrate de que todo se vea bien.", termsLabel: "Acepto los Términos de Servicio y la Política de Privacidad", submitNote: "Al aplicar, estás pidiendo a LaunchBase que asuma la responsabilidad — de forma segura y transparente." },
     buttons: { back: "Atrás", continue: "Continuar", submit: "Enviar Solicitud" },
     pricing: { monthly: "Mensual", setup: "Configuración", cadence: "Frecuencia", layers: "Capas", total: "Total" },
   },
   pl: {
     badge: "Cena założycielska zablokowana na 12 miesięcy",
-    title: "Aplikuj do LaunchBase",
-    subtitle: "3–5 minut. Zobaczysz podgląd tego, co LaunchBase zrobi dla Twojej firmy, zanim cokolwiek zostanie opublikowane.",
+    title: "Nie rejestrujesz się na oprogramowanie.",
+    subtitle: "Przekazujesz odpowiedzialność. LaunchBase to system operacyjny, który buduje Twoją stronę, zarządza widocznością i działa — abyś Ty nie musiał.",
+    trustLine: "Zobacz swoją prawdziwą stronę przed płatnością. Zawsze możesz zobaczyć, co robi LaunchBase.",
+    formIntro: "Odpowiadaj naturalnie. Nie potrzebujesz idealnych słów — LaunchBase przekłada intencję na profesjonalne rezultaty.",
+    microCopy: { editLater: "Możesz to edytować później.", noPublish: "To nic nie publikuje.", approvalRequired: "Nic nie zostanie opublikowane bez Twojej zgody." },
     steps: { language: "Język", business: "Firma", location: "Lokalizacja", cadence: "Częstotliwość", context: "Kontekst", control: "Kontrola", start: "Start", contact: "Kontakt", review: "Przegląd" },
     languageStep: { title: "Wybierz swój język", subtitle: "Wybierz język, w którym czujesz się najlepiej. Twoja strona internetowa zostanie zbudowana po angielsku, aby dotrzeć do lokalnych klientów." },
     businessStep: { title: "Jaki typ firmy?", subtitle: "To pomaga LaunchBase wybrać odpowiednie sygnały kontekstowe dla Twojej branży." },
@@ -111,7 +123,7 @@ const translations: Record<Language, {
     modeStep: { title: "Jak bardzo chcesz być zaangażowany?", subtitle: "Wybierz, ile kontroli chcesz mieć nad każdym postem." },
     timingStep: { title: "Kiedy chcesz zacząć?", subtitle: "Zbudujemy Twoją stronę internetową i skonfigurujemy Twoje przepływy pracy." },
     contactStep: { title: "Informacje kontaktowe", subtitle: "Skontaktujemy się, aby sfinalizować konfigurację.", nameLabel: "Twoje imię", emailLabel: "Email", phoneLabel: "Telefon" },
-    reviewStep: { title: "Przegląd i aplikacja", subtitle: "Upewnij się, że wszystko wygląda dobrze.", termsLabel: "Zgadzam się z Warunkami Usługi i Polityką Prywatności" },
+    reviewStep: { title: "Przegląd i aplikacja", subtitle: "Upewnij się, że wszystko wygląda dobrze.", termsLabel: "Zgadzam się z Warunkami Usługi i Polityką Prywatności", submitNote: "Aplikując, prosisz LaunchBase o przejęcie odpowiedzialności — bezpiecznie i przejrzyście." },
     buttons: { back: "Wstecz", continue: "Kontynuuj", submit: "Wyślij Aplikację" },
     pricing: { monthly: "Miesięcznie", setup: "Konfiguracja", cadence: "Częstotliwość", layers: "Warstwy", total: "Razem" },
   },

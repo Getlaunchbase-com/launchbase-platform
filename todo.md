@@ -1346,3 +1346,42 @@
 - [x] Test integrations page with real customer login (redirects to auth correctly)
 - [x] Add "Download All" button for combined packet
 - [x] Verify customer sees their own data (checklist engine tested with Larre's real data)
+
+
+## Positioning Copy Updates (from pastes)
+
+### Homepage Updates
+- [x] Update subheadline: "LaunchBase doesn't just build your website. It takes responsibility for keeping your business visible — safely — after launch."
+- [x] Add section: "This Is Not a Website Builder" - calm, confident differentiation
+- [x] Add section: "What LaunchBase Is Doing Right Now" - show ObservabilityPanel
+- [x] Add section: "Built to grow with you" - growth without friction messaging
+- [x] Add key line: "You're not signing up for software. You're handing off responsibility."
+- [x] Add line: "Builders make you choose upfront. LaunchBase lets you decide over time."
+
+### Expand LaunchBase Page Updates
+- [x] Update header: "Expand LaunchBase - Add capabilities as your business grows. Nothing you turn on breaks what already works."
+- [x] Add trust line under toggles: "You can change this anytime. Safety, observability, and core intelligence are always enforced."
+
+### Key Positioning Lines (use everywhere)
+- "LaunchBase is an operating system that safely takes responsibility off your plate — and shows its work."
+- "LaunchBase gives you a stable foundation today — and the flexibility to grow without friction tomorrow."
+
+
+### Apply Page Rewrite (from paste)
+- [x] Hero: "You're not signing up for software. You're handing off responsibility."
+- [x] Subheadline: "LaunchBase is an operating system that builds your website, manages visibility, and stays on — so you don't have to."
+- [x] Trust line: "See your real site before you pay. You can always see what LaunchBase is doing."
+- [x] Form intro: "Answer naturally. You don't need perfect wording — LaunchBase translates intent into professional output."
+- [x] Micro-copy throughout (editLater, noPublish, approvalRequired)
+- [x] Submit note: "By applying, you're asking LaunchBase to take responsibility — safely and transparently."
+- [x] All translations updated (English, Spanish, Polish)
+- [ ] Subheadline: "LaunchBase is an operating system that builds your website, manages visibility, and stays on — so you don't have to."
+- [ ] Trust line: "See your real site before you pay. You can always see what LaunchBase is doing."
+- [ ] Add "What This Is / Isn't" section (expectation setting)
+- [ ] Add "Here's exactly what happens next" process section (5 steps)
+- [ ] Add "Why an application?" section
+- [ ] Add form intro: "Answer naturally. You don't need perfect wording."
+- [ ] Add micro-copy: "You can edit this later", "This does not publish anything", "Nothing goes live without approval"
+- [ ] Update success page: "You're in. We're building your site now."
+- [ ] Add footer trust line: "LaunchBase is built on transparency, safety, and inherited intelligence."
+- [ ] Add above submit: "By applying, you're asking LaunchBase to take responsibility — safely and transparently."
