@@ -1416,3 +1416,15 @@
 - [x] Add live deployment status with auto-refresh
 - [x] Add footer with support email and "Powered by LaunchBase" tagline
 - [x] Remove celebration/upsell - confirm responsibility transfer only
+
+
+## Homepage Pressure Test Polish (Dec 25)
+### From Pressure Test Findings:
+- [x] Reframe problem as lack of responsibility, not lack of tools (early, unmissable)
+- [x] Make responsibility concrete through lived outcomes (what stops being your job)
+- [x] Elevate one killer insight to headline level ("See your real site before you pay" or "Silence is a valid decision")
+- [x] Add felt inevitability without manipulation (relief, not urgency)
+- [x] Frame CTA as handoff, not signup (relief language)
+- [x] Explicitly state non-action is safe and change is reversible
+- [x] Add "what disappears from your life" framing (mental load, not features)
+- [x] Pass operator-vs-marketer litmus test on all new copy
