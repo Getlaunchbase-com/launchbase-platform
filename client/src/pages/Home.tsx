@@ -70,13 +70,6 @@ function LiveContextPanel() {
     return () => clearInterval(interval);
   }, []);
 
-  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  const dayName = dayNames[time.getDay()];
-  const hours = time.getHours();
-  const minutes = time.getMinutes().toString().padStart(2, '0');
-  const ampm = hours >= 12 ? 'PM' : 'AM';
-  const displayHours = hours % 12 || 12;
-
   return (
     <div className="bg-[#151518] border border-white/10 rounded-2xl p-5 font-mono text-sm">
       <div className="text-gray-500 mb-3 text-xs uppercase tracking-wider">What LaunchBase is doing right now</div>
@@ -124,13 +117,13 @@ export default function Home() {
           </div>
           <Link href="/apply">
             <Button className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white">
-              Apply <ArrowRight className="w-4 h-4 ml-2" />
+              Hand It Off <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </Link>
         </div>
       </nav>
 
-      {/* Hero Section */}
+      {/* Hero Section - Reframed around responsibility */}
       <section className="pt-32 pb-20 px-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#FF6A00]/5 via-transparent to-transparent pointer-events-none" />
         
@@ -143,25 +136,29 @@ export default function Home() {
               </div>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 leading-tight">
-                Workflows that give you
+                Stop carrying the system
                 <br />
-                <span className="text-[#FF6A00]">back your life.</span>
+                <span className="text-[#FF6A00]">in your head.</span>
               </h1>
               
               <p className="text-lg md:text-xl text-gray-400 mb-6 leading-relaxed">
-                LaunchBase is an operating system for small businesses.
-                We build your website, manage your visibility, and take ongoing responsibility — safely and transparently.
+                Your website exists. Your tools work. But no one owns the system.
+                <br />
+                <span className="text-white">LaunchBase takes ongoing responsibility</span> — so you stop thinking about it.
               </p>
               
-              <p className="text-sm text-gray-500 mb-8 flex items-center gap-2">
-                <Eye className="w-4 h-4 text-[#FF6A00]" />
-                See your real site before you pay. You can always see what LaunchBase is doing.
-              </p>
+              {/* Killer insight - elevated */}
+              <div className="bg-[#FF6A00]/10 border border-[#FF6A00]/30 rounded-xl px-5 py-4 mb-8">
+                <p className="text-[#FF6A00] font-medium flex items-center gap-2">
+                  <Eye className="w-5 h-5" />
+                  See your real site before you pay. Always see what we're doing.
+                </p>
+              </div>
               
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/apply">
                   <Button size="lg" className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white text-lg px-8 py-6 w-full sm:w-auto">
-                    Apply to LaunchBase <ArrowRight className="w-5 h-5 ml-2" />
+                    Hand It Off <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
                 </Link>
                 <Link href="/how-it-works">
@@ -179,70 +176,66 @@ export default function Home() {
         </div>
       </section>
 
-      {/* The Problem - Builder Fatigue */}
+      {/* The Real Problem - Lack of Responsibility */}
       <section className="py-20 px-4 border-b border-white/5">
         <div className="container max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Website builders make you decide too much, too early.
+            Most small businesses stall because no one owns the system.
           </h2>
           
           <p className="text-gray-400 text-lg mb-8 max-w-2xl mx-auto">
-            Pick a template. Pick integrations. Pick a plan.
+            You have a website. You have tools. You have logins.
             <br />
-            Then your business grows — and you rebuild everything.
+            But you're still the one checking if everything's okay.
           </p>
           
-          <div className="bg-[#FF6A00]/10 border border-[#FF6A00]/20 rounded-xl px-6 py-4 inline-block">
-            <p className="text-[#FF6A00] text-xl font-medium">
-              Growth shouldn't force a restart.
+          <div className="bg-white/5 border border-white/10 rounded-xl p-6 max-w-xl mx-auto">
+            <p className="text-gray-300 text-lg mb-4">
+              That background anxiety — <span className="text-white">"Am I missing something?"</span> — never goes away.
+            </p>
+            <p className="text-[#FF6A00] font-medium">
+              Until someone else takes responsibility.
             </p>
           </div>
         </div>
       </section>
 
-      {/* The Difference - Your Category */}
+      {/* What Disappears From Your Life */}
       <section className="py-20 px-4 border-b border-white/5 bg-white/[0.02]">
         <div className="container max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              LaunchBase grows with you — without rebuilding.
+              What stops being your job.
             </h2>
             
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              LaunchBase starts with a solid foundation: your website, hosting, and core intelligence.
-              As your business grows, you expand LaunchBase.
+              LaunchBase doesn't add features. It removes mental load.
             </p>
           </div>
           
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-8 mb-8">
-            <p className="text-white text-xl font-medium text-center mb-6">
-              Same system. Same logic. No migrations.
-            </p>
-            
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="w-12 h-12 bg-[#FF6A00]/20 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Zap className="w-6 h-6 text-[#FF6A00]" />
-                </div>
-                <p className="text-gray-300">Start simple</p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-[#FF6A00]/20 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <TrendingUp className="w-6 h-6 text-[#FF6A00]" />
-                </div>
-                <p className="text-gray-300">Add capabilities anytime</p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-[#FF6A00]/20 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Shield className="w-6 h-6 text-[#FF6A00]" />
-                </div>
-                <p className="text-gray-300">Nothing breaks when you grow</p>
-              </div>
+          <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto mb-8">
+            <div className="bg-white/5 border border-white/10 rounded-xl p-6">
+              <p className="text-gray-500 text-sm mb-2 line-through">You used to think about:</p>
+              <ul className="space-y-2 text-gray-400">
+                <li>"Is my site still up?"</li>
+                <li>"Should I post something today?"</li>
+                <li>"Did that form actually send?"</li>
+                <li>"Is my SSL certificate expiring?"</li>
+              </ul>
+            </div>
+            <div className="bg-[#FF6A00]/5 border border-[#FF6A00]/20 rounded-xl p-6">
+              <p className="text-[#FF6A00] text-sm mb-2">Now you don't:</p>
+              <ul className="space-y-2 text-gray-300">
+                <li>LaunchBase monitors it.</li>
+                <li>LaunchBase decides when it's safe.</li>
+                <li>LaunchBase logs every action.</li>
+                <li>LaunchBase handles it.</li>
+              </ul>
             </div>
           </div>
           
           <p className="text-center text-gray-500 text-lg">
-            LaunchBase gives you a stable foundation today — and the flexibility to grow without friction tomorrow.
+            You retain visibility. You lose the burden.
           </p>
         </div>
       </section>
@@ -266,7 +259,7 @@ export default function Home() {
               </div>
               <h3 className="text-lg font-semibold mb-2">Tell us about your business</h3>
               <p className="text-gray-400 text-sm">
-                Apply in English, Spanish, or Polish.
+                5 minutes. English, Spanish, or Polish.
               </p>
             </div>
             
@@ -276,7 +269,7 @@ export default function Home() {
               </div>
               <h3 className="text-lg font-semibold mb-2">Review your real site</h3>
               <p className="text-gray-400 text-sm">
-                Not a mockup. A live preview.
+                Not a mockup. Your actual website.
               </p>
             </div>
             
@@ -301,8 +294,15 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="text-center">
-            <div className="bg-white/5 border border-white/10 rounded-xl px-6 py-4 inline-block">
+          {/* Safety assurance */}
+          <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-center">
+            <div className="bg-white/5 border border-white/10 rounded-xl px-5 py-3">
+              <p className="text-gray-400 text-sm flex items-center gap-2">
+                <Shield className="w-4 h-4 text-[#1ED760]" />
+                Non-action is always safe. Change is reversible.
+              </p>
+            </div>
+            <div className="bg-white/5 border border-white/10 rounded-xl px-5 py-3">
               <p className="text-gray-400 text-sm flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 text-[#FF6A00]" />
                 Silence is a valid decision. We log it.
@@ -475,7 +475,7 @@ export default function Home() {
                 
                 <Link href="/apply">
                   <Button className="w-full bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white">
-                    Apply to LaunchBase
+                    Hand It Off
                   </Button>
                 </Link>
               </CardContent>
@@ -592,23 +592,26 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Final CTA */}
+      {/* Final CTA - Relief framing */}
       <section className="py-20 px-4">
         <div className="container max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Stop managing tools. Start delegating responsibility.
+            You've been carrying this long enough.
           </h2>
           <p className="text-gray-400 text-lg mb-4">
             You're not signing up for software.
           </p>
           <p className="text-white text-xl font-medium mb-8">
-            You're handing off responsibility — with visibility.
+            You're handing off responsibility — with full visibility.
           </p>
           <Link href="/apply">
             <Button size="lg" className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white text-lg px-10 py-6">
-              Apply to LaunchBase <ArrowRight className="w-5 h-5 ml-2" />
+              Hand It Off <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </Link>
+          <p className="text-gray-600 text-sm mt-6">
+            See your real site before you pay. Cancel anytime.
+          </p>
         </div>
       </section>
 
