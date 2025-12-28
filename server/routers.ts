@@ -1586,6 +1586,9 @@ export const appRouter = router({
           enabledLayers: z.array(z.enum(["sports", "community", "trends"])),
         }),
         termsAccepted: z.literal(true),
+        // New burden-focused fields (optional for backwards compatibility)
+        burdens: z.array(z.enum(["website", "social_media", "visibility", "all_of_it", "not_sure"])).optional(),
+        involvement: z.enum(["HANDLE_IT", "KEEP_ME_POSTED"]).optional(),
       }))
       .mutation(async ({ input }) => {
         const db = await getDb();

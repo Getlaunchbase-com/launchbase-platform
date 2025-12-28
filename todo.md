@@ -1444,3 +1444,26 @@
 - [x] Include: want maximum flexibility over consistency
 - [x] Include: looking for one-time project, not ongoing ownership
 - [x] End with: "LaunchBase is for owners who want the system handled — not managed."
+
+
+## Apply Form Rewrite - Delegation Positioning (Dec 25)
+### Steps to REMOVE (configuration/builder questions):
+- [x] Remove Cadence step (how often to post)
+- [x] Remove Layers step (weather, sports, etc.)
+- [x] Remove Mode step (auto/guided/custom)
+
+### Steps to ADD (burden-focused):
+- [x] Add "What's weighing on you?" step - multi-select with "I'm not sure — it's just heavy" option
+- [x] Add "How involved do you want to be?" step - communication preference, not control mode
+  - "Handle it for me" (default, safest)
+  - "Keep me in the loop" (visibility, not control)
+
+### Steps to KEEP (reframe where needed):
+- [x] Language - keep as is
+- [x] Business - reframe subtitle: "This helps us understand your business — not configure tools"
+- [x] Location - keep as is
+- [x] Start timing - keep as is
+- [x] Contact - keep as is
+- [x] Review - update to reflect burden + involvement, not features
+
+### Principle: No question should require imagining how the system works

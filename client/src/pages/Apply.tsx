@@ -17,16 +17,16 @@ type VerticalCategory =
   | "fitness"
   | "automotive";
 
-type Cadence = "LOW" | "MEDIUM" | "HIGH";
-type Mode = "AUTO" | "GUIDED" | "CUSTOM";
 type StartTiming = "NOW" | "TWO_WEEKS" | "EXPLORING";
+type InvolvementLevel = "HANDLE_IT" | "KEEP_ME_POSTED";
 
-type Layers = {
-  weather: true;
-  sports: boolean;
-  community: boolean;
-  trends: boolean;
-};
+// What's weighing on them - burden categories
+type BurdenCategory = 
+  | "website"
+  | "social_media"
+  | "visibility"
+  | "all_of_it"
+  | "not_sure";
 
 type ApplyForm = {
   language: Language;
@@ -34,9 +34,8 @@ type ApplyForm = {
   industry: string;
   cityZip: string;
   radiusMiles: number;
-  cadence: Cadence;
-  layers: Layers;
-  mode: Mode;
+  burdens: BurdenCategory[];
+  involvement: InvolvementLevel;
   startTiming: StartTiming | null;
   contactName: string;
   contactEmail: string;
@@ -44,7 +43,11 @@ type ApplyForm = {
   termsAccepted: boolean;
 };
 
-const STORAGE_KEY = "launchbase_apply_draft_v2";
+const STORAGE_KEY = "launchbase_apply_draft_v3";
+
+// Fixed founder pricing - no configuration needed
+const FOUNDER_MONTHLY = 129;
+const FOUNDER_SETUP = 249;
 
 // Translations
 const translations: Record<Language, {
@@ -54,18 +57,17 @@ const translations: Record<Language, {
   trustLine: string;
   formIntro: string;
   microCopy: { editLater: string; noPublish: string; approvalRequired: string };
-  steps: { language: string; business: string; location: string; cadence: string; context: string; control: string; start: string; contact: string; review: string };
+  steps: { language: string; business: string; location: string; burden: string; involvement: string; start: string; contact: string; review: string };
   languageStep: { title: string; subtitle: string };
   businessStep: { title: string; subtitle: string };
   locationStep: { title: string; subtitle: string; cityLabel: string; cityPlaceholder: string; radiusLabel: string };
-  cadenceStep: { title: string; subtitle: string };
-  layersStep: { title: string; subtitle: string };
-  modeStep: { title: string; subtitle: string };
+  burdenStep: { title: string; subtitle: string };
+  involvementStep: { title: string; subtitle: string };
   timingStep: { title: string; subtitle: string };
   contactStep: { title: string; subtitle: string; nameLabel: string; emailLabel: string; phoneLabel: string };
   reviewStep: { title: string; subtitle: string; termsLabel: string; submitNote: string };
   buttons: { back: string; continue: string; submit: string };
-  pricing: { monthly: string; setup: string; cadence: string; layers: string; total: string };
+  pricing: { monthly: string; setup: string; total: string; founderLocked: string };
 }> = {
   en: {
     badge: "Founder pricing locks for 12 months",
@@ -74,18 +76,17 @@ const translations: Record<Language, {
     trustLine: "See your real site before you pay. You can always see what LaunchBase is doing.",
     formIntro: "Answer naturally. You don't need perfect wording — LaunchBase translates intent into professional output.",
     microCopy: { editLater: "You can edit this later.", noPublish: "This does not publish anything.", approvalRequired: "Nothing goes live without approval." },
-    steps: { language: "Language", business: "Business", location: "Location", cadence: "Cadence", context: "Context", control: "Control", start: "Start", contact: "Contact", review: "Review" },
+    steps: { language: "Language", business: "Business", location: "Location", burden: "Burden", involvement: "Involvement", start: "Start", contact: "Contact", review: "Review" },
     languageStep: { title: "Choose your language", subtitle: "Select the language you're most comfortable with. Your website will be built in English to reach local customers." },
-    businessStep: { title: "What type of business?", subtitle: "This helps LaunchBase choose the right context signals for your industry." },
-    locationStep: { title: "Location & locality", subtitle: "LaunchBase observes what's happening around your business.", cityLabel: "City or ZIP", cityPlaceholder: "e.g. Chicago, IL or 60614", radiusLabel: "Service radius (miles)" },
-    cadenceStep: { title: "How visible do you want to be?", subtitle: "Cadence controls how often LaunchBase posts on your behalf." },
-    layersStep: { title: "What local context matters?", subtitle: "Add intelligence layers to make your posts more relevant." },
-    modeStep: { title: "How hands-on do you want to be?", subtitle: "Choose how much control you want over each post." },
-    timingStep: { title: "When do you want to start?", subtitle: "We'll build your website and set up your workflows." },
-    contactStep: { title: "Contact information", subtitle: "We'll reach out to finalize your setup.", nameLabel: "Your name", emailLabel: "Email", phoneLabel: "Phone" },
+    businessStep: { title: "What type of business?", subtitle: "This helps us understand your business — not configure tools." },
+    locationStep: { title: "Where are you located?", subtitle: "We'll use this to understand your local market.", cityLabel: "City or ZIP", cityPlaceholder: "e.g. Chicago, IL or 60614", radiusLabel: "Service radius (miles)" },
+    burdenStep: { title: "What's weighing on you?", subtitle: "Select everything you don't want to think about anymore." },
+    involvementStep: { title: "How involved do you want to be?", subtitle: "This is about communication, not control. You'll always have visibility." },
+    timingStep: { title: "When do you want to start?", subtitle: "We'll build your website and set everything up." },
+    contactStep: { title: "Contact information", subtitle: "We'll reach out to get started.", nameLabel: "Your name", emailLabel: "Email", phoneLabel: "Phone" },
     reviewStep: { title: "Review & apply", subtitle: "Make sure everything looks right.", termsLabel: "I agree to the Terms of Service and Privacy Policy", submitNote: "By applying, you're asking LaunchBase to take responsibility — safely and transparently." },
-    buttons: { back: "Back", continue: "Continue", submit: "Submit Application" },
-    pricing: { monthly: "Monthly", setup: "Setup", cadence: "Cadence", layers: "Layers", total: "Total" },
+    buttons: { back: "Back", continue: "Continue", submit: "Hand It Off" },
+    pricing: { monthly: "Monthly", setup: "One-time setup", total: "Total", founderLocked: "Founder pricing locked for 12 months" },
   },
   es: {
     badge: "Precio de fundador bloqueado por 12 meses",
@@ -94,18 +95,17 @@ const translations: Record<Language, {
     trustLine: "Ve tu sitio real antes de pagar. Siempre puedes ver lo que LaunchBase está haciendo.",
     formIntro: "Responde naturalmente. No necesitas palabras perfectas — LaunchBase traduce tu intención en resultados profesionales.",
     microCopy: { editLater: "Puedes editar esto después.", noPublish: "Esto no publica nada.", approvalRequired: "Nada sale en vivo sin tu aprobación." },
-    steps: { language: "Idioma", business: "Negocio", location: "Ubicación", cadence: "Frecuencia", context: "Contexto", control: "Control", start: "Inicio", contact: "Contacto", review: "Revisar" },
+    steps: { language: "Idioma", business: "Negocio", location: "Ubicación", burden: "Carga", involvement: "Participación", start: "Inicio", contact: "Contacto", review: "Revisar" },
     languageStep: { title: "Elige tu idioma", subtitle: "Selecciona el idioma con el que te sientas más cómodo. Tu sitio web se construirá en inglés para llegar a clientes locales." },
-    businessStep: { title: "¿Qué tipo de negocio?", subtitle: "Esto ayuda a LaunchBase a elegir las señales de contexto adecuadas para tu industria." },
-    locationStep: { title: "Ubicación y localidad", subtitle: "LaunchBase observa lo que está pasando alrededor de tu negocio.", cityLabel: "Ciudad o código postal", cityPlaceholder: "ej. Chicago, IL o 60614", radiusLabel: "Radio de servicio (millas)" },
-    cadenceStep: { title: "¿Qué tan visible quieres ser?", subtitle: "La frecuencia controla qué tan seguido LaunchBase publica en tu nombre." },
-    layersStep: { title: "¿Qué contexto local importa?", subtitle: "Agrega capas de inteligencia para hacer tus publicaciones más relevantes." },
-    modeStep: { title: "¿Qué tan involucrado quieres estar?", subtitle: "Elige cuánto control quieres sobre cada publicación." },
-    timingStep: { title: "¿Cuándo quieres empezar?", subtitle: "Construiremos tu sitio web y configuraremos tus flujos de trabajo." },
-    contactStep: { title: "Información de contacto", subtitle: "Nos comunicaremos para finalizar tu configuración.", nameLabel: "Tu nombre", emailLabel: "Correo electrónico", phoneLabel: "Teléfono" },
+    businessStep: { title: "¿Qué tipo de negocio?", subtitle: "Esto nos ayuda a entender tu negocio — no a configurar herramientas." },
+    locationStep: { title: "¿Dónde estás ubicado?", subtitle: "Usaremos esto para entender tu mercado local.", cityLabel: "Ciudad o código postal", cityPlaceholder: "ej. Chicago, IL o 60614", radiusLabel: "Radio de servicio (millas)" },
+    burdenStep: { title: "¿Qué te está pesando?", subtitle: "Selecciona todo lo que no quieres pensar más." },
+    involvementStep: { title: "¿Qué tan involucrado quieres estar?", subtitle: "Esto es sobre comunicación, no control. Siempre tendrás visibilidad." },
+    timingStep: { title: "¿Cuándo quieres empezar?", subtitle: "Construiremos tu sitio web y configuraremos todo." },
+    contactStep: { title: "Información de contacto", subtitle: "Nos comunicaremos para comenzar.", nameLabel: "Tu nombre", emailLabel: "Correo electrónico", phoneLabel: "Teléfono" },
     reviewStep: { title: "Revisar y aplicar", subtitle: "Asegúrate de que todo se vea bien.", termsLabel: "Acepto los Términos de Servicio y la Política de Privacidad", submitNote: "Al aplicar, estás pidiendo a LaunchBase que asuma la responsabilidad — de forma segura y transparente." },
-    buttons: { back: "Atrás", continue: "Continuar", submit: "Enviar Solicitud" },
-    pricing: { monthly: "Mensual", setup: "Configuración", cadence: "Frecuencia", layers: "Capas", total: "Total" },
+    buttons: { back: "Atrás", continue: "Continuar", submit: "Delegar" },
+    pricing: { monthly: "Mensual", setup: "Configuración única", total: "Total", founderLocked: "Precio de fundador bloqueado por 12 meses" },
   },
   pl: {
     badge: "Cena założycielska zablokowana na 12 miesięcy",
@@ -114,23 +114,65 @@ const translations: Record<Language, {
     trustLine: "Zobacz swoją prawdziwą stronę przed płatnością. Zawsze możesz zobaczyć, co robi LaunchBase.",
     formIntro: "Odpowiadaj naturalnie. Nie potrzebujesz idealnych słów — LaunchBase przekłada intencję na profesjonalne rezultaty.",
     microCopy: { editLater: "Możesz to edytować później.", noPublish: "To nic nie publikuje.", approvalRequired: "Nic nie zostanie opublikowane bez Twojej zgody." },
-    steps: { language: "Język", business: "Firma", location: "Lokalizacja", cadence: "Częstotliwość", context: "Kontekst", control: "Kontrola", start: "Start", contact: "Kontakt", review: "Przegląd" },
+    steps: { language: "Język", business: "Firma", location: "Lokalizacja", burden: "Obciążenie", involvement: "Zaangażowanie", start: "Start", contact: "Kontakt", review: "Przegląd" },
     languageStep: { title: "Wybierz swój język", subtitle: "Wybierz język, w którym czujesz się najlepiej. Twoja strona internetowa zostanie zbudowana po angielsku, aby dotrzeć do lokalnych klientów." },
-    businessStep: { title: "Jaki typ firmy?", subtitle: "To pomaga LaunchBase wybrać odpowiednie sygnały kontekstowe dla Twojej branży." },
-    locationStep: { title: "Lokalizacja i okolica", subtitle: "LaunchBase obserwuje, co dzieje się wokół Twojej firmy.", cityLabel: "Miasto lub kod pocztowy", cityPlaceholder: "np. Chicago, IL lub 60614", radiusLabel: "Promień usług (mile)" },
-    cadenceStep: { title: "Jak widoczny chcesz być?", subtitle: "Częstotliwość kontroluje, jak często LaunchBase publikuje w Twoim imieniu." },
-    layersStep: { title: "Jaki lokalny kontekst ma znaczenie?", subtitle: "Dodaj warstwy inteligencji, aby Twoje posty były bardziej trafne." },
-    modeStep: { title: "Jak bardzo chcesz być zaangażowany?", subtitle: "Wybierz, ile kontroli chcesz mieć nad każdym postem." },
-    timingStep: { title: "Kiedy chcesz zacząć?", subtitle: "Zbudujemy Twoją stronę internetową i skonfigurujemy Twoje przepływy pracy." },
-    contactStep: { title: "Informacje kontaktowe", subtitle: "Skontaktujemy się, aby sfinalizować konfigurację.", nameLabel: "Twoje imię", emailLabel: "Email", phoneLabel: "Telefon" },
+    businessStep: { title: "Jaki typ firmy?", subtitle: "To pomaga nam zrozumieć Twoją firmę — nie konfigurować narzędzia." },
+    locationStep: { title: "Gdzie jesteś zlokalizowany?", subtitle: "Użyjemy tego, aby zrozumieć Twój lokalny rynek.", cityLabel: "Miasto lub kod pocztowy", cityPlaceholder: "np. Chicago, IL lub 60614", radiusLabel: "Promień usług (mile)" },
+    burdenStep: { title: "Co Cię obciąża?", subtitle: "Wybierz wszystko, o czym nie chcesz już myśleć." },
+    involvementStep: { title: "Jak bardzo chcesz być zaangażowany?", subtitle: "Chodzi o komunikację, nie kontrolę. Zawsze będziesz mieć wgląd." },
+    timingStep: { title: "Kiedy chcesz zacząć?", subtitle: "Zbudujemy Twoją stronę i wszystko skonfigurujemy." },
+    contactStep: { title: "Informacje kontaktowe", subtitle: "Skontaktujemy się, aby rozpocząć.", nameLabel: "Twoje imię", emailLabel: "Email", phoneLabel: "Telefon" },
     reviewStep: { title: "Przegląd i aplikacja", subtitle: "Upewnij się, że wszystko wygląda dobrze.", termsLabel: "Zgadzam się z Warunkami Usługi i Polityką Prywatności", submitNote: "Aplikując, prosisz LaunchBase o przejęcie odpowiedzialności — bezpiecznie i przejrzyście." },
-    buttons: { back: "Wstecz", continue: "Kontynuuj", submit: "Wyślij Aplikację" },
-    pricing: { monthly: "Miesięcznie", setup: "Konfiguracja", cadence: "Częstotliwość", layers: "Warstwy", total: "Razem" },
+    buttons: { back: "Wstecz", continue: "Kontynuuj", submit: "Przekaż" },
+    pricing: { monthly: "Miesięcznie", setup: "Jednorazowa konfiguracja", total: "Razem", founderLocked: "Cena założycielska zablokowana na 12 miesięcy" },
   },
 };
 
+// Burden options with translations
+const BURDEN_OPTIONS: { id: BurdenCategory; name: Record<Language, string>; desc: Record<Language, string> }[] = [
+  {
+    id: "website",
+    name: { en: "My website", es: "Mi sitio web", pl: "Moja strona" },
+    desc: { en: "Building it, updating it, making sure it works", es: "Construirlo, actualizarlo, asegurar que funcione", pl: "Budowanie, aktualizowanie, upewnianie się że działa" },
+  },
+  {
+    id: "social_media",
+    name: { en: "Social media", es: "Redes sociales", pl: "Media społecznościowe" },
+    desc: { en: "Posting, scheduling, staying consistent", es: "Publicar, programar, mantener consistencia", pl: "Publikowanie, planowanie, utrzymanie spójności" },
+  },
+  {
+    id: "visibility",
+    name: { en: "Being visible locally", es: "Ser visible localmente", pl: "Bycie widocznym lokalnie" },
+    desc: { en: "Getting found, staying relevant, reaching customers", es: "Ser encontrado, mantenerse relevante, llegar a clientes", pl: "Bycie znajdowanym, pozostawanie istotnym, docieranie do klientów" },
+  },
+  {
+    id: "all_of_it",
+    name: { en: "All of it", es: "Todo", pl: "Wszystko" },
+    desc: { en: "I just want it handled", es: "Solo quiero que se encarguen", pl: "Po prostu chcę, żeby to było załatwione" },
+  },
+  {
+    id: "not_sure",
+    name: { en: "I'm not sure — it's just heavy", es: "No estoy seguro — solo es pesado", pl: "Nie jestem pewien — po prostu jest ciężko" },
+    desc: { en: "That's okay. We'll figure it out together.", es: "Está bien. Lo resolveremos juntos.", pl: "W porządku. Rozwiążemy to razem." },
+  },
+];
+
+// Involvement options with translations
+const INVOLVEMENT_OPTIONS: { id: InvolvementLevel; name: Record<Language, string>; desc: Record<Language, string> }[] = [
+  {
+    id: "HANDLE_IT",
+    name: { en: "Handle it for me", es: "Encárgate por mí", pl: "Zajmij się tym za mnie" },
+    desc: { en: "I trust LaunchBase to make good decisions. Just keep me safe.", es: "Confío en que LaunchBase tome buenas decisiones. Solo mantenme seguro.", pl: "Ufam, że LaunchBase podejmie dobre decyzje. Po prostu dbaj o moje bezpieczeństwo." },
+  },
+  {
+    id: "KEEP_ME_POSTED",
+    name: { en: "Keep me in the loop", es: "Mantenme informado", pl: "Informuj mnie na bieżąco" },
+    desc: { en: "I want to see what's happening, but I don't need to approve everything.", es: "Quiero ver lo que está pasando, pero no necesito aprobar todo.", pl: "Chcę widzieć co się dzieje, ale nie muszę wszystkiego zatwierdzać." },
+  },
+];
+
 // Vertical categories with icons and descriptions
-const VERTICALS: { id: VerticalCategory; icon: typeof Wrench; name: Record<Language, string>; desc: Record<Language, string>; industries: { id: string; name: Record<Language, string> }[]; suiteRelevance: { weather: "high" | "medium" | "low"; sports: "high" | "medium" | "low"; community: "high" | "medium" | "low"; trends: "high" | "medium" | "low" } }[] = [
+const VERTICALS: { id: VerticalCategory; icon: typeof Wrench; name: Record<Language, string>; desc: Record<Language, string>; industries: { id: string; name: Record<Language, string> }[] }[] = [
   {
     id: "trades",
     icon: Wrench,
@@ -151,7 +193,6 @@ const VERTICALS: { id: VerticalCategory; icon: typeof Wrench; name: Record<Langu
       { id: "carpenter_furniture", name: { en: "Furniture Maker", es: "Fabricante de Muebles", pl: "Producent Mebli" } },
       { id: "carpenter_general", name: { en: "General Carpentry", es: "Carpintería General", pl: "Stolarstwo Ogólne" } },
     ],
-    suiteRelevance: { weather: "high", sports: "medium", community: "medium", trends: "low" },
   },
   {
     id: "health",
@@ -163,143 +204,98 @@ const VERTICALS: { id: VerticalCategory; icon: typeof Wrench; name: Record<Langu
       { id: "chiropractor", name: { en: "Chiropractor", es: "Quiropráctico", pl: "Kręgarz" } },
       { id: "med_spa", name: { en: "Med Spa", es: "Spa Médico", pl: "Spa Medyczne" } },
       { id: "physical_therapy", name: { en: "Physical Therapy", es: "Fisioterapia", pl: "Fizjoterapia" } },
-      { id: "veterinarian", name: { en: "Veterinarian", es: "Veterinario", pl: "Weterynarz" } },
+      { id: "mental_health", name: { en: "Mental Health", es: "Salud Mental", pl: "Zdrowie Psychiczne" } },
+      { id: "optometry", name: { en: "Optometry", es: "Optometría", pl: "Optometria" } },
     ],
-    suiteRelevance: { weather: "low", sports: "low", community: "high", trends: "medium" },
   },
   {
     id: "beauty",
     icon: Scissors,
     name: { en: "Beauty & Personal Care", es: "Belleza y Cuidado Personal", pl: "Uroda i Pielęgnacja" },
-    desc: { en: "Hair salons, barbers, nail salons, spas, tattoo studios", es: "Salones de belleza, barberías, salones de uñas, spas, estudios de tatuajes", pl: "Salony fryzjerskie, fryzjerzy, salony paznokci, spa, studia tatuażu" },
+    desc: { en: "Hair salons, barbershops, nail salons, spas", es: "Salones de belleza, barberías, salones de uñas, spas", pl: "Salony fryzjerskie, barbershopy, salony paznokci, spa" },
     industries: [
       { id: "hair_salon", name: { en: "Hair Salon", es: "Salón de Belleza", pl: "Salon Fryzjerski" } },
-      { id: "barber", name: { en: "Barber Shop", es: "Barbería", pl: "Fryzjer Męski" } },
+      { id: "barbershop", name: { en: "Barbershop", es: "Barbería", pl: "Barbershop" } },
       { id: "nail_salon", name: { en: "Nail Salon", es: "Salón de Uñas", pl: "Salon Paznokci" } },
-      { id: "spa", name: { en: "Day Spa", es: "Spa", pl: "Spa" } },
-      { id: "tattoo", name: { en: "Tattoo Studio", es: "Estudio de Tatuajes", pl: "Studio Tatuażu" } },
+      { id: "spa", name: { en: "Spa", es: "Spa", pl: "Spa" } },
+      { id: "esthetics", name: { en: "Esthetics", es: "Estética", pl: "Estetyka" } },
     ],
-    suiteRelevance: { weather: "low", sports: "medium", community: "high", trends: "high" },
   },
   {
     id: "food",
     icon: UtensilsCrossed,
-    name: { en: "Food & Beverage", es: "Comida y Bebidas", pl: "Jedzenie i Napoje" },
-    desc: { en: "Restaurants, bars, cafés, bakeries, catering, food trucks", es: "Restaurantes, bares, cafés, panaderías, catering, food trucks", pl: "Restauracje, bary, kawiarnie, piekarnie, catering, food trucki" },
+    name: { en: "Food & Beverage", es: "Alimentos y Bebidas", pl: "Gastronomia" },
+    desc: { en: "Restaurants, cafes, bakeries, food trucks", es: "Restaurantes, cafeterías, panaderías, food trucks", pl: "Restauracje, kawiarnie, piekarnie, food trucki" },
     industries: [
       { id: "restaurant", name: { en: "Restaurant", es: "Restaurante", pl: "Restauracja" } },
-      { id: "bar", name: { en: "Bar & Pub", es: "Bar y Pub", pl: "Bar i Pub" } },
-      { id: "cafe", name: { en: "Café", es: "Café", pl: "Kawiarnia" } },
+      { id: "cafe", name: { en: "Cafe", es: "Cafetería", pl: "Kawiarnia" } },
       { id: "bakery", name: { en: "Bakery", es: "Panadería", pl: "Piekarnia" } },
-      { id: "catering", name: { en: "Catering", es: "Catering", pl: "Catering" } },
       { id: "food_truck", name: { en: "Food Truck", es: "Food Truck", pl: "Food Truck" } },
+      { id: "catering", name: { en: "Catering", es: "Catering", pl: "Catering" } },
     ],
-    suiteRelevance: { weather: "medium", sports: "high", community: "high", trends: "high" },
   },
   {
     id: "cannabis",
     icon: Leaf,
     name: { en: "Cannabis", es: "Cannabis", pl: "Konopie" },
-    desc: { en: "Dispensaries, delivery services, CBD stores", es: "Dispensarios, servicios de entrega, tiendas de CBD", pl: "Apteki, usługi dostawy, sklepy CBD" },
+    desc: { en: "Dispensaries, delivery services, cultivation", es: "Dispensarios, servicios de entrega, cultivo", pl: "Apteki, usługi dostawy, uprawa" },
     industries: [
       { id: "dispensary", name: { en: "Dispensary", es: "Dispensario", pl: "Apteka" } },
-      { id: "delivery", name: { en: "Cannabis Delivery", es: "Entrega de Cannabis", pl: "Dostawa Konopi" } },
-      { id: "cbd", name: { en: "CBD & Hemp", es: "CBD y Cáñamo", pl: "CBD i Konopie" } },
+      { id: "delivery", name: { en: "Delivery Service", es: "Servicio de Entrega", pl: "Usługa Dostawy" } },
+      { id: "cultivation", name: { en: "Cultivation", es: "Cultivo", pl: "Uprawa" } },
     ],
-    suiteRelevance: { weather: "medium", sports: "high", community: "medium", trends: "high" },
   },
   {
     id: "professional",
     icon: Briefcase,
     name: { en: "Professional Services", es: "Servicios Profesionales", pl: "Usługi Profesjonalne" },
-    desc: { en: "Lawyers, accountants, insurance, real estate, consultants", es: "Abogados, contadores, seguros, bienes raíces, consultores", pl: "Prawnicy, księgowi, ubezpieczenia, nieruchomości, konsultanci" },
+    desc: { en: "Law firms, accountants, consultants, real estate", es: "Bufetes de abogados, contadores, consultores, bienes raíces", pl: "Kancelarie prawne, księgowi, konsultanci, nieruchomości" },
     industries: [
-      { id: "lawyer", name: { en: "Law Firm", es: "Firma de Abogados", pl: "Kancelaria Prawna" } },
+      { id: "law_firm", name: { en: "Law Firm", es: "Bufete de Abogados", pl: "Kancelaria Prawna" } },
       { id: "accountant", name: { en: "Accountant", es: "Contador", pl: "Księgowy" } },
-      { id: "insurance", name: { en: "Insurance Agent", es: "Agente de Seguros", pl: "Agent Ubezpieczeniowy" } },
-      { id: "real_estate", name: { en: "Real Estate", es: "Bienes Raíces", pl: "Nieruchomości" } },
       { id: "consultant", name: { en: "Consultant", es: "Consultor", pl: "Konsultant" } },
+      { id: "real_estate", name: { en: "Real Estate", es: "Bienes Raíces", pl: "Nieruchomości" } },
+      { id: "insurance", name: { en: "Insurance", es: "Seguros", pl: "Ubezpieczenia" } },
     ],
-    suiteRelevance: { weather: "low", sports: "low", community: "high", trends: "medium" },
   },
   {
     id: "fitness",
     icon: Dumbbell,
     name: { en: "Fitness & Recreation", es: "Fitness y Recreación", pl: "Fitness i Rekreacja" },
-    desc: { en: "Gyms, personal trainers, yoga studios, martial arts, dance", es: "Gimnasios, entrenadores personales, estudios de yoga, artes marciales, danza", pl: "Siłownie, trenerzy personalni, studia jogi, sztuki walki, taniec" },
+    desc: { en: "Gyms, personal trainers, yoga studios, sports facilities", es: "Gimnasios, entrenadores personales, estudios de yoga, instalaciones deportivas", pl: "Siłownie, trenerzy personalni, studia jogi, obiekty sportowe" },
     industries: [
       { id: "gym", name: { en: "Gym", es: "Gimnasio", pl: "Siłownia" } },
       { id: "personal_trainer", name: { en: "Personal Trainer", es: "Entrenador Personal", pl: "Trener Personalny" } },
-      { id: "yoga", name: { en: "Yoga Studio", es: "Estudio de Yoga", pl: "Studio Jogi" } },
+      { id: "yoga_studio", name: { en: "Yoga Studio", es: "Estudio de Yoga", pl: "Studio Jogi" } },
       { id: "martial_arts", name: { en: "Martial Arts", es: "Artes Marciales", pl: "Sztuki Walki" } },
-      { id: "dance", name: { en: "Dance Studio", es: "Estudio de Danza", pl: "Studio Tańca" } },
+      { id: "dance_studio", name: { en: "Dance Studio", es: "Estudio de Baile", pl: "Studio Tańca" } },
     ],
-    suiteRelevance: { weather: "medium", sports: "medium", community: "high", trends: "medium" },
   },
   {
     id: "automotive",
     icon: Car,
     name: { en: "Automotive", es: "Automotriz", pl: "Motoryzacja" },
-    desc: { en: "Auto repair, detailing, towing, tire shops, body shops", es: "Reparación de autos, detallado, grúas, tiendas de llantas, talleres de carrocería", pl: "Naprawa samochodów, detailing, holowanie, sklepy oponiarskie, blacharnie" },
+    desc: { en: "Auto repair, detailing, dealerships, towing", es: "Reparación de autos, detallado, concesionarios, grúas", pl: "Naprawa samochodów, detailing, salony, holowanie" },
     industries: [
       { id: "auto_repair", name: { en: "Auto Repair", es: "Reparación de Autos", pl: "Naprawa Samochodów" } },
-      { id: "auto_detailing", name: { en: "Auto Detailing", es: "Detallado de Autos", pl: "Detailing Samochodowy" } },
-      { id: "towing", name: { en: "Towing", es: "Grúas", pl: "Holowanie" } },
-      { id: "tire_shop", name: { en: "Tire Shop", es: "Tienda de Llantas", pl: "Sklep Oponiarski" } },
-      { id: "body_shop", name: { en: "Body Shop", es: "Taller de Carrocería", pl: "Blacharnia" } },
+      { id: "detailing", name: { en: "Detailing", es: "Detallado", pl: "Detailing" } },
+      { id: "dealership", name: { en: "Dealership", es: "Concesionario", pl: "Salon" } },
+      { id: "towing", name: { en: "Towing", es: "Grúa", pl: "Holowanie" } },
+      { id: "tire_shop", name: { en: "Tire Shop", es: "Tienda de Llantas", pl: "Sklep Opon" } },
     ],
-    suiteRelevance: { weather: "high", sports: "low", community: "medium", trends: "low" },
   },
 ];
 
-const CADENCE_MONTHLY: Record<Cadence, number> = {
-  LOW: 79,
-  MEDIUM: 129,
-  HIGH: 199,
-};
-
-const LAYER_MONTHLY = {
-  sports: 29,
-  community: 39,
-  trends: 49,
-};
-
-const BASE_SETUP_FEE = 249;
-const PER_LAYER_SETUP_FEE = 99;
-
-function formatMoney(n: number) {
-  return `$${n.toFixed(0)}`;
-}
-
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
-}
-
-function computePricing(form: ApplyForm) {
-  const cadenceMonthly = CADENCE_MONTHLY[form.cadence];
-  const enabledLayerKeys = (["sports", "community", "trends"] as const).filter(
-    (k) => form.layers[k]
-  );
-  const layersMonthly = enabledLayerKeys.reduce((sum, k) => sum + LAYER_MONTHLY[k], 0);
-  const monthlyTotal = cadenceMonthly + layersMonthly;
-  const setupFee = BASE_SETUP_FEE + enabledLayerKeys.length * PER_LAYER_SETUP_FEE;
-
-  return {
-    cadenceMonthly,
-    enabledLayerKeys,
-    layersMonthly,
-    monthlyTotal,
-    setupFee,
-  };
 }
 
 const steps = [
   { id: "language", label: "language" },
   { id: "business", label: "business" },
   { id: "location", label: "location" },
-  { id: "cadence", label: "cadence" },
-  { id: "layers", label: "context" },
-  { id: "mode", label: "control" },
+  { id: "burden", label: "burden" },
+  { id: "involvement", label: "involvement" },
   { id: "timing", label: "start" },
   { id: "contact", label: "contact" },
   { id: "review", label: "review" },
@@ -318,9 +314,8 @@ export default function ApplyPage() {
       industry: "",
       cityZip: "",
       radiusMiles: 15,
-      cadence: "MEDIUM",
-      layers: { weather: true, sports: true, community: false, trends: false },
-      mode: "GUIDED",
+      burdens: [],
+      involvement: "HANDLE_IT",
       startTiming: null,
       contactName: "",
       contactEmail: "",
@@ -337,7 +332,6 @@ export default function ApplyPage() {
 
   const t = translations[form.language];
   const currentStep = steps[stepIndex].id;
-  const pricing = useMemo(() => computePricing(form), [form]);
 
   // Persist draft
   useEffect(() => {
@@ -345,24 +339,6 @@ export default function ApplyPage() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(form));
     } catch {}
   }, [form]);
-
-  // Auto-set recommended layers based on vertical
-  useEffect(() => {
-    if (form.vertical) {
-      const vertical = VERTICALS.find(v => v.id === form.vertical);
-      if (vertical) {
-        setForm(f => ({
-          ...f,
-          layers: {
-            weather: true,
-            sports: vertical.suiteRelevance.sports === "high",
-            community: vertical.suiteRelevance.community === "high",
-            trends: vertical.suiteRelevance.trends === "high",
-          }
-        }));
-      }
-    }
-  }, [form.vertical]);
 
   const submitMutation = trpc.suiteApply.submit.useMutation({
     onSuccess: () => {
@@ -393,6 +369,10 @@ export default function ApplyPage() {
         return !!form.vertical;
       case "location":
         return form.cityZip.trim().length >= 3 && form.radiusMiles >= 5;
+      case "burden":
+        return form.burdens.length > 0;
+      case "involvement":
+        return !!form.involvement;
       case "timing":
         return !!form.startTiming;
       case "contact":
@@ -413,6 +393,8 @@ export default function ApplyPage() {
     
     setSubmitError(null);
     
+    // Map burden-based form to backend structure
+    // The backend will determine the appropriate configuration based on burdens
     submitMutation.mutate({
       language: form.language,
       vertical: form.vertical,
@@ -420,9 +402,9 @@ export default function ApplyPage() {
       location: { cityZip: form.cityZip.trim(), radiusMiles: form.radiusMiles },
       module: {
         name: "SOCIAL_MEDIA_INTELLIGENCE" as const,
-        cadence: form.cadence,
-        mode: form.mode,
-        layers: form.layers,
+        cadence: "MEDIUM", // Default - system determines optimal
+        mode: form.involvement === "HANDLE_IT" ? "AUTO" : "GUIDED",
+        layers: { weather: true, sports: true, community: true, trends: true }, // All layers included
       },
       startTiming: form.startTiming,
       contact: {
@@ -431,13 +413,16 @@ export default function ApplyPage() {
         phone: form.contactPhone.trim(),
       },
       pricing: {
-        cadenceMonthly: pricing.cadenceMonthly,
-        layersMonthly: pricing.layersMonthly,
-        monthlyTotal: pricing.monthlyTotal,
-        setupFee: pricing.setupFee,
-        enabledLayers: pricing.enabledLayerKeys,
+        cadenceMonthly: FOUNDER_MONTHLY,
+        layersMonthly: 0,
+        monthlyTotal: FOUNDER_MONTHLY,
+        setupFee: FOUNDER_SETUP,
+        enabledLayers: ["sports", "community", "trends"],
       },
       termsAccepted: form.termsAccepted as true,
+      // Additional burden data for internal use
+      burdens: form.burdens,
+      involvement: form.involvement,
     });
   }
 
@@ -448,39 +433,41 @@ export default function ApplyPage() {
         <div className="container max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 text-gray-400 hover:text-white transition">
             <ArrowLeft className="w-4 h-4" />
-            <img src="/logo-cropped.png" alt="LaunchBase" className="h-8 w-auto" />
+            <span className="text-sm">Back to home</span>
           </Link>
-          
-          {/* Language indicator */}
-          <div className="flex items-center gap-2 text-sm text-gray-400">
-            <Globe className="w-4 h-4" />
-            <span>{form.language === "es" ? "Español" : form.language === "pl" ? "Polski" : "English"}</span>
-          </div>
+          <div className="text-sm text-[#FF6A00]">{t.badge}</div>
         </div>
       </nav>
 
-      <div className="pt-24 pb-32 lg:pb-12">
-        <div className="mx-auto max-w-[1120px] px-4">
-          {/* Page Header */}
-          <div className="mb-8">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80">
-              <span className="h-2 w-2 rounded-full bg-[#FF6A00]" />
-              {t.badge}
-            </div>
-
-            <h1 className="mt-4 text-3xl font-semibold tracking-tight">
+      {/* Main Content */}
+      <div className="pt-20 pb-32 lg:pb-20">
+        <div className="container max-w-6xl mx-auto px-4">
+          {/* Header Section */}
+          <div className="max-w-2xl mx-auto text-center py-8">
+            <h1 className="text-3xl md:text-4xl font-bold leading-tight">
               {t.title}
             </h1>
-            <p className="mt-2 max-w-2xl text-white/70">
+            <p className="mt-4 text-lg text-gray-400">
               {t.subtitle}
             </p>
+            <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#FF6A00]/10 border border-[#FF6A00]/30 px-4 py-2 text-sm text-[#FF6A00]">
+              <Check className="w-4 h-4" />
+              {t.trustLine}
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px]">
-            {/* Main Form */}
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-5 lg:p-7">
+          {/* Form Section */}
+          <div className="grid lg:grid-cols-[1fr,320px] gap-8 max-w-5xl mx-auto">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 md:p-8">
+              {/* Stepper */}
               <Stepper stepIndex={stepIndex} onGoto={gotoStep} language={form.language} />
 
+              {/* Form Intro */}
+              <div className="mt-6 text-sm text-white/50">
+                {t.formIntro}
+              </div>
+
+              {/* Step Content */}
               <div className="mt-6">
                 {currentStep === "language" && (
                   <StepLanguage
@@ -509,28 +496,19 @@ export default function ApplyPage() {
                   />
                 )}
 
-                {currentStep === "cadence" && (
-                  <StepCadence
-                    value={form.cadence}
-                    onChange={(v) => setForm((f) => ({ ...f, cadence: v }))}
+                {currentStep === "burden" && (
+                  <StepBurden
+                    burdens={form.burdens}
+                    onChange={(b) => setForm((f) => ({ ...f, burdens: b }))}
                     t={t}
                     language={form.language}
                   />
                 )}
 
-                {currentStep === "layers" && (
-                  <StepLayers
-                    layers={form.layers}
-                    onChange={(l) => setForm((f) => ({ ...f, layers: l }))}
-                    t={t}
-                    language={form.language}
-                  />
-                )}
-
-                {currentStep === "mode" && (
-                  <StepMode
-                    value={form.mode}
-                    onChange={(v) => setForm((f) => ({ ...f, mode: v }))}
+                {currentStep === "involvement" && (
+                  <StepInvolvement
+                    value={form.involvement}
+                    onChange={(v) => setForm((f) => ({ ...f, involvement: v }))}
                     t={t}
                     language={form.language}
                   />
@@ -558,7 +536,6 @@ export default function ApplyPage() {
                 {currentStep === "review" && (
                   <StepReview
                     form={form}
-                    pricing={pricing}
                     termsAccepted={form.termsAccepted}
                     onToggleTerms={(v) => setForm((f) => ({ ...f, termsAccepted: v }))}
                     t={t}
@@ -606,13 +583,13 @@ export default function ApplyPage() {
             </div>
 
             {/* Pricing Rail */}
-            <PricingRail form={form} pricing={pricing} t={t} language={form.language} />
+            <PricingRail t={t} language={form.language} />
           </div>
         </div>
       </div>
 
       {/* Mobile Summary Bar */}
-      <MobileSummaryBar pricing={pricing} t={t} />
+      <MobileSummaryBar t={t} />
     </div>
   );
 }
@@ -869,197 +846,119 @@ function StepLocation({
   );
 }
 
-function StepCadence({
-  value,
+function StepBurden({
+  burdens,
   onChange,
   t,
   language,
 }: {
-  value: Cadence;
-  onChange: (v: Cadence) => void;
+  burdens: BurdenCategory[];
+  onChange: (b: BurdenCategory[]) => void;
   t: typeof translations["en"];
   language: Language;
 }) {
-  const cadenceLabels: Record<Cadence, Record<Language, { title: string; desc: string }>> = {
-    LOW: {
-      en: { title: "Low", desc: "1–2 posts/week. Stay visible without noise." },
-      es: { title: "Bajo", desc: "1–2 publicaciones/semana. Mantente visible sin ruido." },
-      pl: { title: "Niski", desc: "1–2 posty/tydzień. Bądź widoczny bez szumu." },
-    },
-    MEDIUM: {
-      en: { title: "Medium", desc: "2–3 posts/week. Balanced, timely presence." },
-      es: { title: "Medio", desc: "2–3 publicaciones/semana. Presencia equilibrada y oportuna." },
-      pl: { title: "Średni", desc: "2–3 posty/tydzień. Zrównoważona, terminowa obecność." },
-    },
-    HIGH: {
-      en: { title: "High", desc: "4–6 posts/week. High visibility during important moments." },
-      es: { title: "Alto", desc: "4–6 publicaciones/semana. Alta visibilidad en momentos importantes." },
-      pl: { title: "Wysoki", desc: "4–6 postów/tydzień. Wysoka widoczność w ważnych momentach." },
-    },
+  const toggleBurden = (id: BurdenCategory) => {
+    // If selecting "all_of_it" or "not_sure", clear others and select only that
+    if (id === "all_of_it" || id === "not_sure") {
+      if (burdens.includes(id)) {
+        onChange([]);
+      } else {
+        onChange([id]);
+      }
+      return;
+    }
+    
+    // If selecting a specific burden, remove "all_of_it" and "not_sure"
+    const filtered = burdens.filter(b => b !== "all_of_it" && b !== "not_sure");
+    
+    if (filtered.includes(id)) {
+      onChange(filtered.filter(b => b !== id));
+    } else {
+      onChange([...filtered, id]);
+    }
   };
 
   return (
     <div>
-      <h2 className="text-xl font-semibold">{t.cadenceStep.title}</h2>
+      <h2 className="text-xl font-semibold">{t.burdenStep.title}</h2>
       <p className="mt-1 text-sm text-white/60">
-        {t.cadenceStep.subtitle}
-      </p>
-
-      <div className="mt-4 grid gap-3">
-        {(["LOW", "MEDIUM", "HIGH"] as Cadence[]).map((c) => (
-          <CardOption
-            key={c}
-            title={`${cadenceLabels[c][language].title} — ${formatMoney(CADENCE_MONTHLY[c])}/mo`}
-            desc={cadenceLabels[c][language].desc}
-            selected={value === c}
-            onClick={() => onChange(c)}
-            badge={c === "MEDIUM" ? (language === "es" ? "Recomendado" : language === "pl" ? "Zalecane" : "Recommended") : undefined}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function StepLayers({
-  layers,
-  onChange,
-  t,
-  language,
-}: {
-  layers: Layers;
-  onChange: (l: Layers) => void;
-  t: typeof translations["en"];
-  language: Language;
-}) {
-  const layerLabels: Record<string, Record<Language, { title: string; desc: string }>> = {
-    weather: {
-      en: { title: "Weather", desc: "Always on. Storm alerts, temperature changes, seasonal shifts." },
-      es: { title: "Clima", desc: "Siempre activo. Alertas de tormentas, cambios de temperatura, cambios estacionales." },
-      pl: { title: "Pogoda", desc: "Zawsze włączone. Alerty burzowe, zmiany temperatury, zmiany sezonowe." },
-    },
-    sports: {
-      en: { title: "Sports & Events", desc: "Game days, local events, community happenings." },
-      es: { title: "Deportes y Eventos", desc: "Días de juego, eventos locales, acontecimientos comunitarios." },
-      pl: { title: "Sport i Wydarzenia", desc: "Dni meczowe, lokalne wydarzenia, wydarzenia społeczne." },
-    },
-    community: {
-      en: { title: "Community & Schools", desc: "School schedules, local news, neighborhood updates." },
-      es: { title: "Comunidad y Escuelas", desc: "Horarios escolares, noticias locales, actualizaciones del vecindario." },
-      pl: { title: "Społeczność i Szkoły", desc: "Harmonogramy szkolne, lokalne wiadomości, aktualizacje sąsiedztwa." },
-    },
-    trends: {
-      en: { title: "Local Trends", desc: "Google Trends, local buzz, what people are searching for." },
-      es: { title: "Tendencias Locales", desc: "Google Trends, tendencias locales, lo que la gente está buscando." },
-      pl: { title: "Lokalne Trendy", desc: "Google Trends, lokalne trendy, czego ludzie szukają." },
-    },
-  };
-
-  return (
-    <div>
-      <h2 className="text-xl font-semibold">{t.layersStep.title}</h2>
-      <p className="mt-1 text-sm text-white/60">
-        {t.layersStep.subtitle}
+        {t.burdenStep.subtitle}
       </p>
 
       <div className="mt-4 space-y-3">
-        {/* Weather - always on */}
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-medium">{layerLabels.weather[language].title}</span>
-                <span className="rounded-full bg-[#1ED760]/20 text-[#1ED760] px-2 py-0.5 text-xs">
-                  {language === "es" ? "Incluido" : language === "pl" ? "Wliczone" : "Included"}
-                </span>
-              </div>
-              <div className="mt-1 text-sm text-white/60">{layerLabels.weather[language].desc}</div>
-            </div>
-            <div className="text-white/40">
-              <Check className="w-5 h-5" />
-            </div>
-          </div>
-        </div>
-
-        {/* Optional layers */}
-        {(["sports", "community", "trends"] as const).map((key) => (
-          <button
-            key={key}
-            onClick={() => onChange({ ...layers, [key]: !layers[key] })}
-            className={`w-full rounded-2xl border p-4 text-left transition ${
-              layers[key]
-                ? "border-[#FF6A00] bg-[#FF6A00]/10"
-                : "border-white/10 bg-white/5 hover:bg-white/10"
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">{layerLabels[key][language].title}</span>
-                  <span className="text-sm text-white/50">+{formatMoney(LAYER_MONTHLY[key])}/mo</span>
+        {BURDEN_OPTIONS.map((option) => {
+          const isSelected = burdens.includes(option.id);
+          const isExclusive = option.id === "all_of_it" || option.id === "not_sure";
+          
+          return (
+            <button
+              key={option.id}
+              onClick={() => toggleBurden(option.id)}
+              className={`w-full rounded-2xl border p-4 text-left transition ${
+                isSelected
+                  ? "border-[#FF6A00] bg-[#FF6A00]/10"
+                  : "border-white/10 bg-white/5 hover:bg-white/10"
+              } ${isExclusive ? "mt-4 border-dashed" : ""}`}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-medium">{option.name[language]}</div>
+                  <div className="mt-1 text-sm text-white/60">{option.desc[language]}</div>
                 </div>
-                <div className="mt-1 text-sm text-white/60">{layerLabels[key][language].desc}</div>
+                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition ${
+                  isSelected ? "border-[#FF6A00] bg-[#FF6A00]" : "border-white/30"
+                }`}>
+                  {isSelected && <Check className="w-4 h-4 text-white" />}
+                </div>
               </div>
-              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition ${
-                layers[key] ? "border-[#FF6A00] bg-[#FF6A00]" : "border-white/30"
-              }`}>
-                {layers[key] && <Check className="w-4 h-4 text-white" />}
-              </div>
-            </div>
-          </button>
-        ))}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
 }
 
-function StepMode({
+function StepInvolvement({
   value,
   onChange,
   t,
   language,
 }: {
-  value: Mode;
-  onChange: (v: Mode) => void;
+  value: InvolvementLevel;
+  onChange: (v: InvolvementLevel) => void;
   t: typeof translations["en"];
   language: Language;
 }) {
-  const modeLabels: Record<Mode, Record<Language, { title: string; desc: string }>> = {
-    AUTO: {
-      en: { title: "Auto", desc: "Set it and forget it. We post when it makes sense." },
-      es: { title: "Automático", desc: "Configúralo y olvídalo. Publicamos cuando tiene sentido." },
-      pl: { title: "Automatyczny", desc: "Ustaw i zapomnij. Publikujemy, gdy ma to sens." },
-    },
-    GUIDED: {
-      en: { title: "Guided", desc: "We advise, you decide. Preview and approve each post." },
-      es: { title: "Guiado", desc: "Nosotros aconsejamos, tú decides. Vista previa y aprueba cada publicación." },
-      pl: { title: "Prowadzony", desc: "My doradzamy, Ty decydujesz. Podgląd i zatwierdzenie każdego posta." },
-    },
-    CUSTOM: {
-      en: { title: "Custom", desc: "Full control with guardrails. Edit, schedule, customize." },
-      es: { title: "Personalizado", desc: "Control total con protecciones. Edita, programa, personaliza." },
-      pl: { title: "Niestandardowy", desc: "Pełna kontrola z zabezpieczeniami. Edytuj, planuj, dostosowuj." },
-    },
-  };
-
   return (
     <div>
-      <h2 className="text-xl font-semibold">{t.modeStep.title}</h2>
+      <h2 className="text-xl font-semibold">{t.involvementStep.title}</h2>
       <p className="mt-1 text-sm text-white/60">
-        {t.modeStep.subtitle}
+        {t.involvementStep.subtitle}
       </p>
 
       <div className="mt-4 grid gap-3">
-        {(["AUTO", "GUIDED", "CUSTOM"] as Mode[]).map((m) => (
+        {INVOLVEMENT_OPTIONS.map((option) => (
           <CardOption
-            key={m}
-            title={modeLabels[m][language].title}
-            desc={modeLabels[m][language].desc}
-            selected={value === m}
-            onClick={() => onChange(m)}
-            badge={m === "GUIDED" ? (language === "es" ? "Popular" : language === "pl" ? "Popularne" : "Popular") : undefined}
+            key={option.id}
+            title={option.name[language]}
+            desc={option.desc[language]}
+            selected={value === option.id}
+            onClick={() => onChange(option.id)}
+            badge={option.id === "HANDLE_IT" ? (language === "es" ? "Recomendado" : language === "pl" ? "Zalecane" : "Recommended") : undefined}
           />
         ))}
+      </div>
+
+      <div className="mt-6 rounded-xl bg-white/5 border border-white/10 p-4">
+        <p className="text-sm text-white/60">
+          {language === "es" 
+            ? "Independientemente de lo que elijas, siempre podrás ver lo que LaunchBase está haciendo. La no-acción siempre es segura. El cambio es reversible."
+            : language === "pl"
+            ? "Niezależnie od wyboru, zawsze będziesz mógł zobaczyć, co robi LaunchBase. Brak działania jest zawsze bezpieczny. Zmiana jest odwracalna."
+            : "Regardless of what you choose, you'll always be able to see what LaunchBase is doing. Non-action is always safe. Change is reversible."
+          }
+        </p>
       </div>
     </div>
   );
@@ -1172,14 +1071,12 @@ function StepContact({
 
 function StepReview({
   form,
-  pricing,
   termsAccepted,
   onToggleTerms,
   t,
   language,
 }: {
   form: ApplyForm;
-  pricing: ReturnType<typeof computePricing>;
   termsAccepted: boolean;
   onToggleTerms: (v: boolean) => void;
   t: typeof translations["en"];
@@ -1187,6 +1084,15 @@ function StepReview({
 }) {
   const vertical = VERTICALS.find(v => v.id === form.vertical);
   const industry = vertical?.industries.find(i => i.id === form.industry);
+  
+  // Get burden labels
+  const burdenLabels = form.burdens.map(b => {
+    const option = BURDEN_OPTIONS.find(o => o.id === b);
+    return option?.name[language] || b;
+  });
+
+  // Get involvement label
+  const involvementLabel = INVOLVEMENT_OPTIONS.find(o => o.id === form.involvement)?.name[language];
 
   return (
     <div>
@@ -1196,6 +1102,7 @@ function StepReview({
       </p>
 
       <div className="mt-5 space-y-4">
+        {/* Business */}
         <div className="rounded-xl border border-white/10 bg-white/5 p-4">
           <div className="text-sm text-white/50 mb-2">
             {language === "es" ? "Negocio" : language === "pl" ? "Firma" : "Business"}
@@ -1204,6 +1111,7 @@ function StepReview({
           {industry && <div className="text-sm text-white/60">{industry.name[language]}</div>}
         </div>
 
+        {/* Location */}
         <div className="rounded-xl border border-white/10 bg-white/5 p-4">
           <div className="text-sm text-white/50 mb-2">
             {language === "es" ? "Ubicación" : language === "pl" ? "Lokalizacja" : "Location"}
@@ -1212,6 +1120,18 @@ function StepReview({
           <div className="text-sm text-white/60">{form.radiusMiles} mile radius</div>
         </div>
 
+        {/* What you're handing off */}
+        <div className="rounded-xl border border-[#FF6A00]/30 bg-[#FF6A00]/5 p-4">
+          <div className="text-sm text-[#FF6A00]/70 mb-2">
+            {language === "es" ? "Lo que estás delegando" : language === "pl" ? "Co przekazujesz" : "What you're handing off"}
+          </div>
+          <div className="font-medium">{burdenLabels.join(", ")}</div>
+          <div className="mt-2 text-sm text-white/60">
+            {involvementLabel}
+          </div>
+        </div>
+
+        {/* Contact */}
         <div className="rounded-xl border border-white/10 bg-white/5 p-4">
           <div className="text-sm text-white/50 mb-2">
             {language === "es" ? "Contacto" : language === "pl" ? "Kontakt" : "Contact"}
@@ -1221,20 +1141,25 @@ function StepReview({
           <div className="text-sm text-white/60">{form.contactPhone}</div>
         </div>
 
+        {/* Pricing */}
         <div className="rounded-xl border border-white/10 bg-white/5 p-4">
           <div className="text-sm text-white/50 mb-2">
-            {language === "es" ? "Precio" : language === "pl" ? "Cena" : "Pricing"}
+            {language === "es" ? "Precio de fundador" : language === "pl" ? "Cena założycielska" : "Founder pricing"}
           </div>
           <div className="flex justify-between">
             <span>{t.pricing.monthly}</span>
-            <span className="font-medium">{formatMoney(pricing.monthlyTotal)}/mo</span>
+            <span className="font-medium text-[#FF6A00]">${FOUNDER_MONTHLY}/mo</span>
           </div>
           <div className="flex justify-between text-sm text-white/60">
             <span>{t.pricing.setup}</span>
-            <span>{formatMoney(pricing.setupFee)}</span>
+            <span>${FOUNDER_SETUP}</span>
+          </div>
+          <div className="mt-2 pt-2 border-t border-white/10 text-xs text-white/50">
+            {t.pricing.founderLocked}
           </div>
         </div>
 
+        {/* Terms */}
         <label className="flex items-start gap-3 cursor-pointer">
           <input
             type="checkbox"
@@ -1246,59 +1171,51 @@ function StepReview({
             {t.reviewStep.termsLabel}
           </span>
         </label>
+
+        {/* Submit note */}
+        <div className="rounded-xl bg-white/5 border border-white/10 p-4">
+          <p className="text-sm text-white/60">
+            {t.reviewStep.submitNote}
+          </p>
+        </div>
       </div>
     </div>
   );
 }
 
 function PricingRail({
-  form,
-  pricing,
   t,
   language,
 }: {
-  form: ApplyForm;
-  pricing: ReturnType<typeof computePricing>;
   t: typeof translations["en"];
   language: Language;
 }) {
-  const vertical = VERTICALS.find(v => v.id === form.vertical);
-
   return (
     <div className="hidden lg:block">
       <div className="sticky top-24 rounded-2xl border border-white/10 bg-white/5 p-6">
         <div className="text-sm text-white/50 mb-4">
-          {language === "es" ? "Tu configuración" : language === "pl" ? "Twoja konfiguracja" : "Your configuration"}
+          {language === "es" ? "Precio de fundador" : language === "pl" ? "Cena założycielska" : "Founder pricing"}
         </div>
 
         <div className="space-y-3 text-sm">
-          {vertical && (
-            <div className="flex justify-between">
-              <span className="text-white/70">{language === "es" ? "Negocio" : language === "pl" ? "Firma" : "Business"}</span>
-              <span className="text-white">{vertical.name[language]}</span>
-            </div>
-          )}
-
           <div className="flex justify-between">
-            <span className="text-white/70">{t.pricing.cadence}</span>
-            <span className="text-white">{form.cadence} — {formatMoney(pricing.cadenceMonthly)}/mo</span>
+            <span className="text-white/70">{t.pricing.monthly}</span>
+            <span className="text-[#FF6A00] font-semibold">${FOUNDER_MONTHLY}/mo</span>
           </div>
 
-          {pricing.enabledLayerKeys.length > 0 && (
-            <div className="flex justify-between">
-              <span className="text-white/70">{t.pricing.layers}</span>
-              <span className="text-white">+{formatMoney(pricing.layersMonthly)}/mo</span>
-            </div>
-          )}
+          <div className="flex justify-between">
+            <span className="text-white/70">{t.pricing.setup}</span>
+            <span className="text-white">${FOUNDER_SETUP}</span>
+          </div>
 
           <div className="border-t border-white/10 pt-3 mt-3">
-            <div className="flex justify-between font-medium">
-              <span>{t.pricing.monthly}</span>
-              <span className="text-[#FF6A00]">{formatMoney(pricing.monthlyTotal)}/mo</span>
-            </div>
-            <div className="flex justify-between text-white/50 mt-1">
-              <span>{t.pricing.setup}</span>
-              <span>{formatMoney(pricing.setupFee)}</span>
+            <div className="text-xs text-white/50">
+              {language === "es" 
+                ? "Incluye todo: sitio web, visibilidad, monitoreo continuo"
+                : language === "pl"
+                ? "Zawiera wszystko: stronę, widoczność, ciągłe monitorowanie"
+                : "Includes everything: website, visibility, ongoing monitoring"
+              }
             </div>
           </div>
         </div>
@@ -1306,7 +1223,23 @@ function PricingRail({
         <div className="mt-6 pt-4 border-t border-white/10">
           <div className="flex items-center gap-2 text-xs text-white/50">
             <div className="w-2 h-2 rounded-full bg-[#1ED760]" />
-            <span>{language === "es" ? "Precio de fundador bloqueado" : language === "pl" ? "Cena założycielska zablokowana" : "Founder pricing locked"}</span>
+            <span>{t.pricing.founderLocked}</span>
+          </div>
+        </div>
+
+        {/* Trust elements */}
+        <div className="mt-6 space-y-2 text-xs text-white/40">
+          <div className="flex items-center gap-2">
+            <Check className="w-3 h-3 text-[#1ED760]" />
+            <span>{language === "es" ? "Ve tu sitio antes de pagar" : language === "pl" ? "Zobacz stronę przed płatnością" : "See your site before you pay"}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Check className="w-3 h-3 text-[#1ED760]" />
+            <span>{language === "es" ? "Nada sale sin tu aprobación" : language === "pl" ? "Nic nie wychodzi bez zgody" : "Nothing goes live without approval"}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Check className="w-3 h-3 text-[#1ED760]" />
+            <span>{language === "es" ? "Siempre visible, siempre seguro" : language === "pl" ? "Zawsze widoczne, zawsze bezpieczne" : "Always visible, always safe"}</span>
           </div>
         </div>
       </div>
@@ -1315,10 +1248,8 @@ function PricingRail({
 }
 
 function MobileSummaryBar({
-  pricing,
   t,
 }: {
-  pricing: ReturnType<typeof computePricing>;
   t: typeof translations["en"];
 }) {
   return (
@@ -1326,11 +1257,11 @@ function MobileSummaryBar({
       <div className="flex items-center justify-between">
         <div>
           <div className="text-xs text-white/50">{t.pricing.monthly}</div>
-          <div className="text-lg font-semibold text-[#FF6A00]">{formatMoney(pricing.monthlyTotal)}/mo</div>
+          <div className="text-lg font-semibold text-[#FF6A00]">${FOUNDER_MONTHLY}/mo</div>
         </div>
         <div className="text-right">
           <div className="text-xs text-white/50">{t.pricing.setup}</div>
-          <div className="text-sm text-white/70">{formatMoney(pricing.setupFee)}</div>
+          <div className="text-sm text-white/70">${FOUNDER_SETUP}</div>
         </div>
       </div>
     </div>
