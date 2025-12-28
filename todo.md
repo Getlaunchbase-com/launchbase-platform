@@ -1428,3 +1428,19 @@
 - [x] Explicitly state non-action is safe and change is reversible
 - [x] Add "what disappears from your life" framing (mental load, not features)
 - [x] Pass operator-vs-marketer litmus test on all new copy
+
+
+## Next Steps from Pressure Test Validation (Dec 25)
+### "Your site is live" Email (Ceremonial, not transactional)
+- [x] Opening: "Your site is live — and you don't need to manage it."
+- [x] Middle: List what is now being carried (monitoring, decisions, waiting, protecting)
+- [x] Reassurance: "Nothing happens silently. Every action is visible. Non-action is always safe."
+- [x] Close: Not a CTA — a release: "You can stop thinking about this."
+
+### "This is not for you if..." Pre-qualification Section
+- [x] Add section to homepage (respectful, relieving, not exclusionary)
+- [x] Include: want to tweak settings/plugins/layouts yourself
+- [x] Include: enjoy experimenting with tools and integrations
+- [x] Include: want maximum flexibility over consistency
+- [x] Include: looking for one-time project, not ongoing ownership
+- [x] End with: "LaunchBase is for owners who want the system handled — not managed."

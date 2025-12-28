@@ -427,6 +427,40 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Pre-qualification - This is not for you if... */}
+      <section className="py-16 px-4 border-b border-white/5">
+        <div className="container max-w-3xl mx-auto">
+          <div className="bg-white/[0.02] border border-white/10 rounded-2xl p-8">
+            <h3 className="text-xl font-semibold mb-6 text-center">
+              This is not for you if…
+            </h3>
+            
+            <ul className="space-y-4 mb-8">
+              <li className="flex items-start gap-3 text-gray-400">
+                <span className="text-gray-600 mt-0.5">•</span>
+                <span>You want to tweak settings, plugins, or layouts yourself</span>
+              </li>
+              <li className="flex items-start gap-3 text-gray-400">
+                <span className="text-gray-600 mt-0.5">•</span>
+                <span>You enjoy experimenting with tools and integrations</span>
+              </li>
+              <li className="flex items-start gap-3 text-gray-400">
+                <span className="text-gray-600 mt-0.5">•</span>
+                <span>You want maximum flexibility over consistency</span>
+              </li>
+              <li className="flex items-start gap-3 text-gray-400">
+                <span className="text-gray-600 mt-0.5">•</span>
+                <span>You're looking for a one-time project, not ongoing ownership</span>
+              </li>
+            </ul>
+            
+            <p className="text-center text-gray-300">
+              LaunchBase is for owners who want the system <span className="text-white font-medium">handled</span> — not managed.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Pricing Section */}
       <section id="pricing" className="py-20 px-4 border-b border-white/5">
         <div className="container max-w-5xl mx-auto">

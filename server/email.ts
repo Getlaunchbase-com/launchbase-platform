@@ -188,18 +188,29 @@ Workflows that give you back your life.`
 
     case "site_live":
       return {
-        subject: "Your site is live",
-        previewText: "Your LaunchBase site is now published.",
+        subject: "Your site is live — and you don't need to manage it",
+        previewText: "LaunchBase has taken over. Here's what that means.",
         body: `Hi ${firstName},
 
-Your site is live.
+Your site is live — and you don't need to manage it.
 
 👉 View your site:
 ${liveUrl || "[Live URL]"}
 
-You can share this link with customers immediately.
+From this moment, LaunchBase is carrying:
 
-If you need any changes, reply to this email and we'll take care of it.
+• Monitoring — we're watching uptime, performance, and availability
+• Decisions — we determine when action is safe and relevant
+• Waiting — sometimes the right move is no move at all
+• Protecting — safety rules are always enforced, without exception
+
+Nothing happens silently.
+Every action is visible in your dashboard.
+Non-action is always safe.
+
+You can stop thinking about this.
+
+If you ever need changes or have questions, reply to this email. We're here.
 
 —
 LaunchBase
