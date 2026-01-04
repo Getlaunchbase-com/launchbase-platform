@@ -32,6 +32,7 @@ import AdminSuiteApplications from "./pages/AdminSuiteApplications";
 import AdminDeployments from "./pages/AdminDeployments";
 import ReferralAnalytics from "./pages/ReferralAnalytics";
 import Integrations from "./pages/Integrations";
+import FacebookConnect from "./pages/FacebookConnect";
 
 function Router() {
   return (
@@ -68,6 +69,7 @@ function Router() {
       <Route path="/dashboard/social/queue" component={PostQueue} />
       <Route path="/dashboard/modules" component={ModuleSetup} />
       <Route path="/expand/integrations" component={Integrations} />
+      <Route path="/settings/facebook/connect" component={FacebookConnect} />
       
       {/* Fallback routes */}
       <Route path="/404" component={NotFound} />

@@ -900,3 +900,32 @@ export const integrationConnections = mysqlTable("integration_connections", {
 
 export type IntegrationConnection = typeof integrationConnections.$inferSelect;
 export type InsertIntegrationConnection = typeof integrationConnections.$inferInsert;
+
+
+/**
+ * Facebook OAuth Sessions - Ephemeral sessions for OAuth flow
+ * Auto-expire after 15 minutes. Used to bridge callback → page selection → connect
+ */
+export const facebookOAuthSessions = mysqlTable("facebook_oauth_sessions", {
+  id: varchar("id", { length: 36 }).primaryKey(), // UUID connectSessionId
+  customerId: int("customerId").notNull(),
+  userId: int("userId").notNull(),
+  // Status workflow
+  status: mysqlEnum("status", ["pending", "pages_ready", "connected", "failed", "expired"]).default("pending").notNull(),
+  // User access token (short-lived, encrypted in production)
+  userAccessToken: text("userAccessToken"),
+  // Scopes granted by user
+  scopesGranted: json("scopesGranted").$type<string[]>(),
+  // Pages available for connection (cached from FB API)
+  pages: json("pages").$type<Array<{ pageId: string; pageName: string; accessToken: string }>>(),
+  // Error message if failed
+  error: text("error"),
+  // Return URL after connect
+  returnTo: varchar("returnTo", { length: 512 }),
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  expiresAt: timestamp("expiresAt").notNull(), // 15 min from creation
+});
+
+export type FacebookOAuthSession = typeof facebookOAuthSessions.$inferSelect;
+export type InsertFacebookOAuthSession = typeof facebookOAuthSessions.$inferInsert;

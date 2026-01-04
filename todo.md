@@ -1495,7 +1495,25 @@
 - [x] Connect Facebook UI component (3-state: disconnected/connected/needs-reconnect)
 - [ ] Verify token is Page access token with pages_manage_posts scope
 
-**Done when:** All acceptance tests pass with real FB Page
+**OAuth Routes (Blocker):**
+- [x] GET /api/facebook/oauth/start returns working redirect URL
+- [x] GET /api/facebook/oauth/callback completes handshake and returns page list
+- [x] State includes customerId and is signed (JWT)
+- [x] trpc.platform.listFacebookPages({ connectSessionId })
+- [x] trpc.platform.connectFacebookPage({ connectSessionId, pageId })
+- [x] /settings/facebook/connect page for page selection UI
+
+**E2E Test (Golden Path):**
+- [ ] Vince's Snowplow page connected, module_connections.status=active
+- [ ] createTestDraft → draft visible in drafts list
+- [ ] Approve → publishes post live + logs external_id/payload_hash
+- [ ] Safety hold path verified (outside hours) + logged
+
+**Admin UI:**
+- [ ] /platform/customers/:id/drafts (internal admin) with pending drafts list
+- [ ] Approve / Hold buttons with "Why we wrote this" + reason chips
+
+**Done when:** All E2E tests pass with real FB Page
 
 ### Slice B — Weather Monitoring moves to LaunchBase
 **Goal:** Weather triggers & drafts created in LaunchBase, not on site
