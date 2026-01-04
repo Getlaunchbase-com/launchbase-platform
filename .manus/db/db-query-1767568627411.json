@@ -1,0 +1,18 @@
+{
+  "query": "SHOW COLUMNS FROM social_posts WHERE Field = 'status';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SHOW COLUMNS FROM social_posts WHERE Field = 'status';",
+  "rows": [
+    {
+      "Field": "status",
+      "Type": "enum('pending','approved','rejected','published','failed')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "pending",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nstatus\tenum('pending','approved','rejected','published','failed')\tNO\t\tpending\t\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}
