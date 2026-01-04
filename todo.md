@@ -1467,3 +1467,55 @@
 - [x] Review - update to reflect burden + involvement, not features
 
 ### Principle: No question should require imagining how the system works
+
+
+---
+
+## Platformization: Vince → LaunchBase Consumer
+
+**Architecture Guardrail:** Customer sites must not store tokens, API keys, or run decision logic.
+
+### Slice A — Facebook Connection + Publish (E2E)
+**Goal:** Connect Vince's FB page → approve a draft → publish → log external_id
+
+- [ ] Connect UI works (OAuth flow complete)
+- [ ] Draft approved publishes to FB Page
+- [ ] activity_logs has post_published with external_id and payload_hash
+- [ ] Safety "hold" works (outside hours / daily cap)
+
+**Done when:** All 4 items checked
+
+### Slice B — Weather Monitoring moves to LaunchBase
+**Goal:** Weather triggers & drafts created in LaunchBase, not on site
+
+- [ ] LaunchBase owns NWS polling + alert ingestion
+- [ ] Creates facebook_drafts for Vince automatically
+- [ ] Vince site has zero NWS code / zero weather trigger logic
+- [ ] Site only consumes via Platform Client API
+
+**Done when:** All 4 items checked
+
+### Slice C — LCI / Community / Sports lookahead centralized
+**Goal:** All context layers run in LaunchBase; sites only render
+
+- [ ] Layer services run in platform
+- [ ] Draft reasons/chips sourced from platform
+- [ ] Site doesn't compute context
+
+**Done when:** All 3 items checked
+
+### Slice D — Delete quarantined staging code
+**Goal:** Remove _staging entirely
+
+- [ ] No quarantined file referenced anywhere
+- [ ] All functionality replaced by platform calls
+- [ ] _staging folder deleted
+
+**Done when:** All 3 items checked
+
+---
+
+## Technical Debt
+
+- [ ] Replace ts-ignore for google-trends-api with minimal local type shim
+
