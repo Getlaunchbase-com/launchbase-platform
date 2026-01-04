@@ -33,6 +33,8 @@ import AdminDeployments from "./pages/AdminDeployments";
 import ReferralAnalytics from "./pages/ReferralAnalytics";
 import Integrations from "./pages/Integrations";
 import FacebookConnect from "./pages/FacebookConnect";
+import AdminDrafts from "./pages/AdminDrafts";
+import SettingsFacebook from "./pages/SettingsFacebook";
 
 function Router() {
   return (
@@ -70,6 +72,8 @@ function Router() {
       <Route path="/dashboard/modules" component={ModuleSetup} />
       <Route path="/expand/integrations" component={Integrations} />
       <Route path="/settings/facebook/connect" component={FacebookConnect} />
+      <Route path="/admin/drafts" component={AdminDrafts} />
+      <Route path="/settings/facebook" component={SettingsFacebook} />
       
       {/* Fallback routes */}
       <Route path="/404" component={NotFound} />
