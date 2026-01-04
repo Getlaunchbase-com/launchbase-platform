@@ -27,6 +27,7 @@ import {
 } from "./db";
 import { sendEmail, AdminNotifications } from "./email";
 import { trackEvent, getFunnelMetrics, getBuildQualityMetrics, getVerticalMetrics, getDailyHealth } from "./analytics";
+import { platformRouter } from "./platform-router";
 import { createSetupCheckoutSession, getCheckoutSession } from "./stripe/checkout";
 import { createSMICheckoutSession, getSMISubscriptionStatus, cancelSMISubscription } from "./stripe/intelligenceCheckout";
 import { generatePlatformGuidePDF } from "./pdfGuide";
@@ -60,6 +61,7 @@ function generateReferralCode(): string {
 
 export const appRouter = router({
   system: systemRouter,
+  platform: platformRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
