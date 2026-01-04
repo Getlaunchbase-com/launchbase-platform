@@ -1478,12 +1478,24 @@
 ### Slice A — Facebook Connection + Publish (E2E)
 **Goal:** Connect Vince's FB page → approve a draft → publish → log external_id
 
-- [ ] Connect UI works (OAuth flow complete)
-- [ ] Draft approved publishes to FB Page
-- [ ] activity_logs has post_published with external_id and payload_hash
-- [ ] Safety "hold" works (outside hours / daily cap)
+**Acceptance Tests:**
+- [ ] Connect UI connects Vince's Page in dev mode
+- [ ] GET /api/platform/facebook/status returns connected + lastVerifiedAt
+- [ ] GET /api/platform/drafts returns pending drafts
+- [ ] POST /api/platform/drafts/:id/approve publishes OR holds with reason
+- [ ] FB post exists and external_id logged in activity_logs
+- [ ] Hold test passes (outside hours = no accidental post)
+- [ ] payload_hash logged for audit trail
 
-**Done when:** All 4 items checked
+**Implementation Tasks:**
+- [x] Platform API: GET /api/platform/facebook/status
+- [x] Platform API: GET /api/platform/drafts
+- [x] Platform API: POST /api/platform/drafts/:id/approve
+- [x] Platform API: POST /api/platform/drafts/test (dev shortcut)
+- [x] Connect Facebook UI component (3-state: disconnected/connected/needs-reconnect)
+- [ ] Verify token is Page access token with pages_manage_posts scope
+
+**Done when:** All acceptance tests pass with real FB Page
 
 ### Slice B — Weather Monitoring moves to LaunchBase
 **Goal:** Weather triggers & drafts created in LaunchBase, not on site
