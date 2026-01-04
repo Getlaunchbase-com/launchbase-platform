@@ -9,6 +9,7 @@ import { z } from "zod";
 import { router, protectedProcedure } from "./_core/trpc";
 import { getDb } from "./db";
 import { moduleConnections, socialPosts, decisionLogs } from "../drizzle/schema";
+import { listPages, connectPage, getSession } from "./services/facebookOAuth";
 import { eq, and, desc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import crypto from "crypto";
@@ -406,6 +407,90 @@ Stay warm, stay safe — we've got you covered.
       return {
         id: draft.id,
         message: "Test draft created successfully",
+      };
+    }),
+
+  /**
+   * Facebook OAuth: List available pages from connect session
+   */
+  listFacebookPages: protectedProcedure
+    .input(z.object({ connectSessionId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const { pages, error } = await listPages(input.connectSessionId, ctx.user.id);
+      
+      if (error) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: error });
+      }
+
+      return { pages };
+    }),
+
+  /**
+   * Facebook OAuth: Connect a specific page
+   */
+  connectFacebookPage: protectedProcedure
+    .input(z.object({
+      connectSessionId: z.string(),
+      pageId: z.string(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      }
+
+      const { success, pageName, error } = await connectPage(
+        input.connectSessionId,
+        ctx.user.id,
+        input.pageId
+      );
+
+      if (!success) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: error || "Connection failed" });
+      }
+
+      // Log the connection
+      await db.insert(decisionLogs).values({
+        userId: ctx.user.id,
+        decision: "post",
+        reason: "facebook_page_connected",
+        triggerContext: "manual",
+        conditions: {
+          pageId: input.pageId,
+          pageName: pageName,
+          connectedAt: new Date().toISOString(),
+          action: "connect",
+        },
+      });
+
+      return {
+        status: "connected",
+        pageId: input.pageId,
+        pageName: pageName,
+      };
+    }),
+
+  /**
+   * Facebook OAuth: Get session status (for UI to check if session is valid)
+   */
+  getFacebookOAuthSession: protectedProcedure
+    .input(z.object({ connectSessionId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const { session, error } = await getSession(input.connectSessionId, ctx.user.id);
+      
+      if (error || !session) {
+        return {
+          valid: false,
+          status: "invalid" as const,
+          error: error || "Session not found",
+        };
+      }
+
+      return {
+        valid: true,
+        status: session.status,
+        error: session.error,
+        returnTo: session.returnTo,
       };
     }),
 });
