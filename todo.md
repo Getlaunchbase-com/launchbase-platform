@@ -1510,10 +1510,17 @@
 - [ ] Safety hold path verified (outside hours) + logged
 
 **Admin UI:**
-- [ ] /platform/customers/:id/drafts (internal admin) with pending drafts list
-- [ ] Approve / Hold buttons with "Why we wrote this" + reason chips
+- [x] /admin/drafts (internal admin) with pending drafts list
+- [x] Approve / Hold buttons with "Why we wrote this" + reason chips
+- [x] /settings/facebook page (connection status display)
 
-**Done when:** All E2E tests pass with real FB Page
+**Email Notifications:**
+- [x] Notify owner when new draft created (needs review)
+- [x] Notify owner when draft approved/published
+- [x] Notify owner when draft held (with reason)
+
+**Done when:** All E2E tests pass with real FB Page (blocked on Meta verification)
+**Unblocked now:** Admin UI, Email notifications, Settings page
 
 ### Slice B — Weather Monitoring moves to LaunchBase
 **Goal:** Weather triggers & drafts created in LaunchBase, not on site

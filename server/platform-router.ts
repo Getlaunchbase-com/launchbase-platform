@@ -10,6 +10,7 @@ import { router, protectedProcedure } from "./_core/trpc";
 import { getDb } from "./db";
 import { moduleConnections, socialPosts, decisionLogs } from "../drizzle/schema";
 import { listPages, connectPage, getSession } from "./services/facebookOAuth";
+import { notifyOnDraftAction } from "./services/draftNotifications";
 import { eq, and, desc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import crypto from "crypto";
@@ -278,6 +279,11 @@ export const platformRouter = router({
           },
         });
 
+        // Notify owner about the hold
+        await notifyOnDraftAction(draft.id, "held", {
+          reason: "Outside business hours (6 AM - 9 PM Chicago time)",
+        });
+
         return {
           status: "held" as const,
           reason: "Outside business hours (6 AM - 9 PM Chicago time)",
@@ -344,6 +350,11 @@ export const platformRouter = router({
         },
         });
 
+      // Notify owner about successful publish
+      await notifyOnDraftAction(draft.id, "published", {
+        externalId: result.postId,
+      });
+
       return {
         status: "published" as const,
         externalId: result.postId,
@@ -403,6 +414,9 @@ Stay warm, stay safe — we've got you covered.
           createdAt: new Date().toISOString(),
         },
         });
+
+      // Notify owner about new draft needing review
+      await notifyOnDraftAction(draft.id, "created");
 
       return {
         id: draft.id,
