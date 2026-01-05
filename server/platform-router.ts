@@ -11,6 +11,7 @@ import { getDb } from "./db";
 import { moduleConnections, socialPosts, decisionLogs } from "../drizzle/schema";
 import { listPages, connectPage, getSession } from "./services/facebookOAuth";
 import { notifyOnDraftAction } from "./services/draftNotifications";
+import { checkFacebookPostingPolicy } from "./services/facebook-policy";
 import { eq, and, desc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import crypto from "crypto";
