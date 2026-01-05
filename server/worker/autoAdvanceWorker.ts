@@ -54,7 +54,7 @@ function generatePreviewToken(): string {
 
 /**
  * Handle auto-advance worker request
- * Route: POST /api/worker/auto-advance
+ * Called by: POST /api/cron/auto-advance
  */
 export async function handleAutoAdvanceWorker(req: Request, res: Response) {
   const startTime = Date.now();
