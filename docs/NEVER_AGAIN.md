@@ -1,0 +1,508 @@
+# NEVER AGAIN: Lessons Learned
+
+This document captures every mistake made during development and the correct pattern to use instead. **Read this before starting any new feature.**
+
+---
+
+## Testing Anti-Patterns
+
+### ❌ MISTAKE: Mocking Drizzle internals in tests
+
+**What we did wrong:**
+```typescript
+// DON'T: Mock Drizzle query builder methods
+vi.mocked(db.select).mockReturnValue({
+  from: vi.fn().mockReturnValue({
+    where: vi.fn().mockReturnValue(...)
+  })
+});
+```
+
+**Why it's wrong:**
+- Tests break when query shape changes
+- Tests break when schema changes
+- You're testing Drizzle, not your code
+- Brittle and hard to maintain
+
+**✅ CORRECT PATTERN: Extract DB helpers and mock those**
+
+```typescript
+// Step 1: Create server/services/[feature]-db.ts
+export async function fetchFacebookConnectedAt(input: {
+  customerId: number;
+  pageId: string;
+}) {
+  const db = await getDb();
+  const [row] = await db
+    .select({ createdAt: moduleConnections.createdAt })
+    .from(moduleConnections)
+    .where(
+      and(
+        eq(moduleConnections.userId, input.customerId),
+        eq(moduleConnections.externalId, input.pageId),
+        eq(moduleConnections.connectionType, "facebook_page")
+      )
+    )
+    .limit(1);
+  
+  return row?.createdAt ?? null;
+}
+
+// Step 2: Use helpers in your service
+import { fetchFacebookConnectedAt } from "./facebook-policy-db";
+const connectedAt = await fetchFacebookConnectedAt({ customerId, pageId });
+
+// Step 3: Mock the helper (simple!)
+vi.mock("../facebook-policy-db", () => ({
+  fetchFacebookConnectedAt: vi.fn(),
+  countPublishedPostsToday: vi.fn(),
+}));
+
+import { fetchFacebookConnectedAt } from "../facebook-policy-db";
+(fetchFacebookConnectedAt as any).mockResolvedValue(new Date());
+```
+
+**Benefits:**
+- Tests stay stable when queries change
+- Only test your logic, not Drizzle
+- Easy to understand and maintain
+
+---
+
+### ❌ MISTAKE: Exact error message assertions
+
+**What we did wrong:**
+```typescript
+// DON'T: Assert exact error text
+expect(result.error).toBe("Daily limit reached");
+expect(result.reasons).toContain("Daily post limit reached (2 posts per 24 hours). Please wait before posting again.");
+```
+
+**Why it's wrong:**
+- Copy evolves over time
+- Product managers change wording
+- Tests break when improving UX copy
+- Blocks legitimate improvements
+
+**✅ CORRECT PATTERN: Assert semantic meaning**
+
+```typescript
+// DO: Assert action + semantic category
+expect(result.success).toBe(false);
+expect(result.action).toBe("BLOCK");
+expect(result.error?.toLowerCase()).toMatch(/limit|cap/);
+expect(result.reasons).toBeDefined();
+expect(Array.isArray(result.reasons)).toBe(true);
+```
+
+**Benefits:**
+- Copy can evolve without breaking tests
+- Tests verify behavior, not presentation
+- Product improvements don't require test rewrites
+
+---
+
+### ❌ MISTAKE: Using `vi.mocked()` without checking Vitest version
+
+**What we did wrong:**
+```typescript
+// DON'T: Assume vi.mocked() exists
+vi.mocked(getWeatherIntelligence).mockResolvedValue(...);
+```
+
+**Why it's wrong:**
+- `vi.mocked()` isn't available in all Vitest versions
+- Creates cryptic "not a function" errors
+- Blocks test execution
+
+**✅ CORRECT PATTERN: Use plain cast + vi.fn()**
+
+```typescript
+// DO: Mock at top of file, cast when using
+vi.mock("../services/weather-intelligence", () => ({
+  getWeatherIntelligence: vi.fn(),
+}));
+
+import { getWeatherIntelligence } from "../services/weather-intelligence";
+const mockGetWeatherIntelligence = getWeatherIntelligence as unknown as ReturnType<typeof vi.fn>;
+mockGetWeatherIntelligence.mockResolvedValue({ ... });
+```
+
+**Even better: Don't mock if you don't need to**
+```typescript
+// If policy returns DRAFT before weather logic runs, don't mock weather at all
+// Mock the policy result directly instead
+```
+
+---
+
+### ❌ MISTAKE: Flipping constants for smoke tests
+
+**What we did wrong:**
+```typescript
+// DON'T: Change production constants for testing
+const DAILY_POST_CAP = 0; // SMOKE TEST
+```
+
+**Why it's wrong:**
+- Risk of shipping test values to production
+- Requires manual revert (easy to forget)
+- Creates "oops we shipped cap=0" incidents
+
+**✅ CORRECT PATTERN: Mock at the seam or use unit tests**
+
+```typescript
+// Option 1: Unit test with mocked DB responses
+const mockGetPostCount = vi.spyOn(
+  await import("../facebook-policy"),
+  "getPostCountLast24Hours"
+);
+mockGetPostCount.mockResolvedValue(2); // Simulate cap reached
+
+// Option 2: Make real posts in dev/staging to hit cap naturally
+// (Safer than flipping constants)
+
+// If you MUST flip a constant:
+// 1. Change constant
+// 2. Run smoke test
+// 3. IMMEDIATELY revert constant
+// 4. Run pnpm test again
+// 5. Only then checkpoint/publish
+```
+
+---
+
+## API Design Anti-Patterns
+
+### ❌ MISTAKE: Changing endpoint paths without updating external callers
+
+**What we did wrong:**
+- Renamed `/api/worker/*` to `/api/cron/*`
+- Forgot external cron service still hits old endpoints
+- Silent failures in production (HTML 200 responses)
+
+**✅ CORRECT PATTERN: Infrastructure Change Rule**
+
+**When changing cron/webhook endpoints:**
+
+1. **Add deprecation warnings first**
+   ```typescript
+   // Step 1: Add deprecation headers + logging
+   app.post("/api/worker/run-next-deploy", 
+     withDeprecationHeaders("Use POST /api/cron/run-next-deploy"),
+     handler
+   );
+   ```
+
+2. **Deploy + monitor for 24-48h**
+   - Check `/api/cron/health` for `deprecatedWorkerHits`
+   - Verify zero hits on old endpoints
+
+3. **Update external services**
+   - Update cron-job.org config
+   - Update webhook URLs
+   - Update documentation
+
+4. **Delete old endpoints**
+   - Only after zero deprecated hits
+   - Add regression test to prevent reintroduction
+   ```typescript
+   it("should return 404 for deleted worker endpoints", async () => {
+     const res = await request(app).post("/api/worker/run-next-deploy");
+     expect(res.status).toBe(404);
+     expect(res.body.ok).toBe(false);
+   });
+   ```
+
+**Document in code:**
+```markdown
+## Infrastructure Change Rule
+
+Cron endpoints are infrastructure. Changes require:
+1. Updating external scheduler configuration (cron-job.org)
+2. Updating regression tests in the same PR
+3. Never change paths without deprecation period
+```
+
+---
+
+## Database Anti-Patterns
+
+### ❌ MISTAKE: Using driver-specific features (insertId)
+
+**What we did wrong:**
+```typescript
+// DON'T: Rely on insertId (breaks with some MySQL drivers)
+const [result] = await db.insert(workerRuns).values({ ... });
+const runId = result.insertId; // ❌ May be undefined
+```
+
+**Why it's wrong:**
+- `insertId` not guaranteed across all MySQL drivers
+- Connection pooling can break it
+- Silent failures in production
+
+**✅ CORRECT PATTERN: Use UUID-based keys**
+
+```typescript
+// DO: Generate UUID before insert
+import { randomUUID } from "crypto";
+
+const runKey = randomUUID();
+await db.insert(workerRuns).values({
+  runKey,
+  workerType: "deployment",
+  // ...
+});
+
+// Update using UUID
+await db.update(workerRuns)
+  .set({ finishedAt: new Date(), ok: true })
+  .where(eq(workerRuns.runKey, runKey));
+```
+
+**Benefits:**
+- Works across all MySQL drivers
+- Works with connection pooling
+- Easier to debug (readable IDs in logs)
+
+---
+
+### ❌ MISTAKE: Letting Drizzle type inference cache issues block you
+
+**What we did wrong:**
+- Tried to fix Drizzle type inference errors
+- Spent hours debugging TypeScript
+- Blocked shipping
+
+**✅ CORRECT PATTERN: Use raw SQL for problematic queries**
+
+```typescript
+// When Drizzle type inference fails, use raw SQL
+import { sql } from "drizzle-orm";
+
+const result = await db.execute(sql`
+  UPDATE worker_runs 
+  SET finishedAt = NOW(), ok = ${ok}
+  WHERE runKey = ${runKey}
+`);
+```
+
+**When to use raw SQL:**
+- Type inference errors that block shipping
+- Complex joins with ambiguous columns
+- Performance-critical queries
+- When you need exact control over the query
+
+**Document why:**
+```typescript
+// Using raw SQL to bypass Drizzle type inference cache issues
+// with finishedAt column (see PR #123)
+```
+
+---
+
+## Deployment Anti-Patterns
+
+### ❌ MISTAKE: No telemetry for migration periods
+
+**What we did wrong:**
+- Deprecated endpoints with no visibility
+- Couldn't tell if external services migrated
+- Had to guess when safe to delete
+
+**✅ CORRECT PATTERN: Queryable telemetry**
+
+```typescript
+// Step 1: Track deprecated hits in memory
+const deprecatedHits = new Map<string, number>();
+
+function recordDeprecatedHit(path: string) {
+  deprecatedHits.set(path, (deprecatedHits.get(path) || 0) + 1);
+  console.log(`[Deprecated] ${new Date().toISOString()} ${path} called`);
+}
+
+// Step 2: Expose via health endpoint
+app.get("/api/cron/health", (req, res) => {
+  res.json({
+    ok: true,
+    timestamp: new Date().toISOString(),
+    database: "connected",
+    deprecatedWorkerHits: Object.fromEntries(deprecatedHits),
+  });
+});
+
+// Step 3: Monitor health endpoint
+// curl https://your-app.com/api/cron/health
+// {"deprecatedWorkerHits": {"POST /api/worker/run-next-deploy": 0}}
+
+// Step 4: Delete when zero hits for 24-48h
+```
+
+---
+
+## Testing Strategy
+
+### ✅ CORRECT PATTERN: Three-layer testing
+
+**Layer 1: Unit tests (fast, isolated)**
+```typescript
+// Test pure functions and business logic
+describe("isInApprovalFirstPeriod", () => {
+  it("returns true when within 7 days", () => {
+    const connectedAt = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000);
+    const now = new Date();
+    expect(isInApprovalFirstPeriod(connectedAt, now, 7)).toBe(true);
+  });
+});
+```
+
+**Layer 2: Integration tests (mock external services)**
+```typescript
+// Test that mutations enforce policy and don't call external APIs when blocked
+it("should NOT call Facebook when policy returns BLOCK", async () => {
+  vi.mocked(checkFacebookPostingPolicy).mockResolvedValue({
+    allowed: false,
+    action: "BLOCK",
+  });
+
+  const result = await caller.facebook.post({ message: "Test" });
+
+  expect(result.action).toBe("BLOCK");
+  expect(facebookPoster.postToFacebook).not.toHaveBeenCalled();
+});
+```
+
+**Layer 3: Smoke tests (production-like scenarios)**
+```typescript
+// Test end-to-end flows with realistic data
+it("SMOKE: Cap reached returns BLOCK with correct response shape", async () => {
+  // Mock DB to simulate cap reached
+  mockGetPostCount.mockResolvedValue(2);
+  
+  const result = await checkFacebookPostingPolicy({
+    customerId: "123",
+    pageId: "page123",
+    mode: "manual",
+    postType: "OTHER",
+    confidence: null,
+    now: new Date(),
+  });
+
+  expect(result.action).toBe("BLOCK");
+  expect(result.error?.toLowerCase()).toMatch(/limit|cap/);
+  console.log("✅ Response:", JSON.stringify(result, null, 2));
+});
+```
+
+---
+
+## Smoke Test Checklist
+
+Before every production deployment, run these smoke tests:
+
+### 1. Policy Enforcement
+- [ ] Cap block returns `BLOCK` with cap reason
+- [ ] Connection missing returns `BLOCK` with connection reason
+- [ ] Quiet hours (auto mode) returns `QUEUE` with `retryAt`
+- [ ] Manual mode bypasses quiet hours (returns `PUBLISH`)
+
+### 2. External API Integration
+- [ ] Facebook API not called when policy blocks
+- [ ] Facebook API called when policy allows
+- [ ] Error responses are user-friendly (no raw Zod errors)
+
+### 3. Cron Endpoints
+- [ ] `POST /api/cron/run-next-deploy` returns 200 JSON
+- [ ] `POST /api/cron/auto-advance` returns 200 JSON
+- [ ] `GET /api/cron/health` shows `lastWorkerRun` data
+- [ ] Deprecated endpoints return 404 JSON (if deleted)
+
+### 4. Database
+- [ ] Worker runs logged with UUID `runKey`
+- [ ] `finishedAt` and `ok` always set (finally block)
+- [ ] No `insertId` dependencies
+
+---
+
+## Code Review Checklist
+
+Before merging any PR, verify:
+
+### Testing
+- [ ] No Drizzle mocking (use DB helpers instead)
+- [ ] No exact error message assertions (use semantic matching)
+- [ ] No `vi.mocked()` calls (use plain cast + `vi.fn()`)
+- [ ] No production constants changed for testing
+
+### API Design
+- [ ] No endpoint path changes without deprecation period
+- [ ] Telemetry added for migration periods
+- [ ] Health endpoint updated if infrastructure changed
+- [ ] External services updated (cron, webhooks)
+
+### Database
+- [ ] No `insertId` usage (use UUID keys)
+- [ ] Raw SQL used for problematic Drizzle queries
+- [ ] Comments explain why raw SQL was needed
+
+### Documentation
+- [ ] NEVER_AGAIN.md updated with new lessons
+- [ ] README updated if API contract changed
+- [ ] Migration guide written if breaking changes
+
+---
+
+## Emergency Rollback Procedure
+
+If production breaks after deployment:
+
+1. **Immediate rollback**
+   ```bash
+   # Rollback to last known good checkpoint
+   pnpm webdev:rollback <version_id>
+   ```
+
+2. **Check telemetry**
+   ```bash
+   curl https://your-app.com/api/cron/health
+   # Look for errors, deprecated hits, worker failures
+   ```
+
+3. **Check worker logs**
+   ```sql
+   SELECT * FROM worker_runs 
+   WHERE ok = false 
+   ORDER BY startedAt DESC 
+   LIMIT 10;
+   ```
+
+4. **Document incident**
+   - Add to NEVER_AGAIN.md
+   - Update smoke test checklist
+   - Add regression test
+
+---
+
+## Key Principles
+
+1. **Never mock what you don't own** (Drizzle, external libraries)
+2. **Test behavior, not presentation** (semantic assertions)
+3. **Infrastructure changes require migration periods** (deprecation → monitor → delete)
+4. **Always have telemetry** (can't improve what you can't measure)
+5. **Document every mistake** (NEVER_AGAIN.md)
+6. **Smoke test before every deploy** (catch issues before production)
+7. **Use UUIDs for distributed systems** (no `insertId` dependencies)
+
+---
+
+## When in Doubt
+
+Ask yourself:
+- Will this test break if I improve the copy?
+- Will this work with connection pooling?
+- Can I monitor this migration?
+- Did I document this mistake in NEVER_AGAIN.md?
+- Did I add a smoke test for this scenario?
+
+If the answer to any is "no," stop and fix it before merging.
