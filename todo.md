@@ -1556,3 +1556,9 @@
 
 - [ ] Replace ts-ignore for google-trends-api with minimal local type shim
 
+
+
+## Cron Job Debugging (Jan 4, 2026)
+- [ ] Fix /api/worker/run-next-deploy endpoint (disabled by cron-job.org due to failures)
+- [ ] Add proper error handling and logging to worker endpoints
+- [ ] Test worker endpoint locally before re-enabling cron
