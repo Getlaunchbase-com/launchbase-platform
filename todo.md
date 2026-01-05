@@ -1562,3 +1562,18 @@
 - [ ] Fix /api/worker/run-next-deploy endpoint (disabled by cron-job.org due to failures)
 - [ ] Add proper error handling and logging to worker endpoints
 - [ ] Test worker endpoint locally before re-enabling cron
+
+
+## Cron Endpoint Standardization & Migration
+
+- [x] Create `/api/cron/*` POST endpoints (canonical)
+- [x] Add deprecation headers to `/api/worker/*` (back-compat)
+- [x] Extract `createApp()` for testability
+- [x] Move API guard to `createApp()` (platform invariant)
+- [x] Add Vitest regression tests (api-routing-guardrails.test.ts)
+- [x] Create docs/cron-contract.md
+- [ ] Update cron-job.org to use `/api/cron/*` POST
+- [ ] Monitor deprecation warnings for 24-48 hours
+- [ ] Delete `/api/worker/*` routes after zero hits
+- [ ] Update tests to verify `/api/worker/*` returns 404
+

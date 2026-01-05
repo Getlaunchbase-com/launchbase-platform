@@ -1,246 +1,49 @@
 /**
- * Cron Endpoints
- * GET endpoints for external cron services (cron-job.org)
+ * Cron Endpoints (Canonical Contract)
+ * POST endpoints for external cron services (cron-job.org)
  * 
- * Why GET instead of POST:
- * - External cron services often have issues with POST to SPA-hosted backends
- * - GET is universally allowed and doesn't trigger CORS preflight
- * - Token in Authorization header keeps it secure
+ * These are the ONLY endpoints external cron jobs should use.
+ * /api/worker/* endpoints exist only for back-compat and will be removed.
+ * 
+ * Contract:
+ * - Method: POST (except /health which is GET)
+ * - Auth: Bearer token in Authorization header OR x-worker-token header
+ * - Response: Always JSON
+ * - Idempotent: Safe to call multiple times (lock prevents concurrent runs)
+ * 
+ * Implementation:
+ * - Cron endpoints delegate to existing worker handlers (single code path)
+ * - Import direction: cronEndpoints → worker (never the reverse)
  */
 
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
+import { handleDeploymentWorker } from "./deploymentWorker";
+import { handleAutoAdvanceWorker } from "./autoAdvanceWorker";
 import { getDb } from "../db";
-import { deployments, intakes, buildPlans, workerRuns } from "../../drizzle/schema";
-import { eq, asc, desc } from "drizzle-orm";
-import { sendEmail } from "../email";
-import { notifyOwner } from "../_core/notification";
-
-// Simple in-memory lock (good enough for single-instance)
-const locks = new Map<string, number>();
-
-const CRON_TOKEN = process.env.WORKER_TOKEN;
 
 /**
- * Acquire a lock for a given key
- */
-function acquireLock(key: string, ttlMs: number = 120_000): boolean {
-  const now = Date.now();
-  const existing = locks.get(key);
-  
-  if (existing && existing > now) {
-    return false;
-  }
-  
-  locks.set(key, now + ttlMs);
-  return true;
-}
-
-/**
- * Release a lock
- */
-function releaseLock(key: string): void {
-  locks.delete(key);
-}
-
-/**
- * Verify token from Authorization header OR x-worker-token header
- * Supports both:
- * - Authorization: Bearer <token>
- * - x-worker-token: <token>
- */
-function verifyToken(req: Request): boolean {
-  if (!CRON_TOKEN) {
-    console.error("[Cron] WORKER_TOKEN not configured");
-    return false;
-  }
-  
-  // Check x-worker-token header first (legacy/existing cron jobs)
-  const workerToken = req.headers["x-worker-token"];
-  if (workerToken === CRON_TOKEN) {
-    return true;
-  }
-  
-  // Check Authorization header (standard Bearer token)
-  const auth = req.headers.authorization;
-  if (auth) {
-    const token = auth.startsWith("Bearer ") ? auth.slice(7) : auth;
-    if (token === CRON_TOKEN) {
-      return true;
-    }
-  }
-  
-  return false;
-}
-
-/**
- * GET /api/cron/run-next-deploy
- * Cron-safe endpoint for deployment worker
+ * POST /api/cron/run-next-deploy
+ * Canonical endpoint for deployment worker
+ * Delegates to existing worker logic
  */
 export async function handleCronRunNextDeploy(req: Request, res: Response) {
-  const startTime = Date.now();
-  
-  // Verify token
-  if (!verifyToken(req)) {
-    return res.status(401).json({ ok: false, error: "unauthorized" });
-  }
-  
-  // Try to acquire lock
-  if (!acquireLock("run-next-deploy", 120_000)) {
-    return res.status(200).json({ ok: true, skipped: "already_running" });
-  }
-  
-  try {
-    const db = await getDb();
-    if (!db) {
-      return res.status(500).json({ ok: false, error: "Database not available" });
-    }
-
-    // Check if any deployment is already running
-    const [runningJob] = await db
-      .select()
-      .from(deployments)
-      .where(eq(deployments.status, "running"))
-      .limit(1);
-
-    if (runningJob) {
-      return res.status(200).json({
-        ok: true,
-        skipped: "deployment_running",
-        runningDeploymentId: runningJob.id,
-      });
-    }
-
-    // Find the oldest queued deployment
-    const [queuedDeployment] = await db
-      .select()
-      .from(deployments)
-      .where(eq(deployments.status, "queued"))
-      .orderBy(asc(deployments.createdAt))
-      .limit(1);
-
-    if (!queuedDeployment) {
-      return res.status(200).json({ 
-        ok: true, 
-        message: "No queued deployments",
-        processed: 0 
-      });
-    }
-
-    // Mark as running
-    await db
-      .update(deployments)
-      .set({ 
-        status: "running",
-        startedAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .where(eq(deployments.id, queuedDeployment.id));
-
-    // Get intake details
-    const [intake] = await db
-      .select()
-      .from(intakes)
-      .where(eq(intakes.id, queuedDeployment.intakeId));
-
-    if (!intake) {
-      throw new Error("Intake not found");
-    }
-
-    // Simulate deployment (in real implementation, this would do actual work)
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    // Generate URL
-    const slug = intake.businessName
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
-    const liveUrl = `https://site-${slug}-${queuedDeployment.id}.launchbase-h86jcadp.manus.space`;
-
-    // Mark as success
-    await db
-      .update(deployments)
-      .set({
-        status: "success",
-        completedAt: new Date(),
-        productionUrl: liveUrl,
-        updatedAt: new Date(),
-      })
-      .where(eq(deployments.id, queuedDeployment.id));
-
-    // Update intake status
-    await db
-      .update(intakes)
-      .set({
-        status: "deployed",
-        updatedAt: new Date(),
-      })
-      .where(eq(intakes.id, intake.id));
-
-    // Send notification
-    await notifyOwner({
-      title: `Site deployed: ${intake.businessName}`,
-      content: `Live URL: ${liveUrl}`,
-    });
-
-    return res.status(200).json({
-      ok: true,
-      message: "Deployment completed",
-      processed: 1,
-      deploymentId: queuedDeployment.id,
-      liveUrl,
-      durationMs: Date.now() - startTime,
-    });
-
-  } catch (error) {
-    console.error("[Cron] run-next-deploy error:", error);
-    return res.status(500).json({
-      ok: false,
-      error: error instanceof Error ? error.message : "Unknown error",
-      durationMs: Date.now() - startTime,
-    });
-  } finally {
-    releaseLock("run-next-deploy");
-  }
+  // Delegate to the existing worker logic (single code path)
+  return handleDeploymentWorker(req, res);
 }
 
 /**
- * GET /api/cron/auto-advance
- * Cron-safe endpoint for auto-advance worker
+ * POST /api/cron/auto-advance
+ * Canonical endpoint for auto-advance worker
+ * Delegates to existing worker logic
  */
 export async function handleCronAutoAdvance(req: Request, res: Response) {
-  const startTime = Date.now();
-  
-  if (!verifyToken(req)) {
-    return res.status(401).json({ ok: false, error: "unauthorized" });
-  }
-  
-  if (!acquireLock("auto-advance", 120_000)) {
-    return res.status(200).json({ ok: true, skipped: "already_running" });
-  }
-  
-  try {
-    // Auto-advance logic would go here
-    // For now, just return success
-    return res.status(200).json({
-      ok: true,
-      message: "Auto-advance check completed",
-      processed: 0,
-      durationMs: Date.now() - startTime,
-    });
-  } catch (error) {
-    console.error("[Cron] auto-advance error:", error);
-    return res.status(500).json({
-      ok: false,
-      error: error instanceof Error ? error.message : "Unknown error",
-    });
-  } finally {
-    releaseLock("auto-advance");
-  }
+  // Delegate to the existing worker logic (single code path)
+  return handleAutoAdvanceWorker(req, res);
 }
 
 /**
  * GET /api/cron/health
- * Simple health check endpoint
+ * Simple health check endpoint (unauthenticated)
  */
 export async function handleCronHealth(_req: Request, res: Response) {
   const db = await getDb();
@@ -249,5 +52,19 @@ export async function handleCronHealth(_req: Request, res: Response) {
     ok: true,
     timestamp: new Date().toISOString(),
     database: db ? "connected" : "disconnected",
+  });
+}
+
+/**
+ * Handle GET requests to POST-only cron endpoints
+ * Returns 405 Method Not Allowed with JSON and Allow header
+ */
+export function handleCronMethodNotAllowed(_req: Request, res: Response) {
+  res.setHeader("Allow", "POST");
+  return res.status(405).json({
+    ok: false,
+    error: "method_not_allowed",
+    message: "This endpoint requires POST. Use POST /api/cron/* for cron jobs.",
+    allowed: ["POST"],
   });
 }
