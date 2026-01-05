@@ -95,4 +95,30 @@ describe("API guardrails (never repeat cron + SPA issues)", () => {
     expect(typeof res.body.timestamp).toBe("string");
     expect(["connected", "disconnected"]).toContain(res.body.database);
   });
+
+  // ⏸️ UNCOMMENT AFTER DELETING /api/worker/* ROUTES
+  // This test ensures worker endpoints are properly removed and return 404 JSON
+  // it.skip("worker endpoints return 404 JSON after deletion", async () => {
+  //   const runNextDeployRes = await supertest(app)
+  //     .post("/api/worker/run-next-deploy")
+  //     .set("Content-Type", "application/json")
+  //     .send({});
+  //
+  //   expect(runNextDeployRes.status).toBe(404);
+  //   const contentType1 = runNextDeployRes.headers["content-type"] ?? "";
+  //   expect(contentType1).toContain("application/json");
+  //   expect(runNextDeployRes.body.ok).toBe(false);
+  //   expect(runNextDeployRes.body.error).toBe("api_route_not_found");
+  //
+  //   const autoAdvanceRes = await supertest(app)
+  //     .post("/api/worker/auto-advance")
+  //     .set("Content-Type", "application/json")
+  //     .send({});
+  //
+  //   expect(autoAdvanceRes.status).toBe(404);
+  //   const contentType2 = autoAdvanceRes.headers["content-type"] ?? "";
+  //   expect(contentType2).toContain("application/json");
+  //   expect(autoAdvanceRes.body.ok).toBe(false);
+  //   expect(autoAdvanceRes.body.error).toBe("api_route_not_found");
+  // });
 });
