@@ -13,6 +13,7 @@
 import { getDb } from "../db";
 import { socialPosts, moduleConnections } from "../../drizzle/schema";
 import { eq, and, gte, sql } from "drizzle-orm";
+import { fetchFacebookConnectedAt, countPublishedPostsToday } from "./facebook-policy-db";
 
 // Policy constants
 const APPROVAL_FIRST_DAYS = 7; // Days to require manual approval for all posts
