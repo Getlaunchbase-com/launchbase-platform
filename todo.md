@@ -1577,3 +1577,14 @@
 - [ ] Delete `/api/worker/*` routes after zero hits
 - [ ] Update tests to verify `/api/worker/*` returns 404
 
+
+## Cron Standardization - Final Hardening
+
+- [x] Add activity logging for deprecated endpoint hits (console warnings with timestamp/path)
+- [x] Update docs/cron-contract.md with "infrastructure change" rule
+- [x] Add Vitest test for worker endpoint deletion verification (commented out until deletion)
+- [ ] Switch cron-job.org to POST /api/cron/* with Content-Type: application/json and body {}
+- [ ] Verify 20+ green runs on /api/cron/* endpoints
+- [ ] Delete /api/worker/* routes after confirmed migration
+- [ ] Uncomment deletion verification test and run `pnpm test api-routing-guardrails`
+

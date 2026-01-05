@@ -238,6 +238,23 @@ function createApp() {
 
 ---
 
+## Infrastructure Change Rule
+
+**Cron endpoints are infrastructure. Changes require updating both cron-job.org configuration and regression tests in the same PR.**
+
+This prevents:
+- Route changes without scheduler updates
+- Method changes without test updates
+- Silent production failures
+
+**Before merging any cron endpoint changes:**
+1. Update cron-job.org configuration (if URL/method changed)
+2. Update Vitest tests (if behavior changed)
+3. Run `pnpm test api-routing-guardrails`
+4. Document the change in this file
+
+---
+
 ## Questions?
 
 If you're unsure whether a change violates this contract, ask:
