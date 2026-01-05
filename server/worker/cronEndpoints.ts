@@ -20,7 +20,6 @@ import type { Request, Response } from "express";
 import { handleDeploymentWorker } from "./deploymentWorker";
 import { handleAutoAdvanceWorker } from "./autoAdvanceWorker";
 import { getDb } from "../db";
-import { getDeprecatedHits } from "../_core/app";
 import { sql } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
@@ -147,15 +146,31 @@ export async function handleCronAutoAdvance(req: Request, res: Response) {
 /**
  * GET /api/cron/health
  * Simple health check endpoint (unauthenticated)
+ * Shows database status and last worker run for observability
  */
 export async function handleCronHealth(_req: Request, res: Response) {
   const db = await getDb();
+  
+  let lastWorkerRun: any = null;
+  if (db) {
+    try {
+      const result = await db.execute(sql`
+        SELECT runKey, job, startedAt, finishedAt, ok, processed
+        FROM worker_runs
+        ORDER BY startedAt DESC
+        LIMIT 1
+      `);
+      lastWorkerRun = (result as any)[0] || null;
+    } catch (err) {
+      console.warn("[Health] Failed to fetch last worker run:", err);
+    }
+  }
   
   return res.status(200).json({
     ok: true,
     timestamp: new Date().toISOString(),
     database: db ? "connected" : "disconnected",
-    deprecatedWorkerHits: getDeprecatedHits(),
+    lastWorkerRun,
   });
 }
 

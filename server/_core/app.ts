@@ -37,42 +37,6 @@ import { getDb } from "../db";
 import { deployments } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 
-/**
- * In-memory counter for deprecated endpoint hits
- * Resets on server restart (acceptable for short migration window)
- * Exposed via /api/cron/health for queryable telemetry
- */
-const deprecatedHits: Record<string, number> = {};
-
-function recordDeprecatedHit(path: string) {
-  deprecatedHits[path] = (deprecatedHits[path] ?? 0) + 1;
-}
-
-/**
- * Get current deprecated hit counts (for health endpoint)
- */
-export function getDeprecatedHits(): Record<string, number> {
-  return { ...deprecatedHits };
-}
-
-/**
- * Helper: add deprecation headers for old worker endpoints
- * These endpoints exist only for back-compat during migration to /api/cron/*
- */
-function withDeprecationHeaders(
-  handler: (req: express.Request, res: express.Response) => unknown | Promise<unknown>,
-  usePath: string
-) {
-  return async (req: express.Request, res: express.Response) => {
-    recordDeprecatedHit(req.path);
-    console.warn(`[Deprecated] ${new Date().toISOString()} ${req.path} called. Use ${usePath} instead.`);
-    res.setHeader("X-LaunchBase-Deprecated", "true");
-    res.setHeader("X-LaunchBase-Use", usePath);
-    res.setHeader("X-LaunchBase-Removal", "after migration");
-    return await handler(req, res);
-  };
-}
-
 export function createApp(): Express {
   const app = express();
 
@@ -83,18 +47,7 @@ export function createApp(): Express {
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
-  // 3. Worker endpoints (back-compat with deprecation headers)
-  // These will be removed after migration to /api/cron/*
-  app.post(
-    "/api/worker/run-next-deploy",
-    withDeprecationHeaders(handleDeploymentWorker, "/api/cron/run-next-deploy")
-  );
-  app.post(
-    "/api/worker/auto-advance",
-    withDeprecationHeaders(handleAutoAdvanceWorker, "/api/cron/auto-advance")
-  );
-
-  // 4. Canonical cron endpoints (POST-only, except health)
+  // 3. Canonical cron endpoints (POST-only, except health)
   // These are the ONLY endpoints external cron jobs should use
   app.post("/api/cron/run-next-deploy", handleCronRunNextDeploy);
   app.post("/api/cron/auto-advance", handleCronAutoAdvance);
