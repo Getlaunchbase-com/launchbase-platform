@@ -883,7 +883,7 @@ export const appRouter = router({
       }
       
       const minutesAgo = workerData.lastRun 
-        ? Math.round((Date.now() - new Date(workerData.lastRun.createdAt).getTime()) / 60000)
+        ? Math.round((Date.now() - new Date(workerData.lastRun.startedAt).getTime()) / 60000)
         : null;
       
       return {

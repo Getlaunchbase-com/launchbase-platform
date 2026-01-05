@@ -7,7 +7,7 @@
 import { Request, Response } from "express";
 import { getDb } from "../db";
 import { deployments, intakes, buildPlans, workerRuns } from "../../drizzle/schema";
-import { eq, asc, desc } from "drizzle-orm";
+import { eq, asc, desc, sql } from "drizzle-orm";
 import { sendEmail } from "../email";
 import { notifyOwner } from "../_core/notification";
 
@@ -58,12 +58,6 @@ export async function handleDeploymentWorker(req: Request, res: Response) {
     if (runningJob) {
       console.log(`[Worker] Worker busy - deployment ${runningJob.id} is already running`);
       
-      // Log the skipped run
-      await logWorkerRun(db, "skipped", 0, Date.now() - startTime, {
-        message: "Worker busy - another deployment running",
-        deploymentIds: [runningJob.id],
-      });
-      
       return res.json({
         success: true,
         message: "Worker busy",
@@ -86,11 +80,6 @@ export async function handleDeploymentWorker(req: Request, res: Response) {
 
     if (!queuedDeployment) {
       console.log("[Worker] No queued deployments found");
-      
-      // Log the skipped run
-      await logWorkerRun(db, "skipped", 0, Date.now() - startTime, {
-        message: "No queued deployments",
-      });
       
       return res.json({ 
         success: true, 
@@ -174,11 +163,6 @@ export async function handleDeploymentWorker(req: Request, res: Response) {
 
     console.log(`[Worker] Deployment ${queuedDeployment.id} completed successfully`);
 
-    // Log the successful run
-    await logWorkerRun(db, "processed", 1, Date.now() - startTime, {
-      message: "Deployment completed successfully",
-      deploymentIds: [queuedDeployment.id],
-    });
 
     return res.json({
       success: true,
@@ -216,10 +200,7 @@ export async function handleDeploymentWorker(req: Request, res: Response) {
       });
     }
 
-    // Log the error
-    await logWorkerRun(db, "error", 0, Date.now() - startTime, {
-      message: error instanceof Error ? error.message : "Unknown error",
-    }, error instanceof Error ? error.message : "Unknown error");
+    // Error logged by cron handler
 
     return res.status(500).json({
       success: false,
@@ -228,31 +209,7 @@ export async function handleDeploymentWorker(req: Request, res: Response) {
   }
 }
 
-/**
- * Log a worker run for observability
- */
-async function logWorkerRun(
-  db: Awaited<ReturnType<typeof getDb>>,
-  result: "processed" | "skipped" | "error",
-  processedCount: number,
-  durationMs: number,
-  details?: { message?: string; deploymentIds?: number[] },
-  errorMessage?: string
-) {
-  if (!db) return;
-  
-  try {
-    await db.insert(workerRuns).values({
-      result,
-      processedCount,
-      durationMs,
-      details,
-      errorMessage,
-    });
-  } catch (err) {
-    console.error("[Worker] Failed to log worker run:", err);
-  }
-}
+// Worker logging removed - now handled by cron endpoints (cronEndpoints.ts)
 
 /**
  * Execute the actual deployment
@@ -382,23 +339,30 @@ export async function getLastWorkerRun() {
   const db = await getDb();
   if (!db) return null;
 
-  const [lastRun] = await db
-    .select()
-    .from(workerRuns)
-    .orderBy(desc(workerRuns.createdAt))
-    .limit(1);
+  // Raw SQL to bypass type inference issues
+  const lastRunResult = await db.execute(sql`
+    SELECT id, job, startedAt, finishedAt, ok, processed, deploymentId, error, meta
+    FROM worker_runs
+    ORDER BY startedAt DESC
+    LIMIT 1
+  `);
+  
+  const lastRun = (lastRunResult as any)[0] || null;
 
   // Get recent runs for stats
-  const recentRuns = await db
-    .select()
-    .from(workerRuns)
-    .orderBy(desc(workerRuns.createdAt))
-    .limit(10);
+  const recentRunsResult = await db.execute(sql`
+    SELECT id, job, startedAt, finishedAt, ok, processed, deploymentId, error, meta
+    FROM worker_runs
+    ORDER BY startedAt DESC
+    LIMIT 10
+  `);
+  
+  const recentRuns = (recentRunsResult as any) || [];
 
-  // Calculate stats
-  const processedCount = recentRuns.filter(r => r.result === "processed").length;
-  const skippedCount = recentRuns.filter(r => r.result === "skipped").length;
-  const errorCount = recentRuns.filter(r => r.result === "error").length;
+  // Calculate stats based on new schema (ok field)
+  const processedCount = recentRuns.filter((r: any) => r.ok === 1 && r.processed > 0).length;
+  const skippedCount = recentRuns.filter((r: any) => r.ok === 1 && r.processed === 0).length;
+  const errorCount = recentRuns.filter((r: any) => r.ok === 0).length;
 
   return {
     lastRun,
