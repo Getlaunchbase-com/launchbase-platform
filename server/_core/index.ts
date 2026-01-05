@@ -11,6 +11,7 @@ import { serveStatic, setupVite } from "./vite";
 import { handleStripeWebhook } from "../stripe/webhook";
 import { handleDeploymentWorker } from "../worker/deploymentWorker";
 import { handleAutoAdvanceWorker } from "../worker/autoAdvanceWorker";
+import { handleCronRunNextDeploy, handleCronAutoAdvance, handleCronHealth } from "../worker/cronEndpoints";
 import { logReferralEvent } from "../referral";
 import { getDb } from "../db";
 import { deployments } from "../../drizzle/schema";
@@ -49,6 +50,12 @@ async function startServer() {
   // Auto-advance worker endpoint (protected by token)
   // Automatically advances stuck suite applications after delay
   app.post("/api/worker/auto-advance", express.json(), handleAutoAdvanceWorker);
+
+  // Cron-safe GET endpoints (for cron-job.org)
+  // These use Bearer token auth and return JSON only
+  app.get("/api/cron/run-next-deploy", handleCronRunNextDeploy);
+  app.get("/api/cron/auto-advance", handleCronAutoAdvance);
+  app.get("/api/cron/health", handleCronHealth);
 
   // Referral redirect endpoint: /r/{siteSlug}
   // Logs badge click and redirects to homepage with UTM params
