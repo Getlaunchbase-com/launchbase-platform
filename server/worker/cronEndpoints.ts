@@ -43,19 +43,33 @@ function releaseLock(key: string): void {
 }
 
 /**
- * Verify Bearer token from Authorization header
+ * Verify token from Authorization header OR x-worker-token header
+ * Supports both:
+ * - Authorization: Bearer <token>
+ * - x-worker-token: <token>
  */
-function verifyBearerToken(req: Request): boolean {
+function verifyToken(req: Request): boolean {
   if (!CRON_TOKEN) {
     console.error("[Cron] WORKER_TOKEN not configured");
     return false;
   }
   
-  const auth = req.headers.authorization;
-  if (!auth) return false;
+  // Check x-worker-token header first (legacy/existing cron jobs)
+  const workerToken = req.headers["x-worker-token"];
+  if (workerToken === CRON_TOKEN) {
+    return true;
+  }
   
-  const token = auth.startsWith("Bearer ") ? auth.slice(7) : auth;
-  return token === CRON_TOKEN;
+  // Check Authorization header (standard Bearer token)
+  const auth = req.headers.authorization;
+  if (auth) {
+    const token = auth.startsWith("Bearer ") ? auth.slice(7) : auth;
+    if (token === CRON_TOKEN) {
+      return true;
+    }
+  }
+  
+  return false;
 }
 
 /**
@@ -66,7 +80,7 @@ export async function handleCronRunNextDeploy(req: Request, res: Response) {
   const startTime = Date.now();
   
   // Verify token
-  if (!verifyBearerToken(req)) {
+  if (!verifyToken(req)) {
     return res.status(401).json({ ok: false, error: "unauthorized" });
   }
   
@@ -196,7 +210,7 @@ export async function handleCronRunNextDeploy(req: Request, res: Response) {
 export async function handleCronAutoAdvance(req: Request, res: Response) {
   const startTime = Date.now();
   
-  if (!verifyBearerToken(req)) {
+  if (!verifyToken(req)) {
     return res.status(401).json({ ok: false, error: "unauthorized" });
   }
   
