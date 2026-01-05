@@ -60,14 +60,8 @@ export function serveStatic(app: Express) {
 
   app.use(express.static(distPath));
 
-  // CRITICAL: /api/* must NEVER fall through to SPA
-  // Return 404 JSON for any unmatched API routes
-  app.all("/api/*", (_req, res) => {
-    res.status(404).json({ error: "API route not found" });
-  });
-
-  // fall through to index.html if the file doesn't exist (SPA routing)
-  // This only catches non-API routes now
+  // SPA fallback: serve index.html for all unmatched routes
+  // Note: /api/* routes are protected by the guard in createApp()
   app.use("*", (_req, res) => {
     res.sendFile(path.resolve(distPath, "index.html"));
   });
