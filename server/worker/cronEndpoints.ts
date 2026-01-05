@@ -20,6 +20,7 @@ import type { Request, Response } from "express";
 import { handleDeploymentWorker } from "./deploymentWorker";
 import { handleAutoAdvanceWorker } from "./autoAdvanceWorker";
 import { getDb } from "../db";
+import { getDeprecatedHits } from "../_core/app";
 
 /**
  * POST /api/cron/run-next-deploy
@@ -52,6 +53,7 @@ export async function handleCronHealth(_req: Request, res: Response) {
     ok: true,
     timestamp: new Date().toISOString(),
     database: db ? "connected" : "disconnected",
+    deprecatedWorkerHits: getDeprecatedHits(),
   });
 }
 
