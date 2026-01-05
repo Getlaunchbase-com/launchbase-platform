@@ -1,0 +1,21 @@
+{
+  "query": "SELECT * FROM email_logs \nWHERE recipientEmail = 'e2e-test-jan5@launchbase-test.com' \nORDER BY sentAt DESC \nLIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT * FROM email_logs \nWHERE recipientEmail = 'e2e-test-jan5@launchbase-test.com' \nORDER BY sentAt DESC \nLIMIT 5;",
+  "rows": [
+    {
+      "id": "180001",
+      "intakeId": "210001",
+      "emailType": "ready_for_review",
+      "recipientEmail": "e2e-test-jan5@launchbase-test.com",
+      "subject": "Your site preview is ready",
+      "status": "sent",
+      "sentAt": "2026-01-05 18:20:33",
+      "openedAt": "NULL",
+      "clickedAt": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tintakeId\temailType\trecipientEmail\tsubject\tstatus\tsentAt\topenedAt\tclickedAt\n180001\t210001\tready_for_review\te2e-test-jan5@launchbase-test.com\tYour site preview is ready\tsent\t2026-01-05 18:20:33\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}

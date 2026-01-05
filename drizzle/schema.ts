@@ -117,7 +117,7 @@ export const deployments = mysqlTable("deployments", {
   // Job status
   status: mysqlEnum("status", ["queued", "running", "success", "failed"]).default("queued").notNull(),
   // URL mode: Phase 1 = TEMP_MANUS, Phase 2 = CUSTOM_DOMAIN
-  urlMode: mysqlEnum("urlMode", ["TEMP_MANUS", "CUSTOM_DOMAIN"]).default("TEMP_MANUS").notNull(),
+  urlMode: varchar("urlMode", { length: 50 }).default("TEMP_MANUS"),
   // Output
   siteId: varchar("siteId", { length: 64 }),
   previewUrl: varchar("previewUrl", { length: 512 }),

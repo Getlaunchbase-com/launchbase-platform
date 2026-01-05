@@ -1,0 +1,21 @@
+{
+  "query": "SELECT * FROM email_logs \nWHERE recipientEmail = 'e2e-test-jan5@launchbase-test.com' \nAND emailType = 'deployment_started'\nORDER BY sentAt DESC \nLIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT * FROM email_logs \nWHERE recipientEmail = 'e2e-test-jan5@launchbase-test.com' \nAND emailType = 'deployment_started'\nORDER BY sentAt DESC \nLIMIT 1;",
+  "rows": [
+    {
+      "id": "180003",
+      "intakeId": "210001",
+      "emailType": "deployment_started",
+      "recipientEmail": "e2e-test-jan5@launchbase-test.com",
+      "subject": "We received payment — deployment has started",
+      "status": "sent",
+      "sentAt": "2026-01-05 18:26:17",
+      "openedAt": "NULL",
+      "clickedAt": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tintakeId\temailType\trecipientEmail\tsubject\tstatus\tsentAt\topenedAt\tclickedAt\n180003\t210001\tdeployment_started\te2e-test-jan5@launchbase-test.com\tWe received payment — deployment has started\tsent\t2026-01-05 18:26:17\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}
