@@ -39,6 +39,7 @@ import { getTopReferringSites, getConversionFunnel, get7DayClicks, logReferralEv
 import { getLastWorkerRun } from "./worker/deploymentWorker";
 import { getObservabilityData, formatTimeAgo } from "./observability";
 import { notifyOwner } from "./_core/notification";
+import { checkFacebookPostingPolicy } from "./services/facebook-policy";
 
 // Generate a hash of the build plan for version locking
 function generateBuildPlanHash(buildPlan: { id: number; plan: unknown }): string {
@@ -2048,6 +2049,50 @@ export const appRouter = router({
         imageUrl: z.string().url().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) {
+          return {
+            success: false,
+            error: "Database unavailable",
+          };
+        }
+
+        // Get Facebook connection for policy check
+        const [connection] = await db.select().from(moduleConnections).where(
+          and(
+            eq(moduleConnections.userId, ctx.user.id),
+            eq(moduleConnections.connectionType, "facebook_page")
+          )
+        ).limit(1);
+
+        if (!connection || !connection.externalId) {
+          return {
+            success: false,
+            error: "Facebook not connected",
+          };
+        }
+
+        // Check Facebook posting policy
+        const policyCheck = await checkFacebookPostingPolicy({
+          customerId: ctx.user.id.toString(),
+          pageId: connection.externalId,
+          mode: "manual", // User explicitly posting
+          postType: "OTHER", // Generic manual post
+          confidence: null, // Manual posts don't have confidence
+          now: new Date(),
+        });
+
+        // Handle policy decision
+        if (policyCheck.action !== "PUBLISH") {
+          return {
+            success: false,
+            error: policyCheck.reasons?.[0] || "Posting not allowed",
+            action: policyCheck.action,
+            reasons: policyCheck.reasons,
+          };
+        }
+
+        // Policy allows - proceed with posting
         const result = await postToFacebook(input);
 
         if (result.success) {
@@ -2076,6 +2121,33 @@ export const appRouter = router({
         includePoweredBy: z.boolean().optional().default(false),
       }))
       .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) {
+          return {
+            posted: false,
+            error: "Database unavailable",
+            intelligence: null,
+            formattedPost: "",
+          };
+        }
+
+        // Get Facebook connection for policy check
+        const [connection] = await db.select().from(moduleConnections).where(
+          and(
+            eq(moduleConnections.userId, ctx.user.id),
+            eq(moduleConnections.connectionType, "facebook_page")
+          )
+        ).limit(1);
+
+        if (!connection || !connection.externalId) {
+          return {
+            posted: false,
+            error: "Facebook not connected",
+            intelligence: null,
+            formattedPost: "",
+          };
+        }
+
         // Get weather intelligence
         const intelligence = await getWeatherIntelligence({
           latitude: input.latitude,
@@ -2088,17 +2160,54 @@ export const appRouter = router({
         if (intelligence.safetyGate) {
           return {
             posted: false,
-            reason: "Safety gate active - severe weather conditions",
+            error: "Safety gate active - severe weather conditions",
             intelligence,
+            formattedPost: "",
           };
         }
 
-        // Format and post
+        // Format post
         const message = formatFacebookPost(intelligence, {
           includeEmoji: input.includeEmoji,
           includePoweredBy: input.includePoweredBy,
         });
 
+        // Check Facebook posting policy
+        const policyCheck = await checkFacebookPostingPolicy({
+          customerId: ctx.user.id.toString(),
+          pageId: connection.externalId,
+          mode: "manual", // User explicitly posting
+          postType: "WEATHER_ALERT", // Weather-derived content
+          confidence: null, // Manual posts don't have confidence
+          now: new Date(),
+        });
+
+        // Handle policy decision
+        if (policyCheck.action !== "PUBLISH") {
+          // Pick top-line message based on action
+          let topLineError = "Posting not allowed";
+          if (policyCheck.action === "DRAFT") {
+            topLineError = "Needs approval";
+          } else if (policyCheck.action === "QUEUE") {
+            topLineError = "Queued for next allowed window";
+          } else if (policyCheck.action === "BLOCK") {
+            topLineError = "Daily limit reached";
+          }
+
+          return {
+            posted: false,
+            postId: undefined,
+            postUrl: undefined,
+            error: topLineError,
+            action: policyCheck.action,
+            reasons: policyCheck.reasons ?? [],
+            retryAt: policyCheck.retryAt,
+            intelligence,
+            formattedPost: message,
+          };
+        }
+
+        // Policy allows - proceed with posting
         const result = await postToFacebook({ message });
 
         if (result.success) {
