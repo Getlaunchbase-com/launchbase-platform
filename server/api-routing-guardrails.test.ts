@@ -1,11 +1,11 @@
 /**
  * API Routing Guardrails (Regression Tests)
  * 
- * These tests lock in three critical invariants that prevent the cron + SPA failure mode:
+ * These tests lock in critical invariants that prevent the cron + SPA failure mode:
  * 
  * 1. /api/* never returns HTML (prevents SPA fallthrough)
  * 2. /api/cron/* is POST-only (GET returns 405 JSON, not 200)
- * 3. /api/worker/* returns deprecation headers (migration telemetry)
+ * 3. /api/worker/* returns 404 JSON (deprecated endpoints removed)
  * 
  * If any of these tests fail, DO NOT bypass them—fix the routing/endpoint behavior.
  * 
@@ -68,18 +68,28 @@ describe("API guardrails (never repeat cron + SPA issues)", () => {
     expect(res.body.allowed).toEqual(["POST"]);
   });
 
-  it("worker endpoints include deprecation headers (migration telemetry)", async () => {
-    // We expect auth to fail (401), but headers should still be present
-    const res = await supertest(app)
+  it("worker endpoints return 404 JSON (deprecated endpoints removed)", async () => {
+    const runNextDeployRes = await supertest(app)
       .post("/api/worker/run-next-deploy")
       .set("Content-Type", "application/json")
       .send({});
 
-    // Allow either 200 (if somehow auth passes) or 401/403
-    expect([200, 401, 403]).toContain(res.status);
+    expect(runNextDeployRes.status).toBe(404);
+    const contentType1 = runNextDeployRes.headers["content-type"] ?? "";
+    expect(contentType1).toContain("application/json");
+    expect(runNextDeployRes.body.ok).toBe(false);
+    expect(runNextDeployRes.body.error).toBe("api_route_not_found");
 
-    expect(res.headers["x-launchbase-deprecated"]).toBe("true");
-    expect(res.headers["x-launchbase-use"]).toBe("/api/cron/run-next-deploy");
+    const autoAdvanceRes = await supertest(app)
+      .post("/api/worker/auto-advance")
+      .set("Content-Type", "application/json")
+      .send({});
+
+    expect(autoAdvanceRes.status).toBe(404);
+    const contentType2 = autoAdvanceRes.headers["content-type"] ?? "";
+    expect(contentType2).toContain("application/json");
+    expect(autoAdvanceRes.body.ok).toBe(false);
+    expect(autoAdvanceRes.body.error).toBe("api_route_not_found");
   });
 
   it("cron health returns JSON and includes db status", async () => {
@@ -96,29 +106,5 @@ describe("API guardrails (never repeat cron + SPA issues)", () => {
     expect(["connected", "disconnected"]).toContain(res.body.database);
   });
 
-  // ⏸️ UNCOMMENT AFTER DELETING /api/worker/* ROUTES
-  // This test ensures worker endpoints are properly removed and return 404 JSON
-  // it.skip("worker endpoints return 404 JSON after deletion", async () => {
-  //   const runNextDeployRes = await supertest(app)
-  //     .post("/api/worker/run-next-deploy")
-  //     .set("Content-Type", "application/json")
-  //     .send({});
-  //
-  //   expect(runNextDeployRes.status).toBe(404);
-  //   const contentType1 = runNextDeployRes.headers["content-type"] ?? "";
-  //   expect(contentType1).toContain("application/json");
-  //   expect(runNextDeployRes.body.ok).toBe(false);
-  //   expect(runNextDeployRes.body.error).toBe("api_route_not_found");
-  //
-  //   const autoAdvanceRes = await supertest(app)
-  //     .post("/api/worker/auto-advance")
-  //     .set("Content-Type", "application/json")
-  //     .send({});
-  //
-  //   expect(autoAdvanceRes.status).toBe(404);
-  //   const contentType2 = autoAdvanceRes.headers["content-type"] ?? "";
-  //   expect(contentType2).toContain("application/json");
-  //   expect(autoAdvanceRes.body.ok).toBe(false);
-  //   expect(autoAdvanceRes.body.error).toBe("api_route_not_found");
-  // });
+
 });
