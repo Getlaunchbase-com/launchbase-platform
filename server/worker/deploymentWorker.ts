@@ -30,7 +30,7 @@ function verifyWorkerToken(req: Request): boolean {
 
 /**
  * Handle deployment worker request
- * Route: POST /api/worker/run-next-deploy
+ * Called by: POST /api/cron/run-next-deploy
  */
 export async function handleDeploymentWorker(req: Request, res: Response) {
   const startTime = Date.now();

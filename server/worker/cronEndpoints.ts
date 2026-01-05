@@ -3,7 +3,6 @@
  * POST endpoints for external cron services (cron-job.org)
  * 
  * These are the ONLY endpoints external cron jobs should use.
- * /api/worker/* endpoints exist only for back-compat and will be removed.
  * 
  * Contract:
  * - Method: POST (except /health which is GET)
