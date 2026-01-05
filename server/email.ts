@@ -22,7 +22,6 @@ export type EmailType =
   | "in_progress"
   | "ready_for_review"
   | "review_nudge"
-  | "launch_confirmation"
   | "deployment_started"
   | "site_live"
   | "preview_followup"
@@ -131,34 +130,6 @@ Just checking in to make sure you saw your site preview.
 There's no rush — we just want to be sure everything looks right before launch.
 
 If you have questions or want changes, reply here and we'll take care of it.
-
-—
-LaunchBase`
-      };
-
-    case "launch_confirmation":
-      return {
-        subject: "🎉 Your site is live!",
-        previewText: "Welcome to LaunchBase.",
-        body: `Hi ${firstName},
-
-Your website is officially live 🎉
-
-👉 View your site:
-${liveUrl || "[Live URL]"}
-
-From here:
-• You can share it with customers
-• Start sending traffic
-• Request updates anytime
-
-—
-
-💰 Refer a friend, get $50
-
-Know another business owner who needs a website? Share your referral link and you'll both save $50.
-
-👉 Get your referral code: https://getlaunchbase.com/referrals
 
 —
 LaunchBase`

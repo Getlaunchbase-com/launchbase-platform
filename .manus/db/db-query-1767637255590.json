@@ -1,0 +1,20 @@
+{
+  "query": "SELECT id, businessName, contactName, email, phone, status, vertical, createdAt \nFROM intakes \nWHERE email = 'e2e-test-jan5@launchbase-test.com' \nORDER BY createdAt DESC \nLIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT id, businessName, contactName, email, phone, status, vertical, createdAt \nFROM intakes \nWHERE email = 'e2e-test-jan5@launchbase-test.com' \nORDER BY createdAt DESC \nLIMIT 1;",
+  "rows": [
+    {
+      "id": "210001",
+      "businessName": "Test User E2E",
+      "contactName": "Test User E2E",
+      "email": "e2e-test-jan5@launchbase-test.com",
+      "phone": "555-0100",
+      "status": "ready_for_review",
+      "vertical": "trades",
+      "createdAt": "2026-01-05 18:20:31"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tbusinessName\tcontactName\temail\tphone\tstatus\tvertical\tcreatedAt\n210001\tTest User E2E\tTest User E2E\te2e-test-jan5@launchbase-test.com\t555-0100\tready_for_review\ttrades\t2026-01-05 18:20:31\n",
+  "stderr": "",
+  "execution_time_ms": 190
+}

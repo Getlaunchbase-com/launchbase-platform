@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO email_logs (intakeId, emailType, recipientEmail, subject, sentAt, status)\nVALUES (\n  (SELECT id FROM intakes WHERE email = 'e2e-test-jan5@launchbase-test.com' ORDER BY createdAt DESC LIMIT 1),\n  'ready_for_review',\n  'e2e-test-jan5@launchbase-test.com',\n  'Your preview is ready - Test User E2E',\n  NOW(),\n  'sent'\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute INSERT INTO email_logs (intakeId, emailType, recipientEmail, subject, sentAt, status)\nVALUES (\n  (SELECT id FROM intakes WHERE email = 'e2e-test-jan5@launchbase-test.com' ORDER BY createdAt DESC LIMIT 1),\n  'ready_for_review',\n  'e2e-test-jan5@launchbase-test.com',\n  'Your preview is ready - Test User E2E',\n  NOW(),\n  'sent'\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 67
+}

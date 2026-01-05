@@ -66,17 +66,6 @@ describe("Email Service", () => {
       expect(template.body).toContain("no rush");
     });
 
-    it("should generate launch confirmation email with live URL", () => {
-      const template = getEmailTemplate("launch_confirmation", {
-        ...baseData,
-        liveUrl: "https://smithplumbing.com",
-      });
-      
-      expect(template.subject).toBe("🎉 Your site is live!");
-      expect(template.body).toContain("smithplumbing.com");
-      expect(template.body).toContain("live");
-    });
-
     it("should generate testimonial request email", () => {
       const template = getEmailTemplate("testimonial_request", baseData);
       
@@ -155,7 +144,8 @@ describe("Email Service", () => {
         "in_progress",
         "ready_for_review",
         "review_nudge",
-        "launch_confirmation",
+        "deployment_started",
+        "site_live",
         "testimonial_request",
         "founding_client_lockin",
         "day7_checkin",
@@ -190,12 +180,12 @@ describe("Email Service", () => {
       const nudge = getEmailTemplate("review_nudge", baseData);
       expect(nudge.body).toContain("no rush");
       
-      // Launch should be celebratory
-      const launch = getEmailTemplate("launch_confirmation", {
+      // Site live should be celebratory
+      const siteLive = getEmailTemplate("site_live", {
         ...baseData,
         liveUrl: "https://example.com",
       });
-      expect(launch.subject).toContain("🎉");
+      expect(siteLive.subject).toContain("live");
     });
   });
 });

@@ -73,12 +73,16 @@ export async function handleDeploymentWorker(req: Request, res: Response) {
     }
 
     // Find the oldest queued deployment
-    const [queuedDeployment] = await db
+    const query = db
       .select()
       .from(deployments)
       .where(eq(deployments.status, "queued"))
       .orderBy(asc(deployments.createdAt))
       .limit(1);
+    
+    console.log("[DEPLOYMENT WORKER] queued query SQL:", query.toSQL());
+    
+    const [queuedDeployment] = await query;
 
     if (!queuedDeployment) {
       console.log("[Worker] No queued deployments found");
