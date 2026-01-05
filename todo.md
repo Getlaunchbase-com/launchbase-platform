@@ -1588,3 +1588,31 @@
 - [ ] Delete /api/worker/* routes after confirmed migration
 - [ ] Uncomment deletion verification test and run `pnpm test api-routing-guardrails`
 
+
+
+## PR A: Worker Runs Logging (Post-Launch Hardening)
+
+- [ ] Add worker_runs table to drizzle schema
+- [ ] Create helper functions for logging worker runs
+- [ ] Update deploymentWorker to log at start/end
+- [ ] Update autoAdvance to log at start/end
+- [ ] Push migration to create table
+- [ ] Verify logging works in dev
+
+
+## PR A: Worker Runs Logging (Final Cleanup)
+- [ ] Fix observability.ts to use startedAt instead of createdAt
+- [ ] Fix routers.ts to use startedAt instead of createdAt
+- [ ] Remove old logging code from deploymentWorker.ts
+- [ ] Verify tsc compiles cleanly
+- [ ] Test cron logging success path
+- [ ] Save checkpoint
+
+## PR B: Remove Deprecated Worker Endpoints
+- [ ] Remove /api/worker/* route registrations
+- [ ] Remove withDeprecationHeaders helper
+- [ ] Remove deprecated hit telemetry
+- [ ] Update Vitest tests to assert 404 for /api/worker/*
+- [ ] Update /api/cron/health to show lastWorkerRun
+- [ ] Smoke test: verify /api/cron/* still works
+- [ ] Save final checkpoint

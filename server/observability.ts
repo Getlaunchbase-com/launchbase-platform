@@ -55,12 +55,14 @@ export async function getSystemStatus(): Promise<SystemStatus> {
     // Check if worker has run recently (within last 10 minutes)
     const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
     
-    const recentWorkerRuns = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(workerRuns)
-      .where(gte(workerRuns.createdAt, tenMinutesAgo));
+    // Raw SQL to bypass type inference issues
+    const recentWorkerRuns = await db.execute<{ count: number }[]>(sql`
+      SELECT COUNT(*) as count
+      FROM worker_runs
+      WHERE startedAt >= ${tenMinutesAgo}
+    `);
     
-    const hasRecentActivity = recentWorkerRuns[0]?.count > 0;
+    const hasRecentActivity = (recentWorkerRuns as any)[0]?.count > 0;
     
     // Check for any failed deployments in last hour
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
