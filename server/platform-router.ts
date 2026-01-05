@@ -11,7 +11,7 @@ import { getDb } from "./db";
 import { moduleConnections, socialPosts, decisionLogs } from "../drizzle/schema";
 import { listPages, connectPage, getSession } from "./services/facebookOAuth";
 import { notifyOnDraftAction } from "./services/draftNotifications";
-import { checkFacebookPostingPolicy } from "./services/facebook-policy";
+import { checkFacebookPostingPolicy, type PolicyPostType } from "./services/facebook-policy";
 import { eq, and, desc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import crypto from "crypto";
@@ -264,33 +264,84 @@ export const platformRouter = router({
         });
       }
 
-      // Safety check: business hours
-      if (!isWithinBusinessHours()) {
-        // Log the hold decision
-        await db.insert(decisionLogs).values({
-          userId: ctx.user.id,
-          decision: "silence",
-          severity: "soft_block",
-          reason: "outside_business_hours",
-          triggerContext: "manual",
-          conditions: {
-            draftId: draft.id,
-            attemptedAt: new Date().toISOString(),
-            reason: "Post held - outside business hours (6 AM - 9 PM Chicago)",
-          },
-        });
+      // Map draft postType to policy postType
+      let policyPostType: PolicyPostType = "OTHER";
+      if (draft.triggerContext === "weather_storm" || draft.triggerContext === "weather_extreme") {
+        policyPostType = "OPS_ALERT";
+      } else if (draft.triggerContext === "weather_clear") {
+        policyPostType = "WEATHER_ALERT";
+      }
 
-        // Notify owner about the hold
-        await notifyOnDraftAction(draft.id, "held", {
-          reason: "Outside business hours (6 AM - 9 PM Chicago time)",
-        });
+      // Check Facebook posting policy (comprehensive safety gate)
+      const policyCheck = await checkFacebookPostingPolicy({
+        customerId: ctx.user.id.toString(),
+        pageId: connection.externalId,
+        mode: "manual", // User explicitly approved
+        postType: policyPostType,
+        confidence: draft.confidenceScore ? draft.confidenceScore / 100 : null, // Convert 0-100 to 0-1
+        now: new Date(),
+      });
 
-        return {
-          status: "held" as const,
-          reason: "Outside business hours (6 AM - 9 PM Chicago time)",
-          externalId: null,
-          payloadHash: null,
-        };
+      // Handle policy decision
+      switch (policyCheck.action) {
+        case "DRAFT":
+          // Policy requires review - demote back to needs_review
+          await db
+            .update(socialPosts)
+            .set({
+              status: "needs_review",
+              decisionReason: policyCheck.reasons?.join("; ") || "Policy check required",
+              updatedAt: new Date(),
+            })
+            .where(eq(socialPosts.id, draft.id));
+
+          return {
+            status: "held" as const,
+            reason: policyCheck.reasons?.[0] || "Policy check required",
+            externalId: null,
+            payloadHash: null,
+          };
+
+        case "QUEUE":
+          // Policy says queue for later - keep as approved with scheduledFor
+          await db
+            .update(socialPosts)
+            .set({
+              status: "approved",
+              scheduledFor: policyCheck.retryAt ? new Date(policyCheck.retryAt) : null,
+              decisionReason: policyCheck.reasons?.join("; ") || "Queued for later",
+              approvedAt: new Date(),
+              approvedBy: ctx.user.id,
+              updatedAt: new Date(),
+            })
+            .where(eq(socialPosts.id, draft.id));
+
+          return {
+            status: "held" as const,
+            reason: policyCheck.reasons?.[0] || "Queued for next allowed window",
+            externalId: null,
+            payloadHash: null,
+          };
+
+        case "BLOCK":
+          // Policy blocks posting - mark as failed
+          await db
+            .update(socialPosts)
+            .set({
+              status: "failed",
+              decisionReason: policyCheck.reasons?.join("; ") || "Blocked by policy",
+              updatedAt: new Date(),
+            })
+            .where(eq(socialPosts.id, draft.id));
+
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: policyCheck.reasons?.[0] || "Posting blocked by policy",
+          });
+
+        case "PUBLISH":
+          // Policy allows - proceed with publishing
+          break;
       }
 
       // Publish to Facebook
