@@ -1706,3 +1706,11 @@
 - [ ] Set ADMIN_EMAILS env var in production (e.g., "vmorre@live.com")
 - [ ] Add navigation link to admin sidebar (optional)
 - [ ] Test with real Stripe webhook events in production
+
+
+## Signed HTTP Smoke Test (Forever Contract)
+- [x] Create `server/__tests__/smoke.stripe-checkout-webhook.test.ts`
+- [x] Test first delivery: intake paid, payment created, email sent, webhook logged
+- [x] Test replay: no duplicates, retryCount incremented, idempotencyHit=true
+- [x] Wire `pnpm smoke` script to run smoke tests only
+- [x] Run smoke test and verify all assertions pass
