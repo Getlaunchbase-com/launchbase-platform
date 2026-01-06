@@ -1771,3 +1771,21 @@
 
 **Forever rule locked:** Detection = suggestion, User choice = authority
 **Forever guardrails:** 7 passing tests prevent merge regression
+
+
+## Website Status Dimension (Jan 6, 2026)
+
+**Goal:** Support 3 customer types (greenfield, refresh, integrate) without fragmenting product
+
+- [x] Add `websiteStatus` enum to intake schema ("none" | "existing" | "systems_only")
+- [x] Run database migration to add websiteStatus column
+- [x] Add website status question to Apply form Step 2 (after language)
+- [x] Update intake submission to store websiteStatus
+- [x] Create homepage routing with 3 CTAs (none/existing/systems_only)
+- [x] Write copy for all 3 states × 3 languages (EN/ES/PL)
+- [x] Update email templates to acknowledge website status
+- [x] Test complete flow for all 3 states
+- [x] Fix rawPayload to include websiteStatus for audit trail
+- [x] Create checkpoint
+
+**Matrix:** 3 languages × 2 audiences × 3 website statuses = 18 entry states, same product

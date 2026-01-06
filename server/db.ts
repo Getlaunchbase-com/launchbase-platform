@@ -110,6 +110,7 @@ export async function createIntake(data: {
   vertical: "trades" | "appointments" | "professional";
   language?: "en" | "es" | "pl";
   audience?: "biz" | "org";
+  websiteStatus?: "none" | "existing" | "systems_only";
   services?: string[];
   serviceArea?: string[];
   primaryCTA?: string;
@@ -124,12 +125,32 @@ export async function createIntake(data: {
     return null;
   }
 
+  // Build rawPayload: merge provided rawPayload with all input fields for audit trail
+  const mergedRawPayload = {
+    ...data.rawPayload,
+    businessName: data.businessName,
+    contactName: data.contactName,
+    email: data.email,
+    phone: data.phone,
+    vertical: data.vertical,
+    language: data.language,
+    audience: data.audience,
+    websiteStatus: data.websiteStatus,
+    services: data.services,
+    serviceArea: data.serviceArea,
+    primaryCTA: data.primaryCTA,
+    bookingLink: data.bookingLink,
+    tagline: data.tagline,
+    brandColors: data.brandColors,
+  };
+
   const values: InsertIntake = {
     businessName: data.businessName,
     contactName: data.contactName,
     email: data.email,
     language: data.language ?? "en",
     audience: data.audience ?? "biz",
+    websiteStatus: data.websiteStatus ?? "none",
     phone: data.phone || null,
     vertical: data.vertical,
     services: data.services || null,
@@ -138,7 +159,7 @@ export async function createIntake(data: {
     bookingLink: data.bookingLink || null,
     tagline: data.tagline || null,
     brandColors: data.brandColors || null,
-    rawPayload: data.rawPayload || null,
+    rawPayload: mergedRawPayload,
     status,
   };
 

@@ -32,6 +32,7 @@ type BurdenCategory =
 type ApplyForm = {
   audience: "biz" | "org";
   language: Language;
+  websiteStatus: "none" | "existing" | "systems_only";
   vertical: VerticalCategory | null;
   industry: string;
   cityZip: string;
@@ -61,7 +62,10 @@ const translations: Record<Language, {
   microCopy: { editLater: string; noPublish: string; approvalRequired: string };
   steps: { language: string; business: string; location: string; burden: string; involvement: string; start: string; contact: string; review: string };
   languageStep: { title: string; subtitle: string };
-  businessStep: { title: string; subtitle: string };
+  websiteStatusOptions: { none: { title: string }; existing: { title: string }; systems_only: { title: string } };
+  websiteStatusLabel: string;
+  websiteStatusHelper: string;
+  businessStep: { title: string; subtitle: string; websiteLabel: string };
   locationStep: { title: string; subtitle: string; cityLabel: string; cityPlaceholder: string; radiusLabel: string };
   burdenStep: { title: string; subtitle: string };
   involvementStep: { title: string; subtitle: string };
@@ -80,7 +84,14 @@ const translations: Record<Language, {
     microCopy: { editLater: "You can edit this later.", noPublish: "This does not publish anything.", approvalRequired: "Nothing goes live without approval." },
     steps: { language: "Language", business: "Business", location: "Location", burden: "Burden", involvement: "Involvement", start: "Start", contact: "Contact", review: "Review" },
     languageStep: { title: "Choose your language", subtitle: "Select the language you're most comfortable with. Your website will be built in English to reach local customers." },
-    businessStep: { title: "What type of business?", subtitle: "This helps us understand your business — not configure tools." },
+    websiteStatusOptions: {
+      systems_only: { title: "I already have a website — keep it, just integrate everything." },
+      existing: { title: "Refresh my website — modernize it and integrate everything." },
+      none: { title: "I need a new website — build it from scratch and integrate everything." },
+    },
+    websiteStatusLabel: "Which best describes your website situation?",
+    websiteStatusHelper: "So we know whether to build, refresh, or just plug into what you already have.",
+    businessStep: { title: "What type of business?", subtitle: "This helps us understand your business — not configure tools.", websiteLabel: "Website" },
     locationStep: { title: "Where are you located?", subtitle: "We'll use this to understand your local market.", cityLabel: "City or ZIP", cityPlaceholder: "e.g. Chicago, IL or 60614", radiusLabel: "Service radius (miles)" },
     burdenStep: { title: "What's weighing on you?", subtitle: "Select everything you don't want to think about anymore." },
     involvementStep: { title: "How involved do you want to be?", subtitle: "This is about communication, not control. You'll always have visibility." },
@@ -99,7 +110,14 @@ const translations: Record<Language, {
     microCopy: { editLater: "Puedes editar esto después.", noPublish: "Esto no publica nada.", approvalRequired: "Nada sale en vivo sin tu aprobación." },
     steps: { language: "Idioma", business: "Negocio", location: "Ubicación", burden: "Carga", involvement: "Participación", start: "Inicio", contact: "Contacto", review: "Revisar" },
     languageStep: { title: "Elige tu idioma", subtitle: "Selecciona el idioma con el que te sientas más cómodo. Tu sitio web se construirá en inglés para llegar a clientes locales." },
-    businessStep: { title: "¿Qué tipo de negocio?", subtitle: "Esto nos ayuda a entender tu negocio — no a configurar herramientas." },
+    websiteStatusOptions: {
+      systems_only: { title: "Ya tengo un sitio web — mantenlo y solo integra todo." },
+      existing: { title: "Quiero renovar mi sitio web — modernízalo e integra todo." },
+      none: { title: "Necesito un sitio web nuevo — créalo desde cero e integra todo." },
+    },
+    websiteStatusLabel: "¿Cuál describe mejor tu situación con tu sitio web?",
+    websiteStatusHelper: "Así sabemos si hay que crear uno nuevo, renovarlo o simplemente integrarnos con el que ya tienes.",
+    businessStep: { title: "¿Qué tipo de negocio?", subtitle: "Esto nos ayuda a entender tu negocio — no a configurar herramientas.", websiteLabel: "Sitio web" },
     locationStep: { title: "¿Dónde estás ubicado?", subtitle: "Usaremos esto para entender tu mercado local.", cityLabel: "Ciudad o código postal", cityPlaceholder: "ej. Chicago, IL o 60614", radiusLabel: "Radio de servicio (millas)" },
     burdenStep: { title: "¿Qué te está pesando?", subtitle: "Selecciona todo lo que no quieres pensar más." },
     involvementStep: { title: "¿Qué tan involucrado quieres estar?", subtitle: "Esto es sobre comunicación, no control. Siempre tendrás visibilidad." },
@@ -118,7 +136,14 @@ const translations: Record<Language, {
     microCopy: { editLater: "Możesz to edytować później.", noPublish: "To nic nie publikuje.", approvalRequired: "Nic nie zostanie opublikowane bez Twojej zgody." },
     steps: { language: "Język", business: "Firma", location: "Lokalizacja", burden: "Obciążenie", involvement: "Zaangażowanie", start: "Start", contact: "Kontakt", review: "Przegląd" },
     languageStep: { title: "Wybierz swój język", subtitle: "Wybierz język, w którym czujesz się najlepiej. Twoja strona internetowa zostanie zbudowana po angielsku, aby dotrzeć do lokalnych klientów." },
-    businessStep: { title: "Jaki typ firmy?", subtitle: "To pomaga nam zrozumieć Twoją firmę — nie konfigurować narzędzia." },
+    websiteStatusOptions: {
+      systems_only: { title: "Mam już stronę — zostaw ją i po prostu zintegruj wszystko." },
+      existing: { title: "Chcę odświeżyć stronę — unowocześnij ją i zintegruj wszystko." },
+      none: { title: "Potrzebuję nowej strony — zbuduj ją od zera i zintegruj wszystko." },
+    },
+    websiteStatusLabel: "Która opcja najlepiej opisuje Twoją sytuację ze stroną internetową?",
+    websiteStatusHelper: "Dzięki temu wiemy, czy mamy zbudować stronę od zera, odświeżyć obecną, czy tylko podłączyć integracje.",
+    businessStep: { title: "Jaki typ firmy?", subtitle: "To pomaga nam zrozumieć Twoją firmę — nie konfigurować narzędzia.", websiteLabel: "Strona" },
     locationStep: { title: "Gdzie jesteś zlokalizowany?", subtitle: "Użyjemy tego, aby zrozumieć Twój lokalny rynek.", cityLabel: "Miasto lub kod pocztowy", cityPlaceholder: "np. Chicago, IL lub 60614", radiusLabel: "Promień usług (mile)" },
     burdenStep: { title: "Co Cię obciąża?", subtitle: "Wybierz wszystko, o czym nie chcesz już myśleć." },
     involvementStep: { title: "Jak bardzo chcesz być zaangażowany?", subtitle: "Chodzi o komunikację, nie kontrolę. Zawsze będziesz mieć wgląd." },
@@ -317,6 +342,7 @@ export default function ApplyPage() {
     const base: ApplyForm = {
       audience: "biz",
       language: "en",
+      websiteStatus: "none",
       vertical: null,
       industry: "",
       cityZip: "",
@@ -424,6 +450,7 @@ export default function ApplyPage() {
     submitMutation.mutate({
       language: form.language,
       audience: form.audience,
+      websiteStatus: form.websiteStatus,
       vertical: form.vertical,
       industry: form.industry,
       location: { cityZip: form.cityZip.trim(), radiusMiles: form.radiusMiles },
@@ -523,6 +550,7 @@ export default function ApplyPage() {
 
                 {currentStep === "business" && (
                   <StepBusiness
+                    websiteStatus={form.websiteStatus}
                     vertical={form.vertical}
                     industry={form.industry}
                     language={form.language}
@@ -781,22 +809,43 @@ function StepLanguage({
 }
 
 function StepBusiness({
+  websiteStatus,
   vertical,
   industry,
   language,
   onChange,
   t,
 }: {
+  websiteStatus: "none" | "existing" | "systems_only";
   vertical: VerticalCategory | null;
   industry: string;
   language: Language;
-  onChange: (patch: Partial<Pick<ApplyForm, "vertical" | "industry">>) => void;
+  onChange: (patch: Partial<Pick<ApplyForm, "websiteStatus" | "vertical" | "industry">>) => void;
   t: typeof translations["en"];
 }) {
   const selectedVertical = VERTICALS.find(v => v.id === vertical);
 
   return (
     <div>
+      {/* Website Status Section */}
+      <div className="mb-8 pb-8 border-b border-white/10">
+        <h3 className="text-base font-semibold mb-1">{t.websiteStatusLabel}</h3>
+        <p className="text-sm text-white/60 mb-4">{t.websiteStatusHelper}</p>
+        <div className="grid gap-3">
+          {(Object.keys(t.websiteStatusOptions) as Array<keyof typeof t.websiteStatusOptions>).map((key) => {
+            const option = t.websiteStatusOptions[key];
+            return (
+              <CardOption
+                key={key}
+                title={option.title}
+                selected={websiteStatus === key}
+                onClick={() => onChange({ websiteStatus: key as "none" | "existing" | "systems_only" })}
+              />
+            );
+          })}
+        </div>
+      </div>
+
       <h2 className="text-xl font-semibold">{t.businessStep.title}</h2>
       <p className="mt-1 text-sm text-white/60">
         {t.businessStep.subtitle}

@@ -30,6 +30,8 @@ export const intakes = mysqlTable("intakes", {
   // Localization + audience
   language: mysqlEnum("language", ["en", "es", "pl"]).default("en").notNull(),
   audience: mysqlEnum("audience", ["biz", "org"]).default("biz").notNull(),
+  // Website status (customer entry state)
+  websiteStatus: mysqlEnum("websiteStatus", ["none", "existing", "systems_only"]).notNull().default("none"),
   phone: varchar("phone", { length: 32 }),
   // AI-inferred vertical
   vertical: mysqlEnum("vertical", ["trades", "appointments", "professional"]).notNull(),

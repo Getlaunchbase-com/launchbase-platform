@@ -1575,6 +1575,7 @@ export const appRouter = router({
       .input(z.object({
         language: z.enum(["en", "es", "pl"]).default("en"),
         audience: z.enum(["biz", "org"]).optional(),
+        websiteStatus: z.enum(["none", "existing", "systems_only"]).default("none"),
         vertical: z.enum(["trades", "health", "beauty", "food", "cannabis", "professional", "fitness", "automotive"]),
         industry: z.string().max(64).optional(),
         location: z.object({
@@ -1642,6 +1643,7 @@ export const appRouter = router({
           vertical: intakeVertical,
           language: input.language,
           audience: input.audience,
+          websiteStatus: input.websiteStatus,
           services: input.industry ? [input.industry.replace(/_/g, " ")] : [],
           serviceArea: [input.location.cityZip],
           primaryCTA: "call",
