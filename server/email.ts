@@ -8,6 +8,7 @@ import { emailLogs } from "../drizzle/schema";
 import { notifyOwner } from "./_core/notification";
 import { Resend } from "resend";
 import { ENV } from "./_core/env";
+import { getEmailCopy, interpolateEmail, type Language, type Audience } from "./emails/emailCopy";
 
 // Error normalization helpers (FOREVER FIX)
 function truncateOneLine(input: unknown, max = 1500): string {
@@ -96,6 +97,8 @@ interface EmailData {
   previewUrl?: string;
   liveUrl?: string;
   checkoutLink?: string;
+  language?: Language;
+  audience?: Audience;
 }
 
 interface EmailTemplate {
@@ -104,9 +107,24 @@ interface EmailTemplate {
   body: string;
 }
 
-// Generate email templates based on type and data
+// Generate email templates based on type and data (LOCALIZED)
 export function getEmailTemplate(type: EmailType, data: EmailData): EmailTemplate {
-  const { firstName, businessName, previewUrl, liveUrl } = data;
+  const { firstName, businessName, previewUrl, liveUrl, language = "en", audience = "biz" } = data;
+  
+  // Get localized copy from emailCopy map
+  const copy = getEmailCopy(language, audience, type);
+  
+  // Interpolate variables
+  const body = interpolateEmail(copy.body, { firstName, businessName, previewUrl, liveUrl });
+  
+  return {
+    subject: copy.subject,
+    previewText: copy.previewText,
+    body,
+  };
+  
+  // Legacy fallback (should never reach here, but kept for safety)
+  const legacyData = { firstName, businessName, previewUrl, liveUrl };
   
   switch (type) {
     // ========== POST-INTAKE SEQUENCE ==========
@@ -342,7 +360,7 @@ LaunchBase`
       return {
         subject: "Update from LaunchBase",
         previewText: "You have a message from LaunchBase.",
-        body: `Hi ${firstName},
+        body: `Hi ${legacyData.firstName},
 
 Thank you for using LaunchBase.
 

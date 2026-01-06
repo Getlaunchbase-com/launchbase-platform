@@ -27,6 +27,9 @@ export const intakes = mysqlTable("intakes", {
   businessName: varchar("businessName", { length: 255 }).notNull(),
   contactName: varchar("contactName", { length: 255 }).notNull(),
   email: varchar("email", { length: 320 }).notNull(),
+  // Localization + audience
+  language: mysqlEnum("language", ["en", "es", "pl"]).default("en").notNull(),
+  audience: mysqlEnum("audience", ["biz", "org"]).default("biz").notNull(),
   phone: varchar("phone", { length: 32 }),
   // AI-inferred vertical
   vertical: mysqlEnum("vertical", ["trades", "appointments", "professional"]).notNull(),

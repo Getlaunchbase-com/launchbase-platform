@@ -1,0 +1,18 @@
+{
+  "query": "SHOW COLUMNS FROM intakes LIKE 'audience';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SHOW COLUMNS FROM intakes LIKE 'audience';",
+  "rows": [
+    {
+      "Field": "audience",
+      "Type": "enum('biz','org')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "biz",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\naudience\tenum('biz','org')\tNO\t\tbiz\t\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

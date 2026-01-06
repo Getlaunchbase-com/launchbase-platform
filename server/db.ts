@@ -108,6 +108,8 @@ export async function createIntake(data: {
   email: string;
   phone?: string;
   vertical: "trades" | "appointments" | "professional";
+  language?: "en" | "es" | "pl";
+  audience?: "biz" | "org";
   services?: string[];
   serviceArea?: string[];
   primaryCTA?: string;
@@ -126,6 +128,8 @@ export async function createIntake(data: {
     businessName: data.businessName,
     contactName: data.contactName,
     email: data.email,
+    language: data.language ?? "en",
+    audience: data.audience ?? "biz",
     phone: data.phone || null,
     vertical: data.vertical,
     services: data.services || null,

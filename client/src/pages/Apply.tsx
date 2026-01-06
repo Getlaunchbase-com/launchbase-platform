@@ -1,5 +1,6 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
+import { getLangFromUrlOrStorage, getAudienceFromUrlOrStorage, setLang, setAudience, type Audience } from "@/lib/prefs";
 import { ArrowLeft, Check, Loader2, Globe, Wrench, Heart, Scissors, UtensilsCrossed, Leaf, Briefcase, Dumbbell, Car } from "lucide-react";
 import { Link } from "wouter";
 
@@ -29,6 +30,7 @@ type BurdenCategory =
   | "not_sure";
 
 type ApplyForm = {
+  audience: "biz" | "org";
   language: Language;
   vertical: VerticalCategory | null;
   industry: string;
@@ -304,11 +306,16 @@ const steps = [
 type StepId = (typeof steps)[number]["id"];
 
 export default function ApplyPage() {
+  // Read language and audience from URL or localStorage
+  const preferredLang = getLangFromUrlOrStorage();
+  const preferredAudience = getAudienceFromUrlOrStorage();
+
   const [stepIndex, setStepIndex] = useState(0);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const [form, setForm] = useState<ApplyForm>(() => {
     const base: ApplyForm = {
+      audience: "biz",
       language: "en",
       vertical: null,
       industry: "",
@@ -322,11 +329,25 @@ export default function ApplyPage() {
       contactPhone: "",
       termsAccepted: false,
     };
+
     if (typeof window === "undefined") return base;
+
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) return { ...base, ...JSON.parse(stored) };
-    } catch {}
+      if (stored) {
+        const parsed = JSON.parse(stored);
+
+        return {
+          ...base,
+          ...parsed,
+          // 🔒 FOREVER DEFAULT
+          audience: parsed?.audience === "org" ? "org" : "biz",
+        };
+      }
+    } catch {
+      // ignore corrupted storage
+    }
+
     return base;
   });
 
@@ -397,6 +418,7 @@ export default function ApplyPage() {
     // The backend will determine the appropriate configuration based on burdens
     submitMutation.mutate({
       language: form.language,
+      audience: form.audience,
       vertical: form.vertical,
       industry: form.industry,
       location: { cityZip: form.cityZip.trim(), radiusMiles: form.radiusMiles },
