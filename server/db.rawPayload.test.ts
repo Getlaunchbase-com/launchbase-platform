@@ -62,6 +62,10 @@ describe("createIntake rawPayload builder", () => {
       expect(stored).toBeDefined();
       expect(stored.rawPayload).toBeDefined();
 
+      // TYPE SANITY: Verify rawPayload is an object, not a JSON string
+      expect(typeof stored.rawPayload).toBe("object");
+      expect(stored.rawPayload).not.toBeNull();
+
       const payload = stored.rawPayload as Record<string, unknown>;
 
       // INVARIANT 1: Caller-provided rawPayload values are preserved
@@ -150,6 +154,55 @@ describe("createIntake rawPayload builder", () => {
       expect(payload.language).toBe("en");
       expect(payload.audience).toBe("biz");
       expect(payload.websiteStatus).toBe("none");
+
+      // Cleanup
+      await db.delete(intakes).where(eq(intakes.id, result.id));
+    }
+  });
+
+  it("canonical fields always win over caller-provided rawPayload", async () => {
+    // SCENARIO: Caller provides rawPayload with language="pl", but input language is "es"
+    // EXPECTED: Stored rawPayload.language should be "es" (input wins, not caller rawPayload)
+    
+    const result = await createIntake({
+      businessName: "Test Business 4",
+      contactName: "Test User 4",
+      email: "test-rawpayload-4@example.com",
+      vertical: "trades",
+      language: "es", // ← Input says "es"
+      audience: "org", // ← Input says "org"
+      websiteStatus: "existing", // ← Input says "existing"
+      rawPayload: {
+        language: "pl", // ← Caller says "pl" (should be overridden)
+        audience: "biz", // ← Caller says "biz" (should be overridden)
+        websiteStatus: "none", // ← Caller says "none" (should be overridden)
+        note: "keep this",
+      },
+    }, "new");
+
+    expect(result).not.toBeNull();
+    
+    const db = await getDb();
+    if (db && result?.id) {
+      const [stored] = await db
+        .select()
+        .from(intakes)
+        .where(eq(intakes.id, result.id));
+
+      const payload = stored.rawPayload as Record<string, unknown>;
+
+      // INVARIANT 4: Canonical fields from input ALWAYS win over caller rawPayload
+      expect(payload.language).toBe("es"); // ← NOT "pl"
+      expect(payload.audience).toBe("org"); // ← NOT "biz"
+      expect(payload.websiteStatus).toBe("existing"); // ← NOT "none"
+
+      // Non-canonical fields are preserved
+      expect(payload.note).toBe("keep this");
+
+      // Also verify column storage matches
+      expect(stored.language).toBe("es");
+      expect(stored.audience).toBe("org");
+      expect(stored.websiteStatus).toBe("existing");
 
       // Cleanup
       await db.delete(intakes).where(eq(intakes.id, result.id));

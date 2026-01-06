@@ -153,6 +153,7 @@ export async function createIntake(data: {
     email: data.email,
     language: data.language ?? "en",
     audience: data.audience ?? "biz",
+    // websiteStatus stored in both column + rawPayload (duplicated intentionally for querying + immutable audit trail)
     websiteStatus: data.websiteStatus ?? "none",
     phone: data.phone || null,
     vertical: data.vertical,
