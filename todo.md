@@ -1827,3 +1827,49 @@
 - [ ] Live sanity check: 3 test intakes (none/existing/systems_only)
 - [ ] Verify email_logs show correct subjects
 - [ ] Create final checkpoint
+
+## Email TX Beta-Real Hardening (Jan 6, 2026)
+
+**Goal:** Make email production-ready for beta launch
+
+- [x] Add fallback-aware FROM/REPLY logic (auto-switches when RESEND_DOMAIN_VERIFIED=true)
+- [x] Add admin test endpoint (system.sendTestEmail)
+- [x] Add admin dashboard panel: "/admin/email-monitoring" with stats + test sender + recent emails
+- [ ] **[VINCE]** Verify getlaunchbase.com in Resend (see VINCE_TODO.md)
+- [ ] **[VINCE]** Add DNS records in Namecheap (see VINCE_TODO.md)
+- [ ] **[VINCE]** Set RESEND_DOMAIN_VERIFIED=true in Manus secrets
+- [ ] **[VINCE]** Send real inbox test to vmorre@live.com
+- [ ] **[VINCE]** Send real inbox test to vince@vincessnowplow.com
+
+## WebsiteStatus Loop (Jan 6, 2026)
+
+**Goal:** Connect homepage CTAs to Apply form with websiteStatus pre-fill
+
+- [ ] Update homepage CTAs with URL params:
+  * "I have a website (integrate)" → /apply?websiteStatus=systems_only
+  * "Refresh my site" → /apply?websiteStatus=existing
+  * "New site" → /apply?websiteStatus=none
+- [ ] Update Apply form to boot from URL param (only if user hasn't explicitly chosen)
+- [ ] Test all 3 CTA flows end-to-end
+
+## Corporate/Organization Fork (Jan 6, 2026)
+
+**Goal:** Add marketing layer for org audience with system/platform/infrastructure copy
+
+- [ ] Update homepage hero for audience=org: use "system/platform/infrastructure" language
+- [ ] Keep transactional emails using "website" for clarity (already done)
+- [ ] Add audience presets to homepage:
+  * "For Business" → audience=biz
+  * "For Organization" → audience=org
+- [ ] Test org flow end-to-end
+
+## Beta Go/No-Go Checklist (Jan 6, 2026)
+
+**Goal:** Add minimum monitoring and incident checklist
+
+- [ ] Add Stripe webhook staleness to admin dashboard (already exists?)
+- [ ] Add email failure rate + last error to dashboard
+- [ ] Add deploy queue health (cron worker) + last run to dashboard
+- [ ] Create NEVER_AGAIN.md with incident checklist
+- [ ] Test all monitoring panels
+

@@ -83,3 +83,90 @@ This document contains the "forever contracts" that must never regress. These ar
 4. **When tests fail:** Check if a contract was violated (not just a flaky test)
 
 **Remember:** These are not guidelines. They are **non-negotiable boundaries** that prevent production incidents.
+
+
+---
+
+## Beta Go/No-Go Checklist
+
+**Purpose:** Minimum monitoring required before accepting beta customers.
+
+### Email Delivery Health
+- [ ] `/admin/email-monitoring` shows recent emails (last 24h)
+- [ ] Test email sent to `vmorre@live.com` (received, not spam)
+- [ ] Test email sent to `vince@vincessnowplow.com` (received, not spam)
+- [ ] FROM shows: `LaunchBase <support@getlaunchbase.com>` (not `onboarding@resend.dev`)
+- [ ] `email_logs` table shows `deliveryProvider="resend"`, `status="sent"`, `errorMessage IS NULL`
+
+### Stripe Webhook Staleness
+- [ ] `/admin/stripe-webhooks` shows recent webhook events
+- [ ] Last webhook received < 24 hours ago (if any payments processed)
+- [ ] No failed webhooks with `status="failed"`
+
+### Deploy Queue Health
+- [ ] `/admin/deployments` shows recent deployments
+- [ ] No deployments stuck in "pending" for > 2 hours
+- [ ] Cron worker last run < 1 hour ago
+
+### Intake Submission Flow
+- [ ] Submit test intake through `/apply` form
+- [ ] Verify intake appears in `/admin` dashboard
+- [ ] Verify confirmation email arrives
+- [ ] Verify owner notification received
+
+---
+
+## Incident Response Playbook
+
+### Quick Diagnosis (Check in order)
+
+1. **Email Monitoring** → `/admin/email-monitoring`
+   - Failed emails? Check `topError`
+   - Common: Domain not verified, API key expired
+
+2. **Stripe Webhooks** → `/admin/stripe-webhooks`
+   - Failed webhooks? Check signature mismatch
+   - Common: Webhook secret changed, endpoint URL wrong
+
+3. **Deployments** → `/admin/deployments`
+   - Stuck deployments? Check error message
+   - Common: Build failure, DNS not propagated
+
+4. **Intakes** → `/admin`
+   - Missing intakes? Check form validation
+   - Common: tRPC mutation failed, DB connection lost
+
+### Common Fixes
+
+**Email Delivery Failing:**
+1. Verify domain in Resend Dashboard
+2. Set `RESEND_DOMAIN_VERIFIED=true` in secrets
+3. Restart server
+
+**Stripe Webhooks Failing:**
+1. Get signing secret from Stripe Dashboard
+2. Update `STRIPE_WEBHOOK_SECRET` in secrets
+3. Restart server
+
+**Deployments Stuck:**
+1. Check cron worker logs
+2. Manually trigger via `/admin/deploy/{intakeId}`
+3. Wait for DNS propagation (5-60 min)
+
+---
+
+## Daily Health Check (5 minutes)
+
+1. **Email**: Sent vs Failed ratio > 95%
+2. **Stripe**: No failed webhooks
+3. **Deploys**: No stuck deployments
+4. **Intakes**: No stuck in "new" > 24h
+
+---
+
+## Forever Rules
+
+1. **Never delete email_logs** - Audit trail for customer communication
+2. **Never skip webhook verification** - Prevents fraud
+3. **Never deploy without approval** - Manual approval required
+4. **Never send emails without logging** - Always log to `email_logs`

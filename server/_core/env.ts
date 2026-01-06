@@ -9,4 +9,5 @@ export const ENV = {
   forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
   adminEmails: process.env.ADMIN_EMAILS ?? "",
   resendApiKey: process.env.RESEND_API_KEY ?? "",
+  resendDomainVerified: process.env.RESEND_DOMAIN_VERIFIED === "true",
 };
