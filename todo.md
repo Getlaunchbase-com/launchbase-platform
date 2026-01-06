@@ -1681,3 +1681,28 @@
 - [ ] Remove unique constraint → idempotency test must fail
 - [ ] Change worker query from "queued" to "running" → deploy smoke must fail
 - [ ] Comment out email log insert → email smoke must fail
+
+
+## Admin Stripe Webhook Monitoring (Jan 5, 2026)
+
+- [x] Created `stripe_webhook_events` table with retry tracking and idempotency
+- [x] Implemented webhook event logging helpers (`logStripeWebhookReceived`, `finalizeStripeWebhookEvent`)
+- [x] Added atomic claim pattern to prevent duplicate charges/emails
+- [x] Created admin auth helpers (`getUserEmailFromCtx`, `assertAdminEmail`)
+- [x] Refactored `admin.ts` to read ADMIN_EMAILS at runtime (not module load)
+- [x] Created `adminStripeWebhooksRouter` with `rollup` and `list` procedures
+- [x] Added 6 backend tests for admin auth security boundary (all passing)
+- [x] Built `/admin/stripe-webhooks` dashboard page with:
+  - Rollup cards (total, ok, failed, pending, retry events, total retries)
+  - Staleness indicator (warns if no events in 6 hours)
+  - Filters (time window, status, event type, retries only)
+  - Events table with expandable rows
+  - Error and metadata display
+  - Auto-refresh every 30 seconds
+- [x] All 220 tests passing (214 existing + 6 new admin auth tests)
+- [x] TypeScript: 0 errors
+
+**Next Steps:**
+- [ ] Set ADMIN_EMAILS env var in production (e.g., "vmorre@live.com")
+- [ ] Add navigation link to admin sidebar (optional)
+- [ ] Test with real Stripe webhook events in production
