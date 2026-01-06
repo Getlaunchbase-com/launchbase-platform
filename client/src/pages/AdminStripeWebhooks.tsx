@@ -95,26 +95,36 @@ export default function AdminStripeWebhooks() {
     return str.slice(0, maxChars) + "…";
   };
 
-  // Handle admin access errors
+  // Handle admin access errors with distinct messages
   if (rollupQuery.error || listQuery.error) {
     const error = rollupQuery.error || listQuery.error;
-    const isAdminError =
-      error?.message?.includes("ADMIN_EMAILS") ||
-      error?.message?.includes("Forbidden") ||
-      error?.message?.includes("admin access");
+    const errorMsg = error?.message || "";
+    
+    // Distinguish between auth states
+    const isNotLoggedIn = errorMsg.includes("Please login") || errorMsg.includes("UNAUTHORIZED");
+    const isNotAdmin = errorMsg.includes("Forbidden") || errorMsg.includes("admin access");
+    const isNotConfigured = errorMsg.includes("ADMIN_EMAILS");
+
+    let title = "Error Loading Data";
+    let message = "Unable to load webhook data. Please try again.";
+
+    if (isNotLoggedIn) {
+      title = "Please Log In";
+      message = "You must be logged in to access the admin dashboard.";
+    } else if (isNotConfigured) {
+      title = "Admin Access Not Configured";
+      message = "ADMIN_EMAILS environment variable is not set.";
+    } else if (isNotAdmin) {
+      title = "Not Authorized";
+      message = "Your account does not have admin access.";
+    }
 
     return (
       <div className="container py-8">
         <Card className="p-8 text-center">
           <AlertTriangle className="mx-auto h-12 w-12 text-yellow-500 mb-4" />
-          <h2 className="text-xl font-semibold mb-2">
-            {isAdminError ? "Admin Access Not Configured" : "Error Loading Data"}
-          </h2>
-          <p className="text-muted-foreground">
-            {isAdminError
-              ? "ADMIN_EMAILS environment variable is not set or you are not authorized."
-              : "Unable to load webhook data. Please try again."}
-          </p>
+          <h2 className="text-xl font-semibold mb-2">{title}</h2>
+          <p className="text-muted-foreground">{message}</p>
         </Card>
       </div>
     );
