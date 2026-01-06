@@ -2,6 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { adminStripeWebhooksRouter } from "./routers/admin/stripeWebhooks";
+import { adminEmailSmokeRouter } from "./routers/admin/emailSmoke";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -804,6 +805,9 @@ export const appRouter = router({
 
     // Stripe webhook monitoring (admin-only, read-only observability)
     stripeWebhooks: adminStripeWebhooksRouter,
+    
+    // Email delivery smoke test (admin-only)
+    emailSmoke: adminEmailSmokeRouter,
   }),
 
   // Analytics tracking (public for frontend events)

@@ -9,71 +9,25 @@ import { notifyOwner } from "./_core/notification";
 import { Resend } from "resend";
 import { ENV } from "./_core/env";
 
-// Error normalization helpers (FOREVER FIX)
-function truncateOneLine(input: unknown, max = 1500): string {
-  let s: string;
-  try {
-    s = typeof input === "string" ? input : JSON.stringify(input);
-  } catch {
-    s = String(input);
-  }
-  s = s.replace(/\s+/g, " ").trim();
-  return s.length > max ? s.slice(0, max) + "…" : s;
-}
-
-function normalizeResendError(err: unknown): {
-  message: string;
-  name?: string;
-  status?: number;
-  code?: string;
-  details?: unknown;
-} {
-  const e = err as any;
-
-  const message =
-    e?.message ||
-    e?.error?.message ||
-    e?.response?.data?.message ||
-    e?.response?.message ||
-    "Unknown error";
-
-  const status =
-    e?.statusCode ??
-    e?.status ??
-    e?.response?.status ??
-    e?.response?.statusCode;
-
-  const code =
-    e?.code ||
-    e?.error?.code ||
-    e?.response?.data?.code;
-
-  const details =
-    e?.response?.data ||
-    e?.error ||
-    e;
-
-  return {
-    message: truncateOneLine(message),
-    name: e?.name ? truncateOneLine(e.name, 120) : undefined,
-    status: typeof status === "number" ? status : undefined,
-    code: typeof code === "string" ? truncateOneLine(code, 120) : undefined,
-    details,
-  };
-}
-
-// Runtime Resend client (never cache at module level)
+// Lazy initialization: read env at runtime (not module load)
+let resendClient: Resend | null = null;
 function getResendClient(): Resend | null {
+  console.log(`[Email Debug] ENV.resendApiKey: ${ENV.resendApiKey ? 'SET (len=' + ENV.resendApiKey.length + ')' : 'NOT SET'}`);
   if (!ENV.resendApiKey) {
-    console.log("[Email] No RESEND_API_KEY configured, will use notification fallback");
+    console.log(`[Email Debug] Resend client: NULL (no API key)`);
     return null;
   }
-  return new Resend(ENV.resendApiKey);
+  if (!resendClient) {
+    console.log(`[Email Debug] Creating new Resend client...`);
+    resendClient = new Resend(ENV.resendApiKey);
+  }
+  console.log(`[Email Debug] Returning Resend client: ${resendClient ? 'INITIALIZED' : 'NULL'}`);
+  return resendClient;
 }
 
-// Email configuration (using Resend shared domain for beta)
-const FROM_EMAIL = process.env.FROM_EMAIL || "LaunchBase <onboarding@resend.dev>";
-const REPLY_TO_EMAIL = process.env.REPLY_TO_EMAIL || "onboarding@resend.dev";
+// Email configuration
+const FROM_EMAIL = process.env.FROM_EMAIL || "LaunchBase <noreply@launchbase.app>";
+const REPLY_TO_EMAIL = process.env.REPLY_TO_EMAIL || "support@launchbase.app";
 
 // Email template types
 export type EmailType = 
@@ -353,161 +307,110 @@ LaunchBase`
 }
 
 // Send email and log it
-// Send email with explicit provider logging (FOREVER FIX)
 export async function sendEmail(
   intakeId: number,
   type: EmailType,
   data: EmailData
-): Promise<{ ok: boolean; provider: "resend" | "notification"; error?: string; warning?: string }> {
+): Promise<boolean> {
   const template = getEmailTemplate(type, data);
-  const recipientEmail = data.email;
-  const subject = template.subject;
-  const html = `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      ${template.body.split('\n').map((line: string) => 
-        line.startsWith('•') 
-          ? `<p style="margin: 8px 0; padding-left: 16px;">${line}</p>`
-          : line === '' 
-            ? '<br/>'
-            : `<p style="margin: 16px 0; line-height: 1.6;">${line}</p>`
-      ).join('')}
-    </div>
-  `;
-
-  const db = await getDb();
-  if (!db) {
-    console.error("[Email] Database not available");
-    return { ok: false, provider: "notification", error: "db_unavailable" };
-  }
-
-  // ---- Attempt 1: Resend ----
-  let resendErrorMsg: string | null = null;
-
+  
   try {
-    if (!ENV.resendApiKey) throw new Error("RESEND_API_KEY missing");
-
-    const resend = new Resend(ENV.resendApiKey);
-
-    const r = await resend.emails.send({
-      from: FROM_EMAIL,
-      to: recipientEmail,
-      subject,
-      html,
-      text: template.body,
-      replyTo: REPLY_TO_EMAIL,
-      // Idempotency key prevents duplicate sends (Stripe pattern)
-      headers: {
-        "X-Entity-Ref-ID": `email/${type}/intake/${intakeId}`,
-      },
-    });
-
-    // Some SDK versions return { error }, some throw. Handle both.
-    if ((r as any)?.error) throw (r as any).error;
-
-    // SUCCESS: Log with provider="resend"
-    await db.insert(emailLogs).values({
-      intakeId,
-      emailType: type,
-      recipientEmail,
-      subject,
-      status: "sent",
-      deliveryProvider: "resend",
-      errorMessage: null,
-    });
-
-    console.log(`[Email] ✅ Sent via Resend: ${type} to ${recipientEmail}`);
-
-    // Additional owner notification for important events
-    if (type === "intake_confirmation") {
-      await notifyOwner({
-        title: `🎉 New intake: ${data.businessName}`,
-        content: `${data.firstName} (${recipientEmail}) just completed an intake for ${data.businessName}. Ready for build plan generation.`,
-      });
+    // Log the email attempt
+    const db = await getDb();
+    if (!db) {
+      console.error("[Email] Database not available");
+      return false;
     }
-
-    return { ok: true, provider: "resend" };
-  } catch (err) {
-    const norm = normalizeResendError(err);
-    resendErrorMsg = `resend_failed${norm.status ? `_${norm.status}` : ""}: ${norm.message}`;
-
-    // IMPORTANT: Log the failure as FAILED (do not pretend "sent")
-    await db.insert(emailLogs).values({
-      intakeId,
-      emailType: type,
-      recipientEmail,
-      subject,
-      status: "failed",
-      deliveryProvider: "resend",
-      errorMessage: resendErrorMsg,
-    });
-
-    console.error("[Email] ❌ Resend failed:", norm);
-  }
-
-  // ---- Attempt 2: Fallback notification ----
-  try {
-    const emailContent = `
-**To:** ${recipientEmail}
-**Subject:** ${subject}
+    
+    // Try to send via Resend if configured
+    let emailSent = false;
+    const resend = getResendClient();
+    if (resend) {
+      try {
+        const result = await resend.emails.send({
+          from: FROM_EMAIL,
+          to: data.email,
+          replyTo: REPLY_TO_EMAIL,
+          subject: template.subject,
+          text: template.body,
+          // HTML version with basic formatting
+          html: `
+            <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+              ${template.body.split('\n').map(line => 
+                line.startsWith('•') 
+                  ? `<p style="margin: 8px 0; padding-left: 16px;">${line}</p>`
+                  : line === '' 
+                    ? '<br/>'
+                    : `<p style="margin: 16px 0; line-height: 1.6;">${line}</p>`
+              ).join('')}
+            </div>
+          `,
+        });
+        
+        if (result.data?.id) {
+          emailSent = true;
+          console.log(`[Email] Sent via Resend: ${type} to ${data.email} (ID: ${result.data.id})`);
+        }
+      } catch (resendError) {
+        console.error(`[Email] Resend failed, falling back to notification:`, resendError);
+      }
+    }
+    
+    // Fallback: Use notification system if Resend not configured or failed
+    if (!emailSent) {
+      const emailContent = `
+**To:** ${data.email}
+**Subject:** ${template.subject}
 
 ---
 
 ${template.body}
-    `.trim();
-
-    await notifyOwner({
-      title: `📧 ${subject}`,
-      content: emailContent,
-    });
-
-    // Log fallback success with provider="notification"
+      `.trim();
+      
+      await notifyOwner({
+        title: `📧 ${template.subject}`,
+        content: emailContent,
+      });
+      
+      console.log(`[Email] Sent via notification: ${type} to ${data.email}`);
+    }
+    
+    // Log success
     await db.insert(emailLogs).values({
       intakeId,
       emailType: type,
-      recipientEmail,
-      subject,
+      recipientEmail: data.email,
+      subject: template.subject,
       status: "sent",
-      deliveryProvider: "notification",
-      errorMessage: resendErrorMsg, // Keep the causal chain
     });
-
-    console.log(`[Email] ✅ Sent via notification (fallback): ${type} to ${recipientEmail}`);
-
+    
+    console.log(`[Email] Subject: ${template.subject}`);
+    
     // Additional owner notification for important events
     if (type === "intake_confirmation") {
       await notifyOwner({
         title: `🎉 New intake: ${data.businessName}`,
-        content: `${data.firstName} (${recipientEmail}) just completed an intake for ${data.businessName}. Ready for build plan generation.`,
+        content: `${data.firstName} (${data.email}) just completed an intake for ${data.businessName}. Ready for build plan generation.`,
       });
     }
-
-    return {
-      ok: true,
-      provider: "notification",
-      warning: resendErrorMsg ?? "resend_failed",
-    };
-  } catch (fallbackErr) {
-    const f = normalizeResendError(fallbackErr);
-    const fallbackMsg = `notification_failed${f.status ? `_${f.status}` : ""}: ${f.message}`;
-
-    // Log complete failure
-    await db.insert(emailLogs).values({
-      intakeId,
-      emailType: type,
-      recipientEmail,
-      subject,
-      status: "failed",
-      deliveryProvider: "notification",
-      errorMessage: [resendErrorMsg, fallbackMsg].filter(Boolean).join(" | "),
-    });
-
-    console.error("[Email] ❌ Notification fallback also failed:", f);
-
-    return {
-      ok: false,
-      provider: "notification",
-      error: [resendErrorMsg, fallbackMsg].filter(Boolean).join(" | "),
-    };
+    
+    return true;
+  } catch (error) {
+    console.error(`[Email] Failed to send ${type} to ${data.email}:`, error);
+    
+    // Log the failure
+    const dbFail = await getDb();
+    if (dbFail) {
+      await dbFail.insert(emailLogs).values({
+        intakeId,
+        emailType: type,
+        recipientEmail: data.email,
+        subject: template.subject,
+        status: "failed",
+      });
+    }
+    
+    return false;
   }
 }
 

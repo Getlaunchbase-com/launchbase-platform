@@ -184,6 +184,9 @@ export const emailLogs = mysqlTable("email_logs", {
   subject: varchar("subject", { length: 255 }).notNull(),
   // Status
   status: mysqlEnum("status", ["sent", "failed", "opened", "clicked"]).default("sent").notNull(),
+  // Delivery tracking (forever observability)
+  deliveryProvider: mysqlEnum("deliveryProvider", ["resend", "notification"]),
+  errorMessage: text("errorMessage"),
   // Timestamps
   sentAt: timestamp("sentAt").defaultNow().notNull(),
   openedAt: timestamp("openedAt"),
