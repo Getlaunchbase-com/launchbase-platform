@@ -37,7 +37,7 @@ import FacebookConnect from "./pages/FacebookConnect";
 import AdminDrafts from "./pages/AdminDrafts";
 import SettingsFacebook from "./pages/SettingsFacebook";
 import AdminStripeWebhooks from "./pages/AdminStripeWebhooks";
-
+import { AdminEmailMonitoring } from "./pages/AdminEmailMonitoring";
 function Router() {
   return (
     <Switch>
@@ -77,6 +77,7 @@ function Router() {
       <Route path="/admin/drafts" component={AdminDrafts} />
       <Route path="/settings/facebook" component={SettingsFacebook} />
       <Route path="/admin/stripe-webhooks" component={AdminStripeWebhooks} />
+      <Route path="/admin/email-monitoring" component={AdminEmailMonitoring} />
       
       {/* Fallback routes */}
       <Route path="/404" component={NotFound} />

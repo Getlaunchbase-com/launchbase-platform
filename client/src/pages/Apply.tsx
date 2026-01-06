@@ -358,6 +358,18 @@ export default function ApplyPage() {
 
     if (typeof window === "undefined") return base;
 
+    // Read websiteStatus from URL params (for CTA pre-fill)
+    let urlWebsiteStatus: "none" | "existing" | "systems_only" | null = null;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const ws = params.get("websiteStatus");
+      if (ws === "none" || ws === "existing" || ws === "systems_only") {
+        urlWebsiteStatus = ws;
+      }
+    } catch {
+      // ignore URL parsing errors
+    }
+
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
@@ -368,6 +380,8 @@ export default function ApplyPage() {
           ...parsed,
           // 🔒 FOREVER DEFAULT
           audience: parsed?.audience === "org" ? "org" : "biz",
+          // URL param wins over localStorage (for CTA routing)
+          websiteStatus: urlWebsiteStatus || parsed?.websiteStatus || "none",
         };
       }
     } catch {
@@ -378,6 +392,7 @@ export default function ApplyPage() {
     return {
       ...base,
       language: preferredLang as Language,
+      websiteStatus: urlWebsiteStatus || "none",
       audience: preferredAudience,
     };
   });

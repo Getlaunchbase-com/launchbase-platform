@@ -72,9 +72,15 @@ function getResendClient(): Resend | null {
   return new Resend(ENV.resendApiKey);
 }
 
-// Email configuration (using Resend shared domain for beta)
-const FROM_EMAIL = process.env.FROM_EMAIL || "LaunchBase <onboarding@resend.dev>";
-const REPLY_TO_EMAIL = process.env.REPLY_TO_EMAIL || "onboarding@resend.dev";
+// Email configuration with verified-domain fallback (FOREVER SAFE)
+// Automatically switches to branded sender once RESEND_DOMAIN_VERIFIED=true
+const FROM_EMAIL = ENV.resendDomainVerified
+  ? "LaunchBase <support@getlaunchbase.com>"
+  : "LaunchBase <onboarding@resend.dev>";
+
+const REPLY_TO_EMAIL = ENV.resendDomainVerified
+  ? "support@getlaunchbase.com"
+  : undefined; // Resend shared domain doesn't support custom reply-to
 
 // Email template types
 export type EmailType = 
