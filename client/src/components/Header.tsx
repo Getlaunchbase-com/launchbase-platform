@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
-import { getPrefs, setPrefs, subscribePrefs, type Audience, type Language } from "@/lib/prefs";
+import { getPrefs, setLanguage, setAudience, subscribePrefs, readLanguageForBoot, type Audience, type Language } from "@/lib/prefs";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Globe, Building2 } from "lucide-react";
 
 export function Header() {
-  const [prefs, setLocal] = useState(() => getPrefs());
+  const [prefs, setLocal] = useState(() => ({
+    ...getPrefs(),
+    language: readLanguageForBoot(), // Auto-detect on first visit
+  }));
 
   useEffect(() => subscribePrefs(() => setLocal(getPrefs())), []);
   useEffect(() => {
@@ -15,14 +18,14 @@ export function Header() {
 
   function updateLanguage(language: Language) {
     console.log('[Header] updateLanguage called:', language);
-    setPrefs({ language });
+    setLanguage(language); // Now marks as explicit choice
     setLocal(getPrefs());
     console.log('[Header] prefs updated:', getPrefs());
   }
 
   function updateAudience(audience: Audience) {
     console.log('[Header] updateAudience called:', audience);
-    setPrefs({ audience });
+    setAudience(audience); // Now marks as explicit choice
     setLocal(getPrefs());
     console.log('[Header] prefs updated:', getPrefs());
   }
