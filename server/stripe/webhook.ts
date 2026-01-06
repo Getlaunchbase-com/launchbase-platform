@@ -7,6 +7,7 @@ import { eq, and, isNull } from "drizzle-orm";
 import { sendEmail } from "../email";
 import { notifyOwner } from "../_core/notification";
 import { Cadence, LayerKey } from "./intelligenceCheckout";
+import { logStripeWebhookReceived, finalizeStripeWebhookEvent } from "./webhookLogger";
 
 /**
  * Handle Stripe webhook events
@@ -45,6 +46,13 @@ export async function handleStripeWebhook(req: Request, res: Response) {
   }
 
   console.log(`[Stripe Webhook] Received event: ${event.type} (${event.id})`);
+
+  // Log webhook receipt immediately (best-effort, never blocks processing)
+  await logStripeWebhookReceived(event);
+
+  let intakeId: number | null = null;
+  let userId: number | null = null;
+  let processingError: string | null = null;
 
   try {
     switch (event.type) {
@@ -104,7 +112,16 @@ export async function handleStripeWebhook(req: Request, res: Response) {
     res.json({ received: true });
   } catch (err) {
     console.error("[Stripe Webhook] Error processing event:", err);
+    processingError = err instanceof Error ? err.message : String(err);
     res.status(500).json({ error: "Webhook handler failed" });
+  } finally {
+    // Always finalize webhook event status (best-effort)
+    await finalizeStripeWebhookEvent(event.id, {
+      ok: processingError === null,
+      error: processingError,
+      intakeId,
+      userId,
+    });
   }
 }
 

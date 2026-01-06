@@ -4,7 +4,7 @@ import Stripe from "stripe";
 
 import { createApp } from "../_core/app";
 import { getDb } from "../db";
-import { intakes, payments, deployments, emailLogs } from "../../drizzle/schema";
+import { intakes, payments, deployments, emailLogs, stripeWebhookEvents } from "../../drizzle/schema";
 import { eq, and } from "drizzle-orm";
 
 /**
@@ -148,5 +148,16 @@ describe("smoke: stripe webhook boundary", () => {
       .where(and(eq(emailLogs.intakeId, intakeId), eq(emailLogs.emailType, "deployment_started")));
     expect(emailRows.length).toBe(1);
     expect(emailRows[0].status).toBe("sent");
+
+    // Assert: webhook event logged with retry tracking
+    const [webhookEvent] = await db
+      .select()
+      .from(stripeWebhookEvents)
+      .where(eq(stripeWebhookEvents.eventId, event.id));
+    expect(webhookEvent).toBeTruthy();
+    expect(webhookEvent.eventType).toBe("checkout.session.completed");
+    expect(webhookEvent.ok).toBe(true);
+    expect(webhookEvent.idempotencyHit).toBe(true); // Second delivery sets this
+    expect(webhookEvent.retryCount).toBe(1); // Incremented on duplicate
   });
 });

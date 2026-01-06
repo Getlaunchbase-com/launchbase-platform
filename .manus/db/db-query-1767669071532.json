@@ -1,0 +1,33 @@
+{
+  "query": "SHOW CREATE TABLE stripe_webhook_events",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SHOW CREATE TABLE stripe_webhook_events",
+  "rows": [
+    {
+      "Table": "stripe_webhook_events",
+      "Create Table": "CREATE TABLE `stripe_webhook_events` ("
+    }
+  ],
+  "messages": [
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `eventId` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `eventType` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `created` int(11) NOT NULL,",
+    "  `receivedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `ok` tinyint(1) DEFAULT NULL,",
+    "  `error` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `intakeId` int(11) DEFAULT NULL,",
+    "  `userId` int(11) DEFAULT NULL,",
+    "  `idempotencyHit` tinyint(1) NOT NULL DEFAULT '0',",
+    "  `retryCount` int(11) NOT NULL DEFAULT '0',",
+    "  `meta` json DEFAULT NULL,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,",
+    "  UNIQUE KEY `uniq_stripe_webhook_events_eventId` (`eventId`),",
+    "  KEY `idx_stripe_webhook_events_eventType_receivedAt` (`eventType`,`receivedAt`),",
+    "  KEY `idx_stripe_webhook_events_intakeId` (`intakeId`),",
+    "  KEY `idx_stripe_webhook_events_userId` (`userId`)",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+  ],
+  "stdout": "Table\tCreate Table\nstripe_webhook_events\tCREATE TABLE `stripe_webhook_events` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `eventId` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `eventType` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `created` int(11) NOT NULL,\n  `receivedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `ok` tinyint(1) DEFAULT NULL,\n  `error` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `intakeId` int(11) DEFAULT NULL,\n  `userId` int(11) DEFAULT NULL,\n  `idempotencyHit` tinyint(1) NOT NULL DEFAULT '0',\n  `retryCount` int(11) NOT NULL DEFAULT '0',\n  `meta` json DEFAULT NULL,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,\n  UNIQUE KEY `uniq_stripe_webhook_events_eventId` (`eventId`),\n  KEY `idx_stripe_webhook_events_eventType_receivedAt` (`eventType`,`receivedAt`),\n  KEY `idx_stripe_webhook_events_intakeId` (`intakeId`),\n  KEY `idx_stripe_webhook_events_userId` (`userId`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\n",
+  "stderr": "",
+  "execution_time_ms": 49
+}
