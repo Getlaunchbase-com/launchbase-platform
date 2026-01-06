@@ -1628,3 +1628,9 @@
 - [x] Create facebook-policy-db.ts with DB helpers
 - [x] Create minimal smoke test suite (2 tests passing)
 - [x] Verify all 210 tests passing
+
+## Smoke Tests Complete (Jan 5, 2026)
+- [x] Add pnpm smoke script to package.json
+- [x] Create mutation-layer cap block smoke test (real DB, no mocks)
+- [x] Update NEVER_AGAIN.md with canonical smoke test pattern
+- [x] Verify all 211 tests passing (210 original + 1 new smoke test)

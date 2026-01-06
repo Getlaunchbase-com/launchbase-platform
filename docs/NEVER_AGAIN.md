@@ -149,26 +149,48 @@ const DAILY_POST_CAP = 0; // SMOKE TEST
 - Requires manual revert (easy to forget)
 - Creates "oops we shipped cap=0" incidents
 
-**✅ CORRECT PATTERN: Mock at the seam or use unit tests**
+**✅ CORRECT PATTERN: Mutation-layer integration test with real DB**
 
 ```typescript
-// Option 1: Unit test with mocked DB responses
-const mockGetPostCount = vi.spyOn(
-  await import("../facebook-policy"),
-  "getPostCountLast24Hours"
-);
-mockGetPostCount.mockResolvedValue(2); // Simulate cap reached
+// CANONICAL PATTERN: Test at mutation layer with real DB setup
+// This is the ONLY way to smoke test caps correctly
 
-// Option 2: Make real posts in dev/staging to hit cap naturally
-// (Safer than flipping constants)
-
-// If you MUST flip a constant:
-// 1. Change constant
-// 2. Run smoke test
-// 3. IMMEDIATELY revert constant
-// 4. Run pnpm test again
-// 5. Only then checkpoint/publish
+it("blocks posting when daily cap is reached", async () => {
+  const db = await getDb();
+  
+  // 1. Arrange: Create connection + 2 published posts (reaching cap)
+  await db.insert(moduleConnections).values({
+    userId: TEST_USER_ID,
+    connectionType: "facebook_page",
+    externalId: TEST_PAGE_ID,
+    accessToken: "test_token",
+    createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
+  });
+  
+  await db.insert(socialPosts).values([
+    { userId: TEST_USER_ID, pageId: TEST_PAGE_ID, status: "published", publishedAt: new Date() },
+    { userId: TEST_USER_ID, pageId: TEST_PAGE_ID, status: "published", publishedAt: new Date() },
+  ]);
+  
+  // 2. Act: Attempt manual post via mutation
+  const caller = appRouter.createCaller({ user: { id: TEST_USER_ID, ... } });
+  const result = await caller.facebook.post({ message: "Should be blocked" });
+  
+  // 3. Assert: Policy blocked it
+  expect(result.success).toBe(false);
+  expect(result.action).toBe("BLOCK");
+  expect(result.error?.toLowerCase()).toMatch(/cap|limit/);
+});
 ```
+
+**Why this is the ONLY correct way:**
+- ✅ Tests full stack (DB → policy → mutation → response)
+- ✅ No mocking (catches real integration issues)
+- ✅ No constant flipping (zero production risk)
+- ✅ Would catch policy bypasses, broken queries, wrong thresholds
+- ✅ This is what prevents Meta platform violations
+
+**See:** `server/__tests__/smoke.facebook-mutations.test.ts` for the authoritative implementation
 
 ---
 
