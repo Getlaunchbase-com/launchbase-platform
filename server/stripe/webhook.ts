@@ -458,6 +458,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       firstName,
       businessName: intake.businessName,
       email: intake.email,
+      language: intake.language as any,
+      audience: intake.audience as any,
     });
     
     // Trigger deployment with safety gates

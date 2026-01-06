@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/accordion";
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
+import { getPrefs, subscribePrefs } from "@/lib/prefs";
+import { heroCopy } from "@/lib/heroCopy";
 
 // Website Preview Component
 function WebsitePreview() {
@@ -102,27 +104,48 @@ function LiveContextPanel() {
 }
 
 export default function Home() {
+  const [prefs, setPrefs] = useState(() => getPrefs());
+  
+  useEffect(() => subscribePrefs(() => setPrefs(getPrefs())), []);
+  
+  const { audience, language } = prefs;
+
+  // Get copy from heroCopy map (includes EN, ES, PL)
+  const rawCopy = heroCopy[language]?.[audience] ?? heroCopy.en.biz;
+  
+  // Transform text into JSX with proper formatting
+  const c = {
+    h1: (
+      <>
+        {rawCopy.h1.split("\n").map((line, i) => (
+          i === 0 ? line : (
+            <>
+              <br />
+              <span className="text-[#FF6A00]">{line}</span>
+            </>
+          )
+        ))}
+      </>
+    ),
+    p: (
+      <>
+        {rawCopy.p.split("\n").map((line, i) => (
+          i === 0 ? line : (
+            <>
+              <br />
+              <span className="text-white">{line}</span>
+            </>
+          )
+        ))}
+      </>
+    ),
+    badge: rawCopy.badge,
+    ctaPrimary: rawCopy.ctaPrimary,
+    ctaSecondary: rawCopy.ctaSecondary,
+  };
+
   return (
     <div className="min-h-screen bg-[#0B0B0C] text-white">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0B0B0C]/95 backdrop-blur-sm border-b border-white/10">
-        <div className="container max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center flex-1 mr-4 md:flex-none md:mr-0">
-            <img src="/logo-cropped.png" alt="LaunchBase" className="h-10 w-auto md:h-8" />
-          </div>
-          <div className="hidden md:flex items-center gap-8">
-            <Link href="/how-it-works" className="text-sm text-gray-400 hover:text-white transition">How It Works</Link>
-            <Link href="/expand" className="text-sm text-gray-400 hover:text-white transition">Expand</Link>
-            <a href="#pricing" className="text-sm text-gray-400 hover:text-white transition">Pricing</a>
-          </div>
-          <Link href="/apply">
-            <Button className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white">
-              Hand It Off <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </Link>
-        </div>
-      </nav>
-
       {/* Hero Section - Reframed around responsibility */}
       <section className="pt-32 pb-20 px-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#FF6A00]/5 via-transparent to-transparent pointer-events-none" />
@@ -136,34 +159,30 @@ export default function Home() {
               </div>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 leading-tight">
-                Stop carrying the system
-                <br />
-                <span className="text-[#FF6A00]">in your head.</span>
+                {c.h1}
               </h1>
               
               <p className="text-lg md:text-xl text-gray-400 mb-6 leading-relaxed">
-                Your website exists. Your tools work. But no one owns the system.
-                <br />
-                <span className="text-white">LaunchBase takes ongoing responsibility</span> — so you stop thinking about it.
+                {c.p}
               </p>
               
               {/* Killer insight - elevated */}
               <div className="bg-[#FF6A00]/10 border border-[#FF6A00]/30 rounded-xl px-5 py-4 mb-8">
                 <p className="text-[#FF6A00] font-medium flex items-center gap-2">
                   <Eye className="w-5 h-5" />
-                  See your real site before you pay. Always see what we're doing.
+                  {c.badge}
                 </p>
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/apply">
                   <Button size="lg" className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white text-lg px-8 py-6 w-full sm:w-auto">
-                    Hand It Off <ArrowRight className="w-5 h-5 ml-2" />
+                    {c.ctaPrimary} <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
                 </Link>
                 <Link href="/how-it-works">
                   <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/5 text-lg px-8 py-6 w-full sm:w-auto">
-                    See how it works
+                    {c.ctaSecondary}
                   </Button>
                 </Link>
               </div>

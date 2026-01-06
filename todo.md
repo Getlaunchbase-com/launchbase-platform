@@ -1714,3 +1714,26 @@
 - [x] Test replay: no duplicates, retryCount incremented, idempotencyHit=true
 - [x] Wire `pnpm smoke` script to run smoke tests only
 - [x] Run smoke test and verify all assertions pass
+
+
+---
+
+## Multi-Language & Multi-Audience System (Jan 6, 2026)
+
+- [x] Add language and audience columns to intakes table
+- [x] Create preference system (localStorage + event subscription)
+- [x] Add language/audience selectors to header
+- [x] Create heroCopy.ts with EN/ES/PL × biz/org translations
+- [x] Update Home.tsx to use localized hero copy
+- [x] Create emailCopy.ts with EN/ES/PL × biz/org email translations
+- [x] Update email.ts to use localized email templates
+- [x] Update all sendEmail calls to pass language/audience from intake
+- [x] Write comprehensive smoke tests (59 tests, all passing)
+- [x] Verify end-to-end localization works
+
+**Coverage:**
+- 3 languages (English, Spanish, Polish)
+- 2 audiences (Business, Organization)
+- 11 email types fully translated
+- Homepage hero fully translated
+- Automatic language/audience detection from intake

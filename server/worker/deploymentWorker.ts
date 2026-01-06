@@ -153,6 +153,8 @@ export async function handleDeploymentWorker(req: Request, res: Response) {
       businessName: intake.businessName,
       email: intake.email,
       liveUrl: deploymentResult.liveUrl,
+      language: intake.language as any,
+      audience: intake.audience as any,
     });
 
     // Notify admin

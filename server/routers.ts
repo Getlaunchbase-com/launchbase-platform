@@ -131,6 +131,8 @@ export const appRouter = router({
             firstName,
             businessName: input.businessName,
             email: input.email,
+            language: intake.language as any,
+            audience: intake.audience as any,
           });
           
           // Notify admin of new intake
@@ -417,6 +419,8 @@ export const appRouter = router({
               businessName: intake.businessName,
               email: intake.email,
               previewUrl: `/preview/${previewToken}`,
+              language: intake.language as any,
+              audience: intake.audience as any,
             });
             
             return { success: true, previewToken };
@@ -507,6 +511,8 @@ export const appRouter = router({
             businessName: intake.businessName,
             email: intake.email,
             previewUrl: `/preview/${intake.previewToken}`,
+            language: intake.language as any,
+            audience: intake.audience as any,
           });
           
           // The email send is already logged in email_logs table via sendEmail
@@ -732,6 +738,8 @@ export const appRouter = router({
               businessName: intake.businessName,
               email: intake.email,
               liveUrl, // Manus URL only
+              language: intake.language as any,
+              audience: intake.audience as any,
             });
             
             console.log(`[Router] Deployment ${queued.id} completed with Manus URL`);
@@ -1566,6 +1574,7 @@ export const appRouter = router({
     submit: publicProcedure
       .input(z.object({
         language: z.enum(["en", "es", "pl"]).default("en"),
+        audience: z.enum(["biz", "org"]).optional(),
         vertical: z.enum(["trades", "health", "beauty", "food", "cannabis", "professional", "fitness", "automotive"]),
         industry: z.string().max(64).optional(),
         location: z.object({
@@ -1631,6 +1640,8 @@ export const appRouter = router({
           email: input.contact.email,
           phone: input.contact.phone,
           vertical: intakeVertical,
+          language: input.language,
+          audience: input.audience,
           services: input.industry ? [input.industry.replace(/_/g, " ")] : [],
           serviceArea: [input.location.cityZip],
           primaryCTA: "call",
@@ -1685,6 +1696,8 @@ export const appRouter = router({
               businessName: input.contact.name,
               email: input.contact.email,
               previewUrl: `/preview/${intakePreviewToken}`,
+              language: intake.language as any,
+              audience: intake.audience as any,
             }
           );
         } catch (emailErr) {
@@ -1927,6 +1940,8 @@ export const appRouter = router({
               businessName: input.businessName,
               email: app.contactEmail,
               previewUrl: `/preview/${previewToken}`,
+              language: intake.language as any,
+              audience: intake.audience as any,
             }
           );
         } else {
@@ -1938,6 +1953,8 @@ export const appRouter = router({
               firstName: app.contactName.split(" ")[0],
               businessName: input.businessName,
               email: app.contactEmail,
+              language: intake.language as any,
+              audience: intake.audience as any,
             }
           );
         }
