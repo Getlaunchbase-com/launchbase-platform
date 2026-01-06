@@ -567,3 +567,182 @@ Ask yourself:
 - Did I add a smoke test for this scenario?
 
 If the answer to any is "no," stop and fix it before merging.
+
+
+---
+
+## Stripe Webhook Idempotency
+
+### ✅ CORRECT PATTERN: Webhook event logging with upsert pattern
+
+**Problem:** Stripe retries failed webhooks, causing duplicate charges, emails, and deployments.
+
+**Solution:** Log every webhook delivery with atomic upsert to track retries.
+
+```typescript
+// server/stripe/webhookLogger.ts
+export async function logStripeWebhookReceived(
+  event: Stripe.Event,
+  meta?: Record<string, unknown>
+): Promise<void> {
+  const db = await getDb();
+  if (!db) return; // Best-effort, never blocks processing
+
+  try {
+    // CRITICAL: This is the ONLY place retryCount increments
+    await db.execute(sql`
+      INSERT INTO stripe_webhook_events 
+        (eventId, eventType, created, receivedAt, ok, error, intakeId, userId, idempotencyHit, retryCount, meta)
+      VALUES (
+        ${event.id}, 
+        ${event.type}, 
+        ${event.created}, 
+        NOW(), 
+        NULL, 
+        NULL, 
+        NULL, 
+        NULL, 
+        FALSE, 
+        0, 
+        ${meta ?? null}
+      )
+      ON DUPLICATE KEY UPDATE 
+        retryCount = retryCount + 1,
+        idempotencyHit = TRUE,
+        receivedAt = NOW()
+    `);
+  } catch (err) {
+    console.error("[Webhook Logger] Failed to log event receipt:", err);
+  }
+}
+```
+
+**Webhook handler wiring order (MUST follow this sequence):**
+
+```typescript
+export async function handleStripeWebhook(req: Request, res: Response) {
+  // 1. Signature verification FIRST (reject unverified payloads)
+  const signature = req.headers["stripe-signature"];
+  if (!signature) return res.status(400).json({ error: "Missing signature" });
+  
+  let event: Stripe.Event;
+  try {
+    event = constructWebhookEvent(req.body, signature);
+  } catch (err) {
+    return res.status(400).json({ error: "Invalid signature" });
+  }
+
+  // 2. Log receipt immediately (upsert pattern, best-effort)
+  await logStripeWebhookReceived(event);
+
+  // 3. Process event with try/catch/finally
+  let processingError: string | null = null;
+  try {
+    switch (event.type) {
+      case "checkout.session.completed":
+        await handleCheckoutCompleted(session);
+        break;
+      // ... other handlers
+    }
+    res.json({ received: true });
+  } catch (err) {
+    processingError = err instanceof Error ? err.message : String(err);
+    res.status(500).json({ error: "Webhook handler failed" });
+  } finally {
+    // 4. Always finalize status (never touches retryCount/idempotencyHit)
+    await finalizeStripeWebhookEvent(event.id, {
+      ok: processingError === null,
+      error: processingError,
+      intakeId: null, // Optional: capture if available
+      userId: null,   // Optional: capture if available
+    });
+  }
+}
+```
+
+**Atomic claim pattern for checkout.session.completed:**
+
+```typescript
+// CRITICAL: This prevents duplicate charges and emails
+const claim = await db
+  .update(intakes)
+  .set({
+    stripeSessionId: session.id,
+    status: "paid",
+    paidAt: new Date(),
+  })
+  .where(
+    and(
+      eq(intakes.id, intakeId),
+      isNull(intakes.stripeSessionId) // Only claim if unclaimed
+    )
+  );
+
+const claimed = (claim?.rowsAffected ?? 0) > 0;
+if (!claimed) {
+  console.log(`[Stripe Webhook] Duplicate checkout ignored (session ${session.id})`);
+  return; // Exit early, no side effects
+}
+
+// Safe zone: only first webhook reaches here
+await db.insert(payments).values({ ... });
+await sendEmail({ ... });
+```
+
+**Smoke test assertions (boundary-real):**
+
+```typescript
+// Test: Send same webhook twice, assert idempotency
+const { payload, signature } = makeSignedStripePayload(event);
+
+const res1 = await request(app)
+  .post("/api/stripe/webhook")
+  .set("stripe-signature", signature)
+  .type("application/json")
+  .send(payload);
+
+const res2 = await request(app)
+  .post("/api/stripe/webhook")
+  .set("stripe-signature", signature)
+  .type("application/json")
+  .send(payload);
+
+// Assert: Both accepted (Stripe expects 2xx)
+expect(res1.status).toBeGreaterThanOrEqual(200);
+expect(res2.status).toBeGreaterThanOrEqual(200);
+
+// Assert: Webhook event logged with retry tracking
+const [webhookEvent] = await db
+  .select()
+  .from(stripeWebhookEvents)
+  .where(eq(stripeWebhookEvents.eventId, event.id));
+
+expect(webhookEvent.eventType).toBe("checkout.session.completed");
+expect(webhookEvent.ok).toBe(true);
+expect(webhookEvent.idempotencyHit).toBe(true); // Second delivery sets this
+expect(webhookEvent.retryCount).toBe(1); // Incremented on duplicate
+
+// Assert: Payment created once
+const payRows = await db.select().from(payments)
+  .where(eq(payments.stripePaymentIntentId, paymentIntentId));
+expect(payRows.length).toBe(1);
+
+// Assert: Email sent once
+const emailRows = await db.select().from(emailLogs)
+  .where(and(eq(emailLogs.intakeId, intakeId), eq(emailLogs.emailType, "deployment_started")));
+expect(emailRows.length).toBe(1);
+```
+
+**Rules:**
+1. **Receipt logging MUST use parameterized queries** (prevent SQL injection)
+2. **retryCount increments ONLY in upsert** (finalize never touches it)
+3. **Finalize runs in finally block** (guarantees execution)
+4. **Atomic claim MUST happen before any side effects** (payments, emails, deployments)
+5. **Smoke tests MUST assert webhook_events table** (proves retry tracking works)
+
+**Reference:** 
+- `server/stripe/webhookLogger.ts` - Logging helpers
+- `server/stripe/webhook.ts` - Handler wiring
+- `server/__tests__/smoke.stripe-webhook.test.ts` - Idempotency smoke test
+- `server/__tests__/smoke.stripe-invoice.test.ts` - Subscription activation test
+

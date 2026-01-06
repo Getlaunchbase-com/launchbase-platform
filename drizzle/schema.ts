@@ -929,3 +929,29 @@ export const facebookOAuthSessions = mysqlTable("facebook_oauth_sessions", {
 
 export type FacebookOAuthSession = typeof facebookOAuthSessions.$inferSelect;
 export type InsertFacebookOAuthSession = typeof facebookOAuthSessions.$inferInsert;
+
+/**
+ * Stripe webhook events log
+ * Tracks all webhook deliveries for observability and idempotency
+ */
+export const stripeWebhookEvents = mysqlTable("stripe_webhook_events", {
+  id: int("id").autoincrement().primaryKey(),
+  // Stripe event details
+  eventId: varchar("eventId", { length: 255 }).notNull().unique(),
+  eventType: varchar("eventType", { length: 64 }).notNull(),
+  created: int("created").notNull(), // Stripe event created timestamp (Unix seconds)
+  // Processing details
+  receivedAt: timestamp("receivedAt").defaultNow().notNull(),
+  ok: boolean("ok"), // Nullable - set after processing completes
+  error: text("error"),
+  // Related entities
+  intakeId: int("intakeId"),
+  userId: int("userId"),
+  // Idempotency tracking
+  idempotencyHit: boolean("idempotencyHit").default(false).notNull(),
+  retryCount: int("retryCount").default(0).notNull(),
+  // Flexible metadata storage
+  meta: json("meta").$type<Record<string, unknown>>(),
+});
+export type StripeWebhookEvent = typeof stripeWebhookEvents.$inferSelect;
+export type InsertStripeWebhookEvent = typeof stripeWebhookEvents.$inferInsert;
