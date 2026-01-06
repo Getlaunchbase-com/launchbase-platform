@@ -1730,10 +1730,16 @@
 - [x] Update all sendEmail calls to pass language/audience from intake
 - [x] Write comprehensive smoke tests (59 tests, all passing)
 - [x] Verify end-to-end localization works
+- [x] Add language toggle to Apply form header
+- [x] Initialize Apply form language from homepage prefs
+- [x] Forever-audit: Mid-flow language switch (Step 4, EN→ES→PL, data persisted)
+- [x] Forever-audit: Reload persistence (language + form data intact)
+- [x] Forever-audit: Submit payload sanity (language='es' in DB + rawPayload)
 
 **Coverage:**
 - 3 languages (English, Spanish, Polish)
 - 2 audiences (Business, Organization)
+- Homepage hero + Apply form + All 11 email types fully localized
 - 11 email types fully translated
 - Homepage hero fully translated
 - Automatic language/audience detection from intake
