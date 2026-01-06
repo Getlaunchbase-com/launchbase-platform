@@ -1763,9 +1763,11 @@
 - [x] Add readLanguageForBoot() for initialization
 - [x] Update setLanguage() and setAudience() to set explicit flags
 - [x] Store explicit flags inside prefs JSON (single source of truth)
-- [x] Update setPrefs() to preserve explicit flags
+- [x] Update setPrefs() to preserve explicit flags with triple fallback
 - [x] Update Header.tsx to use readLanguageForBoot()
 - [x] Add smoke test: explicit choice beats navigator (6 tests passing)
+- [x] Add invariant test: setPrefs() never drops explicit flags (1 test passing)
 - [ ] Optional: Show "Auto-selected from browser" hint on first visit
 
 **Forever rule locked:** Detection = suggestion, User choice = authority
+**Forever guardrails:** 7 passing tests prevent merge regression
