@@ -1634,3 +1634,50 @@
 - [x] Create mutation-layer cap block smoke test (real DB, no mocks)
 - [x] Update NEVER_AGAIN.md with canonical smoke test pattern
 - [x] Verify all 211 tests passing (210 original + 1 new smoke test)
+
+## Additional Smoke Tests (Jan 5, 2026)
+- [ ] Create Stripe webhook smoke test (checkout.session.completed)
+- [ ] Create deploy worker smoke test (run-next-deploy)
+- [ ] Create email utility smoke test (sendEmail)
+- [ ] Run all tests and verify passing
+- [ ] Checkpoint with complete smoke test suite
+
+## Stripe Webhook Idempotency & Smoke Tests (Jan 5, 2026)
+### Idempotency Implementation
+- [x] Add unique constraint to intakes.stripeSessionId (prevent duplicate processing)
+- [x] Add early-return check in webhook handler (if already paid, return 200 OK)
+- [ ] Optional: Create stripe_events table for bulletproof event deduplication
+
+### Smoke Test: Stripe Webhook (smoke.stripe-idempotency.test.ts)
+- [ ] Test 1: First webhook call creates payment + deployment + email
+  - Assert: intakes.status = "paid"
+  - Assert: payments count = 1
+  - Assert: deployments count = 1
+  - Assert: email_logs count = 1 (template = "deployment_started")
+- [ ] Test 2: Second webhook call (duplicate) does NOT create duplicates
+  - Assert: payments count stays 1
+  - Assert: deployments count stays 1
+  - Assert: email_logs count stays 1
+  - Assert: intake remains "paid"
+
+### Smoke Test: Deploy Worker (smoke.deploy-worker-queued.test.ts)
+- [ ] Pre: Insert deployment with status="queued"
+- [ ] Call: POST /api/cron/run-next-deploy
+- [ ] Assert: deployment status changed from "queued"
+- [ ] Assert: startedAt or completedAt is not null
+- [ ] Assert: worker_runs.job = "run-next-deploy"
+- [ ] Assert: worker_runs.ok = true
+- [ ] Assert: worker_runs.finishedAt is not null
+
+### Smoke Test: Email Logging (smoke.email-logging.test.ts)
+- [ ] Mock Resend API to fail
+- [ ] Call sendEmail with test data
+- [ ] Assert: return value is false
+- [ ] Assert: email_logs contains row with success=false
+- [ ] Assert: email_logs.errorMessage is not null
+- [ ] Assert: email_logs.template matches input
+
+### Audit Test (Prove Tests Bite)
+- [ ] Remove unique constraint → idempotency test must fail
+- [ ] Change worker query from "queued" to "running" → deploy smoke must fail
+- [ ] Comment out email log insert → email smoke must fail
