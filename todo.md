@@ -1755,3 +1755,17 @@
 - [x] Verify form submission preserves language selection
 
 **Note:** Apply form was already fully localized with translations object. Only added header toggle for mid-flow language switching.
+
+
+## Browser Language Auto-Detection (Jan 6, 2026)
+
+- [x] Add detectLanguageFromNavigator() function to prefs.ts
+- [x] Add readLanguageForBoot() for initialization
+- [x] Update setLanguage() and setAudience() to set explicit flags
+- [x] Store explicit flags inside prefs JSON (single source of truth)
+- [x] Update setPrefs() to preserve explicit flags
+- [x] Update Header.tsx to use readLanguageForBoot()
+- [x] Add smoke test: explicit choice beats navigator (6 tests passing)
+- [ ] Optional: Show "Auto-selected from browser" hint on first visit
+
+**Forever rule locked:** Detection = suggestion, User choice = authority
