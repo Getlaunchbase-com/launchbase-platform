@@ -6,6 +6,45 @@ This document captures every mistake made during development and the correct pat
 
 ## Testing Anti-Patterns
 
+### ❌ MISTAKE: Asserting downstream behavior in boundary tests
+
+**What we did wrong:**
+```typescript
+// Stripe webhook smoke test asserting deployment creation
+const depRows = await db.select().from(deployments).where(eq(deployments.intakeId, intakeId));
+expect(depRows.length).toBe(1); // ❌ Deployment is gated by business rules!
+```
+
+**Why it's wrong:**
+- Deployment creation depends on safety gates (build plan exists, preview token exists, approval exists)
+- Test intake doesn't satisfy these requirements
+- Test fails even though webhook idempotency is working correctly
+- Conflates boundary testing with business logic testing
+
+**✅ CORRECT PATTERN: Assert only guaranteed side effects at the boundary**
+
+```typescript
+// Stripe webhook idempotency test - assert payment + email, NOT deployment
+const emailRows = await db
+  .select()
+  .from(emailLogs)
+  .where(
+    and(
+      eq(emailLogs.intakeId, intakeId),
+      eq(emailLogs.emailType, "deployment_started")
+    )
+  );
+expect(emailRows.length).toBe(1);
+expect(emailRows[0].status).toBe("sent");
+
+// ✅ Deployment may not exist if safety gates fail - that's correct behavior
+// ✅ This test proves: idempotency works, no duplicate emails, no double charges
+```
+
+**Rule:** Stripe webhook idempotency tests must assert idempotency via database side effects (payments + emailLogs), not downstream deployment creation. Deployment is gated by business rules and must not be assumed.
+
+**Reference:** `server/__tests__/smoke.stripe-webhook.test.ts`
+
 ### ❌ MISTAKE: Mocking Drizzle internals in tests
 
 **What we did wrong:**

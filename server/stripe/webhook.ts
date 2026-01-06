@@ -3,7 +3,7 @@ import Stripe from "stripe";
 import { constructWebhookEvent } from "./checkout";
 import { getDb } from "../db";
 import { intakes, payments, intelligenceLayers, buildPlans, approvals, deployments } from "../../drizzle/schema";
-import { eq } from "drizzle-orm";
+import { eq, and, isNull } from "drizzle-orm";
 import { sendEmail } from "../email";
 import { notifyOwner } from "../_core/notification";
 import { Cadence, LayerKey } from "./intelligenceCheckout";
@@ -19,6 +19,15 @@ export async function handleStripeWebhook(req: Request, res: Response) {
     console.error("[Stripe Webhook] Missing stripe-signature header");
     return res.status(400).json({ error: "Missing signature" });
   }
+
+  // Debug: verify raw body is arriving correctly
+  console.log(
+    "[Webhook body debug]",
+    "isBuffer=", Buffer.isBuffer(req.body),
+    "typeof=", typeof req.body,
+    "content-type=", req.headers["content-type"],
+    "first20=", Buffer.isBuffer(req.body) ? req.body.toString("utf8", 0, 20) : String(req.body).slice(0, 20)
+  );
 
   let event: Stripe.Event;
   
@@ -374,6 +383,37 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   
   const intakeIdNum = parseInt(intakeId, 10);
 
+  // Atomic claim: only the first webhook run can set stripeSessionId
+  // This prevents race conditions where duplicate webhooks could create duplicate payments
+  const claim = await db
+    .update(intakes)
+    .set({
+      stripeSessionId: session.id,
+      status: "paid",
+      stripeCustomerId: session.customer as string | undefined,
+      stripePaymentIntentId: session.payment_intent as string,
+      paidAt: new Date(),
+    })
+    .where(
+      and(
+        eq(intakes.id, intakeIdNum),
+        isNull(intakes.stripeSessionId)
+      )
+    );
+
+  // Check if we successfully claimed this session (affected rows > 0)
+  const claimed =
+    // @ts-expect-error drizzle driver variance
+    (claim?.rowsAffected ?? claim?.[0]?.affectedRows ?? claim?.affectedRows ?? 0) > 0;
+
+  if (!claimed) {
+    console.log(`[Stripe Webhook] ✅ Duplicate checkout completion ignored (session ${session.id}, intake ${intakeId})`);
+    return;
+  }
+
+  console.log(`[Stripe Webhook] ✅ Successfully claimed session ${session.id} for intake ${intakeId}`);
+
+  // Now safe: only one webhook run reaches here
   // Create payment record
   await db.insert(payments).values({
     intakeId: intakeIdNum,
@@ -384,17 +424,6 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     status: "succeeded",
     paidAt: new Date(),
   });
-
-  // Update intake status to paid
-  await db
-    .update(intakes)
-    .set({
-      status: "paid",
-      stripeCustomerId: session.customer as string | undefined,
-      stripePaymentIntentId: session.payment_intent as string,
-      paidAt: new Date(),
-    })
-    .where(eq(intakes.id, intakeIdNum));
 
   // Fetch the updated intake
   const [intake] = await db

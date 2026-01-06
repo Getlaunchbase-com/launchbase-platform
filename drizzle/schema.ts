@@ -47,6 +47,7 @@ export const intakes = mysqlTable("intakes", {
   previewUrl: varchar("previewUrl", { length: 512 }),
   internalNotes: text("internalNotes"),
   // Payment tracking
+  stripeSessionId: varchar("stripeSessionId", { length: 255 }).unique(),
   stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
   stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }),
   paidAt: timestamp("paidAt"),
