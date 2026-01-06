@@ -1798,3 +1798,31 @@
 - [x] Add vitest invariant test to lock behavior (prevent regression)
 - [x] Verify test passes (3/3 tests passed)
 - [x] Create checkpoint
+
+## Email Template Personalization by WebsiteStatus (Jan 6, 2026)
+
+**Goal:** Set correct customer expectations based on their website status choice
+
+- [ ] Update intake confirmation email with 3 variants (none/existing/systems_only)
+- [ ] Translate all 3 variants to Spanish (ES)
+- [ ] Translate all 3 variants to Polish (PL)
+- [ ] Update email sending logic to select correct variant based on websiteStatus
+- [ ] Test all 9 combinations (3 statuses × 3 languages)
+- [ ] Create checkpoint
+
+## Email Personalization Refactor - Forever Approach (Jan 6, 2026)
+
+**Goal:** Implement websiteStatus-aware email variants WITHOUT enum explosion
+
+**Key Decision:** Keep emailType stable, select variants via websiteStatus parameter
+
+- [x] Revert schema enum changes (remove intake_confirmation_new/refresh/systems)
+- [x] Revert email.ts EmailType additions
+- [x] Restructure emailCopy.ts to accept websiteStatus parameter
+- [x] Update getEmailCopy() to select variant based on websiteStatus
+- [x] Update email sending logic to pass websiteStatus
+- [x] Add forever test (9/9 tests passed)
+- [x] Verify all 6 language/audience combinations work
+- [ ] Test variant selection for all 9 combinations (3 statuses × 3 languages)
+- [ ] Add subject line personalization by websiteStatus
+- [ ] Create checkpoint

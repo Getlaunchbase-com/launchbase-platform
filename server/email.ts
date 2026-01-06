@@ -8,7 +8,7 @@ import { emailLogs } from "../drizzle/schema";
 import { notifyOwner } from "./_core/notification";
 import { Resend } from "resend";
 import { ENV } from "./_core/env";
-import { getEmailCopy, interpolateEmail, type Language, type Audience } from "./emails/emailCopy";
+import { getEmailCopy, interpolateEmail, type Language, type Audience, type WebsiteStatus } from "./emails/emailCopy";
 
 // Error normalization helpers (FOREVER FIX)
 function truncateOneLine(input: unknown, max = 1500): string {
@@ -99,6 +99,7 @@ interface EmailData {
   checkoutLink?: string;
   language?: Language;
   audience?: Audience;
+  websiteStatus?: WebsiteStatus;
 }
 
 interface EmailTemplate {
@@ -109,10 +110,10 @@ interface EmailTemplate {
 
 // Generate email templates based on type and data (LOCALIZED)
 export function getEmailTemplate(type: EmailType, data: EmailData): EmailTemplate {
-  const { firstName, businessName, previewUrl, liveUrl, language = "en", audience = "biz" } = data;
+  const { firstName, businessName, previewUrl, liveUrl, language = "en", audience = "biz", websiteStatus } = data;
   
   // Get localized copy from emailCopy map
-  const copy = getEmailCopy(language, audience, type);
+  const copy = getEmailCopy({ language, audience, emailType: type, websiteStatus });
   
   // Interpolate variables
   const body = interpolateEmail(copy.body, { firstName, businessName, previewUrl, liveUrl });

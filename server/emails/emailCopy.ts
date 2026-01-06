@@ -6,6 +6,7 @@
 
 export type Language = "en" | "es" | "pl";
 export type Audience = "biz" | "org";
+export type WebsiteStatus = "none" | "existing" | "systems_only";
 
 export type EmailType =
   | "intake_confirmation"
@@ -26,37 +27,111 @@ interface EmailBlock {
   body: string;
 }
 
-type EmailCopyMap = Record<Language, Record<Audience, Record<EmailType, EmailBlock>>>;
+// Helper type for emails that vary by websiteStatus
+type WebsiteStatusVariants<T> = {
+  none: T;
+  existing: T;
+  systems_only: T;
+};
+
+// Union type for either normal email block or variant block
+type EmailBlockOrVariants = EmailBlock | WebsiteStatusVariants<EmailBlock>;
+
+// Email copy map - some emails have variants, others don't
+type EmailCopyMap = Record<Language, Record<Audience, Record<EmailType, EmailBlockOrVariants>>>;
+
+// websiteStatus controls messaging ONLY.
+// Pricing, eligibility, and cadence are invariant.
+// This prevents expectation drift without fragmenting the product.
 
 export const emailCopy: EmailCopyMap = {
   en: {
     biz: {
       intake_confirmation: {
-        subject: "✅ We're building your website",
-        previewText: "Your LaunchBase site is officially in progress.",
-        body: `Hi {{firstName}},
+        none: {
+          subject: "We're building your site from scratch — here's the plan",
+          previewText: "Your LaunchBase site is officially in progress.",
+          body: `Hi {{firstName}},
 
 Thanks for completing your LaunchBase intake.
 
-We're now building your website based on the information you provided. Our system handles the structure, copy, and layout — and a real human reviews everything before it's ready.
+You don't currently have a website — so we'll be building one from scratch, then integrating everything needed to run it smoothly.
 
-What happens next:
-• We build your site
-• We review it for quality
-• You'll receive a link to preview and approve
+Here's what happens next:
+
+• We design and build your website
+• We connect the systems it needs (forms, tracking, posting, etc.)
+• A real human reviews everything for quality
+• You receive a private preview link to review and approve
+
+No payment is required to review your site.
+
+Once you approve, we'll handle deployment and ongoing updates so you don't have to think about it.
 
 Estimated turnaround: 24–72 hours
-(No payment required to review.)
 
-If you have questions in the meantime, just reply to this email.
-
-—
-💰 Know someone who needs a website? Refer a friend and you'll both save $50.
-https://getlaunchbase.com/referrals
+If you have questions at any point, just reply to this email.
 
 —
 LaunchBase
-The operating system for launching service businesses`,
+The operating system for running your business`,
+        },
+        existing: {
+          subject: "We're refreshing your site — next steps inside",
+          previewText: "We'll refresh and modernize your existing site.",
+          body: `Hi {{firstName}},
+
+Thanks for completing your LaunchBase intake.
+
+You already have a website — so our job is to refresh and modernize it, then integrate the systems that keep it running smoothly.
+
+What we'll do next:
+
+• Review your existing site
+• Update structure, clarity, and flow where needed
+• Integrate the systems behind it (forms, tracking, posting, etc.)
+• Have a human review everything before you see it
+
+You'll receive a private preview link to review and approve before anything goes live.
+
+No payment is required to review.
+
+Estimated turnaround: 24–72 hours
+
+If you want us to preserve or avoid anything specific from your current site, just reply here.
+
+—
+LaunchBase
+The operating system for running your business`,
+        },
+        systems_only: {
+          subject: "We'll integrate your existing site — here's what happens next",
+          previewText: "We'll integrate systems without changing your site design.",
+          body: `Hi {{firstName}},
+
+Thanks for completing your LaunchBase intake.
+
+You already have a website you want to keep — so we'll leave the site itself alone and focus on integrating the systems around it.
+
+Here's what happens next:
+
+• We review how your current site works
+• We connect the systems it needs (forms, tracking, posting, etc.)
+• We verify everything works cleanly together
+• A human reviews it before you see the result
+
+You'll receive a preview link showing how everything connects — without changing your site's design.
+
+No payment is required to review.
+
+Estimated turnaround: 24–72 hours
+
+If there's anything specific we should not touch, reply and let us know.
+
+—
+LaunchBase
+The operating system for running your business`,
+        },
       },
       in_progress: {
         subject: "👷 Your site is in progress",
@@ -235,28 +310,92 @@ LaunchBase`,
     },
     org: {
       intake_confirmation: {
-        subject: "✅ Your system build has started",
-        previewText: "LaunchBase is assembling your operational system.",
-        body: `Hi {{firstName}},
+        none: {
+          subject: "We're building your site from scratch — here's the plan",
+          previewText: "LaunchBase is assembling your operational system.",
+          body: `Hi {{firstName}},
 
 Thanks for submitting your LaunchBase intake.
 
-We're assembling the system based on your inputs. Structure, workflows, and visibility are being configured — with human review before anything goes live.
+You don't currently have a website — so we'll be building one from scratch, then integrating everything needed to run it smoothly.
 
-What happens next:
-• System assembly
-• Quality review
-• Preview link for approval
+Here's what happens next:
+
+• We design and build your website
+• We connect the systems it needs (forms, tracking, posting, etc.)
+• A real human reviews everything for quality
+• You receive a private preview link to review and approve
+
+No payment is required to review your site.
+
+Once you approve, we'll handle deployment and ongoing updates so you don't have to think about it.
 
 Estimated turnaround: 24–72 hours
-(No payment required to review.)
 
-Questions? Reply to this email.
+If you have questions at any point, just reply to this email.
 
 —
 LaunchBase
 Workflows that give you back your life.`,
+        },
+        existing: {
+          subject: "We're refreshing your site — next steps inside",
+          previewText: "We'll refresh and modernize your existing site.",
+          body: `Hi {{firstName}},
+
+Thanks for submitting your LaunchBase intake.
+
+You already have a website — so our job is to refresh and modernize it, then integrate the systems that keep it running smoothly.
+
+What we'll do next:
+
+• Review your existing site
+• Update structure, clarity, and flow where needed
+• Integrate the systems behind it (forms, tracking, posting, etc.)
+• Have a human review everything before you see it
+
+You'll receive a private preview link to review and approve before anything goes live.
+
+No payment is required to review.
+
+Estimated turnaround: 24–72 hours
+
+If you want us to preserve or avoid anything specific from your current site, just reply here.
+
+—
+LaunchBase
+Workflows that give you back your life.`,
+        },
+        systems_only: {
+          subject: "We'll integrate your existing site — here's what happens next",
+          previewText: "We'll integrate systems without changing your site design.",
+          body: `Hi {{firstName}},
+
+Thanks for submitting your LaunchBase intake.
+
+You already have a website you want to keep — so we'll leave the site itself alone and focus on integrating the systems around it.
+
+Here's what happens next:
+
+• We review how your current site works
+• We connect the systems it needs (forms, tracking, posting, etc.)
+• We verify everything works cleanly together
+• A human reviews it before you see the result
+
+You'll receive a preview link showing how everything connects — without changing your site's design.
+
+No payment is required to review.
+
+Estimated turnaround: 24–72 hours
+
+If there's anything specific we should not touch, reply and let us know.
+
+—
+LaunchBase
+Workflows that give you back your life.`,
+        },
       },
+
       in_progress: {
         subject: "👷 System build in progress",
         previewText: "Everything is on track.",
@@ -437,31 +576,90 @@ LaunchBase`,
   es: {
     biz: {
       intake_confirmation: {
-        subject: "✅ Estamos construyendo tu sitio web",
-        previewText: "Tu sitio LaunchBase está oficialmente en progreso.",
-        body: `Hola {{firstName}},
+        none: {
+          subject: "Construimos tu sitio desde cero — aquí está el plan",
+          previewText: "Tu sitio LaunchBase está oficialmente en progreso.",
+          body: `Hola {{firstName}},
 
 Gracias por completar tu registro en LaunchBase.
 
-Ahora estamos construyendo tu sitio web basado en la información que proporcionaste. Nuestro sistema maneja la estructura, el contenido y el diseño — y un humano real revisa todo antes de que esté listo.
+Actualmente no tienes un sitio web — así que lo construiremos desde cero e integraremos todo lo necesario para que funcione sin problemas.
 
 Qué sigue:
-• Construimos tu sitio
-• Lo revisamos para asegurar calidad
-• Recibirás un enlace para previsualizar y aprobar
+
+• Diseñamos y construimos tu sitio web
+• Conectamos los sistemas que necesita (formularios, seguimiento, publicación, etc.)
+• Un humano real revisa todo para asegurar calidad
+• Recibes un enlace privado para revisar y aprobar
+
+No se requiere pago para revisar tu sitio.
+
+Una vez que apruebes, nos encargaremos del despliegue y las actualizaciones continuas para que no tengas que pensar en ello.
 
 Tiempo estimado: 24–72 horas
-(No se requiere pago para revisar.)
 
-Si tienes preguntas mientras tanto, simplemente responde a este correo.
-
-—
-💰 ¿Conoces a alguien que necesite un sitio web? Refiere a un amigo y ambos ahorrarán $50.
-https://getlaunchbase.com/referrals
+Si tienes preguntas en cualquier momento, simplemente responde a este correo.
 
 —
 LaunchBase
-El sistema operativo para lanzar negocios de servicios`,
+El sistema operativo para administrar tu negocio`,
+        },
+        existing: {
+          subject: "Renovamos tu sitio — próximos pasos dentro",
+          previewText: "Renovaremos y modernizaremos tu sitio existente.",
+          body: `Hola {{firstName}},
+
+Gracias por completar tu registro en LaunchBase.
+
+Ya tienes un sitio web — así que nuestro trabajo es renovarlo y modernizarlo, luego integrar los sistemas que lo mantienen funcionando sin problemas.
+
+Qué haremos:
+
+• Revisamos tu sitio actual
+• Actualizamos la estructura, claridad y flujo donde sea necesario
+• Integramos los sistemas detrás de él (formularios, seguimiento, publicación, etc.)
+• Un humano revisa todo antes de que lo veas
+
+Recibirás un enlace privado para revisar y aprobar antes de que algo se publique.
+
+No se requiere pago para revisar.
+
+Tiempo estimado: 24–72 horas
+
+Si quieres que preservemos o evitemos algo específico de tu sitio actual, simplemente responde aquí.
+
+—
+LaunchBase
+El sistema operativo para administrar tu negocio`,
+        },
+        systems_only: {
+          subject: "Integraremos tu sitio existente — esto es lo que sigue",
+          previewText: "Integraremos sistemas sin cambiar el diseño de tu sitio.",
+          body: `Hola {{firstName}},
+
+Gracias por completar tu registro en LaunchBase.
+
+Ya tienes un sitio web que quieres mantener — así que dejaremos el sitio en sí solo y nos enfocaremos en integrar los sistemas a su alrededor.
+
+Qué sigue:
+
+• Revisamos cómo funciona tu sitio actual
+• Conectamos los sistemas que necesita (formularios, seguimiento, publicación, etc.)
+• Verificamos que todo funcione limpiamente juntos
+• Un humano lo revisa antes de que veas el resultado
+
+Recibirás un enlace de vista previa que muestra cómo se conecta todo — sin cambiar el diseño de tu sitio.
+
+No se requiere pago para revisar.
+
+Tiempo estimado: 24–72 horas
+
+Si hay algo específico que no debemos tocar, responde y háznoslo saber.
+
+—
+LaunchBase
+El sistema operativo para administrar tu negocio`,
+        },
       },
       in_progress: {
         subject: "👷 Tu sitio está en progreso",
@@ -640,27 +838,80 @@ LaunchBase`,
     },
     org: {
       intake_confirmation: {
-        subject: "✅ La construcción de tu sistema ha comenzado",
-        previewText: "LaunchBase está ensamblando tu sistema operacional.",
-        body: `Hola {{firstName}},
+        none: {
+          subject: "Construimos tu sitio desde cero — aquí está el plan",
+          previewText: "LaunchBase está ensamblando tu sistema operacional.",
+          body: `Hola {{firstName}},
 
-Gracias por enviar tu registro en LaunchBase.
+Gracias por completar tu formulario en LaunchBase.
 
-Estamos ensamblando el sistema basado en tus entradas. Estructura, flujos de trabajo y visibilidad están siendo configurados — con revisión humana antes de que nada salga en vivo.
+No tienes un sitio web actualmente, así que vamos a crear uno desde cero y conectar todo lo necesario para que funcione sin que tengas que pensar en ello.
 
-Qué sigue:
-• Ensamblaje del sistema
-• Revisión de calidad
-• Enlace de vista previa para aprobación
+Lo que sigue:
+
+• Diseñamos y construimos tu sitio web
+• Conectamos los sistemas que necesita
+• Un humano revisa todo por calidad
+• Recibes un enlace privado para revisar y aprobar
+
+No se requiere ningún pago para revisar el sitio.
 
 Tiempo estimado: 24–72 horas
-(No se requiere pago para revisar.)
 
-¿Preguntas? Responde a este correo.
+Si tienes alguna pregunta, responde a este correo.
 
 —
 LaunchBase
-Flujos de trabajo que te devuelven tu vida.`,
+El sistema operativo para tu negocio`,
+        },
+        existing: {
+          subject: "Renovamos tu sitio — próximos pasos dentro",
+          previewText: "Renovaremos y modernizaremos tu sitio existente.",
+          body: `Hola {{firstName}},
+
+Gracias por completar tu formulario en LaunchBase.
+
+Ya tienes un sitio web, así que nuestro trabajo será mejorarlo y modernizarlo, además de integrar los sistemas que lo hacen funcionar correctamente.
+
+Próximos pasos:
+
+• Revisamos tu sitio actual
+• Mejoramos estructura, claridad y flujo
+• Integramos los sistemas necesarios
+• Un humano revisa todo antes de mostrarte
+
+Recibirás un enlace privado para revisar.
+
+No se requiere pago para revisar.
+
+Tiempo estimado: 24–72 horas
+
+—
+LaunchBase`,
+        },
+        systems_only: {
+          subject: "Integraremos tu sitio existente — esto es lo que sigue",
+          previewText: "Integraremos sistemas sin cambiar el diseño de tu sitio.",
+          body: `Hola {{firstName}},
+
+Gracias por completar tu formulario en LaunchBase.
+
+Ya tienes un sitio web que deseas mantener, así que no cambiaremos el diseño. Nos enfocaremos solo en integrar los sistemas alrededor del sitio.
+
+Lo que haremos:
+
+• Revisamos cómo funciona tu sitio
+• Integramos formularios, seguimiento y sistemas
+• Verificamos que todo funcione correctamente
+• Un humano revisa antes de entregarte
+
+Recibirás un enlace de vista previa.
+
+No se requiere pago para revisar.
+
+—
+LaunchBase`,
+        },
       },
       in_progress: {
         subject: "👷 Construcción del sistema en progreso",
@@ -842,32 +1093,71 @@ LaunchBase`,
   pl: {
     biz: {
       intake_confirmation: {
-        subject: "✅ Budujemy Twoją stronę internetową",
-        previewText: "Twoja strona LaunchBase jest oficjalnie w trakcie realizacji.",
-        body: `Cześć {{firstName}},
+        none: {
+          subject: "Budujemy Twoją stronę od podstaw — oto plan",
+          previewText: "Twoja strona LaunchBase jest oficjalnie w trakcie realizacji.",
+          body: `Cześć {{firstName}},
 
 Dziękujemy za wypełnienie formularza LaunchBase.
 
-Teraz budujemy Twoją stronę internetową na podstawie dostarczonych informacji. Nasz system zajmuje się strukturą, treścią i układem — a prawdziwy człowiek sprawdza wszystko, zanim będzie gotowe.
+Nie masz jeszcze strony internetowej, więc zbudujemy ją od podstaw i podłączymy wszystkie potrzebne systemy.
 
 Co dalej:
-• Budujemy Twoją stronę
-• Sprawdzamy jakość
-• Otrzymasz link do podglądu i zatwierdzenia
 
-Szacowany czas: 24–72 godziny
-(Nie wymaga się płatności do przeglądu.)
+• Projektujemy i budujemy stronę
+• Integrujemy potrzebne systemy
+• Człowiek sprawdza wszystko
+• Otrzymasz prywatny link do podglądu
 
-Jeśli masz pytania w międzyczasie, po prostu odpowiedz na ten e-mail.
+Nie wymagamy płatności za podgląd.
 
-—
-💰 Znasz kogoś, kto potrzebuje strony internetowej? Poleć znajomego, a oboje zaoszczędzicie $50.
-https://getlaunchbase.com/referrals
+Czas realizacji: 24–72 godziny
 
 —
-LaunchBase
-System operacyjny do uruchamiania firm usługowych`,
+LaunchBase`,
+        },
+        existing: {
+          subject: "Odświeżamy Twoją stronę — następne kroki wewnątrz",
+          previewText: "Odświeżymy i zmodernizujemy Twoją istniejącą stronę.",
+          body: `Cześć {{firstName}},
+
+Masz już stronę internetową, więc odświeżymy ją i zmodernizujemy, a następnie zintegrujemy potrzebne systemy.
+
+Następne kroki:
+
+• Przeglądamy obecną stronę
+• Poprawiamy strukturę i czytelność
+• Integrujemy systemy
+• Człowiek sprawdza wszystko
+
+Otrzymasz prywatny link do podglądu.
+
+Bez płatności za podgląd.
+
+—
+LaunchBase`,
+        },
+        systems_only: {
+          subject: "Zintegrujemy Twoją istniejącą stronę — oto co następuje",
+          previewText: "Zintegrujemy systemy bez zmiany wyglądu strony.",
+          body: `Cześć {{firstName}},
+
+Masz stronę, którą chcesz zachować — nie zmieniamy jej wyglądu. Skupiamy się wyłącznie na integracji systemów.
+
+Co robimy:
+
+• Sprawdzamy działanie strony
+• Integrujemy formularze i systemy
+• Testujemy wszystko
+• Człowiek sprawdza efekt
+
+Bez płatności za podgląd.
+
+—
+LaunchBase`,
+        },
       },
+
       in_progress: {
         subject: "👷 Twoja strona jest w trakcie realizacji",
         previewText: "Szybka aktualizacja — wszystko idzie zgodnie z planem.",
@@ -1045,27 +1335,69 @@ LaunchBase`,
     },
     org: {
       intake_confirmation: {
-        subject: "✅ Budowa Twojego systemu rozpoczęta",
-        previewText: "LaunchBase montuje Twój system operacyjny.",
-        body: `Cześć {{firstName}},
+        none: {
+          subject: "Budujemy Twoją stronę od podstaw — oto plan",
+          previewText: "LaunchBase montuje Twój system operacyjny.",
+          body: `Cześć {{firstName}},
 
-Dziękujemy za przesłanie formularza LaunchBase.
+Dziękujemy za wypełnienie formularza LaunchBase.
 
-Montujemy system na podstawie Twoich danych wejściowych. Struktura, przepływy pracy i widoczność są konfigurowane — z ludzkim przeglądem, zanim cokolwiek zostanie uruchomione.
+Nie masz jeszcze strony internetowej, więc zbudujemy ją od podstaw i podłączymy wszystkie potrzebne systemy.
 
 Co dalej:
-• Montaż systemu
-• Przegląd jakości
-• Link podglądu do zatwierdzenia
 
-Szacowany czas: 24–72 godziny
-(Nie wymaga się płatności do przeglądu.)
+• Projektujemy i budujemy stronę
+• Integrujemy potrzebne systemy
+• Człowiek sprawdza wszystko
+• Otrzymasz prywatny link do podglądu
 
-Pytania? Odpowiedz na ten e-mail.
+Nie wymagamy płatności za podgląd.
+
+Czas realizacji: 24–72 godziny
 
 —
-LaunchBase
-Przepływy pracy, które oddają Ci życie.`,
+LaunchBase`,
+        },
+        existing: {
+          subject: "Odświeżamy Twoją stronę — następne kroki wewnątrz",
+          previewText: "Odświeżymy i zmodernizujemy Twoją istniejącą stronę.",
+          body: `Cześć {{firstName}},
+
+Masz już stronę internetową, więc odświeżymy ją i zmodernizujemy, a następnie zintegrujemy potrzebne systemy.
+
+Następne kroki:
+
+• Przeglądamy obecną stronę
+• Poprawiamy strukturę i czytelność
+• Integrujemy systemy
+• Człowiek sprawdza wszystko
+
+Otrzymasz prywatny link do podglądu.
+
+Bez płatności za podgląd.
+
+—
+LaunchBase`,
+        },
+        systems_only: {
+          subject: "Zintegrujemy Twoją istniejącą stronę — oto co następuje",
+          previewText: "Zintegrujemy systemy bez zmiany wyglądu strony.",
+          body: `Cześć {{firstName}},
+
+Masz stronę, którą chcesz zachować — nie zmieniamy jej wyglądu. Skupiamy się wyłącznie na integracji systemów.
+
+Co robimy:
+
+• Sprawdzamy działanie strony
+• Integrujemy formularze i systemy
+• Testujemy wszystko
+• Człowiek sprawdza efekt
+
+Bez płatności za podgląd.
+
+—
+LaunchBase`,
+        },
       },
       in_progress: {
         subject: "👷 Budowa systemu w trakcie",
@@ -1246,15 +1578,47 @@ LaunchBase`,
 };
 
 /**
+ * Type guard to check if an email entry is a websiteStatus variant
+ */
+function isWebsiteStatusVariants(x: unknown): x is WebsiteStatusVariants<EmailBlock> {
+  return !!x
+    && typeof x === "object"
+    && "none" in (x as any)
+    && "existing" in (x as any)
+    && "systems_only" in (x as any);
+}
+
+/**
  * Get email copy for a specific language, audience, and email type
+ * Supports websiteStatus variants for emails like intake_confirmation
  * Falls back to English Business if translation missing
  */
-export function getEmailCopy(
-  language: Language,
-  audience: Audience,
-  emailType: EmailType
-): EmailBlock {
-  return emailCopy[language]?.[audience]?.[emailType] ?? emailCopy.en.biz[emailType];
+export function getEmailCopy(args: {
+  language: Language;
+  audience: Audience;
+  emailType: EmailType;
+  websiteStatus?: WebsiteStatus | null;
+}): EmailBlock {
+  const status: WebsiteStatus = args.websiteStatus ?? "none";
+  
+  const entry = emailCopy[args.language]?.[args.audience]?.[args.emailType] as
+    | EmailBlockOrVariants
+    | undefined;
+  
+  // Fail-loud: better to crash in dev/tests than silently send wrong emails
+  if (!entry) {
+    throw new Error(
+      `[emailCopy] Missing copy for language=${args.language} audience=${args.audience} emailType=${args.emailType}`
+    );
+  }
+  
+  // If this email type has websiteStatus variants, select the right one
+  if (isWebsiteStatusVariants(entry)) {
+    return entry[status] ?? entry.none;
+  }
+  
+  // Old-style email blocks work unchanged
+  return entry;
 }
 
 /**

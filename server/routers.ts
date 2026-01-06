@@ -127,12 +127,15 @@ export const appRouter = router({
         // Send confirmation email
         if (intake?.id) {
           const firstName = input.contactName.split(" ")[0];
+          
+          // Send intake_confirmation email with websiteStatus variant
           await sendEmail(intake.id, "intake_confirmation", {
             firstName,
             businessName: input.businessName,
             email: input.email,
             language: intake.language as any,
             audience: intake.audience as any,
+            websiteStatus: intake.websiteStatus as any,
           });
           
           // Notify admin of new intake
