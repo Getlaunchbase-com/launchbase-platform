@@ -125,24 +125,27 @@ export async function createIntake(data: {
     return null;
   }
 
-  // Build rawPayload: merge provided rawPayload with all input fields for audit trail
-  const mergedRawPayload = {
-    ...data.rawPayload,
+  // Build rawPayload: merge provided rawPayload with canonical + non-nullish fields (no undefined overwrites)
+  const mergedRawPayload: Record<string, unknown> = {
+    ...(data.rawPayload ?? {}),
+    // Canonical fields (always present)
     businessName: data.businessName,
     contactName: data.contactName,
     email: data.email,
-    phone: data.phone,
     vertical: data.vertical,
-    language: data.language,
-    audience: data.audience,
-    websiteStatus: data.websiteStatus,
-    services: data.services,
-    serviceArea: data.serviceArea,
-    primaryCTA: data.primaryCTA,
-    bookingLink: data.bookingLink,
-    tagline: data.tagline,
-    brandColors: data.brandColors,
+    language: data.language ?? "en",
+    audience: data.audience ?? "biz",
+    websiteStatus: data.websiteStatus ?? "none",
   };
+
+  // Optional fields: only set if non-nullish (prevents clobber/noise)
+  if (data.phone != null) mergedRawPayload.phone = data.phone;
+  if (data.services != null) mergedRawPayload.services = data.services;
+  if (data.serviceArea != null) mergedRawPayload.serviceArea = data.serviceArea;
+  if (data.primaryCTA != null) mergedRawPayload.primaryCTA = data.primaryCTA;
+  if (data.bookingLink != null) mergedRawPayload.bookingLink = data.bookingLink;
+  if (data.tagline != null) mergedRawPayload.tagline = data.tagline;
+  if (data.brandColors != null) mergedRawPayload.brandColors = data.brandColors;
 
   const values: InsertIntake = {
     businessName: data.businessName,
