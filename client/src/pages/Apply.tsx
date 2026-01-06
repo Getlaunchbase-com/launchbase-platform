@@ -348,7 +348,12 @@ export default function ApplyPage() {
       // ignore corrupted storage
     }
 
-    return base;
+    // Initialize from homepage prefs if no saved draft
+    return {
+      ...base,
+      language: preferredLang as Language,
+      audience: preferredAudience,
+    };
   });
 
   const t = translations[form.language];
@@ -457,7 +462,24 @@ export default function ApplyPage() {
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm">Back to home</span>
           </Link>
-          <div className="text-sm text-[#FF6A00]">{t.badge}</div>
+          
+          <div className="flex items-center gap-4">
+            {/* Language Toggle */}
+            <div className="flex items-center gap-2">
+              <Globe className="w-4 h-4 text-gray-400" />
+              <select
+                value={form.language}
+                onChange={(e) => setForm((prev) => ({ ...prev, language: e.target.value as Language }))}
+                className="bg-transparent border border-white/10 rounded px-2 py-1 text-sm text-white focus:outline-none focus:border-[#FF6A00]/50 cursor-pointer"
+              >
+                <option value="en" className="bg-[#0B0B0C]">EN</option>
+                <option value="es" className="bg-[#0B0B0C]">ES</option>
+                <option value="pl" className="bg-[#0B0B0C]">PL</option>
+              </select>
+            </div>
+            
+            <div className="text-sm text-[#FF6A00]">{t.badge}</div>
+          </div>
         </div>
       </nav>
 
