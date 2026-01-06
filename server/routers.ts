@@ -1,12 +1,13 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
+import { adminStripeWebhooksRouter } from "./routers/admin/stripeWebhooks";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { getDb } from "./db";
 import { intakes, approvals, buildPlans, referrals, intelligenceLayers, socialPosts, moduleSetupSteps, moduleConnections, suiteApplications, deployments, emailLogs } from "../drizzle/schema";
-import { eq, desc, and, asc } from "drizzle-orm";
+import { eq, desc, and, asc, sql } from "drizzle-orm";
 import { 
   createIntake, 
   getIntakes, 
@@ -800,6 +801,9 @@ export const appRouter = router({
           return { success: true };
         }),
     }),
+
+    // Stripe webhook monitoring (admin-only, read-only observability)
+    stripeWebhooks: adminStripeWebhooksRouter,
   }),
 
   // Analytics tracking (public for frontend events)
