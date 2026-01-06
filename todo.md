@@ -1737,3 +1737,15 @@
 - 11 email types fully translated
 - Homepage hero fully translated
 - Automatic language/audience detection from intake
+
+
+## Apply Form Localization (Jan 6, 2026)
+
+- [x] Extract all copy from Apply.tsx (labels, helper text, validation, buttons)
+- [x] Create applyCopy.ts with EN/ES/PL translations (already existed in Apply.tsx)
+- [x] Update Apply.tsx to use localized copy map (already implemented)
+- [x] Add language toggle to Apply form header
+- [x] Test complete intake flow in all 3 languages
+- [x] Verify form submission preserves language selection
+
+**Note:** Apply form was already fully localized with translations object. Only added header toggle for mid-flow language switching.
