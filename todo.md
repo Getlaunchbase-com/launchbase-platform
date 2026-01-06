@@ -1822,7 +1822,8 @@
 - [x] Update getEmailCopy() to select variant based on websiteStatus
 - [x] Update email sending logic to pass websiteStatus
 - [x] Add forever test (9/9 tests passed)
+- [x] Add tightest smoke test (3/3 tests passed with distinctiveness check)
 - [x] Verify all 6 language/audience combinations work
-- [ ] Test variant selection for all 9 combinations (3 statuses × 3 languages)
-- [ ] Add subject line personalization by websiteStatus
-- [ ] Create checkpoint
+- [ ] Live sanity check: 3 test intakes (none/existing/systems_only)
+- [ ] Verify email_logs show correct subjects
+- [ ] Create final checkpoint
