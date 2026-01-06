@@ -1789,3 +1789,12 @@
 - [x] Create checkpoint
 
 **Matrix:** 3 languages × 2 audiences × 3 website statuses = 18 entry states, same product
+
+## RawPayload Builder Hardening (Jan 6, 2026)
+
+**Goal:** Prevent undefined overwrites in createIntake rawPayload builder
+
+- [x] Replace rawPayload builder with no-undefined-overwrite pattern
+- [x] Add vitest invariant test to lock behavior (prevent regression)
+- [x] Verify test passes (3/3 tests passed)
+- [x] Create checkpoint
