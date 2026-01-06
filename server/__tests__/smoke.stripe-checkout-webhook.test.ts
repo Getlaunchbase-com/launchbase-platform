@@ -1,3 +1,13 @@
+/**
+ * FOREVER CONTRACT: This test must remain boundary-real (signed webhook).
+ * No mocks. Asserts only durable side effects.
+ * 
+ * Guarantees:
+ * - Signed HTTP boundary test with real Stripe signature validation
+ * - Atomic claim pattern prevents duplicate payment processing
+ * - Idempotent email delivery (no duplicates on webhook replay)
+ * - Webhook retry tracking (retryCount, idempotencyHit, ok status)
+ */
 import { describe, it, expect, beforeAll } from "vitest";
 import request from "supertest";
 import crypto from "crypto";
@@ -12,7 +22,7 @@ function signStripePayload(rawBody: string, secret: string, ts: number) {
   return `t=${ts},v1=${sig}`;
 }
 
-describe("smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent)", () => {
+describe.sequential("smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent)", () => {
   let app: any;
   let db: any;
   let webhookSecret: string;
