@@ -48,11 +48,13 @@ export function getPrefs(): Prefs {
 export function setPrefs(next: Partial<Prefs>) {
   if (typeof window === "undefined") return;
   const curr = getPrefs();
+  // Explicit merge: preserve explicit flags even if patch doesn't mention them
+  // This prevents future refactors from silently dropping these critical flags
   const merged: Prefs = {
     language: next.language ?? curr.language,
     audience: next.audience ?? curr.audience,
-    languageExplicit: next.languageExplicit ?? curr.languageExplicit,
-    audienceExplicit: next.audienceExplicit ?? curr.audienceExplicit,
+    languageExplicit: next.languageExplicit ?? curr.languageExplicit ?? false,
+    audienceExplicit: next.audienceExplicit ?? curr.audienceExplicit ?? false,
   };
   localStorage.setItem(KEY, JSON.stringify(merged));
   // Dispatch custom event for same-page reactivity

@@ -42,6 +42,33 @@ afterEach(() => {
   localStorageMock.clear();
 });
 
+describe("Prefs Merge Invariants", () => {
+  it("FOREVER: setPrefs() must not drop explicit flags when patch omits them", async () => {
+    // Arrange: Set language explicitly
+    vi.stubGlobal("navigator", { language: "en-US" });
+    const { setLanguage, setPrefs, getPrefs } = await import(
+      "../../client/src/lib/prefs"
+    );
+
+    // Act 1: User explicitly chooses Spanish
+    setLanguage("es");
+
+    // Verify explicit flag is set
+    let prefs = getPrefs();
+    expect(prefs.language).toBe("es");
+    expect(prefs.languageExplicit).toBe(true);
+
+    // Act 2: Update audience WITHOUT mentioning language or languageExplicit
+    setPrefs({ audience: "org" });
+
+    // Assert: languageExplicit must still be true (not dropped by merge)
+    prefs = getPrefs();
+    expect(prefs.language).toBe("es"); // Language preserved
+    expect(prefs.languageExplicit).toBe(true); // Explicit flag preserved
+    expect(prefs.audience).toBe("org"); // Audience updated
+  });
+});
+
 describe("Browser Language Auto-Detection", () => {
   it("should auto-detect Spanish from navigator on first visit", async () => {
     // Arrange: Set navigator to Spanish
