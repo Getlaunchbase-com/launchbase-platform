@@ -1873,3 +1873,17 @@
 - [ ] Create NEVER_AGAIN.md with incident checklist
 - [ ] Test all monitoring panels
 
+
+
+## Facebook Lead Flow Automation (Jan 2026)
+
+- [x] Design Facebook webhook architecture (messages + lead forms)
+- [x] Implement Facebook webhook receiver endpoint
+- [x] Create email notification templates for Facebook events
+- [x] Add Facebook message notification (→ vince@vincessnowplow.com)
+- [x] Add Facebook lead form notification (→ vince@vincessnowplow.com)
+- [x] Write unit tests for webhook verification and signature validation
+- [ ] Configure Facebook App webhook subscription (user action required)
+- [ ] Test Facebook webhook with real messages (requires Facebook App setup)
+- [ ] Test Facebook lead form submission (requires Facebook App setup)
+- [x] Document Facebook webhook setup for future pages
