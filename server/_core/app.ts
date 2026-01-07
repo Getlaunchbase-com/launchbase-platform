@@ -21,6 +21,7 @@ import type { Express } from "express";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { registerFacebookOAuthRoutes } from "./facebookOAuthRoutes";
+import { createFacebookWebhookRoutes } from "./facebookWebhookRoutes";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { handleStripeWebhook } from "../stripe/webhook";
@@ -118,7 +119,10 @@ export function createApp(): Express {
   registerOAuthRoutes(app);
   registerFacebookOAuthRoutes(app);
 
-  // 7. tRPC API
+  // 7. Facebook webhook routes
+  app.use("/api/facebook", createFacebookWebhookRoutes());
+
+  // 8. tRPC API
   app.use(
     "/api/trpc",
     createExpressMiddleware({
@@ -127,7 +131,7 @@ export function createApp(): Express {
     })
   );
 
-  // 8. CRITICAL: API guard (MUST be after all /api routes)
+  // 9. CRITICAL: API guard (MUST be after all /api routes)
   // This prevents /api/* from falling through to SPA/static serving
   // MUST return JSON 404, never HTML
   app.all("/api/*", (_req, res) => {
