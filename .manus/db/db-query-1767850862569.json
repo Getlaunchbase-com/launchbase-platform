@@ -1,9 +1,0 @@
-{
-  "query": "UPDATE email_logs e JOIN intakes i ON i.id = e.intakeId SET e.tenant = i.tenant WHERE e.intakeId IS NOT NULL",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute UPDATE email_logs e JOIN intakes i ON i.id = e.intakeId SET e.tenant = i.tenant WHERE e.intakeId IS NOT NULL",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 64
-}

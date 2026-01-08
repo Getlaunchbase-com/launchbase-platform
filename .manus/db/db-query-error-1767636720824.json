@@ -1,8 +1,0 @@
-{
-  "query": "ALTER TABLE deployments \nADD COLUMN urlMode VARCHAR(50) DEFAULT 'TEMP_MANUS',\nADD COLUMN siteId VARCHAR(255) DEFAULT NULL;",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute ALTER TABLE deployments \nADD COLUMN urlMode VARCHAR(50) DEFAULT 'TEMP_MANUS',\nADD COLUMN siteId VARCHAR(255) DEFAULT NULL;",
-  "returncode": 1,
-  "logs": [
-    "ERROR 1060 (42S21) at line 1: Duplicate column name 'urlMode'"
-  ]
-}

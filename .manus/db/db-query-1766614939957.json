@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS integration_connections (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  customerId INT NOT NULL,\n  integration ENUM('google_business', 'meta', 'quickbooks') NOT NULL,\n  connectionStatus ENUM('not_connected', 'connected', 'error') DEFAULT 'not_connected' NOT NULL,\n  externalAccountId VARCHAR(255),\n  externalAccountName VARCHAR(255),\n  accessToken TEXT,\n  refreshToken TEXT,\n  tokenExpiresAt TIMESTAMP NULL,\n  lastSyncAt TIMESTAMP NULL,\n  lastSyncStatus ENUM('success', 'partial', 'failed'),\n  lastSyncError TEXT,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL\n);",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute CREATE TABLE IF NOT EXISTS integration_connections (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  customerId INT NOT NULL,\n  integration ENUM('google_business', 'meta', 'quickbooks') NOT NULL,\n  connectionStatus ENUM('not_connected', 'connected', 'error') DEFAULT 'not_connected' NOT NULL,\n  externalAccountId VARCHAR(255),\n  externalAccountName VARCHAR(255),\n  accessToken TEXT,\n  refreshToken TEXT,\n  tokenExpiresAt TIMESTAMP NULL,\n  lastSyncAt TIMESTAMP NULL,\n  lastSyncStatus ENUM('success', 'partial', 'failed'),\n  lastSyncError TEXT,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL\n);",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 288
-}

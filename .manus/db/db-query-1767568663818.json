@@ -1,9 +1,0 @@
-{
-  "query": "ALTER TABLE social_posts \nMODIFY COLUMN postType ENUM('ALL_CLEAR','MONITORING','ACTIVE_STORM','WEATHER_UPDATE','GAME_DAY','COMMUNITY_EVENT','LOCAL_TREND','SEASONAL','MANUAL') DEFAULT 'MANUAL' NOT NULL,\nMODIFY COLUMN triggerContext ENUM('weather_storm','weather_clear','weather_extreme','sports_event','community_event','local_trend','seasonal','manual') DEFAULT 'manual' NOT NULL;",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute ALTER TABLE social_posts \nMODIFY COLUMN postType ENUM('ALL_CLEAR','MONITORING','ACTIVE_STORM','WEATHER_UPDATE','GAME_DAY','COMMUNITY_EVENT','LOCAL_TREND','SEASONAL','MANUAL') DEFAULT 'MANUAL' NOT NULL,\nMODIFY COLUMN triggerContext ENUM('weather_storm','weather_clear','weather_extreme','sports_event','community_event','local_trend','seasonal','manual') DEFAULT 'manual' NOT NULL;",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 219
-}
