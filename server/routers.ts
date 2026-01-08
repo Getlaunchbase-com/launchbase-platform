@@ -41,6 +41,7 @@ import { getTopReferringSites, getConversionFunnel, get7DayClicks, logReferralEv
 import { getLastWorkerRun } from "./worker/deploymentWorker";
 import { getObservabilityData, formatTimeAgo } from "./observability";
 import { notifyOwner } from "./_core/notification";
+import { getHealthMetrics } from "./health";
 import { checkFacebookPostingPolicy } from "./services/facebook-policy";
 
 // Generate a hash of the build plan for version locking
@@ -2681,6 +2682,12 @@ export const appRouter = router({
             content: md,
           };
         }
+      }),
+
+    // Health metrics endpoint
+    health: protectedProcedure
+      .query(async () => {
+        return await getHealthMetrics();
       }),
   }),
 });

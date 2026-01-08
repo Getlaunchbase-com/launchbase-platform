@@ -9,6 +9,7 @@ import Home from "./pages/Home";
 import Onboarding from "./pages/Onboarding";
 import OnboardingSuccess from "./pages/OnboardingSuccess";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminHealth from "./pages/AdminHealth";
 import IntakeDetail from "./pages/IntakeDetail";
 import DeploymentStatus from "./pages/DeploymentStatus";
 import Clarify from "./pages/Clarify";
@@ -78,6 +79,7 @@ function Router() {
       <Route path="/settings/facebook" component={SettingsFacebook} />
       <Route path="/admin/stripe-webhooks" component={AdminStripeWebhooks} />
       <Route path="/admin/email-monitoring" component={AdminEmailMonitoring} />
+      <Route path="/admin/health" component={AdminHealth} />
       
       {/* Fallback routes */}
       <Route path="/404" component={NotFound} />

@@ -1920,3 +1920,16 @@
 - [x] Add test: existing deployment stays frozen
 - [x] Document "When to bump templateVersion" in NEVER_AGAIN.md
 - [x] Document upgrade path for customer sites
+
+
+## Minimal Health Dashboard (Jan 2026)
+
+- [x] Create backend health metrics endpoint (last 24h data)
+- [x] Add deployment metrics (queued/running/success/failed counts)
+- [x] Add email metrics (sent/failed counts, last error)
+- [x] Add Stripe webhook metrics (success/failed counts, last error)
+- [x] Add system uptime metrics
+- [x] Build admin health dashboard UI at /admin/health
+- [x] Add auto-refresh every 30s
+- [x] Add manual refresh button
+- [x] Verify metrics accuracy with test data (4/4 tests passing)
