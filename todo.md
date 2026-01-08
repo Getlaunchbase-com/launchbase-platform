@@ -375,3 +375,14 @@
 - [x] Remove all ambiguous "effort-based" language without prices
 - [x] Add pricing tables with setup + monthly fees
 - [x] Lock model in NEVER_AGAIN.md
+
+## Service Selection & Pricing - Jan 8, 2026
+- [x] Update homepage: Social Media setup $299 (flat, all tiers)
+- [x] Update homepage: Monthly tiers $79/$129/$179 (4/8/12 posts)
+- [x] Add homepage: Bundle discount copy (50% off setup with 2+ services)
+- [x] Add onboarding step: Service selection with pricing
+- [x] Schema: Add fields for selected services (socialMediaTier, enrichmentLayer, googleBusiness, quickBooksSync)
+- [x] Checkout math: Calculate setup total with bundle discount logic
+- [x] Checkout math: Calculate monthly total from selected services
+- [x] Promo interaction: Founder promo overrides setup fees only
+- [ ] Toggle UX: Services can be paused/resumed (billing next cycle) - DEFERRED
