@@ -220,3 +220,55 @@ SHOW INDEX FROM deployments WHERE Key_name LIKE 'idx_%';
 - ❌ Adding indexes on every column (index bloat slows writes)
 - ❌ Creating indexes without checking query patterns first
 - ✅ Add indexes only for columns used in WHERE, JOIN, ORDER BY of frequent queries
+
+
+---
+
+## Rollback System (Jan 2026)
+
+**Contract:** One-click rollback with enterprise safety rails (block if deploy in flight, clone from snapshot, tenant isolation).
+
+**Forever Rules:**
+
+1. **Rollback is clone-from-snapshot only** — Never mutate past deployments. Always create a new deployment row with `trigger='rollback'` and copy `buildPlanSnapshot` + `templateVersion` from the source.
+
+2. **Rollback blocked when deploy in flight** — If any deployment for the intake has `status IN ('queued', 'running')`, throw `PRECONDITION_FAILED`. This prevents two deployments fighting and keeps outcomes predictable.
+
+3. **Tenant isolation enforced** — Cannot rollback across tenants. The rollback mutation checks that the requesting user's tenant matches the intake's tenant.
+
+4. **Snapshot immutability** — `buildPlanSnapshot` is set at deployment creation time and never mutated. The worker must use the snapshot (not regenerate from intake) to ensure rollback is deterministic.
+
+5. **Audit trail required** — Every rollback deployment must set:
+   - `trigger = 'rollback'`
+   - `rolledBackFromDeploymentId = source.id`
+   - `status = 'queued'` (processed like normal deployment)
+
+**UI Safety Rails:**
+
+1. **Show rollback button on all deployments** — Let server enforce rules, but disable client-side when:
+   - Any deployment is queued/running for that intake
+   - No successful deployment exists for that intake
+
+2. **Confirmation modal must show target** — Display the deployment #, timestamp, and templateVersion being rolled back to, so users know exactly what they're restoring.
+
+3. **Trigger badges for audit** — Every deployment row must show its trigger (Auto/Manual/ROLLBACK) and "Rolled back from #X" when applicable.
+
+**Definition of Done:**
+- ✅ 7 FOREVER tests passing in `server/__tests__/rollback.test.ts`
+- ✅ Clone templateVersion + buildPlanSnapshot exactly
+- ✅ Set trigger=rollback and rolledBackFromDeploymentId
+- ✅ Throw when no successful deployment exists
+- ✅ Throw when deployment queued/running (in-flight block)
+- ✅ Enforce tenant isolation
+- ✅ Return correct deployment IDs
+- ✅ Allow multiple rollbacks in sequence
+
+**Test Location:** `server/__tests__/rollback.test.ts`
+
+**Enforcement:** Tests use `afterEach` to mark in-flight deployments as failed (prevents test pollution). Each test creates rollback, verifies behavior, and cleanup happens automatically.
+
+**Common Pitfalls:**
+- ❌ Don't regenerate build plan on rollback — use snapshot
+- ❌ Don't allow rollback when deploy is queued/running
+- ❌ Don't skip tenant isolation check
+- ❌ Don't delete rollback deployments from history (audit trail)

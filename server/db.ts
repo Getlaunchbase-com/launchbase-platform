@@ -373,6 +373,8 @@ export async function createDeployment(data: {
   buildPlanId: number;
   intakeId: number;
   status?: Deployment['status'];
+  trigger?: "auto" | "manual" | "rollback";
+  rolledBackFromDeploymentId?: number;
 }) {
   const db = await getDb();
   if (!db) {
@@ -384,12 +386,33 @@ export async function createDeployment(data: {
   const intake = await getIntakeById(data.intakeId);
   const tenant = intake?.tenant ?? "launchbase";
 
+  // Get buildPlan snapshot for rollback reproducibility
+  const buildPlan = await getBuildPlanById(data.buildPlanId);
+  
+  // Safety guard: throw if buildPlan doesn't exist or has no plan
+  if (!buildPlan || !buildPlan.plan) {
+    throw new Error(`Cannot create deployment: buildPlan ${data.buildPlanId} not found or has no plan`);
+  }
+  
+  const buildPlanSnapshot = {
+    templateId: buildPlan.templateId,
+    plan: buildPlan.plan,
+  };
+
+  // Safety guard: throw if TEMPLATE_VERSION_CURRENT missing
+  if (!TEMPLATE_VERSION_CURRENT) {
+    throw new Error("Cannot create deployment: TEMPLATE_VERSION_CURRENT is not set");
+  }
+
   const values: InsertDeployment = {
     buildPlanId: data.buildPlanId,
     intakeId: data.intakeId,
     tenant,
     status: data.status || "queued",
+    trigger: data.trigger || "auto",
+    rolledBackFromDeploymentId: data.rolledBackFromDeploymentId || null,
     templateVersion: TEMPLATE_VERSION_CURRENT,
+    buildPlanSnapshot,
     logs: [],
   };
 

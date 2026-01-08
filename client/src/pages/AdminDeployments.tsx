@@ -12,10 +12,21 @@ import {
   Loader2,
   ExternalLink,
   AlertTriangle,
+  Undo2,
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import DashboardLayout from "@/components/DashboardLayout";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
   queued: {
@@ -40,8 +51,24 @@ const statusConfig: Record<string, { label: string; color: string; icon: React.R
   },
 };
 
+const triggerConfig: Record<string, { label: string; color: string }> = {
+  auto: {
+    label: "Auto",
+    color: "bg-gray-500/20 text-gray-400 border-gray-500/30",
+  },
+  manual: {
+    label: "Manual",
+    color: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+  },
+  rollback: {
+    label: "ROLLBACK",
+    color: "bg-purple-500/20 text-purple-400 border-purple-500/30",
+  },
+};
+
 export default function AdminDeployments() {
   const [isRunning, setIsRunning] = useState(false);
+  const [rollbackIntakeId, setRollbackIntakeId] = useState<number | null>(null);
 
   const { data: workerStatus, isLoading, refetch } = trpc.admin.deploy.workerStatus.useQuery();
   
@@ -68,6 +95,57 @@ export default function AdminDeployments() {
 
   const handleRunNext = () => {
     runNextMutation.mutate();
+  };
+
+  const rollbackMutation = trpc.admin.deploy.rollbackToLastSuccess.useMutation({
+    onSuccess: (data) => {
+      toast.success(`Rollback queued! Deployment #${data.newDeploymentId} created from #${data.sourceDeploymentId}`);
+      setRollbackIntakeId(null);
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`Rollback failed: ${error.message}`);
+      setRollbackIntakeId(null);
+    },
+  });
+
+  const handleRollback = (intakeId: number) => {
+    setRollbackIntakeId(intakeId);
+  };
+
+  // Check if rollback is allowed for an intake
+  const canRollback = (intakeId: number) => {
+    if (!workerStatus?.recentDeployments) return { allowed: false, reason: "Loading..." };
+    
+    const intakeDeployments = workerStatus.recentDeployments.filter(d => d.intakeId === intakeId);
+    
+    // Check if any deployment is in flight
+    const hasInFlight = intakeDeployments.some(d => d.status === "queued" || d.status === "running");
+    if (hasInFlight) {
+      return { allowed: false, reason: "Deployment in progress" };
+    }
+    
+    // Check if there's a successful deployment
+    const hasSuccess = intakeDeployments.some(d => d.status === "success");
+    if (!hasSuccess) {
+      return { allowed: false, reason: "No successful deployment found" };
+    }
+    
+    return { allowed: true, reason: "" };
+  };
+
+  // Get last successful deployment for an intake
+  const getLastSuccess = (intakeId: number) => {
+    if (!workerStatus?.recentDeployments) return null;
+    return workerStatus.recentDeployments
+      .filter(d => d.intakeId === intakeId && d.status === "success")
+      .sort((a, b) => new Date(b.completedAt || b.createdAt).getTime() - new Date(a.completedAt || a.createdAt).getTime())[0];
+  };
+
+  const confirmRollback = () => {
+    if (rollbackIntakeId) {
+      rollbackMutation.mutate({ intakeId: rollbackIntakeId });
+    }
   };
 
   return (
@@ -176,9 +254,19 @@ export default function AdminDeployments() {
                           {config.icon}
                         </div>
                         <div>
-                          <p className="font-medium">Deployment #{deployment.id}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium">Deployment #{deployment.id}</p>
+                            {deployment.trigger && (
+                              <Badge className={triggerConfig[deployment.trigger]?.color || triggerConfig.auto.color} variant="outline">
+                                {triggerConfig[deployment.trigger]?.label || deployment.trigger}
+                              </Badge>
+                            )}
+                          </div>
                           <p className="text-sm text-gray-400">
                             Intake #{deployment.intakeId} • Plan #{deployment.buildPlanId}
+                            {deployment.trigger === "rollback" && deployment.rolledBackFromDeploymentId && (
+                              <> • Rolled back from <span className="text-purple-400">#{deployment.rolledBackFromDeploymentId}</span></>
+                            )}
                           </p>
                         </div>
                       </div>
@@ -201,6 +289,22 @@ export default function AdminDeployments() {
                             {deployment.errorMessage}
                           </span>
                         )}
+                        {(() => {
+                          const rollbackStatus = canRollback(deployment.intakeId);
+                          return (
+                            <Button
+                              onClick={() => handleRollback(deployment.intakeId)}
+                              variant="outline"
+                              size="sm"
+                              disabled={!rollbackStatus.allowed}
+                              className="border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                              title={rollbackStatus.allowed ? "Rollback to last success" : rollbackStatus.reason}
+                            >
+                              <Undo2 className="w-3 h-3 mr-1" />
+                              Rollback
+                            </Button>
+                          );
+                        })()}
                         <span className="text-sm text-gray-500">
                           {new Date(deployment.createdAt).toLocaleString()}
                         </span>
@@ -213,6 +317,46 @@ export default function AdminDeployments() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Rollback Confirmation Dialog */}
+      <AlertDialog open={rollbackIntakeId !== null} onOpenChange={(open) => !open && setRollbackIntakeId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Rollback site?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {(() => {
+                if (!rollbackIntakeId) return null;
+                const lastSuccess = getLastSuccess(rollbackIntakeId);
+                return (
+                  <>
+                    This will redeploy the last successful version using its saved build plan snapshot. It won't change your intake.
+                    <br /><br />
+                    {lastSuccess && (
+                      <div className="bg-white/5 border border-white/10 rounded-lg p-3 mt-2">
+                        <p className="text-sm font-medium text-white">Rolling back to:</p>
+                        <p className="text-sm text-gray-400 mt-1">
+                          Deployment #{lastSuccess.id} • {new Date(lastSuccess.completedAt || lastSuccess.createdAt).toLocaleString()}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Template: {lastSuccess.templateVersion}
+                        </p>
+                      </div>
+                    )}
+                    <br />
+                    The rollback will be queued and processed like a normal deployment.
+                  </>
+                );
+              })()}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmRollback} className="bg-[#FF6A00] hover:bg-[#FF6A00]/90">
+              Rollback to last successful deploy
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 }

@@ -1977,3 +1977,25 @@
 - [x] Add composite index on deployments(tenant, status, createdAt) for future status filtering
 - [x] Verify indexes are created with SHOW INDEX (5 indexes on each table)
 - [x] Document index strategy in NEVER_AGAIN.md with forever rules
+
+
+## One-Click Rollback (Jan 2026)
+
+- [x] Add trigger enum column to deployments (auto, manual, rollback)
+- [x] Add rolledBackFromDeploymentId column to deployments
+- [x] Add buildPlanSnapshot JSON column to deployments (if not exists)
+- [x] Run SQL migrations to add rollback columns
+- [x] Update createDeployment to save buildPlan snapshot
+- [x] Implement admin.deployments.rollbackToLastSuccess mutation
+- [x] Add safety rail: block if deploy queued/running for intake
+- [x] Add safety rail: throw if no successful deployment exists
+- [x] Add safety rail: tenant isolation (can't rollback across tenants)
+- [x] Clone templateVersion + snapshot from source deployment
+- [x] Add rollback button to deployment history UI
+- [x] Add confirmation modal showing source deploy info
+- [x] Write FOREVER test: creates deployment with trigger=rollback
+- [x] Write FOREVER test: copies templateVersion + snapshot exactly
+- [x] Write FOREVER test: throws if no successful deployment
+- [x] Write FOREVER test: throws if deploy in flight
+- [x] Write FOREVER test: tenant isolation
+- [ ] Document rollback rules in NEVER_AGAIN.md
