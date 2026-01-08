@@ -367,4 +367,4 @@
 ## Onboarding Remaining Microcopy - Jan 8, 2026
 - [x] Step 5: Add field microcopy "Used for visibility, timing, and safety decisions"
 - [x] Step 8: Update to "Nothing deploys without your approval. You can stop at any time"
-- [x] TypeScript error: promoCode already in schema, no fix needed
+- [x] TypeScript error: Moved promoCode to rawPayload to fix type mismatch
