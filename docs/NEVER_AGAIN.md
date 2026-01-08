@@ -813,3 +813,123 @@ export const TEMPLATE_VERSIONS = [
 **Rule:** Template versions are immutable. Once deployed, a site's template version never changes unless explicitly upgraded through admin action.
 
 **Reference:** `shared/templateVersion.ts`, `server/db.ts` (createDeployment)
+
+
+---
+
+## Cron Endpoint Authentication
+
+### ✅ CORRECT PATTERN: All cron endpoints must verify WORKER_TOKEN
+
+**Why this matters:**
+- Unauthenticated cron endpoints can be discovered and abused
+- Alert endpoints without auth can spam ops emails
+- Deployment endpoints without auth can trigger unwanted deploys
+- Rate limiting alone is insufficient (attacker can wait)
+
+**Forever Rule:** Every `/api/cron/*` endpoint (except `/health`) MUST verify the worker token before executing any logic.
+
+**How to implement:**
+
+```typescript
+// At top of cronEndpoints.ts
+const WORKER_TOKEN = process.env.WORKER_TOKEN;
+
+function verifyWorkerToken(req: Request): boolean {
+  if (!WORKER_TOKEN) {
+    console.error("[Cron] WORKER_TOKEN not configured - rejecting all requests");
+    return false;
+  }
+  const token = req.headers["x-worker-token"] || req.headers["authorization"]?.replace("Bearer ", "");
+  return token === WORKER_TOKEN;
+}
+
+// In every cron handler (FIRST thing after function declaration)
+export async function handleCronAlerts(req: Request, res: Response) {
+  // Verify token first
+  if (!verifyWorkerToken(req)) {
+    console.error("[Alerts] Unauthorized request - invalid token");
+    return res.status(401).json({ 
+      success: false, 
+      error: "unauthorized",
+      message: "Invalid or missing worker token" 
+    });
+  }
+  
+  // ... rest of handler logic
+}
+```
+
+**Auth header formats (both supported):**
+- `x-worker-token: <token>` (legacy, for existing cron-job.org configs)
+- `Authorization: Bearer <token>` (standard)
+
+**Rate limiting (additional protection):**
+
+```typescript
+// Add rate limiting AFTER auth check
+let lastAlertsRun: number = 0;
+const MIN_ALERTS_INTERVAL_MS = 60 * 1000; // 60 seconds
+
+const now = Date.now();
+const timeSinceLastRun = now - lastAlertsRun;
+if (lastAlertsRun > 0 && timeSinceLastRun < MIN_ALERTS_INTERVAL_MS) {
+  return res.status(200).json({
+    success: true,
+    skipped: true,
+    message: `Rate limited - try again in ${Math.ceil((MIN_ALERTS_INTERVAL_MS - timeSinceLastRun) / 1000)}s`,
+  });
+}
+lastAlertsRun = now;
+```
+
+**Tests (boundary contracts):**
+
+```typescript
+// Test 1: Reject without token
+it("should reject requests without token", async () => {
+  const res = await request(app).post("/api/cron/alerts").send({});
+  expect(res.status).toBe(401);
+  expect(res.body.error).toBe("unauthorized");
+});
+
+// Test 2: Reject with invalid token
+it("should reject requests with invalid token", async () => {
+  const res = await request(app)
+    .post("/api/cron/alerts")
+    .set("Authorization", "Bearer invalid_token")
+    .send({});
+  expect(res.status).toBe(401);
+});
+
+// Test 3: Accept with valid token
+it("should accept requests with valid token", async () => {
+  const res = await request(app)
+    .post("/api/cron/alerts")
+    .set("x-worker-token", WORKER_TOKEN!)
+    .send({});
+  expect(res.status).toBe(200);
+  expect(res.body.success).toBe(true);
+});
+
+// Test 4: Rate limiting works
+it("should rate limit rapid successive calls", async () => {
+  await request(app).post("/api/cron/alerts").set("x-worker-token", WORKER_TOKEN!).send({});
+  const res = await request(app).post("/api/cron/alerts").set("x-worker-token", WORKER_TOKEN!).send({});
+  expect(res.body.skipped).toBe(true);
+});
+```
+
+**Checklist before deploying new cron endpoint:**
+- [ ] `verifyWorkerToken()` called first in handler
+- [ ] Returns 401 JSON on auth failure
+- [ ] Rate limiting added (60s minimum interval)
+- [ ] 4 boundary tests added (no token, invalid token, valid token, rate limit)
+- [ ] External scheduler configured with correct token
+- [ ] `/api/cron/health` excluded from auth (read-only observability)
+
+**Reference:** 
+- `server/worker/cronEndpoints.ts` (canonical implementation)
+- `server/__tests__/cron-alerts-auth.test.ts` (boundary tests)
+
+**Rule:** Cron endpoints are infrastructure. Auth is non-negotiable. Rate limiting is defense-in-depth.

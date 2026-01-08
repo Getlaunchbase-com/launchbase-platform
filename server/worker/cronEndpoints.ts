@@ -24,6 +24,27 @@ import { getDb } from "../db";
 import { sql } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
+// Worker secret token - MUST be set in environment for production
+const WORKER_TOKEN = process.env.WORKER_TOKEN;
+
+// Rate limiting: track last run time to prevent double-fires
+let lastAlertsRun: number = 0;
+const MIN_ALERTS_INTERVAL_MS = 60 * 1000; // 60 seconds
+
+/**
+ * Verify worker request has valid secret token
+ * Accepts both x-worker-token header and Authorization Bearer header
+ */
+function verifyWorkerToken(req: Request): boolean {
+  // Reject if no token configured (security: don't allow default)
+  if (!WORKER_TOKEN) {
+    console.error("[Cron] WORKER_TOKEN not configured - rejecting all requests");
+    return false;
+  }
+  const token = req.headers["x-worker-token"] || req.headers["authorization"]?.replace("Bearer ", "");
+  return token === WORKER_TOKEN;
+}
+
 /**
  * Start a worker run (best-effort logging)
  * Returns runKey (UUID) for later update, or null if logging fails
@@ -150,6 +171,34 @@ export async function handleCronAutoAdvance(req: Request, res: Response) {
  * Runs every 10-15 minutes to detect issues
  */
 export async function handleCronAlerts(req: Request, res: Response) {
+  // Verify token first
+  if (!verifyWorkerToken(req)) {
+    console.error("[Alerts] Unauthorized request - invalid token");
+    return res.status(401).json({ 
+      success: false, 
+      error: "unauthorized",
+      message: "Invalid or missing worker token" 
+    });
+  }
+  
+  // Rate limiting: prevent double-fires from scheduler
+  const now = Date.now();
+  const timeSinceLastRun = now - lastAlertsRun;
+  if (lastAlertsRun > 0 && timeSinceLastRun < MIN_ALERTS_INTERVAL_MS) {
+    const waitSeconds = Math.ceil((MIN_ALERTS_INTERVAL_MS - timeSinceLastRun) / 1000);
+    console.log(`[Alerts] Rate limited - last run was ${Math.floor(timeSinceLastRun / 1000)}s ago`);
+    return res.status(200).json({
+      success: true,
+      skipped: true,
+      message: `Rate limited - try again in ${waitSeconds}s`,
+      timeSinceLastRun: Math.floor(timeSinceLastRun / 1000),
+      minInterval: MIN_ALERTS_INTERVAL_MS / 1000,
+    });
+  }
+  
+  // Update last run time
+  lastAlertsRun = now;
+  
   const runId = await startWorkerRun("alerts");
   
   let ok = false;
