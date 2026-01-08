@@ -200,6 +200,40 @@ export async function createServiceCheckoutSession({
     }
   }
 
+  // Store pricing snapshot in intake for audit trail
+  const { getDb } = await import("../db");
+  const db = await getDb();
+  if (db) {
+    const { intakes } = await import("../../drizzle/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [intake] = await db.select().from(intakes).where(eq(intakes.id, intakeId));
+    if (intake) {
+      const rawPayload = (intake.rawPayload as Record<string, unknown>) || {};
+      await db.update(intakes)
+        .set({
+          rawPayload: {
+            ...rawPayload,
+            pricingSnapshot: {
+              timestamp: new Date().toISOString(),
+              setupLineItems: pricing.setupLineItems,
+              setupSubtotalCents: pricing.setupSubtotalCents,
+              setupDiscountCents: pricing.setupDiscountCents,
+              setupTotalCents: pricing.setupTotalCents,
+              monthlyLineItems: pricing.monthlyLineItems,
+              monthlyTotalCents: pricing.monthlyTotalCents,
+              selectedServiceCount: pricing.selectedServiceCount,
+              notes: pricing.notes,
+              isFounder: isFounderReserved,
+              promoCode: promoCode || null,
+            },
+          },
+        })
+        .where(eq(intakes.id, intakeId));
+    }
+  }
+
+  // Create Stripe session with audit-grade metadata
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
     customer_email: customerEmail,
@@ -207,21 +241,34 @@ export async function createServiceCheckoutSession({
     allow_promotion_codes: false, // We handle promos internally
     line_items: lineItems,
     metadata: {
+      // Core identifiers
       intake_id: intakeId.toString(),
       customer_email: customerEmail,
       customer_name: customerName,
       tenant,
       payment_type: "service_setup",
+      
+      // Pricing version for audit
+      pricing_version: "v1_2026_01_08",
+      
+      // Promo tracking
       promo_code: promoCode || "",
       is_founder: isFounderReserved ? "true" : "false",
-      monthly_total_cents: pricing.monthlyTotalCents.toString(),
-      // Service selections for webhook processing
+      
+      // Service selections (flattened for easy webhook access)
       website: serviceSelections.website.toString(),
       email_service: serviceSelections.emailService.toString(),
       social_media_tier: serviceSelections.socialMediaTier || "none",
       enrichment_layer: serviceSelections.enrichmentLayer.toString(),
       google_business: serviceSelections.googleBusiness.toString(),
       quickbooks_sync: serviceSelections.quickBooksSync.toString(),
+      
+      // Pricing snapshot (stringified for audit)
+      services_selected_json: JSON.stringify(serviceSelections),
+      setup_total_cents: pricing.setupTotalCents.toString(),
+      setup_discount_cents: pricing.setupDiscountCents.toString(),
+      monthly_total_cents: pricing.monthlyTotalCents.toString(),
+      selected_service_count: pricing.selectedServiceCount.toString(),
     },
     success_url: `${origin}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/onboarding?step=9&intake_id=${intakeId}`,

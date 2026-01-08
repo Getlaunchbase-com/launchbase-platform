@@ -415,3 +415,15 @@
 - [x] Add payment.createServiceCheckout tRPC endpoint
 - [x] Wire onboarding Step 9 to trigger checkout after intake submission
 - [x] Update button states to show checkout loading
+
+## Service Selection Persistence & Admin View - Jan 8, 2026
+- [x] Add pricingSnapshot to checkout metadata (capture computePricing output)
+- [x] Enhance Stripe metadata with audit fields (pricingVersion, servicesSelected JSON)
+- [x] Store pricingSnapshot in intake rawPayload on checkout creation
+- [x] Create admin intake detail card showing service selections
+- [x] Display pricing breakdown in admin view (setup, bundle, founder, monthly)
+- [x] Add visual indicators for selected services (✅/❌)
+- [x] Test end-to-end: Core only (Website + Email) - documented in SMOKE_TESTS.md
+- [x] Test end-to-end: Website + Social + GMB with bundle discount - documented in SMOKE_TESTS.md
+- [x] Test end-to-end: Founder promo ($300 flat override) - documented in SMOKE_TESTS.md
+- [x] Create comprehensive smoke test documentation with 5 scenarios
