@@ -248,7 +248,7 @@ export default function Onboarding() {
           <div className="space-y-6">
             <div>
               <h2 className="text-2xl md:text-3xl font-bold mb-2">Tell us about your business</h2>
-              <p className="text-gray-400">This helps us understand what to build for you.</p>
+              <p className="text-gray-400">This helps LaunchBase decide what is safe to do on your behalf.</p>
             </div>
             <Textarea
               value={data.businessDescription}
@@ -258,8 +258,10 @@ export default function Onboarding() {
               autoFocus
             />
             <p className="text-sm text-gray-500">
-              No need to be perfect — we'll handle wording and structure.
-              <span className="block mt-1 text-[#FF6A00]/70">✓ You can edit this later</span>
+              You're not configuring software. You're giving us the context needed to take responsibility.
+            </p>
+            <p className="text-xs text-gray-600 mt-4 pt-4 border-t border-white/10">
+              Nothing deploys without your approval. You can stop at any time.
             </p>
           </div>
         );
