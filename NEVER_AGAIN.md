@@ -351,3 +351,55 @@ Examples:
 - ❌ Don't alert on every evaluation (use buckets)
 - ❌ Don't forget to auto-resolve when conditions clear
 - ❌ Don't allow recipient to be env-configurable (security risk)
+
+
+
+---
+
+## Pricing Model (Jan 2026)
+
+**Contract:** Every service has explicit setup + monthly pricing. No exceptions.
+
+**Forever Rules:**
+
+1. **Explicit pricing always visible** — Homepage MUST show setup + monthly fees for all services. No hiding behind "configure later" or "effort-based" without tiers.
+
+2. **Enrichment Layer is premium** — Intelligence is a separate, optional add-on. Never bundled. Always priced higher than base posting. Current: $199 setup + $79/mo.
+
+3. **No subscription confusion** — Setup fees are one-time (Stripe Checkout). Monthly fees are recurring (Stripe Subscriptions). Never mix them in a single charge.
+
+4. **No price removal** — Once a price is shown on homepage, it stays until explicitly changed by owner. No "simplification" that removes pricing transparency.
+
+5. **Founder promo is quiet** — Founder promo field hidden by default in onboarding. No homepage mentions. No public marketing. Scarcity and exclusivity are the value.
+
+6. **Onboarding reinforces responsibility** — Language must reflect delegation, not configuration. Examples:
+   - ✅ "This helps LaunchBase decide what is safe to do on your behalf"
+   - ✅ "Nothing deploys without your approval. You can stop at any time."
+   - ❌ "Help us build your website"
+   - ❌ "Configure your settings"
+
+**Current Pricing (Locked):**
+
+- **Core Website:** $499 setup + $49/mo
+- **Social Media Intelligence:**
+  - 4 posts: $149 setup + $59/mo
+  - 8 posts: $199 setup + $99/mo
+  - 12 posts: $249 setup + $149/mo
+- **Enrichment Layer (optional):** $199 setup + $79/mo
+- **Google Business:** $149 setup + $29/mo
+- **QuickBooks Sync:** $199 setup + $39/mo
+
+**Definition of Done:**
+- ✅ Homepage shows all setup + monthly fees
+- ✅ Onboarding shows prices before selection
+- ✅ Enrichment Layer is separate line item
+- ✅ Founder promo hidden by default
+- ✅ Onboarding copy reinforces responsibility-ownership
+
+**Enforcement:** Manual review of homepage and onboarding flow. Any price hiding or bundling requires owner approval.
+
+**Common Pitfalls:**
+- ❌ Don't remove prices to "simplify" homepage
+- ❌ Don't bundle intelligence into base pricing
+- ❌ Don't use "effort-based" without showing tiers
+- ❌ Don't advertise founder promo publicly

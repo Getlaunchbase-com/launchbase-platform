@@ -368,3 +368,10 @@
 - [x] Step 5: Add field microcopy "Used for visibility, timing, and safety decisions"
 - [x] Step 8: Update to "Nothing deploys without your approval. You can stop at any time"
 - [x] TypeScript error: Moved promoCode to rawPayload to fix type mismatch
+
+## Final Locked Pricing Model - Jan 8, 2026
+- [x] Replace homepage Suite section with explicit pricing (Social Media Intelligence tiers, Enrichment Layer, Google Business, QuickBooks)
+- [x] Replace homepage Pricing section with Core Website + examples
+- [x] Remove all ambiguous "effort-based" language without prices
+- [x] Add pricing tables with setup + monthly fees
+- [x] Lock model in NEVER_AGAIN.md
