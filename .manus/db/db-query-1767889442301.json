@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO email_logs (intakeId, tenant, emailType, recipientEmail, subject, status, provider) \nVALUES (1, 'launchbase', 'founder_welcome', 'test@example.com', 'Test Founder Email', 'sent', 'test');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute INSERT INTO email_logs (intakeId, tenant, emailType, recipientEmail, subject, status, provider) \nVALUES (1, 'launchbase', 'founder_welcome', 'test@example.com', 'Test Founder Email', 'sent', 'test');",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 113
+}

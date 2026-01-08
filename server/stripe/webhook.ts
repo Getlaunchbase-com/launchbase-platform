@@ -439,7 +439,23 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   });
   
   if (promoResult.success && promoResult.founderNumber) {
-    console.log(`[Stripe Webhook] 🎉 Founder #${String(promoResult.founderNumber).padStart(2, '0')} claimed by intake ${intakeId}`);
+    const founderNum = String(promoResult.founderNumber).padStart(2, '0');
+    console.log(`[Stripe Webhook] 🎉 Founder #${founderNum} claimed by intake ${intakeId}`);
+    
+    // Send founder welcome email
+    const [intake] = await db.select().from(intakes).where(eq(intakes.id, intakeIdNum));
+    if (intake) {
+      const firstName = intake.contactName?.split(' ')[0] || 'there';
+      await sendEmail(intakeIdNum, 'founder_welcome', {
+        firstName,
+        businessName: intake.businessName,
+        email: intake.email,
+        language: intake.language as any,
+        audience: intake.audience as any,
+        founderNumber: founderNum,
+      });
+      console.log(`[Stripe Webhook] ✉️ Founder welcome email sent to ${intake.email}`);
+    }
   }
 
   // Now safe: only one webhook run reaches here
