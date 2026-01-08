@@ -101,7 +101,7 @@ export const appRouter = router({
         const db = await getDb();
         if (!db) throw new Error("Database not available");
         
-        const intake = await createIntake(input, "new");
+        const intake = await createIntake(input);
         
         // Handle promo code if provided
         if (input.promoCode && intake?.id) {
