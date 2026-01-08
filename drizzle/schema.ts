@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, json, boolean } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, json, boolean, uniqueIndex } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -1028,3 +1028,37 @@ export const stripeWebhookEvents = mysqlTable("stripe_webhook_events", {
 });
 export type StripeWebhookEvent = typeof stripeWebhookEvents.$inferSelect;
 export type InsertStripeWebhookEvent = typeof stripeWebhookEvents.$inferInsert;
+
+
+/**
+ * Promo codes (Beta Founders, etc)
+ */
+export const promoCodes = mysqlTable("promo_codes", {
+  id: int("id").autoincrement().primaryKey(),
+  code: varchar("code", { length: 100 }).notNull().unique(),
+  setupFeeAmount: int("setupFeeAmount").notNull(),
+  monthlyDiscountPercent: int("monthlyDiscountPercent"),
+  monthlyDiscountMonths: int("monthlyDiscountMonths"),
+  maxRedemptions: int("maxRedemptions").notNull(),
+  active: boolean("active").default(true).notNull(),
+  expiresAt: timestamp("expiresAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+/**
+ * Promo redemptions (reservations + actual redemptions)
+ */
+export const promoRedemptions = mysqlTable("promo_redemptions", {
+  id: int("id").autoincrement().primaryKey(),
+  promoCodeId: int("promoCodeId").notNull(),
+  intakeId: int("intakeId").notNull(),
+  status: mysqlEnum("status", ["reserved", "redeemed", "expired"]).notNull(),
+  founderNumber: int("founderNumber"),
+  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
+  stripeCheckoutSessionId: varchar("stripeCheckoutSessionId", { length: 255 }),
+  reservedAt: timestamp("reservedAt").defaultNow().notNull(),
+  redeemedAt: timestamp("redeemedAt"),
+  expiresAt: timestamp("expiresAt").notNull(),
+}, (table) => ({
+  uniqueFounder: uniqueIndex("unique_founder").on(table.promoCodeId, table.founderNumber),
+}));
