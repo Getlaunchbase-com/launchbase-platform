@@ -1868,7 +1868,7 @@ export const appRouter = router({
             pricing: input.pricing,
             startTiming: input.startTiming,
           },
-        }, "review");
+        });
 
         if (!intake) throw new Error("Failed to create intake");
 
@@ -2107,7 +2107,7 @@ export const appRouter = router({
             startTiming: app.startTiming,
             isBetaCustomer: input.isBetaCustomer,
           },
-        }, "review");
+        });
 
         if (!intake) throw new Error("Failed to create intake");
 
