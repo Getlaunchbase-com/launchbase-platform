@@ -395,7 +395,7 @@ export default function Onboarding() {
           <div className="space-y-6">
             <div>
               <h2 className="text-2xl md:text-3xl font-bold mb-2">Where do you serve?</h2>
-              <p className="text-gray-400">This helps us tailor local context to your site.</p>
+              <p className="text-gray-400">Used for visibility, timing, and safety decisions.</p>
             </div>
             <div>
               <label className="text-sm text-gray-400 mb-2 block">Service area</label>
@@ -553,8 +553,7 @@ export default function Onboarding() {
             <div>
               <h2 className="text-3xl md:text-4xl font-bold mb-4">You're all set</h2>
               <p className="text-gray-400 text-lg max-w-md mx-auto">
-                We'll build your website and notify you when it's ready to review.
-                A real human checks everything before it goes live.
+                Nothing deploys without your approval. You can stop at any time.
               </p>
             </div>
 
