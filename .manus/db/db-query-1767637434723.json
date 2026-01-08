@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO build_plans (intakeId, plan, status, templateId, createdAt)\nVALUES (\n  (SELECT id FROM intakes WHERE email = 'e2e-test-jan5@launchbase-test.com' ORDER BY createdAt DESC LIMIT 1),\n  '{\"vertical\": \"plumbing\", \"tone\": \"professional\", \"primaryCTA\": \"Get a Quote\"}',\n  'draft',\n  'template_plumbing_v1',\n  NOW()\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute INSERT INTO build_plans (intakeId, plan, status, templateId, createdAt)\nVALUES (\n  (SELECT id FROM intakes WHERE email = 'e2e-test-jan5@launchbase-test.com' ORDER BY createdAt DESC LIMIT 1),\n  '{\"vertical\": \"plumbing\", \"tone\": \"professional\", \"primaryCTA\": \"Get a Quote\"}',\n  'draft',\n  'template_plumbing_v1',\n  NOW()\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 67
+}

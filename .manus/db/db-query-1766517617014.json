@@ -1,0 +1,46 @@
+{
+  "query": "SELECT column_name FROM information_schema.columns WHERE table_name = 'decision_logs';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT column_name FROM information_schema.columns WHERE table_name = 'decision_logs';",
+  "rows": [
+    {
+      "column_name": "id"
+    },
+    {
+      "column_name": "userId"
+    },
+    {
+      "column_name": "decision"
+    },
+    {
+      "column_name": "severity"
+    },
+    {
+      "column_name": "reason"
+    },
+    {
+      "column_name": "triggerContext"
+    },
+    {
+      "column_name": "conditions"
+    },
+    {
+      "column_name": "layersEvaluated"
+    },
+    {
+      "column_name": "confidenceScore"
+    },
+    {
+      "column_name": "intelligenceVersion"
+    },
+    {
+      "column_name": "socialPostId"
+    },
+    {
+      "column_name": "createdAt"
+    }
+  ],
+  "messages": [],
+  "stdout": "column_name\nid\nuserId\ndecision\nseverity\nreason\ntriggerContext\nconditions\nlayersEvaluated\nconfidenceScore\nintelligenceVersion\nsocialPostId\ncreatedAt\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

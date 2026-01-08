@@ -1,0 +1,98 @@
+{
+  "query": "\nSELECT \n  id,\n  emailType,\n  recipientEmail,\n  status,\n  errorMessage,\n  sentAt\nFROM email_logs\nWHERE tenant = 'launchbase'\n  AND status = 'failed'\n  AND sentAt >= DATE_SUB(NOW(), INTERVAL 24 HOUR)\nORDER BY sentAt DESC\nLIMIT 20;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute \nSELECT \n  id,\n  emailType,\n  recipientEmail,\n  status,\n  errorMessage,\n  sentAt\nFROM email_logs\nWHERE tenant = 'launchbase'\n  AND status = 'failed'\n  AND sentAt >= DATE_SUB(NOW(), INTERVAL 24 HOUR)\nORDER BY sentAt DESC\nLIMIT 20;\n",
+  "rows": [
+    {
+      "id": "210120",
+      "emailType": "site_live",
+      "recipientEmail": "vmorre@live.com.com",
+      "status": "failed",
+      "errorMessage": "resend_failed_403: You can only send testing emails to your own email address (vince@vincessnowplow.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.",
+      "sentAt": "2026-01-08 06:44:13"
+    },
+    {
+      "id": "210117",
+      "emailType": "site_live",
+      "recipientEmail": "vmorre@live.com.com",
+      "status": "failed",
+      "errorMessage": "resend_failed_403: You can only send testing emails to your own email address (vince@vincessnowplow.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.",
+      "sentAt": "2026-01-08 06:42:11"
+    },
+    {
+      "id": "210116",
+      "emailType": "site_live",
+      "recipientEmail": "vmorre@live.com.com",
+      "status": "failed",
+      "errorMessage": "resend_failed_403: You can only send testing emails to your own email address (vince@vincessnowplow.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.",
+      "sentAt": "2026-01-08 06:42:11"
+    },
+    {
+      "id": "210114",
+      "emailType": "site_live",
+      "recipientEmail": "vmorre@live.com.com",
+      "status": "failed",
+      "errorMessage": "resend_failed_403: You can only send testing emails to your own email address (vince@vincessnowplow.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.",
+      "sentAt": "2026-01-08 06:40:11"
+    },
+    {
+      "id": "210111",
+      "emailType": "deployment_started",
+      "recipientEmail": "idem-1767854365511@launchbase-test.com",
+      "status": "failed",
+      "errorMessage": "resend_failed_429: Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.",
+      "sentAt": "2026-01-08 06:39:25"
+    },
+    {
+      "id": "210107",
+      "emailType": "deployment_started",
+      "recipientEmail": "smoke+stripe-2c439454-8b2f-4a4c-a712-288528122e95@launchbase-test.com",
+      "status": "failed",
+      "errorMessage": "resend_failed_403: You can only send testing emails to your own email address (vince@vincessnowplow.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.",
+      "sentAt": "2026-01-08 06:39:25"
+    },
+    {
+      "id": "210101",
+      "emailType": "deployment_started",
+      "recipientEmail": "idem-1767854348093@launchbase-test.com",
+      "status": "failed",
+      "errorMessage": "resend_failed_429: Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.",
+      "sentAt": "2026-01-08 06:39:08"
+    },
+    {
+      "id": "210100",
+      "emailType": "deployment_started",
+      "recipientEmail": "smoke+stripe-e204ae1d-4fce-437d-8f98-35377cc1cd53@launchbase-test.com",
+      "status": "failed",
+      "errorMessage": "resend_failed_403: You can only send testing emails to your own email address (vince@vincessnowplow.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.",
+      "sentAt": "2026-01-08 06:39:08"
+    },
+    {
+      "id": "210091",
+      "emailType": "intake_confirmation",
+      "recipientEmail": "test@launchbase.com",
+      "status": "failed",
+      "errorMessage": "resend_failed_403: You can only send testing emails to your own email address (vince@vincessnowplow.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.",
+      "sentAt": "2026-01-08 05:47:08"
+    },
+    {
+      "id": "210089",
+      "emailType": "site_live",
+      "recipientEmail": "vmorre@live.com.com",
+      "status": "failed",
+      "errorMessage": "resend_failed_403: You can only send testing emails to your own email address (vince@vincessnowplow.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.",
+      "sentAt": "2026-01-08 05:14:30"
+    },
+    {
+      "id": "210087",
+      "emailType": "site_live",
+      "recipientEmail": "vmorre@live.com.com",
+      "status": "failed",
+      "errorMessage": "resend_failed_403: You can only send testing emails to your own email address (vince@vincessnowplow.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.",
+      "sentAt": "2026-01-08 05:14:13"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temailType\trecipientEmail\tstatus\terrorMessage\tsentAt\n210120\tsite_live\tvmorre@live.com.com\tfailed\tresend_failed_403: You can only send testing emails to your own email address (vince@vincessnowplow.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\t2026-01-08 06:44:13\n210117\tsite_live\tvmorre@live.com.com\tfailed\tresend_failed_403: You can only send testing emails to your own email address (vince@vincessnowplow.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\t2026-01-08 06:42:11\n210116\tsite_live\tvmorre@live.com.com\tfailed\tresend_failed_403: You can only send testing emails to your own email address (vince@vincessnowplow.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\t2026-01-08 06:42:11\n210114\tsite_live\tvmorre@live.com.com\tfailed\tresend_failed_403: You can only send testing emails to your own email address (vince@vincessnowplow.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\t2026-01-08 06:40:11\n210111\tdeployment_started\tidem-1767854365511@launchbase-test.com\tfailed\tresend_failed_429: Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.\t2026-01-08 06:39:25\n210107\tdeployment_started\tsmoke+stripe-2c439454-8b2f-4a4c-a712-288528122e95@launchbase-test.com\tfailed\tresend_failed_403: You can only send testing emails to your own email address (vince@vincessnowplow.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\t2026-01-08 06:39:25\n210101\tdeployment_started\tidem-1767854348093@launchbase-test.com\tfailed\tresend_failed_429: Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.\t2026-01-08 06:39:08\n210100\tdeployment_started\tsmoke+stripe-e204ae1d-4fce-437d-8f98-35377cc1cd53@launchbase-test.com\tfailed\tresend_failed_403: You can only send testing emails to your own email address (vince@vincessnowplow.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\t2026-01-08 06:39:08\n210091\tintake_confirmation\ttest@launchbase.com\tfailed\tresend_failed_403: You can only send testing emails to your own email address (vince@vincessnowplow.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\t2026-01-08 05:47:08\n210089\tsite_live\tvmorre@live.com.com\tfailed\tresend_failed_403: You can only send testing emails to your own email address (vince@vincessnowplow.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\t2026-01-08 05:14:30\n210087\tsite_live\tvmorre@live.com.com\tfailed\tresend_failed_403: You can only send testing emails to your own email address (vince@vincessnowplow.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\t2026-01-08 05:14:13\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}

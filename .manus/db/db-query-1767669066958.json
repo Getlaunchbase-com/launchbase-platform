@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `stripe_webhook_events` (\n  `id` INT NOT NULL AUTO_INCREMENT,\n  `eventId` VARCHAR(255) NOT NULL,\n  `eventType` VARCHAR(64) NOT NULL,\n  `created` INT NOT NULL,\n  `receivedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `ok` TINYINT(1) NULL,\n  `error` TEXT NULL,\n  `intakeId` INT NULL,\n  `userId` INT NULL,\n  `idempotencyHit` TINYINT(1) NOT NULL DEFAULT 0,\n  `retryCount` INT NOT NULL DEFAULT 0,\n  `meta` JSON NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `uniq_stripe_webhook_events_eventId` (`eventId`),\n  KEY `idx_stripe_webhook_events_eventType_receivedAt` (`eventType`, `receivedAt`),\n  KEY `idx_stripe_webhook_events_intakeId` (`intakeId`),\n  KEY `idx_stripe_webhook_events_userId` (`userId`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute CREATE TABLE IF NOT EXISTS `stripe_webhook_events` (\n  `id` INT NOT NULL AUTO_INCREMENT,\n  `eventId` VARCHAR(255) NOT NULL,\n  `eventType` VARCHAR(64) NOT NULL,\n  `created` INT NOT NULL,\n  `receivedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `ok` TINYINT(1) NULL,\n  `error` TEXT NULL,\n  `intakeId` INT NULL,\n  `userId` INT NULL,\n  `idempotencyHit` TINYINT(1) NOT NULL DEFAULT 0,\n  `retryCount` INT NOT NULL DEFAULT 0,\n  `meta` JSON NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `uniq_stripe_webhook_events_eventId` (`eventId`),\n  KEY `idx_stripe_webhook_events_eventType_receivedAt` (`eventType`, `receivedAt`),\n  KEY `idx_stripe_webhook_events_intakeId` (`intakeId`),\n  KEY `idx_stripe_webhook_events_userId` (`userId`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 172
+}

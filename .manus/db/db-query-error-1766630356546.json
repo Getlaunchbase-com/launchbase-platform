@@ -1,0 +1,8 @@
+{
+  "query": "SELECT i.id, i.business_name, i.contact_name, i.email, i.status, i.preview_token, i.created_at \nFROM intakes i \nWHERE i.email = 'aboveboardmillwork@gmail.com' \nORDER BY i.created_at DESC \nLIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT i.id, i.business_name, i.contact_name, i.email, i.status, i.preview_token, i.created_at \nFROM intakes i \nWHERE i.email = 'aboveboardmillwork@gmail.com' \nORDER BY i.created_at DESC \nLIMIT 5;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'i.created_at' in 'order clause'"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS decision_logs (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  userId INT NOT NULL,\n  decision ENUM('post', 'silence', 'wait') NOT NULL,\n  severity ENUM('hard_block', 'soft_block', 'discretionary'),\n  reason VARCHAR(128) NOT NULL,\n  triggerContext ENUM('weather_storm', 'weather_clear', 'weather_extreme', 'sports_event', 'community_event', 'local_trend', 'seasonal', 'manual', 'scheduled') NOT NULL,\n  conditions JSON,\n  layersEvaluated JSON,\n  confidenceScore INT DEFAULT 0,\n  intelligenceVersion VARCHAR(16) DEFAULT 'v2.4.0' NOT NULL,\n  socialPostId INT,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute CREATE TABLE IF NOT EXISTS decision_logs (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  userId INT NOT NULL,\n  decision ENUM('post', 'silence', 'wait') NOT NULL,\n  severity ENUM('hard_block', 'soft_block', 'discretionary'),\n  reason VARCHAR(128) NOT NULL,\n  triggerContext ENUM('weather_storm', 'weather_clear', 'weather_extreme', 'sports_event', 'community_event', 'local_trend', 'seasonal', 'manual', 'scheduled') NOT NULL,\n  conditions JSON,\n  layersEvaluated JSON,\n  confidenceScore INT DEFAULT 0,\n  intelligenceVersion VARCHAR(16) DEFAULT 'v2.4.0' NOT NULL,\n  socialPostId INT,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 322
+}

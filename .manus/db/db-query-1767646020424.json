@@ -1,0 +1,16 @@
+{
+  "query": "SELECT id, status, CHAR_LENGTH(status) as status_length, HEX(status) as status_hex \nFROM deployments \nWHERE intakeId = (SELECT id FROM intakes WHERE email = 'e2e-test-jan5@launchbase-test.com' ORDER BY id DESC LIMIT 1);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT id, status, CHAR_LENGTH(status) as status_length, HEX(status) as status_hex \nFROM deployments \nWHERE intakeId = (SELECT id FROM intakes WHERE email = 'e2e-test-jan5@launchbase-test.com' ORDER BY id DESC LIMIT 1);",
+  "rows": [
+    {
+      "id": "90001",
+      "status": "success",
+      "status_length": "7",
+      "status_hex": "73756363657373"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstatus\tstatus_length\tstatus_hex\n90001\tsuccess\t7\t73756363657373\n",
+  "stderr": "",
+  "execution_time_ms": 208
+}

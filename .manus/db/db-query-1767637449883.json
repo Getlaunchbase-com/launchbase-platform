@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO approvals (intakeId, buildPlanId, buildPlanHash, userAgent, ipAddress)\nVALUES (\n  (SELECT id FROM intakes WHERE email = 'e2e-test-jan5@launchbase-test.com' ORDER BY id DESC LIMIT 1),\n  (SELECT id FROM build_plans WHERE intakeId = (SELECT id FROM intakes WHERE email = 'e2e-test-jan5@launchbase-test.com' ORDER BY id DESC LIMIT 1) ORDER BY id DESC LIMIT 1),\n  'hash_e2e_test_jan5_2026',\n  'Mozilla/5.0 E2E Test',\n  '127.0.0.1'\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute INSERT INTO approvals (intakeId, buildPlanId, buildPlanHash, userAgent, ipAddress)\nVALUES (\n  (SELECT id FROM intakes WHERE email = 'e2e-test-jan5@launchbase-test.com' ORDER BY id DESC LIMIT 1),\n  (SELECT id FROM build_plans WHERE intakeId = (SELECT id FROM intakes WHERE email = 'e2e-test-jan5@launchbase-test.com' ORDER BY id DESC LIMIT 1) ORDER BY id DESC LIMIT 1),\n  'hash_e2e_test_jan5_2026',\n  'Mozilla/5.0 E2E Test',\n  '127.0.0.1'\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 68
+}

@@ -1,0 +1,230 @@
+{
+  "query": "SELECT * FROM email_logs ORDER BY sentAt DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT * FROM email_logs ORDER BY sentAt DESC LIMIT 20;",
+  "rows": [
+    {
+      "id": "210018",
+      "intakeId": "240026",
+      "emailType": "deployment_started",
+      "recipientEmail": "idem-1767671364255@launchbase-test.com",
+      "subject": "We received payment — deployment has started",
+      "status": "sent",
+      "sentAt": "2026-01-06 03:49:24",
+      "openedAt": "NULL",
+      "clickedAt": "NULL"
+    },
+    {
+      "id": "210017",
+      "intakeId": "240025",
+      "emailType": "deployment_started",
+      "recipientEmail": "idem-1767671221892@launchbase-test.com",
+      "subject": "We received payment — deployment has started",
+      "status": "sent",
+      "sentAt": "2026-01-06 03:47:02",
+      "openedAt": "NULL",
+      "clickedAt": "NULL"
+    },
+    {
+      "id": "210016",
+      "intakeId": "240024",
+      "emailType": "deployment_started",
+      "recipientEmail": "idem-1767671062779@launchbase-test.com",
+      "subject": "We received payment — deployment has started",
+      "status": "sent",
+      "sentAt": "2026-01-06 03:44:23",
+      "openedAt": "NULL",
+      "clickedAt": "NULL"
+    },
+    {
+      "id": "210015",
+      "intakeId": "240023",
+      "emailType": "deployment_started",
+      "recipientEmail": "idem-1767670866890@launchbase-test.com",
+      "subject": "We received payment — deployment has started",
+      "status": "sent",
+      "sentAt": "2026-01-06 03:41:08",
+      "openedAt": "NULL",
+      "clickedAt": "NULL"
+    },
+    {
+      "id": "210014",
+      "intakeId": "240022",
+      "emailType": "deployment_started",
+      "recipientEmail": "idem-1767669661684@launchbase-test.com",
+      "subject": "We received payment — deployment has started",
+      "status": "sent",
+      "sentAt": "2026-01-06 03:21:03",
+      "openedAt": "NULL",
+      "clickedAt": "NULL"
+    },
+    {
+      "id": "210013",
+      "intakeId": "240021",
+      "emailType": "deployment_started",
+      "recipientEmail": "idem-1767669647087@launchbase-test.com",
+      "subject": "We received payment — deployment has started",
+      "status": "sent",
+      "sentAt": "2026-01-06 03:20:48",
+      "openedAt": "NULL",
+      "clickedAt": "NULL"
+    },
+    {
+      "id": "210012",
+      "intakeId": "240020",
+      "emailType": "deployment_started",
+      "recipientEmail": "idem-1767669372819@launchbase-test.com",
+      "subject": "We received payment — deployment has started",
+      "status": "sent",
+      "sentAt": "2026-01-06 03:16:14",
+      "openedAt": "NULL",
+      "clickedAt": "NULL"
+    },
+    {
+      "id": "210011",
+      "intakeId": "240019",
+      "emailType": "deployment_started",
+      "recipientEmail": "idem-1767669353759@launchbase-test.com",
+      "subject": "We received payment — deployment has started",
+      "status": "sent",
+      "sentAt": "2026-01-06 03:15:54",
+      "openedAt": "NULL",
+      "clickedAt": "NULL"
+    },
+    {
+      "id": "210010",
+      "intakeId": "240017",
+      "emailType": "deployment_started",
+      "recipientEmail": "idem-1767665033625@launchbase-test.com",
+      "subject": "We received payment — deployment has started",
+      "status": "sent",
+      "sentAt": "2026-01-06 02:03:54",
+      "openedAt": "NULL",
+      "clickedAt": "NULL"
+    },
+    {
+      "id": "210009",
+      "intakeId": "240016",
+      "emailType": "deployment_started",
+      "recipientEmail": "idem-1767664962935@launchbase-test.com",
+      "subject": "We received payment — deployment has started",
+      "status": "sent",
+      "sentAt": "2026-01-06 02:02:43",
+      "openedAt": "NULL",
+      "clickedAt": "NULL"
+    },
+    {
+      "id": "210008",
+      "intakeId": "240015",
+      "emailType": "deployment_started",
+      "recipientEmail": "idem-1767664802398@launchbase-test.com",
+      "subject": "We received payment — deployment has started",
+      "status": "sent",
+      "sentAt": "2026-01-06 02:00:03",
+      "openedAt": "NULL",
+      "clickedAt": "NULL"
+    },
+    {
+      "id": "210007",
+      "intakeId": "240014",
+      "emailType": "deployment_started",
+      "recipientEmail": "idem-1767664346645@launchbase-test.com",
+      "subject": "We received payment — deployment has started",
+      "status": "sent",
+      "sentAt": "2026-01-06 01:52:29",
+      "openedAt": "NULL",
+      "clickedAt": "NULL"
+    },
+    {
+      "id": "210006",
+      "intakeId": "240013",
+      "emailType": "deployment_started",
+      "recipientEmail": "idem-1767664322265@launchbase-test.com",
+      "subject": "We received payment — deployment has started",
+      "status": "sent",
+      "sentAt": "2026-01-06 01:52:05",
+      "openedAt": "NULL",
+      "clickedAt": "NULL"
+    },
+    {
+      "id": "210005",
+      "intakeId": "240012",
+      "emailType": "deployment_started",
+      "recipientEmail": "idem-1767663689103@launchbase-test.com",
+      "subject": "We received payment — deployment has started",
+      "status": "sent",
+      "sentAt": "2026-01-06 01:41:31",
+      "openedAt": "NULL",
+      "clickedAt": "NULL"
+    },
+    {
+      "id": "210004",
+      "intakeId": "240011",
+      "emailType": "deployment_started",
+      "recipientEmail": "idem-1767663643770@launchbase-test.com",
+      "subject": "We received payment — deployment has started",
+      "status": "sent",
+      "sentAt": "2026-01-06 01:40:46",
+      "openedAt": "NULL",
+      "clickedAt": "NULL"
+    },
+    {
+      "id": "210003",
+      "intakeId": "240010",
+      "emailType": "deployment_started",
+      "recipientEmail": "idem-1767663624520@launchbase-test.com",
+      "subject": "We received payment — deployment has started",
+      "status": "sent",
+      "sentAt": "2026-01-06 01:40:27",
+      "openedAt": "NULL",
+      "clickedAt": "NULL"
+    },
+    {
+      "id": "210002",
+      "intakeId": "240009",
+      "emailType": "deployment_started",
+      "recipientEmail": "idem-1767663455348@launchbase-test.com",
+      "subject": "We received payment — deployment has started",
+      "status": "sent",
+      "sentAt": "2026-01-06 01:37:38",
+      "openedAt": "NULL",
+      "clickedAt": "NULL"
+    },
+    {
+      "id": "210001",
+      "intakeId": "240008",
+      "emailType": "deployment_started",
+      "recipientEmail": "idem-1767663385692@launchbase-test.com",
+      "subject": "We received payment — deployment has started",
+      "status": "sent",
+      "sentAt": "2026-01-06 01:36:29",
+      "openedAt": "NULL",
+      "clickedAt": "NULL"
+    },
+    {
+      "id": "180008",
+      "intakeId": "210001",
+      "emailType": "site_live",
+      "recipientEmail": "e2e-test-jan5@launchbase-test.com",
+      "subject": "Your site is live — and you don't need to manage it",
+      "status": "sent",
+      "sentAt": "2026-01-05 21:02:13",
+      "openedAt": "NULL",
+      "clickedAt": "NULL"
+    },
+    {
+      "id": "180007",
+      "intakeId": "1",
+      "emailType": "site_live",
+      "recipientEmail": "vmorre@live.com.com",
+      "subject": "Your site is live — and you don't need to manage it",
+      "status": "sent",
+      "sentAt": "2026-01-05 21:00:16",
+      "openedAt": "NULL",
+      "clickedAt": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tintakeId\temailType\trecipientEmail\tsubject\tstatus\tsentAt\topenedAt\tclickedAt\n210018\t240026\tdeployment_started\tidem-1767671364255@launchbase-test.com\tWe received payment — deployment has started\tsent\t2026-01-06 03:49:24\tNULL\tNULL\n210017\t240025\tdeployment_started\tidem-1767671221892@launchbase-test.com\tWe received payment — deployment has started\tsent\t2026-01-06 03:47:02\tNULL\tNULL\n210016\t240024\tdeployment_started\tidem-1767671062779@launchbase-test.com\tWe received payment — deployment has started\tsent\t2026-01-06 03:44:23\tNULL\tNULL\n210015\t240023\tdeployment_started\tidem-1767670866890@launchbase-test.com\tWe received payment — deployment has started\tsent\t2026-01-06 03:41:08\tNULL\tNULL\n210014\t240022\tdeployment_started\tidem-1767669661684@launchbase-test.com\tWe received payment — deployment has started\tsent\t2026-01-06 03:21:03\tNULL\tNULL\n210013\t240021\tdeployment_started\tidem-1767669647087@launchbase-test.com\tWe received payment — deployment has started\tsent\t2026-01-06 03:20:48\tNULL\tNULL\n210012\t240020\tdeployment_started\tidem-1767669372819@launchbase-test.com\tWe received payment — deployment has started\tsent\t2026-01-06 03:16:14\tNULL\tNULL\n210011\t240019\tdeployment_started\tidem-1767669353759@launchbase-test.com\tWe received payment — deployment has started\tsent\t2026-01-06 03:15:54\tNULL\tNULL\n210010\t240017\tdeployment_started\tidem-1767665033625@launchbase-test.com\tWe received payment — deployment has started\tsent\t2026-01-06 02:03:54\tNULL\tNULL\n210009\t240016\tdeployment_started\tidem-1767664962935@launchbase-test.com\tWe received payment — deployment has started\tsent\t2026-01-06 02:02:43\tNULL\tNULL\n210008\t240015\tdeployment_started\tidem-1767664802398@launchbase-test.com\tWe received payment — deployment has started\tsent\t2026-01-06 02:00:03\tNULL\tNULL\n210007\t240014\tdeployment_started\tidem-1767664346645@launchbase-test.com\tWe received payment — deployment has started\tsent\t2026-01-06 01:52:29\tNULL\tNULL\n210006\t240013\tdeployment_started\tidem-1767664322265@launchbase-test.com\tWe received payment — deployment has started\tsent\t2026-01-06 01:52:05\tNULL\tNULL\n210005\t240012\tdeployment_started\tidem-1767663689103@launchbase-test.com\tWe received payment — deployment has started\tsent\t2026-01-06 01:41:31\tNULL\tNULL\n210004\t240011\tdeployment_started\tidem-1767663643770@launchbase-test.com\tWe received payment — deployment has started\tsent\t2026-01-06 01:40:46\tNULL\tNULL\n210003\t240010\tdeployment_started\tidem-1767663624520@launchbase-test.com\tWe received payment — deployment has started\tsent\t2026-01-06 01:40:27\tNULL\tNULL\n210002\t240009\tdeployment_started\tidem-1767663455348@launchbase-test.com\tWe received payment — deployment has started\tsent\t2026-01-06 01:37:38\tNULL\tNULL\n210001\t240008\tdeployment_started\tidem-1767663385692@launchbase-test.com\tWe received payment — deployment has started\tsent\t2026-01-06 01:36:29\tNULL\tNULL\n180008\t210001\tsite_live\te2e-test-jan5@launchbase-test.com\tYour site is live — and you don't need to manage it\tsent\t2026-01-05 21:02:13\tNULL\tNULL\n180007\t1\tsite_live\tvmorre@live.com.com\tYour site is live — and you don't need to manage it\tsent\t2026-01-05 21:00:16\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 116
+}

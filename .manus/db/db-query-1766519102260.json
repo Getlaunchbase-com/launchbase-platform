@@ -1,0 +1,13 @@
+{
+  "query": "SELECT COUNT(*) as silence_count FROM decision_logs WHERE decision IN ('silence', 'wait') AND createdAt >= DATE_SUB(NOW(), INTERVAL 7 DAY);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT COUNT(*) as silence_count FROM decision_logs WHERE decision IN ('silence', 'wait') AND createdAt >= DATE_SUB(NOW(), INTERVAL 7 DAY);",
+  "rows": [
+    {
+      "silence_count": "5"
+    }
+  ],
+  "messages": [],
+  "stdout": "silence_count\n5\n",
+  "stderr": "",
+  "execution_time_ms": 64
+}

@@ -1,0 +1,8 @@
+{
+  "query": "SELECT * FROM approval_logs WHERE intakeId IN (SELECT id FROM intakes WHERE status = 'approved') ORDER BY approvedAt DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT * FROM approval_logs WHERE intakeId IN (SELECT id FROM intakes WHERE status = 'approved') ORDER BY approvedAt DESC LIMIT 5;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1146 (42S02) at line 1: Table 'h86jcadp392wwbwxrcedms.approval_logs' doesn't exist"
+  ]
+}
