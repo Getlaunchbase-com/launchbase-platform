@@ -386,3 +386,12 @@
 - [x] Checkout math: Calculate monthly total from selected services
 - [x] Promo interaction: Founder promo overrides setup fees only
 - [ ] Toggle UX: Services can be paused/resumed (billing next cycle) - DEFERRED
+
+## Step 9 Pricing Summary - Jan 8, 2026
+- [x] Replace Step 9 with pricing summary (setup breakdown + monthly breakdown)
+- [x] Calculate and display setup total with bundle discount
+- [x] Calculate and display monthly total
+- [x] Show bundle discount line if applicable
+- [x] Show founder discount line if applicable
+- [x] Add safety footer copy
+- [x] Add "Confirm & Continue" and "Go Back" buttons
