@@ -30,6 +30,8 @@ export const intakes = mysqlTable("intakes", {
   // Localization + audience
   language: mysqlEnum("language", ["en", "es", "pl"]).default("en").notNull(),
   audience: mysqlEnum("audience", ["biz", "org"]).default("biz").notNull(),
+  // Tenant (for multi-tenant filtering)
+  tenant: mysqlEnum("tenant", ["launchbase", "vinces"]).notNull().default("launchbase"),
   // Website status (customer entry state)
   websiteStatus: mysqlEnum("websiteStatus", ["none", "existing", "systems_only"]).notNull().default("none"),
   phone: varchar("phone", { length: 32 }),
@@ -120,6 +122,8 @@ export const deployments = mysqlTable("deployments", {
   id: int("id").autoincrement().primaryKey(),
   buildPlanId: int("buildPlanId").notNull(),
   intakeId: int("intakeId").notNull(),
+  // Tenant (for multi-tenant filtering)
+  tenant: mysqlEnum("tenant", ["launchbase", "vinces"]).notNull().default("launchbase"),
   // Job status
   status: mysqlEnum("status", ["queued", "running", "success", "failed"]).default("queued").notNull(),
   // URL mode: Phase 1 = TEMP_MANUS, Phase 2 = CUSTOM_DOMAIN
@@ -172,6 +176,8 @@ export type InsertAnalyticsEvent = typeof analyticsEvents.$inferInsert;
 export const emailLogs = mysqlTable("email_logs", {
   id: int("id").autoincrement().primaryKey(),
   intakeId: int("intakeId").notNull(),
+  // Tenant (for multi-tenant filtering)
+  tenant: mysqlEnum("tenant", ["launchbase", "vinces"]).notNull().default("launchbase"),
   // Email details
   emailType: mysqlEnum("emailType", [
     "intake_confirmation",

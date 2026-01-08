@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE deployments d JOIN intakes i ON i.id = d.intakeId SET d.tenant = i.tenant",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute UPDATE deployments d JOIN intakes i ON i.id = d.intakeId SET d.tenant = i.tenant",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 176
+}

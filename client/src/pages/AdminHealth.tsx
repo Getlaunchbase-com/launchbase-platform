@@ -11,9 +11,11 @@
  */
 
 import { useEffect, useState } from "react";
+import { useLocation, useSearch } from "wouter";
 import { trpc } from "../lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import { RefreshCw, CheckCircle2, XCircle, Clock, AlertCircle } from "lucide-react";
 
 function formatUptime(seconds: number): string {
@@ -38,17 +40,26 @@ function formatTimestamp(date: Date | null): string {
 }
 
 export default function AdminHealth() {
+  const [, setLocation] = useLocation();
+  const searchParams = useSearch();
+  const urlParams = new URLSearchParams(searchParams);
+  const tenantParam = (urlParams.get("tenant") || "all") as "all" | "launchbase" | "vinces";
+  
   const [autoRefresh, setAutoRefresh] = useState(true);
-  const { data: metrics, isLoading, refetch } = trpc.admin.health.useQuery();
+  const { data: metrics, isLoading, refetch } = trpc.admin.health.useQuery(
+    { tenant: tenantParam },
+    { refetchInterval: autoRefresh ? 30000 : false }
+  );
+  
+  const handleTenantChange = (newTenant: string) => {
+    if (newTenant === "all") {
+      setLocation("/admin/health");
+    } else {
+      setLocation(`/admin/health?tenant=${newTenant}`);
+    }
+  };
 
-  // Auto-refresh every 30 seconds
-  useEffect(() => {
-    if (!autoRefresh) return;
-    const interval = setInterval(() => {
-      refetch();
-    }, 30000);
-    return () => clearInterval(interval);
-  }, [autoRefresh, refetch]);
+
 
   if (isLoading) {
     return (
@@ -147,9 +158,21 @@ export default function AdminHealth() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">System Health</h1>
-          <p className="text-muted-foreground">Last 24 hours • Auto-refresh: {autoRefresh ? "On" : "Off"}</p>
+          <p className="text-muted-foreground">
+            Last 24 hours • Tenant: <span className="font-medium">{metrics.tenant === "all" ? "All" : metrics.tenant === "launchbase" ? "LaunchBase" : "Vince's Snowplow"}</span> • Auto-refresh: {autoRefresh ? "On" : "Off"}
+          </p>
         </div>
         <div className="flex gap-2">
+          <Select value={tenantParam} onValueChange={handleTenantChange}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select tenant" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Tenants</SelectItem>
+              <SelectItem value="launchbase">LaunchBase</SelectItem>
+              <SelectItem value="vinces">Vince's Snowplow</SelectItem>
+            </SelectContent>
+          </Select>
           <Button
             variant="outline"
             size="sm"

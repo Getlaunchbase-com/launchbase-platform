@@ -6,11 +6,12 @@
 
 import { getDb } from "./db";
 import { deployments, emailLogs, stripeWebhookEvents } from "../drizzle/schema";
-import { sql, gte } from "drizzle-orm";
+import { sql, gte, eq, and } from "drizzle-orm";
 
 const TWENTY_FOUR_HOURS_AGO = () => new Date(Date.now() - 24 * 60 * 60 * 1000);
 
 export interface HealthMetrics {
+  tenant: "all" | "launchbase" | "vinces";
   deployments: {
     total: number;
     queued: number;
@@ -47,7 +48,7 @@ export interface HealthMetrics {
 
 const serverStartTime = new Date();
 
-export async function getHealthMetrics(): Promise<HealthMetrics> {
+export async function getHealthMetrics(tenant?: "launchbase" | "vinces"): Promise<HealthMetrics> {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -56,10 +57,14 @@ export async function getHealthMetrics(): Promise<HealthMetrics> {
   const cutoff = TWENTY_FOUR_HOURS_AGO();
 
   // Deployment metrics
+  const deploymentWhere = tenant
+    ? and(gte(deployments.createdAt, cutoff), eq(deployments.tenant, tenant))
+    : gte(deployments.createdAt, cutoff);
+  
   const deploymentRows = await db
     .select()
     .from(deployments)
-    .where(gte(deployments.createdAt, cutoff));
+    .where(deploymentWhere);
 
   const deploymentMetrics = {
     total: deploymentRows.length,
@@ -76,10 +81,14 @@ export async function getHealthMetrics(): Promise<HealthMetrics> {
   };
 
   // Email metrics
+  const emailWhere = tenant
+    ? and(gte(emailLogs.sentAt, cutoff), eq(emailLogs.tenant, tenant))
+    : gte(emailLogs.sentAt, cutoff);
+  
   const emailRows = await db
     .select()
     .from(emailLogs)
-    .where(gte(emailLogs.sentAt, cutoff));
+    .where(emailWhere);
 
   const emailMetrics = {
     total: emailRows.length,
@@ -126,6 +135,7 @@ export async function getHealthMetrics(): Promise<HealthMetrics> {
   };
 
   return {
+    tenant: tenant ?? "all",
     deployments: deploymentMetrics,
     emails: emailMetrics,
     stripeWebhooks: stripeMetrics,
