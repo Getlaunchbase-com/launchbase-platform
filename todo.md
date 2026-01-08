@@ -397,14 +397,21 @@
 ## Complete Service Selection Flow - Jan 8, 2026
 - [x] Create computePricing.ts with exact pricing logic
 - [x] Create serviceCards.ts with CUSTOMER/IT_HELPER copy
-- [ ] Implement Step 8 UI: Experience toggle (CUSTOMER/IT_HELPER)
-- [ ] Implement Step 8 UI: Service cards with mode-dependent descriptions
-- [ ] Implement Step 8 UI: Email required when Website selected
-- [ ] Implement Step 8 UI: Enrichment disabled when no Social tier
-- [ ] Implement Step 8 UI: Bundle discount banner when 2+ services
-- [ ] Update Step 9: Use computePricing() for all calculations
-- [ ] Update Step 9: Show setup breakdown with bundle/founder discounts
-- [ ] Update Step 9: Show monthly breakdown
-- [ ] Wire Stripe: Create setup-only checkout session
-- [ ] Wire Stripe: Apply founder promo ($300 flat)
-- [ ] Update webhook: Mark paid, assign founder #, send email
+- [x] Implement Step 8 UI: Experience toggle (CUSTOMER/IT_HELPER)
+- [x] Implement Step 8 UI: Service cards with mode-dependent descriptions
+- [x] Implement Step 8 UI: Email required when Website selected
+- [x] Implement Step 8 UI: Enrichment disabled when no Social tier
+- [x] Implement Step 8 UI: Bundle discount banner when 2+ services
+- [x] Implement Step 8 UI: Live pricing preview with setup/monthly totals
+- [x] Update Step 9: Use computePricing() for all calculations
+- [x] Update Step 9: Show setup breakdown with bundle/founder discounts
+- [x] Update Step 9: Show monthly breakdown
+- [x] Update Step 9: Add "Go Back and Adjust Services" button
+- [x] Update Step 9: Add "Confirm & Continue" button
+- [x] Update handleSubmit to include service selections in rawPayload
+- [x] Wire Stripe: Create setup-only checkout session
+- [x] Wire Stripe: Apply founder promo ($300 flat)
+- [x] Update webhook: Mark paid, assign founder #, send email (existing webhook handles it)
+- [x] Add payment.createServiceCheckout tRPC endpoint
+- [x] Wire onboarding Step 9 to trigger checkout after intake submission
+- [x] Update button states to show checkout loading

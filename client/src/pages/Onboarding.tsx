@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, ArrowRight, Rocket, Check, Sparkles, Building2, Users, Briefcase, AlertCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, Rocket, Check, Sparkles, Building2, Users, Briefcase, AlertCircle, Globe, Mail, TrendingUp, Layers, MapPin, DollarSign } from "lucide-react";
+import { computePricing } from "@/lib/computePricing";
+import { serviceCards } from "@/lib/serviceCards";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
 import { cn } from "@/lib/utils";
@@ -24,12 +26,13 @@ interface OnboardingData {
   phone: string;
   email: string;
   brandFeel: "clean" | "bold" | "friendly" | "auto" | "";
-  experienceMode: "plain" | "technical";
-  socialMediaTier: "none" | "4posts" | "8posts" | "12posts";
+  experienceMode: "CUSTOMER" | "IT_HELPER";
+  website: boolean;
+  emailService: boolean;
+  socialMediaTier: "LOW" | "MEDIUM" | "HIGH" | null;
   enrichmentLayer: boolean;
   googleBusiness: boolean;
   quickBooksSync: boolean;
-  emailService: boolean;
   promoCode?: string;
 }
 
@@ -44,12 +47,13 @@ const initialData: OnboardingData = {
   phone: "",
   email: "",
   brandFeel: "",
-  experienceMode: "plain",
-  socialMediaTier: "none",
+  experienceMode: "CUSTOMER",
+  website: true,
+  emailService: true,
+  socialMediaTier: null,
   enrichmentLayer: false,
   googleBusiness: false,
   quickBooksSync: false,
-  emailService: false,
   promoCode: "",
 };
 
@@ -123,12 +127,44 @@ export default function Onboarding() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string>("");
 
+  const createCheckoutMutation = trpc.payment.createServiceCheckout.useMutation({
+    onSuccess: (result) => {
+      // Redirect to Stripe checkout
+      window.location.href = result.checkoutUrl;
+    },
+    onError: (error) => {
+      setGlobalError("Failed to create checkout session. Please try again or contact support.");
+      console.error("Checkout creation error:", error);
+    },
+  });
+
   const submitMutation = trpc.intake.submit.useMutation({
-    onSuccess: () => {
+    onSuccess: (result) => {
+      if (!result.intakeId) {
+        setGlobalError("Failed to create intake. Please try again.");
+        return;
+      }
+
+      // Clear form state
       localStorage.removeItem(STORAGE_KEY);
       setFieldErrors({});
       setGlobalError("");
-      setLocation("/onboarding/success");
+
+      // Create checkout session with service selections
+      createCheckoutMutation.mutate({
+        intakeId: result.intakeId,
+        email: data.email,
+        name: data.businessName,
+        promoCode: data.promoCode,
+        serviceSelections: {
+          website: data.website,
+          emailService: data.emailService,
+          socialMediaTier: data.socialMediaTier,
+          enrichmentLayer: data.enrichmentLayer,
+          googleBusiness: data.googleBusiness,
+          quickBooksSync: data.quickBooksSync,
+        },
+      });
     },
     onError: (error) => {
       setFieldErrors({});
@@ -201,6 +237,38 @@ export default function Onboarding() {
     }
   };
 
+  // Service selection handlers
+  const handleWebsiteToggle = (checked: boolean) => {
+    setData(prev => ({
+      ...prev,
+      website: checked,
+      emailService: checked // Email required with Website
+    }));
+  };
+
+  const handleSocialTierChange = (tier: "LOW" | "MEDIUM" | "HIGH" | null) => {
+    setData(prev => ({
+      ...prev,
+      socialMediaTier: tier,
+      enrichmentLayer: tier === null ? false : prev.enrichmentLayer // Enrichment requires Social
+    }));
+  };
+
+  const countSelectedServices = () => {
+    let count = 0;
+    if (data.website) count++;
+    if (data.socialMediaTier !== null) count++;
+    if (data.enrichmentLayer) count++;
+    if (data.googleBusiness) count++;
+    if (data.quickBooksSync) count++;
+    if (data.emailService && !data.website) count++; // Only count email if standalone
+    return count;
+  };
+
+  const showBundleDiscount = () => {
+    return countSelectedServices() >= 2 && data.socialMediaTier !== null;
+  };
+
   const canProceed = () => {
     switch (currentStep) {
       case 1: return data.businessDescription.trim().length >= 20;
@@ -251,6 +319,14 @@ export default function Onboarding() {
         inferredCTA: primaryCTA,
         inferredTone: tone,
         promoCode: data.promoCode,
+        // Service selections
+        experienceMode: data.experienceMode,
+        website: data.website,
+        emailService: data.emailService,
+        socialMediaTier: data.socialMediaTier,
+        enrichmentLayer: data.enrichmentLayer,
+        googleBusiness: data.googleBusiness,
+        quickBooksSync: data.quickBooksSync,
       },
     });
   };
@@ -559,18 +635,354 @@ export default function Onboarding() {
         );
 
       case 8:
+        const cards = serviceCards[data.experienceMode];
+        const pricing = computePricing({
+          website: data.website,
+          emailService: data.emailService,
+          socialMediaTier: data.socialMediaTier,
+          enrichmentLayer: data.enrichmentLayer,
+          googleBusiness: data.googleBusiness,
+          quickBooksSync: data.quickBooksSync,
+          promoCode: data.promoCode
+        });
+
         return (
-          <div className="space-y-8 text-center">
-            <div className="w-20 h-20 bg-[#FF6A00]/20 rounded-full flex items-center justify-center mx-auto">
-              <Sparkles className="w-10 h-10 text-[#FF6A00]" />
-            </div>
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">You're all set</h2>
-              <p className="text-gray-400 text-lg max-w-md mx-auto">
-                Nothing deploys without your approval. You can stop at any time.
+          <div className="space-y-8">
+            {/* Header */}
+            <div className="text-center">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Choose Your Services</h2>
+              <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                Select what you want LaunchBase to handle. You can add or remove services anytime.
               </p>
             </div>
 
+            {/* Experience Toggle */}
+            <div className="flex items-center justify-center gap-4 p-4 bg-white/5 rounded-lg">
+              <span className="text-sm text-gray-400">View mode:</span>
+              <Button
+                variant={data.experienceMode === "CUSTOMER" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => updateField("experienceMode", "CUSTOMER")}
+                className={data.experienceMode === "CUSTOMER" ? "bg-[#FF6A00] hover:bg-[#FF6A00]/90" : ""}
+              >
+                Plain Language
+              </Button>
+              <Button
+                variant={data.experienceMode === "IT_HELPER" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => updateField("experienceMode", "IT_HELPER")}
+                className={data.experienceMode === "IT_HELPER" ? "bg-[#FF6A00] hover:bg-[#FF6A00]/90" : ""}
+              >
+                Technical
+              </Button>
+            </div>
+
+            {/* Bundle Discount Banner */}
+            {showBundleDiscount() && (
+              <div className="bg-[#FF6A00]/10 border border-[#FF6A00]/30 rounded-lg p-4 text-center">
+                <p className="text-[#FF6A00] font-medium">🎉 Bundle Discount Active: 50% off Social Media setup</p>
+              </div>
+            )}
+
+            {/* Service Cards */}
+            <div className="space-y-4">
+              {/* Website */}
+              <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+                <div className="flex items-start gap-4">
+                  <input
+                    type="checkbox"
+                    checked={data.website}
+                    onChange={(e) => handleWebsiteToggle(e.target.checked)}
+                    className="mt-1 w-5 h-5 rounded border-gray-600 text-[#FF6A00] focus:ring-[#FF6A00]"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Globe className="w-5 h-5 text-[#FF6A00]" />
+                      <h3 className="text-xl font-bold">{cards.website.title}</h3>
+                    </div>
+                    <p className="text-gray-400 mb-3">{cards.website.oneLiner}</p>
+                    <ul className="space-y-1 text-sm text-gray-500">
+                      {cards.website.bullets.map((bullet, i) => (
+                        <li key={i}>• {bullet}</li>
+                      ))}
+                    </ul>
+                    <p className="text-sm text-[#FF6A00] mt-3">$499 setup + $49/mo</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Email Service */}
+              <div className="bg-white/5 border border-white/10 rounded-lg p-6 opacity-75">
+                <div className="flex items-start gap-4">
+                  <input
+                    type="checkbox"
+                    checked={data.emailService}
+                    disabled={data.website}
+                    className="mt-1 w-5 h-5 rounded border-gray-600 text-[#FF6A00] focus:ring-[#FF6A00] disabled:opacity-50"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Mail className="w-5 h-5 text-[#FF6A00]" />
+                      <h3 className="text-xl font-bold">{cards.email.title}</h3>
+                      {data.website && <span className="text-xs bg-[#FF6A00]/20 text-[#FF6A00] px-2 py-1 rounded">Required with Website</span>}
+                    </div>
+                    <p className="text-gray-400 mb-3">{cards.email.oneLiner}</p>
+                    <ul className="space-y-1 text-sm text-gray-500">
+                      {cards.email.bullets.map((bullet, i) => (
+                        <li key={i}>• {bullet}</li>
+                      ))}
+                    </ul>
+                    <p className="text-sm text-[#FF6A00] mt-3">$99 setup + $19/mo</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Social Media Intelligence */}
+              <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <TrendingUp className="w-5 h-5 text-[#FF6A00]" />
+                    <h3 className="text-xl font-bold">Social Media Intelligence</h3>
+                  </div>
+                  <p className="text-gray-400">We write and post for you based on what's happening.</p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <Button
+                      variant={data.socialMediaTier === null ? "default" : "outline"}
+                      onClick={() => handleSocialTierChange(null)}
+                      className={data.socialMediaTier === null ? "bg-gray-700" : ""}
+                    >
+                      Off
+                    </Button>
+                    <Button
+                      variant={data.socialMediaTier === "LOW" ? "default" : "outline"}
+                      onClick={() => handleSocialTierChange("LOW")}
+                      className={data.socialMediaTier === "LOW" ? "bg-[#FF6A00] hover:bg-[#FF6A00]/90" : ""}
+                    >
+                      <div className="text-left">
+                        <div className="font-bold">Low</div>
+                        <div className="text-xs">4 posts/mo</div>
+                      </div>
+                    </Button>
+                    <Button
+                      variant={data.socialMediaTier === "MEDIUM" ? "default" : "outline"}
+                      onClick={() => handleSocialTierChange("MEDIUM")}
+                      className={data.socialMediaTier === "MEDIUM" ? "bg-[#FF6A00] hover:bg-[#FF6A00]/90" : ""}
+                    >
+                      <div className="text-left">
+                        <div className="font-bold">Medium</div>
+                        <div className="text-xs">8 posts/mo</div>
+                      </div>
+                    </Button>
+                    <Button
+                      variant={data.socialMediaTier === "HIGH" ? "default" : "outline"}
+                      onClick={() => handleSocialTierChange("HIGH")}
+                      className={data.socialMediaTier === "HIGH" ? "bg-[#FF6A00] hover:bg-[#FF6A00]/90" : ""}
+                    >
+                      <div className="text-left">
+                        <div className="font-bold">High</div>
+                        <div className="text-xs">12 posts/mo</div>
+                      </div>
+                    </Button>
+                  </div>
+
+                  {data.socialMediaTier && (
+                    <div>
+                      <p className="text-sm text-gray-500 mb-2">
+                        {cards.social[data.socialMediaTier].oneLiner}
+                      </p>
+                      <ul className="space-y-1 text-sm text-gray-500">
+                        {cards.social[data.socialMediaTier].bullets.map((bullet, i) => (
+                          <li key={i}>• {bullet}</li>
+                        ))}
+                      </ul>
+                      <p className="text-sm text-[#FF6A00] mt-3">
+                        $299 setup + ${data.socialMediaTier === "LOW" ? "$79" : data.socialMediaTier === "MEDIUM" ? "$129" : "$179"}/mo
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Enrichment Layer */}
+              <div className={cn(
+                "bg-white/5 border border-white/10 rounded-lg p-6",
+                data.socialMediaTier === null && "opacity-50"
+              )}>
+                <div className="flex items-start gap-4">
+                  <input
+                    type="checkbox"
+                    checked={data.enrichmentLayer}
+                    disabled={data.socialMediaTier === null}
+                    onChange={(e) => updateField("enrichmentLayer", e.target.checked)}
+                    className="mt-1 w-5 h-5 rounded border-gray-600 text-[#FF6A00] focus:ring-[#FF6A00] disabled:opacity-50"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Layers className="w-5 h-5 text-[#FF6A00]" />
+                      <h3 className="text-xl font-bold">{cards.enrichment.title}</h3>
+                      {data.socialMediaTier === null && <span className="text-xs bg-gray-700 text-gray-400 px-2 py-1 rounded">Requires Social</span>}
+                    </div>
+                    <p className="text-gray-400 mb-3">{cards.enrichment.oneLiner}</p>
+                    <ul className="space-y-1 text-sm text-gray-500">
+                      {cards.enrichment.bullets.map((bullet, i) => (
+                        <li key={i}>• {bullet}</li>
+                      ))}
+                    </ul>
+                    <p className="text-sm text-[#FF6A00] mt-3">$199 setup + $79/mo</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Google Business */}
+              <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+                <div className="flex items-start gap-4">
+                  <input
+                    type="checkbox"
+                    checked={data.googleBusiness}
+                    onChange={(e) => updateField("googleBusiness", e.target.checked)}
+                    className="mt-1 w-5 h-5 rounded border-gray-600 text-[#FF6A00] focus:ring-[#FF6A00]"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <MapPin className="w-5 h-5 text-[#FF6A00]" />
+                      <h3 className="text-xl font-bold">{cards.gmb.title}</h3>
+                    </div>
+                    <p className="text-gray-400 mb-3">{cards.gmb.oneLiner}</p>
+                    <ul className="space-y-1 text-sm text-gray-500">
+                      {cards.gmb.bullets.map((bullet, i) => (
+                        <li key={i}>• {bullet}</li>
+                      ))}
+                    </ul>
+                    <p className="text-sm text-[#FF6A00] mt-3">$149 setup + $29/mo</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* QuickBooks Sync */}
+              <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+                <div className="flex items-start gap-4">
+                  <input
+                    type="checkbox"
+                    checked={data.quickBooksSync}
+                    onChange={(e) => updateField("quickBooksSync", e.target.checked)}
+                    className="mt-1 w-5 h-5 rounded border-gray-600 text-[#FF6A00] focus:ring-[#FF6A00]"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <DollarSign className="w-5 h-5 text-[#FF6A00]" />
+                      <h3 className="text-xl font-bold">{cards.qb.title}</h3>
+                    </div>
+                    <p className="text-gray-400 mb-3">{cards.qb.oneLiner}</p>
+                    <ul className="space-y-1 text-sm text-gray-500">
+                      {cards.qb.bullets.map((bullet, i) => (
+                        <li key={i}>• {bullet}</li>
+                      ))}
+                    </ul>
+                    <p className="text-sm text-[#FF6A00] mt-3">$199 setup + $39/mo</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Live Pricing Preview */}
+            <div className="bg-[#FF6A00]/10 border border-[#FF6A00]/30 rounded-lg p-6">
+              <h3 className="text-xl font-bold mb-4">Your Pricing</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-400 mb-1">Setup Total</p>
+                  <p className="text-3xl font-bold text-[#FF6A00]">${(pricing.setupTotalCents / 100).toFixed(0)}</p>
+                  {pricing.setupDiscountCents > 0 && (
+                    <p className="text-xs text-green-400 mt-1">Saved ${(pricing.setupDiscountCents / 100).toFixed(0)} with bundle</p>
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm text-gray-400 mb-1">Monthly Total</p>
+                  <p className="text-3xl font-bold text-[#FF6A00]">${(pricing.monthlyTotalCents / 100).toFixed(0)}</p>
+                  <p className="text-xs text-gray-500 mt-1">Starts after launch</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 9:
+        const pricingSummary = computePricing({
+          website: data.website,
+          emailService: data.emailService,
+          socialMediaTier: data.socialMediaTier,
+          enrichmentLayer: data.enrichmentLayer,
+          googleBusiness: data.googleBusiness,
+          quickBooksSync: data.quickBooksSync,
+          promoCode: data.promoCode
+        });
+
+        return (
+          <div className="space-y-8">
+            {/* Header */}
+            <div className="text-center">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Review Your Pricing</h2>
+              <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                Here's what you'll pay. You can adjust services anytime.
+              </p>
+            </div>
+
+            {/* Setup Breakdown */}
+            <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+              <h3 className="text-xl font-bold mb-4">Setup Fees (One-Time)</h3>
+              <div className="space-y-3">
+                {pricingSummary.setupLineItems.map((item) => (
+                  <div key={item.key} className="flex justify-between items-center">
+                    <span className="text-gray-400">{item.label}</span>
+                    <span className="text-white font-medium">${(item.amountCents / 100).toFixed(0)}</span>
+                  </div>
+                ))}
+                
+                {pricingSummary.setupDiscountCents > 0 && (
+                  <div className="flex justify-between items-center pt-3 border-t border-white/10">
+                    <span className="text-green-400">Bundle Discount (50% off Social)</span>
+                    <span className="text-green-400 font-medium">-${(pricingSummary.setupDiscountCents / 100).toFixed(0)}</span>
+                  </div>
+                )}
+                
+                <div className="flex justify-between items-center pt-3 border-t border-white/10">
+                  <span className="text-xl font-bold">Setup Total</span>
+                  <span className="text-2xl font-bold text-[#FF6A00]">${(pricingSummary.setupTotalCents / 100).toFixed(0)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Monthly Breakdown */}
+            <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+              <h3 className="text-xl font-bold mb-4">Monthly Fees (Recurring)</h3>
+              <div className="space-y-3">
+                {pricingSummary.monthlyLineItems.map((item) => (
+                  <div key={item.key} className="flex justify-between items-center">
+                    <span className="text-gray-400">{item.label}</span>
+                    <span className="text-white font-medium">${(item.amountCents / 100).toFixed(0)}/mo</span>
+                  </div>
+                ))}
+                
+                <div className="flex justify-between items-center pt-3 border-t border-white/10">
+                  <span className="text-xl font-bold">Monthly Total</span>
+                  <span className="text-2xl font-bold text-[#FF6A00]">${(pricingSummary.monthlyTotalCents / 100).toFixed(0)}/mo</span>
+                </div>
+              </div>
+              <p className="text-sm text-gray-500 mt-4">
+                Monthly billing starts after your site launches. Cancel any service anytime. Changes apply next billing cycle.
+              </p>
+            </div>
+
+            {/* Notes */}
+            {pricingSummary.notes.length > 0 && (
+              <div className="bg-[#FF6A00]/10 border border-[#FF6A00]/30 rounded-lg p-4">
+                {pricingSummary.notes.map((note, i) => (
+                  <p key={i} className="text-sm text-[#FF6A00]">• {note}</p>
+                ))}
+              </div>
+            )}
+
+            {/* Error Display */}
             {globalError && (
               <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 flex items-start gap-3">
                 <AlertCircle className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" />
@@ -581,23 +993,39 @@ export default function Onboarding() {
               </div>
             )}
 
-            <Button
-              onClick={handleSubmit}
-              disabled={submitMutation.isPending}
-              size="lg"
-              className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white text-lg px-10 py-7"
-            >
-              {submitMutation.isPending ? (
-                "Building..."
-              ) : (
-                <>
-                  <Rocket className="w-5 h-5 mr-2" />
-                  Build My Website
-                </>
-              )}
-            </Button>
-            <p className="text-sm text-gray-500">
-              No payment required to review your site.
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                variant="outline"
+                onClick={() => setCurrentStep(8)}
+                className="border-white/20 text-white hover:bg-white/10"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Go Back and Adjust Services
+              </Button>
+              
+              <Button
+                onClick={handleSubmit}
+                disabled={submitMutation.isPending || createCheckoutMutation.isPending}
+                size="lg"
+                className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white"
+              >
+                {submitMutation.isPending ? (
+                  "Submitting..."
+                ) : createCheckoutMutation.isPending ? (
+                  "Creating checkout..."
+                ) : (
+                  <>
+                    Confirm & Continue to Payment
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {/* Safety Footer */}
+            <p className="text-center text-sm text-gray-500">
+              Nothing deploys without your approval. You can stop at any time.
             </p>
           </div>
         );

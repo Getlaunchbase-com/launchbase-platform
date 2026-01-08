@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import { PRODUCTS, MODULE_PRODUCTS, ModuleKey } from "./products";
+import { computePricing, type PricingInput, type SocialTier } from "../../client/src/lib/computePricing";
 
 // Initialize Stripe with secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
@@ -107,6 +108,133 @@ export function constructWebhookEvent(
 ): Stripe.Event {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
   return stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+}
+
+export interface CreateServiceCheckoutParams {
+  intakeId: number;
+  customerEmail: string;
+  customerName: string;
+  origin: string;
+  tenant: string;
+  promoCode?: string | null;
+  serviceSelections: {
+    website: boolean;
+    emailService: boolean;
+    socialMediaTier: SocialTier | null;
+    enrichmentLayer: boolean;
+    googleBusiness: boolean;
+    quickBooksSync: boolean;
+  };
+}
+
+/**
+ * Create a Stripe Checkout Session for service selections (new onboarding flow)
+ */
+export async function createServiceCheckoutSession({
+  intakeId,
+  customerEmail,
+  customerName,
+  origin,
+  tenant,
+  promoCode,
+  serviceSelections,
+}: CreateServiceCheckoutParams): Promise<{ url: string; sessionId: string }> {
+  // Check if this intake has a promo reservation
+  const { getRedemptionForIntake } = await import("../services/promoService");
+  const redemption = await getRedemptionForIntake(intakeId);
+  
+  const isFounderReserved = redemption?.status === "reserved" && new Date(redemption.expiresAt) > new Date();
+
+  // Compute pricing using the locked pricing model
+  const pricing = computePricing({
+    ...serviceSelections,
+    promoCode: promoCode ?? null,
+    isFounderReserved,
+  });
+
+  // Build line items from pricing output
+  const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
+
+  // If founder promo, use single $300 line item
+  if (isFounderReserved) {
+    lineItems.push({
+      price_data: {
+        currency: "usd",
+        product_data: {
+          name: "LaunchBase Setup (Beta Founder)",
+          description: "Beta Founders Program - All services setup",
+        },
+        unit_amount: 30000, // $300
+      },
+      quantity: 1,
+    });
+  } else {
+    // Add each setup line item
+    for (const item of pricing.setupLineItems) {
+      lineItems.push({
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: item.label,
+            description: `Setup fee for ${item.label}`,
+          },
+          unit_amount: item.amountCents,
+        },
+        quantity: 1,
+      });
+    }
+
+    // Add bundle discount as negative line item if applicable
+    if (pricing.setupDiscountCents > 0) {
+      lineItems.push({
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: "Bundle Discount",
+            description: "50% off Social Media setup when 2+ services selected",
+          },
+          unit_amount: -pricing.setupDiscountCents,
+        },
+        quantity: 1,
+      });
+    }
+  }
+
+  const session = await stripe.checkout.sessions.create({
+    mode: "payment",
+    customer_email: customerEmail,
+    client_reference_id: intakeId.toString(),
+    allow_promotion_codes: false, // We handle promos internally
+    line_items: lineItems,
+    metadata: {
+      intake_id: intakeId.toString(),
+      customer_email: customerEmail,
+      customer_name: customerName,
+      tenant,
+      payment_type: "service_setup",
+      promo_code: promoCode || "",
+      is_founder: isFounderReserved ? "true" : "false",
+      monthly_total_cents: pricing.monthlyTotalCents.toString(),
+      // Service selections for webhook processing
+      website: serviceSelections.website.toString(),
+      email_service: serviceSelections.emailService.toString(),
+      social_media_tier: serviceSelections.socialMediaTier || "none",
+      enrichment_layer: serviceSelections.enrichmentLayer.toString(),
+      google_business: serviceSelections.googleBusiness.toString(),
+      quickbooks_sync: serviceSelections.quickBooksSync.toString(),
+    },
+    success_url: `${origin}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${origin}/onboarding?step=9&intake_id=${intakeId}`,
+  });
+
+  if (!session.url) {
+    throw new Error("Failed to create checkout session URL");
+  }
+
+  return {
+    url: session.url,
+    sessionId: session.id,
+  };
 }
 
 export { stripe };
