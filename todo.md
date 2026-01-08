@@ -351,3 +351,10 @@
 - [x] Remove "(coming soon)" from QuickBooks Sync
 - [x] Remove "(coming soon)" from Google Business
 - [x] All features now show as available with green checkmarks
+
+## Homepage Effort-Based Pricing Rewrite - Jan 8, 2026
+- [x] Replace LaunchBase Suite section with effort-based copy
+- [x] Replace Pricing section with Core Website + Social Media Intelligence cards
+- [x] Remove flat $129/mo pricing
+- [x] Add "Available during onboarding" for Google Business and QuickBooks
+- [x] Keep hero, problem, how-it-works, observability, footer unchanged

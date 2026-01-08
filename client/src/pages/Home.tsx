@@ -375,7 +375,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Expand LaunchBase */}
+      {/* LaunchBase Suite */}
       <section className="py-20 px-4 border-b border-white/5">
         <div className="container max-w-6xl mx-auto">
           <div className="text-center mb-4">
@@ -391,44 +391,58 @@ export default function Home() {
             </h2>
             
             <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-8">
-              LaunchBase isn't a bundle you're locked into.
-              It's a system you build on.
+              LaunchBase isn't a bundle you're locked into.<br />
+              It's a system you build on — intentionally.
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-8">
+          {/* Social Media Intelligence Card */}
+          <Card className="bg-white/5 border-white/10 max-w-2xl mx-auto mb-8">
+            <CardContent className="p-8">
+              <h3 className="text-2xl font-bold mb-3 text-white">Social Media Intelligence</h3>
+              <p className="text-gray-400 mb-6">
+                Context-aware posting that adapts to your business, location, and timing.
+              </p>
+              
+              <ul className="space-y-2 mb-6 text-sm text-gray-300">
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-[#1ED760] flex-shrink-0" />
+                  Posting volume selected during onboarding
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-[#1ED760] flex-shrink-0" />
+                  One intelligent enrichment layer (premium)
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-[#1ED760] flex-shrink-0" />
+                  Safety-gated, approval-aware, fully visible
+                </li>
+              </ul>
+              
+              <div className="bg-[#FF6A00]/10 border border-[#FF6A00]/20 rounded-lg p-4 mb-6">
+                <p className="text-sm text-[#FF6A00] font-medium">
+                  Pricing scales with effort, not hype.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Other Modules */}
+          <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto mb-8">
             <Card className="bg-white/5 border-white/10">
-              <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 bg-[#FF6A00]/20 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Smartphone className="w-6 h-6 text-[#FF6A00]" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2 text-white">Social Media Intelligence</h3>
+              <CardContent className="p-6">
+                <h3 className="text-lg font-semibold mb-2 text-white">Google Business Setup</h3>
                 <p className="text-gray-400 text-sm">
-                  Weather-aware posts that go out when they matter.
+                  Available during onboarding
                 </p>
               </CardContent>
             </Card>
             
             <Card className="bg-white/5 border-white/10">
-              <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Globe className="w-6 h-6 text-gray-500" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2 text-gray-400">Google Business Setup</h3>
-                <p className="text-gray-500 text-sm">
-                  Coming soon
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-white/5 border-white/10">
-              <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <TrendingUp className="w-6 h-6 text-gray-500" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2 text-gray-400">QuickBooks Sync</h3>
-                <p className="text-gray-500 text-sm">
-                  Coming soon
+              <CardContent className="p-6">
+                <h3 className="text-lg font-semibold mb-2 text-white">QuickBooks Sync</h3>
+                <p className="text-gray-400 text-sm">
+                  Available during onboarding
                 </p>
               </CardContent>
             </Card>
@@ -436,7 +450,8 @@ export default function Home() {
           
           <div className="text-center">
             <p className="text-gray-500 text-sm mb-6">
-              You can change this anytime. Safety never changes.
+              You can change this anytime.<br />
+              Safety never changes.
             </p>
             <Link href="/expand">
               <Button variant="outline" className="border-[#FF6A00]/50 text-[#FF6A00] hover:bg-[#FF6A00]/10">
@@ -495,10 +510,11 @@ export default function Home() {
         <div className="container max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Simple, transparent pricing
+              Pricing, done honestly.
             </h2>
             <p className="text-gray-400 text-lg">
-              One price for your website. Add Suite modules when you're ready.
+              You're not buying software.<br />
+              You're handing off responsibility.
             </p>
           </div>
           
@@ -507,27 +523,22 @@ export default function Home() {
             <Card className="bg-white/5 border-white/10 relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-1 bg-[#FF6A00]" />
               <CardContent className="p-8">
-                <div className="text-sm text-[#FF6A00] font-medium mb-2">Core</div>
+                <div className="text-sm text-[#FF6A00] font-medium mb-2">Core Website</div>
                 <h3 className="text-2xl font-bold mb-2 text-white">LaunchBase Website</h3>
-                <p className="text-gray-400 text-sm mb-6">Everything you need to get online</p>
-                
-                <div className="mb-6">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold text-white">$499</span>
-                    <span className="text-gray-500">setup</span>
-                  </div>
-                  <div className="text-gray-400 text-sm mt-1">+ $49/mo hosting & support</div>
-                </div>
+                <p className="text-gray-400 text-sm mb-6">
+                  One-time setup (based on scope)<br />
+                  Ongoing hosting & system ownership
+                </p>
                 
                 <ul className="space-y-3 mb-8">
                   {[
                     "Custom website design",
-                    "Mobile-optimized",
-                    "Hosting & SSL included",
+                    "Mobile optimization",
+                    "Hosting & SSL",
                     "Contact forms & lead capture",
                     "SEO fundamentals",
-                    "48-hour turnaround",
-                    "Unlimited revisions (first 30 days)",
+                    "Monitoring & safety",
+                    "Full visibility into every action",
                   ].map((feature) => (
                     <li key={feature} className="flex items-center gap-3 text-sm text-gray-300">
                       <CheckCircle className="w-4 h-4 text-[#1ED760] flex-shrink-0" />
@@ -535,6 +546,13 @@ export default function Home() {
                     </li>
                   ))}
                 </ul>
+                
+                <div className="bg-[#FF6A00]/10 border border-[#FF6A00]/20 rounded-lg p-4 mb-6">
+                  <p className="text-sm text-[#FF6A00]">
+                    Final pricing is confirmed during onboarding<br />
+                    before anything is charged.
+                  </p>
+                </div>
                 
                 <Link href="/apply">
                   <Button className="w-full bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white">
@@ -544,41 +562,52 @@ export default function Home() {
               </CardContent>
             </Card>
             
-            {/* Suite Add-ons */}
+            {/* Social Media Intelligence */}
             <Card className="bg-white/5 border-white/10">
               <CardContent className="p-8">
-                <div className="text-sm text-gray-500 font-medium mb-2">Expansion</div>
-                <h3 className="text-2xl font-bold mb-2 text-white">LaunchBase Suite</h3>
-                <p className="text-gray-400 text-sm mb-6">Add intelligent workflows as you grow</p>
+                <div className="text-sm text-gray-500 font-medium mb-2">Social Media Intelligence</div>
+                <h3 className="text-2xl font-bold mb-2 text-white">Effort-based pricing</h3>
+                <p className="text-gray-400 text-sm mb-6">
+                  Determined by:
+                </p>
                 
-                <div className="mb-6">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold text-white">$129</span>
-                    <span className="text-gray-500">/mo</span>
-                  </div>
-                  <div className="text-gray-400 text-sm mt-1">+ $249 setup · Starting price for Social Media Intelligence</div>
-                </div>
-                
-                <ul className="space-y-3 mb-8">
-                  {[
-                    "Social Media Intelligence",
-                    "Weather-aware posting",
-                    "Local context layers",
-                    "Approval workflow",
-                    "Safety gating",
-                    "QuickBooks Sync",
-                    "Google Business",
-                  ].map((feature, i) => (
-                    <li key={feature} className="flex items-center gap-3 text-sm text-gray-300">
-                      <CheckCircle className="w-4 h-4 flex-shrink-0 text-[#1ED760]" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
+                <ul className="space-y-3 mb-6">
+                  <li className="flex items-start gap-3 text-sm text-gray-300">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#FF6A00] mt-1.5 flex-shrink-0" />
+                    <span>How often we post</span>
+                  </li>
+                  <li className="flex items-start gap-3 text-sm text-gray-300">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#FF6A00] mt-1.5 flex-shrink-0" />
+                    <span>Whether intelligent automation is applied</span>
+                  </li>
                 </ul>
                 
-                <Link href="/expand">
+                <div className="bg-white/5 rounded-lg p-4 mb-6">
+                  <p className="text-sm text-gray-400 mb-3">
+                    Most customers choose:
+                  </p>
+                  <ul className="space-y-2 text-sm text-gray-300">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-[#1ED760] flex-shrink-0" />
+                      A posting range
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-[#1ED760] flex-shrink-0" />
+                      Then decide whether to add intelligent enrichment
+                    </li>
+                  </ul>
+                </div>
+                
+                <div className="bg-[#FF6A00]/10 border border-[#FF6A00]/20 rounded-lg p-4 mb-6">
+                  <p className="text-sm text-[#FF6A00] font-medium">
+                    Intelligence is valuable.<br />
+                    We price it like it is.
+                  </p>
+                </div>
+                
+                <Link href="/apply">
                   <Button variant="outline" className="w-full border-white/20 text-white hover:bg-white/5">
-                    Explore modules
+                    Configure during onboarding
                   </Button>
                 </Link>
               </CardContent>
