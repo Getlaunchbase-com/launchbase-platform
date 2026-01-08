@@ -1,27 +1,18 @@
 /**
  * LaunchBase Stripe Products Configuration
  * 
- * LOCKED PRICING MODEL (Jan 8, 2026):
+ * Core Platform:
+ * - $499 one-time setup fee (website build)
+ * - $79/month ongoing hosting
  * 
- * Core Website:
- * - $499 setup + $49/month (required, non-toggleable)
+ * Social Media Intelligence Module (Model A - Clean Add-on):
+ * - Cadence tiers: Low $79, Medium $129, High $199
+ * - Local Context layers: Sports $29, Community $39, Trends $49
+ * - Setup: $249 base + $99 per layer
  * 
- * Social Media Intelligence:
- * - $299 setup (flat, all tiers)
- * - Monthly: $79 (4 posts), $129 (8 posts), $179 (12 posts)
- * - Bundle discount: 50% off setup when 2+ services selected
- * 
- * Enrichment Layer:
- * - $199 setup + $79/month (optional, premium)
- * 
- * Google Business:
- * - $149 setup + $29/month
- * 
- * QuickBooks Sync:
- * - $199 setup + $39/month
- * 
- * Founder Promo:
- * - Overrides setup fees only (not monthly)
+ * Business Modules:
+ * - QuickBooks Integration: $249 setup + $79/month
+ * - Google Business Assistant: Coming soon
  */
 
 export const PRODUCTS = {
@@ -43,154 +34,182 @@ export const PRODUCTS = {
   },
 } as const;
 
-// Social Media Intelligence - Posting Tiers (Locked Pricing)
-export const SOCIAL_MEDIA_TIERS = {
-  "4posts": {
-    id: "social_media_4posts",
-    name: "Social Media Intelligence — 4 posts/month",
-    description: "Context-aware posting that adapts to your business, location, and timing.",
+// Social Media Intelligence - Cadence Tiers (Base Subscription)
+export const CADENCE_PRODUCTS = {
+  low: {
+    id: "cadence_low",
+    name: "Social Media Intelligence — Low",
+    description: "Weather-aware, safety-gated social media posting. 1–2 posts per week. Approval before posting.",
     priceInCents: 7900, // $79.00
     currency: "usd",
     interval: "month" as const,
-    postsPerMonth: 4,
+    metadata: {
+      module: "social_media_intelligence",
+      type: "cadence",
+      cadence_level: "low",
+      posts_per_week: "1-2",
+      posts_included: "8",
+      intelligence_checks: "30",
+    },
   },
-  "8posts": {
-    id: "social_media_8posts",
-    name: "Social Media Intelligence — 8 posts/month",
-    description: "Context-aware posting that adapts to your business, location, and timing.",
+  medium: {
+    id: "cadence_medium",
+    name: "Social Media Intelligence — Medium",
+    description: "Balanced visibility with local awareness. 2–3 posts per week. Recommended for most businesses.",
     priceInCents: 12900, // $129.00
     currency: "usd",
     interval: "month" as const,
-    postsPerMonth: 8,
+    metadata: {
+      module: "social_media_intelligence",
+      type: "cadence",
+      cadence_level: "medium",
+      posts_per_week: "2-3",
+      posts_included: "12",
+      intelligence_checks: "60",
+    },
   },
-  "12posts": {
-    id: "social_media_12posts",
-    name: "Social Media Intelligence — 12 posts/month",
-    description: "Context-aware posting that adapts to your business, location, and timing.",
-    priceInCents: 17900, // $179.00
+  high: {
+    id: "cadence_high",
+    name: "Social Media Intelligence — High",
+    description: "Maximum visibility with advanced local context. 4–6 posts per week.",
+    priceInCents: 19900, // $199.00
     currency: "usd",
     interval: "month" as const,
-    postsPerMonth: 12,
+    metadata: {
+      module: "social_media_intelligence",
+      type: "cadence",
+      cadence_level: "high",
+      posts_per_week: "4-6",
+      posts_included: "24",
+      intelligence_checks: "120",
+    },
   },
 } as const;
 
-// Social Media Intelligence - Setup Fee (Flat for all tiers)
-export const SOCIAL_MEDIA_SETUP = {
-  name: "Social Media Intelligence Setup",
-  description: "Account connection, safety rules, brand voice, and approval workflow.",
-  priceInCents: 29900, // $299.00
-  currency: "usd",
+// Social Media Intelligence - Local Context Layers (Add-on Subscriptions)
+export const LAYER_PRODUCTS = {
+  sports: {
+    id: "layer_sports",
+    name: "Local Context — Sports & Events",
+    description: "References game days, major events, and attendance patterns.",
+    priceInCents: 2900, // $29.00
+    currency: "usd",
+    interval: "month" as const,
+    setupPriceInCents: 9900, // $99.00
+    metadata: {
+      module: "social_media_intelligence",
+      type: "layer",
+      layer_key: "sports",
+      impact: "high",
+    },
+  },
+  community: {
+    id: "layer_community",
+    name: "Local Context — Community & Schools",
+    description: "School schedules, civic events, and community calendars.",
+    priceInCents: 3900, // $39.00
+    currency: "usd",
+    interval: "month" as const,
+    setupPriceInCents: 9900, // $99.00
+    metadata: {
+      module: "social_media_intelligence",
+      type: "layer",
+      layer_key: "community",
+      impact: "medium",
+    },
+  },
+  trends: {
+    id: "layer_trends",
+    name: "Local Context — Local Trends",
+    description: "Geo-filtered trending topics and cultural moments.",
+    priceInCents: 4900, // $49.00
+    currency: "usd",
+    interval: "month" as const,
+    setupPriceInCents: 9900, // $99.00
+    metadata: {
+      module: "social_media_intelligence",
+      type: "layer",
+      layer_key: "trends",
+      impact: "low",
+    },
+  },
 } as const;
 
-// Enrichment Layer (Premium Add-on)
-export const ENRICHMENT_LAYER = {
-  name: "Intelligent Enrichment Layer",
-  description: "Adds contextual decision-making. This is premium. Treated as such.",
-  setupPriceInCents: 19900, // $199.00
-  monthlyPriceInCents: 7900, // $79.00
-  currency: "usd",
-  interval: "month" as const,
+// Social Media Intelligence - Setup Fees
+export const INTELLIGENCE_SETUP = {
+  base: {
+    id: "smi_setup_base",
+    name: "LaunchBase — Social Media Intelligence Setup",
+    description: "One-time setup for Social Media Intelligence module including weather awareness and approval workflow.",
+    priceInCents: 24900, // $249.00
+    currency: "usd",
+    metadata: {
+      module: "social_media_intelligence",
+      type: "setup",
+      setup_type: "base",
+    },
+  },
+  perLayer: {
+    id: "smi_setup_layer",
+    name: "LaunchBase — Local Context Layer Setup",
+    description: "One-time setup fee per Local Context layer.",
+    priceInCents: 9900, // $99.00
+    currency: "usd",
+    metadata: {
+      module: "social_media_intelligence",
+      type: "setup",
+      setup_type: "per_layer",
+    },
+  },
 } as const;
 
-// Business Module Products
+// Business Module Products (Legacy + New)
 export const MODULE_PRODUCTS = {
-  google_business: {
-    name: "Google Business Setup",
-    description: "Profile setup and ongoing visibility monitoring",
-    setupPriceInCents: 14900, // $149.00
-    monthlyPriceInCents: 2900, // $29.00
+  google_ads: {
+    name: "Lead Engine (Google Ads)",
+    description: "Google Ads setup with conversion tracking, starter campaign, and budget guardrails",
+    setupPriceInCents: 49900, // $499.00
+    monthlyPriceInCents: 0,
     currency: "usd",
   },
   quickbooks: {
     name: "QuickBooks Sync",
-    description: "Accounting visibility and error monitoring",
-    setupPriceInCents: 19900, // $199.00
-    monthlyPriceInCents: 3900, // $39.00
+    description: "Keep invoices, customers, and payments automatically in sync.",
+    setupPriceInCents: 24900, // $249.00
+    monthlyPriceInCents: 7900, // $79.00
     currency: "usd",
+  },
+  google_business: {
+    name: "Google Business Assistant",
+    description: "Responds to reviews, updates listings, and posts when visibility matters.",
+    setupPriceInCents: 24900, // $249.00
+    monthlyPriceInCents: 4900, // $49.00
+    currency: "usd",
+    comingSoon: true,
   },
 } as const;
 
 // Type exports
 export type ProductKey = keyof typeof PRODUCTS;
 export type ModuleKey = keyof typeof MODULE_PRODUCTS;
-export type SocialMediaTier = keyof typeof SOCIAL_MEDIA_TIERS | "none";
+export type CadenceKey = keyof typeof CADENCE_PRODUCTS;
+export type LayerKey = keyof typeof LAYER_PRODUCTS;
 
-// Service selection interface
-export interface ServiceSelection {
-  socialMediaTier?: SocialMediaTier;
-  enrichmentLayer: boolean;
-  googleBusiness: boolean;
-  quickBooksSync: boolean;
-}
-
-// Calculate total setup fees with bundle discount logic
-export function calculateSetupTotal(
-  services: ServiceSelection,
-  isFounder: boolean = false
+// Helper to calculate total monthly price for Social Media Intelligence
+export function calculateSMIMonthlyPrice(
+  cadence: CadenceKey,
+  enabledLayers: LayerKey[]
 ): number {
-  if (isFounder) {
-    // Founder promo: $300 total setup (overrides all setup fees)
-    return 30000; // $300.00
+  let total = CADENCE_PRODUCTS[cadence].priceInCents;
+  for (const layer of enabledLayers) {
+    total += LAYER_PRODUCTS[layer].priceInCents;
   }
-
-  let total = PRODUCTS.SETUP_FEE.priceInCents; // Core website: $499
-  let serviceCount = 1; // Core website counts as 1
-
-  // Social Media setup
-  if (services.socialMediaTier && services.socialMediaTier !== "none" as any) {
-    total += SOCIAL_MEDIA_SETUP.priceInCents; // $299
-    serviceCount++;
-  }
-
-  // Enrichment Layer setup
-  if (services.enrichmentLayer) {
-    total += ENRICHMENT_LAYER.setupPriceInCents; // $199
-    serviceCount++;
-  }
-
-  // Google Business setup
-  if (services.googleBusiness) {
-    total += MODULE_PRODUCTS.google_business.setupPriceInCents; // $149
-    serviceCount++;
-  }
-
-  // QuickBooks setup
-  if (services.quickBooksSync) {
-    total += MODULE_PRODUCTS.quickbooks.setupPriceInCents; // $199
-    serviceCount++;
-  }
-
-  // Bundle discount: 50% off Social Media setup when 2+ services selected
-  if (serviceCount >= 3 && services.socialMediaTier && services.socialMediaTier !== "none" as any) {
-    total -= SOCIAL_MEDIA_SETUP.priceInCents / 2; // -$149.50
-  }
-
   return total;
 }
 
-// Calculate total monthly fees
-export function calculateMonthlyTotal(services: ServiceSelection): number {
-  let total = PRODUCTS.MONTHLY_SUBSCRIPTION.priceInCents; // Core website: $49
-
-  // Social Media monthly
-  if (services.socialMediaTier && services.socialMediaTier !== "none" as any) {
-    total += SOCIAL_MEDIA_TIERS[services.socialMediaTier as keyof typeof SOCIAL_MEDIA_TIERS].priceInCents;
-  }
-
-  // Enrichment Layer monthly
-  if (services.enrichmentLayer) {
-    total += ENRICHMENT_LAYER.monthlyPriceInCents; // $79
-  }
-
-  // Google Business monthly
-  if (services.googleBusiness) {
-    total += MODULE_PRODUCTS.google_business.monthlyPriceInCents; // $29
-  }
-
-  // QuickBooks monthly
-  if (services.quickBooksSync) {
-    total += MODULE_PRODUCTS.quickbooks.monthlyPriceInCents; // $39
-  }
-
+// Helper to calculate total setup fee for Social Media Intelligence
+export function calculateSMISetupFee(enabledLayers: LayerKey[]): number {
+  let total = INTELLIGENCE_SETUP.base.priceInCents;
+  total += enabledLayers.length * INTELLIGENCE_SETUP.perLayer.priceInCents;
   return total;
 }
