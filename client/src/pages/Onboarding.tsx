@@ -24,10 +24,12 @@ interface OnboardingData {
   phone: string;
   email: string;
   brandFeel: "clean" | "bold" | "friendly" | "auto" | "";
+  experienceMode: "plain" | "technical";
   socialMediaTier: "none" | "4posts" | "8posts" | "12posts";
   enrichmentLayer: boolean;
   googleBusiness: boolean;
   quickBooksSync: boolean;
+  emailService: boolean;
   promoCode?: string;
 }
 
@@ -42,10 +44,13 @@ const initialData: OnboardingData = {
   phone: "",
   email: "",
   brandFeel: "",
+  experienceMode: "plain",
   socialMediaTier: "none",
   enrichmentLayer: false,
   googleBusiness: false,
   quickBooksSync: false,
+  emailService: false,
+  promoCode: "",
 };
 
 // AI Inference functions
@@ -205,7 +210,7 @@ export default function Onboarding() {
       case 5: return typeof data.serviceArea === 'string' && data.serviceArea.trim().length > 0;
       case 6: return data.businessName.trim().length > 0 && data.email.includes("@");
       case 7: return data.brandFeel !== "";
-      case 8: return true; // Service selection is optional, always can proceed
+      case 8: return true; // Service selection always allows proceed
       case 9: return true;
       default: return false;
     }
@@ -555,342 +560,16 @@ export default function Onboarding() {
 
       case 8:
         return (
-          <div className="space-y-6">
+          <div className="space-y-8 text-center">
+            <div className="w-20 h-20 bg-[#FF6A00]/20 rounded-full flex items-center justify-center mx-auto">
+              <Sparkles className="w-10 h-10 text-[#FF6A00]" />
+            </div>
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold mb-3">Choose the services you want LaunchBase to own</h2>
-              <p className="text-gray-400">
-                You're not committing to automation. You're choosing what responsibility you want handed off.
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">You're all set</h2>
+              <p className="text-gray-400 text-lg max-w-md mx-auto">
+                Nothing deploys without your approval. You can stop at any time.
               </p>
             </div>
-
-            {/* Core Website (required, pre-selected) */}
-            <Card className="bg-white/5 border-white/10">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="text-lg font-semibold text-white">Core Website</h3>
-                      <span className="text-xs bg-[#FF6A00]/20 text-[#FF6A00] px-2 py-0.5 rounded">Required</span>
-                    </div>
-                    <p className="text-sm text-gray-400 mb-3">Hosting, monitoring, safety, ownership</p>
-                    <div className="flex items-center gap-4 text-sm">
-                      <div>
-                        <span className="text-gray-500">Setup:</span>
-                        <span className="text-white font-semibold ml-1">$499</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-500">Monthly:</span>
-                        <span className="text-white font-semibold ml-1">$49</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="w-10 h-10 bg-[#FF6A00]/20 rounded-full flex items-center justify-center">
-                    <Check className="w-5 h-5 text-[#FF6A00]" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Social Media Intelligence */}
-            <Card className="bg-white/5 border-white/10">
-              <CardContent className="p-6">
-                <h3 className="text-lg font-semibold text-white mb-2">Social Media Intelligence</h3>
-                <p className="text-sm text-gray-400 mb-4">Context-aware posting that adapts to your business</p>
-                <div className="space-y-3">
-                  {[
-                    { value: "none", label: "Not right now", monthly: "$0" },
-                    { value: "4posts", label: "4 posts/month", monthly: "$79" },
-                    { value: "8posts", label: "8 posts/month", monthly: "$129" },
-                    { value: "12posts", label: "12 posts/month", monthly: "$179" },
-                  ].map((tier) => (
-                    <button
-                      key={tier.value}
-                      onClick={() => updateField("socialMediaTier", tier.value)}
-                      className={cn(
-                        "w-full text-left px-4 py-3 rounded-lg border transition-all",
-                        data.socialMediaTier === tier.value
-                          ? "bg-[#FF6A00]/10 border-[#FF6A00] text-white"
-                          : "bg-white/5 border-white/10 text-gray-400 hover:border-white/20"
-                      )}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium">{tier.label}</span>
-                        <span className="text-sm">{tier.monthly}/mo</span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-                {data.socialMediaTier !== "none" && (
-                  <div className="mt-4 p-4 bg-[#FF6A00]/10 border border-[#FF6A00]/20 rounded-lg">
-                    <p className="text-sm text-gray-300 mb-2">
-                      <span className="text-[#FF6A00] font-semibold">Setup: $299</span> (one-time, same for all tiers)
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      Includes account connection, safety rules, brand voice, and approval workflow.
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Enrichment Layer */}
-            {data.socialMediaTier !== "none" && (
-              <Card className="bg-white/5 border-white/10">
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-white mb-2">Intelligent Enrichment Layer</h3>
-                      <p className="text-sm text-gray-400 mb-3">
-                        Adds contextual decision-making. This is premium. Treated as such.
-                      </p>
-                      <div className="flex items-center gap-4 text-sm">
-                        <div>
-                          <span className="text-gray-500">Setup:</span>
-                          <span className="text-white font-semibold ml-1">$199</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-500">Monthly:</span>
-                          <span className="text-white font-semibold ml-1">+$79</span>
-                        </div>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => updateField("enrichmentLayer", !data.enrichmentLayer)}
-                      className={cn(
-                        "w-10 h-10 rounded-full flex items-center justify-center transition-all",
-                        data.enrichmentLayer
-                          ? "bg-[#FF6A00] text-white"
-                          : "bg-white/10 text-gray-500 hover:bg-white/20"
-                      )}
-                    >
-                      {data.enrichmentLayer && <Check className="w-5 h-5" />}
-                    </button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Google Business */}
-            <Card className="bg-white/5 border-white/10">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-white mb-2">Google Business Setup</h3>
-                    <p className="text-sm text-gray-400 mb-3">Profile setup and ongoing visibility monitoring</p>
-                    <div className="flex items-center gap-4 text-sm">
-                      <div>
-                        <span className="text-gray-500">Setup:</span>
-                        <span className="text-white font-semibold ml-1">$149</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-500">Monthly:</span>
-                        <span className="text-white font-semibold ml-1">$29</span>
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => updateField("googleBusiness", !data.googleBusiness)}
-                    className={cn(
-                      "w-10 h-10 rounded-full flex items-center justify-center transition-all",
-                      data.googleBusiness
-                        ? "bg-[#FF6A00] text-white"
-                        : "bg-white/10 text-gray-500 hover:bg-white/20"
-                    )}
-                  >
-                    {data.googleBusiness && <Check className="w-5 h-5" />}
-                  </button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* QuickBooks Sync */}
-            <Card className="bg-white/5 border-white/10">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-white mb-2">QuickBooks Sync</h3>
-                    <p className="text-sm text-gray-400 mb-3">Accounting visibility and error monitoring</p>
-                    <div className="flex items-center gap-4 text-sm">
-                      <div>
-                        <span className="text-gray-500">Setup:</span>
-                        <span className="text-white font-semibold ml-1">$199</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-500">Monthly:</span>
-                        <span className="text-white font-semibold ml-1">$39</span>
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => updateField("quickBooksSync", !data.quickBooksSync)}
-                    className={cn(
-                      "w-10 h-10 rounded-full flex items-center justify-center transition-all",
-                      data.quickBooksSync
-                        ? "bg-[#FF6A00] text-white"
-                        : "bg-white/10 text-gray-500 hover:bg-white/20"
-                    )}
-                  >
-                    {data.quickBooksSync && <Check className="w-5 h-5" />}
-                  </button>
-                </div>
-              </CardContent>
-            </Card>
-
-            <p className="text-sm text-gray-500 text-center">
-              You can pause or change any service anytime. Billing is monthly. No contracts.
-            </p>
-          </div>
-        );
-
-      case 9:
-        // Calculate pricing
-        const setupItems = [
-          { name: "LaunchBase Website", price: 49900 },
-        ];
-        let serviceCount = 1;
-        
-        if (data.socialMediaTier && data.socialMediaTier !== "none") {
-          setupItems.push({ name: "Social Media Intelligence", price: 29900 });
-          serviceCount++;
-        }
-        if (data.enrichmentLayer) {
-          setupItems.push({ name: "Enrichment Layer", price: 19900 });
-          serviceCount++;
-        }
-        if (data.googleBusiness) {
-          setupItems.push({ name: "Google Business Setup", price: 14900 });
-          serviceCount++;
-        }
-        if (data.quickBooksSync) {
-          setupItems.push({ name: "QuickBooks Sync", price: 19900 });
-          serviceCount++;
-        }
-
-        // Calculate bundle discount (50% off Social Media setup when 2+ services)
-        let bundleDiscount = 0;
-        if (serviceCount >= 3 && data.socialMediaTier && data.socialMediaTier !== "none") {
-          bundleDiscount = 14950; // $149.50 (50% of $299)
-        }
-
-        const setupTotal = setupItems.reduce((sum, item) => sum + item.price, 0) - bundleDiscount;
-
-        // Calculate monthly
-        const monthlyItems = [
-          { name: "Hosting & System Ownership", price: 4900 },
-        ];
-        
-        if (data.socialMediaTier === "4posts") {
-          monthlyItems.push({ name: "Social Media Intelligence (4 posts)", price: 7900 });
-        } else if (data.socialMediaTier === "8posts") {
-          monthlyItems.push({ name: "Social Media Intelligence (8 posts)", price: 12900 });
-        } else if (data.socialMediaTier === "12posts") {
-          monthlyItems.push({ name: "Social Media Intelligence (12 posts)", price: 17900 });
-        }
-        
-        if (data.enrichmentLayer) {
-          monthlyItems.push({ name: "Enrichment Layer", price: 7900 });
-        }
-        if (data.googleBusiness) {
-          monthlyItems.push({ name: "Google Business Management", price: 2900 });
-        }
-        if (data.quickBooksSync) {
-          monthlyItems.push({ name: "QuickBooks Sync", price: 3900 });
-        }
-
-        const monthlyTotal = monthlyItems.reduce((sum, item) => sum + item.price, 0);
-
-        const formatPrice = (cents: number) => `$${(cents / 100).toFixed(2)}`;
-
-        return (
-          <div className="space-y-8">
-            <div className="text-center">
-              <h2 className="text-3xl md:text-4xl font-bold mb-3">Review Your Setup & Ongoing Ownership</h2>
-              <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                Here's exactly what LaunchBase will take responsibility for.
-              </p>
-              <p className="text-sm text-gray-500 mt-2">
-                Nothing deploys without your approval. Monthly billing starts only after your site goes live.
-              </p>
-            </div>
-
-            {/* One-Time Setup */}
-            <Card className="bg-white/5 border-white/10">
-              <CardContent className="p-6">
-                <h3 className="text-xl font-semibold text-white mb-4">One-Time Setup (charged today)</h3>
-                <div className="space-y-3">
-                  {setupItems.map((item, idx) => (
-                    <div key={idx} className="flex items-center justify-between text-sm">
-                      <span className="text-gray-300">{item.name}</span>
-                      <span className="text-white font-semibold">{formatPrice(item.price)}</span>
-                    </div>
-                  ))}
-                  
-                  {bundleDiscount > 0 && (
-                    <div className="flex items-center justify-between text-sm pt-3 border-t border-white/10">
-                      <span className="text-[#1ED760]">Bundle Discount (50% off Social Media setup)</span>
-                      <span className="text-[#1ED760] font-semibold">−{formatPrice(bundleDiscount)}</span>
-                    </div>
-                  )}
-                  
-                  <div className="flex items-center justify-between text-lg font-bold pt-3 border-t border-white/10">
-                    <span className="text-white">Setup Total Today</span>
-                    <span className="text-[#FF6A00]">{formatPrice(setupTotal)}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Monthly Ownership */}
-            <Card className="bg-white/5 border-white/10">
-              <CardContent className="p-6">
-                <h3 className="text-xl font-semibold text-white mb-4">Monthly Ownership (starts after launch)</h3>
-                <div className="space-y-3">
-                  {monthlyItems.map((item, idx) => (
-                    <div key={idx} className="flex items-center justify-between text-sm">
-                      <span className="text-gray-300">{item.name}</span>
-                      <span className="text-white font-semibold">{formatPrice(item.price)}/mo</span>
-                    </div>
-                  ))}
-                  
-                  <div className="flex items-center justify-between text-lg font-bold pt-3 border-t border-white/10">
-                    <span className="text-white">Estimated Monthly Total</span>
-                    <span className="text-[#FF6A00]">{formatPrice(monthlyTotal)}/mo</span>
-                  </div>
-                </div>
-                <p className="text-xs text-gray-500 mt-4">
-                  You can turn services on or off at any time. Billing adjusts on the next monthly cycle. No penalties.
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* What Happens Next */}
-            <Card className="bg-[#FF6A00]/10 border-[#FF6A00]/20">
-              <CardContent className="p-6">
-                <h3 className="text-lg font-semibold text-white mb-3">What happens next</h3>
-                <ol className="space-y-2 text-sm text-gray-300">
-                  <li className="flex items-start gap-2">
-                    <span className="text-[#FF6A00] font-semibold">1.</span>
-                    <span>You complete setup payment</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-[#FF6A00] font-semibold">2.</span>
-                    <span>We build and connect your system</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-[#FF6A00] font-semibold">3.</span>
-                    <span>You review your real site</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-[#FF6A00] font-semibold">4.</span>
-                    <span>You approve launch</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-[#FF6A00] font-semibold">5.</span>
-                    <span>LaunchBase stays on — monitoring, deciding, protecting</span>
-                  </li>
-                </ol>
-              </CardContent>
-            </Card>
 
             {globalError && (
               <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 flex items-start gap-3">
@@ -902,32 +581,23 @@ export default function Onboarding() {
               </div>
             )}
 
-            <div className="flex items-center gap-4">
-              <Button
-                variant="outline"
-                onClick={() => setCurrentStep(8)}
-                className="flex-1 border-white/20 text-white hover:bg-white/10"
-              >
-                Go Back and Adjust Services
-              </Button>
-              <Button
-                onClick={handleSubmit}
-                disabled={submitMutation.isPending}
-                className="flex-1 bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white"
-              >
-                {submitMutation.isPending ? (
-                  "Processing..."
-                ) : (
-                  <>
-                    <Rocket className="w-5 h-5 mr-2" />
-                    Confirm & Continue
-                  </>
-                )}
-              </Button>
-            </div>
-            
-            <p className="text-center text-sm text-gray-500">
-              Nothing deploys without your approval. You can stop at any time.
+            <Button
+              onClick={handleSubmit}
+              disabled={submitMutation.isPending}
+              size="lg"
+              className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white text-lg px-10 py-7"
+            >
+              {submitMutation.isPending ? (
+                "Building..."
+              ) : (
+                <>
+                  <Rocket className="w-5 h-5 mr-2" />
+                  Build My Website
+                </>
+              )}
+            </Button>
+            <p className="text-sm text-gray-500">
+              No payment required to review your site.
             </p>
           </div>
         );
@@ -987,7 +657,7 @@ export default function Onboarding() {
       </main>
 
       {/* Footer navigation */}
-      {currentStep < 8 && (
+      {currentStep < 9 && (
         <footer className="fixed bottom-0 left-0 right-0 bg-[#0B0B0C]/95 backdrop-blur-sm border-t border-white/10">
           <div className="container max-w-3xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">

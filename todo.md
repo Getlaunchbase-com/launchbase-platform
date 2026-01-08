@@ -376,22 +376,20 @@
 - [x] Add pricing tables with setup + monthly fees
 - [x] Lock model in NEVER_AGAIN.md
 
-## Service Selection & Pricing - Jan 8, 2026
-- [x] Update homepage: Social Media setup $299 (flat, all tiers)
-- [x] Update homepage: Monthly tiers $79/$129/$179 (4/8/12 posts)
-- [x] Add homepage: Bundle discount copy (50% off setup with 2+ services)
-- [x] Add onboarding step: Service selection with pricing
-- [x] Schema: Add fields for selected services (socialMediaTier, enrichmentLayer, googleBusiness, quickBooksSync)
-- [x] Checkout math: Calculate setup total with bundle discount logic
-- [x] Checkout math: Calculate monthly total from selected services
-- [x] Promo interaction: Founder promo overrides setup fees only
-- [ ] Toggle UX: Services can be paused/resumed (billing next cycle) - DEFERRED
+## Experience Toggle & Service Descriptions - Jan 8, 2026
+- [ ] Add experience toggle to onboarding (plain vs technical mode)
+- [ ] Update Step 8: Add mode-dependent descriptions for each service
+- [ ] Update Step 8: Add Email service ($99 setup + $19/mo, auto-included with forms/social)
+- [ ] Update Step 8: Show bundle discount banner when 2+ services selected
+- [ ] Update Step 9: Add Email to pricing breakdown if applicable
+- [ ] Update Step 9: Show service control reminder
+- [ ] Wire experience toggle state across Step 8 and Step 9
 
-## Step 9 Pricing Summary - Jan 8, 2026
-- [x] Replace Step 9 with pricing summary (setup breakdown + monthly breakdown)
-- [x] Calculate and display setup total with bundle discount
-- [x] Calculate and display monthly total
-- [x] Show bundle discount line if applicable
-- [x] Show founder discount line if applicable
-- [x] Add safety footer copy
-- [x] Add "Confirm & Continue" and "Go Back" buttons
+## Stripe Setup Checkout - Jan 8, 2026
+- [ ] Create createSetupCheckoutSession() function with line items from Step 9
+- [ ] Pass setup fees as line items (Website, Social Media, Enrichment, Google Business, QuickBooks, Email)
+- [ ] Apply bundle discount as negative line item
+- [ ] Apply founder promo override ($300 flat) when promoCode present
+- [ ] Pass metadata: intakeId, selected services, monthly total, founder flag
+- [ ] Update webhook to mark setup as paid and assign founder number
+- [ ] Wire "Confirm & Continue" button to trigger checkout
