@@ -205,7 +205,8 @@ export const emailLogs = mysqlTable("email_logs", {
     "founding_client_lockin",
     "day7_checkin",
     "day30_value",
-    "contact_form_confirmation"
+    "contact_form_confirmation",
+    "ops_alert"
   ]).notNull(),
   recipientEmail: varchar("recipientEmail", { length: 320 }).notNull(),
   subject: varchar("subject", { length: 255 }).notNull(),
@@ -959,6 +960,48 @@ export const facebookOAuthSessions = mysqlTable("facebook_oauth_sessions", {
 
 export type FacebookOAuthSession = typeof facebookOAuthSessions.$inferSelect;
 export type InsertFacebookOAuthSession = typeof facebookOAuthSessions.$inferInsert;
+
+/**
+ * Alert events for real-time ops monitoring
+ * Fingerprint-based dedupe: one row per unique (tenant, alertKey, fingerprint)
+ */
+export const alertEvents = mysqlTable("alert_events", {
+  id: int("id").autoincrement().primaryKey(),
+
+  // tenant isolation
+  tenant: mysqlEnum("tenant", ["launchbase", "vinces"]).notNull(),
+
+  // e.g. "health:webhooks_stale", "health:email_failures"
+  alertKey: varchar("alertKey", { length: 64 }).notNull(),
+
+  // dedupe key: e.g. "launchbase|health:webhooks_stale|2h"
+  fingerprint: varchar("fingerprint", { length: 128 }).notNull(),
+
+  severity: mysqlEnum("severity", ["info", "warn", "crit"]).notNull(),
+
+  // human readable
+  title: varchar("title", { length: 160 }).notNull(),
+  message: text("message").notNull(),
+
+  status: mysqlEnum("status", ["active", "resolved"]).notNull().default("active"),
+
+  // timestamps
+  firstSeenAt: timestamp("firstSeenAt").defaultNow().notNull(),
+  lastSeenAt: timestamp("lastSeenAt").defaultNow().notNull(),
+  sentAt: timestamp("sentAt"),
+  resolvedAt: timestamp("resolvedAt"),
+
+  // delivery tracking
+  deliveryProvider: varchar("deliveryProvider", { length: 32 }),
+  deliveryMessageId: varchar("deliveryMessageId", { length: 128 }),
+  lastError: text("lastError"),
+
+  // structured context for debugging
+  meta: json("meta").$type<Record<string, unknown> | null>(),
+});
+
+export type AlertEvent = typeof alertEvents.$inferSelect;
+export type InsertAlertEvent = typeof alertEvents.$inferInsert;
 
 /**
  * Stripe webhook events log

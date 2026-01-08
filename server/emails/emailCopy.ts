@@ -20,7 +20,8 @@ export type EmailType =
   | "founding_client_lockin"
   | "day7_checkin"
   | "day30_value"
-  | "contact_form_confirmation";
+  | "contact_form_confirmation"
+  | "ops_alert";
 
 interface EmailBlock {
   subject: string;
@@ -322,6 +323,11 @@ If this is urgent, you can reply directly to this email.
 —
 {{businessName}}`,
       },
+      ops_alert: {
+        subject: "{{subject}}",
+        previewText: "LaunchBase ops alert",
+        body: `{{text}}`,
+      },
     },
     org: {
       intake_confirmation: {
@@ -598,6 +604,11 @@ If this is urgent, you can reply directly to this email.
 
 —
 {{businessName}}`,
+      },
+      ops_alert: {
+        subject: "{{subject}}",
+        previewText: "LaunchBase ops alert",
+        body: `{{text}}`,
       },
     },
   },
@@ -878,6 +889,11 @@ If this is urgent, you can reply directly to this email.
 —
 {{businessName}}`,
       },
+      ops_alert: {
+        subject: "{{subject}}",
+        previewText: "LaunchBase ops alert",
+        body: `{{text}}`,
+      },
     },
     org: {
       intake_confirmation: {
@@ -1144,6 +1160,11 @@ If this is urgent, you can reply directly to this email.
 —
 {{businessName}}`,
       },
+      ops_alert: {
+        subject: "{{subject}}",
+        previewText: "LaunchBase ops alert",
+        body: `{{text}}`,
+      },
     },
   },
   
@@ -1403,6 +1424,11 @@ If this is urgent, you can reply directly to this email.
 —
 {{businessName}}`,
       },
+      ops_alert: {
+        subject: "{{subject}}",
+        previewText: "LaunchBase ops alert",
+        body: `{{text}}`,
+      },
     },
     org: {
       intake_confirmation: {
@@ -1657,6 +1683,11 @@ If this is urgent, you can reply directly to this email.
 
 —
 {{businessName}}`,
+      },
+      ops_alert: {
+        subject: "{{subject}}",
+        previewText: "LaunchBase ops alert",
+        body: `{{text}}`,
       },
     },
   },
