@@ -453,3 +453,14 @@
 - [x] Update all createIntake call sites to remove status argument
 - [ ] Add explicit transition calls where review status is needed (if required)
 - [ ] Add test: "suite_application creates intakes as new" (optional)
+
+## Status Transition Validation & Audit Log - Jan 8, 2026
+- [x] Add transition allowlist map to setIntakeStatus
+- [x] Add structured result type (ok: true/false) instead of throwing
+- [x] Add explicit override with required overrideReason
+- [x] Add actor tracking (system/admin/customer)
+- [x] Add no-op detection (from === to)
+- [ ] Create intake_status_events table (append-only audit log)
+- [ ] Update setIntakeStatus to write audit events to DB table
+- [ ] Add Status history timeline to admin intake detail page (optional)
+- [ ] Add tests: reject invalid transition, override requires reason
