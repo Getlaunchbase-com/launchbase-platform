@@ -170,3 +170,53 @@ This document contains the "forever contracts" that must never regress. These ar
 2. **Never skip webhook verification** - Prevents fraud
 3. **Never deploy without approval** - Manual approval required
 4. **Never send emails without logging** - Always log to `email_logs`
+
+
+---
+
+## Database Index Strategy for Tenant Filtering
+
+**Contract:** All tenant-filtered queries must have matching composite indexes to prevent slow queries as data grows.
+
+**Forever Rule:** Index to match your WHERE + ORDER BY.
+
+**Indexes Created:**
+
+1. **email_logs:**
+   - `idx_email_logs_tenant_sentAt` → Matches `WHERE tenant=? AND sentAt >= ? ORDER BY sentAt DESC`
+   - `idx_email_logs_tenant_status_sentAt` → Matches `WHERE tenant=? AND status=? AND sentAt >= ?`
+
+2. **deployments:**
+   - `idx_deployments_tenant_createdAt` → Matches `WHERE tenant=? AND createdAt >= ? ORDER BY createdAt DESC`
+   - `idx_deployments_tenant_status_createdAt` → Matches `WHERE tenant=? AND status=? AND createdAt >= ?`
+
+**Query Pattern:**
+```sql
+-- Health metrics query (24h window)
+SELECT * FROM email_logs 
+WHERE tenant='vinces' AND sentAt >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+ORDER BY sentAt DESC;
+```
+
+**Index Selection Logic:**
+- MySQL uses leftmost prefix matching
+- `(tenant, sentAt)` index works for: `WHERE tenant=?`, `WHERE tenant=? AND sentAt>=?`
+- `(tenant, status, sentAt)` index works for: `WHERE tenant=?`, `WHERE tenant=? AND status=?`, `WHERE tenant=? AND status=? AND sentAt>=?`
+
+**Verification:**
+```sql
+SHOW INDEX FROM email_logs WHERE Key_name LIKE 'idx_%';
+SHOW INDEX FROM deployments WHERE Key_name LIKE 'idx_%';
+```
+
+**Enforcement:** No automated test (indexes are infrastructure), but query performance monitoring should alert if queries exceed 100ms.
+
+**When to Add More Indexes:**
+- If you add filtering by `emailType` or `deliveryProvider` → add composite index
+- If you add filtering by `urlMode` or `templateVersion` → add composite index
+- Always match the WHERE clause order in your index column order
+
+**Anti-Pattern to Avoid:**
+- ❌ Adding indexes on every column (index bloat slows writes)
+- ❌ Creating indexes without checking query patterns first
+- ✅ Add indexes only for columns used in WHERE, JOIN, ORDER BY of frequent queries
