@@ -755,6 +755,197 @@ export default function IntakeDetail() {
             </Card>
           </div>
 
+          {/* Service Selection & Pricing Card */}
+          {intake.rawPayload?.pricingSnapshot && (
+            <Card className="bg-white/5 border-white/10">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CreditCard className="w-5 h-5 text-[#FF6A00]" />
+                  Service Selection & Pricing
+                </CardTitle>
+                <CardDescription>
+                  What the customer selected and what they were charged
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Service Selections */}
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-300 mb-3">Services Selected</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Website */}
+                    <div className="flex items-center gap-2">
+                      {intake.rawPayload.website ? (
+                        <CheckCircle className="w-4 h-4 text-green-400" />
+                      ) : (
+                        <Ban className="w-4 h-4 text-gray-600" />
+                      )}
+                      <span className={intake.rawPayload.website ? "text-gray-200" : "text-gray-600"}>
+                        Website
+                      </span>
+                    </div>
+
+                    {/* Email */}
+                    <div className="flex items-center gap-2">
+                      {intake.rawPayload.emailService ? (
+                        <CheckCircle className="w-4 h-4 text-green-400" />
+                      ) : (
+                        <Ban className="w-4 h-4 text-gray-600" />
+                      )}
+                      <span className={intake.rawPayload.emailService ? "text-gray-200" : "text-gray-600"}>
+                        Email Service {intake.rawPayload.website ? " (required)" : ""}
+                      </span>
+                    </div>
+
+                    {/* Social Media */}
+                    <div className="flex items-center gap-2">
+                      {intake.rawPayload.socialMediaTier ? (
+                        <CheckCircle className="w-4 h-4 text-green-400" />
+                      ) : (
+                        <Ban className="w-4 h-4 text-gray-600" />
+                      )}
+                      <span className={intake.rawPayload.socialMediaTier ? "text-gray-200" : "text-gray-600"}>
+                        Social Media
+                        {intake.rawPayload.socialMediaTier ? (
+                          <span className="text-xs text-gray-400 ml-1">
+                            ({String(intake.rawPayload.socialMediaTier) === "LOW" ? "4 posts" : 
+                              String(intake.rawPayload.socialMediaTier) === "MEDIUM" ? "8 posts" : "12 posts"})
+                          </span>
+                        ) : null}
+                      </span>
+                    </div>
+
+                    {/* Enrichment Layer */}
+                    <div className="flex items-center gap-2">
+                      {intake.rawPayload.enrichmentLayer ? (
+                        <CheckCircle className="w-4 h-4 text-green-400" />
+                      ) : (
+                        <Ban className="w-4 h-4 text-gray-600" />
+                      )}
+                      <span className={intake.rawPayload.enrichmentLayer ? "text-gray-200" : "text-gray-600"}>
+                        Enrichment Layer
+                      </span>
+                    </div>
+
+                    {/* Google Business */}
+                    <div className="flex items-center gap-2">
+                      {intake.rawPayload.googleBusiness ? (
+                        <CheckCircle className="w-4 h-4 text-green-400" />
+                      ) : (
+                        <Ban className="w-4 h-4 text-gray-600" />
+                      )}
+                      <span className={intake.rawPayload.googleBusiness ? "text-gray-200" : "text-gray-600"}>
+                        Google Business
+                      </span>
+                    </div>
+
+                    {/* QuickBooks */}
+                    <div className="flex items-center gap-2">
+                      {intake.rawPayload.quickBooksSync ? (
+                        <CheckCircle className="w-4 h-4 text-green-400" />
+                      ) : (
+                        <Ban className="w-4 h-4 text-gray-600" />
+                      )}
+                      <span className={intake.rawPayload.quickBooksSync ? "text-gray-200" : "text-gray-600"}>
+                        QuickBooks Sync
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Pricing Breakdown */}
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-300 mb-3">Setup Pricing</h4>
+                  <div className="space-y-2">
+                    {/* Setup Line Items */}
+                    {(intake.rawPayload.pricingSnapshot as any).setupLineItems?.map((item: any, idx: number) => (
+                      <div key={idx} className="flex justify-between text-sm">
+                        <span className="text-gray-400">{item.label}</span>
+                        <span className="text-gray-200">
+                          ${(item.amountCents / 100).toFixed(2)}
+                        </span>
+                      </div>
+                    ))}
+
+                    {/* Bundle Discount */}
+                    {(intake.rawPayload.pricingSnapshot as any).setupDiscountCents > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-green-400">Bundle Discount (50% off Social)</span>
+                        <span className="text-green-400">
+                           ${((intake.rawPayload.pricingSnapshot as any).setupDiscountCents / 100).toFixed(2)}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Founder Override */}
+                    {(intake.rawPayload.pricingSnapshot as any).isFounder && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-purple-400">🎉 Beta Founder Override</span>
+                        <span className="text-purple-400">$300 flat</span>
+                      </div>
+                    )}
+
+                    {/* Subtotal */}
+                    {(intake.rawPayload.pricingSnapshot as any).setupSubtotalCents && (
+                      <div className="flex justify-between text-sm pt-2 border-t border-white/10">
+                        <span className="text-gray-400">Subtotal</span>
+                        <span className="text-gray-200">
+                          ${((intake.rawPayload.pricingSnapshot as any).setupSubtotalCents / 100).toFixed(2)}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Total */}
+                    <div className="flex justify-between text-base font-semibold pt-2 border-t border-white/10">
+                      <span className="text-gray-200">Setup Total Charged</span>
+                      <span className="text-[#FF6A00]">
+                        ${((intake.rawPayload.pricingSnapshot as any).setupTotalCents / 100).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Monthly Pricing */}
+                {(intake.rawPayload.pricingSnapshot as any).monthlyLineItems?.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-300 mb-3">Monthly Recurring (Not Yet Charged)</h4>
+                    <div className="space-y-2">
+                      {(intake.rawPayload.pricingSnapshot as any).monthlyLineItems.map((item: any, idx: number) => (
+                        <div key={idx} className="flex justify-between text-sm">
+                          <span className="text-gray-400">{item.label}</span>
+                          <span className="text-gray-200">
+                            ${(item.amountCents / 100).toFixed(2)}/mo
+                          </span>
+                        </div>
+                      ))}
+                      <div className="flex justify-between text-base font-semibold pt-2 border-t border-white/10">
+                        <span className="text-gray-200">Monthly Total</span>
+                        <span className="text-[#FF6A00]">
+                          ${((intake.rawPayload.pricingSnapshot as any).monthlyTotalCents / 100).toFixed(2)}/mo
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Metadata */}
+                <div className="text-xs text-gray-500 pt-2 border-t border-white/10">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-3 h-3" />
+                    <span>
+                      Priced at {new Date((intake.rawPayload.pricingSnapshot as any).timestamp).toLocaleString()}
+                    </span>
+                  </div>
+                  {(intake.rawPayload.pricingSnapshot as any).promoCode && (
+                    <div className="flex items-center gap-2 mt-1">
+                      <Sparkles className="w-3 h-3" />
+                      <span>Promo: {(intake.rawPayload.pricingSnapshot as any).promoCode}</span>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Action Buttons */}
           {buildPlan && (
             <Card className="bg-white/5 border-white/10">
