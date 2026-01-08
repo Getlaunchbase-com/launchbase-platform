@@ -743,17 +743,154 @@ export default function Onboarding() {
         );
 
       case 9:
+        // Calculate pricing
+        const setupItems = [
+          { name: "LaunchBase Website", price: 49900 },
+        ];
+        let serviceCount = 1;
+        
+        if (data.socialMediaTier && data.socialMediaTier !== "none") {
+          setupItems.push({ name: "Social Media Intelligence", price: 29900 });
+          serviceCount++;
+        }
+        if (data.enrichmentLayer) {
+          setupItems.push({ name: "Enrichment Layer", price: 19900 });
+          serviceCount++;
+        }
+        if (data.googleBusiness) {
+          setupItems.push({ name: "Google Business Setup", price: 14900 });
+          serviceCount++;
+        }
+        if (data.quickBooksSync) {
+          setupItems.push({ name: "QuickBooks Sync", price: 19900 });
+          serviceCount++;
+        }
+
+        // Calculate bundle discount (50% off Social Media setup when 2+ services)
+        let bundleDiscount = 0;
+        if (serviceCount >= 3 && data.socialMediaTier && data.socialMediaTier !== "none") {
+          bundleDiscount = 14950; // $149.50 (50% of $299)
+        }
+
+        const setupTotal = setupItems.reduce((sum, item) => sum + item.price, 0) - bundleDiscount;
+
+        // Calculate monthly
+        const monthlyItems = [
+          { name: "Hosting & System Ownership", price: 4900 },
+        ];
+        
+        if (data.socialMediaTier === "4posts") {
+          monthlyItems.push({ name: "Social Media Intelligence (4 posts)", price: 7900 });
+        } else if (data.socialMediaTier === "8posts") {
+          monthlyItems.push({ name: "Social Media Intelligence (8 posts)", price: 12900 });
+        } else if (data.socialMediaTier === "12posts") {
+          monthlyItems.push({ name: "Social Media Intelligence (12 posts)", price: 17900 });
+        }
+        
+        if (data.enrichmentLayer) {
+          monthlyItems.push({ name: "Enrichment Layer", price: 7900 });
+        }
+        if (data.googleBusiness) {
+          monthlyItems.push({ name: "Google Business Management", price: 2900 });
+        }
+        if (data.quickBooksSync) {
+          monthlyItems.push({ name: "QuickBooks Sync", price: 3900 });
+        }
+
+        const monthlyTotal = monthlyItems.reduce((sum, item) => sum + item.price, 0);
+
+        const formatPrice = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+
         return (
-          <div className="space-y-8 text-center">
-            <div className="w-20 h-20 bg-[#FF6A00]/20 rounded-full flex items-center justify-center mx-auto">
-              <Sparkles className="w-10 h-10 text-[#FF6A00]" />
-            </div>
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">You're all set</h2>
-              <p className="text-gray-400 text-lg max-w-md mx-auto">
-                Nothing deploys without your approval. You can stop at any time.
+          <div className="space-y-8">
+            <div className="text-center">
+              <h2 className="text-3xl md:text-4xl font-bold mb-3">Review Your Setup & Ongoing Ownership</h2>
+              <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                Here's exactly what LaunchBase will take responsibility for.
+              </p>
+              <p className="text-sm text-gray-500 mt-2">
+                Nothing deploys without your approval. Monthly billing starts only after your site goes live.
               </p>
             </div>
+
+            {/* One-Time Setup */}
+            <Card className="bg-white/5 border-white/10">
+              <CardContent className="p-6">
+                <h3 className="text-xl font-semibold text-white mb-4">One-Time Setup (charged today)</h3>
+                <div className="space-y-3">
+                  {setupItems.map((item, idx) => (
+                    <div key={idx} className="flex items-center justify-between text-sm">
+                      <span className="text-gray-300">{item.name}</span>
+                      <span className="text-white font-semibold">{formatPrice(item.price)}</span>
+                    </div>
+                  ))}
+                  
+                  {bundleDiscount > 0 && (
+                    <div className="flex items-center justify-between text-sm pt-3 border-t border-white/10">
+                      <span className="text-[#1ED760]">Bundle Discount (50% off Social Media setup)</span>
+                      <span className="text-[#1ED760] font-semibold">−{formatPrice(bundleDiscount)}</span>
+                    </div>
+                  )}
+                  
+                  <div className="flex items-center justify-between text-lg font-bold pt-3 border-t border-white/10">
+                    <span className="text-white">Setup Total Today</span>
+                    <span className="text-[#FF6A00]">{formatPrice(setupTotal)}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Monthly Ownership */}
+            <Card className="bg-white/5 border-white/10">
+              <CardContent className="p-6">
+                <h3 className="text-xl font-semibold text-white mb-4">Monthly Ownership (starts after launch)</h3>
+                <div className="space-y-3">
+                  {monthlyItems.map((item, idx) => (
+                    <div key={idx} className="flex items-center justify-between text-sm">
+                      <span className="text-gray-300">{item.name}</span>
+                      <span className="text-white font-semibold">{formatPrice(item.price)}/mo</span>
+                    </div>
+                  ))}
+                  
+                  <div className="flex items-center justify-between text-lg font-bold pt-3 border-t border-white/10">
+                    <span className="text-white">Estimated Monthly Total</span>
+                    <span className="text-[#FF6A00]">{formatPrice(monthlyTotal)}/mo</span>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-4">
+                  You can turn services on or off at any time. Billing adjusts on the next monthly cycle. No penalties.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* What Happens Next */}
+            <Card className="bg-[#FF6A00]/10 border-[#FF6A00]/20">
+              <CardContent className="p-6">
+                <h3 className="text-lg font-semibold text-white mb-3">What happens next</h3>
+                <ol className="space-y-2 text-sm text-gray-300">
+                  <li className="flex items-start gap-2">
+                    <span className="text-[#FF6A00] font-semibold">1.</span>
+                    <span>You complete setup payment</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-[#FF6A00] font-semibold">2.</span>
+                    <span>We build and connect your system</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-[#FF6A00] font-semibold">3.</span>
+                    <span>You review your real site</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-[#FF6A00] font-semibold">4.</span>
+                    <span>You approve launch</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-[#FF6A00] font-semibold">5.</span>
+                    <span>LaunchBase stays on — monitoring, deciding, protecting</span>
+                  </li>
+                </ol>
+              </CardContent>
+            </Card>
 
             {globalError && (
               <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 flex items-start gap-3">
@@ -765,23 +902,32 @@ export default function Onboarding() {
               </div>
             )}
 
-            <Button
-              onClick={handleSubmit}
-              disabled={submitMutation.isPending}
-              size="lg"
-              className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white text-lg px-10 py-7"
-            >
-              {submitMutation.isPending ? (
-                "Building..."
-              ) : (
-                <>
-                  <Rocket className="w-5 h-5 mr-2" />
-                  Build My Website
-                </>
-              )}
-            </Button>
-            <p className="text-sm text-gray-500">
-              No payment required to review your site.
+            <div className="flex items-center gap-4">
+              <Button
+                variant="outline"
+                onClick={() => setCurrentStep(8)}
+                className="flex-1 border-white/20 text-white hover:bg-white/10"
+              >
+                Go Back and Adjust Services
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                disabled={submitMutation.isPending}
+                className="flex-1 bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white"
+              >
+                {submitMutation.isPending ? (
+                  "Processing..."
+                ) : (
+                  <>
+                    <Rocket className="w-5 h-5 mr-2" />
+                    Confirm & Continue
+                  </>
+                )}
+              </Button>
+            </div>
+            
+            <p className="text-center text-sm text-gray-500">
+              Nothing deploys without your approval. You can stop at any time.
             </p>
           </div>
         );
