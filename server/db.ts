@@ -180,18 +180,97 @@ export async function createIntake(data: {
   return { id: insertId, ...values };
 }
 
-export async function setIntakeStatus(intakeId: number, status: Intake['status']) {
+// Allowed status transitions (prevents chaos like "approved → new")
+const ALLOWED_TRANSITIONS: Record<Intake['status'], Intake['status'][]> = {
+  new: ["review", "needs_info", "paid"],
+  review: ["needs_info", "ready_for_review"],
+  needs_info: ["review"],
+  ready_for_review: ["approved"],
+  approved: ["paid", "deployed"],
+  paid: ["deployed"],
+  deployed: [], // terminal state
+};
+
+type SetStatusOptions = {
+  actorType: "system" | "admin" | "customer";
+  actorId?: string | null;
+  override?: boolean;
+  overrideReason?: string;
+  reason?: string;
+};
+
+type SetStatusResult =
+  | { ok: true; intakeId: number; from: Intake['status']; to: Intake['status']; overridden: boolean }
+  | { ok: false; intakeId: number; from: Intake['status']; to: Intake['status']; code: "INVALID_TRANSITION" | "NO_CHANGE"; message: string };
+
+export async function setIntakeStatus(
+  intakeId: number,
+  to: Intake['status'],
+  opts: SetStatusOptions
+): Promise<SetStatusResult | null> {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot update intake status: database not available");
     return null;
   }
 
+  // Get current status
+  const [intake] = await db
+    .select({ status: intakes.status })
+    .from(intakes)
+    .where(eq(intakes.id, intakeId))
+    .limit(1);
+
+  if (!intake) {
+    console.warn(`[Database] Cannot update status: intake ${intakeId} not found`);
+    return null;
+  }
+
+  const from = intake.status;
+
+  // No-op detection
+  if (from === to) {
+    console.log(`[Database] No-op: intake ${intakeId} already in status ${to}`);
+    return { ok: true, intakeId, from, to, overridden: false };
+  }
+
+  // Validate transition
+  const allowed = ALLOWED_TRANSITIONS[from] || [];
+  const isAllowed = allowed.includes(to);
+  const overridden = !!opts.override;
+
+  if (!isAllowed && !overridden) {
+    const message = `Transition not allowed: ${from} → ${to}. Allowed: ${allowed.join(", ") || "none"}`;
+    console.warn(`[Database] ${message}`);
+    return {
+      ok: false,
+      intakeId,
+      from,
+      to,
+      code: "INVALID_TRANSITION",
+      message,
+    };
+  }
+
+  // Require overrideReason when override is true
+  if (overridden && !opts.overrideReason) {
+    throw new Error("overrideReason is required when override=true");
+  }
+
+  // Update status
   await db.update(intakes)
-    .set({ status, updatedAt: new Date() })
+    .set({ status: to, updatedAt: new Date() })
     .where(eq(intakes.id, intakeId));
 
-  return { id: intakeId, status };
+  // Log status change (will be replaced with DB audit table later)
+  console.log(
+    `[Database] Status change: intake ${intakeId}: ${from} → ${to} ` +
+    `(actor: ${opts.actorType}${opts.actorId ? ` #${opts.actorId}` : ""}, ` +
+    `reason: ${overridden ? opts.overrideReason : opts.reason || "none"}, ` +
+    `overridden: ${overridden})`
+  );
+
+  return { ok: true, intakeId, from, to, overridden };
 }
 
 export async function getIntakes(status?: string, search?: string): Promise<Intake[]> {
