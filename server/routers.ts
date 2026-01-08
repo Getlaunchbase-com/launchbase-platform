@@ -95,12 +95,28 @@ export const appRouter = router({
         }).optional(),
         rawPayload: z.record(z.string(), z.unknown()).optional(),
         referralCode: z.string().optional(),
+        promoCode: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
         const db = await getDb();
         if (!db) throw new Error("Database not available");
         
         const intake = await createIntake(input, "new");
+        
+        // Handle promo code if provided
+        if (input.promoCode && intake?.id) {
+          const { reservePromo } = await import("./services/promoService");
+          const promoResult = await reservePromo({
+            promoCode: input.promoCode.toUpperCase(),
+            intakeId: intake.id,
+          });
+          
+          if (!promoResult.success) {
+            console.log(`[Intake] Promo code ${input.promoCode} failed: ${promoResult.error}`);
+          } else {
+            console.log(`[Intake] Promo code ${input.promoCode} reserved for intake ${intake.id}`);
+          }
+        }
         
         // Handle referral code if provided
         let referralDiscount = 0;

@@ -430,6 +430,18 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
   console.log(`[Stripe Webhook] ✅ Successfully claimed session ${session.id} for intake ${intakeId}`);
 
+  // Redeem promo code if this intake has a reservation
+  const { redeemPromo } = await import("../services/promoService");
+  const promoResult = await redeemPromo({
+    intakeId: intakeIdNum,
+    stripeCustomerId: session.customer as string,
+    stripeCheckoutSessionId: session.id,
+  });
+  
+  if (promoResult.success && promoResult.founderNumber) {
+    console.log(`[Stripe Webhook] 🎉 Founder #${String(promoResult.founderNumber).padStart(2, '0')} claimed by intake ${intakeId}`);
+  }
+
   // Now safe: only one webhook run reaches here
   // Create payment record
   await db.insert(payments).values({

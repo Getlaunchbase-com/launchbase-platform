@@ -24,6 +24,7 @@ interface OnboardingData {
   phone: string;
   email: string;
   brandFeel: "clean" | "bold" | "friendly" | "auto" | "";
+  promoCode?: string;
 }
 
 const initialData: OnboardingData = {
@@ -230,6 +231,7 @@ export default function Onboarding() {
       services,
       serviceArea: data.serviceArea ? [data.serviceArea] : [],
       primaryCTA,
+      promoCode: data.promoCode || undefined,
       rawPayload: {
         ...data,
         inferredVertical: vertical,
@@ -466,6 +468,31 @@ export default function Onboarding() {
                 {fieldErrors.email && (
                   <p className="text-red-400 text-xs mt-2">{fieldErrors.email}</p>
                 )}
+              </div>
+              
+              {/* Quiet promo code toggle */}
+              <div className="pt-4 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const toggle = document.getElementById('promo-field');
+                    if (toggle) {
+                      toggle.style.display = toggle.style.display === 'none' ? 'block' : 'none';
+                    }
+                  }}
+                  className="text-sm text-gray-500 hover:text-gray-300 transition-colors"
+                >
+                  Have a founder code?
+                </button>
+                <div id="promo-field" style={{ display: 'none' }} className="mt-3">
+                  <Input
+                    type="text"
+                    value={data.promoCode || ''}
+                    onChange={(e) => updateField("promoCode", e.target.value.toUpperCase())}
+                    placeholder="BETA-FOUNDERS"
+                    className="text-lg py-6"
+                  />
+                </div>
               </div>
             </div>
             <p className="text-sm text-gray-500">

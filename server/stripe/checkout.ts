@@ -24,16 +24,23 @@ export async function createSetupCheckoutSession({
   origin,
   modules = [],
 }: CreateCheckoutParams): Promise<{ url: string; sessionId: string }> {
+  // Check if this intake has a promo reservation
+  const { getRedemptionForIntake } = await import("../services/promoService");
+  const redemption = await getRedemptionForIntake(intakeId);
+  
+  const isFounder = redemption?.status === "reserved" && new Date(redemption.expiresAt) > new Date();
+  const setupFee = isFounder ? 30000 : PRODUCTS.SETUP_FEE.priceInCents;
+
   // Build line items starting with base setup fee
   const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [
     {
       price_data: {
         currency: PRODUCTS.SETUP_FEE.currency,
         product_data: {
-          name: PRODUCTS.SETUP_FEE.name,
-          description: PRODUCTS.SETUP_FEE.description,
+          name: isFounder ? "LaunchBase Setup Fee (Founder)" : PRODUCTS.SETUP_FEE.name,
+          description: isFounder ? "Beta Founders Program - $300 setup" : PRODUCTS.SETUP_FEE.description,
         },
-        unit_amount: PRODUCTS.SETUP_FEE.priceInCents,
+        unit_amount: setupFee,
       },
       quantity: 1,
     },
