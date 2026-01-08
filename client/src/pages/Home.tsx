@@ -174,13 +174,23 @@ export default function Home() {
                 </p>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/apply">
-                  <Button size="lg" className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white text-lg px-8 py-6 w-full sm:w-auto">
-                    {c.ctaPrimary} <ArrowRight className="w-5 h-5 ml-2" />
-                  </Button>
-                </Link>
-                <Link href="/how-it-works">
+              {/* Audience Fork - Explicit Choice */}
+              <div className="space-y-4">
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <Link href="/apply?audience=biz">
+                    <Button size="lg" className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white text-lg px-8 py-6 w-full">
+                      <Users className="w-5 h-5 mr-2" />
+                      For Your Business
+                    </Button>
+                  </Link>
+                  <Link href="/apply?audience=org">
+                    <Button size="lg" className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white text-lg px-8 py-6 w-full">
+                      <TrendingUp className="w-5 h-5 mr-2" />
+                      For Your Organization
+                    </Button>
+                  </Link>
+                </div>
+                <Link href="/how-it-works" className="block text-center">
                   <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/5 text-lg px-8 py-6 w-full sm:w-auto">
                     {c.ctaSecondary}
                   </Button>

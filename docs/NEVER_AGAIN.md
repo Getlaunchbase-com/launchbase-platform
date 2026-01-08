@@ -746,3 +746,70 @@ expect(emailRows.length).toBe(1);
 - `server/__tests__/smoke.stripe-webhook.test.ts` - Idempotency smoke test
 - `server/__tests__/smoke.stripe-invoice.test.ts` - Subscription activation test
 
+
+
+---
+
+## Template Versioning
+
+### ✅ CORRECT PATTERN: Immutable template versions prevent silent breakage
+
+**Why this matters:**
+- Customer sites must never change unexpectedly
+- Template improvements should only affect new deployments
+- Upgrades must be explicit, auditable, and reversible
+
+**How it works:**
+1. Every deployment stores `templateVersion` (e.g., "2026-01-07.1")
+2. New deployments get `TEMPLATE_VERSION_CURRENT`
+3. Old deployments remain frozen at their original version
+4. Template changes never affect existing customer sites
+
+**When to bump `TEMPLATE_VERSION_CURRENT`:**
+
+✅ **BUMP for breaking changes:**
+- Layout structure changes
+- Component hierarchy changes
+- CSS framework updates
+- New required features
+- Breaking API changes
+
+❌ **DO NOT BUMP for safe changes:**
+- Copy/content updates
+- Bug fixes that don't change output
+- Internal refactoring
+- New optional features
+- Performance improvements
+
+**How to bump the version:**
+
+1. Update `TEMPLATE_VERSION_CURRENT` in `shared/templateVersion.ts`
+2. Add the new version to `TEMPLATE_VERSIONS` array
+3. Run tests: `pnpm test template-versioning`
+4. Document what changed in this file
+
+**Example:**
+```typescript
+// shared/templateVersion.ts
+export const TEMPLATE_VERSION_CURRENT = "2026-01-15.1"; // Bumped for new hero layout
+export const TEMPLATE_VERSIONS = [
+  "v1",           // Baseline (all existing sites)
+  "2026-01-07.1", // Initial versioned release
+  "2026-01-15.1", // New hero layout with CTAs
+] as const;
+```
+
+**Upgrade path (future):**
+- Admin UI will allow explicit site upgrades
+- Upgrades create new deployment with new version
+- Old deployment remains as rollback point
+- Customer approves before going live
+
+**Tests enforce immutability:**
+- `server/__tests__/template-versioning.test.ts`
+- New deployments must get current version
+- Existing deployments must never change version
+
+**Rule:** Template versions are immutable. Once deployed, a site's template version never changes unless explicitly upgraded through admin action.
+
+**Reference:** `shared/templateVersion.ts`, `server/db.ts` (createDeployment)

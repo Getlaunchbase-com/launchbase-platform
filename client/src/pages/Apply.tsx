@@ -358,13 +358,18 @@ export default function ApplyPage() {
 
     if (typeof window === "undefined") return base;
 
-    // Read websiteStatus from URL params (for CTA pre-fill)
+    // Read websiteStatus and audience from URL params (for CTA pre-fill)
     let urlWebsiteStatus: "none" | "existing" | "systems_only" | null = null;
+    let urlAudience: "biz" | "org" | null = null;
     try {
       const params = new URLSearchParams(window.location.search);
       const ws = params.get("websiteStatus");
       if (ws === "none" || ws === "existing" || ws === "systems_only") {
         urlWebsiteStatus = ws;
+      }
+      const aud = params.get("audience");
+      if (aud === "biz" || aud === "org") {
+        urlAudience = aud;
       }
     } catch {
       // ignore URL parsing errors
@@ -378,9 +383,8 @@ export default function ApplyPage() {
         return {
           ...base,
           ...parsed,
-          // 🔒 FOREVER DEFAULT
-          audience: parsed?.audience === "org" ? "org" : "biz",
           // URL param wins over localStorage (for CTA routing)
+          audience: urlAudience || (parsed?.audience === "org" ? "org" : "biz"),
           websiteStatus: urlWebsiteStatus || parsed?.websiteStatus || "none",
         };
       }
@@ -393,7 +397,7 @@ export default function ApplyPage() {
       ...base,
       language: preferredLang as Language,
       websiteStatus: urlWebsiteStatus || "none",
-      audience: preferredAudience,
+      audience: urlAudience || preferredAudience,
     };
   });
 

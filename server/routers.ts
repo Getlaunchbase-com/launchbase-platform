@@ -138,6 +138,15 @@ export const appRouter = router({
             websiteStatus: intake.websiteStatus as any,
           });
           
+          // Send auto-reply confirmation to customer
+          await sendEmail(intake.id, "contact_form_confirmation", {
+            firstName,
+            businessName: input.businessName,
+            email: input.email,
+            language: intake.language as any,
+            audience: intake.audience as any,
+          });
+          
           // Notify admin of new intake
           await AdminNotifications.newIntake(input.businessName, 85);
         }
