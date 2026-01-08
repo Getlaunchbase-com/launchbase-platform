@@ -44,14 +44,10 @@ describe("Health Dashboard", () => {
     expect(typeof metrics.system.environment).toBe("string");
   });
 
-  it("should return valid email sender based on RESEND_DOMAIN_VERIFIED", async () => {
+  it("should return pro sender (support@getlaunchbase.com)", async () => {
     const metrics = await getHealthMetrics();
     
-    const expectedSender = process.env.RESEND_DOMAIN_VERIFIED === "true"
-      ? "support@getlaunchbase.com"
-      : "onboarding@resend.dev";
-    
-    expect(metrics.emails.currentSender).toBe(expectedSender);
+    expect(metrics.emails.currentSender).toBe("support@getlaunchbase.com");
   });
 
   it("should calculate deployment counts correctly", async () => {

@@ -933,3 +933,96 @@ it("should rate limit rapid successive calls", async () => {
 - `server/__tests__/cron-alerts-auth.test.ts` (boundary tests)
 
 **Rule:** Cron endpoints are infrastructure. Auth is non-negotiable. Rate limiting is defense-in-depth.
+
+
+---
+
+## Email Sender Identity (FOREVER CONTRACT)
+
+**Pro Sender Enforced**
+
+All emails sent from LaunchBase use a single, professional sender identity:
+
+```typescript
+FROM: LaunchBase <support@getlaunchbase.com>
+REPLY-TO: support@getlaunchbase.com
+```
+
+**What this applies to:**
+- Customer intake confirmations
+- Review/deployment notifications
+- Ops alerts (vince@vincessnowplow.com)
+- Admin notifications
+- Facebook webhook notifications
+- All automated emails
+
+**Why this matters:**
+- **Deliverability**: Verified domain (getlaunchbase.com) improves inbox placement
+- **Trust**: Professional sender builds customer confidence
+- **Consistency**: One identity across all touchpoints
+- **No fallbacks**: No @resend.dev, no personal emails
+
+**Ops Alert Recipient (FOREVER)**
+
+All operational alerts go to ONE inbox:
+```
+vince@vincessnowplow.com
+```
+
+**What triggers ops alerts:**
+- Email failures (3+ in 24h)
+- Stripe webhooks stale (traffic active in last 7 days, then silent 6h+)
+- Deployment failures (2+ in 24h)
+
+**Alert delivery:**
+- Fingerprint-based dedupe (no spam)
+- Auto-resolve when condition clears
+- Detailed stats in cron response
+- Visible in `/admin/alerts` UI
+
+**NEVER:**
+- ❌ Use shared @resend.dev sender
+- ❌ Send ops alerts to multiple recipients
+- ❌ Change sender based on environment
+- ❌ Use personal emails for system notifications
+
+**Code locations:**
+- `server/email.ts` - Main email sender configuration
+- `server/services/facebookWebhook.ts` - Facebook notifications
+- `server/_core/alerts.ts` - Ops alert delivery
+- `server/health.ts` - Health metrics and sender display
+
+**Tests that enforce this:**
+- `server/__tests__/health-dashboard.test.ts` - Verifies sender is support@getlaunchbase.com
+- Email send tests verify FROM/REPLY-TO headers
+
+This is locked forever. No exceptions.
+
+---
+
+## Alert System Rules (FOREVER)
+
+**Webhooks Stale Detection**
+
+Only alert if BOTH conditions are true:
+1. There was at least 1 webhook in the last 7 days (traffic exists)
+2. AND no webhooks in the last 6 hours (went silent)
+
+**Why this prevents false alarms:**
+- New tenants with zero traffic = not stale, just quiet
+- Beta periods with low activity = not stale
+- Only alerts when active traffic suddenly stops = real issue
+
+**Code location:**
+- `server/health.ts` - `isStale` logic in stripeMetrics
+
+**Test this:**
+```typescript
+// No traffic in 7 days = not stale
+expect(metrics.stripeWebhooks.isStale).toBe(false);
+
+// Traffic in last 7 days + none in last 6h = stale
+expect(metrics.stripeWebhooks.isStale).toBe(true);
+```
+
+This prevents ops alert spam during beta/low-traffic periods.

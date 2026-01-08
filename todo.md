@@ -303,3 +303,20 @@
 - [x] Add buildId and serverTime to response for version tracking
 - [x] Add no-cache headers to prevent stale responses
 - [ ] Add test for cron response structure
+
+## Session Jan 8, 2026 - Pro Sender + Alerts UI + Noise Reduction
+- [x] Update email sender to support@getlaunchbase.com everywhere
+- [x] Remove personal email fallbacks (vmorre@live.com)
+- [x] Update Facebook webhook notifications to use pro sender
+- [x] Update health dashboard to reflect pro sender
+- [x] Update tests to expect pro sender
+- [x] Document canonical email identity in NEVER_AGAIN.md
+- [x] Document alert system rules in NEVER_AGAIN.md
+- [x] Build /admin/alerts UI with active/resolved tabs
+- [x] Add tenant filter (All/LaunchBase/Vince's)
+- [x] Add auto-refresh (30s interval)
+- [x] Add tRPC endpoint for fetching alerts
+- [x] Add route to App.tsx
+- [x] Tune webhooks_stale rule to only alert if traffic was active recently
+- [x] Updated isStale logic: only alert if traffic in last 7 days AND silent for 6h
+- [x] Prevents false alarms during beta/low-traffic periods
