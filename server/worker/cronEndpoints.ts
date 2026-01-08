@@ -18,6 +18,8 @@
 import type { Request, Response } from "express";
 import { handleDeploymentWorker } from "./deploymentWorker";
 import { handleAutoAdvanceWorker } from "./autoAdvanceWorker";
+import { processAlerts } from "../_core/alerts";
+import { getHealthMetrics } from "../health";
 import { getDb } from "../db";
 import { sql } from "drizzle-orm";
 import { randomUUID } from "crypto";
@@ -140,6 +142,68 @@ export async function handleCronRunNextDeploy(req: Request, res: Response) {
 export async function handleCronAutoAdvance(req: Request, res: Response) {
   // Delegate to the existing worker logic (single code path)
   return handleAutoAdvanceWorker(req, res);
+}
+
+/**
+ * POST /api/cron/alerts
+ * Evaluate health metrics and send alerts
+ * Runs every 10-15 minutes to detect issues
+ */
+export async function handleCronAlerts(req: Request, res: Response) {
+  const runId = await startWorkerRun("alerts");
+  
+  let ok = false;
+  let processed = 0;
+  let error: string | null = null;
+  
+  try {
+    // Evaluate alerts for both tenants
+    const tenants: ("launchbase" | "vinces")[] = ["launchbase", "vinces"];
+    
+    for (const tenant of tenants) {
+      try {
+        // Get health metrics for this tenant
+        const metrics = await getHealthMetrics(tenant);
+        
+        // Process alerts (upsert + send if new)
+        await processAlerts(metrics);
+        
+        processed++;
+        console.log(`[Alerts] Processed alerts for tenant: ${tenant}`);
+      } catch (tenantError) {
+        const msg = tenantError instanceof Error ? tenantError.message : String(tenantError);
+        console.error(`[Alerts] Failed to process alerts for ${tenant}:`, msg);
+        // Continue to next tenant instead of failing entire job
+      }
+    }
+    
+    ok = true;
+    res.status(200).json({
+      success: true,
+      processed,
+      message: `Evaluated alerts for ${processed} tenant(s)`,
+    });
+  } catch (e: any) {
+    ok = false;
+    error = e?.message ?? String(e);
+    
+    if (!res.headersSent) {
+      res.status(500).json({
+        success: false,
+        error: "alerts_failed",
+        message: error,
+      });
+    }
+  } finally {
+    await finishWorkerRun(
+      runId,
+      ok,
+      processed,
+      undefined,
+      error ?? undefined,
+      { path: req.path }
+    );
+  }
 }
 
 /**

@@ -30,6 +30,7 @@ import { handleAutoAdvanceWorker } from "../worker/autoAdvanceWorker";
 import { 
   handleCronRunNextDeploy, 
   handleCronAutoAdvance, 
+  handleCronAlerts,
   handleCronHealth, 
   handleCronMethodNotAllowed 
 } from "../worker/cronEndpoints";
@@ -52,10 +53,12 @@ export function createApp(): Express {
   // These are the ONLY endpoints external cron jobs should use
   app.post("/api/cron/run-next-deploy", handleCronRunNextDeploy);
   app.post("/api/cron/auto-advance", handleCronAutoAdvance);
+  app.post("/api/cron/alerts", handleCronAlerts);
   
   // Explicit 405 for GET (prevents false success / SPA fallthrough confusion)
   app.get("/api/cron/run-next-deploy", handleCronMethodNotAllowed);
   app.get("/api/cron/auto-advance", handleCronMethodNotAllowed);
+  app.get("/api/cron/alerts", handleCronMethodNotAllowed);
   
   // Health stays GET
   app.get("/api/cron/health", handleCronHealth);

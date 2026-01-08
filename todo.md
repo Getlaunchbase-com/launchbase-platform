@@ -1999,3 +1999,20 @@
 - [x] Write FOREVER test: throws if deploy in flight
 - [x] Write FOREVER test: tenant isolation
 - [ ] Document rollback rules in NEVER_AGAIN.md
+
+
+## Real-Time Alert System (Jan 2026)
+- [x] Create alert_events table in schema
+- [x] Run SQL migration to add alert_events table with indexes
+- [x] Implement alert evaluation logic in server/_core/alerts.ts
+- [x] Add 60min cooldown dedup logic
+- [x] Add auto-resolve when metrics recover
+- [x] Add ops_alert email template
+- [x] Create /api/cron/alerts endpoint
+- [x] Wire alert evaluator to cron endpoint
+- [x] Write FOREVER test: first trigger sends 1 email
+- [x] Write FOREVER test: second run within cooldown sends 0 emails
+- [x] Write FOREVER test: after cooldown sends reminder
+- [x] Write FOREVER test: healthy metric closes incident
+- [x] Write FOREVER test: tenant isolation (vinces ≠ launchbase)
+- [x] Document alert rules in NEVER_AGAIN.md

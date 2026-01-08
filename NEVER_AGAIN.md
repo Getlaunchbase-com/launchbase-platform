@@ -272,3 +272,82 @@ SHOW INDEX FROM deployments WHERE Key_name LIKE 'idx_%';
 - ❌ Don't allow rollback when deploy is queued/running
 - ❌ Don't skip tenant isolation check
 - ❌ Don't delete rollback deployments from history (audit trail)
+
+
+
+---
+
+## Real-Time Alert System (Jan 2026)
+
+**Contract:** Fingerprint-based dedupe prevents spam loops. Alerts only go to vince@vincessnowplow.com.
+
+**Forever Rules:**
+
+1. **Fingerprint-based dedupe** — One row per unique `(tenant, alertKey, fingerprint)`. UNIQUE constraint enforces no duplicates at DB level. Same problem = same fingerprint = single alert row.
+
+2. **Bucket thresholds to reduce noise** — Don't alert every minute. Use discrete buckets:
+   - Email failures: `3plus` or `10plus`
+   - Deploy failures: `2plus` or `5plus`
+   - Webhook staleness: `2h`, `6h`, `12h`, or `24h+`
+
+3. **Upsert + send-once flow** — Check if alert exists by fingerprint. If exists → update `lastSeenAt`. If new → insert + send email + set `sentAt`. This guarantees no duplicate alerts on retries.
+
+4. **Auto-resolve when conditions clear** — Mark `status=resolved` and set `resolvedAt` when alert is no longer present in evaluation. No manual acknowledgment needed.
+
+5. **Recipient hard-locked** — Alerts ONLY go to `vince@vincessnowplow.com`. Hard-coded in `alerts.ts`, not env-dependent. Even if env is misconfigured, recipient stays locked.
+
+6. **Always include clickable link** — Every alert message includes direct link to `/admin/health?tenant={tenant}` (full URL if `PUBLIC_BASE_URL` set, otherwise path-only).
+
+7. **Always log delivery status** — Track `sentAt`, `deliveryProvider`, `deliveryMessageId`, and `lastError` for every alert attempt.
+
+**Alert Thresholds:**
+- **Email failures** (warn): ≥3 in last 24h
+- **Webhook staleness** (crit): No events in >2h
+- **Deploy failures** (warn): ≥2 in last 24h
+
+**Cron Schedule:**
+- Endpoint: `POST /api/cron/alerts`
+- Frequency: Every 10-15 minutes
+- Evaluates both tenants: `launchbase` and `vinces`
+- Logs to `worker_runs` table for observability
+
+**Tenant Isolation:**
+- Each alert tied to single tenant
+- Cannot process alerts for `tenant=all`
+- Fingerprints include tenant to prevent cross-tenant collisions
+
+**Database Schema:**
+
+Table: `alert_events`
+- UNIQUE KEY: `(tenant, alertKey, fingerprint)`
+- Indexes: `(tenant, status, lastSeenAt)`, `(tenant, sentAt)`, `(tenant, alertKey, lastSeenAt)`
+- Auto-resolve via `status` and `resolvedAt` fields
+
+**Fingerprint Format:**
+```
+{tenant}|{alertKey}|{bucket}
+```
+
+Examples:
+- `launchbase|health:webhooks_stale|2h`
+- `vinces|health:email_failures|3plus`
+- `launchbase|health:deploy_failures|5plus`
+
+**Definition of Done:**
+- ✅ alert_events table created with UNIQUE constraint
+- ✅ Fingerprint-based upsert logic implemented
+- ✅ Bucket thresholds prevent alert noise
+- ✅ Auto-resolve marks alerts resolved when conditions clear
+- ✅ Recipient hard-locked to vince@vincessnowplow.com
+- ✅ Cron endpoint `/api/cron/alerts` registered
+- ✅ ops_alert email template added to all language/audience blocks
+
+**Test Location:** Tests pending (system is functional, tests to be added in follow-up)
+
+**Enforcement:** Manual verification via cron endpoint + alert_events table inspection.
+
+**Common Pitfalls:**
+- ❌ Don't send alerts without fingerprint dedupe (spam loop)
+- ❌ Don't alert on every evaluation (use buckets)
+- ❌ Don't forget to auto-resolve when conditions clear
+- ❌ Don't allow recipient to be env-configurable (security risk)
