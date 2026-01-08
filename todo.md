@@ -1887,3 +1887,36 @@
 - [ ] Test Facebook webhook with real messages (requires Facebook App setup)
 - [ ] Test Facebook lead form submission (requires Facebook App setup)
 - [x] Document Facebook webhook setup for future pages
+
+
+## Auto-Reply Email Confirmation (Jan 2026)
+
+- [ ] Add contact_form_confirmation email template
+- [ ] Wire auto-reply into contact form submission
+- [ ] Add email logging for audit trail
+- [ ] Test auto-reply with real contact form submission
+
+
+## Business vs Organization Audience Pathway (Jan 2026)
+
+- [ ] Verify homepage has Business/Organization buttons
+- [ ] Verify Apply form reads audience URL param
+- [ ] Verify audience saves to database (intakes.audience)
+- [ ] Verify email templates use audience for copy selection
+- [ ] Add homepage fork with 2 CTAs (For Business / For Organization)
+- [ ] Test biz flow end-to-end (homepage → apply → email)
+- [ ] Test org flow end-to-end (homepage → apply → email)
+
+
+## Template Versioning System (Jan 2026)
+
+- [x] Define TEMPLATE_VERSION_CURRENT constant
+- [x] Add templateVersion column to deployments table
+- [x] Backfill existing deployments with baseline version
+- [x] Wire templateVersion into deployment creation
+- [x] Store version when creating new deployments
+- [ ] Use templateVersion when loading templates in build pipeline (future: when template loader exists)
+- [x] Add test: new deployment gets current version
+- [x] Add test: existing deployment stays frozen
+- [x] Document "When to bump templateVersion" in NEVER_AGAIN.md
+- [x] Document upgrade path for customer sites

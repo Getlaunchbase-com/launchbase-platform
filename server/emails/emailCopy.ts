@@ -19,7 +19,8 @@ export type EmailType =
   | "testimonial_request"
   | "founding_client_lockin"
   | "day7_checkin"
-  | "day30_value";
+  | "day30_value"
+  | "contact_form_confirmation";
 
 interface EmailBlock {
   subject: string;
@@ -307,6 +308,20 @@ Thanks again for trusting us.
 —
 LaunchBase`,
       },
+      contact_form_confirmation: {
+        subject: "We received your message 👍",
+        previewText: "Thanks for reaching out — we'll get back to you within 24 hours.",
+        body: `Hi {{firstName}},
+
+Thanks for reaching out to {{businessName}}.
+
+We've received your message and will get back to you within 24 hours.
+
+If this is urgent, you can reply directly to this email.
+
+—
+{{businessName}}`,
+      },
     },
     org: {
       intake_confirmation: {
@@ -569,6 +584,20 @@ Thanks again.
 
 —
 LaunchBase`,
+      },
+      contact_form_confirmation: {
+        subject: "We received your message 👍",
+        previewText: "Thanks for reaching out — we'll get back to you within 24 hours.",
+        body: `Hi {{firstName}},
+
+Thanks for reaching out to {{businessName}}.
+
+We've received your message and will get back to you within 24 hours.
+
+If this is urgent, you can reply directly to this email.
+
+—
+{{businessName}}`,
       },
     },
   },
@@ -835,6 +864,20 @@ Gracias de nuevo por confiar en nosotros.
 —
 LaunchBase`,
       },
+      contact_form_confirmation: {
+        subject: "We received your message 👍",
+        previewText: "Thanks for reaching out — we'll get back to you within 24 hours.",
+        body: `Hi {{firstName}},
+
+Thanks for reaching out to {{businessName}}.
+
+We've received your message and will get back to you within 24 hours.
+
+If this is urgent, you can reply directly to this email.
+
+—
+{{businessName}}`,
+      },
     },
     org: {
       intake_confirmation: {
@@ -1087,6 +1130,20 @@ Gracias de nuevo.
 —
 LaunchBase`,
       },
+      contact_form_confirmation: {
+        subject: "We received your message 👍",
+        previewText: "Thanks for reaching out — we'll get back to you within 24 hours.",
+        body: `Hi {{firstName}},
+
+Thanks for reaching out to {{businessName}}.
+
+We've received your message and will get back to you within 24 hours.
+
+If this is urgent, you can reply directly to this email.
+
+—
+{{businessName}}`,
+      },
     },
   },
   
@@ -1332,6 +1389,20 @@ Dziękujemy ponownie za zaufanie.
 —
 LaunchBase`,
       },
+      contact_form_confirmation: {
+        subject: "We received your message 👍",
+        previewText: "Thanks for reaching out — we'll get back to you within 24 hours.",
+        body: `Hi {{firstName}},
+
+Thanks for reaching out to {{businessName}}.
+
+We've received your message and will get back to you within 24 hours.
+
+If this is urgent, you can reply directly to this email.
+
+—
+{{businessName}}`,
+      },
     },
     org: {
       intake_confirmation: {
@@ -1572,6 +1643,20 @@ Dziękujemy ponownie.
 
 —
 LaunchBase`,
+      },
+      contact_form_confirmation: {
+        subject: "We received your message 👍",
+        previewText: "Thanks for reaching out — we'll get back to you within 24 hours.",
+        body: `Hi {{firstName}},
+
+Thanks for reaching out to {{businessName}}.
+
+We've received your message and will get back to you within 24 hours.
+
+If this is urgent, you can reply directly to this email.
+
+—
+{{businessName}}`,
       },
     },
   },

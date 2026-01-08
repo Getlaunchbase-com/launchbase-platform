@@ -10,6 +10,7 @@ import {
   socialPosts, InsertSocialPost, SocialPost,
   postUsage, InsertPostUsage, PostUsage,
 } from "../drizzle/schema";
+import { TEMPLATE_VERSION_CURRENT } from "../shared/templateVersion";
 import { ENV } from './_core/env';
 import { randomBytes } from 'crypto';
 
@@ -377,6 +378,7 @@ export async function createDeployment(data: {
     buildPlanId: data.buildPlanId,
     intakeId: data.intakeId,
     status: data.status || "queued",
+    templateVersion: TEMPLATE_VERSION_CURRENT,
     logs: [],
   };
 

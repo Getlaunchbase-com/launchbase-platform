@@ -124,6 +124,8 @@ export const deployments = mysqlTable("deployments", {
   status: mysqlEnum("status", ["queued", "running", "success", "failed"]).default("queued").notNull(),
   // URL mode: Phase 1 = TEMP_MANUS, Phase 2 = CUSTOM_DOMAIN
   urlMode: varchar("urlMode", { length: 50 }).default("TEMP_MANUS"),
+  // Template version (for immutability)
+  templateVersion: varchar("templateVersion", { length: 32 }).notNull().default("v1"),
   // Output
   siteId: varchar("siteId", { length: 64 }),
   previewUrl: varchar("previewUrl", { length: 512 }),
@@ -183,7 +185,8 @@ export const emailLogs = mysqlTable("email_logs", {
     "testimonial_request",
     "founding_client_lockin",
     "day7_checkin",
-    "day30_value"
+    "day30_value",
+    "contact_form_confirmation"
   ]).notNull(),
   recipientEmail: varchar("recipientEmail", { length: 320 }).notNull(),
   subject: varchar("subject", { length: 255 }).notNull(),
