@@ -97,9 +97,7 @@ export async function getHealthMetrics(tenant?: "launchbase" | "vinces"): Promis
     lastError: emailRows
       .filter((e) => e.errorMessage)
       .sort((a, b) => (b.sentAt?.getTime() || 0) - (a.sentAt?.getTime() || 0))[0]?.errorMessage || null,
-    currentSender: process.env.RESEND_DOMAIN_VERIFIED === "true" 
-      ? "support@getlaunchbase.com" 
-      : "onboarding@resend.dev",
+    currentSender: "support@getlaunchbase.com",
   };
 
   // Stripe webhook metrics
@@ -121,9 +119,26 @@ export async function getHealthMetrics(tenant?: "launchbase" | "vinces"): Promis
     lastEventAt: stripeRows.length > 0
       ? stripeRows.sort((a, b) => (b.receivedAt?.getTime() || 0) - (a.receivedAt?.getTime() || 0))[0].receivedAt
       : null,
-    isStale: stripeRows.length === 0 || 
-      (stripeRows.length > 0 && 
-       (Date.now() - (stripeRows.sort((a, b) => (b.receivedAt?.getTime() || 0) - (a.receivedAt?.getTime() || 0))[0].receivedAt?.getTime() || 0)) > 6 * 60 * 60 * 1000),
+    // Only mark as stale if:
+    // 1. There was at least 1 webhook in the last 7 days (traffic exists)
+    // 2. AND no webhooks in the last 6 hours (went silent)
+    // This prevents false alarms during beta/low-traffic periods
+    isStale: (() => {
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+      const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
+      
+      // Check if there was any traffic in last 7 days
+      const hasRecentTraffic = stripeRows.some(e => e.receivedAt && e.receivedAt >= sevenDaysAgo);
+      
+      if (!hasRecentTraffic) {
+        // No traffic in 7 days = not stale, just quiet
+        return false;
+      }
+      
+      // Has recent traffic, check if it went silent
+      const hasVeryRecentTraffic = stripeRows.some(e => e.receivedAt && e.receivedAt >= sixHoursAgo);
+      return !hasVeryRecentTraffic; // Stale if no traffic in last 6h
+    })(),
   };
 
   // System metrics

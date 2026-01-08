@@ -854,6 +854,43 @@ export const appRouter = router({
         const tenant = input?.tenant === "all" ? undefined : input?.tenant;
         return await getHealthMetrics(tenant);
       }),
+
+    // Get alerts with optional filters
+    getAlerts: protectedProcedure
+      .input(z.object({
+        status: z.enum(["active", "resolved"]).optional(),
+        tenant: z.enum(["launchbase", "vinces"]).optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        const { alertEvents } = await import("../drizzle/schema");
+        const { and, eq, gte } = await import("drizzle-orm");
+
+        // Build where conditions
+        const conditions = [];
+        
+        // Only show alerts from last 24 hours
+        const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        conditions.push(gte(alertEvents.firstSeenAt, cutoff));
+        
+        if (input?.status) {
+          conditions.push(eq(alertEvents.status, input.status));
+        }
+        
+        if (input?.tenant) {
+          conditions.push(eq(alertEvents.tenant, input.tenant));
+        }
+
+        const alerts = await db
+          .select()
+          .from(alertEvents)
+          .where(and(...conditions))
+          .orderBy((await import("drizzle-orm").then(m => m.desc))(alertEvents.firstSeenAt));
+
+        return alerts;
+      }),
   }),
 
   // Analytics tracking (public for frontend events)

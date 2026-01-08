@@ -199,7 +199,7 @@ async function handleMessage(
   
   try {
     await resend.emails.send({
-      from: "LaunchBase <onboarding@resend.dev>",
+      from: "LaunchBase <support@getlaunchbase.com>",
       to: NOTIFICATION_EMAIL,
       subject: `💬 New Facebook Message - ${pageName}`,
       html: `
@@ -307,7 +307,7 @@ async function handleLeadForm(
   
   try {
     await resend.emails.send({
-      from: "LaunchBase <onboarding@resend.dev>",
+      from: "LaunchBase <support@getlaunchbase.com>",
       to: NOTIFICATION_EMAIL,
       subject: `🎯 New Lead Form Submission - ${pageName}`,
       html: `
