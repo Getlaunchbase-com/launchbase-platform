@@ -29,8 +29,12 @@ describe("Health Dashboard", () => {
     // Verify Stripe webhooks metrics
     expect(metrics.stripeWebhooks).toBeDefined();
     expect(typeof metrics.stripeWebhooks.total).toBe("number");
-    expect(typeof metrics.stripeWebhooks.success).toBe("number");
+    expect(typeof metrics.stripeWebhooks.ok).toBe("number");
     expect(typeof metrics.stripeWebhooks.failed).toBe("number");
+    expect(typeof metrics.stripeWebhooks.pending).toBe("number");
+    expect(typeof metrics.stripeWebhooks.retryEvents).toBe("number");
+    expect(typeof metrics.stripeWebhooks.totalRetries).toBe("number");
+    expect(typeof metrics.stripeWebhooks.isStale).toBe("boolean");
 
     // Verify system metrics
     expect(metrics.system).toBeDefined();

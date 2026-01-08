@@ -77,8 +77,72 @@ export default function AdminHealth() {
   const hasEmailErrors = metrics.emails.failed > 0;
   const hasStripeErrors = metrics.stripeWebhooks.failed > 0;
 
+  // Critical alerts (RED)
+  const criticalAlerts: string[] = [];
+  if (hasEmailErrors) criticalAlerts.push(`${metrics.emails.failed} email failures in last 24h`);
+  if (hasDeploymentErrors) criticalAlerts.push(`${metrics.deployments.failed} deployment failures in last 24h`);
+  if (metrics.stripeWebhooks.isStale && metrics.stripeWebhooks.total > 0) {
+    criticalAlerts.push("Stripe webhooks stale (no events in 6+ hours)");
+  }
+
+  // Warning alerts (YELLOW)
+  const warningAlerts: string[] = [];
+  if (metrics.stripeWebhooks.retryEvents > 0) {
+    warningAlerts.push(`${metrics.stripeWebhooks.retryEvents} webhook retry events (${metrics.stripeWebhooks.totalRetries} total retries)`);
+  }
+  if (metrics.deployments.lastDeploymentAt) {
+    const hoursSinceLastDeploy = (Date.now() - new Date(metrics.deployments.lastDeploymentAt).getTime()) / (1000 * 60 * 60);
+    if (hoursSinceLastDeploy > 24) {
+      warningAlerts.push(`No deployments in ${Math.floor(hoursSinceLastDeploy)}+ hours`);
+    }
+  }
+
   return (
     <div className="container mx-auto py-8 space-y-6">
+      {/* Critical Alerts Banner (RED) */}
+      {criticalAlerts.length > 0 && (
+        <Card className="border-destructive bg-destructive/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-destructive">
+              <XCircle className="h-5 w-5" />
+              Attention Needed
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {criticalAlerts.map((alert, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="text-destructive font-bold">•</span>
+                  <span className="text-sm font-medium">{alert}</span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Warning Alerts Banner (YELLOW) */}
+      {warningAlerts.length > 0 && criticalAlerts.length === 0 && (
+        <Card className="border-yellow-600 bg-yellow-50 dark:bg-yellow-950/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-yellow-700 dark:text-yellow-500">
+              <AlertCircle className="h-5 w-5" />
+              Warnings
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {warningAlerts.map((alert, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="text-yellow-700 dark:text-yellow-500 font-bold">•</span>
+                  <span className="text-sm font-medium text-yellow-800 dark:text-yellow-400">{alert}</span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -195,7 +259,7 @@ export default function AdminHealth() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            {hasStripeErrors ? (
+            {hasStripeErrors || metrics.stripeWebhooks.isStale ? (
               <AlertCircle className="h-5 w-5 text-destructive" />
             ) : (
               <CheckCircle2 className="h-5 w-5 text-green-600" />
@@ -203,22 +267,37 @@ export default function AdminHealth() {
             Stripe Webhooks
           </CardTitle>
           <CardDescription>
-            Last webhook: {formatTimestamp(metrics.stripeWebhooks.lastWebhookAt)}
+            Last webhook: {formatTimestamp(metrics.stripeWebhooks.lastEventAt)}
+            {metrics.stripeWebhooks.isStale && (
+              <span className="ml-2 text-destructive font-medium">⚠ Stale (no events in 6+ hours)</span>
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
             <div>
               <div className="text-2xl font-bold">{metrics.stripeWebhooks.total}</div>
               <div className="text-sm text-muted-foreground">Total</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-green-600">{metrics.stripeWebhooks.success}</div>
-              <div className="text-sm text-muted-foreground">Success</div>
+              <div className="text-2xl font-bold text-green-600">{metrics.stripeWebhooks.ok}</div>
+              <div className="text-sm text-muted-foreground">OK</div>
             </div>
             <div>
               <div className="text-2xl font-bold text-destructive">{metrics.stripeWebhooks.failed}</div>
               <div className="text-sm text-muted-foreground">Failed</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-yellow-600">{metrics.stripeWebhooks.pending}</div>
+              <div className="text-sm text-muted-foreground">Pending</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-orange-600">{metrics.stripeWebhooks.retryEvents}</div>
+              <div className="text-sm text-muted-foreground">Retries</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold">{metrics.stripeWebhooks.totalRetries}</div>
+              <div className="text-sm text-muted-foreground">Total Retries</div>
             </div>
           </div>
           {metrics.stripeWebhooks.lastError && (

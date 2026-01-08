@@ -829,6 +829,12 @@ export const appRouter = router({
     
     // Email delivery smoke test (admin-only)
     emailSmoke: adminEmailSmokeRouter,
+    
+    // Health metrics endpoint
+    health: protectedProcedure
+      .query(async () => {
+        return await getHealthMetrics();
+      }),
   }),
 
   // Analytics tracking (public for frontend events)
@@ -2682,12 +2688,6 @@ export const appRouter = router({
             content: md,
           };
         }
-      }),
-
-    // Health metrics endpoint
-    health: protectedProcedure
-      .query(async () => {
-        return await getHealthMetrics();
       }),
   }),
 });
