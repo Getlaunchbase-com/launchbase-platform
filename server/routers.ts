@@ -683,6 +683,21 @@ export const appRouter = router({
           };
         }),
 
+      // One-click rollback to last successful deployment
+      rollbackToLastSuccess: protectedProcedure
+        .input(z.object({
+          intakeId: z.number(),
+          reason: z.string().optional(),
+        }))
+        .mutation(async ({ input }) => {
+          const { rollbackToLastSuccess } = await import("./rollback");
+          const result = await rollbackToLastSuccess({
+            intakeId: input.intakeId,
+            reason: input.reason,
+          });
+          return result;
+        }),
+
       // Manual trigger for running next deployment
       runNext: protectedProcedure
         .mutation(async () => {

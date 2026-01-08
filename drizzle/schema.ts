@@ -126,10 +126,23 @@ export const deployments = mysqlTable("deployments", {
   tenant: mysqlEnum("tenant", ["launchbase", "vinces"]).notNull().default("launchbase"),
   // Job status
   status: mysqlEnum("status", ["queued", "running", "success", "failed"]).default("queued").notNull(),
+  // Rollback tracking
+  trigger: mysqlEnum("trigger", ["auto", "manual", "rollback"]).notNull().default("auto"),
+  rolledBackFromDeploymentId: int("rolledBackFromDeploymentId"),
   // URL mode: Phase 1 = TEMP_MANUS, Phase 2 = CUSTOM_DOMAIN
   urlMode: varchar("urlMode", { length: 50 }).default("TEMP_MANUS"),
   // Template version (for immutability)
   templateVersion: varchar("templateVersion", { length: 32 }).notNull().default("v1"),
+  // Build plan snapshot (for rollback reproducibility)
+  buildPlanSnapshot: json("buildPlanSnapshot").$type<{
+    templateId: string;
+    plan: {
+      pages: Array<{ id: string; title: string; slug: string; sections: unknown[] }>;
+      brand: { primaryColor: string; secondaryColor: string; fontFamily: string };
+      copy: { heroHeadline: string; heroSubheadline: string; ctaText: string };
+      features: string[];
+    };
+  }>(),
   // Output
   siteId: varchar("siteId", { length: 64 }),
   previewUrl: varchar("previewUrl", { length: 512 }),
