@@ -88,6 +88,7 @@ export type EmailType =
   | "preview_followup"
   | "testimonial_request"
   | "founding_client_lockin"
+  | "founder_welcome"
   | "day7_checkin"
   | "day30_value"
   | "contact_form_confirmation";
@@ -102,6 +103,7 @@ interface EmailData {
   language?: Language;
   audience?: Audience;
   websiteStatus?: WebsiteStatus;
+  founderNumber?: string;
 }
 
 interface EmailTemplate {
@@ -112,16 +114,21 @@ interface EmailTemplate {
 
 // Generate email templates based on type and data (LOCALIZED)
 export function getEmailTemplate(type: EmailType, data: EmailData): EmailTemplate {
-  const { firstName, businessName, previewUrl, liveUrl, language = "en", audience = "biz", websiteStatus } = data;
+  const { firstName, businessName, previewUrl, liveUrl, founderNumber, language = "en", audience = "biz", websiteStatus } = data;
   
   // Get localized copy from emailCopy map
   const copy = getEmailCopy({ language, audience, emailType: type, websiteStatus });
   
   // Interpolate variables
-  const body = interpolateEmail(copy.body, { firstName, businessName, previewUrl, liveUrl });
+  let body = interpolateEmail(copy.body, { firstName, businessName, previewUrl, liveUrl });
+  let subject = copy.subject;
+  if (founderNumber) {
+    body = body.replace(/\{\{founderNumber\}\}/g, founderNumber);
+    subject = subject.replace(/\{\{founderNumber\}\}/g, founderNumber);
+  }
   
   return {
-    subject: copy.subject,
+    subject,
     previewText: copy.previewText,
     body,
   };

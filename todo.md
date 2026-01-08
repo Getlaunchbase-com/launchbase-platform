@@ -334,3 +334,13 @@
 - [x] Document all 6 smoke test steps (intake, email, payment, deployment, rollback, alerts)
 - [x] Add "Go Live" criteria checklist
 - [x] Add quick reference section with dashboards and test data
+
+## Beta Founders Promo System - Jan 8, 2026
+- [x] Backend: Promo tables and reservation logic
+- [x] Stripe integration: $300 setup fee for founders
+- [x] UI: Quiet toggle and promo field in Apply form
+- [x] Emails: Founder welcome email (EN/ES/PL)
+- [x] Database: email_logs table restored
+- [x] Webhook: Assign founder #01-10 after payment
+- [ ] Admin: Promo dashboard (/admin/founders)
+- [ ] Cron: Reservation expiry cleanup (every 5 min)

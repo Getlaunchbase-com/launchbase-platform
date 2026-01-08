@@ -18,6 +18,7 @@ export type EmailType =
   | "preview_followup"
   | "testimonial_request"
   | "founding_client_lockin"
+  | "founder_welcome"
   | "day7_checkin"
   | "day30_value"
   | "contact_form_confirmation"
@@ -328,6 +329,30 @@ If this is urgent, you can reply directly to this email.
         previewText: "LaunchBase ops alert",
         body: `{{text}}`,
       },
+      founder_welcome: {
+        subject: "Welcome, Founder #{{founderNumber}} — you're locked in",
+        previewText: "Your LaunchBase Founder spot is confirmed.",
+        body: `Hi {{firstName}},
+
+Your LaunchBase Founder spot is confirmed — Founder #{{founderNumber}}.
+
+Here's what's now locked in for you:
+
+• $300 build (Founder setup)
+• 50% off your first 3 months of service
+• 15% off ongoing service in perpetuity (our thank-you to the O.G.'s)
+
+What happens next:
+
+1. We begin building based on your intake
+2. A human reviews everything for quality
+3. You'll get a preview link to approve (no surprise charges)
+
+If anything changes or you want to add details, just reply to this email.
+
+—
+LaunchBase Support`,
+      },
     },
     org: {
       intake_confirmation: {
@@ -610,6 +635,30 @@ If this is urgent, you can reply directly to this email.
         previewText: "LaunchBase ops alert",
         body: `{{text}}`,
       },
+      founder_welcome: {
+        subject: "Welcome, Founder #{{founderNumber}} — you're locked in",
+        previewText: "Your LaunchBase Founder spot is confirmed.",
+        body: `Hi {{firstName}},
+
+Your LaunchBase Founder spot is confirmed — Founder #{{founderNumber}}.
+
+Here's what's now locked in for you:
+
+• $300 build (Founder setup)
+• 50% off your first 3 months of service
+• 15% off ongoing service in perpetuity (our thank-you to the O.G.'s)
+
+What happens next:
+
+1. We begin building based on your intake
+2. A human reviews everything for quality
+3. You'll get a preview link to approve (no surprise charges)
+
+If anything changes or you want to add details, just reply to this email.
+
+—
+LaunchBase Support`,
+      },
     },
   },
   
@@ -621,7 +670,328 @@ If this is urgent, you can reply directly to this email.
           previewText: "Tu sitio LaunchBase está oficialmente en progreso.",
           body: `Hola {{firstName}},
 
-Gracias por completar tu registro en LaunchBase.
+Gracias por completar tu formulario en LaunchBase.
+
+No tienes un sitio web actualmente, así que vamos a crear uno desde cero y conectar todo lo necesario para que funcione sin que tengas que pensar en ello.
+
+Qué sigue:
+
+• Diseñamos y construimos tu sitio web
+• Conectamos los sistemas que necesita (formularios, seguimiento, publicación, etc.)
+• Una persona real revisa todo por calidad
+• Recibes un enlace privado de vista previa para revisar y aprobar
+
+No se requiere pago para revisar tu sitio.
+
+Una vez que apruebes, nos encargamos del despliegue y las actualizaciones continuas para que no tengas que pensar en ello.
+
+Tiempo estimado: 24–72 horas
+
+Si tienes preguntas en cualquier momento, simplemente responde a este correo.
+
+—
+LaunchBase
+El sistema operativo para dirigir tu negocio`,
+        },
+        existing: {
+          subject: "Actualizamos tu sitio — próximos pasos aquí",
+          previewText: "Actualizaremos y modernizaremos tu sitio existente.",
+          body: `Hola {{firstName}},
+
+Gracias por completar tu formulario en LaunchBase.
+
+Ya tienes un sitio web, así que nuestro trabajo es actualizarlo y modernizarlo, luego integrar los sistemas que lo mantienen funcionando sin problemas.
+
+Qué haremos:
+
+• Revisamos tu sitio existente
+• Actualizamos estructura, claridad y flujo donde sea necesario
+• Integramos los sistemas detrás de él (formularios, seguimiento, publicación, etc.)
+• Una persona revisa todo antes de que lo veas
+
+Recibirás un enlace privado de vista previa para revisar y aprobar antes de que nada se publique.
+
+No se requiere pago para revisar.
+
+Una vez que apruebes, nos encargamos del despliegue y las actualizaciones continuas.
+
+Tiempo estimado: 24–72 horas
+
+Si tienes preguntas, simplemente responde a este correo.
+
+—
+LaunchBase
+El sistema operativo para dirigir tu negocio`,
+        },
+        systems_only: {
+          subject: "Conectamos tus sistemas — aquí está el plan",
+          previewText: "LaunchBase está integrando tus herramientas operacionales.",
+          body: `Hola {{firstName}},
+
+Gracias por completar tu formulario en LaunchBase.
+
+Ya tienes un sitio web, así que nos enfocaremos en conectar los sistemas que lo mantienen funcionando sin problemas.
+
+Qué haremos:
+
+• Conectamos formularios, seguimiento, publicación y automatización
+• Nos aseguramos de que todo funcione con tu sitio actual
+• Una persona revisa todo por calidad
+• Recibes un enlace de vista previa para revisar y aprobar
+
+No se requiere pago para revisar.
+
+Una vez que apruebes, nos encargamos del despliegue y las actualizaciones continuas.
+
+Tiempo estimado: 24–72 horas
+
+Si tienes preguntas, simplemente responde a este correo.
+
+—
+LaunchBase
+El sistema operativo para dirigir tu negocio`,
+        },
+      },
+      in_progress: {
+        subject: "Tu sitio está en progreso — aquí está el estado",
+        previewText: "Estamos trabajando en tu sitio LaunchBase.",
+        body: `Hola {{firstName}},
+
+Solo un recordatorio rápido: tu sitio LaunchBase está en progreso.
+
+Estamos construyendo tu sitio y conectando los sistemas que necesita para funcionar sin problemas.
+
+Una persona real revisará todo antes de que lo veas.
+
+Recibirás un enlace de vista previa para revisar y aprobar antes de que nada se publique.
+
+Tiempo estimado: 24–72 horas desde el envío
+
+Si tienes preguntas, simplemente responde a este correo.
+
+—
+LaunchBase
+El sistema operativo para dirigir tu negocio`,
+      },
+      ready_for_review: {
+        subject: "¡Tu sitio está listo para revisar!",
+        previewText: "Vista previa de tu sitio LaunchBase ahora.",
+        body: `Hola {{firstName}},
+
+¡Tu sitio LaunchBase está listo para revisar!
+
+Hemos construido tu sitio y conectado los sistemas que necesita para funcionar sin problemas.
+
+Una persona real revisó todo por calidad.
+
+Ahora es tu turno:
+
+Revisa tu sitio: {{previewUrl}}
+
+Si te gusta, apruébalo y procede al pago.
+
+Si quieres cambios, solícitalos directamente desde la página de vista previa.
+
+No se requiere pago hasta que apruebes.
+
+Si tienes preguntas, simplemente responde a este correo.
+
+—
+LaunchBase
+El sistema operativo para dirigir tu negocio`,
+      },
+      review_nudge: {
+        subject: "¿Viste tu sitio? Está esperando tu aprobación",
+        previewText: "Tu sitio LaunchBase está listo para revisar.",
+        body: `Hola {{firstName}},
+
+Solo un recordatorio rápido: tu sitio LaunchBase está listo para revisar.
+
+Revisa tu sitio: {{previewUrl}}
+
+Si te gusta, apruébalo y procede al pago.
+
+Si quieres cambios, solícitalos directamente desde la página de vista previa.
+
+No se requiere pago hasta que apruebes.
+
+Si tienes preguntas, simplemente responde a este correo.
+
+—
+LaunchBase
+El sistema operativo para dirigir tu negocio`,
+      },
+      deployment_started: {
+        subject: "Tu sitio se está desplegando ahora",
+        previewText: "LaunchBase está lanzando tu sitio.",
+        body: `Hola {{firstName}},
+
+¡Buenas noticias! Tu sitio se está desplegando ahora.
+
+Esto toma unos minutos.
+
+Te notificaremos cuando esté en vivo.
+
+Si tienes preguntas, simplemente responde a este correo.
+
+—
+LaunchBase
+El sistema operativo para dirigir tu negocio`,
+      },
+      site_live: {
+        subject: "🎉 ¡Tu sitio está en vivo!",
+        previewText: "Tu sitio LaunchBase está ahora en vivo.",
+        body: `Hola {{firstName}},
+
+¡Tu sitio está en vivo!
+
+Ver tu sitio en vivo: {{liveUrl}}
+
+LaunchBase ahora se encarga de las actualizaciones continuas y el mantenimiento para que no tengas que pensar en ello.
+
+Si tienes preguntas, simplemente responde a este correo.
+
+—
+LaunchBase
+El sistema operativo para dirigir tu negocio`,
+      },
+      preview_followup: {
+        subject: "¿Qué piensas de tu sitio?",
+        previewText: "Nos encantaría saber tu opinión.",
+        body: `Hola {{firstName}},
+
+Solo queríamos ver qué piensas de tu sitio LaunchBase.
+
+Revisa tu sitio: {{previewUrl}}
+
+Si te gusta, apruébalo y procede al pago.
+
+Si quieres cambios, solícitalos directamente desde la página de vista previa.
+
+No se requiere pago hasta que apruebes.
+
+Si tienes preguntas, simplemente responde a este correo.
+
+—
+LaunchBase
+El sistema operativo para dirigir tu negocio`,
+      },
+      testimonial_request: {
+        subject: "¿Cómo va tu sitio LaunchBase?",
+        previewText: "Nos encantaría saber cómo te está yendo.",
+        body: `Hola {{firstName}},
+
+Ha pasado una semana desde que tu sitio LaunchBase se lanzó.
+
+Nos encantaría saber cómo te está yendo.
+
+Si tienes un minuto, ¿podrías compartir tus comentarios?
+
+Simplemente responde a este correo con tus pensamientos.
+
+Si tienes preguntas o necesitas ayuda, simplemente responde a este correo.
+
+—
+LaunchBase
+El sistema operativo para dirigir tu negocio`,
+      },
+      founding_client_lockin: {
+        subject: "Tu precio de cliente fundador está bloqueado",
+        previewText: "Tu precio de cliente fundador está bloqueado para siempre.",
+        body: `Hola {{firstName}},
+
+Solo un recordatorio rápido: tu precio de cliente fundador está bloqueado para siempre.
+
+Esto significa que nunca pagarás más de lo que pagas ahora.
+
+LaunchBase se encarga de las actualizaciones continuas y el mantenimiento para que no tengas que pensar en ello.
+
+Si tienes preguntas, simplemente responde a este correo.
+
+—
+LaunchBase
+El sistema operativo para dirigir tu negocio`,
+      },
+      day7_checkin: {
+        subject: "¿Cómo va tu sitio LaunchBase?",
+        previewText: "Nos encantaría saber cómo te está yendo.",
+        body: `Hola {{firstName}},
+
+Ha pasado una semana desde que tu sitio LaunchBase se lanzó.
+
+Nos encantaría saber cómo te está yendo.
+
+Si tienes preguntas o necesitas ayuda, simplemente responde a este correo.
+
+—
+LaunchBase
+El sistema operativo para dirigir tu negocio`,
+      },
+      day30_value: {
+        subject: "Tu sitio LaunchBase: 30 días después",
+        previewText: "Cómo LaunchBase te está ahorrando tiempo.",
+        body: `Hola {{firstName}},
+
+Ha pasado un mes desde que tu sitio LaunchBase se lanzó.
+
+LaunchBase se encarga de las actualizaciones continuas y el mantenimiento para que no tengas que pensar en ello.
+
+Si tienes preguntas o necesitas ayuda, simplemente responde a este correo.
+
+—
+LaunchBase
+El sistema operativo para dirigir tu negocio`,
+      },
+      contact_form_confirmation: {
+        subject: "Recibimos tu mensaje",
+        previewText: "Te responderemos pronto.",
+        body: `Hola {{firstName}},
+
+Recibimos tu mensaje y te responderemos pronto.
+
+Si esto es urgente, puedes responder directamente a este correo.
+
+—
+{{businessName}}`,
+      },
+      ops_alert: {
+        subject: "{{subject}}",
+        previewText: "LaunchBase ops alert",
+        body: `{{text}}`,
+      },
+      founder_welcome: {
+        subject: "Bienvenido, Fundador #{{founderNumber}} — ya estás asegurado",
+        previewText: "Tu lugar como fundador en LaunchBase está confirmado.",
+        body: `Hola {{firstName}},
+
+Tu lugar como fundador en LaunchBase está confirmado — Fundador #{{founderNumber}}.
+
+Esto es lo que ya quedó bloqueado para ti:
+
+• Construcción por $300 (setup de fundador)
+• 50% de descuento en tus primeros 3 meses de servicio
+• 15% de descuento para siempre en el servicio (nuestro agradecimiento a los O.G.'s)
+
+Qué sigue:
+
+1. Empezamos a construir con tu información del formulario
+2. Una persona revisa todo por calidad
+3. Recibirás un enlace de vista previa para aprobar (sin cargos sorpresa)
+
+Si quieres agregar algo o cambiar detalles, responde a este correo.
+
+—
+Soporte de LaunchBase`,
+      },
+    },
+    org: {
+      intake_confirmation: {
+        none: {
+          subject: "Construimos tu sitio desde cero — aquí está el plan",
+          previewText: "LaunchBase está ensamblando tu sistema operacional.",
+          body: `Hola {{firstName}},
+
+Gracias por completar tu formulario en LaunchBase.
 
 Actualmente no tienes un sitio web — así que lo construiremos desde cero e integraremos todo lo necesario para que funcione sin problemas.
 
@@ -894,276 +1264,29 @@ If this is urgent, you can reply directly to this email.
         previewText: "LaunchBase ops alert",
         body: `{{text}}`,
       },
-    },
-    org: {
-      intake_confirmation: {
-        none: {
-          subject: "Construimos tu sitio desde cero — aquí está el plan",
-          previewText: "LaunchBase está ensamblando tu sistema operacional.",
-          body: `Hola {{firstName}},
-
-Gracias por completar tu formulario en LaunchBase.
-
-No tienes un sitio web actualmente, así que vamos a crear uno desde cero y conectar todo lo necesario para que funcione sin que tengas que pensar en ello.
-
-Lo que sigue:
-
-• Diseñamos y construimos tu sitio web
-• Conectamos los sistemas que necesita
-• Un humano revisa todo por calidad
-• Recibes un enlace privado para revisar y aprobar
-
-No se requiere ningún pago para revisar el sitio.
-
-Tiempo estimado: 24–72 horas
-
-Si tienes alguna pregunta, responde a este correo.
-
-—
-LaunchBase
-El sistema operativo para tu negocio`,
-        },
-        existing: {
-          subject: "Renovamos tu sitio — próximos pasos dentro",
-          previewText: "Renovaremos y modernizaremos tu sitio existente.",
-          body: `Hola {{firstName}},
-
-Gracias por completar tu formulario en LaunchBase.
-
-Ya tienes un sitio web, así que nuestro trabajo será mejorarlo y modernizarlo, además de integrar los sistemas que lo hacen funcionar correctamente.
-
-Próximos pasos:
-
-• Revisamos tu sitio actual
-• Mejoramos estructura, claridad y flujo
-• Integramos los sistemas necesarios
-• Un humano revisa todo antes de mostrarte
-
-Recibirás un enlace privado para revisar.
-
-No se requiere pago para revisar.
-
-Tiempo estimado: 24–72 horas
-
-—
-LaunchBase`,
-        },
-        systems_only: {
-          subject: "Integraremos tu sitio existente — esto es lo que sigue",
-          previewText: "Integraremos sistemas sin cambiar el diseño de tu sitio.",
-          body: `Hola {{firstName}},
-
-Gracias por completar tu formulario en LaunchBase.
-
-Ya tienes un sitio web que deseas mantener, así que no cambiaremos el diseño. Nos enfocaremos solo en integrar los sistemas alrededor del sitio.
-
-Lo que haremos:
-
-• Revisamos cómo funciona tu sitio
-• Integramos formularios, seguimiento y sistemas
-• Verificamos que todo funcione correctamente
-• Un humano revisa antes de entregarte
-
-Recibirás un enlace de vista previa.
-
-No se requiere pago para revisar.
-
-—
-LaunchBase`,
-        },
-      },
-      in_progress: {
-        subject: "👷 Construcción del sistema en progreso",
-        previewText: "Todo va según lo planeado.",
-        body: `Hola {{firstName}},
-
-Actualización rápida — tu sistema está siendo ensamblado actualmente.
-
-No necesitas hacer nada ahora. Estamos configurando flujos de trabajo y revisando todo antes de que esté listo.
-
-Recibirás otro correo cuando tu vista previa esté disponible.
-
-—
-LaunchBase`,
-      },
-      ready_for_review: {
-        subject: "Tu vista previa del sistema está lista",
-        previewText: "Nada está en vivo aún — revisa y aprueba cuando estés listo.",
-        body: `Hola {{firstName}},
-
-Tu vista previa del sistema LaunchBase está lista.
-
-Nada está en vivo aún — esta es tu oportunidad de confirmar que todo está configurado correctamente.
-
-👉 Revisa tu vista previa:
-{{previewUrl}}
-
-Si se necesitan ajustes, responde a este correo.
-
-—
-LaunchBase
-Flujos de trabajo que te devuelven tu vida.`,
-      },
-      review_nudge: {
-        subject: "Verificando — tu sistema está listo",
-        previewText: "Sin prisa, solo asegurándonos de que lo viste.",
-        body: `Hola {{firstName}},
-
-Solo verificando para asegurarme de que viste tu vista previa del sistema.
-
-👉 {{previewUrl}}
-
-Sin prisa — solo queremos confirmar que todo está configurado correctamente antes del despliegue.
-
-¿Preguntas o cambios? Responde aquí.
-
-—
-LaunchBase`,
-      },
-      deployment_started: {
-        subject: "Pago recibido — despliegue en marcha",
-        previewText: "Tu sistema está siendo desplegado.",
-        body: `Hola {{firstName}},
-
-Pago recibido — gracias.
-
-Tu sistema ahora está siendo desplegado:
-
-1. Aprovisionando infraestructura
-2. Aplicando configuración
-3. Publicando flujos de trabajo
-4. Conectando integraciones (si aplica)
-
-Recibirás confirmación cuando el despliegue esté completo.
-
-—
-LaunchBase
-Flujos de trabajo que te devuelven tu vida.`,
-      },
-      site_live: {
-        subject: "Tu sistema está en vivo — LaunchBase ahora lo está llevando",
-        previewText: "Ejecución sin caos. Esto es lo que significa.",
-        body: `Hola {{firstName}},
-
-Tu sistema está en vivo — y LaunchBase ahora lo está llevando.
-
-👉 Ver tu sistema:
-{{liveUrl}}
-
-Desde este momento, LaunchBase maneja:
-
-• Monitoreo — tiempo de actividad, rendimiento, disponibilidad
-• Decisiones — determinando cuándo la acción es segura y relevante
-• Espera — a veces el movimiento correcto es no moverse
-• Protección — reglas de seguridad aplicadas sin excepción
-
-Nada sucede en silencio.
-Cada acción es visible.
-La no acción siempre es segura.
-
-Puedes dejar de coordinar esto tú mismo.
-
-¿Preguntas o cambios? Responde a este correo.
-
-—
-LaunchBase
-Flujos de trabajo que te devuelven tu vida.`,
-      },
-      preview_followup: {
-        subject: "Verificando — feliz de hacer ajustes",
-        previewText: "Revisa cuando sea conveniente.",
-        body: `Hola {{firstName}},
-
-Verificando para ver si has tenido la oportunidad de revisar tu sistema.
-
-👉 {{previewUrl}}
-
-Si se necesitan ajustes, simplemente responde — lo manejaremos antes del despliegue.
-
-Sin prisa.
-
-—
-LaunchBase`,
-      },
-      testimonial_request: {
-        subject: "Pregunta rápida (2 minutos)",
-        previewText: "Valoraríamos tu opinión.",
-        body: `Hola {{firstName}},
-
-Pregunta rápida — si LaunchBase ayudó a optimizar operaciones o reducir la sobrecarga de coordinación, ¿estarías abierto a compartir un breve testimonio?
-
-Una o dos oraciones es perfecto. Nada formal.
-
-Ayuda mientras expandimos a más organizaciones.
-
-Gracias de cualquier manera.
-
-—
-LaunchBase`,
-      },
-      founding_client_lockin: {
-        subject: "Oficialmente eres un cliente fundador de LaunchBase",
-        previewText: "Tu precio está bloqueado.",
-        body: `Hola {{firstName}},
-
-Una nota rápida para decir gracias.
-
-Mientras nos preparamos para el lanzamiento público, oficialmente estás bloqueado como Cliente Fundador.
-
-Eso significa:
-• Tu precio nunca cambia
-• El soporte prioritario continúa
-• Tu retroalimentación da forma a la plataforma
-
-Apreciamos tu confianza temprana.
-
-—
-LaunchBase`,
-      },
-      day7_checkin: {
-        subject: "¿Todo funciona sin problemas?",
-        previewText: "Solo verificando.",
-        body: `Hola {{firstName}},
-
-Solo verificando para asegurarme de que todo funciona sin problemas.
-
-Si se necesitan ajustes, siéntete libre de responder.
-
-—
-LaunchBase`,
-      },
-      day30_value: {
-        subject: "Nota rápida de LaunchBase",
-        previewText: "Tu suscripción cubre alojamiento, actualizaciones y soporte.",
-        body: `Hola {{firstName}},
-
-Nota rápida — tu suscripción a LaunchBase cubre alojamiento, actualizaciones y soporte continuo.
-
-Si necesitas cambios o mejoras, simplemente responde.
-
-Gracias de nuevo.
-
-—
-LaunchBase`,
-      },
-      contact_form_confirmation: {
-        subject: "We received your message 👍",
-        previewText: "Thanks for reaching out — we'll get back to you within 24 hours.",
+      founder_welcome: {
+        subject: "Welcome, Founder #{{founderNumber}} — you're locked in",
+        previewText: "Your LaunchBase Founder spot is confirmed.",
         body: `Hi {{firstName}},
 
-Thanks for reaching out to {{businessName}}.
+Your LaunchBase Founder spot is confirmed — Founder #{{founderNumber}}.
 
-We've received your message and will get back to you within 24 hours.
+Here's what's now locked in for you:
 
-If this is urgent, you can reply directly to this email.
+• $300 build (Founder setup)
+• 50% off your first 3 months of service
+• 15% off ongoing service in perpetuity (our thank-you to the O.G.'s)
+
+What happens next:
+
+1. We begin building based on your intake
+2. A human reviews everything for quality
+3. You'll get a preview link to approve (no surprise charges)
+
+If anything changes or you want to add details, just reply to this email.
 
 —
-{{businessName}}`,
-      },
-      ops_alert: {
-        subject: "{{subject}}",
-        previewText: "LaunchBase ops alert",
-        body: `{{text}}`,
+LaunchBase Support`,
       },
     },
   },
@@ -1429,6 +1552,30 @@ If this is urgent, you can reply directly to this email.
         previewText: "LaunchBase ops alert",
         body: `{{text}}`,
       },
+      founder_welcome: {
+        subject: "Welcome, Founder #{{founderNumber}} — you're locked in",
+        previewText: "Your LaunchBase Founder spot is confirmed.",
+        body: `Hi {{firstName}},
+
+Your LaunchBase Founder spot is confirmed — Founder #{{founderNumber}}.
+
+Here's what's now locked in for you:
+
+• $300 build (Founder setup)
+• 50% off your first 3 months of service
+• 15% off ongoing service in perpetuity (our thank-you to the O.G.'s)
+
+What happens next:
+
+1. We begin building based on your intake
+2. A human reviews everything for quality
+3. You'll get a preview link to approve (no surprise charges)
+
+If anything changes or you want to add details, just reply to this email.
+
+—
+LaunchBase Support`,
+      },
     },
     org: {
       intake_confirmation: {
@@ -1688,6 +1835,30 @@ If this is urgent, you can reply directly to this email.
         subject: "{{subject}}",
         previewText: "LaunchBase ops alert",
         body: `{{text}}`,
+      },
+      founder_welcome: {
+        subject: "Welcome, Founder #{{founderNumber}} — you're locked in",
+        previewText: "Your LaunchBase Founder spot is confirmed.",
+        body: `Hi {{firstName}},
+
+Your LaunchBase Founder spot is confirmed — Founder #{{founderNumber}}.
+
+Here's what's now locked in for you:
+
+• $300 build (Founder setup)
+• 50% off your first 3 months of service
+• 15% off ongoing service in perpetuity (our thank-you to the O.G.'s)
+
+What happens next:
+
+1. We begin building based on your intake
+2. A human reviews everything for quality
+3. You'll get a preview link to approve (no surprise charges)
+
+If anything changes or you want to add details, just reply to this email.
+
+—
+LaunchBase Support`,
       },
     },
   },

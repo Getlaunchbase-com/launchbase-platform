@@ -1,0 +1,64 @@
+{
+  "query": "SHOW TABLES;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SHOW TABLES;",
+  "rows": [
+    {
+      "Tables_in_H86jcAdP392wwbWXRcEDMs": "__drizzle_migrations"
+    },
+    {
+      "Tables_in_H86jcAdP392wwbWXRcEDMs": "activity_logs"
+    },
+    {
+      "Tables_in_H86jcAdP392wwbWXRcEDMs": "alert_events"
+    },
+    {
+      "Tables_in_H86jcAdP392wwbWXRcEDMs": "decision_logs"
+    },
+    {
+      "Tables_in_H86jcAdP392wwbWXRcEDMs": "facebook_connections"
+    },
+    {
+      "Tables_in_H86jcAdP392wwbWXRcEDMs": "facebook_drafts"
+    },
+    {
+      "Tables_in_H86jcAdP392wwbWXRcEDMs": "facebook_oauth_sessions"
+    },
+    {
+      "Tables_in_H86jcAdP392wwbWXRcEDMs": "integration_connections"
+    },
+    {
+      "Tables_in_H86jcAdP392wwbWXRcEDMs": "integration_setup_packets"
+    },
+    {
+      "Tables_in_H86jcAdP392wwbWXRcEDMs": "module_connections"
+    },
+    {
+      "Tables_in_H86jcAdP392wwbWXRcEDMs": "module_setup_steps"
+    },
+    {
+      "Tables_in_H86jcAdP392wwbWXRcEDMs": "promo_codes"
+    },
+    {
+      "Tables_in_H86jcAdP392wwbWXRcEDMs": "promo_redemptions"
+    },
+    {
+      "Tables_in_H86jcAdP392wwbWXRcEDMs": "referral_events"
+    },
+    {
+      "Tables_in_H86jcAdP392wwbWXRcEDMs": "stripe_webhook_events"
+    },
+    {
+      "Tables_in_H86jcAdP392wwbWXRcEDMs": "suite_applications"
+    },
+    {
+      "Tables_in_H86jcAdP392wwbWXRcEDMs": "users"
+    },
+    {
+      "Tables_in_H86jcAdP392wwbWXRcEDMs": "worker_runs"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_H86jcAdP392wwbWXRcEDMs\n__drizzle_migrations\nactivity_logs\nalert_events\ndecision_logs\nfacebook_connections\nfacebook_drafts\nfacebook_oauth_sessions\nintegration_connections\nintegration_setup_packets\nmodule_connections\nmodule_setup_steps\npromo_codes\npromo_redemptions\nreferral_events\nstripe_webhook_events\nsuite_applications\nusers\nworker_runs\n",
+  "stderr": "",
+  "execution_time_ms": 258
+}

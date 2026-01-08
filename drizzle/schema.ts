@@ -203,6 +203,7 @@ export const emailLogs = mysqlTable("email_logs", {
     "preview_followup",
     "testimonial_request",
     "founding_client_lockin",
+    "founder_welcome",
     "day7_checkin",
     "day30_value",
     "contact_form_confirmation",
