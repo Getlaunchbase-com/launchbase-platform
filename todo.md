@@ -358,3 +358,8 @@
 - [x] Remove flat $129/mo pricing
 - [x] Add "Available during onboarding" for Google Business and QuickBooks
 - [x] Keep hero, problem, how-it-works, observability, footer unchanged
+
+## Onboarding Step 1 Microcopy Update - Jan 8, 2026
+- [x] Update helper text to "This helps LaunchBase decide what is safe to do on your behalf."
+- [x] Add secondary reassurance "You're not configuring software. You're giving us the context needed to take responsibility."
+- [x] Add footer safety line "Nothing deploys without your approval. You can stop at any time."
