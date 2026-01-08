@@ -1943,3 +1943,27 @@
 - [x] Add yellow warning system (rising retries, stale deployments)
 - [x] Test all alert conditions with real data (4/4 tests passing)
 - [x] Verify auto-refresh works correctly (30s interval)
+
+
+## Tenant Filtering for Health Dashboard (Jan 2026)
+
+- [x] Create tenant type definition with deriveTenantFromEmail helper (server/_core/tenant.ts)
+- [x] Add tenant enum column to intakes table
+- [x] Add tenant enum column to email_logs table
+- [x] Add tenant enum column to deployments table
+- [x] Run SQL migrations to add tenant columns (via webdev_execute_sql)
+- [x] Backfill intakes tenant based on email domain
+- [x] Backfill email_logs tenant based on recipientEmail domain
+- [x] Backfill deployments tenant from linked intakes
+- [x] Update intake creation to use deriveTenantFromEmail (priority: explicit > email domain > fallback)
+- [x] Update deployment creation to inherit tenant from linked intake
+- [x] Update email logging to use deriveTenantFromEmail (priority: intake.tenant > email domain > fallback)
+- [x] Add tenant input parameter to admin.health tRPC query
+- [x] Add tenant filtering to deployment metrics query
+- [x] Add tenant filtering to email metrics query
+- [x] Stripe webhook metrics remain global (shared Stripe account)
+- [x] Add tenant dropdown to health dashboard UI (All / LaunchBase / Vince's Snowplow)
+- [x] Wire tenant dropdown to URL query params (bookmarkable/shareable)
+- [x] Pass tenant from URL to tRPC query with auto-refresh
+- [x] Write FOREVER test for tenant filtering (7/7 tests passing)
+- [x] Verify tenant isolation across all creation paths

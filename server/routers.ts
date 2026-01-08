@@ -832,8 +832,12 @@ export const appRouter = router({
     
     // Health metrics endpoint
     health: protectedProcedure
-      .query(async () => {
-        return await getHealthMetrics();
+      .input(z.object({
+        tenant: z.enum(["all", "launchbase", "vinces"]).default("all"),
+      }).optional())
+      .query(async ({ input }) => {
+        const tenant = input?.tenant === "all" ? undefined : input?.tenant;
+        return await getHealthMetrics(tenant);
       }),
   }),
 

@@ -404,6 +404,12 @@ export async function sendEmail(
   const template = getEmailTemplate(type, data);
   const recipientEmail = data.email;
   const subject = template.subject;
+  
+  // Derive tenant: priority order = intake.tenant > email domain > fallback
+  const { getIntakeById } = await import("./db");
+  const { deriveTenantFromEmail } = await import("./_core/tenant");
+  const intake = await getIntakeById(intakeId);
+  const tenant = intake?.tenant ?? deriveTenantFromEmail(recipientEmail);
   const html = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
       ${template.body.split('\n').map((line: string) => 
@@ -449,6 +455,7 @@ export async function sendEmail(
     // SUCCESS: Log with provider="resend"
     await db.insert(emailLogs).values({
       intakeId,
+      tenant,
       emailType: type,
       recipientEmail,
       subject,
@@ -475,6 +482,7 @@ export async function sendEmail(
     // IMPORTANT: Log the failure as FAILED (do not pretend "sent")
     await db.insert(emailLogs).values({
       intakeId,
+      tenant,
       emailType: type,
       recipientEmail,
       subject,
@@ -505,6 +513,7 @@ ${template.body}
     // Log fallback success with provider="notification"
     await db.insert(emailLogs).values({
       intakeId,
+      tenant,
       emailType: type,
       recipientEmail,
       subject,
@@ -535,6 +544,7 @@ ${template.body}
     // Log complete failure
     await db.insert(emailLogs).values({
       intakeId,
+      tenant,
       emailType: type,
       recipientEmail,
       subject,

@@ -112,6 +112,7 @@ export async function createIntake(data: {
   language?: "en" | "es" | "pl";
   audience?: "biz" | "org";
   websiteStatus?: "none" | "existing" | "systems_only";
+  tenant?: "launchbase" | "vinces";
   services?: string[];
   serviceArea?: string[];
   primaryCTA?: string;
@@ -148,6 +149,10 @@ export async function createIntake(data: {
   if (data.tagline != null) mergedRawPayload.tagline = data.tagline;
   if (data.brandColors != null) mergedRawPayload.brandColors = data.brandColors;
 
+  // Derive tenant: priority order = explicit > email domain > fallback
+  const { deriveTenantFromEmail } = await import("./_core/tenant");
+  const tenant = data.tenant ?? deriveTenantFromEmail(data.email);
+
   const values: InsertIntake = {
     businessName: data.businessName,
     contactName: data.contactName,
@@ -156,6 +161,7 @@ export async function createIntake(data: {
     audience: data.audience ?? "biz",
     // websiteStatus stored in both column + rawPayload (duplicated intentionally for querying + immutable audit trail)
     websiteStatus: data.websiteStatus ?? "none",
+    tenant,
     phone: data.phone || null,
     vertical: data.vertical,
     services: data.services || null,
@@ -374,9 +380,14 @@ export async function createDeployment(data: {
     return null;
   }
 
+  // Get tenant from linked intake
+  const intake = await getIntakeById(data.intakeId);
+  const tenant = intake?.tenant ?? "launchbase";
+
   const values: InsertDeployment = {
     buildPlanId: data.buildPlanId,
     intakeId: data.intakeId,
+    tenant,
     status: data.status || "queued",
     templateVersion: TEMPLATE_VERSION_CURRENT,
     logs: [],
