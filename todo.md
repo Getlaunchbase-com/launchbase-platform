@@ -440,3 +440,9 @@
 - [ ] Test canonical scenario with Stripe test card (ready for user)
 - [ ] Verify webhook idempotency (resend event) (ready for user)
 - [ ] Confirm admin intake card displays snapshot correctly (ready for user)
+
+## Fix Intake Submission - Jan 8, 2026
+- [x] Remove stray positional 'review' argument from suite_application paths
+- [x] Ensure status defaults to 'new' in createIntake
+- [ ] Test onboarding submission end-to-end (ready for user)
+- [ ] Verify Stripe checkout redirect works (ready for user)
