@@ -393,3 +393,18 @@
 - [ ] Pass metadata: intakeId, selected services, monthly total, founder flag
 - [ ] Update webhook to mark setup as paid and assign founder number
 - [ ] Wire "Confirm & Continue" button to trigger checkout
+
+## Complete Service Selection Flow - Jan 8, 2026
+- [x] Create computePricing.ts with exact pricing logic
+- [x] Create serviceCards.ts with CUSTOMER/IT_HELPER copy
+- [ ] Implement Step 8 UI: Experience toggle (CUSTOMER/IT_HELPER)
+- [ ] Implement Step 8 UI: Service cards with mode-dependent descriptions
+- [ ] Implement Step 8 UI: Email required when Website selected
+- [ ] Implement Step 8 UI: Enrichment disabled when no Social tier
+- [ ] Implement Step 8 UI: Bundle discount banner when 2+ services
+- [ ] Update Step 9: Use computePricing() for all calculations
+- [ ] Update Step 9: Show setup breakdown with bundle/founder discounts
+- [ ] Update Step 9: Show monthly breakdown
+- [ ] Wire Stripe: Create setup-only checkout session
+- [ ] Wire Stripe: Apply founder promo ($300 flat)
+- [ ] Update webhook: Mark paid, assign founder #, send email
