@@ -553,10 +553,10 @@ export default function Home() {
                 
                 <div className="mb-6">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold text-white">$79</span>
+                    <span className="text-4xl font-bold text-white">$129</span>
                     <span className="text-gray-500">/mo</span>
                   </div>
-                  <div className="text-gray-400 text-sm mt-1">Starting price for Social Media Intelligence</div>
+                  <div className="text-gray-400 text-sm mt-1">+ $249 setup · Starting price for Social Media Intelligence</div>
                 </div>
                 
                 <ul className="space-y-3 mb-8">
@@ -566,12 +566,12 @@ export default function Home() {
                     "Local context layers",
                     "Approval workflow",
                     "Safety gating",
-                    "QuickBooks Sync (coming soon)",
-                    "Google Business (coming soon)",
+                    "QuickBooks Sync",
+                    "Google Business",
                   ].map((feature, i) => (
                     <li key={feature} className="flex items-center gap-3 text-sm text-gray-300">
-                      <CheckCircle className={`w-4 h-4 flex-shrink-0 ${i < 5 ? 'text-[#1ED760]' : 'text-gray-600'}`} />
-                      <span className={i >= 5 ? 'text-gray-500' : ''}>{feature}</span>
+                      <CheckCircle className="w-4 h-4 flex-shrink-0 text-[#1ED760]" />
+                      <span>{feature}</span>
                     </li>
                   ))}
                 </ul>

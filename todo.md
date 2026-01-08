@@ -344,3 +344,10 @@
 - [x] Webhook: Assign founder #01-10 after payment
 - [ ] Admin: Promo dashboard (/admin/founders)
 - [ ] Cron: Reservation expiry cleanup (every 5 min)
+
+## Homepage Pricing Update - Jan 8, 2026
+- [x] Update LaunchBase Suite pricing from $79/mo to $129/mo
+- [x] Update setup fee to $249 (founder pricing)
+- [x] Remove "(coming soon)" from QuickBooks Sync
+- [x] Remove "(coming soon)" from Google Business
+- [x] All features now show as available with green checkmarks
