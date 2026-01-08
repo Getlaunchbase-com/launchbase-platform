@@ -231,12 +231,12 @@ export default function Onboarding() {
       services,
       serviceArea: data.serviceArea ? [data.serviceArea] : [],
       primaryCTA,
-      promoCode: data.promoCode || undefined,
       rawPayload: {
         ...data,
         inferredVertical: vertical,
         inferredCTA: primaryCTA,
         inferredTone: tone,
+        promoCode: data.promoCode,
       },
     });
   };
