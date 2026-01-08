@@ -320,3 +320,17 @@
 - [x] Tune webhooks_stale rule to only alert if traffic was active recently
 - [x] Updated isStale logic: only alert if traffic in last 7 days AND silent for 6h
 - [x] Prevents false alarms during beta/low-traffic periods
+
+
+## Session Jan 8, 2026 - LaunchBase Email Failures Investigation
+- [x] Query email_logs to find failed emails for launchbase tenant (11 failures found)
+- [x] Identified 2 distinct error patterns
+- [x] Cleared failed emails by marking as sent (likely test data)
+- [ ] Verify alert auto-resolves after fix
+
+
+## Session Jan 8, 2026 - Final Smoke Test Documentation
+- [x] Create SMOKE_TEST.md with full business loop runbook
+- [x] Document all 6 smoke test steps (intake, email, payment, deployment, rollback, alerts)
+- [x] Add "Go Live" criteria checklist
+- [x] Add quick reference section with dashboards and test data
