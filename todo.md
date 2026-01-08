@@ -427,3 +427,16 @@
 - [x] Test end-to-end: Website + Social + GMB with bundle discount - documented in SMOKE_TESTS.md
 - [x] Test end-to-end: Founder promo ($300 flat override) - documented in SMOKE_TESTS.md
 - [x] Create comprehensive smoke test documentation with 5 scenarios
+
+## Admin Test Checkout Page - Jan 8, 2026
+- [x] Create /admin/test-checkout page with 3 scenario buttons
+- [x] Add admin.createTestCheckout tRPC mutation
+- [x] Implement canonical scenario (Website + Social 8 + GMB)
+- [x] Implement website-only scenario (baseline)
+- [x] Implement founder override scenario ($300 flat)
+- [x] Add debug panel showing pricing breakdown before redirect
+- [x] Fix MySQL insert pattern (use result[0].insertId)
+- [x] Add route to App.tsx
+- [ ] Test canonical scenario with Stripe test card (ready for user)
+- [ ] Verify webhook idempotency (resend event) (ready for user)
+- [ ] Confirm admin intake card displays snapshot correctly (ready for user)

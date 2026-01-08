@@ -11,6 +11,7 @@ import OnboardingSuccess from "./pages/OnboardingSuccess";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminHealth from "./pages/AdminHealth";
 import AdminAlerts from "./pages/AdminAlerts";
+import AdminTestCheckout from "./pages/AdminTestCheckout";
 import IntakeDetail from "./pages/IntakeDetail";
 import DeploymentStatus from "./pages/DeploymentStatus";
 import Clarify from "./pages/Clarify";
@@ -82,6 +83,7 @@ function Router() {
       <Route path="/admin/email-monitoring" component={AdminEmailMonitoring} />
       <Route path="/admin/health" component={AdminHealth} />
       <Route path="/admin/alerts" component={AdminAlerts} />
+      <Route path="/admin/test-checkout" component={AdminTestCheckout} />
       
       {/* Fallback routes */}
       <Route path="/404" component={NotFound} />

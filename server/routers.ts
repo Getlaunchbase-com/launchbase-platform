@@ -861,6 +861,95 @@ export const appRouter = router({
     // Email delivery smoke test (admin-only)
     emailSmoke: adminEmailSmokeRouter,
     
+    // Test checkout for Stripe integration verification
+    createTestCheckout: protectedProcedure
+      .input(z.object({
+        scenario: z.enum(["canonical", "website_only", "founder"]),
+      }))
+      .mutation(async ({ input }) => {
+        const { computePricing } = await import("../client/src/lib/computePricing");
+        
+        // Define service selections for each scenario
+        const scenarios = {
+          canonical: {
+            website: true,
+            emailService: true,
+            socialMediaTier: "MEDIUM" as const,
+            enrichmentLayer: false,
+            googleBusiness: true,
+            quickBooksSync: false,
+            promoCode: null,
+          },
+          website_only: {
+            website: true,
+            emailService: true,
+            socialMediaTier: null,
+            enrichmentLayer: false,
+            googleBusiness: false,
+            quickBooksSync: false,
+            promoCode: null,
+          },
+          founder: {
+            website: true,
+            emailService: true,
+            socialMediaTier: "HIGH" as const,
+            enrichmentLayer: true,
+            googleBusiness: true,
+            quickBooksSync: true,
+            promoCode: "BETA-FOUNDERS",
+          },
+        };
+        
+        const selections = scenarios[input.scenario];
+        
+        // Create test intake
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        const result = await db.insert(intakes).values({
+          businessName: `Test ${input.scenario} - ${new Date().toISOString()}`,
+          contactName: "Test User",
+          email: "test@example.com",
+          phone: "555-0100",
+          vertical: "trades",
+          status: "new",
+          rawPayload: selections,
+          tenant: "launchbase",
+        });
+        
+        const insertId = result[0]?.insertId;
+        if (!insertId) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Insert failed: missing insertId" });
+        
+        const [intake] = await db.select().from(intakes).where(eq(intakes.id, insertId)).limit(1);
+        if (!intake) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Insert succeeded but row not found" });
+        
+        // Compute pricing
+        const pricing = computePricing(selections);
+        
+        // Create checkout session (this will store pricingSnapshot)
+        const session = await createServiceCheckoutSession({
+          intakeId: intake.id,
+          customerEmail: intake.email,
+          customerName: intake.contactName,
+          origin: "http://localhost:3000",
+          tenant: "launchbase",
+          promoCode: selections.promoCode,
+          serviceSelections: selections,
+        });
+        
+        return {
+          intakeId: intake.id,
+          checkoutUrl: session.url!,
+          snapshot: {
+            ...pricing,
+            tenant: "launchbase",
+            pricingVersion: "v1_2026_01_08",
+            timestamp: new Date().toISOString(),
+            promoCode: selections.promoCode,
+          },
+        };
+      }),
+    
     // Health metrics endpoint
     health: protectedProcedure
       .input(z.object({
