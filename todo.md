@@ -446,3 +446,10 @@
 - [x] Ensure status defaults to 'new' in createIntake
 - [ ] Test onboarding submission end-to-end (ready for user)
 - [ ] Verify Stripe checkout redirect works (ready for user)
+
+## Harden Intake Creation - Jan 8, 2026
+- [x] Remove status parameter from createIntake (always creates "new")
+- [x] Add setIntakeStatus function for explicit transitions
+- [x] Update all createIntake call sites to remove status argument
+- [ ] Add explicit transition calls where review status is needed (if required)
+- [ ] Add test: "suite_application creates intakes as new" (optional)

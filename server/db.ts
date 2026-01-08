@@ -120,7 +120,7 @@ export async function createIntake(data: {
   tagline?: string;
   brandColors?: { primary?: string; secondary?: string };
   rawPayload?: Record<string, unknown>;
-}, status: Intake['status'] = "new") {
+}) {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot create intake: database not available");
@@ -171,13 +171,27 @@ export async function createIntake(data: {
     tagline: data.tagline || null,
     brandColors: data.brandColors || null,
     rawPayload: mergedRawPayload,
-    status,
+    status: "new" as const,
   };
 
   const result = await db.insert(intakes).values(values);
   const insertId = result[0].insertId;
   
   return { id: insertId, ...values };
+}
+
+export async function setIntakeStatus(intakeId: number, status: Intake['status']) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update intake status: database not available");
+    return null;
+  }
+
+  await db.update(intakes)
+    .set({ status, updatedAt: new Date() })
+    .where(eq(intakes.id, intakeId));
+
+  return { id: intakeId, status };
 }
 
 export async function getIntakes(status?: string, search?: string): Promise<Intake[]> {
