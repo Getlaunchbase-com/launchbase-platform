@@ -1967,3 +1967,13 @@
 - [x] Pass tenant from URL to tRPC query with auto-refresh
 - [x] Write FOREVER test for tenant filtering (7/7 tests passing)
 - [x] Verify tenant isolation across all creation paths
+
+
+## Database Indexes for Tenant Filtering (Jan 2026)
+
+- [x] Add index on email_logs(tenant, sentAt) for health metrics query
+- [x] Add index on deployments(tenant, createdAt) for health metrics query
+- [x] Add composite index on email_logs(tenant, status, sentAt) for future status filtering
+- [x] Add composite index on deployments(tenant, status, createdAt) for future status filtering
+- [x] Verify indexes are created with SHOW INDEX (5 indexes on each table)
+- [x] Document index strategy in NEVER_AGAIN.md with forever rules
