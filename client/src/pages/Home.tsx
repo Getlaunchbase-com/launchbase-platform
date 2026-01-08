@@ -376,6 +376,7 @@ export default function Home() {
       </section>
 
       {/* LaunchBase Suite */}
+      {/* LaunchBase Suite */}
       <section className="py-20 px-4 border-b border-white/5">
         <div className="container max-w-6xl mx-auto">
           <div className="text-center mb-4">
@@ -397,43 +398,132 @@ export default function Home() {
           </div>
           
           {/* Social Media Intelligence Card */}
-          <Card className="bg-white/5 border-white/10 max-w-2xl mx-auto mb-8">
+          <Card className="bg-white/5 border-white/10 max-w-4xl mx-auto mb-8">
             <CardContent className="p-8">
               <h3 className="text-2xl font-bold mb-3 text-white">Social Media Intelligence</h3>
               <p className="text-gray-400 mb-6">
                 Context-aware posting that adapts to your business, location, and timing.
               </p>
               
+              <div className="mb-6">
+                <h4 className="text-sm font-semibold text-gray-300 mb-3">Choose your posting volume:</h4>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-white/10">
+                        <th className="text-left py-3 px-4 text-gray-400 font-medium">Posts per month</th>
+                        <th className="text-right py-3 px-4 text-gray-400 font-medium">Setup</th>
+                        <th className="text-right py-3 px-4 text-gray-400 font-medium">Monthly</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b border-white/5">
+                        <td className="py-3 px-4 text-white">4 posts</td>
+                        <td className="text-right py-3 px-4 text-white">$149</td>
+                        <td className="text-right py-3 px-4 text-white">$59</td>
+                      </tr>
+                      <tr className="border-b border-white/5">
+                        <td className="py-3 px-4 text-white">8 posts</td>
+                        <td className="text-right py-3 px-4 text-white">$199</td>
+                        <td className="text-right py-3 px-4 text-white">$99</td>
+                      </tr>
+                      <tr>
+                        <td className="py-3 px-4 text-white">12 posts</td>
+                        <td className="text-right py-3 px-4 text-white">$249</td>
+                        <td className="text-right py-3 px-4 text-white">$149</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              
               <ul className="space-y-2 mb-6 text-sm text-gray-300">
                 <li className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-[#1ED760] flex-shrink-0" />
-                  Posting volume selected during onboarding
+                  Scheduled posting
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-[#1ED760] flex-shrink-0" />
-                  One intelligent enrichment layer (premium)
+                  Platform-safe formatting
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-[#1ED760] flex-shrink-0" />
-                  Safety-gated, approval-aware, fully visible
+                  Approval workflow
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-[#1ED760] flex-shrink-0" />
+                  Full activity log
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-[#1ED760] flex-shrink-0" />
+                  Pause or change anytime
                 </li>
               </ul>
               
-              <div className="bg-[#FF6A00]/10 border border-[#FF6A00]/20 rounded-lg p-4 mb-6">
-                <p className="text-sm text-[#FF6A00] font-medium">
-                  Pricing scales with effort, not hype.
+              <div className="bg-[#FF6A00]/10 border border-[#FF6A00]/20 rounded-lg p-6 mt-6">
+                <h4 className="text-lg font-semibold text-white mb-2">Intelligent Enrichment Layer (Optional)</h4>
+                <p className="text-sm text-gray-300 mb-4">
+                  Automation that understands when not to act.
+                </p>
+                <div className="flex items-center gap-6 mb-4">
+                  <div>
+                    <div className="text-xs text-gray-400 mb-1">Setup</div>
+                    <div className="text-xl font-bold text-[#FF6A00]">$199</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-400 mb-1">Monthly</div>
+                    <div className="text-xl font-bold text-[#FF6A00]">+$79/mo</div>
+                  </div>
+                </div>
+                <ul className="space-y-2 text-sm text-gray-300">
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#FF6A00]" />
+                    Weather-aware logic
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#FF6A00]" />
+                    Local context awareness
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#FF6A00]" />
+                    Industry timing rules
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#FF6A00]" />
+                    Safety gating
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#FF6A00]" />
+                    Decision logging ("why this posted")
+                  </li>
+                </ul>
+                <p className="text-sm text-[#FF6A00] mt-4 font-medium">
+                  Intelligence is valuable. We price it like it is.
                 </p>
               </div>
             </CardContent>
           </Card>
           
           {/* Other Modules */}
-          <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto mb-8">
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-8">
             <Card className="bg-white/5 border-white/10">
               <CardContent className="p-6">
-                <h3 className="text-lg font-semibold mb-2 text-white">Google Business Setup</h3>
-                <p className="text-gray-400 text-sm">
-                  Available during onboarding
+                <h3 className="text-lg font-semibold mb-2 text-white">Google Business Profile</h3>
+                <p className="text-gray-400 text-sm mb-4">
+                  Setup and ongoing visibility monitoring.
+                </p>
+                <div className="flex items-center gap-6">
+                  <div>
+                    <div className="text-xs text-gray-400 mb-1">Setup</div>
+                    <div className="text-lg font-bold text-white">$149</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-400 mb-1">Monthly</div>
+                    <div className="text-lg font-bold text-white">$29/mo</div>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-4">
+                  Includes profile setup or cleanup, posting sync (if enabled), and health monitoring.
                 </p>
               </CardContent>
             </Card>
@@ -441,18 +531,27 @@ export default function Home() {
             <Card className="bg-white/5 border-white/10">
               <CardContent className="p-6">
                 <h3 className="text-lg font-semibold mb-2 text-white">QuickBooks Sync</h3>
-                <p className="text-gray-400 text-sm">
-                  Available during onboarding
+                <p className="text-gray-400 text-sm mb-4">
+                  Accounting visibility and error monitoring.
+                </p>
+                <div className="flex items-center gap-6">
+                  <div>
+                    <div className="text-xs text-gray-400 mb-1">Setup</div>
+                    <div className="text-lg font-bold text-white">$199</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-400 mb-1">Monthly</div>
+                    <div className="text-lg font-bold text-white">$39/mo</div>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-4">
+                  Includes revenue visibility, payment sync, and activity logging.
                 </p>
               </CardContent>
             </Card>
           </div>
           
           <div className="text-center">
-            <p className="text-gray-500 text-sm mb-6">
-              You can change this anytime.<br />
-              Safety never changes.
-            </p>
             <Link href="/expand">
               <Button variant="outline" className="border-[#FF6A00]/50 text-[#FF6A00] hover:bg-[#FF6A00]/10">
                 Explore the Suite <ChevronRight className="w-4 h-4 ml-2" />
@@ -506,6 +605,7 @@ export default function Home() {
       </section>
 
       {/* Pricing Section */}
+      {/* Pricing Section */}
       <section id="pricing" className="py-20 px-4 border-b border-white/5">
         <div className="container max-w-5xl mx-auto">
           <div className="text-center mb-16">
@@ -518,100 +618,88 @@ export default function Home() {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {/* Core Website */}
-            <Card className="bg-white/5 border-white/10 relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-[#FF6A00]" />
-              <CardContent className="p-8">
-                <div className="text-sm text-[#FF6A00] font-medium mb-2">Core Website</div>
-                <h3 className="text-2xl font-bold mb-2 text-white">LaunchBase Website</h3>
-                <p className="text-gray-400 text-sm mb-6">
-                  One-time setup (based on scope)<br />
-                  Ongoing hosting & system ownership
-                </p>
-                
-                <ul className="space-y-3 mb-8">
-                  {[
-                    "Custom website design",
-                    "Mobile optimization",
-                    "Hosting & SSL",
-                    "Contact forms & lead capture",
-                    "SEO fundamentals",
-                    "Monitoring & safety",
-                    "Full visibility into every action",
-                  ].map((feature) => (
-                    <li key={feature} className="flex items-center gap-3 text-sm text-gray-300">
-                      <CheckCircle className="w-4 h-4 text-[#1ED760] flex-shrink-0" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                
-                <div className="bg-[#FF6A00]/10 border border-[#FF6A00]/20 rounded-lg p-4 mb-6">
-                  <p className="text-sm text-[#FF6A00]">
-                    Final pricing is confirmed during onboarding<br />
-                    before anything is charged.
-                  </p>
+          {/* Core Website Card */}
+          <Card className="bg-white/5 border-white/10 max-w-3xl mx-auto mb-12 relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-[#FF6A00]" />
+            <CardContent className="p-8">
+              <div className="text-sm text-[#FF6A00] font-medium mb-2">Core Website</div>
+              <h3 className="text-2xl font-bold mb-2 text-white">LaunchBase Website</h3>
+              
+              <div className="flex items-center gap-8 mb-6">
+                <div>
+                  <div className="text-sm text-gray-400 mb-1">Setup</div>
+                  <div className="text-3xl font-bold text-white">$499</div>
+                  <div className="text-xs text-gray-500">(base)</div>
                 </div>
-                
-                <Link href="/apply">
-                  <Button className="w-full bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white">
-                    Hand It Off
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+                <div>
+                  <div className="text-sm text-gray-400 mb-1">Monthly</div>
+                  <div className="text-3xl font-bold text-white">$49<span className="text-lg">/mo</span></div>
+                </div>
+              </div>
+              
+              <ul className="space-y-3 mb-8">
+                {[
+                  "Custom website design",
+                  "Mobile optimization",
+                  "Hosting & SSL",
+                  "Contact forms & lead capture",
+                  "SEO fundamentals",
+                  "Monitoring & safety",
+                  "Full visibility into every action",
+                ].map((feature) => (
+                  <li key={feature} className="flex items-center gap-3 text-sm text-gray-300">
+                    <CheckCircle className="w-4 h-4 text-[#1ED760] flex-shrink-0" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              
+              <div className="bg-[#FF6A00]/10 border border-[#FF6A00]/20 rounded-lg p-4 mb-6">
+                <p className="text-sm text-[#FF6A00]">
+                  Final pricing is confirmed during onboarding before anything is charged.
+                </p>
+              </div>
+              
+              <Link href="/apply">
+                <Button className="w-full bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white">
+                  Hand It Off
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+          
+          {/* Example Pricing */}
+          <div className="max-w-3xl mx-auto">
+            <h3 className="text-xl font-semibold text-white mb-6 text-center">Example (no math surprises)</h3>
+            <div className="bg-white/5 border border-white/10 rounded-xl p-6 mb-6">
+              <p className="text-gray-300 mb-4 font-medium">
+                Website + Social (8 posts) + Intelligence
+              </p>
+              <div className="space-y-2 text-sm text-gray-400 mb-4">
+                <div className="flex justify-between">
+                  <span>Setup:</span>
+                  <span className="text-white">$499 + $199 + $199 = $897</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Monthly:</span>
+                  <span className="text-white">$49 + $99 + $79 = $227</span>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 text-center">
+                No calls. No negotiation. No confusion.
+              </p>
+            </div>
             
-            {/* Social Media Intelligence */}
-            <Card className="bg-white/5 border-white/10">
-              <CardContent className="p-8">
-                <div className="text-sm text-gray-500 font-medium mb-2">Social Media Intelligence</div>
-                <h3 className="text-2xl font-bold mb-2 text-white">Effort-based pricing</h3>
-                <p className="text-gray-400 text-sm mb-6">
-                  Determined by:
-                </p>
-                
-                <ul className="space-y-3 mb-6">
-                  <li className="flex items-start gap-3 text-sm text-gray-300">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#FF6A00] mt-1.5 flex-shrink-0" />
-                    <span>How often we post</span>
-                  </li>
-                  <li className="flex items-start gap-3 text-sm text-gray-300">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#FF6A00] mt-1.5 flex-shrink-0" />
-                    <span>Whether intelligent automation is applied</span>
-                  </li>
-                </ul>
-                
-                <div className="bg-white/5 rounded-lg p-4 mb-6">
-                  <p className="text-sm text-gray-400 mb-3">
-                    Most customers choose:
-                  </p>
-                  <ul className="space-y-2 text-sm text-gray-300">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-[#1ED760] flex-shrink-0" />
-                      A posting range
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-[#1ED760] flex-shrink-0" />
-                      Then decide whether to add intelligent enrichment
-                    </li>
-                  </ul>
-                </div>
-                
-                <div className="bg-[#FF6A00]/10 border border-[#FF6A00]/20 rounded-lg p-4 mb-6">
-                  <p className="text-sm text-[#FF6A00] font-medium">
-                    Intelligence is valuable.<br />
-                    We price it like it is.
-                  </p>
-                </div>
-                
-                <Link href="/apply">
-                  <Button variant="outline" className="w-full border-white/20 text-white hover:bg-white/5">
-                    Configure during onboarding
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+            <div className="text-center">
+              <Link href="/apply">
+                <Button size="lg" className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white">
+                  Hand It Off <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+              <p className="text-sm text-gray-500 mt-4">
+                See your real site before you pay. Cancel anytime.
+              </p>
+            </div>
           </div>
         </div>
       </section>
