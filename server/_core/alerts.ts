@@ -131,19 +131,46 @@ function evaluateHealthAlerts(snapshot: HealthSnapshot): AlertCandidate[] {
 }
 
 /**
+ * Summary of alert processing run
+ */
+export type AlertsRunSummary = {
+  tenantsProcessed: number;
+  created: number;
+  sent: number;
+  deduped: number;
+  resolved: number;
+  skippedRateLimit: boolean;
+  alerts: Array<{
+    tenant: string;
+    alertType: string;
+    action: "created" | "sent" | "deduped" | "resolved" | "none";
+    fingerprint: string;
+  }>;
+};
+
+/**
  * Process alert candidates: upsert + send if new
  */
-export async function processAlerts(snapshot: HealthSnapshot): Promise<void> {
+export async function processAlerts(snapshot: HealthSnapshot): Promise<AlertsRunSummary> {
+  const stats: AlertsRunSummary = {
+    tenantsProcessed: 1,
+    created: 0,
+    sent: 0,
+    deduped: 0,
+    resolved: 0,
+    skippedRateLimit: false,
+    alerts: [],
+  };
   const db = await getDb();
   if (!db) {
     console.error("[Alerts] Database not available");
-    return;
+    return stats;
   }
 
   // Skip if tenant is "all" (alerts are per-tenant only)
   if (snapshot.tenant === "all") {
     console.warn("[Alerts] Cannot process alerts for tenant='all', skipping");
-    return;
+    return stats;
   }
 
   const candidates = evaluateHealthAlerts(snapshot);
@@ -175,6 +202,14 @@ export async function processAlerts(snapshot: HealthSnapshot): Promise<void> {
           })
           .where(eq(alertEvents.id, existing.id));
 
+        stats.deduped++;
+        stats.alerts.push({
+          tenant: snapshot.tenant,
+          alertType: candidate.alertKey,
+          action: "deduped",
+          fingerprint: candidate.fingerprint,
+        });
+
         console.log(
           `[Alerts] Updated existing alert: ${candidate.alertKey} (${candidate.fingerprint})`
         );
@@ -196,6 +231,13 @@ export async function processAlerts(snapshot: HealthSnapshot): Promise<void> {
         });
 
         const alertId = Number(result.insertId);
+        stats.created++;
+        stats.alerts.push({
+          tenant: snapshot.tenant,
+          alertType: candidate.alertKey,
+          action: "created",
+          fingerprint: candidate.fingerprint,
+        });
 
         // Send email (hard-locked to vince@vincessnowplow.com)
         try {
@@ -215,6 +257,11 @@ export async function processAlerts(snapshot: HealthSnapshot): Promise<void> {
               deliveryProvider: "resend",
             })
             .where(eq(alertEvents.id, alertId));
+
+          stats.sent++;
+          // Update last alert action to "sent"
+          const lastAlert = stats.alerts[stats.alerts.length - 1];
+          if (lastAlert) lastAlert.action = "sent";
 
           console.log(
             `[Alerts] Sent new alert: ${candidate.alertKey} (${candidate.fingerprint}) to ${ALERT_RECIPIENT}`
@@ -271,10 +318,22 @@ export async function processAlerts(snapshot: HealthSnapshot): Promise<void> {
           })
           .where(eq(alertEvents.id, alert.id));
 
+        stats.resolved++;
+        stats.alerts.push({
+          tenant: snapshot.tenant,
+          alertType: alert.alertKey,
+          action: "resolved",
+          fingerprint: alert.fingerprint,
+        });
+
         console.log(
           `[Alerts] Resolved alert: ${alert.alertKey} (${alert.fingerprint})`
         );
       }
     }
   }
+
+  // Limit alerts array to last 10 for readability
+  stats.alerts = stats.alerts.slice(-10);
+  return stats;
 }

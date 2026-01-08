@@ -18,7 +18,7 @@
 import type { Request, Response } from "express";
 import { handleDeploymentWorker } from "./deploymentWorker";
 import { handleAutoAdvanceWorker } from "./autoAdvanceWorker";
-import { processAlerts } from "../_core/alerts";
+import { processAlerts, type AlertsRunSummary } from "../_core/alerts";
 import { getHealthMetrics } from "../health";
 import { getDb } from "../db";
 import { sql } from "drizzle-orm";
@@ -209,13 +209,32 @@ export async function handleCronAlerts(req: Request, res: Response) {
     // Evaluate alerts for both tenants
     const tenants: ("launchbase" | "vinces")[] = ["launchbase", "vinces"];
     
+    // Aggregate stats across all tenants
+    const aggregateStats: AlertsRunSummary = {
+      tenantsProcessed: 0,
+      created: 0,
+      sent: 0,
+      deduped: 0,
+      resolved: 0,
+      skippedRateLimit: false,
+      alerts: [],
+    };
+    
     for (const tenant of tenants) {
       try {
         // Get health metrics for this tenant
         const metrics = await getHealthMetrics(tenant);
         
         // Process alerts (upsert + send if new)
-        await processAlerts(metrics);
+        const stats = await processAlerts(metrics);
+        
+        // Aggregate stats
+        aggregateStats.tenantsProcessed++;
+        aggregateStats.created += stats.created;
+        aggregateStats.sent += stats.sent;
+        aggregateStats.deduped += stats.deduped;
+        aggregateStats.resolved += stats.resolved;
+        aggregateStats.alerts.push(...stats.alerts);
         
         processed++;
         console.log(`[Alerts] Processed alerts for tenant: ${tenant}`);
@@ -226,11 +245,20 @@ export async function handleCronAlerts(req: Request, res: Response) {
       }
     }
     
+    // Limit alerts array to last 10 for readability
+    aggregateStats.alerts = aggregateStats.alerts.slice(-10);
+    
     ok = true;
+    
+    // Add no-cache headers to prevent stale responses
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('CDN-Cache-Control', 'no-store');
+    
     res.status(200).json({
       success: true,
-      processed,
-      message: `Evaluated alerts for ${processed} tenant(s)`,
+      buildId: process.env.RENDER_GIT_COMMIT || new Date().toISOString(),
+      serverTime: new Date().toISOString(),
+      ...aggregateStats,
     });
   } catch (e: any) {
     ok = false;
