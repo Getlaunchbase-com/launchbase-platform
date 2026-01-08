@@ -5,7 +5,7 @@
  */
 
 import { getDb } from "./db";
-import { deployments, emailLogs } from "../drizzle/schema";
+import { deployments, emailLogs, stripeWebhookEvents } from "../drizzle/schema";
 import { sql, gte } from "drizzle-orm";
 
 const TWENTY_FOUR_HOURS_AGO = () => new Date(Date.now() - 24 * 60 * 60 * 1000);
@@ -29,10 +29,14 @@ export interface HealthMetrics {
   };
   stripeWebhooks: {
     total: number;
-    success: number;
+    ok: number;
     failed: number;
+    pending: number;
+    retryEvents: number;
+    totalRetries: number;
     lastError: string | null;
-    lastWebhookAt: Date | null;
+    lastEventAt: Date | null;
+    isStale: boolean;
   };
   system: {
     uptime: number; // seconds
@@ -89,13 +93,28 @@ export async function getHealthMetrics(): Promise<HealthMetrics> {
       : "onboarding@resend.dev",
   };
 
-  // Stripe webhook metrics (placeholder - will be populated when webhook events table exists)
+  // Stripe webhook metrics
+  const stripeRows = await db
+    .select()
+    .from(stripeWebhookEvents)
+    .where(gte(stripeWebhookEvents.receivedAt, cutoff));
+
   const stripeMetrics = {
-    total: 0,
-    success: 0,
-    failed: 0,
-    lastError: null,
-    lastWebhookAt: null,
+    total: stripeRows.length,
+    ok: stripeRows.filter((e) => e.ok === true).length,
+    failed: stripeRows.filter((e) => e.ok === false).length,
+    pending: stripeRows.filter((e) => e.ok === null).length,
+    retryEvents: stripeRows.filter((e) => e.retryCount > 0).length,
+    totalRetries: stripeRows.reduce((sum, e) => sum + (e.retryCount || 0), 0),
+    lastError: stripeRows
+      .filter((e) => e.error)
+      .sort((a, b) => (b.receivedAt?.getTime() || 0) - (a.receivedAt?.getTime() || 0))[0]?.error || null,
+    lastEventAt: stripeRows.length > 0
+      ? stripeRows.sort((a, b) => (b.receivedAt?.getTime() || 0) - (a.receivedAt?.getTime() || 0))[0].receivedAt
+      : null,
+    isStale: stripeRows.length === 0 || 
+      (stripeRows.length > 0 && 
+       (Date.now() - (stripeRows.sort((a, b) => (b.receivedAt?.getTime() || 0) - (a.receivedAt?.getTime() || 0))[0].receivedAt?.getTime() || 0)) > 6 * 60 * 60 * 1000),
   };
 
   // System metrics

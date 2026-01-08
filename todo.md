@@ -1933,3 +1933,13 @@
 - [x] Add auto-refresh every 30s
 - [x] Add manual refresh button
 - [x] Verify metrics accuracy with test data (4/4 tests passing)
+
+
+## Health Dashboard Hardening (Jan 2026)
+
+- [x] Fix TypeScript type inference lag (moved health endpoint from setupPackets to admin router)
+- [x] Add real Stripe webhook metrics (total, ok, failed, pending, retryEvents, totalRetries, lastEventAt, isStale)
+- [x] Implement red banner alert system (email failures, deployment failures, stale webhooks)
+- [x] Add yellow warning system (rising retries, stale deployments)
+- [x] Test all alert conditions with real data (4/4 tests passing)
+- [x] Verify auto-refresh works correctly (30s interval)
