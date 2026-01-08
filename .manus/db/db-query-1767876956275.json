@@ -1,0 +1,24 @@
+{
+  "query": "SELECT * FROM email_logs WHERE emailType = 'ops_alert' ORDER BY sentAt DESC LIMIT 1",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT * FROM email_logs WHERE emailType = 'ops_alert' ORDER BY sentAt DESC LIMIT 1",
+  "rows": [
+    {
+      "id": "210122",
+      "intakeId": "0",
+      "emailType": "ops_alert",
+      "recipientEmail": "vince@vincessnowplow.com",
+      "subject": "{{subject}}",
+      "status": "sent",
+      "sentAt": "2026-01-08 12:51:07",
+      "openedAt": "NULL",
+      "clickedAt": "NULL",
+      "deliveryProvider": "resend",
+      "errorMessage": "NULL",
+      "tenant": "vinces"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tintakeId\temailType\trecipientEmail\tsubject\tstatus\tsentAt\topenedAt\tclickedAt\tdeliveryProvider\terrorMessage\ttenant\n210122\t0\tops_alert\tvince@vincessnowplow.com\t{{subject}}\tsent\t2026-01-08 12:51:07\tNULL\tNULL\tresend\tNULL\tvinces\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}
