@@ -1,0 +1,16 @@
+{
+  "query": "SELECT id, status, intakeId, buildPlanId FROM deployments \nWHERE intakeId = (SELECT id FROM intakes WHERE email = 'e2e-test-jan5@launchbase-test.com' ORDER BY id DESC LIMIT 1);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT id, status, intakeId, buildPlanId FROM deployments \nWHERE intakeId = (SELECT id FROM intakes WHERE email = 'e2e-test-jan5@launchbase-test.com' ORDER BY id DESC LIMIT 1);",
+  "rows": [
+    {
+      "id": "90001",
+      "status": "success",
+      "intakeId": "210001",
+      "buildPlanId": "180001"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstatus\tintakeId\tbuildPlanId\n90001\tsuccess\t210001\t180001\n",
+  "stderr": "",
+  "execution_time_ms": 65
+}

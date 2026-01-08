@@ -1,0 +1,18 @@
+{
+  "query": "\nSELECT DISTINCT errorMessage, COUNT(*) as count\nFROM email_logs\nWHERE tenant = 'launchbase'\n  AND status = 'failed'\n  AND sentAt >= DATE_SUB(NOW(), INTERVAL 24 HOUR)\nGROUP BY errorMessage;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute \nSELECT DISTINCT errorMessage, COUNT(*) as count\nFROM email_logs\nWHERE tenant = 'launchbase'\n  AND status = 'failed'\n  AND sentAt >= DATE_SUB(NOW(), INTERVAL 24 HOUR)\nGROUP BY errorMessage;\n",
+  "rows": [
+    {
+      "errorMessage": "resend_failed_403: You can only send testing emails to your own email address (vince@vincessnowplow.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.",
+      "count": "9"
+    },
+    {
+      "errorMessage": "resend_failed_429: Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.",
+      "count": "2"
+    }
+  ],
+  "messages": [],
+  "stdout": "errorMessage\tcount\nresend_failed_403: You can only send testing emails to your own email address (vince@vincessnowplow.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\t9\nresend_failed_429: Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.\t2\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}

@@ -1,0 +1,40 @@
+{
+  "query": "SELECT id, tenant, alertKey, fingerprint, status, firstSeenAt, lastSeenAt, resolvedAt FROM alert_events WHERE tenant = 'vinces' ORDER BY firstSeenAt DESC LIMIT 3",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT id, tenant, alertKey, fingerprint, status, firstSeenAt, lastSeenAt, resolvedAt FROM alert_events WHERE tenant = 'vinces' ORDER BY firstSeenAt DESC LIMIT 3",
+  "rows": [
+    {
+      "id": "7",
+      "tenant": "vinces",
+      "alertKey": "health:webhooks_stale",
+      "fingerprint": "vinces|health:webhooks_stale|6h",
+      "status": "active",
+      "firstSeenAt": "2026-01-08 12:51:07",
+      "lastSeenAt": "2026-01-08 12:51:07",
+      "resolvedAt": "NULL"
+    },
+    {
+      "id": "4",
+      "tenant": "vinces",
+      "alertKey": "health:email_failures",
+      "fingerprint": "vinces|health:email_failures|3plus",
+      "status": "active",
+      "firstSeenAt": "2026-01-08 06:39:11",
+      "lastSeenAt": "2026-01-08 12:51:07",
+      "resolvedAt": "NULL"
+    },
+    {
+      "id": "3",
+      "tenant": "vinces",
+      "alertKey": "health:webhooks_stale",
+      "fingerprint": "vinces|health:webhooks_stale|24h+",
+      "status": "resolved",
+      "firstSeenAt": "2026-01-08 06:38:52",
+      "lastSeenAt": "2026-01-08 06:38:52",
+      "resolvedAt": "2026-01-08 06:39:11"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttenant\talertKey\tfingerprint\tstatus\tfirstSeenAt\tlastSeenAt\tresolvedAt\n7\tvinces\thealth:webhooks_stale\tvinces|health:webhooks_stale|6h\tactive\t2026-01-08 12:51:07\t2026-01-08 12:51:07\tNULL\n4\tvinces\thealth:email_failures\tvinces|health:email_failures|3plus\tactive\t2026-01-08 06:39:11\t2026-01-08 12:51:07\tNULL\n3\tvinces\thealth:webhooks_stale\tvinces|health:webhooks_stale|24h+\tresolved\t2026-01-08 06:38:52\t2026-01-08 06:38:52\t2026-01-08 06:39:11\n",
+  "stderr": "",
+  "execution_time_ms": 49
+}

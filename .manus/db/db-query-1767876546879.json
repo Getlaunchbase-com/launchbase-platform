@@ -1,0 +1,50 @@
+{
+  "query": "SELECT id, intakeId, emailType, status, tenant, sentAt \nFROM email_logs \nWHERE tenant = 'vinces' \nORDER BY sentAt DESC \nLIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT id, intakeId, emailType, status, tenant, sentAt \nFROM email_logs \nWHERE tenant = 'vinces' \nORDER BY sentAt DESC \nLIMIT 5",
+  "rows": [
+    {
+      "id": "210112",
+      "intakeId": "150001",
+      "emailType": "intake_confirmation",
+      "status": "sent",
+      "tenant": "vinces",
+      "sentAt": "2026-01-08 06:39:25"
+    },
+    {
+      "id": "210110",
+      "intakeId": "150001",
+      "emailType": "intake_confirmation",
+      "status": "failed",
+      "tenant": "vinces",
+      "sentAt": "2026-01-08 06:39:25"
+    },
+    {
+      "id": "210108",
+      "intakeId": "150001",
+      "emailType": "intake_confirmation",
+      "status": "sent",
+      "tenant": "vinces",
+      "sentAt": "2026-01-08 06:39:25"
+    },
+    {
+      "id": "210106",
+      "intakeId": "0",
+      "emailType": "ops_alert",
+      "status": "sent",
+      "tenant": "vinces",
+      "sentAt": "2026-01-08 06:39:10"
+    },
+    {
+      "id": "210105",
+      "intakeId": "150001",
+      "emailType": "intake_confirmation",
+      "status": "sent",
+      "tenant": "vinces",
+      "sentAt": "2026-01-08 06:39:08"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tintakeId\temailType\tstatus\ttenant\tsentAt\n210112\t150001\tintake_confirmation\tsent\tvinces\t2026-01-08 06:39:25\n210110\t150001\tintake_confirmation\tfailed\tvinces\t2026-01-08 06:39:25\n210108\t150001\tintake_confirmation\tsent\tvinces\t2026-01-08 06:39:25\n210106\t0\tops_alert\tsent\tvinces\t2026-01-08 06:39:10\n210105\t150001\tintake_confirmation\tsent\tvinces\t2026-01-08 06:39:08\n",
+  "stderr": "",
+  "execution_time_ms": 1291
+}

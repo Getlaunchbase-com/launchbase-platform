@@ -1,0 +1,19 @@
+{
+  "query": "SELECT \n  i.id as intakeId,\n  i.status,\n  i.previewToken,\n  i.previewUrl,\n  e.id as emailLogId,\n  e.emailType,\n  e.sentAt\nFROM intakes i\nLEFT JOIN email_logs e ON i.id = e.intakeId AND e.emailType = 'ready_for_review'\nWHERE i.email = 'e2e-test-jan5@launchbase-test.com'\nORDER BY i.createdAt DESC, e.sentAt DESC\nLIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT \n  i.id as intakeId,\n  i.status,\n  i.previewToken,\n  i.previewUrl,\n  e.id as emailLogId,\n  e.emailType,\n  e.sentAt\nFROM intakes i\nLEFT JOIN email_logs e ON i.id = e.intakeId AND e.emailType = 'ready_for_review'\nWHERE i.email = 'e2e-test-jan5@launchbase-test.com'\nORDER BY i.createdAt DESC, e.sentAt DESC\nLIMIT 1;",
+  "rows": [
+    {
+      "intakeId": "210001",
+      "status": "ready_for_review",
+      "previewToken": "preview_e2e_test_jan5_2026",
+      "previewUrl": "https://preview-e2e-test.manus.space",
+      "emailLogId": "180002",
+      "emailType": "ready_for_review",
+      "sentAt": "2026-01-05 18:23:13"
+    }
+  ],
+  "messages": [],
+  "stdout": "intakeId\tstatus\tpreviewToken\tpreviewUrl\temailLogId\temailType\tsentAt\n210001\tready_for_review\tpreview_e2e_test_jan5_2026\thttps://preview-e2e-test.manus.space\t180002\tready_for_review\t2026-01-05 18:23:13\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

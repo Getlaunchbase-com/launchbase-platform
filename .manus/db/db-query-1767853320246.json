@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE email_logs MODIFY COLUMN emailType ENUM(\n  'intake_confirmation',\n  'in_progress',\n  'ready_for_review',\n  'review_nudge',\n  'launch_confirmation',\n  'deployment_started',\n  'site_live',\n  'preview_followup',\n  'testimonial_request',\n  'founding_client_lockin',\n  'day7_checkin',\n  'day30_value',\n  'contact_form_confirmation',\n  'ops_alert'\n) NOT NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute ALTER TABLE email_logs MODIFY COLUMN emailType ENUM(\n  'intake_confirmation',\n  'in_progress',\n  'ready_for_review',\n  'review_nudge',\n  'launch_confirmation',\n  'deployment_started',\n  'site_live',\n  'preview_followup',\n  'testimonial_request',\n  'founding_client_lockin',\n  'day7_checkin',\n  'day30_value',\n  'contact_form_confirmation',\n  'ops_alert'\n) NOT NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 197
+}

@@ -1,0 +1,27 @@
+{
+  "query": "SELECT * FROM deployments \nWHERE intakeId = (SELECT id FROM intakes WHERE email = 'e2e-test-jan5@launchbase-test.com' ORDER BY id DESC LIMIT 1)\nORDER BY id DESC \nLIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT * FROM deployments \nWHERE intakeId = (SELECT id FROM intakes WHERE email = 'e2e-test-jan5@launchbase-test.com' ORDER BY id DESC LIMIT 1)\nORDER BY id DESC \nLIMIT 1;",
+  "rows": [
+    {
+      "id": "90001",
+      "buildPlanId": "180001",
+      "intakeId": "210001",
+      "status": "success",
+      "siteId": "NULL",
+      "previewUrl": "NULL",
+      "productionUrl": "https://site-test-user-e2e-90001.launchbase-h86jcadp.manus.space",
+      "logs": "NULL",
+      "errorMessage": "NULL",
+      "startedAt": "2026-01-05 18:28:01",
+      "completedAt": "2026-01-05 18:28:11",
+      "createdAt": "2026-01-05 18:26:17",
+      "updatedAt": "2026-01-05 18:28:11",
+      "urlMode": "TEMP_MANUS",
+      "urlModeEnforcementLog": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tbuildPlanId\tintakeId\tstatus\tsiteId\tpreviewUrl\tproductionUrl\tlogs\terrorMessage\tstartedAt\tcompletedAt\tcreatedAt\tupdatedAt\turlMode\turlModeEnforcementLog\n90001\t180001\t210001\tsuccess\tNULL\tNULL\thttps://site-test-user-e2e-90001.launchbase-h86jcadp.manus.space\tNULL\tNULL\t2026-01-05 18:28:01\t2026-01-05 18:28:11\t2026-01-05 18:26:17\t2026-01-05 18:28:11\tTEMP_MANUS\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

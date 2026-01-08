@@ -1,0 +1,186 @@
+{
+  "query": "DESCRIBE suite_applications;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute DESCRIBE suite_applications;",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "contactName",
+      "Type": "varchar(255)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "contactEmail",
+      "Type": "varchar(320)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "contactPhone",
+      "Type": "varchar(64)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "language",
+      "Type": "enum('en','es','pl')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "en",
+      "Extra": ""
+    },
+    {
+      "Field": "vertical",
+      "Type": "enum('trades','health','beauty','food','cannabis','professional','fitness','automotive')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "industry",
+      "Type": "varchar(64)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "businessType",
+      "Type": "enum('TRADES','FOOD','RETAIL','PRO','OTHER')",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "cityZip",
+      "Type": "varchar(128)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "radiusMiles",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "cadence",
+      "Type": "enum('LOW','MEDIUM','HIGH')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "mode",
+      "Type": "enum('AUTO','GUIDED','CUSTOM')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "layers",
+      "Type": "json",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "pricing",
+      "Type": "json",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "startTiming",
+      "Type": "enum('NOW','TWO_WEEKS','EXPLORING')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "status",
+      "Type": "enum('submitted','ready_for_review','preview_ready','approved','paid','active','rejected')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "submitted",
+      "Extra": ""
+    },
+    {
+      "Field": "previewToken",
+      "Type": "varchar(64)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "createdAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "updatedAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+    },
+    {
+      "Field": "admin_notes",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "reviewed_by",
+      "Type": "varchar(255)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "intake_id",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint(11)\tNO\tPRI\tNULL\tauto_increment\ncontactName\tvarchar(255)\tNO\t\tNULL\t\ncontactEmail\tvarchar(320)\tNO\t\tNULL\t\ncontactPhone\tvarchar(64)\tNO\t\tNULL\t\nlanguage\tenum('en','es','pl')\tNO\t\ten\t\nvertical\tenum('trades','health','beauty','food','cannabis','professional','fitness','automotive')\tNO\t\tNULL\t\nindustry\tvarchar(64)\tYES\t\tNULL\t\nbusinessType\tenum('TRADES','FOOD','RETAIL','PRO','OTHER')\tYES\t\tNULL\t\ncityZip\tvarchar(128)\tNO\t\tNULL\t\nradiusMiles\tint(11)\tNO\t\tNULL\t\ncadence\tenum('LOW','MEDIUM','HIGH')\tNO\t\tNULL\t\nmode\tenum('AUTO','GUIDED','CUSTOM')\tNO\t\tNULL\t\nlayers\tjson\tNO\t\tNULL\t\npricing\tjson\tNO\t\tNULL\t\nstartTiming\tenum('NOW','TWO_WEEKS','EXPLORING')\tNO\t\tNULL\t\nstatus\tenum('submitted','ready_for_review','preview_ready','approved','paid','active','rejected')\tNO\t\tsubmitted\t\npreviewToken\tvarchar(64)\tYES\t\tNULL\t\ncreatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nupdatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP\nadmin_notes\ttext\tYES\t\tNULL\t\nreviewed_by\tvarchar(255)\tYES\t\tNULL\t\nintake_id\tint(11)\tYES\t\tNULL\t\n",
+  "stderr": "",
+  "execution_time_ms": 63
+}

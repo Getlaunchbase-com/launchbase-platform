@@ -1,0 +1,30 @@
+{
+  "query": "SELECT id, status, intakeId FROM deployments ORDER BY id DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT id, status, intakeId FROM deployments ORDER BY id DESC;",
+  "rows": [
+    {
+      "id": "90001",
+      "status": "queued",
+      "intakeId": "210001"
+    },
+    {
+      "id": "60001",
+      "status": "queued",
+      "intakeId": "1"
+    },
+    {
+      "id": "30001",
+      "status": "queued",
+      "intakeId": "60001"
+    },
+    {
+      "id": "1",
+      "status": "queued",
+      "intakeId": "30001"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tstatus\tintakeId\n90001\tqueued\t210001\n60001\tqueued\t1\n30001\tqueued\t60001\n1\tqueued\t30001\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

@@ -1,0 +1,6 @@
+Database Inspection Results
+===========================
+
+The webdev_execute_sql tool shows "Query executed successfully | rows: 15" but doesn't display the actual column names.
+
+Let me use a different approach to see what columns exist.

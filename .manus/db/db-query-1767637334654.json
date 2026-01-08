@@ -1,0 +1,13 @@
+{
+  "query": "SELECT id FROM intakes WHERE email = 'e2e-test-jan5@launchbase-test.com' ORDER BY createdAt DESC LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT id FROM intakes WHERE email = 'e2e-test-jan5@launchbase-test.com' ORDER BY createdAt DESC LIMIT 1;",
+  "rows": [
+    {
+      "id": "210001"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\n210001\n",
+  "stderr": "",
+  "execution_time_ms": 50
+}

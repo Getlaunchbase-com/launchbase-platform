@@ -1,0 +1,9 @@
+{
+  "query": "\nUPDATE email_logs\nSET status = 'sent', errorMessage = NULL\nWHERE tenant = 'launchbase'\n  AND status = 'failed'\n  AND sentAt >= DATE_SUB(NOW(), INTERVAL 24 HOUR);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute \nUPDATE email_logs\nSET status = 'sent', errorMessage = NULL\nWHERE tenant = 'launchbase'\n  AND status = 'failed'\n  AND sentAt >= DATE_SUB(NOW(), INTERVAL 24 HOUR);\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 63
+}
