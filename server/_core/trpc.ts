@@ -1,48 +1,10 @@
 import { NOT_ADMIN_ERR_MSG, UNAUTHED_ERR_MSG } from '@shared/const';
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
-import { ZodError } from "zod";
 import type { TrpcContext } from "./context";
-
-// Centralized error formatter for user-friendly validation errors
-function formatValidationError(error: unknown) {
-  if (error instanceof ZodError) {
-    const flat = error.flatten();
-    const fieldErrors: Record<string, string> = {};
-    
-    for (const [key, messages] of Object.entries(flat.fieldErrors)) {
-      if (Array.isArray(messages) && messages.length > 0) {
-        fieldErrors[key] = messages[0];
-      }
-    }
-    
-    return {
-      code: "VALIDATION_ERROR",
-      fieldErrors,
-      formError: flat.formErrors?.[0] ?? "Please check the highlighted fields.",
-    };
-  }
-  return null;
-}
 
 const t = initTRPC.context<TrpcContext>().create({
   transformer: superjson,
-  errorFormatter({ shape, error }) {
-    // Handle Zod validation errors
-    const validationError = formatValidationError(error.cause);
-    if (validationError) {
-      return {
-        ...shape,
-        data: {
-          ...shape.data,
-          ...validationError,
-        },
-      };
-    }
-    
-    // Return original shape for non-validation errors
-    return shape;
-  },
 });
 
 export const router = t.router;
@@ -81,6 +43,3 @@ export const adminProcedure = t.procedure.use(
     });
   }),
 );
-
-// Export error formatter for testing
-export { formatValidationError };

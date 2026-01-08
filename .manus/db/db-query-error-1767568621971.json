@@ -1,8 +1,0 @@
-{
-  "query": "INSERT INTO social_posts (userId, content, headline, postType, triggerContext, status) VALUES (1, 'Test content', 'Test headline', 'MANUAL', 'manual', 'needs_review');",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute INSERT INTO social_posts (userId, content, headline, postType, triggerContext, status) VALUES (1, 'Test content', 'Test headline', 'MANUAL', 'manual', 'needs_review');",
-  "returncode": 1,
-  "logs": [
-    "ERROR 1265 (01000) at line 1: Data truncated for column 'status' at row 1"
-  ]
-}

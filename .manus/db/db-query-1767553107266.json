@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS `facebook_oauth_sessions` (\n  `id` VARCHAR(36) NOT NULL PRIMARY KEY,\n  `customerId` INT NOT NULL,\n  `userId` INT NOT NULL,\n  `status` ENUM('pending', 'pages_ready', 'connected', 'failed', 'expired') NOT NULL DEFAULT 'pending',\n  `userAccessToken` TEXT,\n  `scopesGranted` JSON,\n  `pages` JSON,\n  `error` TEXT,\n  `returnTo` VARCHAR(512),\n  `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `expiresAt` TIMESTAMP NOT NULL,\n  INDEX `idx_user_expires` (`userId`, `expiresAt`),\n  INDEX `idx_expires` (`expiresAt`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute CREATE TABLE IF NOT EXISTS `facebook_oauth_sessions` (\n  `id` VARCHAR(36) NOT NULL PRIMARY KEY,\n  `customerId` INT NOT NULL,\n  `userId` INT NOT NULL,\n  `status` ENUM('pending', 'pages_ready', 'connected', 'failed', 'expired') NOT NULL DEFAULT 'pending',\n  `userAccessToken` TEXT,\n  `scopesGranted` JSON,\n  `pages` JSON,\n  `error` TEXT,\n  `returnTo` VARCHAR(512),\n  `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `expiresAt` TIMESTAMP NOT NULL,\n  INDEX `idx_user_expires` (`userId`, `expiresAt`),\n  INDEX `idx_expires` (`expiresAt`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 1550
-}

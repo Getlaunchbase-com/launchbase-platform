@@ -1,8 +1,0 @@
-{
-  "query": "SELECT id, intakeId, emailType, sentTo, subject, sentAt, deliveryStatus FROM email_logs WHERE intakeId IN (SELECT id FROM intakes WHERE businessName LIKE '%E2E%') ORDER BY sentAt DESC;",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT id, intakeId, emailType, sentTo, subject, sentAt, deliveryStatus FROM email_logs WHERE intakeId IN (SELECT id FROM intakes WHERE businessName LIKE '%E2E%') ORDER BY sentAt DESC;",
-  "returncode": 1,
-  "logs": [
-    "ERROR 1054 (42S22) at line 1: Unknown column 'sentto' in 'field list'"
-  ]
-}

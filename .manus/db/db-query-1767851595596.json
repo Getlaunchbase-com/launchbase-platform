@@ -1,9 +1,0 @@
-{
-  "query": "CREATE INDEX idx_deployments_tenant_createdAt ON deployments(tenant, createdAt)",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute CREATE INDEX idx_deployments_tenant_createdAt ON deployments(tenant, createdAt)",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 463
-}
