@@ -30,7 +30,7 @@ import {
 import { sendEmail, AdminNotifications } from "./email";
 import { trackEvent, getFunnelMetrics, getBuildQualityMetrics, getVerticalMetrics, getDailyHealth } from "./analytics";
 import { platformRouter } from "./platform-router";
-import { createSetupCheckoutSession, getCheckoutSession } from "./stripe/checkout";
+import { createSetupCheckoutSession, getCheckoutSession, createServiceCheckoutSession } from "./stripe/checkout";
 import { createSMICheckoutSession, getSMISubscriptionStatus, cancelSMISubscription } from "./stripe/intelligenceCheckout";
 import { generatePlatformGuidePDF } from "./pdfGuide";
 import { generatePreviewHTML, generateBuildPlan as generatePreviewBuildPlan } from "./previewTemplates";
@@ -1021,6 +1021,38 @@ export const appRouter = router({
           origin,
           modules: input.modules,
         });
+        return { checkoutUrl: url, sessionId };
+      }),
+
+    createServiceCheckout: publicProcedure
+      .input(z.object({
+        intakeId: z.number(),
+        email: z.string().email(),
+        name: z.string(),
+        promoCode: z.string().optional(),
+        serviceSelections: z.object({
+          website: z.boolean(),
+          emailService: z.boolean(),
+          socialMediaTier: z.enum(["LOW", "MEDIUM", "HIGH"]).nullable(),
+          enrichmentLayer: z.boolean(),
+          googleBusiness: z.boolean(),
+          quickBooksSync: z.boolean(),
+        }),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const origin = ctx.req.headers.origin || "http://localhost:3000";
+        const tenant = process.env.OWNER_NAME || "launchbase";
+        
+        const { url, sessionId } = await createServiceCheckoutSession({
+          intakeId: input.intakeId,
+          customerEmail: input.email,
+          customerName: input.name,
+          origin,
+          tenant,
+          promoCode: input.promoCode,
+          serviceSelections: input.serviceSelections,
+        });
+        
         return { checkoutUrl: url, sessionId };
       }),
 
