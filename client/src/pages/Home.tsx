@@ -406,35 +406,46 @@ export default function Home() {
               </p>
               
               <div className="mb-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <div className="text-sm text-gray-400 mb-1">Setup (one-time)</div>
+                    <div className="text-2xl font-bold text-white">$299</div>
+                    <div className="text-xs text-gray-500">Same for all tiers</div>
+                  </div>
+                  <div className="text-sm text-gray-400">
+                    Bundle with 2+ services → <span className="text-[#1ED760] font-semibold">50% off setup</span>
+                  </div>
+                </div>
+                
                 <h4 className="text-sm font-semibold text-gray-300 mb-3">Choose your posting volume:</h4>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-white/10">
                         <th className="text-left py-3 px-4 text-gray-400 font-medium">Posts per month</th>
-                        <th className="text-right py-3 px-4 text-gray-400 font-medium">Setup</th>
                         <th className="text-right py-3 px-4 text-gray-400 font-medium">Monthly</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr className="border-b border-white/5">
                         <td className="py-3 px-4 text-white">4 posts</td>
-                        <td className="text-right py-3 px-4 text-white">$149</td>
-                        <td className="text-right py-3 px-4 text-white">$59</td>
+                        <td className="text-right py-3 px-4 text-white">$79</td>
                       </tr>
                       <tr className="border-b border-white/5">
                         <td className="py-3 px-4 text-white">8 posts</td>
-                        <td className="text-right py-3 px-4 text-white">$199</td>
-                        <td className="text-right py-3 px-4 text-white">$99</td>
+                        <td className="text-right py-3 px-4 text-white">$129</td>
                       </tr>
                       <tr>
                         <td className="py-3 px-4 text-white">12 posts</td>
-                        <td className="text-right py-3 px-4 text-white">$249</td>
-                        <td className="text-right py-3 px-4 text-white">$149</td>
+                        <td className="text-right py-3 px-4 text-white">$179</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
+                
+                <p className="text-xs text-gray-500 mt-3">
+                  Setup includes account connection, safety rules, brand voice, and approval workflow.
+                </p>
               </div>
               
               <ul className="space-y-2 mb-6 text-sm text-gray-300">
