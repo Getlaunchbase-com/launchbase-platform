@@ -509,3 +509,11 @@
 - [x] Test alert with fake missing column
 - [x] Verify email sent to ADMIN_EMAILS with correct subject/body
 - [x] Verify dedupe works (second call doesn't create duplicate alert)
+
+## Session Jan 9, 2026 - Fix Preview Email & Payment Flow
+- [x] Fix #1: Change preview email link from relative to absolute URL (4 locations fixed)
+- [x] Fix #2: Add "Approve & Pay" button to CustomerPreview page (TEMPORARY BRIDGE)
+- [ ] Verify createServiceCheckout endpoint returns checkoutUrl
+- [ ] Test: Preview email link opens correctly on mobile
+- [ ] Test: Approve & Pay button redirects to Stripe
+- [ ] Test: After payment, preview shows paid state

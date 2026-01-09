@@ -95,8 +95,20 @@ export default function CustomerPreview() {
   // Log approval event
   const logApprovalMutation = trpc.intake.logApproval.useMutation();
 
-  // Create checkout session
+  // Create checkout session (old modules-based)
   const checkoutMutation = trpc.payment.createCheckout.useMutation({
+    onSuccess: (data) => {
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      }
+    },
+    onError: (error) => {
+      toast.error("Failed to start checkout: " + error.message);
+    },
+  });
+
+  // Create service checkout session (new service-based)
+  const serviceCheckoutMutation = trpc.payment.createServiceCheckout.useMutation({
     onSuccess: (data) => {
       if (data.checkoutUrl) {
         window.location.href = data.checkoutUrl;
@@ -330,6 +342,53 @@ export default function CustomerPreview() {
                     <ExternalLink className="h-4 w-4 mr-2" />
                     Open Full Preview
                   </Button>
+                )}
+
+                {/* TEMPORARY BRIDGE: Approve & Pay button for legacy intakes */}
+                {/* This allows payment for intakes that already received previews */}
+                {/* REMOVE after webhook-only preview generation is enforced */}
+                {!isPaid && (intake as any).previewHTML && (
+                  <div className="mt-6 p-4 border-t">
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Approve your site and complete payment to proceed with launch.
+                    </p>
+                    <Button
+                      onClick={() => {
+                        // Map old rawPayload to new serviceSelections format
+                        const rawPayload = intake.rawPayload as any;
+                        const serviceSelections = {
+                          website: true, // Always true for legacy intakes
+                          emailService: true, // Always required with website
+                          socialMediaTier: rawPayload?.cadence ? (rawPayload.cadence as "LOW" | "MEDIUM" | "HIGH") : null,
+                          enrichmentLayer: false, // Not in old flow
+                          googleBusiness: false, // Not in old flow
+                          quickBooksSync: false, // Not in old flow
+                        };
+                        
+                        serviceCheckoutMutation.mutate({
+                          intakeId: intake.id,
+                          email: intake.email,
+                          name: intake.contactName || intake.businessName,
+                          serviceSelections,
+                        });
+                      }}
+                      disabled={serviceCheckoutMutation.isPending}
+                      className="w-full bg-orange-500 hover:bg-orange-600"
+                      size="lg"
+                    >
+                      {serviceCheckoutMutation.isPending ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Redirecting to payment...
+                        </>
+                      ) : (
+                        <>
+                          Approve & Pay
+                          <ArrowRight className="h-4 w-4 ml-2" />
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 )}
 
                 {/* Business Overview */}
