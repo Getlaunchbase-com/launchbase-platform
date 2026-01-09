@@ -354,22 +354,9 @@ export default function CustomerPreview() {
                     </p>
                     <Button
                       onClick={() => {
-                        // Map old rawPayload to new serviceSelections format
-                        const rawPayload = intake.rawPayload as any;
-                        const serviceSelections = {
-                          website: true, // Always true for legacy intakes
-                          emailService: true, // Always required with website
-                          socialMediaTier: rawPayload?.cadence ? (rawPayload.cadence as "LOW" | "MEDIUM" | "HIGH") : null,
-                          enrichmentLayer: false, // Not in old flow
-                          googleBusiness: false, // Not in old flow
-                          quickBooksSync: false, // Not in old flow
-                        };
-                        
+                        // Server derives service selections from intake.rawPayload
                         serviceCheckoutMutation.mutate({
                           intakeId: intake.id,
-                          email: intake.email,
-                          name: intake.contactName || intake.businessName,
-                          serviceSelections,
                         });
                       }}
                       disabled={serviceCheckoutMutation.isPending}

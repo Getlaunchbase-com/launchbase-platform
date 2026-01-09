@@ -1119,6 +1119,59 @@ export const appRouter = router({
         return { checkoutUrl: url, sessionId };
       }),
 
+    /**
+     * Create checkout from intake - server derives service selections
+     * This is the single source of truth for payment creation
+     */
+    createServiceCheckoutFromIntake: publicProcedure
+      .input(z.object({
+        intakeId: z.number(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const origin = ctx.req.headers.origin || "http://localhost:3000";
+        const tenant = process.env.OWNER_NAME || "launchbase";
+        
+        // Load intake
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        const [intake] = await db.select().from(intakes).where(eq(intakes.id, input.intakeId));
+        if (!intake) {
+          throw new Error("Intake not found");
+        }
+        
+        // Derive service selections from intake.rawPayload (best-effort)
+        const rawPayload = (intake.rawPayload as Record<string, unknown>) || {};
+        
+        // Conservative inference: default to false/null if uncertain
+        const serviceSelections = {
+          website: rawPayload.website === true || rawPayload.websiteStatus !== "systems_only",
+          emailService: rawPayload.emailService === true || rawPayload.website === true, // Email required with website
+          socialMediaTier: (rawPayload.socialMediaTier as "LOW" | "MEDIUM" | "HIGH" | null) || null,
+          enrichmentLayer: rawPayload.enrichmentLayer === true,
+          googleBusiness: rawPayload.googleBusiness === true,
+          quickBooksSync: rawPayload.quickBooksSync === true,
+        };
+        
+        // Get promo code from rawPayload if exists
+        const promoCode = typeof rawPayload.promoCode === "string" ? rawPayload.promoCode : undefined;
+        
+        const { url, sessionId } = await createServiceCheckoutSession({
+          intakeId: input.intakeId,
+          customerEmail: intake.email,
+          customerName: intake.contactName,
+          origin,
+          tenant,
+          promoCode,
+          serviceSelections,
+        });
+        
+        return { checkoutUrl: url, sessionId };
+      }),
+
+    /**
+     * Legacy endpoint - kept for backward compatibility
+     * New code should use createServiceCheckoutFromIntake
+     */
     createServiceCheckout: publicProcedure
       .input(z.object({
         intakeId: z.number(),

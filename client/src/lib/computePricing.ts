@@ -98,8 +98,8 @@ export function computePricing(input: PricingInput): PricingOutput {
     (hasQb ? 1 : 0) +
     (hasEmail ? 1 : 0);
 
-  // Setup line items
-  const setupLineItems: MoneyLine[] = [];
+  // Setup line items (use let because founder pricing may replace entire array)
+  let setupLineItems: MoneyLine[] = [];
   if (hasWebsite) setupLineItems.push({ key: "setup_website", label: "Website setup", amountCents: PRICES.setup.website });
   if (hasEmail) setupLineItems.push({ key: "setup_email", label: "Email setup", amountCents: PRICES.setup.email });
   if (hasSocial) setupLineItems.push({ key: "setup_social", label: "Social Media setup", amountCents: PRICES.setup.social });
@@ -107,7 +107,7 @@ export function computePricing(input: PricingInput): PricingOutput {
   if (hasGmb) setupLineItems.push({ key: "setup_gmb", label: "Google Business setup", amountCents: PRICES.setup.gmb });
   if (hasQb) setupLineItems.push({ key: "setup_qb", label: "QuickBooks sync setup", amountCents: PRICES.setup.qb });
 
-  const setupSubtotalCents = setupLineItems.reduce((sum, li) => sum + li.amountCents, 0);
+  let setupSubtotalCents = setupLineItems.reduce((sum, li) => sum + li.amountCents, 0);
 
   // Bundle discount: 50% off Social Media setup when 2+ services selected
   let setupDiscountCents = 0;
@@ -119,15 +119,12 @@ export function computePricing(input: PricingInput): PricingOutput {
 
   // Founder promo: $300 flat setup overrides all setup fees
   if (isFounder(input)) {
-    // Founder override ignores other discounts by definition.
-    // We still compute them above for transparency, but final total is forced.
-    // Discount = subtotal - $300, but never negative (if subtotal < $300, no discount)
-    if (setupSubtotalCents > 30000) {
-      setupDiscountCents = setupSubtotalCents - 30000; // makes total exactly $300
-    } else {
-      setupDiscountCents = 0; // subtotal already <= $300, no discount needed
-    }
-    notes.push("Founder pricing applied: $300 flat setup.");
+    // Founder override: replace all setup line items with single $300 flat fee
+    // This prevents negative discount issues in Stripe
+    setupLineItems = [{ key: "founder_setup", label: "Beta Founder Setup", amountCents: 30000 }];
+    setupSubtotalCents = 30000;
+    setupDiscountCents = 0;
+    notes.push("Founder pricing applied: $300 flat setup (all services included).");
   }
 
   const setupTotalCents = Math.max(0, setupSubtotalCents - setupDiscountCents);
