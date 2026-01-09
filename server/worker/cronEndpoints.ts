@@ -23,6 +23,7 @@ import { getHealthMetrics } from "../health";
 import { getDb } from "../db";
 import { sql } from "drizzle-orm";
 import { randomUUID } from "crypto";
+import { checkWorkerSchema, buildMeta } from "../schemaGuard";
 
 // Worker secret token - MUST be set in environment for production
 const WORKER_TOKEN = process.env.WORKER_TOKEN;
@@ -118,6 +119,20 @@ async function finishWorkerRun(
  * Delegates to existing worker logic with best-effort logging
  */
 export async function handleCronRunNextDeploy(req: Request, res: Response) {
+  // Check schema before running worker logic
+  const schema = await checkWorkerSchema();
+  if (!schema.ok) {
+    console.warn("[Cron] Schema out of date, skipping run-next-deploy", schema.missing);
+    return res.status(200).json({
+      success: true,
+      skipped: true,
+      reason: "schema_out_of_date",
+      schemaKey: schema.schemaKey,
+      missingColumns: schema.missing,
+      ...buildMeta(),
+    });
+  }
+  
   const db = await getDb();
   
   const runId = await startWorkerRun("run-next-deploy");
@@ -161,6 +176,20 @@ export async function handleCronRunNextDeploy(req: Request, res: Response) {
  * Delegates to existing worker logic
  */
 export async function handleCronAutoAdvance(req: Request, res: Response) {
+  // Check schema before running worker logic
+  const schema = await checkWorkerSchema();
+  if (!schema.ok) {
+    console.warn("[Cron] Schema out of date, skipping auto-advance", schema.missing);
+    return res.status(200).json({
+      success: true,
+      skipped: true,
+      reason: "schema_out_of_date",
+      schemaKey: schema.schemaKey,
+      missingColumns: schema.missing,
+      ...buildMeta(),
+    });
+  }
+  
   // Delegate to the existing worker logic (single code path)
   return handleAutoAdvanceWorker(req, res);
 }
@@ -256,8 +285,7 @@ export async function handleCronAlerts(req: Request, res: Response) {
     
     res.status(200).json({
       success: true,
-      buildId: process.env.RENDER_GIT_COMMIT || new Date().toISOString(),
-      serverTime: new Date().toISOString(),
+      ...buildMeta(),
       ...aggregateStats,
     });
   } catch (e: any) {
