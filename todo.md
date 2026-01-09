@@ -464,3 +464,16 @@
 - [ ] Update setIntakeStatus to write audit events to DB table
 - [ ] Add Status history timeline to admin intake detail page (optional)
 - [ ] Add tests: reject invalid transition, override requires reason
+
+## Complete Audit Logging - Jan 8, 2026
+- [x] Add intake_status_events table to schema
+- [x] Fix Drizzle migration history (marked 0010-0012 as applied)
+- [x] Run migration to create table (0013_nappy_zaladane)
+- [x] Update setIntakeStatus to write events after successful transitions
+- [x] Add intakeStatusEvents import to db.ts
+- [x] Add meta field to SetStatusOptions type
+- [x] Add test: reject invalid transition (new → approved) - written, pending test DB setup
+- [x] Add test: override requires overrideReason - written, pending test DB setup
+- [x] Add test: verify event row created for successful transition - written, pending test DB setup
+- [ ] Fix test DB setup (test DB URL mismatch with global setup)
+- [ ] Wire admin UI status updates with reason/override inputs (optional)
