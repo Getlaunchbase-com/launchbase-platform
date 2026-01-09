@@ -3,6 +3,7 @@ import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, users,
   intakes, InsertIntake, Intake,
+  intakeStatusEvents, InsertIntakeStatusEvent,
   buildPlans, InsertBuildPlan, BuildPlan,
   clarifications, InsertClarification, Clarification,
   deployments, InsertDeployment, Deployment,
@@ -197,6 +198,7 @@ type SetStatusOptions = {
   override?: boolean;
   overrideReason?: string;
   reason?: string;
+  meta?: Record<string, unknown> | null;
 };
 
 type SetStatusResult =
@@ -262,7 +264,19 @@ export async function setIntakeStatus(
     .set({ status: to, updatedAt: new Date() })
     .where(eq(intakes.id, intakeId));
 
-  // Log status change (will be replaced with DB audit table later)
+  // Write audit event (append-only)
+  await db.insert(intakeStatusEvents).values({
+    intakeId,
+    fromStatus: from,
+    toStatus: to,
+    actorType: opts.actorType,
+    actorId: opts.actorId || null,
+    reason: overridden ? (opts.overrideReason || "") : (opts.reason || ""),
+    override: overridden ? 1 : 0,
+    meta: opts.meta || null,
+  });
+
+  // Also log to console for immediate visibility
   console.log(
     `[Database] Status change: intake ${intakeId}: ${from} → ${to} ` +
     `(actor: ${opts.actorType}${opts.actorId ? ` #${opts.actorId}` : ""}, ` +

@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, json, boolean, uniqueIndex } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, json, boolean, uniqueIndex, index } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -1063,3 +1063,55 @@ export const promoRedemptions = mysqlTable("promo_redemptions", {
 }, (table) => ({
   uniqueFounder: uniqueIndex("unique_founder").on(table.promoCodeId, table.founderNumber),
 }));
+
+/**
+ * Intake status change audit log (append-only)
+ */
+export const intakeStatusEvents = mysqlTable(
+  "intake_status_events",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    intakeId: int("intakeId").notNull(),
+
+    fromStatus: mysqlEnum("fromStatus", [
+      "new",
+      "review",
+      "needs_info",
+      "ready_for_review",
+      "approved",
+      "paid",
+      "deployed",
+    ]).notNull(),
+
+    toStatus: mysqlEnum("toStatus", [
+      "new",
+      "review",
+      "needs_info",
+      "ready_for_review",
+      "approved",
+      "paid",
+      "deployed",
+    ]).notNull(),
+
+    actorType: mysqlEnum("actorType", ["system", "admin", "customer"]).notNull(),
+    actorId: varchar("actorId", { length: 191 }), // nullable; e.g. admin user id/email
+
+    reason: varchar("reason", { length: 512 }).notNull(),
+    override: int("override").notNull().default(0), // 0/1 for mysql friendliness
+    meta: json("meta").$type<Record<string, unknown>>(), // optional extra context (ip, ui surface, etc.)
+
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    intakeCreatedIdx: index("idx_intake_status_events_intake_created").on(
+      t.intakeId,
+      t.createdAt
+    ),
+    toStatusIdx: index("idx_intake_status_events_toStatus_created").on(
+      t.toStatus,
+      t.createdAt
+    ),
+  })
+);
+export type IntakeStatusEvent = typeof intakeStatusEvents.$inferSelect;
+export type InsertIntakeStatusEvent = typeof intakeStatusEvents.$inferInsert;
