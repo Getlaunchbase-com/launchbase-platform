@@ -483,3 +483,13 @@
 - [x] Add test: verify event row created for successful transition - written, pending test DB setup
 - [ ] Fix test DB setup (test DB URL mismatch with global setup)
 - [ ] Wire admin UI status updates with reason/override inputs (optional)
+
+## Session Jan 9, 2026 - Alert System FOREVER Tests
+- [x] Write test: Cooldown/dedupe (same fingerprint → 1 email only)
+- [x] Write test: Tenant isolation (vinces ≠ launchbase)
+- [x] Write test: Auto-resolve (condition clears → alert resolves)
+- [x] Write test: Auth (reject missing/invalid WORKER_TOKEN) - Already covered in cron-alerts-auth.test.ts
+- [x] Write test: Rate limit (back-to-back calls → skipped) - Already covered in cron-alerts-auth.test.ts
+- [x] Verify all tests are 100% deterministic (no time-based flakes)
+- [x] Fix production bug: resolve logic now runs even when no candidates exist
+- [x] All 9 alert FOREVER tests passing

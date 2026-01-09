@@ -294,42 +294,40 @@ export async function processAlerts(snapshot: HealthSnapshot): Promise<AlertsRun
   // Resolve alerts that are no longer active
   const activeFingerprints = candidates.map((c) => c.fingerprint);
 
-  if (activeFingerprints.length > 0) {
-    // Find all active alerts for this tenant that are NOT in the current candidate list
-    const activeAlerts = await db
-      .select()
-      .from(alertEvents)
-      .where(
-        and(
-          eq(alertEvents.tenant, snapshot.tenant),
-          eq(alertEvents.status, "active"),
-          isNull(alertEvents.resolvedAt)
-        )
+  // Find all active alerts for this tenant that are NOT in the current candidate list
+  const activeAlerts = await db
+    .select()
+    .from(alertEvents)
+    .where(
+      and(
+        eq(alertEvents.tenant, snapshot.tenant),
+        eq(alertEvents.status, "active"),
+        isNull(alertEvents.resolvedAt)
+      )
+    );
+
+  for (const alert of activeAlerts) {
+    if (!activeFingerprints.includes(alert.fingerprint)) {
+      // This alert is no longer active - resolve it
+      await db
+        .update(alertEvents)
+        .set({
+          status: "resolved",
+          resolvedAt: now,
+        })
+        .where(eq(alertEvents.id, alert.id));
+
+      stats.resolved++;
+      stats.alerts.push({
+        tenant: snapshot.tenant,
+        alertType: alert.alertKey,
+        action: "resolved",
+        fingerprint: alert.fingerprint,
+      });
+
+      console.log(
+        `[Alerts] Resolved alert: ${alert.alertKey} (${alert.fingerprint})`
       );
-
-    for (const alert of activeAlerts) {
-      if (!activeFingerprints.includes(alert.fingerprint)) {
-        // This alert is no longer active - resolve it
-        await db
-          .update(alertEvents)
-          .set({
-            status: "resolved",
-            resolvedAt: now,
-          })
-          .where(eq(alertEvents.id, alert.id));
-
-        stats.resolved++;
-        stats.alerts.push({
-          tenant: snapshot.tenant,
-          alertType: alert.alertKey,
-          action: "resolved",
-          fingerprint: alert.fingerprint,
-        });
-
-        console.log(
-          `[Alerts] Resolved alert: ${alert.alertKey} (${alert.fingerprint})`
-        );
-      }
     }
   }
 
