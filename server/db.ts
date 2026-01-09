@@ -21,6 +21,12 @@ let _db: ReturnType<typeof drizzle> | null = null;
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
+      // Debug logging for test DB verification
+      if (process.env.NODE_ENV === 'test') {
+        const url = new URL(process.env.DATABASE_URL);
+        const dbName = url.pathname.replace(/^\//,'');
+        console.log('[DB] Connecting to database:', dbName);
+      }
       _db = drizzle(process.env.DATABASE_URL);
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
