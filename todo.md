@@ -493,3 +493,12 @@
 - [x] Verify all tests are 100% deterministic (no time-based flakes)
 - [x] Fix production bug: resolve logic now runs even when no candidates exist
 - [x] All 9 alert FOREVER tests passing
+
+## Session Jan 9, 2026 - Worker Endpoint Production Safeguards
+- [x] Create schema guard helper (server/schemaGuard.ts)
+- [x] Add schema guard to /api/cron/run-next-deploy
+- [x] Add schema guard to /api/cron/auto-advance
+- [x] Add buildId + schemaKey to all worker responses
+- [x] Verify schema guard implementation (all required columns exist in production)
+- [ ] Update cron-job.org: slow auto-advance to */5 (from */2) - User action required
+- [ ] Bonus: Add alert on schema_out_of_date condition
