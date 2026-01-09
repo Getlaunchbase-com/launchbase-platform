@@ -1026,3 +1026,74 @@ expect(metrics.stripeWebhooks.isStale).toBe(true);
 ```
 
 This prevents ops alert spam during beta/low-traffic periods.
+
+
+---
+
+## Test Database Setup
+
+### ❌ MISTAKE: Relying on migration history without rebuilding schema
+
+**What we did wrong:**
+- Migrations marked as "applied" in `__drizzle_migrations` table
+- But actual CREATE TABLE / ALTER TABLE statements never ran
+- Tests failed with "table doesn't exist" or "unknown column" errors
+- Manual patching with ALTER statements created more drift
+- Mixed `drizzle-kit push` and `drizzle-kit migrate` workflows
+
+**Why it's wrong:**
+- Schema drift between migration history and actual database state
+- "Ghost migrations" where history says applied but tables/columns missing
+- Tests fail unpredictably when schema changes
+- Manual fixes create technical debt
+- No single source of truth for database schema
+
+**✅ CORRECT PATTERN: Rebuild test database on every test run**
+
+```typescript
+// vitest.global-setup.ts
+import { execSync } from "node:child_process";
+import mysql from "mysql2/promise";
+
+export default async function globalSetup() {
+  const databaseUrl = process.env.DATABASE_URL;
+  const url = new URL(databaseUrl);
+  const dbName = url.pathname.replace(/^\//, '');
+  
+  // Connection URL without database selection
+  const connectionUrl = `${url.protocol}//${url.username}:${url.password}@${url.host}${url.search}`;
+  
+  const conn = await mysql.createConnection(connectionUrl);
+  
+  // Drop and recreate database for clean slate
+  await conn.query(`DROP DATABASE IF EXISTS \`${dbName}\``);
+  await conn.query(`CREATE DATABASE \`${dbName}\``);
+  await conn.end();
+  
+  // Run migrations against fresh database
+  execSync("pnpm -s drizzle-kit migrate", { stdio: "inherit" });
+}
+```
+
+**Benefits:**
+- ✅ No schema drift - every test run starts clean
+- ✅ Migrations actually run - no ghost migrations
+- ✅ `__drizzle_migrations` matches reality
+- ✅ Tests are deterministic and reproducible
+- ✅ Schema changes are validated immediately
+
+**Tradeoffs:**
+- Test duration increases (~2s → ~25s for full rebuild)
+- But this is the correct tradeoff for reliability
+- Production platforms rebuild test DBs on every CI run
+
+**Rule:** Test databases must be rebuilt from scratch on every test run. Never rely on existing migration history. Never manually patch test schemas with ALTER statements.
+
+**Reference:** `vitest.global-setup.ts`, `vitest.setup.ts`
+
+**Forever Contract:**
+1. Use `drizzle-kit migrate` for all schema changes (never `push` in tests)
+2. Drop and recreate test database before migrations
+3. Never manually ALTER test database tables
+4. If tests fail with "table doesn't exist" or "unknown column", check that migrations ran successfully - don't patch manually
+

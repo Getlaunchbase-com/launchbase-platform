@@ -1,5 +1,11 @@
 # LaunchBase TODO
 
+## Session Jan 9, 2026 - Test Database Setup Fix
+- [x] Implement robust test database setup with schema rebuild on each test run
+- [x] Update vitest.global-setup.ts to DROP/CREATE database before migrations
+- [x] Document test database pattern in NEVER_AGAIN.md
+- [x] Verify all setIntakeStatus tests pass (4/4 passing)
+
 ## Session Jan 8, 2026 - Alert System Auth Hardening
 - [x] Add WORKER_TOKEN verification to /api/cron/alerts endpoint
 - [x] Add rate limiting (60s minimum interval) to prevent double-fires
