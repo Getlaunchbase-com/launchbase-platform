@@ -121,8 +121,12 @@ export function computePricing(input: PricingInput): PricingOutput {
   if (isFounder(input)) {
     // Founder override ignores other discounts by definition.
     // We still compute them above for transparency, but final total is forced.
-    setupDiscountCents = setupSubtotalCents - 30000; // makes total exactly 300
-    if (setupDiscountCents < 0) setupDiscountCents = 0; // safety
+    // Discount = subtotal - $300, but never negative (if subtotal < $300, no discount)
+    if (setupSubtotalCents > 30000) {
+      setupDiscountCents = setupSubtotalCents - 30000; // makes total exactly $300
+    } else {
+      setupDiscountCents = 0; // subtotal already <= $300, no discount needed
+    }
     notes.push("Founder pricing applied: $300 flat setup.");
   }
 

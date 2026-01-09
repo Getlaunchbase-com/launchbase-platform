@@ -44,6 +44,12 @@ import { notifyOwner } from "./_core/notification";
 import { getHealthMetrics } from "./health";
 import { checkFacebookPostingPolicy } from "./services/facebook-policy";
 
+// App base URL for absolute links in emails
+const APP_URL = 
+  process.env.PUBLIC_BASE_URL ??
+  process.env.APP_URL ??
+  "https://launchbase-h86jcadp.manus.space";
+
 // Generate a hash of the build plan for version locking
 function generateBuildPlanHash(buildPlan: { id: number; plan: unknown }): string {
   const content = JSON.stringify({
@@ -447,7 +453,7 @@ export const appRouter = router({
               firstName,
               businessName: intake.businessName,
               email: intake.email,
-              previewUrl: `/preview/${previewToken}`,
+              previewUrl: `${APP_URL}/preview/${previewToken}`,
               language: intake.language as any,
               audience: intake.audience as any,
             });
@@ -539,7 +545,7 @@ export const appRouter = router({
             firstName,
             businessName: intake.businessName,
             email: intake.email,
-            previewUrl: `/preview/${intake.previewToken}`,
+            previewUrl: `${APP_URL}/preview/${intake.previewToken}`,
             language: intake.language as any,
             audience: intake.audience as any,
           });
@@ -1909,7 +1915,7 @@ export const appRouter = router({
               firstName: input.contact.name.split(" ")[0],
               businessName: input.contact.name,
               email: input.contact.email,
-              previewUrl: `/preview/${intakePreviewToken}`,
+              previewUrl: `${APP_URL}/preview/${intakePreviewToken}`,
               language: intake.language as any,
               audience: intake.audience as any,
             }
@@ -2153,7 +2159,7 @@ export const appRouter = router({
               firstName: app.contactName.split(" ")[0],
               businessName: input.businessName,
               email: app.contactEmail,
-              previewUrl: `/preview/${previewToken}`,
+              previewUrl: `${APP_URL}/preview/${previewToken}`,
               language: intake.language as any,
               audience: intake.audience as any,
             }
