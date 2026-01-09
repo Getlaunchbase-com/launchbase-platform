@@ -517,3 +517,13 @@
 - [ ] Test: Preview email link opens correctly on mobile
 - [ ] Test: Approve & Pay button redirects to Stripe
 - [ ] Test: After payment, preview shows paid state
+
+## Payment Flow Fix - Jan 9, 2026
+- [x] Create payment.createServiceCheckoutFromIntake endpoint (accepts intakeId only)
+- [x] Implement server-side service selection inference from intake.rawPayload
+- [x] Fix founder pricing to create single $300 line item (not negative discount)
+- [x] Update CustomerPreview to call new endpoint instead of manual mapping
+- [x] Test payment flow with legacy intake (Stripe URL generated successfully)
+- [ ] Test payment flow with new intake (complete onboarding → payment)
+- [x] Verify Stripe checkout shows correct amounts ($598 for Website + Email)
+- [ ] Verify webhook marks intake as paid after successful payment
