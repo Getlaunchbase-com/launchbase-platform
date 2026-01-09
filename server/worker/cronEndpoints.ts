@@ -24,6 +24,7 @@ import { getDb } from "../db";
 import { sql } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import { checkWorkerSchema, buildMeta } from "../schemaGuard";
+import { alertSchemaOutOfDate } from "../schemaOutOfDateAlert";
 
 // Worker secret token - MUST be set in environment for production
 const WORKER_TOKEN = process.env.WORKER_TOKEN;
@@ -123,13 +124,24 @@ export async function handleCronRunNextDeploy(req: Request, res: Response) {
   const schema = await checkWorkerSchema();
   if (!schema.ok) {
     console.warn("[Cron] Schema out of date, skipping run-next-deploy", schema.missing);
+    
+    // Send ops alert (deduped)
+    const meta = buildMeta();
+    await alertSchemaOutOfDate({
+      endpoint: "/api/cron/run-next-deploy",
+      schemaKey: schema.schemaKey,
+      missingColumns: schema.missing,
+      buildId: meta.buildId,
+      serverTime: meta.serverTime,
+    });
+    
     return res.status(200).json({
       success: true,
       skipped: true,
       reason: "schema_out_of_date",
       schemaKey: schema.schemaKey,
       missingColumns: schema.missing,
-      ...buildMeta(),
+      ...meta,
     });
   }
   
@@ -180,13 +192,24 @@ export async function handleCronAutoAdvance(req: Request, res: Response) {
   const schema = await checkWorkerSchema();
   if (!schema.ok) {
     console.warn("[Cron] Schema out of date, skipping auto-advance", schema.missing);
+    
+    // Send ops alert (deduped)
+    const meta = buildMeta();
+    await alertSchemaOutOfDate({
+      endpoint: "/api/cron/auto-advance",
+      schemaKey: schema.schemaKey,
+      missingColumns: schema.missing,
+      buildId: meta.buildId,
+      serverTime: meta.serverTime,
+    });
+    
     return res.status(200).json({
       success: true,
       skipped: true,
       reason: "schema_out_of_date",
       schemaKey: schema.schemaKey,
       missingColumns: schema.missing,
-      ...buildMeta(),
+      ...meta,
     });
   }
   

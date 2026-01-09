@@ -502,3 +502,10 @@
 - [x] Verify schema guard implementation (all required columns exist in production)
 - [ ] Update cron-job.org: slow auto-advance to */5 (from */2) - User action required
 - [ ] Bonus: Add alert on schema_out_of_date condition
+
+## Session Jan 9, 2026 - Schema Out of Date Alert
+- [x] Create schema_out_of_date alert helper with 60-min dedupe
+- [x] Integrate alert into worker endpoints (run-next-deploy, auto-advance)
+- [x] Test alert with fake missing column
+- [x] Verify email sent to ADMIN_EMAILS with correct subject/body
+- [x] Verify dedupe works (second call doesn't create duplicate alert)

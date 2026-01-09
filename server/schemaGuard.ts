@@ -58,13 +58,18 @@ export async function checkWorkerSchema(): Promise<SchemaGuardResult> {
   }
 
   // Query information_schema for deployments columns
-  const rows = await db.execute(sql`
+  const queryResult = await db.execute(sql`
     SELECT column_name
     FROM information_schema.columns
     WHERE table_schema = DATABASE()
       AND table_name = 'deployments'
   `);
 
+  // Drizzle's execute() returns [[{...}]] - double-nested array
+  const rows = Array.isArray(queryResult) && queryResult.length > 0 && Array.isArray(queryResult[0]) 
+    ? queryResult[0] 
+    : queryResult;
+  
   // Normalize column names (MySQL returns different cases)
   const cols = new Set(
     (rows as any[]).map((r: any) => r.column_name ?? r.COLUMN_NAME).filter(Boolean)
