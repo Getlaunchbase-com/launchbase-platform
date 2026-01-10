@@ -307,13 +307,14 @@ export default function CustomerPreview() {
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Live Preview */}
-                <div className="aspect-video bg-muted rounded-lg overflow-hidden border">
+                <div className="w-full aspect-[9/16] md:aspect-video bg-muted rounded-lg overflow-hidden border">
                   {(intake as any).previewHTML ? (
                     <iframe 
                       srcDoc={(intake as any).previewHTML}
-                      className="w-full h-full"
+                      className="w-full h-full pointer-events-none md:pointer-events-auto"
                       title="Website Preview"
-                      sandbox="allow-same-origin"
+                      sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
+                      referrerPolicy="no-referrer"
                     />
                   ) : (
                     <div className="flex items-center justify-center h-full text-center p-8">
@@ -328,27 +329,31 @@ export default function CustomerPreview() {
                 </div>
 
                 {(intake as any).previewHTML && (
-                  <Button 
-                    variant="outline" 
-                    className="w-full"
-                    onClick={() => {
-                      const newWindow = window.open('', '_blank');
-                      if (newWindow) {
-                        newWindow.document.write((intake as any).previewHTML);
-                        newWindow.document.close();
-                      }
-                    }}
-                  >
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    Open Full Preview
-                  </Button>
+                  <div className="space-y-2">
+                    <Button 
+                      variant="default" 
+                      size="lg"
+                      className="w-full h-12 text-base"
+                      onClick={() => {
+                        const newWindow = window.open('', '_blank');
+                        if (newWindow) {
+                          newWindow.document.write((intake as any).previewHTML);
+                          newWindow.document.close();
+                        }
+                      }}
+                    >
+                      <ExternalLink className="h-5 w-5 mr-2" />
+                      Open Full Preview
+                    </Button>
+                    <p className="text-xs text-center text-muted-foreground">Tap to interact (best on mobile)</p>
+                  </div>
                 )}
 
                 {/* TEMPORARY BRIDGE: Approve & Pay button for legacy intakes */}
                 {/* This allows payment for intakes that already received previews */}
                 {/* REMOVE after webhook-only preview generation is enforced */}
                 {!isPaid && (intake as any).previewHTML && (
-                  <div className="mt-6 p-4 border-t">
+                  <div className="mt-6 p-4 border-t md:block hidden">
                     <p className="text-sm text-muted-foreground mb-4">
                       Approve your site and complete payment to proceed with launch.
                     </p>
@@ -982,6 +987,34 @@ export default function CustomerPreview() {
           Questions? Email support@launchbase.com
         </p>
       </main>
+
+      {/* Sticky Mobile CTA - Only show on mobile when not paid and preview exists */}
+      {!isPaid && (intake as any).previewHTML && (
+        <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] backdrop-blur-lg bg-background/90 border-t border-border/40 z-50">
+          <Button
+            size="lg"
+            className="w-full h-12 text-base"
+            onClick={() => {
+              serviceCheckoutMutation.mutate({
+                intakeId: intake.id,
+              });
+            }}
+            disabled={serviceCheckoutMutation.isPending}
+          >
+            {serviceCheckoutMutation.isPending ? (
+              <>
+                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              <>
+                <CreditCard className="h-5 w-5 mr-2" />
+                Approve & Pay
+              </>
+            )}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

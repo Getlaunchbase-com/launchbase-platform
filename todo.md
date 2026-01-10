@@ -553,3 +553,12 @@
 - [ ] Write tests for all confidence scenarios
 - [ ] Test complete loop: Ask → Customer replies → Apply → Confirm
 - [ ] Add maintenance triggers (data drift, platform changes, customer requests)
+
+## Mobile Preview Optimization - Jan 10, 2026
+- [x] Add viewport-fit=cover for iOS safe areas
+- [x] Change iframe aspect ratio to 9:16 on mobile (mobile-shaped preview)
+- [x] Disable pointer events on mobile iframe (prevents scroll confusion)
+- [x] Make "Open Full Preview" button prominent and primary
+- [x] Add sticky "Approve & Pay" CTA at bottom with safe-area padding
+- [x] Add responsive typography and prevent horizontal overflow
+- [x] Test complete customer flow: onboard → preview → approve → pay - WORKS END-TO-END!
