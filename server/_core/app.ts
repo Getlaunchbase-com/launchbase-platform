@@ -55,6 +55,8 @@ export async function createApp(): Promise<Express> {
   app.post("/api/cron/run-next-deploy", handleCronRunNextDeploy);
   app.post("/api/cron/auto-advance", handleCronAutoAdvance);
   app.post("/api/cron/alerts", handleCronAlerts);
+  const { handleDiagnostic } = await import("../api.diagnostic");
+  app.get("/api/diagnostic", handleDiagnostic);
   app.post("/api/cron/action-requests", handleCronActionRequests);
   
   // Explicit 405 for GET (prevents false success / SPA fallthrough confusion)

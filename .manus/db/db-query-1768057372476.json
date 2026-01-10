@@ -1,0 +1,16 @@
+{
+  "query": "SELECT eventType, reason, meta, createdAt\nFROM action_request_events\nORDER BY createdAt DESC\nLIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT eventType, reason, meta, createdAt\nFROM action_request_events\nORDER BY createdAt DESC\nLIMIT 1;",
+  "rows": [
+    {
+      "eventType": "PREVIEW_VIEWED",
+      "reason": "NULL",
+      "meta": "{\"checklistKey\": \"homepage.headline\", \"previewToken\": \"action_1768033533380_ad86b4ba9df53dec\"}",
+      "createdAt": "2026-01-10 08:25:33"
+    }
+  ],
+  "messages": [],
+  "stdout": "eventType\treason\tmeta\tcreatedAt\nPREVIEW_VIEWED\tNULL\t{\"checklistKey\": \"homepage.headline\", \"previewToken\": \"action_1768033533380_ad86b4ba9df53dec\"}\t2026-01-10 08:25:33\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

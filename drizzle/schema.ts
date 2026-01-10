@@ -195,6 +195,7 @@ export const actionRequestEvents = mysqlTable("action_request_events", {
     "ADMIN_UNLOCK",
     "ADMIN_EXPIRE",
     "ESCALATED",
+  "SEND_FAILED",
     "PREVIEW_VIEWED",
     "PROPOSED_PREVIEW_RENDER_FAILED",
   ]).notNull(),

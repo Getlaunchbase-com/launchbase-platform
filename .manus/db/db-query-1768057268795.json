@@ -1,0 +1,9 @@
+{
+  "query": "-- Reset action requests that are marked \"sent\" but have no actual SENT/RESENT event\nUPDATE action_requests\nSET status = 'pending', lastSentAt = NULL\nWHERE status = 'sent'\n  AND id NOT IN (\n    SELECT DISTINCT actionRequestId \n    FROM action_request_events \n    WHERE eventType IN ('SENT', 'RESENT')\n  );\n\n-- Log the reset\nINSERT INTO action_request_events (actionRequestId, intakeId, eventType, actorType, reason)\nSELECT ar.id, ar.intakeId, 'ADMIN_RESET_TO_PENDING', 'system', 'Reset stuck sent status without delivery confirmation'\nFROM action_requests ar\nWHERE ar.status = 'pending'\n  AND ar.id IN (\n    SELECT id FROM action_requests WHERE status = 'sent' \n    AND id NOT IN (SELECT DISTINCT actionRequestId FROM action_request_events WHERE eventType IN ('SENT', 'RESENT'))\n  )\nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute -- Reset action requests that are marked \"sent\" but have no actual SENT/RESENT event\nUPDATE action_requests\nSET status = 'pending', lastSentAt = NULL\nWHERE status = 'sent'\n  AND id NOT IN (\n    SELECT DISTINCT actionRequestId \n    FROM action_request_events \n    WHERE eventType IN ('SENT', 'RESENT')\n  );\n\n-- Log the reset\nINSERT INTO action_request_events (actionRequestId, intakeId, eventType, actorType, reason)\nSELECT ar.id, ar.intakeId, 'ADMIN_RESET_TO_PENDING', 'system', 'Reset stuck sent status without delivery confirmation'\nFROM action_requests ar\nWHERE ar.status = 'pending'\n  AND ar.id IN (\n    SELECT id FROM action_requests WHERE status = 'sent' \n    AND id NOT IN (SELECT DISTINCT actionRequestId FROM action_request_events WHERE eventType IN ('SENT', 'RESENT'))\n  )\nLIMIT 10;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 66
+}

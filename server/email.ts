@@ -619,7 +619,7 @@ export async function sendActionRequestEmail(data: {
   token: string;
   checklistKey: string;
   proposedPreviewToken?: string;
-}): Promise<{ success: boolean; error?: string }> {
+}): Promise<{ success: boolean; provider?: "resend" | "notification"; error?: string }> {
   const resend = getResendClient();
   
   const approveUrl = `${ENV.publicBaseUrl}/api/actions/${data.token}/approve`;
@@ -766,6 +766,12 @@ export async function sendActionRequestEmail(data: {
 </html>
   `;
   
+  console.log("[Email] sendActionRequestEmail called");
+  console.log("[Email] - To:", data.to);
+  console.log("[Email] - Resend client exists:", !!resend);
+  console.log("[Email] - ENV.resendApiKey exists:", !!ENV.resendApiKey);
+  console.log("[Email] - ENV.resendApiKey length:", ENV.resendApiKey?.length || 0);
+  
   const text = `
 ${data.questionText}
 
@@ -793,7 +799,8 @@ Diagnostics: Token ...${data.token.slice(-6)} | Key: ${data.checklistKey}
   
   try {
     if (resend) {
-      await resend.emails.send({
+      console.log("[Email] Calling resend.emails.send()...");
+      const result = await resend.emails.send({
         from: FROM_EMAIL,
         to: data.to,
         replyTo: replyTo,
@@ -802,17 +809,20 @@ Diagnostics: Token ...${data.token.slice(-6)} | Key: ${data.checklistKey}
         text,
       });
       
+      console.log("[Email] ✅ Resend API call succeeded:", result);
+      
       // TODO: Log email to emailLogs table
       
-      return { success: true };
+      return { success: true, provider: "resend" };
     } else {
       // Fallback to notification
+      console.log("[Email] ⚠️ No Resend client - falling back to notification");
       await notifyOwner({
         title: `Action Request: ${data.questionText}`,
         content: `To: ${data.to}\nProposed: ${data.proposedValue}\n\nApprove: ${approveUrl}\nEdit: ${editUrl}`
       });
       
-      return { success: true };
+      return { success: false, provider: "notification", error: "no_resend_client" };
     }
   } catch (err) {
     const normalized = normalizeResendError(err);

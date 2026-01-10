@@ -1,0 +1,38 @@
+{
+  "query": "SELECT eventType, actorType, reason, meta, createdAt\nFROM action_request_events\nORDER BY createdAt DESC\nLIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT eventType, actorType, reason, meta, createdAt\nFROM action_request_events\nORDER BY createdAt DESC\nLIMIT 5;",
+  "rows": [
+    {
+      "eventType": "PREVIEW_VIEWED",
+      "actorType": "customer",
+      "reason": "NULL",
+      "meta": "{\"checklistKey\": \"homepage.headline\", \"previewToken\": \"action_1768033533380_ad86b4ba9df53dec\"}",
+      "createdAt": "2026-01-10 08:25:33"
+    },
+    {
+      "eventType": "PREVIEW_VIEWED",
+      "actorType": "customer",
+      "reason": "NULL",
+      "meta": "{\"checklistKey\": \"homepage.headline\", \"previewToken\": \"action_1768033533380_ad86b4ba9df53dec\"}",
+      "createdAt": "2026-01-10 08:25:33"
+    },
+    {
+      "eventType": "PROPOSED_PREVIEW_RENDER_FAILED",
+      "actorType": "system",
+      "reason": "Unknown checklistKey: unknown.key.that.doesnt.exist",
+      "meta": "NULL",
+      "createdAt": "2026-01-10 08:25:33"
+    },
+    {
+      "eventType": "PREVIEW_VIEWED",
+      "actorType": "customer",
+      "reason": "NULL",
+      "meta": "{\"checklistKey\": \"homepage.headline\", \"previewToken\": \"action_1768033533380_ad86b4ba9df53dec\"}",
+      "createdAt": "2026-01-10 08:25:33"
+    }
+  ],
+  "messages": [],
+  "stdout": "eventType\tactorType\treason\tmeta\tcreatedAt\nPREVIEW_VIEWED\tcustomer\tNULL\t{\"checklistKey\": \"homepage.headline\", \"previewToken\": \"action_1768033533380_ad86b4ba9df53dec\"}\t2026-01-10 08:25:33\nPREVIEW_VIEWED\tcustomer\tNULL\t{\"checklistKey\": \"homepage.headline\", \"previewToken\": \"action_1768033533380_ad86b4ba9df53dec\"}\t2026-01-10 08:25:33\nPROPOSED_PREVIEW_RENDER_FAILED\tsystem\tUnknown checklistKey: unknown.key.that.doesnt.exist\tNULL\t2026-01-10 08:25:33\nPREVIEW_VIEWED\tcustomer\tNULL\t{\"checklistKey\": \"homepage.headline\", \"previewToken\": \"action_1768033533380_ad86b4ba9df53dec\"}\t2026-01-10 08:25:33\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}
