@@ -56,3 +56,11 @@
 - [x] Create PresentationSummaryCard component (read-only)
 - [x] Wire card into IntakeDetail page
 - [ ] Test admin visibility with real Tier 1 job
+
+## Session Jan 10, 2026 - 3-Run End-to-End Validation (Do Not Change Features During Testing)
+- [ ] Prepare 3 fresh test intakes (unique business names)
+- [ ] Run 1: Happy path (approve) - verify zero human intervention
+- [ ] Run 2: Edit path (clear edit) - verify applied without escalation
+- [ ] Run 3: Unclear reply - verify escalation occurs
+- [ ] Automation tests: cron idempotency, Resend verification, guardrails, Tier 1
+- [ ] Produce 1-page test report (timestamps, event chain, failures)
