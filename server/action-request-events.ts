@@ -7,11 +7,13 @@
 
 import { getDb } from "./db";
 import { actionRequestEvents, type InsertActionRequestEvent } from "../drizzle/schema";
+import { eq } from "drizzle-orm";
 
 /**
  * Write an audit event for an action request
+ * Never throws - audit logging should not break customer flow
  */
-export async function writeActionRequestEvent(
+export async function logActionEvent(
   event: Omit<InsertActionRequestEvent, "id" | "createdAt">
 ): Promise<void> {
   const db = await getDb();
@@ -60,5 +62,4 @@ export async function getIntakeActionRequestEvents(intakeId: number) {
   return events;
 }
 
-// Import eq for queries
-import { eq } from "drizzle-orm";
+

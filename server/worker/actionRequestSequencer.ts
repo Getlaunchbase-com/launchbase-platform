@@ -195,11 +195,23 @@ async function processIntake(intake: any): Promise<void> {
   });
 
   if (result.success) {
-    // Mark as sent
+    // Mark as sent and update send tracking
     await db.update(actionRequests).set({
       status: "sent",
       sentAt: new Date(),
+      sendCount: actionRequest.sendCount + 1,
+      lastSentAt: new Date(),
     }).where(eq(actionRequests.id, actionRequest.id));
+    
+    // Log event
+    const { logActionEvent } = await import("../action-request-events");
+    await logActionEvent({
+      actionRequestId: actionRequest.id,
+      intakeId: intake.id,
+      eventType: "SENT",
+      actorType: "system",
+      meta: { messageType: nextAction.messageType },
+    });
     
     console.log(`[Sequencer] Sent ${nextAction.messageType} to ${intake.email}`);
   } else {
