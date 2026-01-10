@@ -43,6 +43,7 @@ import { getObservabilityData, formatTimeAgo } from "./observability";
 import { notifyOwner } from "./_core/notification";
 import { getHealthMetrics } from "./health";
 import { checkFacebookPostingPolicy } from "./services/facebook-policy";
+import { absoluteUrl } from "./utils/absoluteUrl";
 
 // App base URL for absolute links in emails
 const APP_URL = 
@@ -453,7 +454,7 @@ export const appRouter = router({
               firstName,
               businessName: intake.businessName,
               email: intake.email,
-              previewUrl: `${APP_URL}/preview/${previewToken}`,
+              previewUrl: absoluteUrl(`/preview/${previewToken}`),
               language: intake.language as any,
               audience: intake.audience as any,
             });
@@ -545,7 +546,7 @@ export const appRouter = router({
             firstName,
             businessName: intake.businessName,
             email: intake.email,
-            previewUrl: `${APP_URL}/preview/${intake.previewToken}`,
+            previewUrl: absoluteUrl(`/preview/${intake.previewToken}`),
             language: intake.language as any,
             audience: intake.audience as any,
           });
@@ -1968,7 +1969,7 @@ export const appRouter = router({
               firstName: input.contact.name.split(" ")[0],
               businessName: input.contact.name,
               email: input.contact.email,
-              previewUrl: `${APP_URL}/preview/${intakePreviewToken}`,
+              previewUrl: absoluteUrl(`/preview/${intakePreviewToken}`),
               language: intake.language as any,
               audience: intake.audience as any,
             }
@@ -2212,7 +2213,7 @@ export const appRouter = router({
               firstName: app.contactName.split(" ")[0],
               businessName: input.businessName,
               email: app.contactEmail,
-              previewUrl: `${APP_URL}/preview/${previewToken}`,
+              previewUrl: absoluteUrl(`/preview/${previewToken}`),
               language: intake.language as any,
               audience: intake.audience as any,
             }

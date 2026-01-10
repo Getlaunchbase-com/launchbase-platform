@@ -527,3 +527,27 @@
 - [ ] Test payment flow with new intake (complete onboarding → payment)
 - [x] Verify Stripe checkout shows correct amounts ($598 for Website + Email)
 - [ ] Verify webhook marks intake as paid after successful payment
+
+## CRITICAL BUGS - Customer Flow Broken - Jan 9, 2026
+- [x] Fix preview link in email (showing relative path, needs absolute URL) - Added absoluteUrl() helper + PUBLIC_BASE_URL
+- [x] Fix payment button validation (email, name, serviceSelections undefined) - Changed to createServiceCheckoutFromIntake
+- [ ] Fix mobile preview rendering (viewport, responsive layout)
+- [ ] Test complete customer flow: onboard → preview → approve → pay
+
+## Async Refinement Loop (4-Step: Ask → Understand → Apply → Confirm) - Jan 9, 2026
+- [x] Draft first 10 bot messages (Day 0-3 post-payment refinement)
+- [x] Technical spec for reply parsing + confidence scoring
+- [ ] Create database schema: refinement_messages table
+- [ ] Create database schema: refinement_replies table
+- [ ] Implement reply normalization (trim, lowercase, remove signatures/quotes)
+- [ ] Implement intent classification (APPROVE/REJECT/EDIT/READY/UNCLEAR)
+- [ ] Implement confidence scoring (0.0-1.0 with modifiers)
+- [ ] Build auto-apply logic with safety thresholds (0.85/0.60)
+- [ ] Create escalation notification system (confidence < 0.60)
+- [ ] Add locking mechanism to checklist items (never ask twice)
+- [ ] Build confirmation email templates
+- [ ] Create inbound email webhook for replies
+- [ ] Add cron job to send next question in queue
+- [ ] Write tests for all confidence scenarios
+- [ ] Test complete loop: Ask → Customer replies → Apply → Confirm
+- [ ] Add maintenance triggers (data drift, platform changes, customer requests)

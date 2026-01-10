@@ -107,8 +107,8 @@ export default function CustomerPreview() {
     },
   });
 
-  // Create service checkout session (new service-based)
-  const serviceCheckoutMutation = trpc.payment.createServiceCheckout.useMutation({
+  // Create service checkout session (server derives everything from intake)
+  const serviceCheckoutMutation = trpc.payment.createServiceCheckoutFromIntake.useMutation({
     onSuccess: (data) => {
       if (data.checkoutUrl) {
         window.location.href = data.checkoutUrl;
