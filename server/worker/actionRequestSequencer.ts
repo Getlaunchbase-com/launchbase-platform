@@ -174,7 +174,6 @@ async function processIntake(intake: any): Promise<void> {
     tenant: intake.tenant,
     intakeId: intake.id,
     checklistKey: nextAction.checklistKey,
-    proposedPreviewToken: actionRequest.proposedPreviewToken || undefined,
     proposedValue,
     messageType: nextAction.messageType,
   });
@@ -196,8 +195,8 @@ async function processIntake(intake: any): Promise<void> {
     proposedPreviewToken: actionRequest.proposedPreviewToken || undefined,
   });
 
-  if (result.success) {
-    // Mark as sent and update send tracking
+  if (result.success && result.provider === "resend") {
+    // Mark as sent ONLY if real email was delivered via Resend
     await db.update(actionRequests).set({
       status: "sent",
       sentAt: new Date(),
@@ -212,12 +211,23 @@ async function processIntake(intake: any): Promise<void> {
       intakeId: intake.id,
       eventType: "SENT",
       actorType: "system",
-      meta: { messageType: nextAction.messageType },
+      meta: { messageType: nextAction.messageType, provider: "resend" },
     });
     
-    console.log(`[Sequencer] Sent ${nextAction.messageType} to ${intake.email}`);
+    console.log(`[Sequencer] ✅ Sent ${nextAction.messageType} to ${intake.email} via Resend`);
   } else {
-    console.error(`[Sequencer] Failed to send email to ${intake.email}:`, result.error);
+    // Send failed - keep status as pending and log failure
+    const { logActionEvent } = await import("../action-request-events");
+    await logActionEvent({
+      actionRequestId: actionRequest.id,
+      intakeId: intake.id,
+      eventType: "SEND_FAILED",
+      actorType: "system",
+      reason: result.error || "unknown",
+      meta: { messageType: nextAction.messageType, provider: result.provider },
+    });
+    
+    console.error(`[Sequencer] ❌ Failed to send email to ${intake.email}:`, result.error);
   }
 }
 
