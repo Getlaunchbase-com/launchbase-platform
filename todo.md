@@ -1,5 +1,14 @@
 # LaunchBase TODO
 
+## Session Jan 10, 2026 - EMAIL_TRANSPORT Toggle (SaaS Maturity Step)
+- [x] Add EMAIL_TRANSPORT env var to env.ts (resend | log | memory)
+- [x] Update sendActionRequestEmail to respect transport mode
+- [x] Implement log transport (console + event only)
+- [x] Implement memory transport (store in test array)
+- [x] Update E2E tests to use memory transport
+- [x] Verify all 20 action request tests pass with new transport
+- [x] Document transport modes in NEVER_AGAIN.md
+
 ## Session Jan 10, 2026 - Email Automation Hardening
 - [x] Add Resend message ID tracking to event logging (store in meta field)
 - [x] Create docs/email-verification.md with troubleshooting guide

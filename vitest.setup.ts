@@ -36,5 +36,9 @@ console.log("[Vitest Setup] DB name:", dbName);
 // This ensures drizzle-kit migrations and server/db.ts connect to the same database
 process.env.DATABASE_URL = testDbUrl;
 
+// Force memory transport for deterministic tests (no real emails)
+process.env.EMAIL_TRANSPORT = "memory";
+console.log("[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)");
+
 // Export for debugging if needed
 export const TEST_DB_NAME = dbName;

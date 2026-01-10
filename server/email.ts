@@ -797,41 +797,29 @@ Questions? Reply to this email or contact support@getlaunchbase.com
 Diagnostics: Token ...${data.token.slice(-6)} | Key: ${data.checklistKey}
   `.trim();
   
+  // Use transport layer (respects EMAIL_TRANSPORT env var)
+  const { sendEmail: sendViaTransport } = await import("./emailTransport");
+  
   try {
-    if (resend) {
-      console.log("[Email] Calling resend.emails.send()...");
-      const result = await resend.emails.send({
-        from: FROM_EMAIL,
-        to: data.to,
-        replyTo: replyTo,
-        subject,
-        html,
-        text,
-      });
-      
-      console.log("[Email] ✅ Resend API call succeeded:", result);
-      
-      // Return Resend message ID for event logging
-      return { 
-        success: true, 
-        provider: "resend",
-        resendMessageId: result.id 
-      };
+    const result = await sendViaTransport({
+      from: FROM_EMAIL,
+      to: data.to,
+      replyTo: replyTo,
+      subject,
+      html,
+      text,
+    });
+    
+    if (result.success) {
+      console.log(`[Email] ✅ Sent via ${result.provider}:`, result.resendMessageId);
+      return result;
     } else {
-      // Fallback to notification
-      console.log("[Email] ⚠️ No Resend client - falling back to notification");
-      await notifyOwner({
-        title: `Action Request: ${data.questionText}`,
-        content: `To: ${data.to}\nProposed: ${data.proposedValue}\n\nApprove: ${approveUrl}\nEdit: ${editUrl}`
-      });
-      
-      return { success: false, provider: "notification", error: "no_resend_client" };
+      console.error(`[Email] ❌ Failed via ${result.provider}:`, result.error);
+      return result;
     }
   } catch (err) {
     const normalized = normalizeResendError(err);
     console.error("[Email] Failed to send action request:", normalized);
-    
-    // TODO: Log failed email
     
     return { success: false, error: normalized.message };
   }
