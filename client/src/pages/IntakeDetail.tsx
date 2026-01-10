@@ -34,6 +34,7 @@ import { Link, useParams, useLocation } from "wouter";
 import DashboardLayout from "@/components/DashboardLayout";
 import { toast } from "sonner";
 import { generatePreviewHTML } from "@/lib/previewGenerator";
+import ActionRequestsCard from "@/components/ActionRequestsCard";
 import {
   Dialog,
   DialogContent,
@@ -1010,6 +1011,9 @@ export default function IntakeDetail() {
               </CardContent>
             </Card>
           )}
+
+          {/* Action Requests Card */}
+          <ActionRequestsCard intakeId={intakeId} />
 
           {/* Internal Notes Section */}
           <Card className="bg-white/5 border-white/10">

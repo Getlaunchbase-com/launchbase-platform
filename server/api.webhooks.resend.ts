@@ -20,6 +20,8 @@ import { sendAdminNotification } from "./email";
 import { getDb } from "./db";
 import { actionRequests, intakes } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
+import { logActionEvent } from "./action-request-events";
+import { alertWebhookFailure } from "./_core/webhookAlert";
 
 /**
  * Extract token from email address or subject
@@ -152,6 +154,20 @@ export async function handleResendInbound(req: Request, res: Response) {
       }).where(eq(actionRequests.id, actionRequest.id));
     }
     
+    // Log customer response event
+    await logActionEvent({
+      actionRequestId: actionRequest.id,
+      intakeId: actionRequest.intakeId,
+      eventType: "CUSTOMER_APPROVED",
+      actorType: "customer",
+      actorId: from,
+      meta: {
+        intent: classification.intent,
+        confidence: classification.confidence,
+        replyChannel: "email",
+      },
+    });
+    
     // Handle based on intent
     if (classification.intent === "APPROVE") {
       // High confidence approval - apply immediately
@@ -182,6 +198,21 @@ export async function handleResendInbound(req: Request, res: Response) {
         return res.status(200).json({ message: "Failed to apply", error: result.error });
       }
     } else if (classification.intent === "EDIT_EXACT") {
+      // Log edit event
+      await logActionEvent({
+        actionRequestId: actionRequest.id,
+        intakeId: actionRequest.intakeId,
+        eventType: "CUSTOMER_EDITED",
+        actorType: "customer",
+        actorId: from,
+        meta: {
+          intent: classification.intent,
+          confidence: classification.confidence,
+          extractedValue: classification.extractedValue,
+          replyChannel: "email",
+        },
+      });
+      
       // Concrete edit provided - apply if confidence is high enough
       const result = await applyActionRequest(actionRequest.id);
       
@@ -214,14 +245,56 @@ export async function handleResendInbound(req: Request, res: Response) {
         return res.status(200).json({ message: "Failed to apply", error: result.error });
       }
     } else if (classification.intent === "REJECT") {
+      // Log unclear event
+      await logActionEvent({
+        actionRequestId: actionRequest.id,
+        intakeId: actionRequest.intakeId,
+        eventType: "CUSTOMER_UNCLEAR",
+        actorType: "customer",
+        actorId: from,
+        meta: {
+          intent: classification.intent,
+          confidence: classification.confidence,
+          replyChannel: "email",
+        },
+      });
+      
       // Customer rejected without providing alternative
       await escalateToHuman(actionRequest, classification, "Customer rejected without alternative");
       return res.status(200).json({ message: "Escalated to human" });
     } else if (classification.intent === "EDIT_AMBIGUOUS") {
+      // Log unclear event
+      await logActionEvent({
+        actionRequestId: actionRequest.id,
+        intakeId: actionRequest.intakeId,
+        eventType: "CUSTOMER_UNCLEAR",
+        actorType: "customer",
+        actorId: from,
+        meta: {
+          intent: classification.intent,
+          confidence: classification.confidence,
+          replyChannel: "email",
+        },
+      });
+      
       // Unclear edit request
       await escalateToHuman(actionRequest, classification, "Ambiguous edit request");
       return res.status(200).json({ message: "Escalated to human" });
     } else if (classification.intent === "NEW_REQUEST") {
+      // Log unclear event
+      await logActionEvent({
+        actionRequestId: actionRequest.id,
+        intakeId: actionRequest.intakeId,
+        eventType: "CUSTOMER_UNCLEAR",
+        actorType: "customer",
+        actorId: from,
+        meta: {
+          intent: classification.intent,
+          confidence: classification.confidence,
+          replyChannel: "email",
+        },
+      });
+      
       // Scope change
       await escalateToHuman(actionRequest, classification, "Scope change / new request");
       return res.status(200).json({ message: "Escalated to human" });
@@ -230,6 +303,15 @@ export async function handleResendInbound(req: Request, res: Response) {
     return res.status(200).json({ message: "Processed" });
   } catch (err) {
     console.error("[Webhook] Error processing inbound email:", err);
+    
+    // Send ops alert for webhook failure
+    await alertWebhookFailure({
+      endpoint: "/api/webhooks/resend/inbound",
+      statusCode: 500,
+      error: err instanceof Error ? err.message : String(err),
+      timestamp: new Date().toISOString(),
+    });
+    
     return res.status(500).json({ error: "Internal server error" });
   }
 }
@@ -249,6 +331,19 @@ async function escalateToHuman(
   await db.update(actionRequests).set({
     status: "needs_human",
   }).where(eq(actionRequests.id, actionRequest.id));
+  
+  // Log escalation event
+  await logActionEvent({
+    actionRequestId: actionRequest.id,
+    intakeId: actionRequest.intakeId,
+    eventType: "ESCALATED",
+    actorType: "system",
+    reason,
+    meta: {
+      intent: classification.intent,
+      confidence: classification.confidence,
+    },
+  });
   
   // Load intake for context
   const [intake] = await db.select().from(intakes).where(eq(intakes.id, actionRequest.intakeId)).limit(1);

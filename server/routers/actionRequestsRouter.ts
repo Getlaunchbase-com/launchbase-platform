@@ -6,9 +6,11 @@
 import { z } from "zod";
 import { publicProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
+import { getSystemMeta } from "../_core/version";
 import { actionRequests, intakes } from "../../drizzle/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { sendActionRequestEmail } from "../email";
+import { logActionEvent } from "../action-request-events";
 
 export const actionRequestsRouter = router({
   /**
@@ -52,7 +54,7 @@ export const actionRequestsRouter = router({
     }),
 
   /**
-   * Resend an action request email
+   * Resend an action request email (with 10-minute rate limit)
    */
   resend: publicProcedure
     .input(z.object({ id: z.number() }))
@@ -71,6 +73,30 @@ export const actionRequestsRouter = router({
 
       if (!request) {
         throw new Error("Action request not found");
+      }
+      
+      // Safety: Only allow resend if status is pending
+      if (request.status !== "pending") {
+        return { 
+          ok: false, 
+          code: "invalid_status", 
+          message: "Can only resend pending requests" 
+        };
+      }
+      
+      // Rate limit: 10 minutes minimum between sends
+      if (request.lastSentAt) {
+        const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+        if (request.lastSentAt > tenMinutesAgo) {
+          const retryAt = new Date(request.lastSentAt.getTime() + 10 * 60 * 1000);
+          return { 
+            ok: false, 
+            code: "rate_limited", 
+            message: "Must wait 10 minutes between sends",
+            retryAt: retryAt.toISOString(),
+            ...getSystemMeta(),
+          };
+        }
       }
 
       // Load intake
@@ -98,40 +124,74 @@ export const actionRequestsRouter = router({
       });
 
       if (result.success) {
-        // Update sentAt
+        // Update sendCount and lastSentAt
         await db.update(actionRequests).set({
-          sentAt: new Date(),
+          sendCount: request.sendCount + 1,
+          lastSentAt: new Date(),
         }).where(eq(actionRequests.id, input.id));
+        
+        // Log resend event
+        await logActionEvent({
+          actionRequestId: request.id,
+          intakeId: request.intakeId,
+          eventType: "RESENT",
+          actorType: "admin",
+          reason: "Manual resend from admin panel",
+        });
       }
 
-      return { success: result.success, error: result.error };
+      return { ok: true, success: result.success, error: result.error, ...getSystemMeta() };
     }),
 
   /**
-   * Override and manually apply an action request
+   * Admin manually apply an action request (renamed from overrideApply)
    */
-  overrideApply: publicProcedure
+  adminApply: publicProcedure
     .input(z.object({ 
       id: z.number(),
-      proposedValue: z.unknown(),
+      finalValue: z.unknown(),
+      reason: z.string().min(1, "Reason is required"),
     }))
     .mutation(async ({ input }) => {
       const db = await getDb();
       if (!db) {
         throw new Error("Database not available");
       }
+      
+      // Load action request
+      const [request] = await db
+        .select()
+        .from(actionRequests)
+        .where(eq(actionRequests.id, input.id))
+        .limit(1);
+
+      if (!request) {
+        throw new Error("Action request not found");
+      }
 
       // Update proposed value
       await db.update(actionRequests).set({
-        proposedValue: input.proposedValue as any,
+        proposedValue: input.finalValue as any,
         status: "responded",
         respondedAt: new Date(),
         replyChannel: "link",
         confidence: 1.0, // Admin override = 100% confidence
         rawInbound: { method: "admin_override" } as any,
       }).where(eq(actionRequests.id, input.id));
+      
+      // Log admin apply event
+      await logActionEvent({
+        actionRequestId: request.id,
+        intakeId: request.intakeId,
+        eventType: "ADMIN_APPLY",
+        actorType: "admin",
+        reason: input.reason,
+        meta: {
+          finalValue: input.finalValue,
+        },
+      });
 
-      // Apply
+      // Apply through same path as bot
       const { applyActionRequest, confirmAndLockActionRequest } = await import("../action-requests");
       const result = await applyActionRequest(input.id);
 
@@ -139,7 +199,7 @@ export const actionRequestsRouter = router({
         await confirmAndLockActionRequest(input.id);
       }
 
-      return { success: result.success, error: result.error };
+      return { success: result.success, error: result.error, ...getSystemMeta() };
     }),
 
   /**
@@ -159,7 +219,130 @@ export const actionRequestsRouter = router({
 
       return { success: true };
     }),
+  
+  /**
+   * Expire an action request (admin decision to not pursue)
+   */
+  expire: publicProcedure
+    .input(z.object({ 
+      id: z.number(),
+      reason: z.string().min(1, "Reason is required"),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) {
+        throw new Error("Database not available");
+      }
+      
+      // Load action request
+      const [request] = await db
+        .select()
+        .from(actionRequests)
+        .where(eq(actionRequests.id, input.id))
+        .limit(1);
 
+      if (!request) {
+        throw new Error("Action request not found");
+      }
+      
+      // Safety: Only allow expire from pending or needs_human
+      if (request.status !== "pending" && request.status !== "needs_human") {
+        return { 
+          ok: false, 
+          message: "Can only expire pending or needs_human requests" 
+        };
+      }
+
+      // Mark as expired
+      await db.update(actionRequests).set({
+        status: "expired",
+      }).where(eq(actionRequests.id, input.id));
+      
+      // Log expire event
+      await logActionEvent({
+        actionRequestId: request.id,
+        intakeId: request.intakeId,
+        eventType: "ADMIN_EXPIRE",
+        actorType: "admin",
+        reason: input.reason,
+      });
+
+      return { ok: true, ...getSystemMeta() };
+    }),
+  
+  /**
+   * Unlock an action request (allow re-processing)
+   */
+  unlock: publicProcedure
+    .input(z.object({ 
+      id: z.number(),
+      reason: z.string().min(1, "Reason is required"),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) {
+        throw new Error("Database not available");
+      }
+      
+      // Load action request
+      const [request] = await db
+        .select()
+        .from(actionRequests)
+        .where(eq(actionRequests.id, input.id))
+        .limit(1);
+
+      if (!request) {
+        throw new Error("Action request not found");
+      }
+      
+      // Safety: Only allow unlock from locked or applied
+      if (request.status !== "locked" && request.status !== "applied") {
+        return { 
+          ok: false, 
+          message: "Can only unlock locked or applied requests" 
+        };
+      }
+
+      // Mark as needs_human (safer than pending - forces human review before re-asking)
+      await db.update(actionRequests).set({
+        status: "needs_human",
+      }).where(eq(actionRequests.id, input.id));
+      
+      // Log unlock event
+      await logActionEvent({
+        actionRequestId: request.id,
+        intakeId: request.intakeId,
+        eventType: "ADMIN_UNLOCK",
+        actorType: "admin",
+        reason: input.reason,
+      });
+
+      return { ok: true, ...getSystemMeta() };
+    }),
+
+  /**
+   * Get recent events for an action request
+   */
+  getEvents: publicProcedure
+    .input(z.object({ actionRequestId: z.number(), limit: z.number().optional().default(5) }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) {
+        throw new Error("Database not available");
+      }
+      
+      const { actionRequestEvents } = await import("../../drizzle/schema");
+      
+      const events = await db
+        .select()
+        .from(actionRequestEvents)
+        .where(eq(actionRequestEvents.actionRequestId, input.actionRequestId))
+        .orderBy(desc(actionRequestEvents.createdAt))
+        .limit(input.limit);
+
+      return events;
+    }),
+  
   /**
    * Get summary stats for an intake
    */
