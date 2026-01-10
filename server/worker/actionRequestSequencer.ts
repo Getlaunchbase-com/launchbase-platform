@@ -204,14 +204,20 @@ async function processIntake(intake: any): Promise<void> {
       lastSentAt: new Date(),
     }).where(eq(actionRequests.id, actionRequest.id));
     
-    // Log event
+    // Log event with Resend message ID for traceability
     const { logActionEvent } = await import("../action-request-events");
     await logActionEvent({
       actionRequestId: actionRequest.id,
       intakeId: intake.id,
       eventType: "SENT",
       actorType: "system",
-      meta: { messageType: nextAction.messageType, provider: "resend" },
+      meta: { 
+        messageType: nextAction.messageType, 
+        provider: "resend",
+        resendMessageId: result.resendMessageId,
+        to: intake.email,
+        subject: `Approve: ${nextAction.questionText}`,
+      },
     });
     
     console.log(`[Sequencer] ✅ Sent ${nextAction.messageType} to ${intake.email} via Resend`);

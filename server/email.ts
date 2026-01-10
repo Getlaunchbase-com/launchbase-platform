@@ -811,9 +811,12 @@ Diagnostics: Token ...${data.token.slice(-6)} | Key: ${data.checklistKey}
       
       console.log("[Email] ✅ Resend API call succeeded:", result);
       
-      // TODO: Log email to emailLogs table
-      
-      return { success: true, provider: "resend" };
+      // Return Resend message ID for event logging
+      return { 
+        success: true, 
+        provider: "resend",
+        resendMessageId: result.id 
+      };
     } else {
       // Fallback to notification
       console.log("[Email] ⚠️ No Resend client - falling back to notification");
