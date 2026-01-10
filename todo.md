@@ -571,3 +571,76 @@
 - [x] Replace with "✅ Payment confirmed" badge when paid
 - [x] Add overflow-x-hidden to page root
 - [x] Verify viewport meta tag with viewport-fit=cover
+
+## Email Automation System - Ask → Understand → Apply → Confirm (Jan 2026)
+
+### Phase 1: Data Model
+- [ ] Create action_requests table in drizzle/schema.ts
+- [ ] Add indexes: (tenant, intakeId, checklistKey), (status, createdAt), (token) UNIQUE
+- [ ] Run migration: pnpm db:push
+- [ ] Verify table exists in database
+
+### Phase 2: Approve/Edit Endpoints
+- [ ] Create /api/actions/:token/approve endpoint (GET)
+- [ ] Create /api/actions/:token/edit endpoint (GET with form)
+- [ ] Implement applyActionRequest(actionRequestId) function
+- [ ] Add checklistKey switch logic (homepage.headline, cta.primary, gmb.category, etc.)
+- [ ] Add safety rules: confidence threshold, lock checking, reversibility
+- [ ] Write intake_events for audit trail
+
+### Phase 3: Outbound Bot Emails
+- [ ] Create hybrid email template with ✅ Approve / ✏️ Edit buttons
+- [ ] Add Reply-To: approvals+{token}@getlaunchbase.com
+- [ ] Implement sendActionRequest(actionRequestId) function
+- [ ] Test email delivery with buttons
+
+### Phase 4: Inbound Webhook
+- [ ] Create POST /api/webhooks/resend/inbound endpoint
+- [ ] Extract token from to address (approvals+TOKEN@...)
+- [ ] Parse email body (strip quoted replies/signatures)
+- [ ] Classify intent: APPROVE/REJECT/EDIT_PROVIDED/UNCLEAR
+- [ ] Set confidence score and update action_request status
+- [ ] Trigger applyActionRequest for high-confidence responses
+- [ ] Escalate needs_human to ops email
+
+### Phase 5: Cron Sequencing
+- [ ] Create POST /api/cron/action-requests endpoint
+- [ ] Find paid intakes where Day0 sequence not started
+- [ ] Enqueue first message (homepage.headline)
+- [ ] Send next message only when prior is locked/expired/needs_human
+- [ ] Add WORKER_TOKEN auth
+- [ ] Schedule cron-job.org to POST every 15 minutes
+
+### Phase 6: Admin Panel
+- [ ] Add action requests tab to IntakeDetail.tsx
+- [ ] Show pending actions (yellow)
+- [ ] Show needs_human actions (red)
+- [ ] Show locked actions (green, read-only)
+- [ ] Add "Resend question" button
+- [ ] Add "Override apply" button
+- [ ] Add "Mark resolved" button
+
+### Phase 7: FOREVER Tests
+- [ ] Test: Approve link updates state → applied → confirmed → locked
+- [ ] Test: Inbound "YES" approves and applies
+- [ ] Test: Inbound edit applies when confident
+- [ ] Test: Inbound unclear escalates + does not apply
+- [ ] Test: Duplicate replies are idempotent (no double-apply)
+- [ ] Test: Locked keys can't be re-asked
+
+## Email Automation System - Ask → Understand → Apply → Confirm
+- [x] action_requests table schema
+- [x] Approve/Edit link endpoints
+- [x] Apply logic with safety policy
+- [x] Outbound email templates (hybrid buttons + reply-to)
+- [x] Inbound webhook for email parsing
+- [x] Cron sequencing for Day 0-3
+- [x] Admin panel tRPC router
+- [x] FOREVER tests (8 tests)
+- [x] action_request_events table (audit log)
+- [x] Audit event helper functions
+- [ ] Wire audit events into all transitions
+- [ ] Add rate limiting to resend (10 min)
+- [ ] Add expire/unlock mutations
+- [ ] Update tRPC router with new mutations
+- [ ] Add 4 additional FOREVER tests

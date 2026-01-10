@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, json, boolean, uniqueIndex, index } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, json, boolean, uniqueIndex, index, float } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -114,6 +114,99 @@ export const clarifications = mysqlTable("clarifications", {
 
 export type Clarification = typeof clarifications.$inferSelect;
 export type InsertClarification = typeof clarifications.$inferInsert;
+
+/**
+ * Action requests for automated Ask → Understand → Apply → Confirm loop
+ * (Different from clarifications which are manual/admin-driven)
+ */
+export const actionRequests = mysqlTable("action_requests", {
+  id: int("id").autoincrement().primaryKey(),
+  // Tenant (for multi-tenant filtering)
+  tenant: mysqlEnum("tenant", ["launchbase", "vinces"]).notNull().default("launchbase"),
+  intakeId: int("intakeId").notNull(),
+  // Checklist key (e.g. homepage.headline, cta.primary, gmb.category)
+  checklistKey: varchar("checklistKey", { length: 128 }).notNull(),
+  // Proposed value to apply
+  proposedValue: json("proposedValue").$type<unknown>(),
+  // State machine
+  status: mysqlEnum("status", [
+    "pending",      // created
+    "sent",         // email sent
+    "responded",    // customer replied
+    "applied",      // change applied
+    "confirmed",    // confirmation sent
+    "locked",       // done forever
+    "expired",      // too old
+    "needs_human"   // unclear/conflicting
+  ]).default("pending").notNull(),
+  // One-time token for links
+  token: varchar("token", { length: 64 }).notNull().unique(),
+  // Message type (e.g. DAY0_HEADLINE)
+  messageType: varchar("messageType", { length: 64 }),
+  // Reply channel (link | email)
+  replyChannel: mysqlEnum("replyChannel", ["link", "email"]),
+  // Confidence score (0-1)
+  confidence: float("confidence"),
+  // Raw inbound payload
+  rawInbound: json("rawInbound").$type<unknown>(),
+  // Send tracking
+  sendCount: int("sendCount").default(0).notNull(),
+  lastSentAt: timestamp("lastSentAt"),
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  sentAt: timestamp("sentAt"),
+  respondedAt: timestamp("respondedAt"),
+  appliedAt: timestamp("appliedAt"),
+  expiresAt: timestamp("expiresAt"),
+}, (table) => ({
+  // Indexes for efficient queries
+  tenantIntakeKeyIdx: index("tenant_intake_key_idx").on(table.tenant, table.intakeId, table.checklistKey),
+  statusCreatedIdx: index("status_created_idx").on(table.status, table.createdAt),
+}));
+
+export type ActionRequest = typeof actionRequests.$inferSelect;
+export type InsertActionRequest = typeof actionRequests.$inferInsert;
+
+/**
+ * Action request events (audit log)
+ * Append-only log of all state transitions and actions
+ */
+export const actionRequestEvents = mysqlTable("action_request_events", {
+  id: int("id").autoincrement().primaryKey(),
+  actionRequestId: int("actionRequestId").notNull(),
+  intakeId: int("intakeId").notNull(),
+  // Event type
+  eventType: mysqlEnum("eventType", [
+    "SENT",
+    "CUSTOMER_APPROVED",
+    "CUSTOMER_EDITED",
+    "CUSTOMER_UNCLEAR",
+    "APPLIED",
+    "LOCKED",
+    "EXPIRED",
+    "RESENT",
+    "ADMIN_APPLY",
+    "ADMIN_UNLOCK",
+    "ADMIN_EXPIRE",
+    "ESCALATED"
+  ]).notNull(),
+  // Actor
+  actorType: mysqlEnum("actorType", ["system", "customer", "admin"]).notNull(),
+  actorId: varchar("actorId", { length: 64 }),
+  // Reason (for admin actions)
+  reason: text("reason"),
+  // Metadata (JSON)
+  meta: json("meta").$type<Record<string, unknown>>(),
+  // Timestamp
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  // Indexes for efficient queries
+  actionRequestCreatedIdx: index("action_request_created_idx").on(table.actionRequestId, table.createdAt),
+  intakeCreatedIdx: index("intake_created_idx").on(table.intakeId, table.createdAt),
+}));
+
+export type ActionRequestEvent = typeof actionRequestEvents.$inferSelect;
+export type InsertActionRequestEvent = typeof actionRequestEvents.$inferInsert;
 
 /**
  * Deployment jobs

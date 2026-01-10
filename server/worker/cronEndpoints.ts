@@ -369,6 +369,42 @@ export async function handleCronHealth(_req: Request, res: Response) {
  * Handle GET requests to POST-only cron endpoints
  * Returns 405 Method Not Allowed with JSON and Allow header
  */
+/**
+ * POST /api/cron/action-requests
+ * Sequencer for Day 0-3 action request emails
+ * Runs every 15 minutes
+ */
+export async function handleCronActionRequests(req: Request, res: Response) {
+  // Verify token first
+  if (!verifyWorkerToken(req)) {
+    console.error("[ActionRequests] Unauthorized request - invalid token");
+    return res.status(401).json({ 
+      success: false, 
+      error: "unauthorized",
+      message: "Invalid WORKER_TOKEN"
+    });
+  }
+
+  try {
+    const { handleActionRequestSequencer } = require("./actionRequestSequencer");
+    const result = await handleActionRequestSequencer();
+    
+    return res.status(200).json({
+      success: result.success,
+      processed: result.processed,
+      errors: result.errors,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err) {
+    console.error("[ActionRequests] Cron error:", err);
+    return res.status(500).json({
+      success: false,
+      error: "internal_error",
+      message: err instanceof Error ? err.message : "Unknown error",
+    });
+  }
+}
+
 export function handleCronMethodNotAllowed(_req: Request, res: Response) {
   res.setHeader("Allow", "POST");
   return res.status(405).json({

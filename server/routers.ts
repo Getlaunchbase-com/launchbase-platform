@@ -70,9 +70,12 @@ function generateReferralCode(): string {
   return code;
 }
 
+import { actionRequestsRouter } from "./routers/actionRequestsRouter";
+
 export const appRouter = router({
   system: systemRouter,
   platform: platformRouter,
+  actionRequests: actionRequestsRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {

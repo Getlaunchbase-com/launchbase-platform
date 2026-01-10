@@ -605,3 +605,365 @@ export const AdminNotifications = {
       `${businessName} is now live at ${url}`
     ),
 };
+
+/**
+ * Send action request email (Ask → Understand → Apply → Confirm loop)
+ * Hybrid format: buttons + reply-to
+ */
+export async function sendActionRequestEmail(data: {
+  to: string;
+  businessName: string;
+  firstName: string;
+  questionText: string;
+  proposedValue: string;
+  token: string;
+  checklistKey: string;
+}): Promise<{ success: boolean; error?: string }> {
+  const resend = getResendClient();
+  
+  const approveUrl = `${ENV.publicBaseUrl}/api/actions/${data.token}/approve`;
+  const editUrl = `${ENV.publicBaseUrl}/api/actions/${data.token}/edit`;
+  
+  // Tokenized reply-to for inbound parsing
+  const replyTo = `approvals+${data.token}@getlaunchbase.com`;
+  
+  const subject = `[LB:${data.token}] ${data.questionText}`;
+  
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${data.questionText}</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #1f2937;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f9fafb;
+    }
+    .container {
+      background: white;
+      border-radius: 8px;
+      padding: 32px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin: 0 0 16px 0;
+      color: #111827;
+    }
+    .proposed {
+      background: #f3f4f6;
+      border-left: 4px solid #ea580c;
+      padding: 16px;
+      margin: 24px 0;
+      border-radius: 4px;
+    }
+    .proposed-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #6b7280;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .proposed-value {
+      font-size: 18px;
+      font-weight: 500;
+      color: #111827;
+    }
+    .buttons {
+      display: flex;
+      gap: 12px;
+      margin: 32px 0;
+    }
+    .btn {
+      display: inline-block;
+      padding: 14px 28px;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 500;
+      text-align: center;
+      flex: 1;
+    }
+    .btn-approve {
+      background: #16a34a;
+      color: white;
+    }
+    .btn-edit {
+      background: #ea580c;
+      color: white;
+    }
+    .or-reply {
+      text-align: center;
+      color: #6b7280;
+      font-size: 14px;
+      margin: 24px 0;
+    }
+    .reply-instructions {
+      background: #fef3c7;
+      border: 1px solid #fbbf24;
+      padding: 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #92400e;
+    }
+    .footer {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid #e5e7eb;
+      font-size: 13px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>${data.questionText}</h1>
+    
+    <p>Hi ${data.firstName},</p>
+    
+    <p>We've drafted this for ${data.businessName}:</p>
+    
+    <div class="proposed">
+      <div class="proposed-label">We proposed:</div>
+      <div class="proposed-value">${data.proposedValue}</div>
+    </div>
+    
+    <div class="buttons">
+      <a href="${approveUrl}" class="btn btn-approve">✅ Approve</a>
+      <a href="${editUrl}" class="btn btn-edit">✏️ Edit</a>
+    </div>
+    
+    <div class="or-reply">— OR —</div>
+    
+    <div class="reply-instructions">
+      <strong>Reply to this email:</strong><br>
+      • Type <strong>YES</strong> to approve<br>
+      • Type your preferred version to edit<br>
+      • Type <strong>NO</strong> if you want something different
+    </div>
+    
+    <div class="footer">
+      <p>This is part of your LaunchBase build process. Nothing goes live until you approve it.</p>
+      <p>Questions? Reply to this email or contact support@getlaunchbase.com</p>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+  
+  const text = `
+${data.questionText}
+
+Hi ${data.firstName},
+
+We've drafted this for ${data.businessName}:
+
+${data.proposedValue}
+
+To approve: ${approveUrl}
+To edit: ${editUrl}
+
+Or reply to this email:
+• Type YES to approve
+• Type your preferred version to edit
+• Type NO if you want something different
+
+Questions? Reply to this email or contact support@getlaunchbase.com
+  `.trim();
+  
+  try {
+    if (resend) {
+      await resend.emails.send({
+        from: FROM_EMAIL,
+        to: data.to,
+        replyTo: replyTo,
+        subject,
+        html,
+        text,
+      });
+      
+      // TODO: Log email to emailLogs table
+      
+      return { success: true };
+    } else {
+      // Fallback to notification
+      await notifyOwner({
+        title: `Action Request: ${data.questionText}`,
+        content: `To: ${data.to}\nProposed: ${data.proposedValue}\n\nApprove: ${approveUrl}\nEdit: ${editUrl}`
+      });
+      
+      return { success: true };
+    }
+  } catch (err) {
+    const normalized = normalizeResendError(err);
+    console.error("[Email] Failed to send action request:", normalized);
+    
+    // TODO: Log failed email
+    
+    return { success: false, error: normalized.message };
+  }
+}
+
+/**
+ * Send confirmation email after action is applied
+ */
+export async function sendActionConfirmationEmail(data: {
+  to: string;
+  businessName: string;
+  firstName: string;
+  checklistKey: string;
+  appliedValue: string;
+  previewUrl?: string;
+}): Promise<{ success: boolean; error?: string }> {
+  const resend = getResendClient();
+  
+  const subject = `✅ Applied: ${data.checklistKey}`;
+  
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Change Applied</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #1f2937;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f9fafb;
+    }
+    .container {
+      background: white;
+      border-radius: 8px;
+      padding: 32px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin: 0 0 16px 0;
+      color: #16a34a;
+    }
+    .applied {
+      background: #dcfce7;
+      border-left: 4px solid #16a34a;
+      padding: 16px;
+      margin: 24px 0;
+      border-radius: 4px;
+    }
+    .applied-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #166534;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .applied-value {
+      font-size: 18px;
+      font-weight: 500;
+      color: #111827;
+    }
+    .btn {
+      display: inline-block;
+      padding: 14px 28px;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 500;
+      text-align: center;
+      background: #ea580c;
+      color: white;
+      margin-top: 24px;
+    }
+    .footer {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid #e5e7eb;
+      font-size: 13px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>✅ Change Applied</h1>
+    
+    <p>Hi ${data.firstName},</p>
+    
+    <p>We've updated ${data.businessName}:</p>
+    
+    <div class="applied">
+      <div class="applied-label">${data.checklistKey} is now:</div>
+      <div class="applied-value">${data.appliedValue}</div>
+    </div>
+    
+    ${data.previewUrl ? `<a href="${data.previewUrl}" class="btn">View Preview</a>` : ''}
+    
+    <div class="footer">
+      <p>You'll hear from us when the next item needs your approval.</p>
+      <p>Questions? Reply to this email or contact support@getlaunchbase.com</p>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+  
+  const text = `
+✅ Change Applied
+
+Hi ${data.firstName},
+
+We've updated ${data.businessName}:
+
+${data.checklistKey} is now: ${data.appliedValue}
+
+${data.previewUrl ? `View preview: ${data.previewUrl}` : ''}
+
+You'll hear from us when the next item needs your approval.
+
+Questions? Reply to this email or contact support@getlaunchbase.com
+  `.trim();
+  
+  try {
+    if (resend) {
+      await resend.emails.send({
+        from: FROM_EMAIL,
+        to: data.to,
+        replyTo: REPLY_TO_EMAIL,
+        subject,
+        html,
+        text,
+      });
+      
+      // TODO: Log email to emailLogs table
+      
+      return { success: true };
+    } else {
+      await notifyOwner({
+        title: `Action Confirmed: ${data.checklistKey}`,
+        content: `To: ${data.to}\nApplied: ${data.appliedValue}`
+      });
+      
+      return { success: true };
+    }
+  } catch (err) {
+    const normalized = normalizeResendError(err);
+    console.error("[Email] Failed to send confirmation:", normalized);
+    
+    // TODO: Log failed email
+    
+    return { success: false, error: normalized.message };
+  }
+}

@@ -31,6 +31,7 @@ import {
   handleCronRunNextDeploy, 
   handleCronAutoAdvance, 
   handleCronAlerts,
+  handleCronActionRequests,
   handleCronHealth, 
   handleCronMethodNotAllowed 
 } from "../worker/cronEndpoints";
@@ -54,14 +55,26 @@ export function createApp(): Express {
   app.post("/api/cron/run-next-deploy", handleCronRunNextDeploy);
   app.post("/api/cron/auto-advance", handleCronAutoAdvance);
   app.post("/api/cron/alerts", handleCronAlerts);
+  app.post("/api/cron/action-requests", handleCronActionRequests);
   
   // Explicit 405 for GET (prevents false success / SPA fallthrough confusion)
   app.get("/api/cron/run-next-deploy", handleCronMethodNotAllowed);
   app.get("/api/cron/auto-advance", handleCronMethodNotAllowed);
   app.get("/api/cron/alerts", handleCronMethodNotAllowed);
+  app.get("/api/cron/action-requests", handleCronMethodNotAllowed);
   
   // Health stays GET
   app.get("/api/cron/health", handleCronHealth);
+
+  // 4. Action request endpoints (customer approve/edit links)
+  const { handleApprove, handleEditForm, handleEditSubmit } = require("../api.actions");
+  app.get("/api/actions/:token/approve", handleApprove);
+  app.get("/api/actions/:token/edit", handleEditForm);
+  app.post("/api/actions/:token/edit", handleEditSubmit);
+  
+  // 5. Resend inbound webhook (email reply parsing)
+  const { handleResendInbound } = require("../api.webhooks.resend");
+  app.post("/api/webhooks/resend/inbound", handleResendInbound);
 
   // 5. Referral redirect endpoint: /r/{siteSlug}
   // Logs badge click and redirects to homepage with UTM params
