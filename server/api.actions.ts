@@ -60,15 +60,40 @@ export async function handleApprove(req: Request, res: Response) {
       ));
   }
 
+  // Log customer approval
+  const { logActionEvent } = await import("./action-request-events");
+  await logActionEvent({
+    actionRequestId: actionRequest.id,
+    intakeId: actionRequest.intakeId,
+    eventType: "CUSTOMER_APPROVED",
+    actorType: "customer",
+  });
+
   // Apply the change
   const result = await applyActionRequest(actionRequest.id);
 
   if (result.success) {
+    // Log applied
+    await logActionEvent({
+      actionRequestId: actionRequest.id,
+      intakeId: actionRequest.intakeId,
+      eventType: "APPLIED",
+      actorType: "system",
+    });
+
     // Send confirmation email
     // TODO: Implement sendConfirmationEmail()
 
     // Mark as confirmed and locked
     await confirmAndLockActionRequest(actionRequest.id);
+
+    // Log locked
+    await logActionEvent({
+      actionRequestId: actionRequest.id,
+      intakeId: actionRequest.intakeId,
+      eventType: "LOCKED",
+      actorType: "system",
+    });
 
     return res.send(`
       <!DOCTYPE html>
@@ -228,11 +253,37 @@ export async function handleEditSubmit(req: Request, res: Response) {
       ));
   }
 
+  // Log customer edit
+  const { logActionEvent } = await import("./action-request-events");
+  await logActionEvent({
+    actionRequestId: actionRequest.id,
+    intakeId: actionRequest.intakeId,
+    eventType: "CUSTOMER_EDITED",
+    actorType: "customer",
+    meta: { originalValue: actionRequest.proposedValue, newValue: classification.extractedValue || value },
+  });
+
   // Apply the change
   const result = await applyActionRequest(actionRequest.id);
 
   if (result.success) {
+    // Log applied
+    await logActionEvent({
+      actionRequestId: actionRequest.id,
+      intakeId: actionRequest.intakeId,
+      eventType: "APPLIED",
+      actorType: "system",
+    });
+
     await confirmAndLockActionRequest(actionRequest.id);
+
+    // Log locked
+    await logActionEvent({
+      actionRequestId: actionRequest.id,
+      intakeId: actionRequest.intakeId,
+      eventType: "LOCKED",
+      actorType: "system",
+    });
     return res.send(`
       <!DOCTYPE html>
       <html>
