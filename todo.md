@@ -4,11 +4,11 @@
 - [x] Draft DesignInput + DesignOutput schema (tool-agnostic contract)
 - [x] Formalize PresentationScore rubric (deterministic scoring)
 - [x] Create docs/design-engines.md (philosophy + architecture)
-- [ ] Implement design_jobs table and tracking
-- [ ] Build candidate generator (3-5 variants per tier)
-- [ ] Implement scoring engine (evaluate candidates against rubric)
-- [ ] Add tier routing logic (standard/enhanced/premium)
-- [ ] Wire into existing preview + approval flow
+- [x] Implement design_jobs table and tracking
+- [x] Build candidate generator (3-5 variants per tier)
+- [x] Implement scoring engine (evaluate candidates against rubric)
+- [x] Add tier routing logic (standard/enhanced/premium)
+- [x] Wire into existing preview + approval flow
 - [ ] Test Tier 1 Enhanced Presentation Pass end-to-end
 - [ ] Document foundation for future premium engines (Framer/Lovable)
 

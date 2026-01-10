@@ -148,6 +148,13 @@
       "when": 1768061881048,
       "tag": "0020_strange_puff_adder",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "5",
+      "when": 1768065896918,
+      "tag": "0021_luxuriant_hobgoblin",
+      "breakpoints": true
     }
   ]
 }
