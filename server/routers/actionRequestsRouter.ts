@@ -131,13 +131,18 @@ export const actionRequestsRouter = router({
           lastSentAt: new Date(),
         }).where(eq(actionRequests.id, input.id));
         
-        // Log resend event
+        // Log resend event with Resend message ID
         await logActionEvent({
           actionRequestId: request.id,
           intakeId: request.intakeId,
           eventType: "RESENT",
           actorType: "admin",
           reason: "Manual resend from admin panel",
+          meta: {
+            resendMessageId: result.resendMessageId,
+            to: intake.email,
+            provider: result.provider,
+          },
         });
       }
 
