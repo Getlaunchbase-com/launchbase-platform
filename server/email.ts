@@ -753,6 +753,9 @@ export async function sendActionRequestEmail(data: {
     <div class="footer">
       <p>This is part of your LaunchBase build process. Nothing goes live until you approve it.</p>
       <p>Questions? Reply to this email or contact support@getlaunchbase.com</p>
+      <p style="font-size: 11px; color: #9ca3af; margin-top: 16px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
+        Diagnostics: Token ...${data.token.slice(-6)} | Key: ${data.checklistKey} | Env: ${ENV.publicBaseUrl?.includes('localhost') ? 'dev' : 'prod'}
+      </p>
     </div>
   </div>
 </body>
@@ -777,6 +780,8 @@ Or reply to this email:
 • Type NO if you want something different
 
 Questions? Reply to this email or contact support@getlaunchbase.com
+
+Diagnostics: Token ...${data.token.slice(-6)} | Key: ${data.checklistKey}
   `.trim();
   
   try {

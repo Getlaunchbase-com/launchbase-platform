@@ -272,7 +272,19 @@ export async function applyActionRequest(actionRequestId: number): Promise<{
     appliedAt: new Date(),
   }).where(eq(actionRequests.id, actionRequestId));
 
-  // TODO: Write intake_event for audit trail with previousValue
+  // Log APPLIED event
+  const { logActionEvent } = await import("./action-request-events");
+  await logActionEvent({
+    actionRequestId: actionRequest.id,
+    intakeId: actionRequest.intakeId,
+    eventType: "APPLIED",
+    actorType: "system",
+    meta: {
+      checklistKey: actionRequest.checklistKey,
+      appliedValue: actionRequest.proposedValue,
+      previousValue,
+    },
+  });
 
   return { success: true };
 }
@@ -350,7 +362,21 @@ export async function confirmAndLockActionRequest(actionRequestId: number): Prom
   const db = await getDb();
   if (!db) return;
 
+  // Load action request for event logging
+  const [actionRequest] = await db.select().from(actionRequests).where(eq(actionRequests.id, actionRequestId)).limit(1);
+  if (!actionRequest) return;
+
   await db.update(actionRequests).set({
     status: "locked",
   }).where(eq(actionRequests.id, actionRequestId));
+  
+  // Log LOCKED event
+  const { logActionEvent } = await import("./action-request-events");
+  await logActionEvent({
+    actionRequestId: actionRequest.id,
+    intakeId: actionRequest.intakeId,
+    eventType: "LOCKED",
+    actorType: "system",
+    reason: "Action request confirmed and locked",
+  });
 }
