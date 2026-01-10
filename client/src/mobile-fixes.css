@@ -1,0 +1,25 @@
+/* Mobile Preview Optimizations */
+
+/* Prevent horizontal overflow on mobile */
+html, body {
+  overflow-x: hidden;
+}
+
+/* Responsive typography for mobile */
+@media (max-width: 420px) {
+  h1 {
+    font-size: 34px;
+    line-height: 1.05;
+  }
+  
+  .subhead {
+    font-size: 16px;
+  }
+}
+
+/* Ensure safe area padding is respected */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .sticky-cta {
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+  }
+}
