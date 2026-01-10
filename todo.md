@@ -1,5 +1,13 @@
 # LaunchBase TODO
 
+## Session Jan 10, 2026 - Architecture Documentation
+- [x] Create docs/how-launchbase-works.md with 3-layer architecture
+- [x] Document Core Engine (Layer 1): action_requests + events
+- [x] Document Channels (Layer 2): Email, Admin UI, Cron
+- [x] Document Website Output (Layer 3): Previews + deployments
+- [x] Document canonical workflow: Ask → Understand → Apply → Confirm
+- [x] Document operational guardrails and "Do Not Break" rules
+
 ## Session Jan 10, 2026 - EMAIL_TRANSPORT Toggle (SaaS Maturity Step)
 - [x] Add EMAIL_TRANSPORT env var to env.ts (resend | log | memory)
 - [x] Update sendActionRequestEmail to respect transport mode
