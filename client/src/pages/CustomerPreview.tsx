@@ -307,7 +307,7 @@ export default function CustomerPreview() {
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Live Preview */}
-                <div className="w-full aspect-[9/16] md:aspect-video bg-muted rounded-lg overflow-hidden border">
+                <div className="w-full aspect-[9/16] md:aspect-video max-h-[520px] md:max-h-none bg-muted rounded-lg overflow-hidden border">
                   {(intake as any).previewHTML ? (
                     <iframe 
                       srcDoc={(intake as any).previewHTML}
@@ -330,22 +330,22 @@ export default function CustomerPreview() {
 
                 {(intake as any).previewHTML && (
                   <div className="space-y-2">
+                    <p className="text-xs text-center text-muted-foreground">Preview is interactive in Full Preview. Tap below to scroll and interact.</p>
                     <Button 
                       variant="default" 
                       size="lg"
                       className="w-full h-12 text-base"
-                      onClick={() => {
-                        const newWindow = window.open('', '_blank');
-                        if (newWindow) {
-                          newWindow.document.write((intake as any).previewHTML);
-                          newWindow.document.close();
-                        }
-                      }}
+                      asChild
                     >
-                      <ExternalLink className="h-5 w-5 mr-2" />
-                      Open Full Preview
+                      <a 
+                        href={`${window.location.origin}/preview/${token}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <ExternalLink className="h-5 w-5 mr-2" />
+                        Open Full Preview
+                      </a>
                     </Button>
-                    <p className="text-xs text-center text-muted-foreground">Tap to interact (best on mobile)</p>
                   </div>
                 )}
 

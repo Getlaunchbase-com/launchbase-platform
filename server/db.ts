@@ -171,7 +171,7 @@ export async function createIntake(data: {
     tenant,
     phone: data.phone || null,
     vertical: data.vertical,
-    services: data.services || null,
+    services: (data.services as string[] | undefined) || null,
     serviceArea: data.serviceArea || null,
     primaryCTA: data.primaryCTA || null,
     bookingLink: data.bookingLink || null,
