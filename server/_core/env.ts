@@ -11,4 +11,5 @@ export const ENV = {
   adminEmails: process.env.ADMIN_EMAILS ?? "",
   resendApiKey: process.env.RESEND_API_KEY ?? "",
   resendDomainVerified: process.env.RESEND_DOMAIN_VERIFIED === "true",
+  emailTransport: (process.env.EMAIL_TRANSPORT ?? "resend") as "resend" | "log" | "memory",
 };

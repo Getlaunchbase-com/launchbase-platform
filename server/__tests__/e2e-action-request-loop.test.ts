@@ -18,6 +18,7 @@ import { actionRequests, actionRequestEvents, intakes } from "../../drizzle/sche
 import { eq } from "drizzle-orm";
 import { createActionRequest } from "../action-requests";
 import { sendActionRequestEmail } from "../email";
+import { clearMemoryStore, getMemoryStore } from "../emailTransport";
 
 describe("E2E: Ask → Understand → Apply → Confirm Loop", () => {
   let testIntakeId: number;
@@ -27,6 +28,9 @@ describe("E2E: Ask → Understand → Apply → Confirm Loop", () => {
   beforeEach(async () => {
     const db = await getDb();
     if (!db) throw new Error("Database not available");
+    
+    // Clear email memory store
+    clearMemoryStore();
 
     // Create test intake
     const testEmail = `e2e-test-${Date.now()}@test.com`;
@@ -83,6 +87,13 @@ describe("E2E: Ask → Understand → Apply → Confirm Loop", () => {
     });
 
     expect(emailResult.success).toBe(true);
+    expect(emailResult.provider).toBe("memory");
+    
+    // Verify email stored in memory
+    const memoryStore = getMemoryStore();
+    expect(memoryStore.length).toBe(1);
+    expect(memoryStore[0].to).toBe(intake.email);
+    expect(memoryStore[0].subject).toContain("Approve your homepage headline");
 
     // Update sendCount and lastSentAt (normally done by sequencer)
     await db.update(actionRequests).set({

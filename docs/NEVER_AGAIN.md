@@ -1097,3 +1097,174 @@ export default async function globalSetup() {
 3. Never manually ALTER test database tables
 4. If tests fail with "table doesn't exist" or "unknown column", check that migrations ran successfully - don't patch manually
 
+
+
+---
+
+## Email Transport Abstraction (Jan 10, 2026)
+
+### ❌ MISTAKE: Tests depending on real email delivery
+
+**What we did wrong:**
+- Tests called Resend API directly
+- Tests failed when Resend was down
+- Tests failed on rate limits
+- Couldn't run tests in CI without credentials
+- Debugging email during feature work was constant distraction
+
+**Why it's wrong:**
+- Non-deterministic tests (external dependency)
+- Slow tests (network calls)
+- Flaky CI (Resend downtime)
+- Can't simulate failures safely
+
+**✅ CORRECT PATTERN: Pluggable email transport layer**
+
+### Implementation
+
+**1. Environment variable:**
+```typescript
+// server/_core/env.ts
+emailTransport: (process.env.EMAIL_TRANSPORT ?? "resend") as "resend" | "log" | "memory"
+```
+
+**2. Transport layer:**
+```typescript
+// server/emailTransport.ts
+export interface EmailPayload {
+  from: string;
+  to: string;
+  replyTo?: string;
+  subject: string;
+  html: string;
+  text: string;
+}
+
+export interface EmailSendResult {
+  success: boolean;
+  provider: "resend" | "log" | "memory";
+  resendMessageId?: string;
+  error?: string;
+}
+
+export async function sendEmail(payload: EmailPayload): Promise<EmailSendResult> {
+  const transport = ENV.emailTransport;
+  
+  switch (transport) {
+    case "resend": return sendViaResend(payload);
+    case "log": return sendViaLog(payload);
+    case "memory": return sendViaMemory(payload);
+  }
+}
+```
+
+**3. Memory transport for tests:**
+```typescript
+let memoryStore: EmailPayload[] = [];
+
+export function getMemoryStore(): EmailPayload[] {
+  return memoryStore;
+}
+
+export function clearMemoryStore(): void {
+  memoryStore = [];
+}
+
+async function sendViaMemory(payload: EmailPayload): Promise<EmailSendResult> {
+  memoryStore.push(payload);
+  const fakeMessageId = `memory_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+  
+  return {
+    success: true,
+    provider: "memory",
+    resendMessageId: fakeMessageId,
+  };
+}
+```
+
+**4. Test setup:**
+```typescript
+// vitest.setup.ts
+process.env.EMAIL_TRANSPORT = "memory";
+console.log("[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)");
+```
+
+**5. Test usage:**
+```typescript
+import { clearMemoryStore, getMemoryStore } from "../emailTransport";
+
+beforeEach(async () => {
+  clearMemoryStore(); // Prevent test pollution
+});
+
+it("sends action request email", async () => {
+  const result = await sendActionRequestEmail({ ... });
+  
+  expect(result.success).toBe(true);
+  expect(result.provider).toBe("memory");
+  
+  // Verify email stored in memory
+  const emails = getMemoryStore();
+  expect(emails.length).toBe(1);
+  expect(emails[0].to).toBe("customer@example.com");
+  expect(emails[0].subject).toContain("Approve");
+});
+```
+
+### Transport Modes
+
+| Mode | Behavior | Use Case |
+|------|----------|----------|
+| `resend` | Real delivery via Resend API | Production, staging |
+| `log` | Console + event only (no actual send) | Local development, debugging |
+| `memory` | Store in test array for assertions | E2E tests, CI |
+
+### Forever Rules
+
+1. **Never send real emails in tests** - Always use `memory` transport in CI
+2. **Never bypass the transport layer** - All email sends must go through `sendEmail()`
+3. **Never mock Resend directly** - Use transport abstraction instead
+4. **Always clear memory store in beforeEach** - Prevents test pollution
+5. **Always return fake message IDs** - Maintains event logging compatibility
+
+### Benefits
+
+- ✅ Tests are deterministic (no flaky email delivery)
+- ✅ CI is stable (no external dependencies)
+- ✅ Can simulate failures safely (transport returns error)
+- ✅ Never debug email during feature work
+- ✅ Fast tests (no network calls)
+- ✅ Works without credentials (local development)
+
+### Migration Path
+
+**Before:**
+```typescript
+// ❌ Direct Resend usage (non-deterministic)
+const resend = new Resend(ENV.resendApiKey);
+const result = await resend.emails.send({ ... });
+```
+
+**After:**
+```typescript
+// ✅ Transport layer (deterministic)
+const { sendEmail } = await import("./emailTransport");
+const result = await sendEmail({ ... });
+```
+
+**Test verification:**
+```bash
+# Run tests with memory transport
+EMAIL_TRANSPORT=memory pnpm test
+
+# Verify no real emails sent
+grep "Sent via memory" test-output.log
+```
+
+### Reference
+
+- **Implementation:** `server/emailTransport.ts`
+- **Test setup:** `vitest.setup.ts`
+- **E2E test:** `server/__tests__/e2e-action-request-loop.test.ts`
+
+**This is a "textbook SaaS maturity step" that makes tests deterministic and prevents debugging email during feature work.**
