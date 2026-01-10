@@ -195,7 +195,7 @@ export default function CustomerPreview() {
 
   if (error || !intake) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background overflow-x-hidden">
         <Header />
         <main className="container max-w-2xl py-16 text-center">
           <h1 className="text-2xl font-bold mb-4">Preview Not Found</h1>
@@ -212,7 +212,7 @@ export default function CustomerPreview() {
   const isPaid = intake.paidAt !== null && intake.paidAt !== undefined;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       <Header />
 
       <main className="container max-w-4xl py-8 md:py-16">
@@ -988,31 +988,57 @@ export default function CustomerPreview() {
         </p>
       </main>
 
-      {/* Sticky Mobile CTA - Only show on mobile when not paid and preview exists */}
-      {!isPaid && (intake as any).previewHTML && (
+      {/* Sticky Mobile CTA - Show on mobile when preview exists */}
+      {(intake as any).previewHTML && (
         <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] backdrop-blur-lg bg-background/90 border-t border-border/40 z-50">
-          <Button
-            size="lg"
-            className="w-full h-12 text-base"
-            onClick={() => {
-              serviceCheckoutMutation.mutate({
-                intakeId: intake.id,
-              });
-            }}
-            disabled={serviceCheckoutMutation.isPending}
-          >
-            {serviceCheckoutMutation.isPending ? (
-              <>
-                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                Processing...
-              </>
-            ) : (
-              <>
-                <CreditCard className="h-5 w-5 mr-2" />
-                Approve & Pay
-              </>
-            )}
-          </Button>
+          {isPaid ? (
+            // Paid State: Show confirmation badge
+            <div className="flex items-center justify-center gap-2 h-12 bg-green-500/10 border border-green-500/20 rounded-lg">
+              <CheckCircle className="h-5 w-5 text-green-500" />
+              <span className="text-green-500 font-medium">Payment Confirmed</span>
+            </div>
+          ) : (
+            // Not Paid: Show two-button layout
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="lg"
+                className="flex-1 h-12"
+                asChild
+              >
+                <a 
+                  href={`${window.location.origin}/preview/${token}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Open Full Preview
+                </a>
+              </Button>
+              <Button
+                size="lg"
+                className="flex-[1.5] h-12 bg-orange-500 hover:bg-orange-600"
+                onClick={() => {
+                  serviceCheckoutMutation.mutate({
+                    intakeId: intake.id,
+                  });
+                }}
+                disabled={serviceCheckoutMutation.isPending}
+              >
+                {serviceCheckoutMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    Approve & Pay
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>
