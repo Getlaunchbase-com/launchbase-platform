@@ -41,7 +41,7 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
  * Start the HTTP server
  */
 async function startServer() {
-  const app = createApp();
+  const app = await createApp();
   const server = createServer(app);
 
   // Apply environment-specific middleware

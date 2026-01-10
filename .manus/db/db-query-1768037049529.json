@@ -1,0 +1,43 @@
+{
+  "query": "SELECT ar.id, ar.checklistKey, ar.status, ar.sendCount, ar.lastSentAt, \n       e.eventType, e.actorType, e.reason, e.createdAt as eventTime\nFROM action_requests ar\nLEFT JOIN action_request_events e ON ar.id = e.actionRequestId\nWHERE ar.id = (SELECT id FROM action_requests ORDER BY createdAt DESC LIMIT 1)\nORDER BY e.createdAt DESC\nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT ar.id, ar.checklistKey, ar.status, ar.sendCount, ar.lastSentAt, \n       e.eventType, e.actorType, e.reason, e.createdAt as eventTime\nFROM action_requests ar\nLEFT JOIN action_request_events e ON ar.id = e.actionRequestId\nWHERE ar.id = (SELECT id FROM action_requests ORDER BY createdAt DESC LIMIT 1)\nORDER BY e.createdAt DESC\nLIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "checklistKey": "homepage.headline",
+      "status": "pending",
+      "sendCount": "0",
+      "lastSentAt": "NULL",
+      "eventType": "PREVIEW_VIEWED",
+      "actorType": "customer",
+      "reason": "NULL",
+      "eventTime": "2026-01-10 08:25:33"
+    },
+    {
+      "id": "1",
+      "checklistKey": "homepage.headline",
+      "status": "pending",
+      "sendCount": "0",
+      "lastSentAt": "NULL",
+      "eventType": "PREVIEW_VIEWED",
+      "actorType": "customer",
+      "reason": "NULL",
+      "eventTime": "2026-01-10 08:25:33"
+    },
+    {
+      "id": "1",
+      "checklistKey": "homepage.headline",
+      "status": "pending",
+      "sendCount": "0",
+      "lastSentAt": "NULL",
+      "eventType": "PREVIEW_VIEWED",
+      "actorType": "customer",
+      "reason": "NULL",
+      "eventTime": "2026-01-10 08:25:33"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tchecklistKey\tstatus\tsendCount\tlastSentAt\teventType\tactorType\treason\teventTime\n1\thomepage.headline\tpending\t0\tNULL\tPREVIEW_VIEWED\tcustomer\tNULL\t2026-01-10 08:25:33\n1\thomepage.headline\tpending\t0\tNULL\tPREVIEW_VIEWED\tcustomer\tNULL\t2026-01-10 08:25:33\n1\thomepage.headline\tpending\t0\tNULL\tPREVIEW_VIEWED\tcustomer\tNULL\t2026-01-10 08:25:33\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

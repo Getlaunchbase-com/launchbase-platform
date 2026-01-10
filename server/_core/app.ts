@@ -40,7 +40,7 @@ import { getDb } from "../db";
 import { deployments } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 
-export function createApp(): Express {
+export async function createApp(): Promise<Express> {
   const app = express();
 
   // 1. Stripe webhook (raw body MUST be first, before body parsers)
@@ -67,17 +67,17 @@ export function createApp(): Express {
   app.get("/api/cron/health", handleCronHealth);
 
   // 4. Action request endpoints (customer approve/edit links)
-  const { handleApprove, handleEditForm, handleEditSubmit } = require("../api.actions");
+  const { handleApprove, handleEditForm, handleEditSubmit } = await import("../api.actions.js");
   app.get("/api/actions/:token/approve", handleApprove);
   app.get("/api/actions/:token/edit", handleEditForm);
   app.post("/api/actions/:token/edit", handleEditSubmit);
   
   // Proposed change preview
-  const { handleProposedPreview } = require("../api.preview.proposed");
+  const { handleProposedPreview } = await import("../api.preview.proposed.js");
   app.get("/preview/proposed/:token", handleProposedPreview);
   
   // 5. Resend inbound webhook (email reply parsing)
-  const { handleResendInbound } = require("../api.webhooks.resend");
+  const { handleResendInbound } = await import("../api.webhooks.resend.js");
   app.post("/api/webhooks/resend/inbound", handleResendInbound);
 
   // 5. Referral redirect endpoint: /r/{siteSlug}
