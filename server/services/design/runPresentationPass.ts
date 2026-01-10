@@ -29,7 +29,7 @@ export async function runPresentationPass(args: {
   intakeData: IntakeData;
   buildPlan: BuildPlan;
   siteSlug?: string;
-}): Promise<{ jobId: number; winner: DesignOutput } | null> {
+}): Promise<{ jobId: number; winner: DesignOutput; variantKey: string; score: number } | null> {
   // 0) Hard guard: only enhanced tier
   if (args.tier !== "enhanced") {
     return null;
@@ -110,7 +110,7 @@ export async function runPresentationPass(args: {
 
     console.log(`[Presentation Pass] Job ${job.id} complete: winner=${winner.variantKey}, score=${winner.scoreTotal}`);
 
-    return { jobId: job.id, winner: winner.design };
+    return { jobId: job.id, winner: winner.design, variantKey: winner.variantKey, score: winner.scoreTotal };
   } catch (e) {
     console.error(`[Presentation Pass] Failed for intake ${args.intakeId}:`, e);
     await logDesignEvent({
@@ -153,7 +153,7 @@ async function findCompletedJob(params: {
   tenant: string;
   tier: string;
   inputsHash: string;
-}): Promise<{ jobId: number; winner: DesignOutput } | null> {
+}): Promise<{ jobId: number; winner: DesignOutput; variantKey: string; score: number } | null> {
   const db = await getDb();
   if (!db) return null;
 
@@ -191,6 +191,8 @@ async function findCompletedJob(params: {
   return {
     jobId: job.id,
     winner: candidates[0].designJson as DesignOutput,
+    variantKey: candidates[0].variantKey,
+    score: candidates[0].scoreTotal,
   };
 }
 
@@ -217,7 +219,8 @@ async function createDesignJob(params: {
   };
 
   const result = await db.insert(designJobs).values(job);
-  return { id: Number(result.insertId) };
+  const insertId = result[0].insertId;
+  return { id: insertId };
 }
 
 /**

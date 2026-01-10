@@ -1,0 +1,8 @@
+{
+  "query": "SELECT id, designJobId, variantKey, scoreTotal, rank, status FROM design_candidates WHERE designJobId = 3 ORDER BY rank;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT id, designJobId, variantKey, scoreTotal, rank, status FROM design_candidates WHERE designJobId = 3 ORDER BY rank;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1064 (42000) at line 1: You have an error in your SQL syntax; check the manual that corresponds to your TiDB version for the right syntax to use line 1 column 53 near \", status FROM design_candidates WHERE designJobId = 3 ORDER BY rank\""
+  ]
+}
