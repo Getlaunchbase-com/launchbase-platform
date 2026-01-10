@@ -35,6 +35,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { toast } from "sonner";
 import { generatePreviewHTML } from "@/lib/previewGenerator";
 import ActionRequestsCard from "@/components/ActionRequestsCard";
+import PresentationSummaryCard from "@/components/PresentationSummaryCard";
 import {
   Dialog,
   DialogContent,
@@ -1011,6 +1012,9 @@ export default function IntakeDetail() {
               </CardContent>
             </Card>
           )}
+
+          {/* Presentation Summary Card */}
+          <PresentationSummaryCard intakeId={intakeId} />
 
           {/* Action Requests Card */}
           <ActionRequestsCard intakeId={intakeId} />
