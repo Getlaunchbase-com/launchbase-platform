@@ -93,6 +93,10 @@ export async function createActionRequest(data: {
 
   const token = generateToken();
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+  
+  // Generate proposed preview token (7 days expiration)
+  const proposedPreviewToken = generateToken();
+  const proposedPreviewExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
   const values: InsertActionRequest = {
     tenant: data.tenant,
@@ -103,6 +107,8 @@ export async function createActionRequest(data: {
     token,
     messageType: data.messageType,
     expiresAt,
+    proposedPreviewToken,
+    proposedPreviewExpiresAt,
   };
 
   const result = await db.insert(actionRequests).values(values);

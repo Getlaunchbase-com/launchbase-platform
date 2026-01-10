@@ -174,6 +174,7 @@ async function processIntake(intake: any): Promise<void> {
     tenant: intake.tenant,
     intakeId: intake.id,
     checklistKey: nextAction.checklistKey,
+    proposedPreviewToken: actionRequest.proposedPreviewToken || undefined,
     proposedValue,
     messageType: nextAction.messageType,
   });
@@ -192,6 +193,7 @@ async function processIntake(intake: any): Promise<void> {
     proposedValue: typeof proposedValue === "string" ? proposedValue : JSON.stringify(proposedValue),
     token: actionRequest.token,
     checklistKey: nextAction.checklistKey,
+    proposedPreviewToken: actionRequest.proposedPreviewToken || undefined,
   });
 
   if (result.success) {

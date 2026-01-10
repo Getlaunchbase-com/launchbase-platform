@@ -120,6 +120,7 @@ export const actionRequestsRouter = router({
           ? request.proposedValue 
           : JSON.stringify(request.proposedValue),
         token: request.token,
+        proposedPreviewToken: request.proposedPreviewToken || undefined,
         checklistKey: request.checklistKey,
       });
 
