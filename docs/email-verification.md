@@ -1,243 +1,92 @@
-# Email Verification & Troubleshooting
+# Email Verification & Troubleshooting (Resend)
 
-This document explains how to verify email delivery and debug issues with the action request system.
-
-## Quick Reference
-
-**Resend Dashboard:** https://resend.com/emails  
-**Inbound Domain:** approvals@getlaunchbase.com  
-**DNS Status:** https://resend.com/domains
+This doc covers how to verify LaunchBase outbound + inbound email flows and debug fast.
 
 ---
 
-## Outbound Emails (Ask / Confirm)
+## 1) Outbound Email (Ask / Confirm / Resend)
 
-### How to Verify Delivery
+### Where to check
+Resend Dashboard → Emails
 
-1. Go to **Resend → Emails**
-2. Filter by recipient email address
-3. Check status column
+### What "good" looks like
+- Status: **Delivered**
+- Recipient matches expected customer email
+- The app logs an audit event:
+  - `SENT` (system) or `RESENT` (admin)
+  - `meta.resendMessageId` present
 
-### Status Meanings
+### How to trace one email end-to-end (fast)
+1. In LaunchBase Admin → Intake → Action Requests
+2. Open "Recent activity"
+3. Find the latest `SENT` / `RESENT` event
+4. Copy `meta.resendMessageId`
+5. In Resend → Emails, search for that ID  
+   (or filter by recipient + time)
 
-| Status | Meaning | Action Required |
-|--------|---------|-----------------|
-| **Delivered** | ✅ Email successfully delivered to inbox | None - working correctly |
-| **Delivery Delay** | ⏳ Temporary delay (common for test domains like @test.com) | Wait or use real email address |
-| **Failed** | ❌ Permanent delivery failure | Check `meta.errorMessage` in event log |
+This guarantees you're looking at the exact email.
 
-### Common Non-Issues
-
-- **@test.com delivery delays are expected** - These are fake test addresses, not real inboxes
-- **Cron skips existing sent requests by design** - Status must be "pending" to send
-- **Emails only marked "sent" on real Resend delivery** - Fallback notifications don't change status
-
----
-
-## Inbound Emails (Customer Replies)
-
-### How to Verify Inbound Setup
-
-1. Go to **Resend → Domains → getlaunchbase.com**
-2. Check **Receiving** section shows **Verified** ✅
-3. Verify MX record exists:
-   ```bash
-   dig MX getlaunchbase.com
-   ```
-
-### Test Inbound Processing
-
-1. Find an action request email in your inbox
-2. Reply with exactly: `YES`
-3. Check **Admin → Action Requests** card
-4. Verify events appear in order:
-   - `CUSTOMER_APPROVED`
-   - `APPLIED`
-   - `LOCKED`
-5. Confirm confirmation email sent
-
-### Inbound Webhook Endpoint
-
-- **URL:** `https://www.getlaunchbase.com/api/webhooks/resend`
-- **Method:** POST
-- **Auth:** Resend signature verification (automatic)
+### Common statuses
+- **Delivered** → Success
+- **Delivery Delay** → Not necessarily a bug (common for test domains / certain providers)
+- **Failed** → Check:
+  - sending domain verification
+  - SPF/DKIM records
+  - Resend suppression/bounce
+  - API key/environment
 
 ---
 
-## How to Debug Fast
+## 2) Inbound Email (Customer Replies)
 
-### Step 1: Find the Event
+LaunchBase uses Resend inbound to receive customer replies and classify them.
 
-```sql
-SELECT * FROM action_request_events 
-WHERE actionRequestId = ? 
-ORDER BY createdAt DESC;
-```
+### Where to check
+Resend Dashboard → Domains → (your domain) → Receiving
 
-### Step 2: Extract Resend Message ID
+### What "good" looks like
+- Receiving shows **Verified**
+- MX record is configured at registrar
+- A real reply triggers events in LaunchBase:
+  - `CUSTOMER_APPROVED` (reply "YES")
+  - OR `CUSTOMER_EDITED` (reply includes edit)
+  - OR `CUSTOMER_UNCLEAR` + `ESCALATED` (ambiguous)
 
-Look for `meta.resendMessageId` in the event row:
-
-```json
-{
-  "resendMessageId": "abc123...",
-  "to": "customer@example.com",
-  "subject": "Approve: homepage headline"
-}
-```
-
-### Step 3: Search in Resend Dashboard
-
-1. Copy the `resendMessageId`
-2. Go to Resend → Emails
-3. Paste ID in search box
-4. View full delivery details
-
-### Step 4: Check Event Sequence
-
-Expected flow for successful approval:
+### The fastest inbound test
+Reply to a real action request email with:
 
 ```
-SENT → CUSTOMER_APPROVED → APPLIED → LOCKED
+YES
 ```
 
-If stuck at `SENT`:
-- Customer hasn't replied yet
-- Reply went to wrong address (check replyTo)
-- Webhook not receiving (check Resend logs)
-
-If `SEND_FAILED`:
-- Check `meta.errorMessage` for Resend error
-- Verify RESEND_API_KEY is set
-- Check recipient email format
+Expected event chain:
+- `CUSTOMER_APPROVED`
+- `APPLIED`
+- `LOCKED`
 
 ---
 
-## Common Issues
+## 3) Common "Looks Broken But Isn't" Cases
 
-### Issue: "Email not sending"
+### Cron creates requests but no new emails
+- If an action request already exists with status `pending` / `sent`, the sequencer may skip creating/sending again.
+- Use Admin "Resend" (rate-limited) or expire/unlock as needed.
 
-**Symptoms:** Action request stays in "pending" status
-
-**Debug steps:**
-1. Check `action_request_events` for `SEND_FAILED` event
-2. Look at `meta.errorMessage` for Resend error
-3. Verify `RESEND_API_KEY` environment variable is set
-4. Check Resend dashboard for API errors
-
-**Common causes:**
-- Missing or invalid API key
-- Recipient email invalid format
-- Resend account suspended (check billing)
+### "Delivery Delay" in Resend
+- Often normal for test addresses / some providers.
+- Confirm by checking if real addresses (like vmorre@live.com) deliver.
 
 ---
 
-### Issue: "Customer replied but nothing happened"
+## 4) Debug Checklist (5 steps)
 
-**Symptoms:** Reply sent but no `CUSTOMER_APPROVED` event
-
-**Debug steps:**
-1. Check Resend → Domains → Receiving = Verified
-2. Verify MX record exists: `dig MX getlaunchbase.com`
-3. Check webhook endpoint is accessible: `curl https://www.getlaunchbase.com/api/webhooks/resend`
-4. Look for webhook errors in server logs
-
-**Common causes:**
-- MX record not configured
-- Webhook endpoint down
-- Customer replied to wrong address
-- Reply didn't include approve/edit keywords
-
----
-
-### Issue: "Delivery Delay" in Resend
-
-**Symptoms:** Email shows "Delivery Delay" status
-
-**This is expected for:**
-- Test email addresses (@test.com, @example.com)
-- Temporary recipient server issues
-- Greylisting by recipient mail server
-
-**Action:**
-- If using test addresses: This is normal, use real email to verify
-- If using real addresses: Wait 5-10 minutes, usually resolves automatically
-- If persistent (>1 hour): Check recipient's spam folder or mail server status
-
----
-
-## Testing Checklist
-
-Before deploying changes to email system:
-
-- [ ] Send test action request via Admin UI
-- [ ] Verify email appears in Resend dashboard with "Delivered" status
-- [ ] Reply "YES" from real email client
-- [ ] Verify `CUSTOMER_APPROVED` event logged
-- [ ] Verify confirmation email sent
-- [ ] Check `resendMessageId` is stored in event meta
-- [ ] Verify no duplicate sends on cron re-run
-
----
-
-## Emergency Procedures
-
-### If emails stop sending entirely:
-
-1. **Check Resend API status:** https://resend.com/status
-2. **Verify API key:** `echo $RESEND_API_KEY` (should not be empty)
-3. **Check account billing:** Resend dashboard → Settings → Billing
-4. **Test with curl:**
-   ```bash
-   curl -X POST https://api.resend.com/emails \
-     -H "Authorization: Bearer $RESEND_API_KEY" \
-     -H "Content-Type: application/json" \
-     -d '{"from":"support@getlaunchbase.com","to":"test@example.com","subject":"Test","html":"Test"}'
-   ```
-
-### If inbound webhook stops working:
-
-1. **Check DNS:** `dig MX getlaunchbase.com` (should return Resend MX records)
-2. **Check webhook logs:** Resend dashboard → Domains → Receiving → Logs
-3. **Test webhook endpoint:**
-   ```bash
-   curl -X POST https://www.getlaunchbase.com/api/webhooks/resend \
-     -H "Content-Type: application/json" \
-     -d '{"type":"email.received","data":{"to":"approvals@getlaunchbase.com"}}'
-   ```
-4. **Verify signature validation:** Check server logs for "Invalid signature" errors
-
----
-
-## Forever Rules
-
-These patterns prevent re-debugging:
-
-1. **Always log `resendMessageId`** - One-click correlation to Resend dashboard
-2. **Never mark "sent" without real delivery** - Status reflects reality, not attempts
-3. **Log SEND_FAILED with error message** - Failures are visible, not silent
-4. **Test with real email addresses** - @test.com delays are expected and meaningless
-
----
-
-## Reference: Event Types
-
-| Event Type | Meaning | Actor | Logged When |
-|------------|---------|-------|-------------|
-| `SENT` | Email successfully delivered via Resend | system | After `resend.emails.send()` succeeds |
-| `RESENT` | Admin manually resent email | admin | Admin clicks "Resend" button |
-| `SEND_FAILED` | Email delivery failed | system | After `resend.emails.send()` throws |
-| `CUSTOMER_APPROVED` | Customer replied "YES" | customer | Webhook processes approval reply |
-| `CUSTOMER_EDITED` | Customer replied with edit | customer | Webhook processes edit reply |
-| `CUSTOMER_UNCLEAR` | Customer reply ambiguous | customer | Webhook can't classify intent |
-| `APPLIED` | Change applied to checklist | system | After approval processed |
-| `LOCKED` | Request locked (no more edits) | system | After change applied |
-| `ESCALATED` | Unclear reply escalated to human | system | After `CUSTOMER_UNCLEAR` |
-
----
-
-## Support Contacts
-
-- **Resend Support:** support@resend.com
-- **DNS Issues:** Check with domain registrar (Namecheap, etc.)
-- **LaunchBase Ops:** Check Admin → Alerts for system-level issues
+1. Find the latest action request for the intake
+2. Look at `action_request_events` for that request
+3. Confirm whether you have:
+   - `SENT` / `RESENT` with `resendMessageId`
+   - `SEND_FAILED` with error meta (if present)
+4. Use `resendMessageId` to find the exact email in Resend
+5. If inbound reply doesn't apply:
+   - confirm Receiving is Verified
+   - confirm webhook endpoint logs / events appear:
+     - `CUSTOMER_APPROVED` / `CUSTOMER_EDITED` / `CUSTOMER_UNCLEAR`
