@@ -52,4 +52,7 @@
 - [ ] Test full loop with real email reply (reply "YES" from phone)
 - [ ] Verify CUSTOMER_APPROVED → APPLIED → LOCKED event sequence
 - [ ] Verify confirmation email sent after approval
-- [ ] Add Design section to intake admin view (tier, winner, score, candidates table)
+- [x] Create designJobsRouter with byIntake query
+- [x] Create PresentationSummaryCard component (read-only)
+- [x] Wire card into IntakeDetail page
+- [ ] Test admin visibility with real Tier 1 job
