@@ -1,5 +1,17 @@
 # LaunchBase TODO
 
+## Session Jan 10, 2026 - Design Engine Interface Foundation
+- [x] Draft DesignInput + DesignOutput schema (tool-agnostic contract)
+- [x] Formalize PresentationScore rubric (deterministic scoring)
+- [x] Create docs/design-engines.md (philosophy + architecture)
+- [ ] Implement design_jobs table and tracking
+- [ ] Build candidate generator (3-5 variants per tier)
+- [ ] Implement scoring engine (evaluate candidates against rubric)
+- [ ] Add tier routing logic (standard/enhanced/premium)
+- [ ] Wire into existing preview + approval flow
+- [ ] Test Tier 1 Enhanced Presentation Pass end-to-end
+- [ ] Document foundation for future premium engines (Framer/Lovable)
+
 ## Session Jan 10, 2026 - Batch Approvals & Confidence Learning
 - [x] Design batch approval mutation (approve multiple action requests at once)
 - [x] Implement batchApprove mutation in actionRequestsRouter
@@ -35,32 +47,3 @@
 - [ ] Test full loop with real email reply (reply "YES" from phone)
 - [ ] Verify CUSTOMER_APPROVED → APPLIED → LOCKED event sequence
 - [ ] Verify confirmation email sent after approval
-
-## Session Jan 9, 2026 - Test Database Setup Fix
-- [x] Implement robust test database setup with schema rebuild on each test run
-- [x] Update vitest.global-setup.ts to DROP/CREATE database before migrations
-- [x] Document test database pattern in NEVER_AGAIN.md
-- [x] Verify all setIntakeStatus tests pass (4/4 passing)
-
-## Session Jan 8, 2026 - Alert System Auth Hardening
-- [x] Add WORKER_TOKEN verification to /api/cron/alerts endpoint
-- [x] Add rate limiting (60s minimum interval) to prevent double-fires
-- [x] Create boundary tests for auth (6/6 passing)
-- [x] Document cron endpoint auth pattern in NEVER_AGAIN.md
-- [ ] Schedule external cron job (cron-job.org) to POST /api/cron/alerts every 15 minutes
-- [ ] Test alert delivery end-to-end (trigger real condition, verify email)
-- [ ] Add alert history UI at /admin/alerts (read-only table)
-
-## Real-Time Alert System (Jan 2026) - COMPLETE
-- [x] Create alert_events table in schema
-- [x] Run SQL migration to add alert_events table with indexes
-- [x] Implement alert evaluation logic in server/_core/alerts.ts
-- [x] Add 60min cooldown dedup logic
-- [x] Add auto-resolve when metrics recover
-- [x] Add ops_alert email template
-- [x] Create /api/cron/alerts endpoint
-- [x] Wire alert evaluator to cron endpoint
-- [x] Add WORKER_TOKEN verification to alerts endpoint
-- [x] Add rate limiting to prevent double-fires
-- [x] Write boundary tests for auth (6/6 passing)
-- [x] Document alert rules in NEVER_AGAIN.md
