@@ -562,3 +562,12 @@
 - [x] Add sticky "Approve & Pay" CTA at bottom with safe-area padding
 - [x] Add responsive typography and prevent horizontal overflow
 - [x] Test complete customer flow: onboard → preview → approve → pay - WORKS END-TO-END!
+
+
+## Mobile Conversion Optimization - COMPLETED (Jan 10, 2026)
+- [x] Add sticky bottom CTA bar (mobile only) with safe-area padding
+- [x] Two buttons: "Approve & Pay" (primary) + "Open Full Preview" (secondary)
+- [x] Disable primary during checkout mutation
+- [x] Replace with "✅ Payment confirmed" badge when paid
+- [x] Add overflow-x-hidden to page root
+- [x] Verify viewport meta tag with viewport-fit=cover
