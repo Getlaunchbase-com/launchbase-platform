@@ -110,6 +110,9 @@ export const clarifications = mysqlTable("clarifications", {
   used: boolean("used").default(false).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   expiresAt: timestamp("expiresAt"),
+  // Proposed preview token (for View Proposed Preview link)
+  proposedPreviewToken: varchar("proposedPreviewToken", { length: 64 }).unique(),
+  proposedPreviewExpiresAt: timestamp("proposedPreviewExpiresAt"),
 });
 
 export type Clarification = typeof clarifications.$inferSelect;
@@ -158,6 +161,9 @@ export const actionRequests = mysqlTable("action_requests", {
   respondedAt: timestamp("respondedAt"),
   appliedAt: timestamp("appliedAt"),
   expiresAt: timestamp("expiresAt"),
+  // Proposed preview token (for View Proposed Preview link)
+  proposedPreviewToken: varchar("proposedPreviewToken", { length: 64 }).unique(),
+  proposedPreviewExpiresAt: timestamp("proposedPreviewExpiresAt"),
 }, (table) => ({
   // Indexes for efficient queries
   tenantIntakeKeyIdx: index("tenant_intake_key_idx").on(table.tenant, table.intakeId, table.checklistKey),
@@ -188,7 +194,9 @@ export const actionRequestEvents = mysqlTable("action_request_events", {
     "ADMIN_APPLY",
     "ADMIN_UNLOCK",
     "ADMIN_EXPIRE",
-    "ESCALATED"
+    "ESCALATED",
+    "PREVIEW_VIEWED",
+    "PROPOSED_PREVIEW_RENDER_FAILED",
   ]).notNull(),
   // Actor
   actorType: mysqlEnum("actorType", ["system", "customer", "admin"]).notNull(),
@@ -536,6 +544,9 @@ export const socialPosts = mysqlTable("social_posts", {
   // Timestamps
   scheduledFor: timestamp("scheduledFor"),
   expiresAt: timestamp("expiresAt"), // For Guided mode expiry
+  // Proposed preview token (for View Proposed Preview link)
+  proposedPreviewToken: varchar("proposedPreviewToken", { length: 64 }).unique(),
+  proposedPreviewExpiresAt: timestamp("proposedPreviewExpiresAt"),
   approvedAt: timestamp("approvedAt"),
   approvedBy: int("approvedBy"), // User ID who approved
   publishedAt: timestamp("publishedAt"),
@@ -1136,6 +1147,9 @@ export const promoCodes = mysqlTable("promo_codes", {
   maxRedemptions: int("maxRedemptions").notNull(),
   active: boolean("active").default(true).notNull(),
   expiresAt: timestamp("expiresAt"),
+  // Proposed preview token (for View Proposed Preview link)
+  proposedPreviewToken: varchar("proposedPreviewToken", { length: 64 }).unique(),
+  proposedPreviewExpiresAt: timestamp("proposedPreviewExpiresAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 

@@ -618,6 +618,7 @@ export async function sendActionRequestEmail(data: {
   proposedValue: string;
   token: string;
   checklistKey: string;
+  proposedPreviewToken?: string;
 }): Promise<{ success: boolean; error?: string }> {
   const resend = getResendClient();
   
@@ -696,7 +697,9 @@ export async function sendActionRequestEmail(data: {
       background: #16a34a;
       color: white;
     }
-    .btn-edit {
+    .btn-preview {
+      background: #3b82f6;
+    }
       background: #ea580c;
       color: white;
     }
@@ -737,6 +740,7 @@ export async function sendActionRequestEmail(data: {
     </div>
     
     <div class="buttons">
+      ${data.proposedPreviewToken ? `<a href="${ENV.publicBaseUrl}/preview/proposed/${data.proposedPreviewToken}" class="btn btn-preview">👁️ View Proposed Preview</a>` : ""}
       <a href="${approveUrl}" class="btn btn-approve">✅ Approve</a>
       <a href="${editUrl}" class="btn btn-edit">✏️ Edit</a>
     </div>
@@ -771,6 +775,9 @@ We've drafted this for ${data.businessName}:
 
 ${data.proposedValue}
 
+${data.proposedPreviewToken ? `View proposed preview: ${ENV.publicBaseUrl}/preview/proposed/${data.proposedPreviewToken}
+
+` : ""}
 To approve: ${approveUrl}
 To edit: ${editUrl}
 
@@ -825,6 +832,7 @@ export async function sendActionConfirmationEmail(data: {
   businessName: string;
   firstName: string;
   checklistKey: string;
+  proposedPreviewToken?: string;
   appliedValue: string;
   previewUrl?: string;
 }): Promise<{ success: boolean; error?: string }> {

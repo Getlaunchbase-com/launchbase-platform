@@ -72,6 +72,10 @@ export function createApp(): Express {
   app.get("/api/actions/:token/edit", handleEditForm);
   app.post("/api/actions/:token/edit", handleEditSubmit);
   
+  // Proposed change preview
+  const { handleProposedPreview } = require("../api.preview.proposed");
+  app.get("/preview/proposed/:token", handleProposedPreview);
+  
   // 5. Resend inbound webhook (email reply parsing)
   const { handleResendInbound } = require("../api.webhooks.resend");
   app.post("/api/webhooks/resend/inbound", handleResendInbound);

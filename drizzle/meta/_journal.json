@@ -120,6 +120,20 @@
       "when": 1768029771948,
       "tag": "0016_known_red_skull",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "5",
+      "when": 1768032058462,
+      "tag": "0017_naive_supernaut",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "5",
+      "when": 1768032482626,
+      "tag": "0018_even_karma",
+      "breakpoints": true
     }
   ]
 }
