@@ -108,6 +108,7 @@ export function generatePreviewHTML(intake: IntakeData, buildPlan: BuildPlan, si
   // Design tier (for visual verification)
   const designTier = opts?.design ? "enhanced" : "standard";
   const variantKey = opts?.design?.variantKey || "default";
+  const designScore = opts?.design?.score || null;
   
   // Color schemes by vertical
   const colorSchemes = {
@@ -137,8 +138,17 @@ export function generatePreviewHTML(intake: IntakeData, buildPlan: BuildPlan, si
   // Services section based on description
   const services = extractServices(businessDescription, vertical);
   
-  return `
-<!DOCTYPE html>
+  // Build HTML comment for verification (non-customer visible)
+  const debugComment = opts?.design 
+    ? `<!-- PRESENTATION_TIER: enhanced | variant=${variantKey} | score=${designScore} -->\n`
+    : '';
+  
+  // Build body tag with data attributes for verification
+  const bodyTag = opts?.design
+    ? `<body data-presentation-tier="enhanced" data-design-variant="${variantKey}">`
+    : '<body>';
+  
+  return `${debugComment}<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -369,9 +379,9 @@ export function generatePreviewHTML(intake: IntakeData, buildPlan: BuildPlan, si
     }
   </style>
 </head>
-<body>
+${bodyTag}
   <div class="preview-banner">
-    🎨 This is a preview of your website. Final version may vary slightly. [Tier: ${designTier} | Variant: ${variantKey}]
+    🎨 This is a preview of your website. Final version may vary slightly.
   </div>
   
   <header class="header">

@@ -9,7 +9,12 @@
 - [x] Implement scoring engine (evaluate candidates against rubric)
 - [x] Add tier routing logic (standard/enhanced/premium)
 - [x] Wire into existing preview + approval flow
-- [ ] Test Tier 1 Enhanced Presentation Pass end-to-end
+- [x] Add HTML comment + data attribute to preview for Tier 1 verification
+- [x] Remove customer-facing tier badge from preview
+- [x] End-to-end test: 1 job, 3 candidates, scores differ
+- [x] End-to-end test: Winner stable across reloads (persistence)
+- [x] End-to-end test: No duplicate jobs created
+- [x] End-to-end test: All required events logged
 - [ ] Document foundation for future premium engines (Framer/Lovable)
 
 ## Session Jan 10, 2026 - Batch Approvals & Confidence Learning
@@ -47,3 +52,4 @@
 - [ ] Test full loop with real email reply (reply "YES" from phone)
 - [ ] Verify CUSTOMER_APPROVED → APPLIED → LOCKED event sequence
 - [ ] Verify confirmation email sent after approval
+- [ ] Add Design section to intake admin view (tier, winner, score, candidates table)

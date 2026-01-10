@@ -1,0 +1,40 @@
+{
+  "query": "SELECT * FROM `design_candidates` WHERE `designJobId` = 3;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT * FROM `design_candidates` WHERE `designJobId` = 3;",
+  "rows": [
+    {
+      "id": "4",
+      "designJobId": "3",
+      "variantKey": "hero_left_trust_inline",
+      "designJson": "{\"layout\": {\"cta\": \"heroAndBottom\", \"hero\": \"left\", \"services\": \"cards\", \"testimonials\": \"single\", \"trust\": \"inline\"}, \"tokens\": {\"ctaStyle\": \"solid\", \"headingScale\": \"default\", \"imageStyle\": \"stock\", \"maxWidth\": \"lg\", \"radius\": \"lg\", \"sectionGap\": \"normal\", \"trustPlacement\": \"hero\"}, \"variantKey\": \"hero_left_trust_inline\", \"version\": \"v1\"}",
+      "scoreTotal": "87",
+      "scoreBreakdown": "{\"brandNeutral\": 12, \"cta\": 15, \"ctaRedundancy\": 10, \"mobileClarity\": 12, \"readability\": 14, \"riskPenalty\": 0, \"services\": 12, \"trust\": 12}",
+      "rank": "1",
+      "createdAt": "2026-01-10 17:37:39"
+    },
+    {
+      "id": "5",
+      "designJobId": "3",
+      "variantKey": "hero_center_trust_cardRow",
+      "designJson": "{\"layout\": {\"cta\": \"heroAndBottom\", \"hero\": \"center\", \"services\": \"cards\", \"testimonials\": \"grid\", \"trust\": \"cardRow\"}, \"tokens\": {\"ctaStyle\": \"solid\", \"headingScale\": \"bold\", \"imageStyle\": \"abstract\", \"maxWidth\": \"md\", \"radius\": \"lg\", \"sectionGap\": \"airy\", \"trustPlacement\": \"belowHero\"}, \"variantKey\": \"hero_center_trust_cardRow\", \"version\": \"v1\"}",
+      "scoreTotal": "81",
+      "scoreBreakdown": "{\"brandNeutral\": 8, \"cta\": 15, \"ctaRedundancy\": 10, \"mobileClarity\": 15, \"readability\": 14, \"riskPenalty\": -3, \"services\": 12, \"trust\": 10}",
+      "rank": "2",
+      "createdAt": "2026-01-10 17:37:39"
+    },
+    {
+      "id": "6",
+      "designJobId": "3",
+      "variantKey": "compact_left_list_services",
+      "designJson": "{\"layout\": {\"cta\": \"heroOnly\", \"hero\": \"left\", \"services\": \"list\", \"testimonials\": \"single\", \"trust\": \"inline\"}, \"tokens\": {\"ctaStyle\": \"outline\", \"headingScale\": \"compact\", \"imageStyle\": \"none\", \"maxWidth\": \"lg\", \"radius\": \"md\", \"sectionGap\": \"tight\", \"trustPlacement\": \"hero\"}, \"variantKey\": \"compact_left_list_services\", \"version\": \"v1\"}",
+      "scoreTotal": "68",
+      "scoreBreakdown": "{\"brandNeutral\": 12, \"cta\": 10, \"ctaRedundancy\": 6, \"mobileClarity\": 8, \"readability\": 10, \"riskPenalty\": 0, \"services\": 10, \"trust\": 12}",
+      "rank": "3",
+      "createdAt": "2026-01-10 17:37:39"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tdesignJobId\tvariantKey\tdesignJson\tscoreTotal\tscoreBreakdown\trank\tcreatedAt\n4\t3\thero_left_trust_inline\t{\"layout\": {\"cta\": \"heroAndBottom\", \"hero\": \"left\", \"services\": \"cards\", \"testimonials\": \"single\", \"trust\": \"inline\"}, \"tokens\": {\"ctaStyle\": \"solid\", \"headingScale\": \"default\", \"imageStyle\": \"stock\", \"maxWidth\": \"lg\", \"radius\": \"lg\", \"sectionGap\": \"normal\", \"trustPlacement\": \"hero\"}, \"variantKey\": \"hero_left_trust_inline\", \"version\": \"v1\"}\t87\t{\"brandNeutral\": 12, \"cta\": 15, \"ctaRedundancy\": 10, \"mobileClarity\": 12, \"readability\": 14, \"riskPenalty\": 0, \"services\": 12, \"trust\": 12}\t1\t2026-01-10 17:37:39\n5\t3\thero_center_trust_cardRow\t{\"layout\": {\"cta\": \"heroAndBottom\", \"hero\": \"center\", \"services\": \"cards\", \"testimonials\": \"grid\", \"trust\": \"cardRow\"}, \"tokens\": {\"ctaStyle\": \"solid\", \"headingScale\": \"bold\", \"imageStyle\": \"abstract\", \"maxWidth\": \"md\", \"radius\": \"lg\", \"sectionGap\": \"airy\", \"trustPlacement\": \"belowHero\"}, \"variantKey\": \"hero_center_trust_cardRow\", \"version\": \"v1\"}\t81\t{\"brandNeutral\": 8, \"cta\": 15, \"ctaRedundancy\": 10, \"mobileClarity\": 15, \"readability\": 14, \"riskPenalty\": -3, \"services\": 12, \"trust\": 10}\t2\t2026-01-10 17:37:39\n6\t3\tcompact_left_list_services\t{\"layout\": {\"cta\": \"heroOnly\", \"hero\": \"left\", \"services\": \"list\", \"testimonials\": \"single\", \"trust\": \"inline\"}, \"tokens\": {\"ctaStyle\": \"outline\", \"headingScale\": \"compact\", \"imageStyle\": \"none\", \"maxWidth\": \"lg\", \"radius\": \"md\", \"sectionGap\": \"tight\", \"trustPlacement\": \"hero\"}, \"variantKey\": \"compact_left_list_services\", \"version\": \"v1\"}\t68\t{\"brandNeutral\": 12, \"cta\": 10, \"ctaRedundancy\": 6, \"mobileClarity\": 8, \"readability\": 10, \"riskPenalty\": 0, \"services\": 10, \"trust\": 12}\t3\t2026-01-10 17:37:39\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}
