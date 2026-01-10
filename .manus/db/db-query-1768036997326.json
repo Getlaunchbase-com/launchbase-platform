@@ -1,0 +1,23 @@
+{
+  "query": "SELECT ar.id, ar.intakeId, ar.checklistKey, ar.proposedValue, ar.status, ar.sendCount, ar.lastSentAt, ar.token, ar.proposedPreviewToken, i.businessName, i.email \nFROM action_requests ar \nJOIN intakes i ON ar.intakeId = i.id \nORDER BY ar.createdAt DESC \nLIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT ar.id, ar.intakeId, ar.checklistKey, ar.proposedValue, ar.status, ar.sendCount, ar.lastSentAt, ar.token, ar.proposedPreviewToken, i.businessName, i.email \nFROM action_requests ar \nJOIN intakes i ON ar.intakeId = i.id \nORDER BY ar.createdAt DESC \nLIMIT 1;",
+  "rows": [
+    {
+      "id": "2",
+      "intakeId": "1",
+      "checklistKey": "homepage.subheadline",
+      "proposedValue": "\"Test Subheadline\"",
+      "status": "pending",
+      "sendCount": "0",
+      "lastSentAt": "NULL",
+      "token": "action_1768033533450_09b9862922729cc6",
+      "proposedPreviewToken": "action_1768033533450_24b973a0b34b342b",
+      "businessName": "Preview Test Business",
+      "email": "preview-test@test.com"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tintakeId\tchecklistKey\tproposedValue\tstatus\tsendCount\tlastSentAt\ttoken\tproposedPreviewToken\tbusinessName\temail\n2\t1\thomepage.subheadline\t\"Test Subheadline\"\tpending\t0\tNULL\taction_1768033533450_09b9862922729cc6\taction_1768033533450_24b973a0b34b342b\tPreview Test Business\tpreview-test@test.com\n",
+  "stderr": "",
+  "execution_time_ms": 168
+}

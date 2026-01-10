@@ -386,7 +386,7 @@ export async function handleCronActionRequests(req: Request, res: Response) {
   }
 
   try {
-    const { handleActionRequestSequencer } = require("./actionRequestSequencer");
+    const { handleActionRequestSequencer } = await import("./actionRequestSequencer.js");
     const result = await handleActionRequestSequencer();
     
     return res.status(200).json({
