@@ -531,8 +531,10 @@
 ## CRITICAL BUGS - Customer Flow Broken - Jan 9, 2026
 - [x] Fix preview link in email (showing relative path, needs absolute URL) - Added absoluteUrl() helper + PUBLIC_BASE_URL
 - [x] Fix payment button validation (email, name, serviceSelections undefined) - Changed to createServiceCheckoutFromIntake
+- [x] Set PUBLIC_BASE_URL to https://www.getlaunchbase.com (matches DNS)
+- [x] Configure DNS: www CNAME to launchbase-h86jcadp.manus.space
 - [ ] Fix mobile preview rendering (viewport, responsive layout)
-- [ ] Test complete customer flow: onboard → preview → approve → pay
+- [ ] Test complete customer flow: onboard → preview → approve → pay (waiting for DNS propagation)
 
 ## Async Refinement Loop (4-Step: Ask → Understand → Apply → Confirm) - Jan 9, 2026
 - [x] Draft first 10 bot messages (Day 0-3 post-payment refinement)
