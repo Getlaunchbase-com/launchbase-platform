@@ -22,6 +22,7 @@ import { actionRequests, intakes } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { logActionEvent } from "./action-request-events";
 import { alertWebhookFailure } from "./_core/webhookAlert";
+import { recordConfidenceOutcome } from "./confidence-learning";
 
 /**
  * Extract token from email address or subject
@@ -166,6 +167,19 @@ export async function handleResendInbound(req: Request, res: Response) {
         confidence: classification.confidence,
         replyChannel: "email",
       },
+    });
+    
+    // Record confidence learning outcome
+    const learningOutcome = 
+      classification.intent === "APPROVE" ? "approved" :
+      classification.intent === "EDIT_EXACT" ? "edited" :
+      classification.intent === "REJECT" ? "rejected" :
+      "unclear";
+    
+    await recordConfidenceOutcome({
+      checklistKey: actionRequest.checklistKey,
+      tenant: actionRequest.tenant,
+      outcome: learningOutcome,
     });
     
     // Handle based on intent
