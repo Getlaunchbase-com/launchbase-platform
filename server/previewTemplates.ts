@@ -101,9 +101,13 @@ export function generateBuildPlan(intake: IntakeData): BuildPlan {
 }
 
 // Generate preview HTML
-export function generatePreviewHTML(intake: IntakeData, buildPlan: BuildPlan, siteSlug?: string): string {
+export function generatePreviewHTML(intake: IntakeData, buildPlan: BuildPlan, siteSlug?: string, opts?: { design?: any }): string {
   const { businessName, businessDescription, serviceArea, phone, email } = intake;
   const { vertical, tone, primaryCTA } = buildPlan;
+  
+  // Design tier (for visual verification)
+  const designTier = opts?.design ? "enhanced" : "standard";
+  const variantKey = opts?.design?.variantKey || "default";
   
   // Color schemes by vertical
   const colorSchemes = {
@@ -367,7 +371,7 @@ export function generatePreviewHTML(intake: IntakeData, buildPlan: BuildPlan, si
 </head>
 <body>
   <div class="preview-banner">
-    🎨 This is a preview of your website. Final version may vary slightly.
+    🎨 This is a preview of your website. Final version may vary slightly. [Tier: ${designTier} | Variant: ${variantKey}]
   </div>
   
   <header class="header">

@@ -211,7 +211,30 @@ export const appRouter = router({
         const previewBuildPlan = generatePreviewBuildPlan(intakeData);
         // Generate siteSlug from business name for badge tracking
         const siteSlug = intake.businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').substring(0, 50);
-        const previewHTML = generatePreviewHTML(intakeData, previewBuildPlan, siteSlug);
+        
+        // Tier 1 Enhanced Presentation Pass (feature flag + tenant allowlist)
+        const { ENV } = await import("./_core/env");
+        const isEnhanced =
+          ENV.presentationTier === "enhanced" &&
+          intake.tenant === "vinces"; // Start safe: only vinces first
+        
+        let presentation: any | undefined;
+        
+        if (isEnhanced) {
+          const { runPresentationPass } = await import("./services/design/runPresentationPass");
+          const pass = await runPresentationPass({
+            intakeId: intake.id,
+            tenant: intake.tenant,
+            tier: "enhanced",
+            intakeData,
+            buildPlan: previewBuildPlan,
+            siteSlug,
+          });
+          
+          presentation = pass?.winner ?? undefined;
+        }
+        
+        const previewHTML = generatePreviewHTML(intakeData, previewBuildPlan, siteSlug, { design: presentation });
         
         return {
           ...intake,

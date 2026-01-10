@@ -1257,3 +1257,149 @@ export const confidenceLearning = mysqlTable("confidence_learning", {
 
 export type ConfidenceLearning = typeof confidenceLearning.$inferSelect;
 export type InsertConfidenceLearning = typeof confidenceLearning.$inferInsert;
+
+/**
+ * Design Jobs: Track each "presentation pass" for an intake
+ * One row per presentation run (tier, status, winner, timings)
+ */
+export const designJobs = mysqlTable("design_jobs", {
+  id: int("id").autoincrement().primaryKey(),
+  intakeId: int("intakeId").notNull(),
+  tenant: mysqlEnum("tenant", ["launchbase", "vinces"]).notNull().default("launchbase"),
+  
+  // Tier selection
+  tier: mysqlEnum("tier", ["standard", "enhanced", "premium"]).notNull().default("standard"),
+  
+  // Status workflow
+  status: mysqlEnum("status", ["created", "generated", "scored", "selected", "rendered", "failed"]).notNull().default("created"),
+  
+  // Engine used
+  engine: varchar("engine", { length: 64 }).notNull().default("launchbase_rules_v1"),
+  
+  // Winner selection
+  winnerCandidateId: int("winnerCandidateId"),
+  
+  // Input hash (to detect if re-run needed)
+  inputsHash: varchar("inputsHash", { length: 64 }).notNull(),
+  
+  // Metadata
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  intakeCreatedIdx: index("intake_created_idx").on(table.intakeId, table.createdAt),
+  statusCreatedIdx: index("status_created_idx").on(table.status, table.createdAt),
+  tenantCreatedIdx: index("tenant_created_idx").on(table.tenant, table.createdAt),
+}));
+
+export type DesignJob = typeof designJobs.$inferSelect;
+export type InsertDesignJob = typeof designJobs.$inferInsert;
+
+/**
+ * Design Candidates: Store each variant, its score, and why it won
+ * 3-5 rows per job (one per variant)
+ */
+export const designCandidates = mysqlTable("design_candidates", {
+  id: int("id").autoincrement().primaryKey(),
+  designJobId: int("designJobId").notNull(),
+  
+  // Variant identification
+  variantKey: varchar("variantKey", { length: 128 }).notNull(), // e.g., "hero_left_trust_above_cta_solid"
+  
+  // Design output (normalized JSON)
+  designJson: json("designJson").$type<{
+    hero: {
+      layoutType: string;
+      headlineSize: string;
+      imageTreatment: string;
+      ctaPosition: string;
+      trustIndicatorsVisible: boolean;
+    };
+    sections: Array<{
+      type: string;
+      order: number;
+      layout: string;
+      emphasis: string;
+    }>;
+    typography: {
+      scale: string;
+      weightContrast: string;
+      maxFonts: number;
+      headingFont: string;
+      bodyFont: string;
+    };
+    spacing: {
+      verticalRhythm: string;
+      sectionDensity: string;
+      containerMaxWidth: number;
+    };
+    colors: {
+      primary: string;
+      secondary?: string;
+      neutral: string;
+      maxAccentColors: number;
+    };
+    mobile: {
+      tapTargetScore: number;
+      foldClarity: number;
+      stackOrder: string;
+    };
+    meta: {
+      generatedBy: string;
+      variantId: string;
+      generatedAt: string;
+    };
+  }>(),
+  
+  // Scoring
+  scoreTotal: int("scoreTotal").notNull(), // 0-1000
+  scoreBreakdown: json("scoreBreakdown").$type<{
+    readability: number;
+    hierarchy: number;
+    mobileClarity: number;
+    conversionClarity: number;
+    brandNeutrality: number;
+    signals: Record<string, number>;
+    violations: string[];
+  }>(),
+  
+  // Ranking
+  rank: int("rank").notNull(), // 1 = winner
+  
+  // Metadata
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  jobScoreIdx: index("job_score_idx").on(table.designJobId, table.scoreTotal),
+  jobRankIdx: index("job_rank_idx").on(table.designJobId, table.rank),
+}));
+
+export type DesignCandidate = typeof designCandidates.$inferSelect;
+export type InsertDesignCandidate = typeof designCandidates.$inferInsert;
+
+/**
+ * Design Events: Audit trail for design operations
+ * Tracks all design-related events (created, generated, scored, selected, etc.)
+ */
+export const designEvents = mysqlTable("design_events", {
+  id: int("id").autoincrement().primaryKey(),
+  intakeId: int("intakeId").notNull(),
+  designJobId: int("designJobId"),
+  tenant: mysqlEnum("tenant", ["launchbase", "vinces"]).notNull().default("launchbase"),
+  
+  // Event classification
+  eventType: varchar("eventType", { length: 64 }).notNull(), // DESIGN_JOB_CREATED, DESIGN_CANDIDATES_GENERATED, etc.
+  actorType: mysqlEnum("actorType", ["system", "admin", "customer"]).notNull().default("system"),
+  
+  // Context
+  reason: text("reason"), // Human-readable reason
+  meta: json("meta").$type<Record<string, unknown>>(), // Additional context
+  
+  // Metadata
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  intakeCreatedIdx: index("intake_created_idx").on(table.intakeId, table.createdAt),
+  jobCreatedIdx: index("job_created_idx").on(table.designJobId, table.createdAt),
+  eventTypeIdx: index("event_type_idx").on(table.eventType, table.createdAt),
+}));
+
+export type DesignEvent = typeof designEvents.$inferSelect;
+export type InsertDesignEvent = typeof designEvents.$inferInsert;
