@@ -32,6 +32,26 @@ import { toast } from "sonner";
 import { ShareSiteModal } from "@/components/ShareSiteModal";
 import { Share2 } from "lucide-react";
 
+// Mobile detection hook (failsafe for embedded webviews)
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      // Failsafe: viewport width OR userAgent
+      const isSmallViewport = window.innerWidth < 768;
+      const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      setIsMobile(isSmallViewport || isMobileUA);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  return isMobile;
+}
+
 // Business module definitions with production copy
 const BUSINESS_MODULES = [
   {
@@ -74,6 +94,9 @@ export default function CustomerPreview() {
   const [showShareModal, setShowShareModal] = useState(false);
   const [checkoutApprovalChecked, setCheckoutApprovalChecked] = useState(false);
   const [approvalChecked, setApprovalChecked] = useState(false);
+  
+  // Mobile detection (failsafe for embedded webviews)
+  const isMobile = useIsMobile();
 
   // Fetch intake by preview token
   const { data: intake, isLoading, error } = trpc.intake.getByPreviewToken.useQuery(
@@ -988,9 +1011,9 @@ export default function CustomerPreview() {
         </p>
       </main>
 
-      {/* Sticky Mobile CTA - Show on mobile when preview exists */}
-      {(intake as any).previewHTML && (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] backdrop-blur-lg bg-background/90 border-t border-border/40 z-50">
+      {/* Sticky Mobile CTA - Show on mobile when preview exists (failsafe: viewport OR userAgent) */}
+      {isMobile && (intake as any).previewHTML && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] backdrop-blur-lg bg-background/90 border-t border-border/40 z-50">
           {isPaid ? (
             // Paid State: Show confirmation badge
             <div className="flex items-center justify-center gap-2 h-12 bg-green-500/10 border border-green-500/20 rounded-lg">
