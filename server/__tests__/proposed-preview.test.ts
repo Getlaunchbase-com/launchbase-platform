@@ -86,7 +86,7 @@ describe("FOREVER: Proposed Preview Feature", () => {
     // Assertions
     expect(responseStatus).toBe(200);
     expect(responseBody).toContain("Test Headline - Professional Snow Removal");
-    expect(responseBody).toContain("Preview Mode");
+    expect(responseBody).toContain("Not live yet");
     expect(responseBody).toContain("Approve This Change");
     expect(responseBody).toContain("Edit Instead");
 

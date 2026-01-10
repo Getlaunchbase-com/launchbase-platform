@@ -354,7 +354,7 @@ function renderProposedPreviewHTML(data: {
 <body>
   <div class="preview-banner">
     <div class="preview-banner-text">
-      📋 Preview Mode: This shows how "${actionRequest.checklistKey}" will look with your proposed change
+      📋 Previewing proposed change · Not live yet · This shows how "${actionRequest.checklistKey}" will look with your proposed change
     </div>
     <div class="preview-actions">
       <a href="/api/actions/${actionRequest.token}/approve" class="btn btn-approve">✅ Approve This Change</a>
