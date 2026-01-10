@@ -141,6 +141,13 @@
       "when": 1768057253805,
       "tag": "0019_nice_psynapse",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1768061881048,
+      "tag": "0020_strange_puff_adder",
+      "breakpoints": true
     }
   ]
 }

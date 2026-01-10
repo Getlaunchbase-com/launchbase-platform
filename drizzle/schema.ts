@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, json, boolean, uniqueIndex, index, float } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, json, boolean, uniqueIndex, index, float, decimal } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -1223,3 +1223,37 @@ export const intakeStatusEvents = mysqlTable(
 );
 export type IntakeStatusEvent = typeof intakeStatusEvents.$inferSelect;
 export type InsertIntakeStatusEvent = typeof intakeStatusEvents.$inferInsert;
+
+/**
+ * Confidence Learning: Track approval/rejection patterns by checklist key
+ * System uses this to auto-tune confidence thresholds over time
+ */
+export const confidenceLearning = mysqlTable("confidence_learning", {
+  id: int("id").autoincrement().primaryKey(),
+  checklistKey: varchar("checklistKey", { length: 128 }).notNull(),
+  tenant: mysqlEnum("tenant", ["launchbase", "vinces"]).notNull().default("launchbase"),
+  
+  // Counters
+  totalSent: int("totalSent").notNull().default(0),
+  totalApproved: int("totalApproved").notNull().default(0),
+  totalRejected: int("totalRejected").notNull().default(0),
+  totalEdited: int("totalEdited").notNull().default(0),
+  totalUnclear: int("totalUnclear").notNull().default(0),
+  
+  // Computed metrics
+  approvalRate: float("approvalRate").notNull().default(0.0), // 0.0 to 1.0
+  editRate: float("editRate").notNull().default(0.0),
+  
+  // Recommended confidence threshold (learned)
+  recommendedThreshold: float("recommendedThreshold").notNull().default(0.9), // Start at 0.9
+  
+  // Metadata
+  lastUpdatedAt: timestamp("lastUpdatedAt").defaultNow().onUpdateNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  checklistKeyIdx: index("checklistKey_idx").on(table.checklistKey),
+  tenantIdx: index("tenant_idx").on(table.tenant),
+}));
+
+export type ConfidenceLearning = typeof confidenceLearning.$inferSelect;
+export type InsertConfidenceLearning = typeof confidenceLearning.$inferInsert;

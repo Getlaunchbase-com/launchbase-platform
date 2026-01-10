@@ -1,5 +1,17 @@
 # LaunchBase TODO
 
+## Session Jan 10, 2026 - Batch Approvals & Confidence Learning
+- [x] Design batch approval mutation (approve multiple action requests at once)
+- [x] Implement batchApprove mutation in actionRequestsRouter
+- [x] Add batch approval logic with transaction support
+- [x] Log ADMIN_APPLY + APPLIED + LOCKED events for each request
+- [ ] Add batch approval UI in Admin panel (checkbox selection) - SKIPPED (no UI yet)
+- [x] Write tests for batch approval (3 requests → all locked)
+- [x] Design confidence_learning table schema
+- [x] Implement confidence learning tracker (track approve/reject by key)
+- [x] Add confidence learning to webhook handler
+- [x] Write tests for confidence learning
+
 ## Session Jan 10, 2026 - Architecture Documentation
 - [x] Create docs/how-launchbase-works.md with 3-layer architecture
 - [x] Document Core Engine (Layer 1): action_requests + events

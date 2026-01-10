@@ -209,6 +209,96 @@ export const actionRequestsRouter = router({
     }),
 
   /**
+   * Batch approve multiple action requests at once
+   * Reduces friction when customer trusts multiple proposals
+   */
+  batchApprove: publicProcedure
+    .input(z.object({
+      ids: z.array(z.number()).min(1, "At least one ID required"),
+      reason: z.string().min(1, "Reason is required"),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) {
+        throw new Error("Database not available");
+      }
+      
+      const results: Array<{ id: number; success: boolean; error?: string }> = [];
+      
+      // Process each request sequentially (transaction-like)
+      for (const id of input.ids) {
+        try {
+          // Load action request
+          const [request] = await db
+            .select()
+            .from(actionRequests)
+            .where(eq(actionRequests.id, id))
+            .limit(1);
+
+          if (!request) {
+            results.push({ id, success: false, error: "Not found" });
+            continue;
+          }
+          
+          // Skip if already locked
+          if (request.status === "locked") {
+            results.push({ id, success: false, error: "Already locked" });
+            continue;
+          }
+
+          // Update to responded status
+          await db.update(actionRequests).set({
+            status: "responded",
+            respondedAt: new Date(),
+            replyChannel: "link",
+            confidence: 1.0, // Admin batch approval = 100% confidence
+            rawInbound: { method: "batch_admin_approve" } as any,
+          }).where(eq(actionRequests.id, id));
+          
+          // Log admin apply event
+          await logActionEvent({
+            actionRequestId: request.id,
+            intakeId: request.intakeId,
+            eventType: "ADMIN_APPLY",
+            actorType: "admin",
+            reason: `Batch approval: ${input.reason}`,
+            meta: {
+              batchSize: input.ids.length,
+              batchIds: input.ids,
+            },
+          });
+
+          // Apply through same path as bot
+          const { applyActionRequest, confirmAndLockActionRequest } = await import("../action-requests");
+          const result = await applyActionRequest(id);
+
+          if (result.success) {
+            await confirmAndLockActionRequest(id);
+            results.push({ id, success: true });
+          } else {
+            results.push({ id, success: false, error: result.error });
+          }
+        } catch (err: any) {
+          results.push({ id, success: false, error: err.message || "Unknown error" });
+        }
+      }
+      
+      const successCount = results.filter(r => r.success).length;
+      const failureCount = results.filter(r => !r.success).length;
+      
+      return { 
+        ok: true,
+        results,
+        summary: {
+          total: input.ids.length,
+          success: successCount,
+          failed: failureCount,
+        },
+        ...getSystemMeta() 
+      };
+    }),
+
+  /**
    * Mark action request as resolved (human handled it manually)
    */
   markResolved: publicProcedure
