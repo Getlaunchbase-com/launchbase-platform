@@ -11,6 +11,7 @@
 - [x] Add service summary to onboarding review UI
 - [x] Add service summary to preview approval page
 - [x] Add tRPC getServiceSummary query
+- [x] Add FOREVER tests for service summary parity (5 tests passing)
 - [ ] Add itemized LaunchBase service descriptions:
   - [ ] Facebook ads setup
   - [ ] Google ads setup  
