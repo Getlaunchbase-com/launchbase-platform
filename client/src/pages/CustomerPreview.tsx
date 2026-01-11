@@ -30,6 +30,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { ShareSiteModal } from "@/components/ShareSiteModal";
+import { ServiceSummaryDisplay } from "@/components/ServiceSummaryDisplay";
 import { Share2 } from "lucide-react";
 
 // Mobile detection hook (failsafe for embedded webviews)
@@ -102,6 +103,12 @@ export default function CustomerPreview() {
   const { data: intake, isLoading, error } = trpc.intake.getByPreviewToken.useQuery(
     { token: token || "" },
     { enabled: !!token }
+  );
+
+  // Fetch service summary for display
+  const { data: serviceSummary } = trpc.payment.getServiceSummary.useQuery(
+    { intakeId: intake?.id || 0 },
+    { enabled: !!intake?.id }
   );
 
   // Sync local state with database status when intake loads
@@ -369,6 +376,17 @@ export default function CustomerPreview() {
                         Open Full Preview
                       </a>
                     </Button>
+                  </div>
+                )}
+
+                {/* Service Summary */}
+                {serviceSummary && serviceSummary.lines.length > 0 && (
+                  <div className="mt-6">
+                    <ServiceSummaryDisplay
+                      lines={serviceSummary.lines}
+                      totals={serviceSummary.totals}
+                      showNote={!isPaid}
+                    />
                   </div>
                 )}
 
@@ -981,6 +999,15 @@ export default function CustomerPreview() {
                 You're officially queued for launch.
               </p>
             </div>
+            
+            {/* Service Summary */}
+            {serviceSummary && serviceSummary.lines.length > 0 && (
+              <ServiceSummaryDisplay
+                lines={serviceSummary.lines}
+                totals={serviceSummary.totals}
+                showNote={false}
+              />
+            )}
             
             <Card>
               <CardContent className="p-6">
