@@ -1244,6 +1244,57 @@ export const appRouter = router({
           intakeId: session.metadata?.intake_id,
         };
       }),
+
+    /**
+     * Get service summary for display in UI
+     * Single source of truth for "what you're getting"
+     */
+    getServiceSummary: publicProcedure
+      .input(z.object({ intakeId: z.number() }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        
+        const [intake] = await db.select().from(intakes).where(eq(intakes.id, input.intakeId));
+        if (!intake) {
+          throw new Error("Intake not found");
+        }
+        
+        const rawPayload = (intake.rawPayload as any) || {};
+        const pricingSnapshot = rawPayload.pricingSnapshot;
+        const serviceSelections = rawPayload.serviceSelections;
+        
+        if (!pricingSnapshot || !serviceSelections) {
+          // No services selected yet
+          return {
+            lines: [],
+            totals: { setupCents: 0, monthlyCents: 0 },
+            version: pricingSnapshot?.pricingVersion || "unknown"
+          };
+        }
+        
+        // Build service summary
+        const { buildServiceSummary } = await import("./services/serviceSummary");
+        const summary = buildServiceSummary(serviceSelections, pricingSnapshot);
+        
+        // Convert to UI-friendly format
+        const lines = summary.items.map(item => {
+          const parts = [item.title];
+          if (item.includes.length > 0) {
+            parts.push(item.includes[0]); // Show first "included" item
+          }
+          return parts.join(" — ");
+        });
+        
+        return {
+          lines,
+          totals: {
+            setupCents: summary.setupTotal,
+            monthlyCents: summary.monthlyTotal
+          },
+          version: pricingSnapshot.pricingVersion || "unknown"
+        };
+      }),
   }),
 
   // PDF Guide generation

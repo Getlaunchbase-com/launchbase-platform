@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { ServiceSummaryCard } from "@/components/ServiceSummaryCard";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
@@ -972,6 +973,22 @@ export default function Onboarding() {
                 Monthly billing starts after your site launches. Cancel any service anytime. Changes apply next billing cycle.
               </p>
             </div>
+
+            {/* Service Summary */}
+            <ServiceSummaryCard
+              serviceSelections={{
+                website: data.website,
+                emailService: data.emailService,
+                socialMediaTier: data.socialMediaTier,
+                googleBusiness: data.googleBusiness,
+                quickBooksSync: data.quickBooksSync,
+                phoneService: data.phoneService
+              }}
+              pricingSummary={{
+                setupTotalCents: pricingSummary.setupTotalCents,
+                monthlyTotalCents: pricingSummary.monthlyTotalCents
+              }}
+            />
 
             {/* Notes */}
             {pricingSummary.notes.length > 0 && (
