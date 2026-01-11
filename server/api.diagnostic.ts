@@ -5,7 +5,7 @@ import type { Request, Response } from "express";
 import { ENV } from "./_core/env";
 import { getDb } from "./db";
 import { intakes, designJobs } from "../drizzle/schema";
-import { desc, sql } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 export async function handleDiagnostic(req: Request, res: Response) {
   // Only allow in development or with worker token
@@ -24,20 +24,8 @@ export async function handleDiagnostic(req: Request, res: Response) {
     }
     
     const results = await db
-      .select({
-        id: intakes.id,
-        businessName: intakes.businessName,
-        email: intakes.email,
-        status: intakes.status,
-        tenant: intakes.tenant,
-        createdAt: intakes.createdAt,
-        approvedAt: intakes.approvedAt,
-        designJobId: designJobs.designJobId,
-        tier: designJobs.tier,
-        designStatus: designJobs.status,
-      })
+      .select()
       .from(intakes)
-      .leftJoin(designJobs, sql`${intakes.id} = ${designJobs.intakeId}`)
       .orderBy(desc(intakes.createdAt))
       .limit(50);
     
