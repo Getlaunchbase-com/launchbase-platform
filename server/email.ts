@@ -104,6 +104,7 @@ interface EmailData {
   audience?: Audience;
   websiteStatus?: WebsiteStatus;
   founderNumber?: string;
+  serviceSummaryText?: string;
 }
 
 interface EmailTemplate {
@@ -114,13 +115,13 @@ interface EmailTemplate {
 
 // Generate email templates based on type and data (LOCALIZED)
 export function getEmailTemplate(type: EmailType, data: EmailData): EmailTemplate {
-  const { firstName, businessName, previewUrl, liveUrl, founderNumber, language = "en", audience = "biz", websiteStatus } = data;
+  const { firstName, businessName, previewUrl, liveUrl, founderNumber, serviceSummaryText, language = "en", audience = "biz", websiteStatus } = data;
   
   // Get localized copy from emailCopy map
   const copy = getEmailCopy({ language, audience, emailType: type, websiteStatus });
   
   // Interpolate variables
-  let body = interpolateEmail(copy.body, { firstName, businessName, previewUrl, liveUrl });
+  let body = interpolateEmail(copy.body, { firstName, businessName, previewUrl, liveUrl, serviceSummaryText });
   let subject = copy.subject;
   if (founderNumber) {
     body = body.replace(/\{\{founderNumber\}\}/g, founderNumber);

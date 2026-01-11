@@ -200,6 +200,10 @@ Your site is now being deployed. Here's what's happening:
 
 You'll receive another email as soon as your site is live.
 
+{{serviceSummaryText}}
+
+If you need any changes or have questions, reply to this email. We're here.
+
 —
 LaunchBase
 Workflows that give you back your life.`,
@@ -1919,11 +1923,13 @@ export function interpolateEmail(
     businessName: string;
     previewUrl?: string;
     liveUrl?: string;
+    serviceSummaryText?: string;
   }
 ): string {
   return template
     .replace(/\{\{firstName\}\}/g, data.firstName)
     .replace(/\{\{businessName\}\}/g, data.businessName)
     .replace(/\{\{previewUrl\}\}/g, data.previewUrl || "[Preview URL]")
-    .replace(/\{\{liveUrl\}\}/g, data.liveUrl || "[Live URL]");
+    .replace(/\{\{liveUrl\}\}/g, data.liveUrl || "[Live URL]")
+    .replace(/\{\{serviceSummaryText\}\}/g, data.serviceSummaryText || "");
 }
