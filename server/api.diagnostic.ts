@@ -1,8 +1,11 @@
 /**
- * Diagnostic endpoint to check environment variables
+ * Diagnostic endpoint to check environment variables and query data
  */
 import type { Request, Response } from "express";
 import { ENV } from "./_core/env";
+import { getDb } from "./db";
+import { intakes, designJobs } from "../drizzle/schema";
+import { desc, sql } from "drizzle-orm";
 
 export async function handleDiagnostic(req: Request, res: Response) {
   // Only allow in development or with worker token
@@ -11,6 +14,38 @@ export async function handleDiagnostic(req: Request, res: Response) {
   
   if (process.env.NODE_ENV !== "development" && token !== process.env.WORKER_TOKEN) {
     return res.status(403).json({ error: "forbidden" });
+  }
+  
+  // Check if requesting intakes data
+  if (req.query.intakes === "true") {
+    const db = await getDb();
+    if (!db) {
+      return res.status(500).json({ error: "Database not available" });
+    }
+    
+    const results = await db
+      .select({
+        id: intakes.id,
+        businessName: intakes.businessName,
+        email: intakes.email,
+        status: intakes.status,
+        tenant: intakes.tenant,
+        createdAt: intakes.createdAt,
+        approvedAt: intakes.approvedAt,
+        designJobId: designJobs.designJobId,
+        tier: designJobs.tier,
+        designStatus: designJobs.status,
+      })
+      .from(intakes)
+      .leftJoin(designJobs, sql`${intakes.id} = ${designJobs.intakeId}`)
+      .orderBy(desc(intakes.createdAt))
+      .limit(50);
+    
+    return res.json({
+      count: results.length,
+      intakes: results,
+      timestamp: new Date().toISOString(),
+    });
   }
   
   res.json({
