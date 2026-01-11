@@ -481,6 +481,23 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     
     const firstName = intake.contactName?.split(" ")[0] || "there";
     
+    // Build service summary for email
+    let serviceSummaryText: string | undefined;
+    try {
+      const rawPayload = intake.rawPayload as any;
+      if (rawPayload?.pricingSnapshot && rawPayload?.serviceSelections) {
+        const { buildServiceSummary, renderServiceSummaryText } = await import("../services/serviceSummary");
+        const summary = buildServiceSummary(
+          rawPayload.serviceSelections,
+          rawPayload.pricingSnapshot
+        );
+        serviceSummaryText = renderServiceSummaryText(summary);
+      }
+    } catch (err) {
+      console.error("[Stripe Webhook] Failed to build service summary:", err);
+      // Continue without service summary
+    }
+    
     // Send "deployment started" email
     await sendEmail(intakeIdNum, "deployment_started", {
       firstName,
@@ -488,6 +505,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       email: intake.email,
       language: intake.language as any,
       audience: intake.audience as any,
+      serviceSummaryText,
     });
     
     // Trigger deployment with safety gates
