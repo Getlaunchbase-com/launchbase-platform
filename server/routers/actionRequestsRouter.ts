@@ -231,8 +231,9 @@ export const actionRequestsRouter = router({
       );
 
       // 4) Map service result to response contract
-      const needsHuman = !service.success && service.reason === "needs_human";
-      const stopReason = service.success ? "ok" : (service.reason === "needs_human" ? "needs_human" : "unknown");
+      // Service now returns stopReason directly (clean contract)
+      const stopReason = service.stopReason;
+      const needsHuman = service.success ? false : (service.needsHuman ?? false);
 
       // 5) Log event on the original ActionRequest (customer-safe meta only)
       await logActionEvent({
