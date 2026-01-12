@@ -452,3 +452,77 @@
 - ❌ Don't add proposal tables yet - use ActionRequests + rawInbound.aiTennis
 - ✅ Add new table only when hitting real constraint (multiple proposals per key, heavy analytics)
 
+
+
+---
+
+## 🧭 AI DRIFT PROTOCOL V1 (Platform Stabilization)
+
+> **Mode:** Stabilization + drift containment + learning extraction  
+> **Goal:** Prevent silent AI degradation before adding surface area  
+> **Status:** Documentation complete, metrics plumbing next
+
+### ✅ Forever Contracts (COMPLETE)
+- [x] `docs/FOREVER_CONTRACTS.md` - Constitutional guarantees
+  - stopReason is the only outcome vocabulary
+  - Prompt packs are immutable at runtime
+  - Schema-or-fail discipline
+  - Two audit trails (never cross the streams)
+  - Idempotency ownership guards (nonce-based)
+
+### ✅ Drift Protocol Documentation (COMPLETE)
+- [x] `docs/AI_DRIFT_PROTOCOL_V1.md` - Operational discipline
+  - Drift definition and detection rules
+  - 4 containment layers (determinism, idempotency, visibility, escalation)
+  - 4 required signals (cost, approval rate, needsHuman, stopReason)
+  - Weekly review cadence
+  - Field General governance rules
+
+### 📋 Metrics Plumbing (Read-Only)
+- [ ] **Create drift metrics queries:**
+  - [ ] Cost per approved action: `SUM(estimatedUsd) / COUNT(approved)`
+  - [ ] Approval rate: `COUNT(approved) / COUNT(proposals)`
+  - [ ] needsHuman rate: `COUNT(needsHuman=true) / COUNT(total)`
+  - [ ] stopReason distribution: Breakdown by enum value
+  - [ ] Cache hit rate: `COUNT(cached=true) / COUNT(total)`
+  - [ ] Stale takeover rate: `COUNT(attemptCount > 1) / COUNT(total)`
+- [ ] **Add logging (no behavior change):**
+  - [ ] Log drift signals on every AI Tennis run
+  - [ ] Store in `drift_metrics` table (weekly aggregates)
+  - [ ] No dashboards yet, just queryability
+- [ ] **Create weekly review script:**
+  - [ ] Compare WoW deltas for 4 required signals
+  - [ ] Flag anomalies (>threshold)
+  - [ ] Output markdown report
+
+### 📋 Customer UI (Thin Shell)
+- [ ] **Inbox view:**
+  - [ ] List pending proposals
+  - [ ] Show rationale + confidence
+  - [ ] Approve/Edit buttons
+- [ ] **Decision view:**
+  - [ ] Show proposal details
+  - [ ] Show AI reasoning (customer trail only)
+  - [ ] Show confidence score
+- [ ] **Audit trail view:**
+  - [ ] Show proposal history
+  - [ ] Show approvals/edits timeline
+  - [ ] Show confidence evolution
+- [ ] **No advanced controls yet** (keep it thin)
+
+### 🚫 Frozen Until Drift Visibility Exists
+- [ ] No new AI roles
+- [ ] No new prompts
+- [ ] No tier expansion
+- [ ] No feature expansion
+
+**Rule:** Drift is detected by change over time, never absolute values.
+
+**Docs Created:**
+- [x] `docs/FOREVER_CONTRACTS.md`
+- [x] `docs/AI_DRIFT_PROTOCOL_V1.md`
+- [x] `docs/IDEMPOTENCY_KEYS.md`
+
+**Docs to Create:**
+- [ ] `docs/DRIFT_METRICS_QUERIES.md` - SQL queries for drift signals
+- [ ] `docs/SHOWROOM_STRATEGY.md` - How to use 4 sites as baselines
