@@ -7,6 +7,7 @@
 
 import type { AiProvider, AiChatRequest, AiChatResponse, AiChatMessage } from "./types";
 import { aimlProvider } from "./aimlProvider";
+import { safeError, safePreview, toSafeClientMessage } from "../security/redaction";
 
 // ============================================
 // TRANSPORT TYPES
@@ -298,15 +299,16 @@ export interface CompleteJsonResult {
 export async function completeJson(
   options: CompleteJsonOptions,
   transport?: AiTransport,
-  routerOpts?: { task?: string; useRouter?: boolean }
+  routerOpts?: { task?: string; useRouter?: boolean; strict?: boolean }
 ): Promise<CompleteJsonResult> {
-  // Determine transport (explicit param > env > default)
   const selectedTransport = transport || (process.env.AI_PROVIDER as AiTransport) || "aiml";
   const provider = getAiProvider(selectedTransport);
   const startTime = Date.now();
 
-  // If router enabled and transport is aiml, use ModelRouter for failover
   let finalModel = options.model;
+  const trace = `${options.trace.jobId}:${options.trace.step}:${options.trace.round}`;
+
+  // If router enabled and transport is aiml, use ModelRouter for failover
   if (routerOpts?.useRouter && selectedTransport === "aiml") {
     try {
       const { modelRouter } = await import("../index");
@@ -327,20 +329,46 @@ export async function completeJson(
       );
 
       const latencyMs = Date.now() - startTime;
-      return buildCompleteJsonResult(result, finalModel, selectedTransport, latencyMs);
+      return buildCompleteJsonResult(result, finalModel, selectedTransport, latencyMs, trace);
     } catch (err) {
-      console.warn("[AI] ModelRouter failed, falling back to direct provider call", err);
+      // Do NOT log raw error object.
+      const e = safeError(err);
+      console.warn("[AI] ModelRouter failed", {
+        trace,
+        transport: selectedTransport,
+        requestedModel: options.model,
+        task: routerOpts.task || "json",
+        error: e,
+      });
+
+      // STRICT MODE: no fallback
+      if (routerOpts.strict) {
+        throw new Error(toSafeClientMessage({ trace, hint: "router_strict" }));
+      }
+      // Non-strict fallback continues below.
     }
   }
 
   // Call provider directly (no router)
-  const response = await provider.chat({
-    ...options,
-    jsonOnly: true,
-  });
+  try {
+    const response = await provider.chat({
+      ...options,
+      jsonOnly: true,
+    });
 
-  const latencyMs = Date.now() - startTime;
-  return buildCompleteJsonResult(response, finalModel, selectedTransport, latencyMs);
+    const latencyMs = Date.now() - startTime;
+    return buildCompleteJsonResult(response, finalModel, selectedTransport, latencyMs, trace);
+  } catch (err) {
+    // Ensure we never leak provider message details to callers up-stack.
+    const e = safeError(err);
+    console.error("[AI] Provider chat failed", {
+      trace,
+      transport: selectedTransport,
+      model: finalModel,
+      error: e,
+    });
+    throw new Error(toSafeClientMessage({ trace }));
+  }
 }
 
 /**
@@ -350,16 +378,21 @@ function buildCompleteJsonResult(
   response: AiChatResponse,
   model: string,
   transport: string,
-  latencyMs: number
+  latencyMs: number,
+  trace?: string
 ): CompleteJsonResult {
-  // Parse JSON
   let json: any | null = null;
+
   try {
     json = JSON.parse(response.rawText);
   } catch (err) {
+    // NEVER log rawText preview. Log only a hash + length.
     console.warn("[AI] Failed to parse JSON response", {
-      error: err instanceof Error ? err.message : String(err),
-      rawTextPreview: response.rawText.slice(0, 200),
+      trace,
+      model: response.providerMeta?.model || model,
+      requestId: response.providerMeta?.requestId || "unknown",
+      rawText: safePreview(response.rawText),
+      error: safeError(err),
     });
   }
 

@@ -8,6 +8,60 @@
 
 ---
 
+## 🎯 AI TENNIS ORCHESTRATION (In Progress)
+
+### ✅ Step 2.2 - PromptPack Registry (COMPLETE)
+- [x] PromptPack registry with versioning (v1)
+- [x] 4 task types: intent_parse, generate_candidates, critique, decision_collapse
+- [x] JSON-only enforcement in all prompts
+- [x] Schema validation with Ajv
+- [x] Memory transport fixtures for testing
+- [x] 12/12 validation tests passing
+
+### ✅ Step 2.3 - ModelRouter (COMPLETE)
+- [x] ModelRegistry with TTL cache (433 models loaded)
+- [x] Background refresh every 10 minutes
+- [x] ModelPolicy with task-based filtering
+- [x] Automatic failover routing
+- [x] Express endpoints: /internal/models, /internal/resolve-model, /admin/models/refresh
+- [x] 13/13 tests passing (registry, policy, router)
+
+### 🚧 Step 2.4 - AI Tennis Orchestrator (80% Complete)
+- [x] `runAiTennis.ts` implemented with generate → critique → collapse
+- [x] Token budget enforcement (maxTokensTotal, maxTokensPerCall)
+- [x] Cost cap enforcement (costCapUsd)
+- [x] needsHuman early exit
+- [x] Schema validation at every phase
+- [x] Strict ModelRouter mode (no silent fallback)
+- [x] Test file created
+- [ ] **Fix test transport selection** (tests calling AIML instead of memory)
+- [ ] **Verify all 8 tests passing**
+- [ ] **Add integration test with real prompt packs**
+
+### ✅ Step 2.5 - Prompt Secrecy Hardening (COMPLETE)
+- [x] `server/ai/security/redaction.ts` - Safe error/preview utilities
+- [x] `completeJson()` patched with strict router mode + safe error handling
+- [x] `buildCompleteJsonResult()` patched to remove rawTextPreview
+- [x] `aimlProvider.ts` patched with sanitized error logging
+- [x] Zero prompt leakage in logs/errors
+- [x] Trace IDs are opaque (no user content)
+
+### 📋 Step 2.6 - First Use Case Wiring (TODO)
+- [ ] **Add copy_proposal schema** (if not exists)
+- [ ] **Add critique schema** (if not exists)
+- [ ] **Create ActionRequest proposal table**
+- [ ] **Add POST /action-requests/:id/ai/propose-copy endpoint**
+- [ ] **Store proposals as pending (never auto-apply)**
+- [ ] **UI: Show proposal + rationale + trace for approval**
+- [ ] **Test end-to-end flow**
+
+**Docs to Create:**
+- [ ] `docs/AI_TENNIS_ARCHITECTURE.md` - System design and flow
+- [ ] `docs/PROMPT_SECRECY.md` - Security hardening rules
+- [ ] `docs/MODEL_PHILOSOPHY.md` - Dynamic model discovery approach
+
+---
+
 ## 🔥 CRITICAL (Do First)
 
 ### Production Stability Verification
