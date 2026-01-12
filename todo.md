@@ -377,3 +377,78 @@
 **🎯 Focus:** Complete Facebook + Email Automation → Observe Tier 1 → Build QuickBooks Integration
 
 **📖 Full context:** See `WHERE_WE_ARE.md`
+
+### 🚧 Step 2.7 - Production-Grade AI Tennis Infrastructure (In Progress)
+
+**Phase 0: Freeze what's working**
+- [ ] Add CHANGELOG.md entry for stopReason contract
+  - Dated heading (January 12, 2026)
+  - 3 bullets: stopReason standardization, prompt secrecy, trace-based seeding
+
+**Phase 1: Idempotency (CRITICAL - must-have before customer UI)**
+- [x] Create idempotency_keys table migration (0023 + 0024)
+  - Fields: id, tenant, scope, keyHash (HMAC-SHA256), status (enum), responseJson, timestamps, attemptCount
+  - Unique constraint: (tenant, scope, keyHash)
+  - Indexes: expiresAt (cleanup), staleIdx (takeover)
+  - TTL: expiresAt (24h)
+- [x] Implement idempotency wrapper skeleton
+  - Scope: "actionRequests.aiProposeCopy"
+  - Atomic claim via INSERT + unique constraint
+  - Stale takeover logic
+  - Failure retry logic
+- [x] Write unit tests (8/9 passing, concurrency test has syntax error)
+
+**Phase 1.5: Security & Correctness Fixes (IN PROGRESS)**
+- [ ] **Security fixes:**
+  - [ ] Require IDEMPOTENCY_SECRET in production (throw if missing)
+  - [ ] Hash userText before idempotency key (never include raw text)
+  - [ ] No error.message storage (store only fingerprint + stopReason)
+- [ ] **Correctness fixes:**
+  - [ ] Add getRowsAffected() helper (supports rowsAffected/affectedRows/array)
+  - [ ] Ownership guard on commit (track claimStartedAt, guard UPDATE)
+  - [ ] Check UPDATE affected rows in takeover (only claim if 1 row updated)
+- [ ] **Router fixes:**
+  - [ ] Hash userText in router inputs (userTextHash, not raw)
+  - [ ] No raw Error throws (return safe contract)
+  - [ ] Add "in_progress" to stopReason enum
+- [ ] **Tests:**
+  - [ ] Fix concurrency test syntax error
+  - [ ] Verify all 9 tests passing
+  - [ ] Add test for ownership guard
+
+**Phase 2: Two Audit Trails (internal vs customer)** (BLOCKED until Phase 1.5 complete)
+- [ ] Define strict schema for rawInbound.aiTennis (job meta only, no prompts)
+- [ ] Define customer-safe view model (what customer can see)
+- [ ] Add helper: toCustomerAuditTrail(actionRequest, events)
+  - Strips internal-only fields
+  - Never includes: system prompts, provider errors/stack traces, requestId/model routing internals
+- [ ] Write test asserting customer API never returns forbidden fields
+
+**Phase 3: Endpoint Hardening (production sturdy)**
+- [ ] Add rate limit per intake for aiProposeCopy mutation
+- [ ] Require intakeId ownership (when auth enabled)
+- [ ] Ensure router strict mode is mandatory (no bypass flag)
+- [ ] Guard against AI_PROVIDER=memory in production
+- [ ] Staging test: run AI Tennis against AIML for real intake without logging prompts
+
+**Phase 4: Customer UI (thin shell)**
+- [ ] Screen 1: Inbox (ActionRequests by intake)
+- [ ] Screen 2: Decision (proposedValue + rationale + confidence + risks + approve/edit)
+- [ ] Screen 3: Audit Trail (customer-safe events timeline)
+- [ ] Gate: customer can trigger propose-copy, see proposals, approve, see audit trail update
+
+**Phase 5: Documentation (prevent future drift)**
+- [ ] Create docs/STOP_REASON_CONTRACT.md
+  - Enum values + meaning
+  - "Service boundary MUST emit stopReason"
+  - Examples of router responses
+- [ ] Create docs/AI_AUDIT_TRAILS.md
+  - Internal trail (operators) vs Customer trail
+  - Where stored (rawInbound.aiTennis, events meta)
+  - Explicit "never store" list (prompts, provider errors)
+- [ ] Add PR checklist item: "Any AI change updates relevant docs/tests"
+
+**Design Decision:**
+- ❌ Don't add proposal tables yet - use ActionRequests + rawInbound.aiTennis
+- ✅ Add new table only when hitting real constraint (multiple proposals per key, heavy analytics)
+

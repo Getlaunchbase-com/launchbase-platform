@@ -40,5 +40,17 @@ process.env.DATABASE_URL = testDbUrl;
 process.env.EMAIL_TRANSPORT = "memory";
 console.log("[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)");
 
+// Set explicit test secret for idempotency (prevents accidental fallback reliance)
+process.env.IDEMPOTENCY_SECRET = "test-secret-deterministic-vitest";
+console.log("[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)");
+
+// Force memory AI provider (prevents ModelRouter invocation in tests)
+process.env.NODE_ENV = "test";
+process.env.VITEST = "1";
+process.env.AI_PROVIDER = "memory";
+process.env.AIML_API_KEY = "test";
+process.env.AIML_BASE_URL = "http://test";
+console.log("[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)");
+
 // Export for debugging if needed
 export const TEST_DB_NAME = dbName;

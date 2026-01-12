@@ -12,6 +12,7 @@ import { eq, and, desc } from "drizzle-orm";
 import { sendActionRequestEmail } from "../email";
 import { logActionEvent } from "../action-request-events";
 import { aiTennisCopyRefine } from "../actionRequests/aiTennisCopyRefine";
+import { withIdempotency, hashUserText } from "../utils/idempotency";
 
 // Response contract for AI Tennis copy proposal
 const AiProposeCopyResponseSchema = z.object({
@@ -30,6 +31,7 @@ const AiProposeCopyResponseSchema = z.object({
     "router_failed",
     "provider_failed",
     "needs_human",
+    "in_progress", // Idempotency: operation already running
     "unknown",
   ]).optional(),
   meta: z.object({
@@ -178,6 +180,8 @@ export const actionRequestsRouter = router({
   /**
    * AI Tennis copy proposal generation
    * Calls AI Tennis service to generate copy proposals for an action request
+   * 
+   * Idempotency: Prevents duplicate AI calls on retry (double clicks, refreshes, timeouts)
    */
   aiProposeCopy: publicProcedure
     .input(z.object({
@@ -212,54 +216,92 @@ export const actionRequestsRouter = router({
 
       if (!intake) throw new Error("Intake not found");
 
-      // 3) Call service (transport defaults to aiml; tests force AI_PROVIDER=memory anyway)
+      // 3) Wrap AI Tennis call with idempotency protection
       const transport =
         process.env.AI_PROVIDER === "memory" || process.env.AI_PROVIDER === "log"
           ? (process.env.AI_PROVIDER as "memory" | "log")
           : ("aiml" as const);
 
-      const service = await aiTennisCopyRefine(
-        {
-          tenant: intake.tenant as any,
+      const idempotencyResult = await withIdempotency({
+        tenant: intake.tenant,
+        scope: "actionRequests.aiProposeCopy",
+        inputs: {
           intakeId: request.intakeId,
-          userText: input.userText,
+          actionRequestId: input.id,
+          userTextHash: hashUserText(input.userText), // SECURITY: Never include raw text
           targetSection: input.targetSection,
-          currentCopy: input.currentCopy,
           constraints: input.constraints,
         },
-        transport
-      );
+        ttlHours: 24,
+        operation: async () => {
+          // Run AI Tennis service
+          const service = await aiTennisCopyRefine(
+            {
+              tenant: intake.tenant as any,
+              intakeId: request.intakeId,
+              userText: input.userText,
+              targetSection: input.targetSection,
+              currentCopy: input.currentCopy,
+              constraints: input.constraints,
+            },
+            transport
+          );
 
-      // 4) Map service result to response contract
-      // Service now returns stopReason directly (clean contract)
-      const stopReason = service.stopReason;
-      const needsHuman = service.success ? false : (service.needsHuman ?? false);
+          // Map service result to response contract
+          const stopReason = service.stopReason;
+          const needsHuman = service.success ? false : (service.needsHuman ?? false);
 
-      // 5) Log event on the original ActionRequest (customer-safe meta only)
-      await logActionEvent({
-        actionRequestId: request.id,
-        intakeId: request.intakeId,
-        eventType: "AI_PROPOSE_COPY",
-        actorType: "system",
-        reason: "AI Tennis copy proposal requested",
-        meta: {
-          ok: service.success,
-          createdActionRequestIds: service.success ? [service.actionRequestId] : [],
-          traceId: service.traceId,
-          needsHuman,
-          stopReason,
+          // Log event on the original ActionRequest (customer-safe meta only)
+          await logActionEvent({
+            actionRequestId: request.id,
+            intakeId: request.intakeId,
+            eventType: "AI_PROPOSE_COPY",
+            actorType: "system",
+            reason: "AI Tennis copy proposal requested",
+            meta: {
+              ok: service.success,
+              createdActionRequestIds: service.success ? [service.actionRequestId] : [],
+              traceId: service.traceId,
+              needsHuman,
+              stopReason,
+            },
+          });
+
+          // Return strict, customer-safe contract
+          return AiProposeCopyResponseSchema.parse({
+            ok: service.success,
+            createdActionRequestIds: service.success ? [service.actionRequestId] : [],
+            traceId: service.traceId,
+            needsHuman,
+            stopReason,
+            meta: getSystemMeta(),
+          });
         },
       });
 
-      // 6) Return strict, customer-safe contract
-      return AiProposeCopyResponseSchema.parse({
-        ok: service.success,
-        createdActionRequestIds: service.success ? [service.actionRequestId] : [],
-        traceId: service.traceId,
-        needsHuman,
-        stopReason,
-        meta: getSystemMeta(),
-      });
+      // 4) Handle idempotency result (no throws, return safe contract)
+      if (idempotencyResult.status === "in_progress") {
+        return AiProposeCopyResponseSchema.parse({
+          ok: false,
+          stopReason: "in_progress",
+          traceId: undefined,
+          needsHuman: false,
+          meta: getSystemMeta(),
+        });
+      }
+
+      if (idempotencyResult.status === "failed") {
+        return AiProposeCopyResponseSchema.parse({
+          ok: false,
+          stopReason: "provider_failed",
+          traceId: undefined,
+          needsHuman: true,
+          meta: getSystemMeta(),
+        });
+      }
+
+      // Return cached or fresh result (succeeded)
+      return idempotencyResult.data;
     }),
 
   /**
