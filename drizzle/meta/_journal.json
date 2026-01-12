@@ -155,6 +155,13 @@
       "when": 1768065896918,
       "tag": "0021_luxuriant_hobgoblin",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "5",
+      "when": 1768242778257,
+      "tag": "0022_boring_nocturne",
+      "breakpoints": true
     }
   ]
 }

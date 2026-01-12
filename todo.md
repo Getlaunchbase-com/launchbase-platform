@@ -46,8 +46,23 @@
 - [x] Zero prompt leakage in logs/errors
 - [x] Trace IDs are opaque (no user content)
 
-### 📋 Step 2.6 - First Use Case Wiring (TODO)
-- [ ] **Add copy_proposal schema** (if not exists)
+### 🚧 Step 2.6 - First Use Case Wiring (In Progress)
+- [x] **Add `aiProposeCopy` mutation to actionRequestsRouter**
+  - Loads ActionRequest + Intake for tenant
+  - Calls `aiTennisCopyRefine()` service
+  - Logs `AI_PROPOSE_COPY` event
+  - Returns customer-safe response (no prompts, no provider errors)
+- [x] **Add response contract** (`AiProposeCopyResponseSchema`)
+  - `ok`, `createdActionRequestIds`, `traceId`, `needsHuman`, `stopReason`
+  - Zod-validated enum for stopReason
+  - No prompt content ever included
+- [x] **Add `AI_PROPOSE_COPY` to event types enum**
+- [x] **Database migration applied** (0022_boring_nocturne.sql)
+- [ ] **Fix AI Tennis test seeding** (tests need proper `refineCopy` result shape)
+- [ ] **Add idempotency table** (for retry safety)
+- [ ] **Split trails** (internal vs customer in rawInbound)
+- [ ] **Add event meta schemas** (structured logging)
+- [ ] **Wire up customer UI** (call endpoint + display proposals)
 - [ ] **Add critique schema** (if not exists)
 - [ ] **Create ActionRequest proposal table**
 - [ ] **Add POST /action-requests/:id/ai/propose-copy endpoint**
@@ -57,6 +72,7 @@
 
 **Docs Created:**
 - [x] `docs/TRACE_BASED_SEEDING.md` - Trace-based test seeding pattern
+- [ ] `docs/AI_TENNIS_ENDPOINT.md` - Endpoint contract + usage guide
 
 **Docs to Create:**
 - [ ] `docs/AI_TENNIS_ARCHITECTURE.md` - System design and flow

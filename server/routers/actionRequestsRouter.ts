@@ -11,6 +11,32 @@ import { actionRequests, intakes } from "../../drizzle/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { sendActionRequestEmail } from "../email";
 import { logActionEvent } from "../action-request-events";
+import { aiTennisCopyRefine } from "../actionRequests/aiTennisCopyRefine";
+
+// Response contract for AI Tennis copy proposal
+const AiProposeCopyResponseSchema = z.object({
+  ok: z.boolean(),
+  createdActionRequestIds: z.array(z.number()).optional(),
+  traceId: z.string().optional(),
+  needsHuman: z.boolean().optional(),
+  stopReason: z.enum([
+    "ok",
+    "token_cap",
+    "cost_cap",
+    "round_cap",
+    "stop_condition_met",
+    "json_parse_failed",
+    "ajv_failed",
+    "router_failed",
+    "provider_failed",
+    "needs_human",
+    "unknown",
+  ]).optional(),
+  meta: z.object({
+    version: z.string().optional(),
+    buildSha: z.string().optional(),
+  }).optional(),
+});
 
 export const actionRequestsRouter = router({
   /**
@@ -147,6 +173,92 @@ export const actionRequestsRouter = router({
       }
 
       return { ok: true, success: result.success, error: result.error, ...getSystemMeta() };
+    }),
+
+  /**
+   * AI Tennis copy proposal generation
+   * Calls AI Tennis service to generate copy proposals for an action request
+   */
+  aiProposeCopy: publicProcedure
+    .input(z.object({
+      id: z.number(),
+      userText: z.string().min(1),
+      targetSection: z.string().optional(),
+      currentCopy: z.record(z.any()).optional(),
+      constraints: z.object({
+        maxRounds: z.number().int().min(1).max(6).optional(),
+        costCapUsd: z.number().min(0).max(10).optional(),
+      }).optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      // 1) Load ActionRequest
+      const [request] = await db
+        .select()
+        .from(actionRequests)
+        .where(eq(actionRequests.id, input.id))
+        .limit(1);
+
+      if (!request) throw new Error("Action request not found");
+
+      // 2) Load Intake (tenant + email)
+      const [intake] = await db
+        .select()
+        .from(intakes)
+        .where(eq(intakes.id, request.intakeId))
+        .limit(1);
+
+      if (!intake) throw new Error("Intake not found");
+
+      // 3) Call service (transport defaults to aiml; tests force AI_PROVIDER=memory anyway)
+      const transport =
+        process.env.AI_PROVIDER === "memory" || process.env.AI_PROVIDER === "log"
+          ? (process.env.AI_PROVIDER as "memory" | "log")
+          : ("aiml" as const);
+
+      const service = await aiTennisCopyRefine(
+        {
+          tenant: intake.tenant as any,
+          intakeId: request.intakeId,
+          userText: input.userText,
+          targetSection: input.targetSection,
+          currentCopy: input.currentCopy,
+          constraints: input.constraints,
+        },
+        transport
+      );
+
+      // 4) Map service result to response contract
+      const needsHuman = !service.success && service.reason === "needs_human";
+      const stopReason = service.success ? "ok" : (service.reason === "needs_human" ? "needs_human" : "unknown");
+
+      // 5) Log event on the original ActionRequest (customer-safe meta only)
+      await logActionEvent({
+        actionRequestId: request.id,
+        intakeId: request.intakeId,
+        eventType: "AI_PROPOSE_COPY",
+        actorType: "system",
+        reason: "AI Tennis copy proposal requested",
+        meta: {
+          ok: service.success,
+          createdActionRequestIds: service.success ? [service.actionRequestId] : [],
+          traceId: service.traceId,
+          needsHuman,
+          stopReason,
+        },
+      });
+
+      // 6) Return strict, customer-safe contract
+      return AiProposeCopyResponseSchema.parse({
+        ok: service.success,
+        createdActionRequestIds: service.success ? [service.actionRequestId] : [],
+        traceId: service.traceId,
+        needsHuman,
+        stopReason,
+        meta: getSystemMeta(),
+      });
     }),
 
   /**
