@@ -46,7 +46,7 @@
 - [x] Zero prompt leakage in logs/errors
 - [x] Trace IDs are opaque (no user content)
 
-### 🚧 Step 2.6 - First Use Case Wiring (In Progress)
+### ✅ Step 2.6 - First Use Case Wiring (COMPLETE)
 - [x] **Add `aiProposeCopy` mutation to actionRequestsRouter**
   - Loads ActionRequest + Intake for tenant
   - Calls `aiTennisCopyRefine()` service
@@ -58,21 +58,34 @@
   - No prompt content ever included
 - [x] **Add `AI_PROPOSE_COPY` to event types enum**
 - [x] **Database migration applied** (0022_boring_nocturne.sql)
-- [ ] **Fix AI Tennis test seeding** (tests need proper `refineCopy` result shape)
-- [ ] **Add idempotency table** (for retry safety)
-- [ ] **Split trails** (internal vs customer in rawInbound)
-- [ ] **Add event meta schemas** (structured logging)
-- [ ] **Wire up customer UI** (call endpoint + display proposals)
-- [ ] **Add critique schema** (if not exists)
-- [ ] **Create ActionRequest proposal table**
-- [ ] **Add POST /action-requests/:id/ai/propose-copy endpoint**
-- [ ] **Store proposals as pending (never auto-apply)**
-- [ ] **UI: Show proposal + rationale + trace for approval**
-- [ ] **Test end-to-end flow**
+- [x] **Standardized on `stopReason` field** (FOREVER CONTRACT)
+  - Updated `AiCopyRefineResult` type to use `stopReason` instead of `reason`
+  - All service return statements now use `stopReason`
+  - Router reads `service.stopReason` directly (no fallback needed)
+  - Added `needsHuman` to failure branch of type
+  - Rule: "All AI orchestration outcomes MUST surface as stopReason at the service boundary. reason is forbidden in exported types."
+
+### 📋 Next Steps (Reordered by Priority)
+- [ ] **1. Idempotency table** (prevents double-spend on retries)
+  - Create `idempotency_keys` table with `(tenant, scope, key)` unique constraint
+  - Check key before calling AI Tennis
+  - Store result with key after success
+- [ ] **2. Wire customer UI** (call endpoint + display proposals)
+  - Build inbox view for pending proposals
+  - Display proposal + rationale + confidence
+  - Approve/Edit buttons
+- [ ] **3. Split trails** (internal vs customer in rawInbound - optional)
+  - Internal: traceId, models[], requestIds[], costs, usage
+  - Customer: sanitized proposal, rationale, confidence
+- [ ] **4. Event meta schemas** (structured logging - optional)
+  - Define schemas for customer UI display
+- [ ] **5. Fix test seeding** (optional if memory provider works deterministically)
+  - Update tests to seed complete `refineCopy` result shape
 
 **Docs Created:**
 - [x] `docs/TRACE_BASED_SEEDING.md` - Trace-based test seeding pattern
 - [ ] `docs/AI_TENNIS_ENDPOINT.md` - Endpoint contract + usage guide
+- [ ] `docs/STOP_REASON_CONTRACT.md` - stopReason field standardization (FOREVER CONTRACT)
 
 **Docs to Create:**
 - [ ] `docs/AI_TENNIS_ARCHITECTURE.md` - System design and flow

@@ -44,6 +44,7 @@ export type AiCopyRefineResult =
       success: true;
       actionRequestId: number;
       traceId: string;
+      stopReason: "ok";
       meta: {
         rounds: number;
         estimatedUsd: number;
@@ -53,7 +54,7 @@ export type AiCopyRefineResult =
     }
   | {
       success: false;
-      reason: ServiceFailReason;
+      stopReason: ServiceFailReason;
       traceId: string;
       meta: {
         rounds: number;
@@ -95,7 +96,7 @@ export async function aiTennisCopyRefine(
   } catch {
     return {
       success: false,
-      reason: "ai_tennis_failed",
+      stopReason: "ai_tennis_failed",
       traceId,
       meta: { rounds: 0, estimatedUsd: 0, calls: 0, models: [] },
     };
@@ -104,7 +105,7 @@ export async function aiTennisCopyRefine(
   if (!aiResult.success || !aiResult.proposal) {
     return {
       success: false,
-      reason: "ai_tennis_failed",
+      stopReason: "ai_tennis_failed",
       traceId,
       meta: {
         rounds: aiResult.meta.roundsRun,
@@ -123,7 +124,8 @@ export async function aiTennisCopyRefine(
   if (aiResult.needsHuman) {
     return {
       success: false,
-      reason: "needs_human",
+      stopReason: "needs_human",
+      needsHuman: true,
       traceId,
       meta: {
         rounds: aiResult.meta.roundsRun,
@@ -137,7 +139,7 @@ export async function aiTennisCopyRefine(
   if (!selected) {
     return {
       success: false,
-      reason: "no_selected_proposal",
+      stopReason: "no_selected_proposal",
       traceId,
       meta: {
         rounds: aiResult.meta.roundsRun,
@@ -151,7 +153,7 @@ export async function aiTennisCopyRefine(
   if (!selected.targetKey || !selected.value) {
     return {
       success: false,
-      reason: "invalid_selected_proposal",
+      stopReason: "invalid_selected_proposal",
       traceId,
       meta: {
         rounds: aiResult.meta.roundsRun,
@@ -204,7 +206,7 @@ export async function aiTennisCopyRefine(
     if (!actionRequest) {
       return {
         success: false,
-        reason: "action_request_create_failed",
+        stopReason: "action_request_create_failed",
         traceId,
         meta: {
           rounds: aiResult.meta.roundsRun,
@@ -219,6 +221,7 @@ export async function aiTennisCopyRefine(
       success: true,
       actionRequestId: actionRequest.id,
       traceId,
+      stopReason: "ok",
       meta: {
         rounds: aiResult.meta.roundsRun,
         estimatedUsd: aiResult.meta.estimatedUsd,
@@ -229,7 +232,7 @@ export async function aiTennisCopyRefine(
   } catch {
     return {
       success: false,
-      reason: "action_request_create_failed",
+      stopReason: "action_request_create_failed",
       traceId,
       meta: {
         rounds: aiResult.meta.roundsRun,

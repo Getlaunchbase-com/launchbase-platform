@@ -102,7 +102,8 @@ describe("aiTennisCopyRefine", () => {
     // Should return structured failure (not throw)
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.reason).toBe("needs_human");
+      expect(result.stopReason).toBe("needs_human");
+      expect(result.needsHuman).toBe(true);
     }
   });
 
