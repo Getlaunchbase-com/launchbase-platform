@@ -1,7 +1,7 @@
 # LaunchBase TODO
 
 **Status:** 🟢 Production Live & Operational  
-**Version:** e98a11d8  
+**Version:** 11a16467  
 **Last Updated:** January 12, 2026
 
 > **📖 See WHERE_WE_ARE.md for complete status report and vision**
@@ -47,50 +47,179 @@
 
 ---
 
-## 📊 NEXT PHASE: Metrics Plumbing (Read-Only Observation)
+## 🚀 PHASE 5: Learning-Ready, Drift-Safe Execution
 
-**Mode:** Stabilization + drift containment + learning extraction  
-**Goal:** Make drift visible before it becomes expensive  
+**Goal:** Start learning from real usage without changing AI behavior  
+**Mode:** SQL-first using existing tables/logs before adding any new metrics table  
 **Rule:** Observe only. No behavior changes. No auto-tuning.
 
-### 📋 Metrics Queries (SQL + Logs - No Dashboard Yet)
-- [ ] **Create drift metrics queries:**
-  - [ ] Cost per approved action: `SUM(estimatedUsd) / COUNT(approved)`
-  - [ ] Approval rate: `COUNT(approved) / COUNT(proposals)`
-  - [ ] needsHuman rate: `COUNT(needsHuman=true) / COUNT(total)`
-  - [ ] stopReason distribution: Breakdown by enum value
-  - [ ] Cache hit rate: `COUNT(cached=true) / COUNT(total)`
-  - [ ] Stale takeover rate: `COUNT(attemptCount > 1) / COUNT(total)`
+**Enterprise Principle:** Truth before tooling. Dashboards lie before schemas stabilize.
 
-### 📝 Read-Only Logging (No Behavior Change)
-- [ ] **Add drift signal logging:**
-  - [ ] Log signals on every AI Tennis run
-  - [ ] Store in `drift_metrics` table (weekly aggregates)
-  - [ ] Queryable via SQL, no UI needed yet
+### 🚫 What We Do NOT Do Yet
+- ❌ No auto-optimizing prompts
+- ❌ No reinforcement learning
+- ❌ No silent retries
+- ❌ No "AI decides to change itself"
+- ❌ No new `drift_metrics` table (until SQL-first proves we need it)
 
-### 📈 Weekly Review Script
+### Step 1: Canonical Metrics Queries (SQL-First) ✅ COMPLETE
+
+**Status:** Schema-Correct, Pending Data Emission
+
+**Marching orders:** Produce `docs/AI_METRICS_QUERIES.md` first; everything else depends on it.
+
+- [x] **Create `docs/AI_METRICS_QUERIES.md`** with 4 required signals:
+  
+  - [ ] **1. stopReason distribution** (drift canary)
+    ```sql
+    SELECT
+      JSON_EXTRACT(rawInbound, '$.aiTennis.stopReason') AS stopReason,
+      COUNT(*) as count
+    FROM action_requests
+    WHERE messageType = 'AI_TENNIS_COPY_REFINE'
+    GROUP BY stopReason;
+    ```
+  
+  - [ ] **2. needsHuman rate** (protocol mismatch detector)
+    ```sql
+    SELECT
+      COUNT(*) AS total,
+      SUM(JSON_EXTRACT(rawInbound, '$.aiTennis.needsHuman') = true) AS needs_human
+    FROM action_requests
+    WHERE messageType = 'AI_TENNIS_COPY_REFINE';
+    ```
+    > If this climbs, you have protocol mismatch, not model failure.
+  
+  - [ ] **3. Cost per approval** (only cost number that matters)
+    ```sql
+    SELECT
+      AVG(JSON_EXTRACT(rawInbound, '$.aiTennis.costUsd')) AS avg_cost
+    FROM action_requests
+    WHERE status IN ('applied','confirmed');
+    ```
+  
+  - [ ] **4. Cache hit rate** (idempotency health)
+    ```sql
+    SELECT
+      COUNT(*) AS total,
+      SUM(JSON_EXTRACT(response_json, '$.cached') = true) AS cache_hits
+    FROM idempotency_keys
+    WHERE scope = 'actionRequests.aiProposeCopy'
+      AND status = 'succeeded';
+    ```
+    > Low cache hit ≠ bad. Rising cache hit over time = customers trusting + retrying safely.
+  
+  - [x] Include time window variants (24h / 7d / 30d)
+  - [x] Include "by tenant" variants
+
+**Hard rule:** No new `drift_metrics` table unless SQL-first proves we cannot reliably compute signals from existing data.
+
+**✅ Queries are frozen by contract and will be validated once AI Tennis endpoint emits `rawInbound.aiTennis`.**
+
+**Dependency:** Metrics queries cannot be executed until AI Tennis endpoint writes `rawInbound.aiTennis`. This is an intentional dependency that prevents:
+- Dashboard-driven definition drift
+- Mocking metrics with fake data
+- Premature aggregation tables
+- Learning from test data instead of real customer interactions
+
+### Step 2: Minimal Safe Event Emission (NEXT - Wire AI Tennis Endpoint)
+
+**Status:** Blocked until AI Tennis endpoint is wired up
+
+**Goal:** Wire AI Tennis endpoint to write `rawInbound.aiTennis` with correct, immutable facts.
+
+- [ ] **Wire AI Tennis endpoint (aiProposeCopy mutation):**
+  - [ ] Load ActionRequest + Intake for tenant
+  - [ ] Call `aiTennisCopyRefine()` service
+  - [ ] Write `rawInbound.aiTennis` using `buildAiTennisMeta()`
+  - [ ] Log `AI_PROPOSE_COPY` event
+  - [ ] Return customer-safe response (no prompts, no provider errors)
+  - [ ] **Hard rule:** No aggregation, no metrics table, just correct immutable facts
+
+- [ ] **Verify existing logging is sufficient:**
+  - [ ] Check `action_request_events.meta` has what we need
+  - [ ] Check `actionRequests.rawInbound.aiTennis` has what we need
+  - [ ] **Hard rule:** No prompts, no provider errors, no raw userText
+- [ ] **Add minimal logging only if gaps exist:**
+  - [ ] Log only what's missing for 4 canonical queries
+  - [ ] Use existing tables/columns first
+
+### Step 3: Weekly Review Script
 - [ ] **Create automated review script:**
-  - [ ] Compare WoW (Week over Week) deltas for 4 required signals
-  - [ ] Flag anomalies (>threshold from protocol)
+  - [ ] Run 4 canonical queries
+  - [ ] Compare WoW (Week over Week) deltas
+  - [ ] Flag anomalies (>threshold from AI_DRIFT_PROTOCOL_V1.md)
   - [ ] Output markdown report for manual review
+  - [ ] No dashboard yet - just script output
 
-### 🧠 Learning Extraction (Manual - Before Customer UI)
-- [ ] **Use real sites as learning surface:**
-  - LaunchBase site (our own)
-  - 3 GPT/Manus-built showroom sites
-  - Beta customers (when available)
+### Step 4: Weekly Learning Ritual (Human-in-the-Loop)
+
+**This is where Field General earns their keep.**
+
+- [ ] **Establish weekly review process:**
+  - [ ] Review 4 metrics from script output
+  - [ ] Pull 5 real ActionRequests
+  - [ ] Ask for each:
+    1. Why did this need human?
+    2. What assumption failed?
+    3. Was the prompt wrong — or the constraint?
+  - [ ] Output:
+    - 1 learning note
+    - 0 or 1 proposed change
+  - [ ] If change proposed → new version, new tests, explicit diff
+  - [ ] **No silent edits. Ever.**
+
+### Step 5: Showroom Learning (4 Sites Strategy)
+
+**Use real sites as learning surface - this is gold:**
+- LaunchBase site (our own)
+- 3 GPT/Manus-built showroom sites
+- Beta customers (when available)
+
+- [ ] **For each site, run same task across:**
+  - [ ] Base tier
+  - [ ] Upgraded tier
+  - [ ] Compare:
+    - stopReason
+    - rounds
+    - approvals
+    - human overrides
+
+- [ ] **This becomes:**
+  - Customer-facing truth
+  - Internal tuning evidence
+  - Sales proof without marketing lies
+
 - [ ] **Answer key questions:**
   - [ ] Where do humans override AI proposals?
   - [ ] Where do approvals stall?
   - [ ] Which sections trigger needsHuman?
   - [ ] What patterns predict approval?
+
 - [ ] **Document learnings:**
   - [ ] Create `docs/AI_LEARNING_NOTES.md` (non-binding, observational)
   - [ ] Propose prompt pack changes (versioned)
   - [ ] Propose protocol updates (versioned)
   - [ ] Test changes before deployment
 
-### 🧾 Customer UI (Thin Shell - LAST)
+### Step 6: Thin Internal Metrics Page (LAST - Only After SQL Feels Boring)
+
+**Rules for this page:**
+- Internal only
+- Read-only
+- No filters that change meaning
+- No live updates
+- No "AI score"
+- If the page breaks, the system must still be trustworthy
+
+**Just:**
+- [ ] Charts over time
+- [ ] Counts
+- [ ] Percentages
+- [ ] Links to underlying ActionRequests
+
+### Step 7: Customer UI (Thin Shell - AFTER Showroom Learning)
+
 **Rule:** Purely reflective. No hidden logic. Customer trail only.
 
 - [ ] **Inbox view:**
@@ -107,7 +236,20 @@
   - [ ] Show confidence evolution
 - [ ] **No advanced controls** (keep it thin)
 
+---
+
+### 🎯 Where You Are Now (Reality Check)
+
+You now have:
+- ✅ A constitutional AI platform
+- ✅ A cost-safe learning loop
+- ✅ A trust-preserving audit trail
+- ✅ A system that can grow without eating itself
+
+**Most teams never get here.**
+
 ### 🚫 Frozen Until Drift Visibility Exists
+
 **No new AI behavior until real usage is observed:**
 - ❌ No new AI roles
 - ❌ No new prompts (without versioning)
@@ -127,7 +269,7 @@
 - [x] `docs/IDEMPOTENCY_KEYS.md` - Idempotency implementation
 
 ### To Create (Next Phase)
-- [ ] `docs/DRIFT_METRICS_QUERIES.md` - SQL queries for drift signals
+- [x] `docs/AI_METRICS_QUERIES.md` - Canonical SQL queries for 4 required signals ✅ **COMPLETE (Schema-Correct, Pending Data Emission)**
 - [ ] `docs/AI_LEARNING_NOTES.md` - Non-binding observational learnings
 - [ ] `docs/SHOWROOM_STRATEGY.md` - How to use 4 sites as baselines
 
@@ -457,7 +599,7 @@
 - [x] FOREVER_CONTRACTS.md (constitutional guarantees)
 - [x] AI_DRIFT_PROTOCOL_V1.md (operational discipline)
 - [x] IDEMPOTENCY_KEYS.md (idempotency implementation)
-- [ ] DRIFT_METRICS_QUERIES.md (SQL queries for drift signals)
+- [ ] AI_METRICS_QUERIES.md (canonical SQL queries - FIRST)
 - [ ] AI_LEARNING_NOTES.md (non-binding observational learnings)
 - [ ] SHOWROOM_STRATEGY.md (how to use 4 sites as baselines)
 - [ ] QUICKBOOKS_INTEGRATION.md (technical spec)
@@ -516,6 +658,6 @@
 
 ---
 
-**🎯 Current Focus:** Metrics plumbing (read-only observation) → Learning extraction → Customer UI (thin shell)
+**🎯 Current Focus:** Phase 5 - SQL-first metrics plumbing → Weekly learning ritual → Showroom strategy
 
 **📖 Full context:** See `WHERE_WE_ARE.md`
