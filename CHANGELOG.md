@@ -14,6 +14,10 @@ All notable changes to this project will be documented in this file.
 
 - **Trace-based seeding is test-only (VITEST guarded)**: Test seeding uses trace-based pattern with wildcard matching for unpredictable jobIds. Memory transport fixtures ensure deterministic tests without prompt-hash brittleness. All 12 tests passing (8 orchestrator + 4 service).
 
+- **Metrics queries validated against real data**: All 4 canonical SQL queries from `AI_METRICS_QUERIES.md` validated successfully. JSON paths extract correctly (`$.aiTennis.stopReason`, `$.aiTennis.costUsd`, `$.aiTennis.needsHuman`, `$.aiTennis.rounds`, `$.aiTennis.traceId`). Data shape from Step 2.1 is correct.
+
+- **Incident: Prod seeding + immediate cleanup**: Metrics validation briefly used seeded AI Tennis rows in production (ActionRequest IDs 10-12, Intake ID 10). All seeded rows removed immediately via `scripts/cleanup-test-data.ts`. No customer data affected. Hard guardrails added to `scripts/seed-ai-tennis-test-data.ts` to forbid future prod seeding. New FOREVER CONTRACT added: "Production is Read-Only for Metrics Validation" (see `docs/FOREVER_CONTRACTS.md` §8).
+
 ---
 
 ## Previous Work

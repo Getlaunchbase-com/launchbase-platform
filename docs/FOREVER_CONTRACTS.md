@@ -141,3 +141,37 @@ These contracts **do not change** without:
 ---
 
 > If you can't explain a decision via `stopReason` + `traceId` + prompt version, it's invalid.
+
+
+---
+
+## 8. Production is Read-Only for Metrics Validation
+
+**Contract:**
+- All AI metrics validation and testing MUST use dev/staging database snapshots
+- Production database is read-only for observation and analysis
+- Seeding synthetic AI data in production is strictly forbidden
+
+**Allowed:**
+- Reading production metrics for analysis
+- Running canonical queries against production data
+- Exporting production data to staging for validation
+
+**Forbidden:**
+- Seeding test ActionRequests with `rawInbound.aiTennis` in production
+- Creating synthetic intakes for testing in production
+- Any write operations that pollute learning signals
+
+**Rationale:**
+- Synthetic data pollutes drift detection signals
+- Violates "truth before tooling" principle
+- Creates false positives in anomaly detection
+- Undermines customer trust in metrics accuracy
+
+**Enforcement:**
+- All seeding scripts MUST check `process.env.NODE_ENV` and `DATABASE_URL`
+- Scripts MUST throw explicit errors if production environment detected
+- See `scripts/seed-ai-tennis-test-data.ts` for reference implementation
+
+**Incident Log:**
+- 2026-01-12: Metrics query validation briefly used seeded AI Tennis rows in prod. Rows removed immediately. No customer data affected. Guardrails added.
