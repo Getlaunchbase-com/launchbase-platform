@@ -2,6 +2,14 @@ import { getDb } from '../server/db';
 import { actionRequests, intakes } from '../drizzle/schema';
 
 async function main() {
+  // HARD GUARDRAIL: Forbid seeding in production
+  if (process.env.NODE_ENV === 'production' || process.env.DATABASE_URL?.includes('prod')) {
+    throw new Error(
+      '❌ FORBIDDEN: Seeding AI metrics test data in production is not allowed.\n' +
+      'Use a dev/staging database snapshot for validation work.\n' +
+      'See FOREVER_CONTRACTS.md for the prod-read-only rule.'
+    );
+  }
   const db = await getDb();
 
   // Create a test intake first

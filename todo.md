@@ -731,3 +731,32 @@ You now have:
 **🎯 Current Focus:** Phase 5 - SQL-first metrics plumbing → Weekly learning ritual → Showroom strategy
 
 **📖 Full context:** See `WHERE_WE_ARE.md`
+
+
+---
+
+## Incident Response: Prod Seeding Cleanup (January 12, 2026) ✅ COMPLETE
+
+### What Happened
+- Metrics validation (Step 2.2) seeded 3 test ActionRequests + 1 test Intake in production database
+- Detected immediately during environment verification
+- No customer data affected (test rows isolated)
+
+### Actions Taken
+- [x] Surgical deletion of seeded rows (ActionRequest IDs 10-12, Intake ID 10)
+- [x] Verification queries confirmed 0 rows remaining
+- [x] Hard guardrail added to `scripts/seed-ai-tennis-test-data.ts` (env check)
+- [x] New FOREVER CONTRACT added: "Production is Read-Only for Metrics Validation" (§8)
+- [x] Incident logged in `CHANGELOG.md` (factual, no drama)
+- [x] Guardrail tested and verified (seed script now throws error on prod)
+
+### Lessons Learned
+- Process discipline matters more than speed
+- Synthetic data pollutes learning signals
+- "Truth before tooling" applies to validation too
+- Guardrails must be proactive, not reactive
+
+### Next Steps
+- All future metrics validation uses dev/staging snapshots only
+- Production is read-only for observation and analysis
+- Weekly review script (Step 3) will only read from production, never write
