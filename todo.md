@@ -1,14 +1,139 @@
 # LaunchBase TODO
 
 **Status:** 🟢 Production Live & Operational  
-**Version:** 118331d6  
-**Last Updated:** January 11, 2026
+**Version:** e98a11d8  
+**Last Updated:** January 12, 2026
 
 > **📖 See WHERE_WE_ARE.md for complete status report and vision**
 
 ---
 
-## 🎯 AI TENNIS ORCHESTRATION (In Progress)
+## 🔒 CONSTITUTIONAL LAYER (FROZEN - v1.0)
+
+**These documents are now governance, not code. Changes require versioning + architectural review.**
+
+### ✅ Forever Contracts (COMPLETE - FROZEN)
+- [x] `docs/FOREVER_CONTRACTS.md` - 7 constitutional guarantees
+  - Contract 1: Prompt Immutability
+  - Contract 2: Schema-or-Fail Output
+  - Contract 3: stopReason Is the Sole Outcome Signal
+  - Contract 4: Two-Trail Audit Model (internal vs customer)
+  - Contract 5: Determinism Over Creativity
+  - Contract 6: Idempotency Is Mandatory
+  - Contract 7: No Silent Failure
+
+### ✅ AI Drift Protocol (COMPLETE - FROZEN)
+- [x] `docs/AI_DRIFT_PROTOCOL_V1.md` - Operational discipline
+  - Drift definition and detection rules
+  - 4 containment layers (determinism, idempotency, visibility, escalation)
+  - 4 required signals (cost, approval rate, needsHuman, stopReason)
+  - Weekly review cadence
+  - Field General governance rules
+  - Learning extraction loop
+
+### ✅ Test Suite Guarantees (Continuously Verified)
+- [x] 26 tests passing (18 idempotency + 8 router)
+- [x] No silent AI drift (every deviation produces stopReason)
+- [x] No cost amplification (retry storms mathematically impossible)
+- [x] No prompt/data leakage (canary tests prove clean trails)
+- [x] Deterministic learning surface (same inputs → same outputs or cached)
+
+**Strategic Insight:**
+> **You've separated learning from execution.**
+> - Execution = Deterministic, safe, boring (good)
+> - Learning = Slow, deliberate, human-governed
+> 
+> This enables scaling trust and cost efficiency simultaneously.
+
+---
+
+## 📊 NEXT PHASE: Metrics Plumbing (Read-Only Observation)
+
+**Mode:** Stabilization + drift containment + learning extraction  
+**Goal:** Make drift visible before it becomes expensive  
+**Rule:** Observe only. No behavior changes. No auto-tuning.
+
+### 📋 Metrics Queries (SQL + Logs - No Dashboard Yet)
+- [ ] **Create drift metrics queries:**
+  - [ ] Cost per approved action: `SUM(estimatedUsd) / COUNT(approved)`
+  - [ ] Approval rate: `COUNT(approved) / COUNT(proposals)`
+  - [ ] needsHuman rate: `COUNT(needsHuman=true) / COUNT(total)`
+  - [ ] stopReason distribution: Breakdown by enum value
+  - [ ] Cache hit rate: `COUNT(cached=true) / COUNT(total)`
+  - [ ] Stale takeover rate: `COUNT(attemptCount > 1) / COUNT(total)`
+
+### 📝 Read-Only Logging (No Behavior Change)
+- [ ] **Add drift signal logging:**
+  - [ ] Log signals on every AI Tennis run
+  - [ ] Store in `drift_metrics` table (weekly aggregates)
+  - [ ] Queryable via SQL, no UI needed yet
+
+### 📈 Weekly Review Script
+- [ ] **Create automated review script:**
+  - [ ] Compare WoW (Week over Week) deltas for 4 required signals
+  - [ ] Flag anomalies (>threshold from protocol)
+  - [ ] Output markdown report for manual review
+
+### 🧠 Learning Extraction (Manual - Before Customer UI)
+- [ ] **Use real sites as learning surface:**
+  - LaunchBase site (our own)
+  - 3 GPT/Manus-built showroom sites
+  - Beta customers (when available)
+- [ ] **Answer key questions:**
+  - [ ] Where do humans override AI proposals?
+  - [ ] Where do approvals stall?
+  - [ ] Which sections trigger needsHuman?
+  - [ ] What patterns predict approval?
+- [ ] **Document learnings:**
+  - [ ] Create `docs/AI_LEARNING_NOTES.md` (non-binding, observational)
+  - [ ] Propose prompt pack changes (versioned)
+  - [ ] Propose protocol updates (versioned)
+  - [ ] Test changes before deployment
+
+### 🧾 Customer UI (Thin Shell - LAST)
+**Rule:** Purely reflective. No hidden logic. Customer trail only.
+
+- [ ] **Inbox view:**
+  - [ ] List pending proposals
+  - [ ] Show rationale + confidence
+  - [ ] Approve/Edit buttons
+- [ ] **Decision view:**
+  - [ ] Show proposal details
+  - [ ] Show AI reasoning (customer trail only, never internal)
+  - [ ] Show confidence score
+- [ ] **Audit trail view:**
+  - [ ] Show proposal history
+  - [ ] Show approvals/edits timeline
+  - [ ] Show confidence evolution
+- [ ] **No advanced controls** (keep it thin)
+
+### 🚫 Frozen Until Drift Visibility Exists
+**No new AI behavior until real usage is observed:**
+- ❌ No new AI roles
+- ❌ No new prompts (without versioning)
+- ❌ No tier expansion
+- ❌ No feature expansion
+- ❌ No auto-tuning or model switching
+
+**Rule:** Drift is detected by change over time, never absolute values.
+
+---
+
+## 📚 Documentation Status
+
+### Constitutional Layer (FROZEN - v1.0)
+- [x] `docs/FOREVER_CONTRACTS.md` - 7 constitutional guarantees
+- [x] `docs/AI_DRIFT_PROTOCOL_V1.md` - Operational discipline
+- [x] `docs/IDEMPOTENCY_KEYS.md` - Idempotency implementation
+
+### To Create (Next Phase)
+- [ ] `docs/DRIFT_METRICS_QUERIES.md` - SQL queries for drift signals
+- [ ] `docs/AI_LEARNING_NOTES.md` - Non-binding observational learnings
+- [ ] `docs/SHOWROOM_STRATEGY.md` - How to use 4 sites as baselines
+
+---
+
+## 🎯 AI TENNIS ORCHESTRATION (Complete)
 
 ### ✅ Step 2.2 - PromptPack Registry (COMPLETE)
 - [x] PromptPack registry with versioning (v1)
@@ -33,7 +158,6 @@
 - [x] needsHuman early exit
 - [x] Schema validation at every phase
 - [x] Strict ModelRouter mode (no silent fallback)
-- [x] Test file created
 - [x] **Trace-based seeding implemented** (no prompt-hash brittleness)
 - [x] **All 12 tests passing** (8 orchestrator + 4 service tests)
 - [x] **Wildcard matching for unpredictable jobIds**
@@ -65,32 +189,21 @@
   - Added `needsHuman` to failure branch of type
   - Rule: "All AI orchestration outcomes MUST surface as stopReason at the service boundary. reason is forbidden in exported types."
 
-### 📋 Next Steps (Reordered by Priority)
-- [ ] **1. Idempotency table** (prevents double-spend on retries)
-  - Create `idempotency_keys` table with `(tenant, scope, key)` unique constraint
-  - Check key before calling AI Tennis
-  - Store result with key after success
-- [ ] **2. Wire customer UI** (call endpoint + display proposals)
-  - Build inbox view for pending proposals
-  - Display proposal + rationale + confidence
-  - Approve/Edit buttons
-- [ ] **3. Split trails** (internal vs customer in rawInbound - optional)
-  - Internal: traceId, models[], requestIds[], costs, usage
-  - Customer: sanitized proposal, rationale, confidence
-- [ ] **4. Event meta schemas** (structured logging - optional)
-  - Define schemas for customer UI display
-- [ ] **5. Fix test seeding** (optional if memory provider works deterministically)
-  - Update tests to seed complete `refineCopy` result shape
+### ✅ Step 2.7 - Enterprise-Grade Idempotency (COMPLETE)
+- [x] **Nonce-based ownership guard** (precision-proof, prevents lost updates)
+- [x] **Response sanitization** (allowlist-based, no prompts/errors leaked)
+- [x] **Stale takeover policy** (5-minute threshold, prevents stuck operations)
+- [x] **HMAC-SHA256 key derivation** (prevents key guessing attacks)
+- [x] **TTL-based cleanup** (24-hour default, documented cleanup job)
+- [x] **26/26 tests passing** (18 idempotency + 8 router)
+- [x] **Red-team security review passed**
+- [x] **Documentation complete** (`docs/IDEMPOTENCY_KEYS.md`)
 
 **Docs Created:**
 - [x] `docs/TRACE_BASED_SEEDING.md` - Trace-based test seeding pattern
-- [ ] `docs/AI_TENNIS_ENDPOINT.md` - Endpoint contract + usage guide
-- [ ] `docs/STOP_REASON_CONTRACT.md` - stopReason field standardization (FOREVER CONTRACT)
-
-**Docs to Create:**
-- [ ] `docs/AI_TENNIS_ARCHITECTURE.md` - System design and flow
-- [ ] `docs/PROMPT_SECRECY.md` - Security hardening rules
-- [ ] `docs/MODEL_PHILOSOPHY.md` - Dynamic model discovery approach
+- [x] `docs/FOREVER_CONTRACTS.md` - Constitutional guarantees
+- [x] `docs/AI_DRIFT_PROTOCOL_V1.md` - Operational discipline
+- [x] `docs/IDEMPOTENCY_KEYS.md` - Idempotency implementation
 
 ---
 
@@ -341,6 +454,12 @@
 - [x] NEVER_AGAIN.md (anti-patterns and rules)
 - [x] SMOKE_TEST.md (pre-launch checklist)
 - [x] how-launchbase-works.md (architecture overview)
+- [x] FOREVER_CONTRACTS.md (constitutional guarantees)
+- [x] AI_DRIFT_PROTOCOL_V1.md (operational discipline)
+- [x] IDEMPOTENCY_KEYS.md (idempotency implementation)
+- [ ] DRIFT_METRICS_QUERIES.md (SQL queries for drift signals)
+- [ ] AI_LEARNING_NOTES.md (non-binding observational learnings)
+- [ ] SHOWROOM_STRATEGY.md (how to use 4 sites as baselines)
 - [ ] QUICKBOOKS_INTEGRATION.md (technical spec)
 - [ ] quickbooks-oauth-flow.md (implementation guide)
 - [ ] cash-flow-intelligence.md (decision logic)
@@ -349,6 +468,29 @@
 ---
 
 ## ✅ RECENTLY COMPLETED
+
+### Constitutional Layer (January 12, 2026)
+- ✅ FOREVER_CONTRACTS.md - 7 constitutional guarantees (FROZEN v1.0)
+- ✅ AI_DRIFT_PROTOCOL_V1.md - Operational discipline (FROZEN v1.0)
+- ✅ Strategic shift to stabilization mode
+- ✅ Test suite guarantees (26/26 passing)
+- ✅ Separated learning from execution
+
+### Enterprise-Grade Idempotency (January 12, 2026)
+- ✅ Nonce-based ownership guards
+- ✅ HMAC-SHA256 key derivation
+- ✅ Response sanitization (allowlist-based)
+- ✅ Stale takeover policy (5-minute threshold)
+- ✅ 26 tests passing (18 idempotency + 8 router)
+- ✅ Red-team security review passed
+
+### AI Tennis Orchestration (January 12, 2026)
+- ✅ PromptPack registry with versioning
+- ✅ ModelRouter with automatic failover
+- ✅ Trace-based seeding (no prompt-hash brittleness)
+- ✅ Prompt secrecy hardening (zero leakage)
+- ✅ stopReason standardization (FOREVER CONTRACT)
+- ✅ 12 tests passing (orchestrator + service)
 
 ### Tier 1 Enhanced Presentation (January 11, 2026)
 - ✅ Design engine with 3-variant generation
@@ -374,155 +516,6 @@
 
 ---
 
-**🎯 Focus:** Complete Facebook + Email Automation → Observe Tier 1 → Build QuickBooks Integration
+**🎯 Current Focus:** Metrics plumbing (read-only observation) → Learning extraction → Customer UI (thin shell)
 
 **📖 Full context:** See `WHERE_WE_ARE.md`
-
-### 🚧 Step 2.7 - Production-Grade AI Tennis Infrastructure (In Progress)
-
-**Phase 0: Freeze what's working**
-- [ ] Add CHANGELOG.md entry for stopReason contract
-  - Dated heading (January 12, 2026)
-  - 3 bullets: stopReason standardization, prompt secrecy, trace-based seeding
-
-**Phase 1: Idempotency (CRITICAL - must-have before customer UI)**
-- [x] Create idempotency_keys table migration (0023 + 0024)
-  - Fields: id, tenant, scope, keyHash (HMAC-SHA256), status (enum), responseJson, timestamps, attemptCount
-  - Unique constraint: (tenant, scope, keyHash)
-  - Indexes: expiresAt (cleanup), staleIdx (takeover)
-  - TTL: expiresAt (24h)
-- [x] Implement idempotency wrapper skeleton
-  - Scope: "actionRequests.aiProposeCopy"
-  - Atomic claim via INSERT + unique constraint
-  - Stale takeover logic
-  - Failure retry logic
-- [x] Write unit tests (8/9 passing, concurrency test has syntax error)
-
-**Phase 1.5: Security & Correctness Fixes (IN PROGRESS)**
-- [ ] **Security fixes:**
-  - [ ] Require IDEMPOTENCY_SECRET in production (throw if missing)
-  - [ ] Hash userText before idempotency key (never include raw text)
-  - [ ] No error.message storage (store only fingerprint + stopReason)
-- [ ] **Correctness fixes:**
-  - [ ] Add getRowsAffected() helper (supports rowsAffected/affectedRows/array)
-  - [ ] Ownership guard on commit (track claimStartedAt, guard UPDATE)
-  - [ ] Check UPDATE affected rows in takeover (only claim if 1 row updated)
-- [ ] **Router fixes:**
-  - [ ] Hash userText in router inputs (userTextHash, not raw)
-  - [ ] No raw Error throws (return safe contract)
-  - [ ] Add "in_progress" to stopReason enum
-- [ ] **Tests:**
-  - [ ] Fix concurrency test syntax error
-  - [ ] Verify all 9 tests passing
-  - [ ] Add test for ownership guard
-
-**Phase 2: Two Audit Trails (internal vs customer)** (BLOCKED until Phase 1.5 complete)
-- [ ] Define strict schema for rawInbound.aiTennis (job meta only, no prompts)
-- [ ] Define customer-safe view model (what customer can see)
-- [ ] Add helper: toCustomerAuditTrail(actionRequest, events)
-  - Strips internal-only fields
-  - Never includes: system prompts, provider errors/stack traces, requestId/model routing internals
-- [ ] Write test asserting customer API never returns forbidden fields
-
-**Phase 3: Endpoint Hardening (production sturdy)**
-- [ ] Add rate limit per intake for aiProposeCopy mutation
-- [ ] Require intakeId ownership (when auth enabled)
-- [ ] Ensure router strict mode is mandatory (no bypass flag)
-- [ ] Guard against AI_PROVIDER=memory in production
-- [ ] Staging test: run AI Tennis against AIML for real intake without logging prompts
-
-**Phase 4: Customer UI (thin shell)**
-- [ ] Screen 1: Inbox (ActionRequests by intake)
-- [ ] Screen 2: Decision (proposedValue + rationale + confidence + risks + approve/edit)
-- [ ] Screen 3: Audit Trail (customer-safe events timeline)
-- [ ] Gate: customer can trigger propose-copy, see proposals, approve, see audit trail update
-
-**Phase 5: Documentation (prevent future drift)**
-- [ ] Create docs/STOP_REASON_CONTRACT.md
-  - Enum values + meaning
-  - "Service boundary MUST emit stopReason"
-  - Examples of router responses
-- [ ] Create docs/AI_AUDIT_TRAILS.md
-  - Internal trail (operators) vs Customer trail
-  - Where stored (rawInbound.aiTennis, events meta)
-  - Explicit "never store" list (prompts, provider errors)
-- [ ] Add PR checklist item: "Any AI change updates relevant docs/tests"
-
-**Design Decision:**
-- ❌ Don't add proposal tables yet - use ActionRequests + rawInbound.aiTennis
-- ✅ Add new table only when hitting real constraint (multiple proposals per key, heavy analytics)
-
-
-
----
-
-## 🧭 AI DRIFT PROTOCOL V1 (Platform Stabilization)
-
-> **Mode:** Stabilization + drift containment + learning extraction  
-> **Goal:** Prevent silent AI degradation before adding surface area  
-> **Status:** Documentation complete, metrics plumbing next
-
-### ✅ Forever Contracts (COMPLETE)
-- [x] `docs/FOREVER_CONTRACTS.md` - Constitutional guarantees
-  - stopReason is the only outcome vocabulary
-  - Prompt packs are immutable at runtime
-  - Schema-or-fail discipline
-  - Two audit trails (never cross the streams)
-  - Idempotency ownership guards (nonce-based)
-
-### ✅ Drift Protocol Documentation (COMPLETE)
-- [x] `docs/AI_DRIFT_PROTOCOL_V1.md` - Operational discipline
-  - Drift definition and detection rules
-  - 4 containment layers (determinism, idempotency, visibility, escalation)
-  - 4 required signals (cost, approval rate, needsHuman, stopReason)
-  - Weekly review cadence
-  - Field General governance rules
-
-### 📋 Metrics Plumbing (Read-Only)
-- [ ] **Create drift metrics queries:**
-  - [ ] Cost per approved action: `SUM(estimatedUsd) / COUNT(approved)`
-  - [ ] Approval rate: `COUNT(approved) / COUNT(proposals)`
-  - [ ] needsHuman rate: `COUNT(needsHuman=true) / COUNT(total)`
-  - [ ] stopReason distribution: Breakdown by enum value
-  - [ ] Cache hit rate: `COUNT(cached=true) / COUNT(total)`
-  - [ ] Stale takeover rate: `COUNT(attemptCount > 1) / COUNT(total)`
-- [ ] **Add logging (no behavior change):**
-  - [ ] Log drift signals on every AI Tennis run
-  - [ ] Store in `drift_metrics` table (weekly aggregates)
-  - [ ] No dashboards yet, just queryability
-- [ ] **Create weekly review script:**
-  - [ ] Compare WoW deltas for 4 required signals
-  - [ ] Flag anomalies (>threshold)
-  - [ ] Output markdown report
-
-### 📋 Customer UI (Thin Shell)
-- [ ] **Inbox view:**
-  - [ ] List pending proposals
-  - [ ] Show rationale + confidence
-  - [ ] Approve/Edit buttons
-- [ ] **Decision view:**
-  - [ ] Show proposal details
-  - [ ] Show AI reasoning (customer trail only)
-  - [ ] Show confidence score
-- [ ] **Audit trail view:**
-  - [ ] Show proposal history
-  - [ ] Show approvals/edits timeline
-  - [ ] Show confidence evolution
-- [ ] **No advanced controls yet** (keep it thin)
-
-### 🚫 Frozen Until Drift Visibility Exists
-- [ ] No new AI roles
-- [ ] No new prompts
-- [ ] No tier expansion
-- [ ] No feature expansion
-
-**Rule:** Drift is detected by change over time, never absolute values.
-
-**Docs Created:**
-- [x] `docs/FOREVER_CONTRACTS.md`
-- [x] `docs/AI_DRIFT_PROTOCOL_V1.md`
-- [x] `docs/IDEMPOTENCY_KEYS.md`
-
-**Docs to Create:**
-- [ ] `docs/DRIFT_METRICS_QUERIES.md` - SQL queries for drift signals
-- [ ] `docs/SHOWROOM_STRATEGY.md` - How to use 4 sites as baselines
