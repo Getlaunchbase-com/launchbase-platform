@@ -195,18 +195,23 @@ function enforceVariantCaps(variant: CopyVariant, index: number): string[] {
  * Call this AFTER validateAiOutput() passes.
  * 
  * @param proposal - Validated CopyProposal
- * @returns CapViolationResult
+ * @returns The proposal payload (unchanged if valid, or throws if caps violated)
  * 
  * @example
  * const schemaResult = validateAiOutput<CopyProposal>("copy_proposal", payload);
- * if (!schemaResult.ok) return schemaResult;
+ * if (!schemaResult.ok) throw new Error("Schema validation failed");
  * 
- * const capResult = enforceSectionCaps(schemaResult.data);
- * if (!capResult.ok) return capResult;
- * 
- * // Safe to use proposal
+ * const capped = enforceSectionCaps(schemaResult.data);
+ * // Safe to use capped proposal
  */
-export function enforceSectionCaps(proposal: CopyProposal): CapViolationResult {
+export function enforceSectionCaps(proposal: CopyProposal): CopyProposal {
+  // Defensive guards
+  if (!proposal || typeof proposal !== "object") return proposal;
+  
+  if (!("variants" in proposal) || !Array.isArray(proposal.variants)) {
+    return proposal; // schema validation handles missing variants
+  }
+
   const errors: string[] = [];
 
   proposal.variants.forEach((variant, index) => {
@@ -215,14 +220,10 @@ export function enforceSectionCaps(proposal: CopyProposal): CapViolationResult {
   });
 
   if (errors.length > 0) {
-    return {
-      ok: false,
-      code: "cap_violation",
-      errors,
-    };
+    throw new Error(`Cap violations: ${errors.join("; ")}`);
   }
 
-  return { ok: true };
+  return proposal;
 }
 
 /**
