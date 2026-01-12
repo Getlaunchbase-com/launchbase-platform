@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DesignTokensProposal",
+  "description": "AI-generated presentation tokens (no HTML, no content structure changes)",
+  "type": "object",
+  "required": ["schemaVersion", "tokens", "requiresApproval", "confidence", "risks", "assumptions"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "v1",
+      "description": "Schema version for safe migrations"
+    },
+    "tokens": {
+      "type": "object",
+      "description": "Presentation tokens only - no content structure changes",
+      "additionalProperties": false,
+      "properties": {
+        "maxWidth": {
+          "type": "string",
+          "pattern": "^\\d+(px|rem|em)$",
+          "description": "Max content width (e.g., '1200px', '80rem')"
+        },
+        "sectionGap": {
+          "type": "string",
+          "pattern": "^\\d+(px|rem|em)$",
+          "description": "Gap between sections (e.g., '4rem', '64px')"
+        },
+        "radius": {
+          "type": "string",
+          "enum": ["none", "sm", "md", "lg", "xl"],
+          "description": "Border radius style"
+        },
+        "cardStyle": {
+          "type": "string",
+          "enum": ["flat", "bordered", "elevated", "outlined"],
+          "description": "Card presentation style"
+        },
+        "trustLayout": {
+          "type": "string",
+          "enum": ["grid", "list", "carousel", "stacked"],
+          "description": "Trust section layout"
+        },
+        "ctaStyle": {
+          "type": "string",
+          "enum": ["solid", "outline", "ghost", "gradient"],
+          "description": "CTA button style"
+        },
+        "typographyScale": {
+          "type": "string",
+          "enum": ["compact", "comfortable", "spacious"],
+          "description": "Typography scale"
+        },
+        "spacing": {
+          "type": "string",
+          "enum": ["tight", "normal", "relaxed"],
+          "description": "Overall spacing density"
+        }
+      }
+    },
+    "rationale": {
+      "type": "string",
+      "maxLength": 300,
+      "description": "Why these tokens improve presentation"
+    },
+    "requiresApproval": {
+      "type": "boolean",
+      "const": true,
+      "description": "Must always be true"
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Confidence in token choices"
+    },
+    "risks": {
+      "type": "array",
+      "description": "Potential risks with these tokens",
+      "items": {
+        "type": "string",
+        "maxLength": 120
+      },
+      "maxItems": 3
+    },
+    "assumptions": {
+      "type": "array",
+      "description": "Assumptions made about design goals",
+      "items": {
+        "type": "string",
+        "maxLength": 120
+      },
+      "maxItems": 3
+    }
+  }
+}
