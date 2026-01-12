@@ -108,6 +108,8 @@ const keyHash = createHmac("sha256", IDEMPOTENCY_SECRET)
   .digest("hex");
 ```
 
+**In production, missing `IDEMPOTENCY_SECRET` must fail fast at startup.**
+
 **CRITICAL**: Never include raw user text in the canonical string. Always hash it first:
 
 ```typescript
@@ -127,7 +129,7 @@ Only customer-safe fields are stored in `response_json`:
 - `traceId` (string)
 - `needsHuman` (boolean)
 - `cached` (boolean)
-- `data` (primitives only)
+- `data` (JSON-serializable, customer-safe primitives only; no nested objects with semantic meaning)
 
 **Blocklist** (never stored):
 - `_internal`, `debug`, `prompt`
@@ -173,9 +175,19 @@ const result = await withIdempotency({
 if (result.status === "succeeded") {
   return result.data; // From cache or fresh
 } else if (result.status === "in_progress") {
-  throw new TRPCError({ code: "CONFLICT", message: result.message });
+  // No-throw contract: return safe response
+  return {
+    ok: false,
+    stopReason: "in_progress",
+    meta: getSystemMeta(),
+  };
 } else {
-  throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: result.error });
+  // Handle failure case
+  return {
+    ok: false,
+    stopReason: result.stopReason || "unknown",
+    meta: getSystemMeta(),
+  };
 }
 ```
 
