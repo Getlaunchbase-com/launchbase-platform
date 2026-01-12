@@ -195,9 +195,10 @@ export const actionRequestEvents = mysqlTable("action_request_events", {
     "ADMIN_UNLOCK",
     "ADMIN_EXPIRE",
     "ESCALATED",
-  "SEND_FAILED",
+    "SEND_FAILED",
     "PREVIEW_VIEWED",
     "PROPOSED_PREVIEW_RENDER_FAILED",
+    "AI_PROPOSE_COPY",
   ]).notNull(),
   // Actor
   actorType: mysqlEnum("actorType", ["system", "customer", "admin"]).notNull(),
