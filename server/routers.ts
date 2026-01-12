@@ -72,12 +72,14 @@ function generateReferralCode(): string {
 
 import { actionRequestsRouter } from "./routers/actionRequestsRouter";
 import { designJobsRouter } from "./routers/designJobsRouter";
+import { aiCopyRefineRouter } from "./routers/aiCopyRefineRouter";
 
 export const appRouter = router({
   system: systemRouter,
   platform: platformRouter,
   actionRequests: actionRequestsRouter,
   designJobs: designJobsRouter,
+  aiCopyRefine: aiCopyRefineRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {

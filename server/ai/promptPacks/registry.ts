@@ -6,7 +6,11 @@
  */
 
 import { readFileSync } from "fs";
-import { join } from "path";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dir = dirname(__filename);
 import type { AiContractType } from "../validateAiOutput";
 
 // ============================================
@@ -36,7 +40,7 @@ export interface PromptPack {
 // PROMPT LOADER
 // ============================================
 
-const PROMPT_DIR = join(__dirname, "v1");
+const PROMPT_DIR = join(__dir, "v1");
 
 function loadPrompt(filename: string): string {
   const path = join(PROMPT_DIR, filename);
