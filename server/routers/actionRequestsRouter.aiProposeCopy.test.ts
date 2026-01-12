@@ -189,6 +189,55 @@ describe("actionRequests.aiProposeCopy", () => {
     ).rejects.toThrow("Action request not found");
   });
 
+  describe("STEP 2.1: ROUTER CONTRACT VERIFICATION", () => {
+    it("should return customer-safe contract with correct structure", async () => {
+      // Mock successful AI Tennis response with new ActionRequest ID
+      const newActionRequestId = testActionRequestId + 1000; // Simulate new ID
+      mockAiTennisCopyRefine.mockResolvedValueOnce({
+        success: true,
+        actionRequestId: newActionRequestId,
+        stopReason: "ok",
+        traceId: "test-trace-shape",
+        meta: {
+          rounds: 2,
+          estimatedUsd: 0.01,
+          calls: 3,
+          models: ["test-model"],
+        },
+      } as AiCopyRefineResult);
+
+      const caller = appRouter.createCaller({
+        req: {} as any,
+        res: {} as any,
+        user: null,
+      });
+
+      const result = await caller.actionRequests.aiProposeCopy({
+        id: testActionRequestId,
+        userText: "Test contract shape",
+        targetSection: "hero",
+      });
+
+      // STEP 2.1 ASSERTIONS: Verify router returns customer-safe contract
+      expect(result.ok).toBe(true);
+      expect(result.createdActionRequestIds).toBeDefined();
+      expect(result.createdActionRequestIds).toEqual([newActionRequestId]);
+      expect(result.traceId).toBe("test-trace-shape");
+      expect(result.stopReason).toBe("ok");
+      expect(result.needsHuman).toBe(false);
+      
+      // Verify meta contains version info
+      expect(result.meta).toBeDefined();
+      expect(result.meta?.version).toBeDefined();
+      
+      // Verify no internal details leaked
+      const responseStr = JSON.stringify(result);
+      expect(responseStr).not.toContain("prompt");
+      expect(responseStr).not.toContain("system:");
+      expect(responseStr).not.toContain("Error:");
+    });
+  });
+
   describe("IDEMPOTENCY BEHAVIOR", () => {
     it("CASE 1: first call returns valid contract (no throws)", async () => {
       const caller = appRouter.createCaller({

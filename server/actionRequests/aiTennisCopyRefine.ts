@@ -166,6 +166,14 @@ export async function aiTennisCopyRefine(
 
   // Step 3: Create ActionRequest
   try {
+    // Derive real stopReason (FOREVER CONTRACT)
+    // Since runAiTennis doesn't expose stopReason yet, derive from success state
+    const stopReason: string = aiResult.success
+      ? "ok"
+      : aiResult.needsHuman
+      ? "needs_human"
+      : "provider_failed";
+
     // Build AI Tennis job metadata (no prompt content)
     const jobMeta = buildAiTennisMeta({
       traceId,
@@ -178,18 +186,20 @@ export async function aiTennisCopyRefine(
       },
       costUsd: aiResult.meta.estimatedUsd,
       needsHuman: aiResult.needsHuman,
-      stopReason: "completed",
+      stopReason, // Real stopReason, not "completed"
     });
 
-    // Combine job + proposal metadata in rawInbound
+    // Combine job + proposal metadata in rawInbound (Step 2.1 contract)
     const rawInbound = {
       source: "ai_tennis",
-      ...jobMeta,
+      aiTennis: jobMeta.aiTennis, // Correct structure: aiTennis at top level
       proposal: {
         targetKey: selected.targetKey,
         value: selected.value,
         rationale: decision.reason || "",
         confidence: decision.confidence || 0,
+        risks: decision.risks || [], // MUST be array
+        assumptions: decision.assumptions || [], // MUST be array
       },
     };
 

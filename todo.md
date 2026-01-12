@@ -124,33 +124,101 @@
 
 ### Step 2: Minimal Safe Event Emission (NEXT - Wire AI Tennis Endpoint)
 
-**Status:** Blocked until AI Tennis endpoint is wired up
+**Status:** Ready to implement
 
-**Goal:** Wire AI Tennis endpoint to write `rawInbound.aiTennis` with correct, immutable facts.
+**Goal:** Wire AI Tennis endpoint to emit `rawInbound.aiTennis` (minimum viable emission)
 
-- [ ] **Wire AI Tennis endpoint (aiProposeCopy mutation):**
-  - [ ] Load ActionRequest + Intake for tenant
-  - [ ] Call `aiTennisCopyRefine()` service
-  - [ ] Write `rawInbound.aiTennis` using `buildAiTennisMeta()`
-  - [ ] Log `AI_PROPOSE_COPY` event
-  - [ ] Return customer-safe response (no prompts, no provider errors)
-  - [ ] **Hard rule:** No aggregation, no metrics table, just correct immutable facts
+**Scope Boundaries (DO NOT EXPAND):**
+- ❌ No new tables
+- ❌ No dashboards
+- ❌ No aggregation
+- ❌ No metrics table
+- ✅ Just correct, immutable facts in existing `action_requests` table
 
-- [ ] **Verify existing logging is sufficient:**
-  - [ ] Check `action_request_events.meta` has what we need
-  - [ ] Check `actionRequests.rawInbound.aiTennis` has what we need
-  - [ ] **Hard rule:** No prompts, no provider errors, no raw userText
-- [ ] **Add minimal logging only if gaps exist:**
-  - [ ] Log only what's missing for 4 canonical queries
-  - [ ] Use existing tables/columns first
+#### 2.1: Wire AI Tennis Endpoint ✅ COMPLETE
 
-### Step 3: Weekly Review Script
-- [ ] **Create automated review script:**
-  - [ ] Run 4 canonical queries
-  - [ ] Compare WoW (Week over Week) deltas
-  - [ ] Flag anomalies (>threshold from AI_DRIFT_PROTOCOL_V1.md)
+**Status:** Endpoint emits metrics-complete, customer-safe `rawInbound.aiTennis`. stopReason derivation temporary; propagation deferred to Step 2.2.
+
+- [x] **Confirm `actionRequests.aiProposeCopy` mutation exists:**
+  - [x] tRPC mutation exists in `actionRequestsRouter`
+  - [x] Loads ActionRequest + Intake for tenant
+  - [x] Calls `aiTennisCopyRefine()` service
+  - [x] Creates ActionRequest(s) with `rawInbound` containing:
+    - `rawInbound.aiTennis` (job-level meta)
+    - `rawInbound.proposal` (customer-facing)
+  - [x] Logs `AI_PROPOSE_COPY` event
+  - [x] Returns customer-safe response (no prompts, no provider errors)
+
+- [x] **ActionRequest includes `rawInbound.aiTennis`:**
+  - [x] `traceId` (string) - opaque trace identifier
+  - [x] `jobId` (string) - job identifier
+  - [x] `rounds` (number) - number of AI Tennis rounds
+  - [x] `models` (string[]) - models used
+  - [x] `requestIds` (string[]) - provider request IDs
+  - [x] `usage` (object) - `{ inputTokens, outputTokens }`
+  - [x] `costUsd` (number) - total cost in USD
+  - [x] `stopReason` (string) - canonical outcome signal (derived from success state)
+  - [x] `needsHuman` (boolean) - escalation flag
+  - [x] `confidence` (number, optional) - confidence score
+
+- [x] **ActionRequest includes `rawInbound.proposal`:**
+  - [x] `targetKey` (string) - checklist key being updated
+  - [x] `value` (string) - proposed value
+  - [x] `rationale` (string) - why this value
+  - [x] `confidence` (number) - confidence score
+  - [x] `risks` (string[]) - **MUST be array**
+  - [x] `assumptions` (string[]) - **MUST be array**
+
+- [x] **Security contracts guaranteed:**
+  - [x] No prompts stored
+  - [x] No provider errors stored
+  - [x] No stack traces stored
+  - [x] `stopReason` used everywhere (no "reason" field)
+
+- [x] **Unit tests passing (9/9):**
+  - [x] Router returns customer-safe contract
+  - [x] Idempotency works (cached response)
+  - [x] No internal details leaked
+  - [x] Test aligned to responsibility boundaries (unit-style, not integration)
+
+#### 2.2: Validate Metrics Queries Against Real Data
+
+- [ ] **Run canonical SQL queries against real rows:**
+  - [ ] At least one succeeded run (`stopReason = 'ok'`)
+  - [ ] At least one failed run (`stopReason = 'provider_failed'` or similar)
+  - [ ] At least one `needsHuman = true` scenario
+  - [ ] At least one cached/idempotency hit
+
+- [ ] **Confirm JSON paths work:**
+  - [ ] `$.aiTennis.stopReason` extracts correctly
+  - [ ] `$.aiTennis.costUsd` extracts correctly
+  - [ ] `$.aiTennis.needsHuman` extracts correctly
+  - [ ] `$.aiTennis.rounds` extracts correctly
+  - [ ] `$.aiTennis.traceId` extracts correctly
+  - [ ] Idempotency fields (`response_json.cached`, `attempt_count`) work
+
+- [ ] **Fix any JSON path mismatches:**
+  - [ ] If paths don't match, fix data shape at write-time
+  - [ ] Do NOT change query semantics ad hoc
+  - [ ] Update `buildAiTennisMeta()` if needed
+
+### Step 3: Weekly Review Script (ONLY AFTER Step 2 Complete)
+
+**Status:** Blocked until endpoint emits real data
+
+**Goal:** Automate query execution with WoW comparison and threshold-based anomaly flagging
+
+- [ ] **Create weekly review script:**
+  - [ ] Run 6 canonical queries from `AI_METRICS_QUERIES.md`
+  - [ ] Compare WoW (Week over Week) deltas for 4 required signals
+  - [ ] Flag anomalies (>threshold from `AI_DRIFT_PROTOCOL_V1.md`):
+    - Cost ↑ +25% WoW → Investigate models/prompts
+    - Approval ↓ −15% WoW → Review prompt/schema
+    - needsHuman ↑ +20% WoW → Tighten constraints
+    - ajv_failed ↑ >2% → Immediate rollback
   - [ ] Output markdown report for manual review
-  - [ ] No dashboard yet - just script output
+  - [ ] **No dashboard** - just script output
+  - [ ] Store script in `server/scripts/weeklyDriftReview.ts`
 
 ### Step 4: Weekly Learning Ritual (Human-in-the-Loop)
 
