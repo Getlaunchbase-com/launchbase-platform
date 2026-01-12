@@ -7,207 +7,13 @@
 
 import type { AiProvider, AiChatRequest, AiChatResponse, AiChatMessage } from "./types";
 import { aimlProvider } from "./aimlProvider";
-import { safeError, safePreview, toSafeClientMessage, toErrorFingerprint } from "../security/redaction";
-import crypto from "node:crypto";
-
-// ============================================
-// HELPERS
-// ============================================
-
-function hashText(s: string) {
-  return crypto.createHash("sha256").update(s).digest("hex").slice(0, 12);
-}
+import { safeError, safePreview, toSafeClientMessage } from "../security/redaction";
 
 // ============================================
 // TRANSPORT TYPES
 // ============================================
 
 export type AiTransport = "aiml" | "memory" | "log";
-
-// ============================================
-// SCHEMA-VALID FIXTURES (for memory transport)
-// ============================================
-
-/**
- * Infer targetKey from request messages to ensure fixture matches what runAiTennis expects
- */
-function inferTargetKey(messages: Array<{ role: string; content: string }>): string {
-  const text = messages.map(m => m.content).join("\n");
-
-  // Extract targetKey from messages (looks for hero.headline, hero.cta, etc.)
-  const match = text.match(/\b(hero\.(headline|subheadline|cta)|trust\.items|services\.items|socialProof\.(reviews|outcomes|credentials))\b/i);
-  if (match?.[0]) return match[0];
-
-  // Default to hero.headline
-  return "hero.headline";
-}
-
-/**
- * Build copy_proposal fixture with dynamic targetKey
- */
-function buildCopyProposalFixture(targetKey: string) {
-  return {
-    schemaVersion: "v1",
-    variants: [
-      {
-        targetKey,
-        value: "Ship faster with LaunchBase",
-        rationale: "Short, benefit-led, and clear on outcome.",
-        confidence: 0.84,
-        risks: ["May be too generic for niche audiences"],
-      },
-    ],
-    requiresApproval: true,
-    confidence: 0.84,
-    risks: [],
-    assumptions: ["Audience is evaluating a platform product"],
-  };
-}
-
-/**
- * Minimal schema-valid fixture for critique (critique step)
- */
-const FIXTURE_CRITIQUE_V1 = {
-  schemaVersion: "v1",
-  pass: true,
-  issues: [],
-  suggestedFixes: [],
-  confidence: 0.8,
-  requiresApproval: true,
-  evaluationCriteria: {
-    clarity: 0.8,
-    trust: 0.8,
-    scanability: 0.8,
-    mobileFold: 0.8,
-    sectionContractCompliance: 1.0,
-  },
-};
-
-/**
- * Minimal schema-valid fixture for decision_collapse (collapse step)
- */
-const FIXTURE_DECISION_COLLAPSE_V1 = {
-  schemaVersion: "v1",
-  selectedProposal: {
-    type: "copy" as const,
-    targetKey: "hero.headline",
-    value: "Launch faster with LaunchBase",
-  },
-  reason: "Best clarity and strongest value proposition.",
-  approvalText: "Approve this copy change for hero.headline.",
-  previewRecommended: true,
-  needsHuman: false,
-  confidence: 0.85,
-  requiresApproval: true,
-  roundLimit: 2,
-  costCapUsd: 2,
-};
-
-/**
- * Minimal schema-valid fixture for intent_parse
- */
-const FIXTURE_INTENT_PARSE_V1 = {
-  schemaVersion: "v1",
-  intentType: "COPY_CHANGE",
-  targetKeys: ["hero.headline"],
-  userText: "Test request",
-  proposedDirection: "Update hero headline",
-  needsHuman: false,
-  confidence: 0.85,
-  requiresApproval: true,
-};
-
-/**
- * Trace object type (supports both string and object formats)
- */
-type TraceObj =
-  | string
-  | {
-      jobId?: string;
-      step?: string;   // "generate" | "critique" | "collapse"
-      schema?: string; // "copy_proposal" | "critique" | "decision_collapse"
-      round?: number;
-    }
-  | undefined;
-
-/**
- * Parse trace from string or object
- */
-function parseTrace(t?: unknown): any {
-  if (typeof t !== "string") return t;
-  if (t.startsWith("{")) {
-    try { return JSON.parse(t); } catch { return null; }
-  }
-  return null;
-}
-
-/**
- * Route trace to contract type
- * Handles both string traces and object traces with step/schema mapping
- */
-function contractFromTrace(trace: TraceObj): string | null {
-  // Parse JSON string traces
-  const parsed = parseTrace(trace);
-  const traceObj = parsed || trace;
-  // 1) If trace is an object and includes schema, use it directly
-  if (traceObj && typeof traceObj === "object") {
-    const schema = String((traceObj as any).schema || "").toLowerCase();
-    if (schema === "copy_proposal") return "copy_proposal";
-    if (schema === "critique") return "critique";
-    if (schema === "decision_collapse") return "decision_collapse";
-    if (schema === "intent_parse") return "intent_parse";
-
-    // 2) Otherwise map step -> contract
-    const step = String((traceObj as any).step || "").toLowerCase();
-    if (step === "generate") return "copy_proposal";
-    if (step === "critique") return "critique";
-    if (step === "collapse") return "decision_collapse";
-    if (step === "intent_parse" || step === "intent") return "intent_parse";
-  }
-
-  // 3) If trace is a string, do keyword matching
-  const t = (typeof traceObj === "string" ? traceObj : JSON.stringify(traceObj || {})).toLowerCase();
-  if (t.includes("copy_proposal") || t.includes("generate_candidates") || t.includes('"step":"generate"') || t.includes("generate")) {
-    return "copy_proposal";
-  }
-  if (t.includes("critique") || t.includes('"step":"critique"')) return "critique";
-  if (t.includes("decision_collapse") || t.includes('"step":"collapse"') || t.includes("collapse")) return "decision_collapse";
-  if (t.includes("intent_parse") || t.includes("intent")) return "intent_parse";
-
-  return null;
-}
-
-/**
- * Get fixture for contract type
- */
-function fixtureForContract(type: string, messages?: Array<{ role: string; content: string }>, trace?: any): unknown {
-  switch (type) {
-    case "copy_proposal": {
-      const targetKey = messages ? inferTargetKey(messages) : "hero.headline";
-      return buildCopyProposalFixture(targetKey);
-    }
-    case "critique":
-      return FIXTURE_CRITIQUE_V1;
-    case "decision_collapse": {
-      const caps = trace?.caps || { roundLimit: 2, costCapUsd: 2 };
-      return {
-        ...FIXTURE_DECISION_COLLAPSE_V1,
-        roundLimit: caps.roundLimit,
-        costCapUsd: caps.costCapUsd,
-      };
-    }
-    case "intent_parse":
-      return FIXTURE_INTENT_PARSE_V1;
-    default:
-      // Fallback for unknown contract types
-      return { 
-        schemaVersion: "v1", 
-        requiresApproval: true, 
-        needsHuman: true, 
-        confidence: 0.5 
-      };
-  }
-}
 
 // ============================================
 // MEMORY TRANSPORT (for tests)
@@ -252,6 +58,56 @@ function simpleHash(text: string): string {
   return Math.abs(hash).toString(36);
 }
 
+type TraceParsed = {
+  jobId?: string;
+  step?: string;
+  schema?: string;
+  round?: number;
+  caps?: { roundLimit?: number; costCapUsd?: number };
+};
+
+function parseTrace(trace: unknown): TraceParsed {
+  if (!trace) return {};
+
+  // If object, return as-is
+  if (typeof trace === "object") return trace as TraceParsed;
+
+  if (typeof trace !== "string") return {};
+
+  let s = trace.trim();
+
+  // Attempt up to 2 parses to handle double-stringify
+  for (let i = 0; i < 2; i++) {
+    if (!(s.startsWith("{") || s.startsWith('"'))) break;
+    try {
+      const parsed = JSON.parse(s);
+      if (typeof parsed === "string") {
+        s = parsed.trim();
+        continue; // try parsing again
+      }
+      return parsed as TraceParsed; // object
+    } catch {
+      break;
+    }
+  }
+
+  return {};
+}
+
+function schemaFromTraceOrFallback(request: { trace?: any; model?: string }): string | undefined {
+  const t = parseTrace(request.trace);
+  if (t?.schema && typeof t.schema === "string") return t.schema;
+
+  const traceStr =
+    typeof request.trace === "string" ? request.trace : JSON.stringify(request.trace ?? "");
+
+  if (traceStr.includes('"schema":"copy_proposal"') || traceStr.includes("copy_proposal")) return "copy_proposal";
+  if (traceStr.includes('"schema":"critique"') || traceStr.includes("critique")) return "critique";
+  if (traceStr.includes('"schema":"decision_collapse"') || traceStr.includes("decision_collapse")) return "decision_collapse";
+
+  return undefined;
+}
+
 /**
  * Memory transport provider (deterministic, for tests)
  */
@@ -259,63 +115,113 @@ const memoryProvider: AiProvider = {
   async chat(req: AiChatRequest): Promise<AiChatResponse> {
     const { model, messages, trace } = req;
 
-    // Env-controlled modes for testing error paths
-    const mode = process.env.MEMORY_PROVIDER_MODE;
-
-    if (mode === "throw") {
-      const msg = process.env.MEMORY_PROVIDER_THROW_MESSAGE || "memory provider throw";
-      throw new Error(msg);
-    }
-
-    if (mode === "raw") {
-      const raw = process.env.MEMORY_PROVIDER_RAW_TEXT ?? '{"ok":true}';
-      return {
-        rawText: raw,
-        usage: { inputTokens: 1, outputTokens: 1 },
-        providerMeta: {
-          requestId: `memory-raw-${Date.now()}`,
-          model: model || "memory-model",
-          finishReason: "stop",
-        },
-      };
-    }
-
     // Build key from step + model + user message content
-    const parsedTraceForKey = parseTrace(trace);
-    const traceStep = parsedTraceForKey?.step || (typeof trace === "object" ? (trace as any).step : undefined) || "unknown";
     const userMessage = messages.find((m) => m.role === "user")?.content || "";
     const hash = simpleHash(userMessage);
-    const key = `${traceStep}:${model}:${hash}`;
+    const traceObj = parseTrace(trace);
+    const key = `${traceObj?.step || "unknown"}:${model}:${hash}`;
 
     // Lookup response
     const rawText = memoryStore.get(key);
 
     if (!rawText) {
-      console.warn("[AI:memory] No seeded response found, returning default valid JSON", {
+      console.warn("[AI:memory] No seeded response found, returning schema-based fixture", {
         key,
         trace,
         availableKeys: Array.from(memoryStore.keys()),
       });
 
-      // Return default valid JSON for each schema type
-      // Route by trace string (contains contract name)
-      const contractType = contractFromTrace(trace);
-      const parsedTrace = parseTrace(trace);
-      const defaultText = contractType 
-        ? JSON.stringify(fixtureForContract(contractType, messages, parsedTrace))
-        : "{}";
+      // Schema-first routing
+      const schema = schemaFromTraceOrFallback(req);
+      let fixture: any;
+
+      switch (schema) {
+        case "intent_parse":
+          fixture = {
+            userText: "I want to rewrite my homepage copy",
+            intent: "copy_rewrite",
+            confidence: 0.95,
+            issues: [],
+            needsHuman: false,
+          };
+          break;
+
+        case "copy_proposal":
+          fixture = {
+            schemaVersion: "v1",
+            requiresApproval: true,
+            variants: [
+              {
+                targetKey: "hero.headline",
+                value: "Transform Your Business",
+                rationale: "Clear, benefit-led headline for above-the-fold.",
+                confidence: 0.9,
+                risks: [],
+              },
+            ],
+            confidence: 0.9,
+            risks: [],
+            assumptions: ["User wants homepage hero copy rewrite"],
+          };
+          break;
+
+        case "critique":
+          fixture = {
+            schemaVersion: "v1",
+            pass: true,
+            issues: [],
+            suggestedFixes: [],
+            confidence: 0.85,
+            requiresApproval: true,
+            evaluationCriteria: {
+              clarity: 0.8,
+              trust: 0.8,
+              scanability: 0.8,
+              mobileFold: 0.8,
+              sectionContractCompliance: 0.8,
+            },
+          };
+          break;
+
+        case "decision_collapse": {
+          const caps = traceObj?.caps ?? {};
+          const roundLimit = Math.max(0, Math.min(2, Number(caps.roundLimit ?? 2)));
+          const costCapUsd = Math.max(0, Math.min(10, Number(caps.costCapUsd ?? 2)));
+
+          fixture = {
+            schemaVersion: "v1",
+            selectedProposal: {
+              type: "copy",
+              targetKey: "hero.headline",
+              value: "Transform Your Business",
+            },
+            reason: "Best balance of clarity and impact.",
+            approvalText: "Approve updated hero headline.",
+            previewRecommended: true,
+            needsHuman: false,
+            confidence: 0.9,
+            requiresApproval: true,
+            roundLimit,
+            costCapUsd,
+          };
+          break;
+        }
+
+        default:
+          throw new Error("SENTINEL::MEMORY_PROVIDER_DEFAULT_BRANCH::v2 (schema: " + schema + ")");
+      }
 
       return {
-        rawText: defaultText,
+        rawText: JSON.stringify(fixture),
         usage: {
           inputTokens: 0,
           outputTokens: 0,
         },
         providerMeta: {
           requestId: `memory-${Date.now()}`,
-          model,
+          model: `memory:${schema ?? "none"}`,
           finishReason: "stop",
-        },
+        } as any,
       };
     }
 
@@ -427,21 +333,11 @@ export interface CompleteJsonOptions {
   messages: AiChatMessage[];
   temperature?: number;
   maxTokens?: number;
-  trace: string | {
+  trace: {
     jobId: string;
     step: string;
-    schema?: string;
     round: number;
   };
-}
-
-/**
- * Router options for completeJson
- */
-export interface RouterOpts {
-  task?: "chat" | "json" | "embedding" | string;
-  useRouter?: boolean;
-  strict?: boolean;
 }
 
 /**
@@ -477,16 +373,14 @@ export interface CompleteJsonResult {
 export async function completeJson(
   options: CompleteJsonOptions,
   transport?: AiTransport,
-  routerOpts?: RouterOpts
+  routerOpts?: { task?: string; useRouter?: boolean; strict?: boolean }
 ): Promise<CompleteJsonResult> {
   const selectedTransport = transport || (process.env.AI_PROVIDER as AiTransport) || "aiml";
   const provider = getAiProvider(selectedTransport);
   const startTime = Date.now();
 
   let finalModel = options.model;
-  const trace = typeof options.trace === "string" 
-    ? options.trace 
-    : `${options.trace.jobId}:${options.trace.step}:${options.trace.round}`;
+  const trace = `${options.trace.jobId}:${options.trace.step}:${options.trace.round}`;
 
   // If router enabled and transport is aiml, use ModelRouter for failover
   if (routerOpts?.useRouter && selectedTransport === "aiml") {
@@ -511,13 +405,14 @@ export async function completeJson(
       const latencyMs = Date.now() - startTime;
       return buildCompleteJsonResult(result, finalModel, selectedTransport, latencyMs, trace);
     } catch (err) {
-      // NEVER log error.message/stack/object (can contain prompt/user text)
+      // Do NOT log raw error object.
+      const e = safeError(err);
       console.warn("[AI] ModelRouter failed", {
         trace,
         transport: selectedTransport,
         requestedModel: options.model,
         task: routerOpts.task || "json",
-        ...toErrorFingerprint(err),
+        error: e,
       });
 
       // STRICT MODE: no fallback
@@ -538,12 +433,13 @@ export async function completeJson(
     const latencyMs = Date.now() - startTime;
     return buildCompleteJsonResult(response, finalModel, selectedTransport, latencyMs, trace);
   } catch (err) {
-    // NEVER log error.message/stack/object (can contain prompt/user text)
+    // Ensure we never leak provider message details to callers up-stack.
+    const e = safeError(err);
     console.error("[AI] Provider chat failed", {
       trace,
       transport: selectedTransport,
       model: finalModel,
-      ...toErrorFingerprint(err),
+      error: e,
     });
     throw new Error(toSafeClientMessage({ trace }));
   }
@@ -564,17 +460,13 @@ function buildCompleteJsonResult(
   try {
     json = JSON.parse(response.rawText);
   } catch (err) {
-    // NEVER log rawText content - only fingerprint
-    const raw = response.rawText ?? "";
-    console.warn("[AI] JSON parse failed", {
-      trace: trace ?? "unknown",
+    // NEVER log rawText preview. Log only a hash + length.
+    console.warn("[AI] Failed to parse JSON response", {
+      trace,
       model: response.providerMeta?.model || model,
       requestId: response.providerMeta?.requestId || "unknown",
-      rawLen: raw.length,
-      rawHash: hashText(raw),
-      firstChar: raw.length ? raw.charCodeAt(0) : null,
-      lastChar: raw.length ? raw.charCodeAt(raw.length - 1) : null,
-      error: toErrorFingerprint(err),
+      rawText: safePreview(response.rawText),
+      error: safeError(err),
     });
   }
 
