@@ -16,7 +16,7 @@
 
 ## Key Format
 
-### Trace-Based Key (PREFERRED)
+### Trace-Based Key (REQUIRED)
 ```
 ${schema}:${model}:${jobId}:${round}
 ```
@@ -26,21 +26,20 @@ ${schema}:${model}:${jobId}:${round}
 decision_collapse:router:copy-refine-test-1:1
 ```
 
-### Hash-Based Key (LEGACY - Deprecated)
+**Critical:** Keys NEVER contain prompt content. Only trace metadata.
+
+### Hash-Based Key (DEPRECATED - DO NOT USE)
 ```
 ${step}:${model}:${hash}
 ```
 
-**Example:**
-```
-decision_collapse:router:5xzxjq
-```
+**Warning:** Uses prompt content for keys. Deprecated. Will be removed.
 
 ---
 
 ## API
 
-### seedMemoryTraceResponse (PREFERRED)
+### seedMemoryTraceResponse (REQUIRED)
 
 ```typescript
 import { seedMemoryTraceResponse } from "../ai/providers/providerFactory";
@@ -48,24 +47,116 @@ import { seedMemoryTraceResponse } from "../ai/providers/providerFactory";
 seedMemoryTraceResponse(
   schema: string,    // e.g., "decision_collapse", "copy_proposal", "critique"
   model: string,     // e.g., "router" (ModelRouter resolves actual model)
-  jobId: string,     // e.g., "copy-refine-test-1" (deterministic test ID)
+  jobId: string,     // e.g., "test-job-1" (deterministic test ID)
   round: number,     // e.g., 0, 1, 2 (AI Tennis round number)
   response: string   // JSON string of the AI response
 );
 ```
 
-### seedMemoryResponse (LEGACY - Deprecated)
+### seedMemoryResponse (DEPRECATED - DO NOT USE)
 
 ```typescript
-import { seedMemoryResponse } from "../ai/providers/providerFactory";
+// @deprecated Uses prompt content for keys - DO NOT USE
+// Will be removed in future version
+seedMemoryResponse(step, model, userTextHash, response);
+```
 
-// @deprecated Use seedMemoryTraceResponse instead
-seedMemoryResponse(
-  step: string,
-  model: string,
-  userTextHash: string,
-  response: string
-);
+---
+
+## Testing Approach
+
+### Option 1: Deterministic jobId (PREFERRED)
+
+Inject a deterministic `jobId` into the service call:
+
+```typescript
+it("handles needsHuman path", async () => {
+  const testJobId = "test-needshuman-1";
+  
+  // Seed with deterministic jobId
+  seedMemoryTraceResponse(
+    "decision_collapse",
+    "router",
+    testJobId,
+    1,
+    JSON.stringify(needsHumanCollapse)
+  );
+
+  // Call service with injected jobId
+  const result = await aiTennisService.refineCopy(
+    { userText: "...", jobId: testJobId },  // ← Inject deterministic jobId
+    "memory"
+  );
+  
+  expect(result.needsHuman).toBe(true);
+});
+```
+
+### Option 2: Mock Date.now() (ALTERNATIVE)
+
+Mock `Date.now()` to make timestamp-based jobIds predictable:
+
+```typescript
+import { vi } from 'vitest';
+
+it("handles needsHuman path", async () => {
+  const fixedTime = 1700000000000;
+  vi.spyOn(Date, 'now').mockReturnValue(fixedTime);
+  
+  const expectedJobId = `copy-refine-${fixedTime}`;
+  
+  seedMemoryTraceResponse(
+    "decision_collapse",
+    "router",
+    expectedJobId,
+    1,
+    JSON.stringify(needsHumanCollapse)
+  );
+
+  const result = await aiTennisService.refineCopy(
+    { userText: "..." },
+    "memory"
+  );
+  
+  expect(result.needsHuman).toBe(true);
+  
+  vi.restoreAllMocks();
+});
+```
+
+### Option 3: Wildcard Matching (TEST-ONLY FALLBACK)
+
+**WARNING:** Only works when `process.env.VITEST === 'true'`. Not available in production.
+
+The memory provider will match any jobId for the same schema/model/round:
+
+```typescript
+it("handles needsHuman path", async () => {
+  // Seed with ANY jobId (wildcard will match)
+  seedMemoryTraceResponse(
+    "decision_collapse",
+    "router",
+    "test-wildcard",  // ← Any jobId works in VITEST
+    1,
+    JSON.stringify(needsHumanCollapse)
+  );
+
+  // Actual jobId will be "copy-refine-1768238332301" (with Date.now())
+  // Wildcard matching will find the seeded response
+  const result = await aiTennisService.refineCopy(
+    { userText: "..." },
+    "memory"
+  );
+  
+  expect(result.needsHuman).toBe(true);
+});
+```
+
+**Wildcard matching is guarded by:**
+```typescript
+if (process.env.VITEST === 'true') {
+  // Wildcard matching allowed
+}
 ```
 
 ---
@@ -75,119 +166,34 @@ seedMemoryResponse(
 The memory provider tries keys in this order:
 
 1. **Exact trace match**: `${schema}:${model}:${jobId}:${round}`
-2. **Wildcard trace match**: `${schema}:${model}:*:${round}` (for unpredictable jobIds)
-3. **Hash-based fallback**: `${step}:${model}:${hash}` (legacy compatibility)
+2. **Wildcard trace match** (VITEST only): `${schema}:${model}:*:${round}`
+3. **Hash-based fallback** (DEPRECATED): `${step}:${model}:${hash}`
 4. **Schema-based fixture**: Default fixture for the schema (last resort)
 
 ---
 
-## Example: Testing needsHuman Path
+## Security Guarantees
 
-```typescript
-it("handles needsHuman path with structured failure", async () => {
-  // Seed a needsHuman decision_collapse response
-  const needsHumanCollapse = {
-    schemaVersion: "v1",
-    selectedProposal: null,
-    reason: "Needs human review.",
-    needsHuman: true,
-    confidence: 0.4,
-    requiresApproval: true,
-    roundLimit: 1,
-    costCapUsd: 1,
-  };
+### ✅ Trace-Based Keys (SAFE)
+- **No prompt content** in keys
+- **No prompt duplication** in test code
+- **Zero leak risk** in logs or errors
 
-  // Seed using trace-based key (deterministic, no prompt dependency)
-  const testJobId = "copy-refine-test-needshuman";
-  seedMemoryTraceResponse(
-    "decision_collapse",  // schema
-    "router",             // model
-    testJobId,            // jobId (test-specific, predictable)
-    1,                    // round
-    JSON.stringify(needsHumanCollapse)
-  );
-
-  const result = await aiTennisCopyRefine(
-    {
-      tenant: "launchbase",
-      intakeId: 2,
-      userText: "Complex request requiring human review",
-      constraints: { maxRounds: 1, costCapUsd: 0.0001 },
-    },
-    "memory"
-  );
-
-  // Wildcard matching will find the seeded response even if the actual
-  // jobId is "copy-refine-1768238332301" (with timestamp)
-  expect(result.success).toBe(false);
-  expect(result.reason).toBe("needs_human");
-});
-```
-
----
-
-## Wildcard Matching
-
-When the exact `jobId` can't be predicted (e.g., contains `Date.now()`), the memory provider uses wildcard matching:
-
-**Seeded key:**
-```
-decision_collapse:router:copy-refine-test-needshuman:1
-```
-
-**Actual runtime key:**
-```
-decision_collapse:router:copy-refine-1768238332301:1
-```
-
-**Match logic:**
-```typescript
-// Matches any key with same schema, model, and round
-if (key.startsWith(`${schema}:${model}:`) && key.endsWith(`:${round}`)) {
-  return value;
-}
-```
-
----
-
-## Benefits
-
-1. **No Prompt Duplication**: Tests don't need to know how prompts are rendered
-2. **Stable Tests**: Prompt template changes don't break tests
-3. **Zero Leak Risk**: No prompt content in test code
-4. **Deterministic**: Same inputs always produce same results
-5. **Backward Compatible**: Legacy hash-based tests still work
-
----
-
-## Migration Guide
-
-### Before (Hash-Based)
-```typescript
-import { seedMemoryResponse, simpleHash } from "../ai/providers/providerFactory";
-
-const userText = "Complex request";
-const hash = simpleHash(userText);
-seedMemoryResponse("decision_collapse", "router", hash, JSON.stringify(response));
-```
-
-### After (Trace-Based)
-```typescript
-import { seedMemoryTraceResponse } from "../ai/providers/providerFactory";
-
-const testJobId = "test-job-1";
-seedMemoryTraceResponse("decision_collapse", "router", testJobId, 1, JSON.stringify(response));
-```
+### ⚠️ Hash-Based Keys (UNSAFE - DEPRECATED)
+- **Prompt content hashed** for keys
+- **Prompt rendering duplicated** in tests
+- **Leak risk** if hash function changes
 
 ---
 
 ## Forever Rules
 
-1. **Always use trace-based seeding for new tests**
-2. **Never hash prompt content in tests**
-3. **Never duplicate prompt rendering logic**
-4. **Use predictable jobIds in tests** (e.g., "test-job-1", not timestamps)
-5. **Rely on wildcard matching for unpredictable jobIds**
+1. **ALWAYS use trace-based seeding for new tests**
+2. **NEVER hash prompt content in tests**
+3. **NEVER duplicate prompt rendering logic**
+4. **Use deterministic jobIds** (Option 1) or **mock Date.now()** (Option 2)
+5. **Wildcard matching is test-only** (guarded by VITEST)
+6. **No prompt data in keys** - trace metadata only
 
 ---
 
@@ -198,6 +204,69 @@ seedMemoryTraceResponse("decision_collapse", "router", testJobId, 1, JSON.string
 **After:** 12/12 tests passing
 - ✅ 8/8 AI Tennis orchestrator tests
 - ✅ 4/4 AI Tennis service tests
+- ✅ No prompt content in keys
+- ✅ No debug logs in production
+- ✅ Wildcard matching guarded by VITEST
+
+---
+
+## Implementation Details
+
+### Memory Provider Key Generation
+
+```typescript
+// Trace-based key (PREFERRED - no prompt content)
+const schema = traceObj?.schema;
+const jobId = traceObj?.jobId;
+const round = traceObj?.round ?? 0;
+const traceKey = schema && jobId 
+  ? `${schema}:${model}:${jobId}:${round}` 
+  : null;
+
+// Exact match
+rawText = memoryStore.get(traceKey);
+
+// Wildcard match (VITEST only)
+if (!rawText && process.env.VITEST === 'true') {
+  for (const [key, value] of memoryStore.entries()) {
+    if (key.startsWith(`${schema}:${model}:`) && key.endsWith(`:${round}`)) {
+      rawText = value;
+      break;
+    }
+  }
+}
+```
+
+### Hash-Based Fallback (DEPRECATED)
+
+```typescript
+// WARNING: Uses prompt content for keys - deprecated
+const userMessage = messages.find((m) => m.role === "user")?.content || "";
+const hash = simpleHash(userMessage);
+const hashKey = `${traceObj?.step || "unknown"}:${model}:${hash}`;
+rawText = memoryStore.get(hashKey);
+```
+
+---
+
+## Migration Guide
+
+### Before (Hash-Based - DEPRECATED)
+```typescript
+import { seedMemoryResponse, simpleHash } from "../ai/providers/providerFactory";
+
+const userText = "Complex request";
+const hash = simpleHash(userText);  // ← Hashing prompt content
+seedMemoryResponse("decision_collapse", "router", hash, JSON.stringify(response));
+```
+
+### After (Trace-Based - REQUIRED)
+```typescript
+import { seedMemoryTraceResponse } from "../ai/providers/providerFactory";
+
+const testJobId = "test-job-1";  // ← Deterministic jobId
+seedMemoryTraceResponse("decision_collapse", "router", testJobId, 1, JSON.stringify(response));
+```
 
 ---
 

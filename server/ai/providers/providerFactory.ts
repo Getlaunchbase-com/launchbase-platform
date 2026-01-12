@@ -144,15 +144,13 @@ const memoryProvider: AiProvider = {
     if (traceKey) {
       // Try exact match first
       rawText = memoryStore.get(traceKey);
-      if (rawText) {
-        console.log("[AI:memory] Using trace-based seeded response (exact match)", { traceKey });
-      } else if (schema && jobId) {
-        // Try wildcard match: schema:model:*:round (for tests that can't predict jobId)
-        const wildcardPattern = `${schema}:${model}:*:${round}`;
+      
+      // Wildcard matching ONLY in tests (for unpredictable Date.now() jobIds)
+      // Production code should use deterministic jobIds or mock Date.now()
+      if (!rawText && schema && jobId && typeof process !== 'undefined' && process.env.VITEST === 'true') {
         for (const [key, value] of memoryStore.entries()) {
           if (key.startsWith(`${schema}:${model}:`) && key.endsWith(`:${round}`)) {
             rawText = value;
-            console.log("[AI:memory] Using trace-based seeded response (wildcard match)", { pattern: wildcardPattern, matched: key });
             break;
           }
         }
@@ -160,22 +158,16 @@ const memoryProvider: AiProvider = {
     }
 
     // Fallback to hash-based key (LEGACY - brittle but keeps old tests working)
+    // WARNING: This uses prompt content for keys - deprecated, use trace-based seeding
     if (!rawText) {
       const userMessage = messages.find((m) => m.role === "user")?.content || "";
       const hash = simpleHash(userMessage);
       const hashKey = `${traceObj?.step || "unknown"}:${model}:${hash}`;
       rawText = memoryStore.get(hashKey);
-      if (rawText) {
-        console.log("[AI:memory] Using hash-based seeded response (LEGACY)", { hashKey });
-      }
     }
 
     if (!rawText) {
-      console.warn("[AI:memory] No seeded response found, returning schema-based fixture", {
-        traceKey,
-        trace,
-        availableKeys: Array.from(memoryStore.keys()),
-      });
+      // No seeded response found, return schema-based fixture
 
       // Schema-first routing
       const schema = schemaFromTraceOrFallback(req);
@@ -271,11 +263,7 @@ const memoryProvider: AiProvider = {
       };
     }
 
-    console.log("[AI:memory] Using seeded response", {
-      traceKey,
-      trace,
-      responseLength: rawText.length,
-    });
+    // Response found and will be returned
 
     return {
       rawText,
