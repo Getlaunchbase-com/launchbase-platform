@@ -1404,3 +1404,31 @@ export const designEvents = mysqlTable("design_events", {
 
 export type DesignEvent = typeof designEvents.$inferSelect;
 export type InsertDesignEvent = typeof designEvents.$inferInsert;
+
+/**
+ * Idempotency keys for preventing duplicate AI Tennis calls
+ * Pattern: Stripe-style idempotency with TTL
+ * Purpose: Prevent double-spend on retries (double clicks, refreshes, network timeouts)
+ */
+export const idempotencyKeys = mysqlTable("idempotency_keys", {
+  id: int("id").autoincrement().primaryKey(),
+  tenant: varchar("tenant", { length: 64 }).notNull(),
+  scope: varchar("scope", { length: 255 }).notNull(), // e.g., "actionRequests.aiProposeCopy"
+  keyHash: varchar("key_hash", { length: 64 }).notNull(), // HMAC-SHA256 hex (prevents key guessing)
+  claimNonce: varchar("claim_nonce", { length: 40 }), // Ownership guard (precision-proof, replaces timestamp equality)
+  status: mysqlEnum("status", ["started", "succeeded", "failed"]).notNull().default("started"),
+  responseJson: json("response_json").$type<Record<string, unknown>>(), // Customer-safe cached response (no prompts/errors)
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+  startedAt: timestamp("started_at"), // When operation started (for stale takeover)
+  completedAt: timestamp("completed_at"), // When operation completed/failed
+  expiresAt: timestamp("expires_at"), // TTL for cleanup (24h-7d)
+  attemptCount: int("attempt_count").notNull().default(1), // Retry counter for stale takeover
+}, (table) => ({
+  expiresIdx: index("idempotency_keys_expires_idx").on(table.expiresAt),
+  staleIdx: index("idempotency_keys_stale_idx").on(table.status, table.startedAt),
+  uniqueKey: uniqueIndex("idempotency_keys_tenant_scope_keyhash_unique").on(table.tenant, table.scope, table.keyHash),
+}));
+
+export type IdempotencyKey = typeof idempotencyKeys.$inferSelect;
+export type InsertIdempotencyKey = typeof idempotencyKeys.$inferInsert;

@@ -1,0 +1,1 @@
+ALTER TABLE `idempotency_keys` ADD `claim_nonce` varchar(40);

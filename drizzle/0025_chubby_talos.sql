@@ -1,0 +1,2 @@
+DROP INDEX `idempotency_keys_lookup_idx` ON `idempotency_keys`;--> statement-breakpoint
+ALTER TABLE `idempotency_keys` MODIFY COLUMN `status` enum('started','succeeded','failed') NOT NULL DEFAULT 'started';

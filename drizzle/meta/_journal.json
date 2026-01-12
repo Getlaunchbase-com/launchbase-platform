@@ -162,6 +162,34 @@
       "when": 1768242778257,
       "tag": "0022_boring_nocturne",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "5",
+      "when": 1768244345082,
+      "tag": "0023_magenta_radioactive_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "5",
+      "when": 1768245079137,
+      "tag": "0024_exotic_marvex",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "5",
+      "when": 1768249343314,
+      "tag": "0025_chubby_talos",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "5",
+      "when": 1768249372686,
+      "tag": "0026_short_sandman",
+      "breakpoints": true
     }
   ]
 }
