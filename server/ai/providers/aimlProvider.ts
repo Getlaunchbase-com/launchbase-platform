@@ -7,6 +7,7 @@
 
 import OpenAI from "openai";
 import type { AiProvider, AiChatRequest, AiChatResponse } from "./types";
+import { safeError, toSafeClientMessage } from "../security/redaction";
 
 // ============================================
 // CONFIGURATION
@@ -114,16 +115,16 @@ export const aimlProvider: AiProvider = {
 
       return response;
     } catch (error) {
-      // Log error (no PII)
-      console.error("[AIML] Chat error", {
-        model,
+      const e = safeError(error);
+
+      console.error("[aimlProvider] Error", {
         trace,
-        error: error instanceof Error ? error.message : String(error),
-        timestamp: new Date().toISOString(),
+        model,
+        error: e,
       });
 
-      // Re-throw for caller to wrap into structured error
-      throw error;
+      // Throw sanitized error upward (prevents leaking AIML echo content)
+      throw new Error(toSafeClientMessage({ trace }));
     }
   },
 };
