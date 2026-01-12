@@ -84,6 +84,8 @@ export async function createActionRequest(data: {
   checklistKey: string;
   proposedValue: unknown;
   messageType?: string;
+  confidence?: number;
+  rawInbound?: unknown;
 }): Promise<ActionRequest | null> {
   const db = await getDb();
   if (!db) {
@@ -106,6 +108,8 @@ export async function createActionRequest(data: {
     status: "pending",
     token,
     messageType: data.messageType,
+    confidence: data.confidence ?? null,
+    rawInbound: data.rawInbound as any,
     expiresAt,
     proposedPreviewToken,
     proposedPreviewExpiresAt,

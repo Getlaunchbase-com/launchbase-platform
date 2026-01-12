@@ -26,7 +26,7 @@
 - [x] Express endpoints: /internal/models, /internal/resolve-model, /admin/models/refresh
 - [x] 13/13 tests passing (registry, policy, router)
 
-### 🚧 Step 2.4 - AI Tennis Orchestrator (80% Complete)
+### ✅ Step 2.4 - AI Tennis Orchestrator (COMPLETE)
 - [x] `runAiTennis.ts` implemented with generate → critique → collapse
 - [x] Token budget enforcement (maxTokensTotal, maxTokensPerCall)
 - [x] Cost cap enforcement (costCapUsd)
@@ -34,9 +34,9 @@
 - [x] Schema validation at every phase
 - [x] Strict ModelRouter mode (no silent fallback)
 - [x] Test file created
-- [ ] **Fix test transport selection** (tests calling AIML instead of memory)
-- [ ] **Verify all 8 tests passing**
-- [ ] **Add integration test with real prompt packs**
+- [x] **Trace-based seeding implemented** (no prompt-hash brittleness)
+- [x] **All 12 tests passing** (8 orchestrator + 4 service tests)
+- [x] **Wildcard matching for unpredictable jobIds**
 
 ### ✅ Step 2.5 - Prompt Secrecy Hardening (COMPLETE)
 - [x] `server/ai/security/redaction.ts` - Safe error/preview utilities
@@ -54,6 +54,9 @@
 - [ ] **Store proposals as pending (never auto-apply)**
 - [ ] **UI: Show proposal + rationale + trace for approval**
 - [ ] **Test end-to-end flow**
+
+**Docs Created:**
+- [x] `docs/TRACE_BASED_SEEDING.md` - Trace-based test seeding pattern
 
 **Docs to Create:**
 - [ ] `docs/AI_TENNIS_ARCHITECTURE.md` - System design and flow

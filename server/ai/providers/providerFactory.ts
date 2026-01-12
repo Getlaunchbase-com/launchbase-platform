@@ -26,7 +26,24 @@ export type AiTransport = "aiml" | "memory" | "log";
 const memoryStore = new Map<string, string>();
 
 /**
- * Seed a response for memory transport (used in tests)
+ * Seed a response for memory transport using trace-based key (PREFERRED)
+ * This is deterministic and doesn't depend on prompt content.
+ */
+export function seedMemoryTraceResponse(
+  schema: string,
+  model: string,
+  jobId: string,
+  round: number,
+  response: string
+): void {
+  const key = `${schema}:${model}:${jobId}:${round}`;
+  memoryStore.set(key, response);
+}
+
+/**
+ * Seed a response for memory transport using hash-based key (LEGACY)
+ * Kept for backward compatibility but brittle (depends on prompt rendering).
+ * @deprecated Use seedMemoryTraceResponse instead
  */
 export function seedMemoryResponse(
   step: string,
@@ -48,7 +65,7 @@ export function clearMemoryResponses(): void {
 /**
  * Simple hash function for memory keys
  */
-function simpleHash(text: string): string {
+export function simpleHash(text: string): string {
   let hash = 0;
   for (let i = 0; i < text.length; i++) {
     const char = text.charCodeAt(i);
@@ -114,19 +131,48 @@ function schemaFromTraceOrFallback(request: { trace?: any; model?: string }): st
 const memoryProvider: AiProvider = {
   async chat(req: AiChatRequest): Promise<AiChatResponse> {
     const { model, messages, trace } = req;
-
-    // Build key from step + model + user message content
-    const userMessage = messages.find((m) => m.role === "user")?.content || "";
-    const hash = simpleHash(userMessage);
     const traceObj = parseTrace(trace);
-    const key = `${traceObj?.step || "unknown"}:${model}:${hash}`;
 
-    // Lookup response
-    const rawText = memoryStore.get(key);
+    // Try trace-based key first (PREFERRED - deterministic, no prompt dependency)
+    const schema = traceObj?.schema;
+    const jobId = traceObj?.jobId;
+    const round = traceObj?.round ?? 0;
+    const traceKey = schema && jobId ? `${schema}:${model}:${jobId}:${round}` : null;
+
+    let rawText: string | undefined;
+
+    if (traceKey) {
+      // Try exact match first
+      rawText = memoryStore.get(traceKey);
+      if (rawText) {
+        console.log("[AI:memory] Using trace-based seeded response (exact match)", { traceKey });
+      } else if (schema && jobId) {
+        // Try wildcard match: schema:model:*:round (for tests that can't predict jobId)
+        const wildcardPattern = `${schema}:${model}:*:${round}`;
+        for (const [key, value] of memoryStore.entries()) {
+          if (key.startsWith(`${schema}:${model}:`) && key.endsWith(`:${round}`)) {
+            rawText = value;
+            console.log("[AI:memory] Using trace-based seeded response (wildcard match)", { pattern: wildcardPattern, matched: key });
+            break;
+          }
+        }
+      }
+    }
+
+    // Fallback to hash-based key (LEGACY - brittle but keeps old tests working)
+    if (!rawText) {
+      const userMessage = messages.find((m) => m.role === "user")?.content || "";
+      const hash = simpleHash(userMessage);
+      const hashKey = `${traceObj?.step || "unknown"}:${model}:${hash}`;
+      rawText = memoryStore.get(hashKey);
+      if (rawText) {
+        console.log("[AI:memory] Using hash-based seeded response (LEGACY)", { hashKey });
+      }
+    }
 
     if (!rawText) {
       console.warn("[AI:memory] No seeded response found, returning schema-based fixture", {
-        key,
+        traceKey,
         trace,
         availableKeys: Array.from(memoryStore.keys()),
       });
@@ -226,7 +272,7 @@ const memoryProvider: AiProvider = {
     }
 
     console.log("[AI:memory] Using seeded response", {
-      key,
+      traceKey,
       trace,
       responseLength: rawText.length,
     });
