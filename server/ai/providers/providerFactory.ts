@@ -292,24 +292,66 @@ export interface CompleteJsonResult {
  * High-level wrapper that calls provider.chat() and parses JSON
  * 
  * This is the interface tests and orchestrators should use.
+ * 
+ * Supports optional ModelRouter integration for automatic failover.
  */
 export async function completeJson(
   options: CompleteJsonOptions,
-  transport?: AiTransport
+  transport?: AiTransport,
+  routerOpts?: { task?: string; useRouter?: boolean }
 ): Promise<CompleteJsonResult> {
   // Determine transport (explicit param > env > default)
   const selectedTransport = transport || (process.env.AI_PROVIDER as AiTransport) || "aiml";
   const provider = getAiProvider(selectedTransport);
   const startTime = Date.now();
 
-  // Call provider
+  // If router enabled and transport is aiml, use ModelRouter for failover
+  let finalModel = options.model;
+  if (routerOpts?.useRouter && selectedTransport === "aiml") {
+    try {
+      const { modelRouter } = await import("../index");
+      const result = await modelRouter.route(
+        {
+          task: routerOpts.task || "json",
+          requestedModelId: options.model,
+          maxAttempts: 3,
+        },
+        async (modelId) => {
+          finalModel = modelId;
+          return await provider.chat({
+            ...options,
+            model: modelId,
+            jsonOnly: true,
+          });
+        }
+      );
+
+      const latencyMs = Date.now() - startTime;
+      return buildCompleteJsonResult(result, finalModel, selectedTransport, latencyMs);
+    } catch (err) {
+      console.warn("[AI] ModelRouter failed, falling back to direct provider call", err);
+    }
+  }
+
+  // Call provider directly (no router)
   const response = await provider.chat({
     ...options,
     jsonOnly: true,
   });
 
   const latencyMs = Date.now() - startTime;
+  return buildCompleteJsonResult(response, finalModel, selectedTransport, latencyMs);
+}
 
+/**
+ * Helper to build CompleteJsonResult from provider response
+ */
+function buildCompleteJsonResult(
+  response: AiChatResponse,
+  model: string,
+  transport: string,
+  latencyMs: number
+): CompleteJsonResult {
   // Parse JSON
   let json: any | null = null;
   try {
@@ -334,8 +376,8 @@ export async function completeJson(
       outputTokens,
     },
     meta: {
-      provider: selectedTransport, // Use the actual selected transport
-      model: response.providerMeta?.model || options.model,
+      provider: transport,
+      model: response.providerMeta?.model || model,
       requestId: response.providerMeta?.requestId || "unknown",
       finishReason: response.providerMeta?.finishReason || "unknown",
     },

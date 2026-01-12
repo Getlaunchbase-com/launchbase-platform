@@ -41,6 +41,18 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
  * Start the HTTP server
  */
 async function startServer() {
+  // Initialize model registry before starting server
+  if (process.env.NODE_ENV !== "test") {
+    const { initializeModelRegistry, startModelRegistryRefresh } = await import("../ai");
+    try {
+      await initializeModelRegistry();
+      startModelRegistryRefresh();
+    } catch (err) {
+      console.error("[AI] Failed to initialize model registry:", err);
+      console.warn("[AI] Server will start but model routing may not work correctly");
+    }
+  }
+
   const app = await createApp();
   const server = createServer(app);
 

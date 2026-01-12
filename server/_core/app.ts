@@ -144,6 +144,10 @@ export async function createApp(): Promise<Express> {
   // 7. Facebook webhook routes
   app.use("/api/facebook", createFacebookWebhookRoutes());
 
+  // 7.5. Model routing endpoints (internal + admin)
+  const { mountModelRoutingRoutes } = await import("../routers/modelRouting");
+  mountModelRoutingRoutes(app);
+
   // 8. tRPC API
   app.use(
     "/api/trpc",
