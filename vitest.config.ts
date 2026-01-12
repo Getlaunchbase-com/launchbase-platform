@@ -17,5 +17,7 @@ export default defineConfig({
     include: ["server/**/*.test.ts", "server/**/*.spec.ts"],
     setupFiles: ["./vitest.setup.ts"],
     globalSetup: "./vitest.global-setup.ts",
+    silent: false,
+    onConsoleLog: () => true, // never suppress console.*
   },
 });

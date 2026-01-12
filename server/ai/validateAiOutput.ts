@@ -51,6 +51,9 @@ const validators = {
 // ERROR FORMATTING
 // ============================================
 
+// TEMP DEBUG (remove once fixed)
+const DEBUG_AJV = process.env.DEBUG_AJV === "1";
+
 /**
  * Convert Ajv errors into short, readable strings
  * Examples:
@@ -162,6 +165,36 @@ export function validateAiOutput<T>(
 
   // Validation failed - format errors
   const errors = formatAjvErrors(validator.errors);
+
+  if (DEBUG_AJV) {
+    // ONLY print top-level numeric fields + keys; never print user text or proposal values
+    const safeShape = payload && typeof payload === "object"
+      ? {
+          schemaVersion: (payload as any).schemaVersion,
+          needsHuman: (payload as any).needsHuman,
+          requiresApproval: (payload as any).requiresApproval,
+          roundLimit: (payload as any).roundLimit,
+          costCapUsd: (payload as any).costCapUsd,
+          hasSelectedProposal: (payload as any).selectedProposal != null,
+          selectedType: (payload as any).selectedProposal?.type,
+          selectedTargetKey: (payload as any).selectedProposal?.targetKey,
+        }
+      : { type: typeof payload };
+
+    const errs = validator.errors?.map(e => ({
+      instancePath: e.instancePath,
+      schemaPath: e.schemaPath,
+      keyword: e.keyword,
+      message: e.message,
+      params: e.params,
+    })) ?? [];
+
+    console.log("[DEBUG_AJV] validation failed", {
+      type,
+      safeShape,
+      errors: errs,
+    });
+  }
 
   return {
     ok: false,

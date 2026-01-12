@@ -26,7 +26,7 @@
 - [x] Express endpoints: /internal/models, /internal/resolve-model, /admin/models/refresh
 - [x] 13/13 tests passing (registry, policy, router)
 
-### 🚧 Step 2.4 - AI Tennis Orchestrator (80% Complete)
+### 🚧 Step 2.4 - AI Tennis Orchestrator (In Progress)
 - [x] `runAiTennis.ts` implemented with generate → critique → collapse
 - [x] Token budget enforcement (maxTokensTotal, maxTokensPerCall)
 - [x] Cost cap enforcement (costCapUsd)
@@ -34,9 +34,17 @@
 - [x] Schema validation at every phase
 - [x] Strict ModelRouter mode (no silent fallback)
 - [x] Test file created
-- [ ] **Fix test transport selection** (tests calling AIML instead of memory)
-- [ ] **Verify all 8 tests passing**
-- [ ] **Add integration test with real prompt packs**
+- [x] **Update RouterOpts type to include strict (type-safe, no 'as any')**
+- [x] **Remove all 'as any' casts from validateAiOutput calls**
+- [x] **Fix runAiTennis.ts to use genPack.maxRounds (not .meta.maxRounds)**
+- [x] **Add canary helper (server/ai/security/canary.ts)**
+- [x] **Add console capture helper (server/ai/__tests__/helpers/captureConsole.ts)**
+- [x] **Add memory provider env hooks (MEMORY_PROVIDER_MODE=throw/raw)**
+- [x] **Add no-prompt-leak FOREVER tests (security.noPromptLeak.test.ts)**
+- [x] **Fix safeError() to return fingerprint only (no message leak)**
+- [x] **Fix console.warn/error to use toErrorFingerprint() helper**
+- [x] **All 3 no-prompt-leak tests passing** ✅
+- [x] **Drop-in runAiTennis.ts with enterprise-grade caps + telemetry**
 
 ### ✅ Step 2.5 - Prompt Secrecy Hardening (COMPLETE)
 - [x] `server/ai/security/redaction.ts` - Safe error/preview utilities
@@ -46,14 +54,34 @@
 - [x] Zero prompt leakage in logs/errors
 - [x] Trace IDs are opaque (no user content)
 
-### 📋 Step 2.6 - First Use Case Wiring (TODO)
-- [ ] **Add copy_proposal schema** (if not exists)
-- [ ] **Add critique schema** (if not exists)
-- [ ] **Create ActionRequest proposal table**
-- [ ] **Add POST /action-requests/:id/ai/propose-copy endpoint**
-- [ ] **Store proposals as pending (never auto-apply)**
-- [ ] **UI: Show proposal + rationale + trace for approval**
-- [ ] **Test end-to-end flow**
+### 🔧 Step 2.5.1 - Fix Memory Provider Schemas for Tennis (IN PROGRESS)
+- [x] **Update memory provider default responses to match tennis schemas:**
+  - [x] copy_proposal schema (for generate step)
+  - [x] critique schema (for critique step)  
+  - [x] decision_collapse schema (for collapse step)
+- [x] **Split "schema_invalid" into "json_parse_failed" and "ajv_failed"**
+- [x] **Update trace to be JSON string with caps**
+- [x] **Fix memory provider to parse JSON trace**
+- [x] **Fix memory provider key building**
+- [x] **Add contractCaps clamping (0-2, 0-10)**
+- [x] **Update CompleteJsonOptions trace type**
+- [x] **Update runAiTennis stopReason type**
+- [ ] **Debug budget cap tests (6/8 passing, 2 failing with ajv_failed)**
+  - [ ] Investigate why decision_collapse fixture fails AJV despite appearing valid
+  - [ ] Capture actual AJV error messages
+
+### 📋 Step 2.6 - Customer API & UI (TODO - Do Last)
+- [ ] **Add customer API endpoints:**
+  - [ ] POST /api/action-requests (create + run tennis)
+  - [ ] GET /api/action-requests/:id (fetch status + results)
+  - [ ] POST /api/action-requests/:id/approve (apply chosen variant)
+- [ ] **Add React UI page:**
+  - [ ] Textarea + Submit button
+  - [ ] Poll status endpoint
+  - [ ] Render variants + critique + final choice
+  - [ ] Show needsHuman banner
+- [ ] **Add idempotency + rate limiting**
+- [ ] **Test end-to-end customer flow**
 
 **Docs to Create:**
 - [ ] `docs/AI_TENNIS_ARCHITECTURE.md` - System design and flow
