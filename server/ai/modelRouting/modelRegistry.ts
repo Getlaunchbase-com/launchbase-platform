@@ -32,10 +32,14 @@ function inferTypeFromId(id: string): ModelType {
 function normalizeModel(raw: any): NormalizedModel {
   const id = String(raw.id);
   const info = raw.info ?? {};
-  const featuresObj = raw.features ?? {};
-  const features = Object.entries(featuresObj)
-    .filter(([, v]) => Boolean(v))
-    .map(([k]) => k);
+  
+  // AIML returns features as array of strings, not object
+  const rawFeatures = raw.features ?? [];
+  const features = Array.isArray(rawFeatures)
+    ? rawFeatures.filter((f) => typeof f === "string")
+    : Object.entries(rawFeatures)
+        .filter(([, v]) => Boolean(v))
+        .map(([k]) => k);
 
   return {
     id,

@@ -111,8 +111,26 @@
   - "What good looks like" (non-N/A metrics, sample report sections)
   - Troubleshooting guide (needsHuman, model routing, N/A persistence)
   - Definition of Done checklist
-- [ ] **FIX BLOCKER:** Debug model router and AIML provider configuration
-- [ ] In staging (or dev), run one real AI Tennis workflow:
+
+**Gate A: Debug Model Router Hang** ✅ COMPLETE
+- [x] Fixed feature normalization (array + object support)
+- [x] Added feature alias mapping (json_schema → openai/chat-completion.response-format)
+- [x] Fixed type mismatch (chat-completion vs text)
+- [x] Model router now selects gpt-4o-mini successfully (96 eligible models)
+
+**Gate B: Schema Validation Fix** ✅ COMPLETE
+- [x] Fixed CopyProposal prompt to match validation schema
+- [x] Changed `proposedValue` → `value`, removed `variantId`
+- [x] Added required root-level fields (confidence, risks, assumptions)
+- [x] Round 0 (generate_candidates) now passes validation
+- [x] System progresses to Round 1 (critique phase)
+
+**Gate C: One Real Workflow Run** ⛔ BLOCKED (AIML Credits Exhausted)
+- [x] Model routing works (gpt-4o-mini selected)
+- [x] Round 0 validation passes
+- [x] System reaches Round 1 (critique)
+- [ ] **BLOCKER:** AIML API returns 403 "You've run out of credits"
+- [ ] In staging (or dev), run one real AI Tennis workflow (after credits restored):
   - Use existing intake (do NOT create new one)
   - Trigger `aiTennisCopyRefine` with AIML provider (NOT memory)
   - Verify `success: true` and `actionRequestId` returned

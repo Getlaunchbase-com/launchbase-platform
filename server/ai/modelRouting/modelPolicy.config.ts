@@ -30,10 +30,11 @@ export const MODEL_POLICIES: TaskPolicy[] = [
     task: "json",
     preferredModelIds: ["gpt-*-latest", "gpt-4.1*", "gpt-4o-mini*"],
     constraints: {
-      type: "text",
-      requiredFeatures: ["json_schema", "structured_outputs"],
+      type: "chat-completion",
+      // AIML uses "openai/chat-completion.response-format" for JSON mode
+      requiredFeatures: ["openai/chat-completion.response-format"],
       minContextLength: 16000,
-      preferPinned: true,
+      preferPinned: false, // AIML doesn't expose pinned status, disable filter
     },
     fallbackLimit: 5,
   },

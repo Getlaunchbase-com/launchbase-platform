@@ -4,7 +4,7 @@
  * Types for model registry, policy resolution, and routing.
  */
 
-export type ModelType = "text" | "image" | "video" | "audio" | "embedding" | "other";
+export type ModelType = "text" | "chat-completion" | "image" | "video" | "audio" | "embedding" | "other";
 
 export type NormalizedModel = {
   id: string;

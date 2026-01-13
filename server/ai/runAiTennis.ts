@@ -212,15 +212,29 @@ export async function runAiTennis<TFinal = any>(
 
   // ---- ROUND 0: generate candidates (draft) ----
   const draft0 = await callJson("generate_candidates", "generate_candidates", roles.generator, input, 0);
+  
+  // DEBUG: Log raw AIML response before validation
+  console.log('[runAiTennis] draft0 raw response:', JSON.stringify(draft0, null, 2));
+  
   // Round 0 is ALWAYS copy_proposal, regardless of outputTypeFinal
   const v0Result = validateAiOutputTyped("copy_proposal", draft0);
+  
+  // DEBUG: Log validation result
+  console.log('[runAiTennis] v0Result.ok:', v0Result.ok);
+  if (!v0Result.ok) {
+    console.log('[runAiTennis] Validation errors:', v0Result.errors);
+  }
   if (!v0Result.ok) {
     throw new Error(`AI output failed schema validation (copy_proposal): ${v0Result.errors.join("; ")}`);
   }
   const v0 = v0Result.data;
   drafts.push(v0);
 
+  // DEBUG: Log v0 to see if needsHuman is present
+  console.log('[runAiTennis] v0 draft:', JSON.stringify(v0, null, 2));
+
   if (Boolean((v0 as any)?.needsHuman)) {
+    console.log('[runAiTennis] v0.needsHuman is TRUE, escalating');
     needsHuman = true;
     return finish(trace, 0, v0 as TFinal);
   }
@@ -229,9 +243,15 @@ export async function runAiTennis<TFinal = any>(
 
   // ---- ROUNDS: critique -> collapse ----
   for (let round = 1; round <= maxRounds; round++) {
+    console.log(`[runAiTennis] Starting round ${round} (maxRounds: ${maxRounds})`);
+    
     const crit = await callJson("critique", "critique", roles.critic, { ...input, draft: current }, round);
+    console.log('[runAiTennis] critique raw response:', JSON.stringify(crit, null, 2));
+    
     const critVResult = validateAiOutputTyped(opts.outputTypeCritique, crit);
+    console.log('[runAiTennis] critVResult.ok:', critVResult.ok);
     if (!critVResult.ok) {
+      console.log('[runAiTennis] Critique validation errors:', critVResult.errors);
       throw new Error(`AI output failed schema validation (${opts.outputTypeCritique}): ${critVResult.errors.join("; ")}`);
     }
     const critV = critVResult.data;
