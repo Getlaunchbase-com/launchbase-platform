@@ -1,0 +1,26 @@
+{
+  "version": "v1",
+  "tenant": "launchbase",
+  "scope": "showroom.coffee-shop.baseline",
+  "policyId": "swarm_premium_v1",
+  "inputs": {
+    "task": "Write homepage copy for artisan coffee shop",
+    "business": "The Daily Grind",
+    "description": "Locally roasted coffee, cozy atmosphere, community gathering space"
+  },
+  "constraints": {
+    "maxRounds": 1,
+    "costCapUsd": 1
+  },
+  "idempotency": {
+    "scope": "showroom.coffee-shop.baseline",
+    "keyHash": "coffee-shop-baseline-1768331309355"
+  },
+  "trace": {
+    "jobId": "showroom-coffee-shop-baseline-1768331309355"
+  },
+  "audit": {
+    "customerTrailOn": true,
+    "internalTrailOn": true
+  }
+}
