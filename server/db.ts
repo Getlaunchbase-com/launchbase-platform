@@ -1,5 +1,6 @@
 import { eq, like, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
+import * as schema from "../drizzle/schema";
 import { 
   InsertUser, users,
   intakes, InsertIntake, Intake,
@@ -27,7 +28,10 @@ export async function getDb() {
         const dbName = url.pathname.replace(/^\//,'');
         console.log('[DB] Connecting to database:', dbName);
       }
-      _db = drizzle(process.env.DATABASE_URL);
+      _db = drizzle(process.env.DATABASE_URL, {
+        schema,
+        mode: 'default',
+      });
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;
