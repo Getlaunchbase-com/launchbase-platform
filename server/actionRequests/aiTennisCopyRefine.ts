@@ -94,7 +94,7 @@ export async function aiTennisCopyRefine(
       transport
     );
   } catch (error) {
-    console.error("[aiTennisCopyRefine] AI Tennis failed:", error);
+    // Never log error details (could contain prompts/provider errors)
     return {
       success: false,
       stopReason: "ai_tennis_failed",
@@ -133,9 +133,15 @@ export async function aiTennisCopyRefine(
     };
   }
 
-  // Step 2: Extract variant from CopyProposal (refineCopy wraps it in variants array)
-  const proposal = aiResult.proposal as any; // CopyProposal shape
-  const selected = proposal?.variants?.[0]; // First variant
+  // Step 2: Extract a single selected proposal from either shape:
+  // - DecisionCollapse: { selectedProposal: {...} }
+  // - CopyProposal: { variants: [{...}] }
+  const proposal = aiResult.proposal as any;
+
+  const selected =
+    proposal?.selectedProposal ??
+    proposal?.variants?.[0] ??
+    null;
 
   if (!selected) {
     return {
@@ -151,7 +157,12 @@ export async function aiTennisCopyRefine(
     };
   }
 
-  if (!selected.targetKey || !selected.value) {
+  // Validate required fields. Be strict about presence; allow falsy-but-valid values.
+  // (e.g. value could be "" or 0 depending on schema; only reject null/undefined)
+  const hasTargetKey = typeof selected.targetKey === "string" && selected.targetKey.trim().length > 0;
+  const hasValue = selected.value !== undefined && selected.value !== null;
+
+  if (!hasTargetKey || !hasValue) {
     return {
       success: false,
       stopReason: "invalid_selected_proposal",
