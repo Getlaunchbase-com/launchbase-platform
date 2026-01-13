@@ -866,3 +866,47 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [ ] Cost cap stops further calls and collapses safely
 - [ ] Specialist failure → controlled collapse (no throw, no leaked error)
 - [ ] New tripwire tests passing (5 tests)
+
+
+---
+
+## Phase 2.3 Gate 3: Provider Wiring + Cost Accounting ✅ COMPLETE
+
+**Goal:** Role-based provider wiring with strict cost tracking and total cap enforcement
+
+**Tripwires (6 tests, write first):**
+- [x] Test 1: Field General uses memory transport (no provider call)
+- [x] Test 2: Craft/Critic use policy-defined models (gpt-4o-mini)
+- [x] Test 3: meta.swarm.roleCostsUsd + totalCostUsd present on every run
+- [x] Test 4: Per-role cap triggers correct stopReason
+- [x] Test 5: Total cap halts with skipped artifact (preserves 4-artifact frozen order)
+- [x] Test 6: CustomerSafe boundary unchanged (only collapse is customerSafe=true)
+
+**Implementation:**
+- [x] Add cost accounting to swarmRunner:
+  - [x] Track roleCostsUsd per specialist (craft, critic)
+  - [x] Sum into totalCostUsd
+  - [x] Add to result.extensions.swarm.meta
+- [x] Implement total cap halt logic:
+  - [x] Check total before calling next specialist
+  - [x] If cap exceeded, emit skipped artifact with {skipped: true, reason: "total_cap_exceeded"}
+  - [x] Preserve frozen 4-artifact order (plan → craft → critic → collapse)
+- [x] Verify frozen layers remain green:
+  - [x] Gate 0 (Bootstrap): 4/4
+  - [x] Gate 1 (Swarm Skeleton): 7/7
+  - [x] Gate 2 (Specialist Intelligence): 8/8
+  - [x] Contract Tripwires: 8/8
+  - [x] Policy Registry: 11/11
+
+**Hard Invariants (MUST NOT CHANGE):**
+- Artifact order frozen (plan → craft → critic → collapse)
+- Only collapse is customerSafe=true
+- No new stopReason values (use extensions.warnings instead)
+- No artifact structure changes
+- Gate 1/2 contracts remain intact
+
+**Definition of Done:**
+- [x] Gate 3 tripwire tests written (6 tests)
+- [x] All tripwire tests passing
+- [x] Frozen layers remain green (44/44 tests)
+- [ ] Checkpoint saved with tag: phase2.3-gate3-stable

@@ -40,6 +40,8 @@ export async function runSwarmV1(
     stopReason: string;
   }> = [];
   let totalCostUsd = 0;
+  const roleCostsUsd: Record<string, number> = {};
+  const roleModels: Record<string, string> = {};
 
   // Warning aggregator (Gate 2)
   let hadWarnings = false;
@@ -161,6 +163,8 @@ export async function runSwarmV1(
               swarm: {
                 costs,
                 totalCostUsd,
+                roleCostsUsd,
+                roleModels,
                 warnings,
                 failedSpecialist: specialist,
                 reason: `Per-role cost cap (${perRoleCap} USD) exceeded for ${specialist}`,
@@ -181,6 +185,8 @@ export async function runSwarmV1(
         stopReason: result.stopReason,
       };
       artifacts.push(artifact);
+
+      // Track cost
       costs.push({
         specialist,
         inputTokens: result.meta.inputTokens,
@@ -191,6 +197,10 @@ export async function runSwarmV1(
         stopReason: result.stopReason,
       });
       totalCostUsd += result.meta.costUsd;
+      
+      // Track per-role cost and model (Gate 3)
+      roleCostsUsd[specialist] = (roleCostsUsd[specialist] || 0) + result.meta.costUsd;
+      roleModels[specialist] = result.meta.model;
 
       // Check total cap AFTER adding specialist cost
       if (typeof costCapsUsd.total === "number" && totalCostUsd > costCapsUsd.total) {
@@ -221,6 +231,8 @@ export async function runSwarmV1(
               swarm: {
                 costs,
                 totalCostUsd,
+                roleCostsUsd,
+                roleModels,
                 warnings,
                 reason: `Total cost cap (${costCapsUsd.total} USD) exceeded after ${specialist} specialist`,
               },
@@ -257,6 +269,8 @@ export async function runSwarmV1(
             swarm: {
               costs,
               totalCostUsd,
+              roleCostsUsd,
+              roleModels,
               failedSpecialist: specialist,
               failureReason: result.stopReason,
             },
@@ -320,6 +334,8 @@ export async function runSwarmV1(
           swarm: {
             costs,
             totalCostUsd,
+            roleCostsUsd,
+            roleModels,
             failedSpecialist: specialist,
             error: errorMessage,
           },
@@ -354,6 +370,8 @@ export async function runSwarmV1(
       swarm: {
         costs,
         totalCostUsd,
+        roleCostsUsd,
+        roleModels,
         warnings: hadWarnings ? warnings : undefined,
       },
     },
