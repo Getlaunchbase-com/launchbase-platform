@@ -15,6 +15,7 @@
 import type { AiWorkOrderV1, AiWorkResultV1, ArtifactV1, StopReasonV1 } from "./types";
 import type { PolicyV1 } from "./policy/policyTypes";
 import { callSpecialistAIML } from "./specialists";
+import { buildDeterministicCollapse } from "./swarm/collapseDeterministic";
 
 /**
  * Run swarm orchestration (Gate 1 skeleton)
@@ -106,6 +107,13 @@ export async function runSwarmV1(
         roleConfig,
       });
 
+      // Inject stopReason into payload (single source of truth)
+      result.artifact.payload = {
+        ...(result.artifact.payload ?? {}),
+        role: specialist,
+        stopReason: result.stopReason,
+      };
+
       // Check per-role cap AFTER specialist call
       const perRoleCap = costCapsUsd.perRole?.[specialist];
       const roleCapExceeded = typeof perRoleCap === "number" && result.meta.costUsd > perRoleCap;
@@ -140,16 +148,12 @@ export async function runSwarmV1(
 
         // fail_fast: stop immediately
         if (failureMode === "fail_fast") {
-          const collapseArtifact = await runFieldGeneralCollapse(
-            workOrder,
-            policy,
-            ctx,
-            artifacts,
-            costs,
-            totalCostUsd,
-            "cost_cap_exceeded"
-          );
-          artifacts.push(collapseArtifact);
+          // Deterministic failure collapse: customer-safe, no provider calls
+          artifacts.push({
+            kind: "swarm.collapse",
+            customerSafe: true,
+            payload: null,
+          });
 
           return {
             version: "v1",
@@ -165,9 +169,15 @@ export async function runSwarmV1(
                 totalCostUsd,
                 roleCostsUsd,
                 roleModels,
-                warnings,
+                warnings: [
+                  ...warnings,
+                  makeFailureCollapseWarning(
+                    "cost_cap_exceeded",
+                    `Per-role cap exceeded (role=${specialist})`
+                  ),
+                ],
                 failedSpecialist: specialist,
-                reason: `Per-role cost cap (${perRoleCap} USD) exceeded for ${specialist}`,
+                failureReason: "cost_cap_exceeded",
               },
             },
           };
@@ -208,16 +218,12 @@ export async function runSwarmV1(
 
         // fail_fast: stop immediately
         if (failureMode === "fail_fast") {
-          const collapseArtifact = await runFieldGeneralCollapse(
-            workOrder,
-            policy,
-            ctx,
-            artifacts,
-            costs,
-            totalCostUsd,
-            "cost_cap_exceeded"
-          );
-          artifacts.push(collapseArtifact);
+          // Deterministic failure collapse: customer-safe, no provider calls
+          artifacts.push({
+            kind: "swarm.collapse",
+            customerSafe: true,
+            payload: null,
+          });
 
           return {
             version: "v1",
@@ -233,8 +239,14 @@ export async function runSwarmV1(
                 totalCostUsd,
                 roleCostsUsd,
                 roleModels,
-                warnings,
-                reason: `Total cost cap (${costCapsUsd.total} USD) exceeded after ${specialist} specialist`,
+                warnings: [
+                  ...warnings,
+                  makeFailureCollapseWarning(
+                    "cost_cap_exceeded",
+                    `Total cap exceeded (totalCostUsd=${totalCostUsd})`
+                  ),
+                ],
+                failureReason: "cost_cap_exceeded",
               },
             },
           };
@@ -246,16 +258,12 @@ export async function runSwarmV1(
 
       // If specialist failed and failureMode is NOT continue_with_warnings, stop
       if (result.stopReason !== "ok" && failureMode !== "continue_with_warnings") {
-        const collapseArtifact = await runFieldGeneralCollapse(
-          workOrder,
-          policy,
-          ctx,
-          artifacts,
-          costs,
-          totalCostUsd,
-          "provider_failed"
-        );
-        artifacts.push(collapseArtifact);
+        // Deterministic failure collapse: customer-safe, no provider calls
+        artifacts.push({
+          kind: "swarm.collapse",
+          customerSafe: true,
+          payload: null,
+        });
 
         return {
           version: "v1",
@@ -271,6 +279,13 @@ export async function runSwarmV1(
               totalCostUsd,
               roleCostsUsd,
               roleModels,
+              warnings: [
+                ...warnings,
+                makeFailureCollapseWarning(
+                  "provider_failed",
+                  `Specialist failed (role=${specialist})`
+                ),
+              ],
               failedSpecialist: specialist,
               failureReason: result.stopReason,
             },
@@ -311,16 +326,12 @@ export async function runSwarmV1(
       }
 
       // fail_fast: stop immediately
-      const collapseArtifact = await runFieldGeneralCollapse(
-        workOrder,
-        policy,
-        ctx,
-        artifacts,
-        costs,
-        totalCostUsd,
-        "provider_failed"
-      );
-      artifacts.push(collapseArtifact);
+      // Deterministic failure collapse: customer-safe, no provider calls
+      artifacts.push({
+        kind: "swarm.collapse",
+        customerSafe: true,
+        payload: null,
+      });
 
       return {
         version: "v1",
@@ -336,33 +347,87 @@ export async function runSwarmV1(
             totalCostUsd,
             roleCostsUsd,
             roleModels,
+            warnings: [
+              ...warnings,
+              makeFailureCollapseWarning("provider_failed", "Unexpected error in swarmRunner"),
+            ],
             failedSpecialist: specialist,
-            error: errorMessage,
+            failureReason: "provider_failed",
           },
         },
       };
     }
   }
 
-  // Step 4: Field General "collapse"
-  // Use "ok" for success, warnings tracked in extensions
-  const finalStopReason: StopReasonV1 = "ok";
-  const collapseArtifact = await runFieldGeneralCollapse(
-    workOrder,
-    policy,
-    ctx,
-    artifacts,
-    costs,
-    totalCostUsd,
-    finalStopReason
-  );
-  artifacts.push(collapseArtifact);
+  // Step 4: Field General "collapse" (deterministic synthesis)
+  // Extract craft + critic artifacts to feed into collapse
+  const craftArtifact = artifacts.find((a) => a.kind === "swarm.specialist.craft");
+  const criticArtifact = artifacts.find((a) => a.kind === "swarm.specialist.critic");
+
+  // If either specialist is missing, return needs_human collapse
+  if (!craftArtifact || !criticArtifact) {
+    artifacts.push({
+      kind: "swarm.collapse",
+      customerSafe: true,
+      payload: null,
+    });
+
+    return {
+      version: "v1",
+      status: "succeeded",
+      stopReason: "needs_human",
+      needsHuman: true,
+      traceId: ctx.traceId,
+      artifacts,
+      customerSafe: true,
+      extensions: {
+        swarm: {
+          costs,
+          totalCostUsd,
+          roleCostsUsd,
+          roleModels,
+          warnings,
+          reason: "Missing craft or critic artifact for collapse",
+        },
+      },
+    };
+  }
+
+  // Extract stopReason from specialist costs (fallback to "ok" if not found)
+  const craftCost = costs.find((c) => c.specialist === "craft");
+  const criticCost = costs.find((c) => c.specialist === "critic");
+  const craftStopReason = craftCost?.stopReason || "ok";
+  const criticStopReason = criticCost?.stopReason || "ok";
+
+  // Build deterministic collapse
+  const collapse = buildDeterministicCollapse({
+    craft: {
+      stopReason: craftStopReason,
+      payload: craftArtifact.payload,
+    },
+    critic: {
+      stopReason: criticStopReason,
+      payload: criticArtifact.payload,
+    },
+  });
+
+  // Push collapse artifact (ONLY customerSafe artifact)
+  artifacts.push({
+    kind: "swarm.collapse",
+    customerSafe: true,
+    payload: collapse.payload, // null if needs_human
+  });
+
+  // Determine final status and needsHuman
+  // Status is "succeeded" because swarm completed all steps (even if needs escalation)
+  const finalStatus = "succeeded";
+  const needsHuman = collapse.stopReason === "needs_human";
 
   return {
     version: "v1",
-    status: "succeeded",
-    stopReason: finalStopReason,
-    needsHuman: false,
+    status: finalStatus,
+    stopReason: collapse.stopReason,
+    needsHuman,
     traceId: ctx.traceId,
     artifacts,
     customerSafe: true,
@@ -373,50 +438,15 @@ export async function runSwarmV1(
         roleCostsUsd,
         roleModels,
         warnings: hadWarnings ? warnings : undefined,
+        ...(collapse.extensions || {}),
       },
     },
   };
 }
 
 /**
- * Field General collapse step (deterministic)
- * 
- * @param workOrder - AI work order
- * @param policy - Resolved policy
- * @param ctx - Execution context
- * @param artifacts - Artifacts so far
- * @param costs - Cost breakdown
- * @param totalCostUsd - Total cost
- * @param stopReason - Final stop reason
- * @returns Collapse artifact (customerSafe=true)
+ * Helper: Create failure warning for collapse extensions
  */
-async function runFieldGeneralCollapse(
-  workOrder: AiWorkOrderV1,
-  policy: PolicyV1,
-  ctx: { traceId: string },
-  artifacts: ArtifactV1[],
-  costs: Array<{
-    specialist: string;
-    inputTokens: number;
-    outputTokens: number;
-    costUsd: number;
-    model: string;
-    latencyMs: number;
-    stopReason: string;
-  }>,
-  totalCostUsd: number,
-  stopReason: StopReasonV1
-): Promise<ArtifactV1> {
-  // Deterministic collapse logic (Gate 1: simple summary)
-  return {
-    kind: "swarm.collapse",
-    payload: {
-      summary: `Swarm completed with ${artifacts.length} artifacts`,
-      totalCostUsd,
-      specialists: costs.map((c) => c.specialist),
-      stopReason,
-      fingerprint: `${ctx.traceId}:collapse`,
-    },
-    customerSafe: true,
-  };
+function makeFailureCollapseWarning(kind: string, message: string) {
+  return { kind, message };
 }

@@ -958,4 +958,67 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [x] Showroom runner script complete
 - [x] 3 coffee shop benchmark runs executed
 - [x] Frozen layers remain green (51/51 tests)
-- [ ] Checkpoint saved with benchmark results
+- [x] Checkpoint saved (version: f71eb964)
+
+
+---
+
+## Phase 2.4: Deterministic Collapse Logic
+
+**Goal:** Synthesize craft + critic outputs into final customer-safe decision without additional provider calls
+
+**Tripwires (8 tests, write first):**
+- [x] T1: ok with payload when craft+critic clean
+- [x] T2: needs_human when critic fails
+- [x] T3: needs_human when no changes exist
+- [x] T4: needs_human when craft stopReason not ok
+- [x] T5: needs_human when critic stopReason not ok
+- [x] T6: forbidden keys never appear in extensions
+- [x] T7: deterministic for same inputs
+- [x] T8: merges risks and assumptions from craft and critic
+
+**Implementation:**
+- [x] Create collapseDeterministic.ts:
+  - [x] Pure function (no provider calls)
+  - [x] Gates on stopReason BEFORE touching schema fields
+  - [x] Reads minimal subset from craft/critic only when stopReason=ok
+  - [x] Returns stopReason always (ok or needs_human)
+  - [x] If needs_human, payload is null
+  - [x] Sanitizes forbidden keys in debug extensions
+- [x] Wire into swarmRunner.ts:
+  - [x] Import buildDeterministicCollapse
+  - [x] Inject payload.stopReason after specialist call (single source of truth)
+  - [x] Feed craft + critic stopReason + payload
+  - [x] Push collapse artifact (customerSafe=true)
+  - [x] Set result.stopReason = collapse.stopReason
+  - [x] Put internal details in extensions (NOT customerSafe)
+- [x] Write Gate 5 tripwire tests:
+  - [x] ok when craft+critic ok and critic passes and has changes
+  - [x] needs_human if craft/critic stopReason not ok
+  - [x] needs_human if missing changes
+  - [x] strips forbidden keys from extensions debug
+  - [x] deterministic for same inputs
+- [x] Run full test suite and verify coffee shop benchmarks
+- [x] Verify frozen layers remain green:
+  - [x] Gate 0 (Bootstrap): 4/4
+  - [x] Gate 1 (Swarm Skeleton): 7/7
+  - [x] Gate 2 (Specialist Intelligence): 8/8
+  - [x] Gate 3 (Cost Accounting): 6/6
+  - [x] Gate 4 (Showroom Runner): 7/7
+  - [x] Gate 5 (Collapse Logic): 8/8
+
+**Hard Invariants (MUST NOT CHANGE):**
+- Artifact order frozen (plan → craft → critic → collapse)
+- Only collapse is customerSafe=true
+- No new stopReason values (use ok or needs_human)
+- No artifact structure changes
+- Gates 0/1/2/3/4 contracts remain intact
+
+**Definition of Done:**
+- [x] collapseDeterministic.ts created (pure function)
+- [x] Collapse logic wired into swarmRunner.ts
+- [x] Gate 5 tripwire tests written (8 tests)
+- [x] All tripwire tests passing (59/59)
+- [x] Coffee shop benchmarks re-run with deterministic collapse ($0.0198, 14.4s, needs_human)
+- [x] Frozen layers remain green (59/59 tests)
+- [ ] Checkpoint saved with collapse logic
