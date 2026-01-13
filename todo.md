@@ -1057,4 +1057,4 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [x] CTAs consistent throughout
 - [x] No pricing changes
 - [x] Homepage tested locally (dev server running, screenshot verified)
-- [ ] Checkpoint saved with new copy
+- [x] Checkpoint saved (version: f9d313cc)
