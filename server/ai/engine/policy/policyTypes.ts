@@ -34,8 +34,21 @@ export type Capability = z.infer<typeof CapabilitySchema>;
 
 export const SwarmConfigSchema = z.object({
   enabled: z.boolean().default(false),
-  maxLoops: z.number().int().min(0).max(5).default(0),
-  specialists: z.array(z.string()).default([]), // e.g., ["design_web", "copy_marketing", "code_review"]
+  maxLoops: z.number().int().min(0).max(5).optional(),
+  maxSwirlRounds: z.number().int().min(0).max(5).optional(),
+  specialists: z.array(z.string()).default([]), // e.g., ["craft", "critic"]
+  collapseStrategy: z.string().optional(), // e.g., "field_general"
+  failureMode: z.string().optional(), // e.g., "continue_with_warnings"
+  roles: z.record(z.string(), z.object({
+    transport: z.string(),
+    model: z.string().optional(),
+    capabilities: z.array(z.string()).optional(),
+  })).optional(),
+  costCapsUsd: z.object({
+    perRole: z.record(z.string(), z.number()).optional(),
+    total: z.number().optional(),
+  }).optional(),
+  timeoutsMs: z.record(z.string(), z.number()).optional(),
 });
 
 export type SwarmConfig = z.infer<typeof SwarmConfigSchema>;

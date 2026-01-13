@@ -62,31 +62,38 @@ describe("Policy Registry — Tripwire Tests", () => {
   // ============================================
 
   it("returns policy_invalid for malformed policy object", async () => {
-    // Register an invalid policy (missing required fields)
+    // Register an invalid policy (invalid engineVersion value)
+    // Strict mode: throw on first invalid policy
     clearPolicyRegistry();
-    registerPolicies([
-      {
-        policyId: "invalid_test_policy",
-        // Missing required fields (engineVersion, caps, routing, swarm, etc.)
-      },
-    ]);
-
-    const order: AiWorkOrderV1 = {
-      version: "v1",
-      tenant: "launchbase",
-      scope: "test.scope",
-      policyId: "invalid_test_policy",
-      inputs: { test: true },
-      constraints: {},
-      idempotency: { scope: "test", keyHash: "abc123" },
-      trace: { jobId: "test-job-2" },
-      audit: { customerTrailOn: true, internalTrailOn: true },
-    };
-
-    const result = await runEngine(order);
-
-    expect(result.status).toBe("failed");
-    expect(result.stopReason).toBe("policy_not_found"); // Invalid policies are not registered
+    
+    expect(() => {
+      registerPolicies([
+        {
+          policyId: "invalid_test_policy",
+          engineVersion: "v2", // Invalid: only "v1" is allowed
+          caps: {
+            maxRounds: 3,
+            costCapUsd: 1.0,
+            maxTokensTotal: 8000,
+          },
+          routing: {
+            requiredCaps: ["json_output"],
+            preferredCaps: [],
+          },
+          swarm: {
+            enabled: false,
+          },
+          presentationDefaults: {
+            mode: "single_best",
+            allowUserProviderPreference: false,
+          },
+          logging: {
+            customerTrailEnabled: true,
+            internalTrailEnabled: true,
+          },
+        },
+      ], { strict: true });
+    }).toThrow("Policy validation failed");
 
     // Restore policies
     clearPolicyRegistry();

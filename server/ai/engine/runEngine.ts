@@ -325,13 +325,11 @@ export async function runEngine(order: AiWorkOrderV1): Promise<AiWorkResultV1> {
   // Step 4: Check policy caps (reject if WorkOrder exceeds caps)
   const capsCheck = checkPolicyCaps(order, policy);
   if (!capsCheck.ok) {
-    console.log(`[runEngine] Policy caps exceeded: ${capsCheck.reason}`);
     return stop(false, "policy_rejected", traceId);
   }
 
   // Step 5: Verify idempotency keyHash (optional check)
   // In Phase 2.3+, check: if (order.idempotency.keyHash !== computedKey) return stop(...)
-  console.log(`[runEngine] Idempotency key computed: ${computedKey}`);
 
   // Step 6: Check cache (idempotency)
   // TODO Phase 2.3: Implement cache lookup using order.idempotency.keyHash
