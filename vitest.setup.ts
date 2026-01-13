@@ -46,7 +46,7 @@ console.log("[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic 
 
 // Force memory AI provider (prevents ModelRouter invocation in tests)
 process.env.NODE_ENV = "test";
-process.env.VITEST = "1";
+process.env.VITEST = "true"; // Standardized to "true" (not "1") for consistency
 process.env.AI_PROVIDER = "memory";
 process.env.AIML_API_KEY = "test";
 process.env.AIML_BASE_URL = "http://test";

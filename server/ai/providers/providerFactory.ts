@@ -147,7 +147,7 @@ const memoryProvider: AiProvider = {
       
       // Wildcard matching ONLY in tests (for unpredictable Date.now() jobIds)
       // Production code should use deterministic jobIds or mock Date.now()
-      if (!rawText && schema && jobId && typeof process !== 'undefined' && process.env.VITEST === 'true') {
+      if (!rawText && schema && jobId && typeof process !== 'undefined' && (process.env.VITEST === 'true' || process.env.VITEST === '1')) {
         for (const [key, value] of memoryStore.entries()) {
           if (key.startsWith(`${schema}:${model}:`) && key.endsWith(`:${round}`)) {
             rawText = value;
@@ -229,9 +229,11 @@ const memoryProvider: AiProvider = {
           fixture = {
             schemaVersion: "v1",
             selectedProposal: {
-              type: "copy",
               targetKey: "hero.headline",
               value: "Transform Your Business",
+              rationale: "Clear, benefit-led headline for above-the-fold.",
+              confidence: 0.9,
+              risks: [],
             },
             reason: "Best balance of clarity and impact.",
             approvalText: "Approve updated hero headline.",

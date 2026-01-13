@@ -93,12 +93,29 @@ export async function aiTennisCopyRefine(
       },
       transport
     );
-  } catch {
+  } catch (error) {
+    console.error("[aiTennisCopyRefine] AI Tennis failed:", error);
     return {
       success: false,
       stopReason: "ai_tennis_failed",
       traceId,
       meta: { rounds: 0, estimatedUsd: 0, calls: 0, models: [] },
+    };
+  }
+
+  // Check needsHuman FIRST before checking proposal (needsHuman path has no proposal)
+  if (aiResult.needsHuman) {
+    return {
+      success: false,
+      stopReason: "needs_human",
+      needsHuman: true,
+      traceId,
+      meta: {
+        rounds: aiResult.meta.roundsRun,
+        estimatedUsd: aiResult.meta.estimatedUsd,
+        calls: aiResult.meta.calls,
+        models: aiResult.meta.models,
+      },
     };
   }
 
@@ -116,25 +133,9 @@ export async function aiTennisCopyRefine(
     };
   }
 
-  // Step 2: Extract selectedProposal from decision_collapse
-  const decision = aiResult.proposal as any; // decision_collapse shape
-  const selected = decision?.selectedProposal;
-
-  // needsHuman path: no ActionRequests created
-  if (aiResult.needsHuman) {
-    return {
-      success: false,
-      stopReason: "needs_human",
-      needsHuman: true,
-      traceId,
-      meta: {
-        rounds: aiResult.meta.roundsRun,
-        estimatedUsd: aiResult.meta.estimatedUsd,
-        calls: aiResult.meta.calls,
-        models: aiResult.meta.models,
-      },
-    };
-  }
+  // Step 2: Extract variant from CopyProposal (refineCopy wraps it in variants array)
+  const proposal = aiResult.proposal as any; // CopyProposal shape
+  const selected = proposal?.variants?.[0]; // First variant
 
   if (!selected) {
     return {
@@ -196,10 +197,10 @@ export async function aiTennisCopyRefine(
       proposal: {
         targetKey: selected.targetKey,
         value: selected.value,
-        rationale: decision.reason || "",
-        confidence: decision.confidence || 0,
-        risks: decision.risks || [], // MUST be array
-        assumptions: decision.assumptions || [], // MUST be array
+        rationale: selected.rationale || "",
+        confidence: selected.confidence || 0,
+        risks: selected.risks || [], // MUST be array
+        assumptions: proposal.assumptions || [], // MUST be array
       },
     };
 
@@ -209,7 +210,7 @@ export async function aiTennisCopyRefine(
       checklistKey: normalizeChecklistKey(selected.targetKey),
       proposedValue: selected.value,
       messageType: "AI_TENNIS_COPY_REFINE",
-      confidence: decision.confidence ?? null,
+      confidence: selected.confidence ?? null,
       rawInbound,
     });
 
@@ -239,7 +240,7 @@ export async function aiTennisCopyRefine(
         models: aiResult.meta.models,
       },
     };
-  } catch {
+  } catch (err) {
     return {
       success: false,
       stopReason: "action_request_create_failed",
@@ -249,6 +250,7 @@ export async function aiTennisCopyRefine(
         estimatedUsd: aiResult.meta.estimatedUsd,
         calls: aiResult.meta.calls,
         models: aiResult.meta.models,
+        ...(process.env.VITEST ? { error: err instanceof Error ? err.message : String(err) } : {}),
       },
     };
   }

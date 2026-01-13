@@ -760,3 +760,45 @@ You now have:
 - All future metrics validation uses dev/staging snapshots only
 - Production is read-only for observation and analysis
 - Weekly review script (Step 3) will only read from production, never write
+
+
+---
+
+## Constitutional Fix: needsHuman Contract (URGENT - In Progress)
+
+### Root Cause
+- `refineCopy()` configured with `outputTypeFinal: "copy_proposal"` 
+- Orchestrator stops after round 0, never generates `decision_collapse`
+- `needsHuman` field only exists in `decision_collapse`, not `copy_proposal`
+- Service always returns `success: true` because `result.needsHuman` is always false
+
+### Fix Required (Minimal Patch)
+
+- [ ] **Change refineCopy() to use decision_collapse as final output**
+  - [ ] Import `DecisionCollapse` type from `server/ai/contracts/types.ts`
+  - [ ] Change `RunAiTennisResult<CopyProposal>` to `RunAiTennisResult<DecisionCollapse>`
+  - [ ] Change `outputTypeFinal: "copy_proposal"` to `outputTypeFinal: "decision_collapse"`
+  - [ ] Update return logic to extract `proposal` from `decision.selectedProposal`
+  - [ ] Add explicit `if (decision.needsHuman)` branch that returns `success: false`
+  - [ ] When not needsHuman, return `proposal: decision.selectedProposal`
+
+- [ ] **Update CopyRefinementResult type (if needed)**
+  - [ ] Ensure `proposal` is optional or nullable in failure case
+  - [ ] Or keep as union type (success true includes proposal; success false omits it)
+
+- [ ] **Re-run constitutional test**
+  - [ ] `server/actionRequests/__tests__/aiTennisCopyRefine.test.ts`
+  - [ ] Verify `needsHuman` test now passes
+  - [ ] Verify all 4 tests pass
+
+### Why This Fixes It
+- Orchestrator now runs full flow: generate → critique → collapse
+- `needsHuman` comes from `decision_collapse` where it belongs
+- FOREVER CONTRACT "escalation is not success" becomes mechanically enforceable
+- Test seeding strategy becomes valid (seed decision_collapse with needsHuman:true)
+
+### Scope
+- **DO:** Fix aiTennisService.ts only (minimal, surgical)
+- **DON'T:** Touch aiTennisCopyRefine.ts (should work after service fix)
+- **DON'T:** Add new enums, tables, or logging
+- **DON'T:** Reorder checks to "make it pass"

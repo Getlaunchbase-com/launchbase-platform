@@ -12,7 +12,7 @@
  */
 
 import { runAiTennis, type RunAiTennisResult } from "./runAiTennis";
-import type { CopyProposal } from "./contracts/types";
+import type { CopyProposal, DecisionCollapse } from "./contracts/types";
 
 // ============================================
 // TYPES
@@ -64,7 +64,7 @@ export async function refineCopy(
   transport: AiTennisTransport = "aiml"
 ): Promise<CopyRefinementResult> {
   try {
-    const result: RunAiTennisResult<CopyProposal> = await runAiTennis(
+    const result: RunAiTennisResult<DecisionCollapse> = await runAiTennis(
       {
         userText: request.userText,
         targetSection: request.targetSection,
@@ -76,7 +76,7 @@ export async function refineCopy(
           jobId: `copy-refine-${Date.now()}`,
           step: "homepage_copy_refinement",
         },
-        outputTypeFinal: "copy_proposal",
+        outputTypeFinal: "decision_collapse",
         outputTypeCritique: "critique",
         maxRounds: request.constraints?.maxRounds ?? 2,
         costCapUsd: request.constraints?.costCapUsd ?? 2.0,
@@ -85,10 +85,50 @@ export async function refineCopy(
       }
     );
 
+    const decision = result.final;
+
+    // FOREVER CONTRACT: needsHuman forces success: false (escalation, not automation)
+    if (decision.needsHuman || decision.selectedProposal === null) {
+      return {
+        success: false,
+        needsHuman: true,
+        meta: {
+          roundsRun: result.roundsRun,
+          estimatedUsd: result.usage.estimatedUsd,
+          calls: result.usage.calls,
+          latencyMsTotal: result.usage.latencyMsTotal,
+          models: result.meta.models,
+          requestIds: result.meta.requestIds,
+          inputTokens: result.usage.inputTokens,
+          outputTokens: result.usage.outputTokens,
+        },
+      };
+    }
+
+    // Wrap selectedProposal into CopyProposal format (1-item variants array)
+    // Extract only copy-type fields (strip 'type' field from selectedProposal)
+    const selectedCopy = decision.selectedProposal as { type: "copy"; targetKey: any; value: any };
+    const proposal: CopyProposal = {
+      schemaVersion: "v1",
+      variants: [
+        {
+          targetKey: selectedCopy.targetKey,
+          value: selectedCopy.value,
+          rationale: decision.reason || "Selected by AI Tennis",
+          confidence: decision.confidence,
+          risks: decision.assumptions || [],
+        },
+      ],
+      requiresApproval: true,
+      confidence: decision.confidence,
+      risks: [],
+      assumptions: decision.assumptions || [],
+    };
+
     return {
       success: true,
-      proposal: result.final,
-      needsHuman: result.needsHuman,
+      needsHuman: false,
+      proposal,
       meta: {
         roundsRun: result.roundsRun,
         estimatedUsd: result.usage.estimatedUsd,

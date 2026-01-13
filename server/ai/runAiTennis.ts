@@ -212,9 +212,10 @@ export async function runAiTennis<TFinal = any>(
 
   // ---- ROUND 0: generate candidates (draft) ----
   const draft0 = await callJson("generate_candidates", "generate_candidates", roles.generator, input, 0);
-  const v0Result = validateAiOutputTyped(opts.outputTypeFinal, draft0);
+  // Round 0 is ALWAYS copy_proposal, regardless of outputTypeFinal
+  const v0Result = validateAiOutputTyped("copy_proposal", draft0);
   if (!v0Result.ok) {
-    throw new Error(`AI output failed schema validation (${opts.outputTypeFinal}): ${v0Result.errors.join("; ")}`);
+    throw new Error(`AI output failed schema validation (copy_proposal): ${v0Result.errors.join("; ")}`);
   }
   const v0 = v0Result.data;
   drafts.push(v0);
@@ -267,6 +268,37 @@ export async function runAiTennis<TFinal = any>(
     }
 
     current = colV;
+  }
+
+  // Fix 2: If outputTypeFinal is decision_collapse but we never ran collapse (stopped early),
+  // run collapse once to ensure final output matches the requested type
+  if (opts.outputTypeFinal === "decision_collapse" && collapsed.length === 0) {
+    const finalCrit = await callJson("critique", "critique", roles.critic, { ...input, draft: current }, critiques.length + 1);
+    const finalCritVResult = validateAiOutputTyped(opts.outputTypeCritique, finalCrit);
+    if (!finalCritVResult.ok) {
+      throw new Error(`AI output failed schema validation (${opts.outputTypeCritique}): ${finalCritVResult.errors.join("; ")}`);
+    }
+    const finalCritV = finalCritVResult.data;
+    critiques.push(finalCritV);
+
+    const finalCol = await callJson("decision_collapse", "decision_collapse", roles.collapse, {
+      ...input,
+      draft: current,
+      critique: finalCritV,
+    }, critiques.length);
+
+    const finalColVResult = validateAiOutputTyped("decision_collapse", finalCol);
+    if (!finalColVResult.ok) {
+      throw new Error(`AI output failed schema validation (decision_collapse): ${finalColVResult.errors.join("; ")}`);
+    }
+    const finalColV = finalColVResult.data;
+    collapsed.push(finalColV);
+
+    if (Boolean((finalColV as any)?.needsHuman)) {
+      needsHuman = true;
+    }
+
+    current = finalColV;
   }
 
   return {
