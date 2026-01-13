@@ -32,9 +32,11 @@ function mockCraftOk(overrides?: Partial<SpecialistOutput>): SpecialistOutput {
       kind: "swarm.specialist.craft",
       customerSafe: false,
       payload: {
-        role: "craft",
-        draft: { text: "draft copy v1" },
-        stopReason: "ok",
+        proposedChanges: [
+          { targetKey: "hero.headline", value: "Fast Coffee", rationale: "Shorter and punchier" },
+        ],
+        risks: ["May lose brand voice"],
+        assumptions: ["Target audience prefers brevity"],
       },
     },
     meta: {
@@ -56,9 +58,11 @@ function mockCriticOk(overrides?: Partial<SpecialistOutput>): SpecialistOutput {
       kind: "swarm.specialist.critic",
       customerSafe: false,
       payload: {
-        role: "critic",
-        verdict: { pass: true, issues: [], suggestedFixes: [] },
-        stopReason: "ok",
+        pass: true,
+        issues: [],
+        previewRecommended: false,
+        risks: [],
+        assumptions: [],
       },
     },
     meta: {
@@ -77,24 +81,21 @@ function mockCriticOk(overrides?: Partial<SpecialistOutput>): SpecialistOutput {
 function mockFail(
   role: "craft" | "critic",
   stopReason: SpecialistOutput["stopReason"],
-  costUsd = 0.0,
+  costUsd = 0.01,
   overrides?: Partial<SpecialistOutput>
 ): SpecialistOutput {
   return {
     artifact: {
       kind: `swarm.specialist.${role}`,
       customerSafe: false,
-      payload: {
-        role,
-        stopReason,
-      },
+      payload: { role, stopReason }, // minimal on purpose
     },
     meta: {
       model: "gpt-4o-mini",
-      requestId: `req_${role}_fail`,
-      latencyMs: 50,
-      inputTokens: 10,
-      outputTokens: 0,
+      requestId: "req_test",
+      latencyMs: 10,
+      inputTokens: 1,
+      outputTokens: 1,
       costUsd,
     },
     stopReason,
@@ -279,9 +280,9 @@ describe("Gate 2: Specialist Intelligence Tripwires", () => {
     expect(result.status).toBe("succeeded"); // continue_with_warnings
     expect(result.artifacts.length).toBe(4); // plan + craft + critic + collapse
     expect(result.artifacts[1].kind).toBe("swarm.specialist.craft");
-    expect(result.artifacts[1].payload.draft).toBeDefined();
+    expect(result.artifacts[1].payload.stopReason).toBe("ok"); // craft succeeded
     expect(result.artifacts[2].kind).toBe("swarm.specialist.critic");
-    expect(result.artifacts[2].payload.stopReason).toBe("provider_failed");
+    expect(result.artifacts[2].payload.stopReason).toBe("provider_failed"); // critic failed
   });
 
   it("5. per-role cap enforced", async () => {
@@ -335,9 +336,12 @@ describe("Gate 2: Specialist Intelligence Tripwires", () => {
 
     // continue_with_warnings: stops making calls, but succeeds with warnings tracked in extensions
     expect(result.status).toBe("succeeded");
-    expect(result.stopReason).toBe("ok");
+    expect(result.stopReason).toBe("needs_human"); // Collapse returns needs_human when critic is missing
+    expect(result.needsHuman).toBe(true);
     expect(result.artifacts.length).toBe(3); // plan + craft + collapse (no critic)
     expect(result.artifacts[1].kind).toBe("swarm.specialist.craft");
+    expect(result.artifacts[2].kind).toBe("swarm.collapse");
+    expect(result.artifacts[2].payload).toBeNull(); // null payload when needs_human
   });
 
   it("7. idempotency unchanged (same CORE → same keyHash)", async () => {

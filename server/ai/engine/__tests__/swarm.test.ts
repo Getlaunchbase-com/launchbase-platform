@@ -10,17 +10,87 @@
  * 4. Idempotency unchanged (same CORE → same keyHash)
  */
 
-import { describe, it, expect, beforeAll } from "vitest";
-import { runEngine, computeWorkOrderKeyV1 } from "../runEngine";
+import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
+import type { SpecialistOutput } from "../specialists";
 import { registerPolicies, clearPolicyRegistry } from "../policy/policyRegistry";
 import { ALL_POLICIES } from "../policy/policyBundle";
 import type { AiWorkOrderV1 } from "../types";
+
+// Mock the specialists module BEFORE importing runEngine
+vi.mock("../specialists", () => ({
+  callSpecialistAIML: vi.fn(),
+}));
+
+// Import AFTER mock
+import { runEngine, computeWorkOrderKeyV1 } from "../runEngine";
+import { callSpecialistAIML } from "../specialists";
+
+// Mock helper functions
+function mockCraftOk(): SpecialistOutput {
+  return {
+    artifact: {
+      kind: "swarm.specialist.craft",
+      customerSafe: false,
+      payload: {
+        proposedChanges: [
+          { targetKey: "hero.headline", value: "Fast Coffee", rationale: "Shorter and punchier" },
+        ],
+        risks: ["May lose brand voice"],
+        assumptions: ["Target audience prefers brevity"],
+      },
+    },
+    meta: {
+      model: "gpt-4o-mini",
+      requestId: "req_craft_1",
+      latencyMs: 120,
+      inputTokens: 100,
+      outputTokens: 50,
+      costUsd: 0.02,
+    },
+    stopReason: "ok",
+  } as SpecialistOutput;
+}
+
+function mockCriticOk(): SpecialistOutput {
+  return {
+    artifact: {
+      kind: "swarm.specialist.critic",
+      customerSafe: false,
+      payload: {
+        pass: true,
+        issues: [],
+        previewRecommended: false,
+        risks: [],
+        assumptions: [],
+      },
+    },
+    meta: {
+      model: "gpt-4o-mini",
+      requestId: "req_critic_1",
+      latencyMs: 140,
+      inputTokens: 110,
+      outputTokens: 55,
+      costUsd: 0.02,
+    },
+    stopReason: "ok",
+  } as SpecialistOutput;
+}
 
 // Set up environment
 beforeAll(() => {
   process.env.IDEMPOTENCY_SECRET = "test-secret-do-not-use-in-production";
   clearPolicyRegistry();
   registerPolicies(ALL_POLICIES);
+});
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  // Mock specialists to return valid payloads
+  (callSpecialistAIML as any).mockImplementation(({ role }: { role: string }) => {
+    if (role === "craft") return mockCraftOk();
+    if (role === "critic") return mockCriticOk();
+    throw new Error("unknown role");
+  });
 });
 
 describe("Swarm Orchestration — Gate 1 Tripwire Tests", () => {

@@ -39,9 +39,11 @@ function mockCraftOk(overrides?: Partial<SpecialistOutput>): SpecialistOutput {
       kind: "swarm.specialist.craft",
       customerSafe: false,
       payload: {
-        role: "craft",
-        draft: { text: "draft copy v1" },
-        stopReason: "ok",
+        proposedChanges: [
+          { targetKey: "hero.headline", value: "Fast Coffee", rationale: "Shorter and punchier" },
+        ],
+        risks: ["May lose brand voice"],
+        assumptions: ["Target audience prefers brevity"],
       },
     },
     meta: {
@@ -63,9 +65,11 @@ function mockCriticOk(overrides?: Partial<SpecialistOutput>): SpecialistOutput {
       kind: "swarm.specialist.critic",
       customerSafe: false,
       payload: {
-        role: "critic",
-        verdict: { pass: true, issues: [], suggestedFixes: [] },
-        stopReason: "ok",
+        pass: true,
+        issues: [],
+        previewRecommended: false,
+        risks: [],
+        assumptions: [],
       },
     },
     meta: {
