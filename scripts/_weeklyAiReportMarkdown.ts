@@ -22,6 +22,9 @@ type QueryResults = Record<
 type Flag = "✅" | "⚠️" | "🚨";
 
 type RateResult = { text: string; rate: number | null };
+type DeltaResult = { text: string; delta: number | null };
+type DollarsResult = { text: string; value: number | null };
+type Window = { label: "current" | "prior"; start: Date; end: Date };
 
 /**
  * Convert numerator/denominator to rate percentage.
@@ -53,6 +56,54 @@ function flagHighRate(rate: number | null, warnAbove: number, criticalAbove: num
   if (rate > criticalAbove) return "🚨";
   if (rate > warnAbove) return "⚠️";
   return "✅";
+}
+
+/**
+ * Compute delta between current and prior rates (in percentage points).
+ * Returns N/A if either rate is null.
+ */
+function deltaPct(current: number | null, prior: number | null, decimals = 1): DeltaResult {
+  if (current === null || prior === null) return { text: "N/A", delta: null };
+  const delta = current - prior; // delta in rate units (0..1)
+  const sign = delta > 0 ? "+" : "";
+  return { text: `${sign}${(delta * 100).toFixed(decimals)}pp`, delta };
+}
+
+/**
+ * Flag number where HIGH is BAD (e.g., cost per approval).
+ * Returns empty string if value is null (N/A).
+ */
+function flagHighNumber(value: number | null, warnAbove: number, criticalAbove: number): Flag | "" {
+  if (value === null) return "";
+  if (value > criticalAbove) return "🚨";
+  if (value > warnAbove) return "⚠️";
+  return "✅";
+}
+
+/**
+ * Convert cost sum and approval count to dollars per approval.
+ * Returns N/A if approvals is 0 or invalid.
+ */
+function toDollarsPerApproval(costUsdSum: number, approvals: number): DollarsResult {
+  if (!Number.isFinite(approvals) || approvals <= 0) return { text: "N/A", value: null };
+  const v = costUsdSum / approvals;
+  return { text: `$${v.toFixed(2)}`, value: v };
+}
+
+/**
+ * Get current and prior 7-day windows for WoW comparisons.
+ * Current: now-7d → now
+ * Prior: now-14d → now-7d
+ */
+function getWindows(now = new Date()): { current: Window; prior: Window } {
+  const endCurrent = now;
+  const startCurrent = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const endPrior = startCurrent;
+  const startPrior = new Date(endPrior.getTime() - 7 * 24 * 60 * 60 * 1000);
+  return {
+    current: { label: "current", start: startCurrent, end: endCurrent },
+    prior: { label: "prior", start: startPrior, end: endPrior },
+  };
 }
 
 type Thresholds = {
@@ -207,17 +258,25 @@ function renderStopReasonDistribution(rows: AnyRow[], t: Thresholds) {
   return `${table}\n\n${note}`;
 }
 
-// 2) needsHuman Rate rows: { period, ratePct, wowDeltaPct? } OR per-tenant
-function renderNeedsHumanRate(rows: AnyRow[], t: Thresholds) {
-  const normalized = rows.map((r) => {
-    const period = safeStr(r.period ?? r.window ?? r.tenant ?? "—");
-    const rate = safeNum(r.ratePct ?? r.rate_pct ?? r.needsHumanPct ?? r.pct);
-    const wow = safeNum(r.wowDeltaPct ?? r.wow_delta_pct ?? r.wowDelta ?? r.wow);
-    const flag = flagFromRateBadIsHigh(rate, t.needsHumanWarnPct, t.needsHumanCritPct);
-    return { period, rate, wow, flag };
-  });
+// 2) needsHuman Rate rows: { period, numerator, denominator }
+function renderNeedsHumanRate(currentRows: AnyRow[], priorRows: AnyRow[], t: Thresholds) {
+  if (currentRows.length === 0) {
+    return "_No AI Tennis proposals found for this period._";
+  }
 
-  const table = mdTable(["period", "rate", "WoW Δ", "Flag"], normalized.map((r) => [r.period, pct(r.rate), pctDelta(r.wow), r.flag]));
+  const curr = currentRows[0]; // Single row for global rate
+  const prior = priorRows[0] || {};
+
+  const period = safeStr(curr.period ?? "7-day");
+  const currRate = toRate(safeNum(curr.numerator), safeNum(curr.denominator));
+  const priorRate = toRate(safeNum(prior.numerator), safeNum(prior.denominator));
+  const wow = deltaPct(currRate.rate, priorRate.rate);
+  const flag = flagHighRate(currRate.rate, t.needsHumanWarnPct / 100, t.needsHumanCritPct / 100);
+
+  const table = mdTable(
+    ["period", "This Week", "WoW Δ", "Flag"],
+    [[period, currRate.text, wow.text, flag || "—"]]
+  );
   const note = `**Interpretation:** rising rate indicates prompt/protocol mismatch (not necessarily model failure).`;
   return `${table}\n\n${note}`;
 }
@@ -241,97 +300,95 @@ function renderCostPerApproval(rows: AnyRow[], t: Thresholds) {
   return `${table}\n\n${note}`;
 }
 
-// 4) Approval Rate rows: { tenant, rate7Pct, rate30Pct, wowDeltaPp?, totalRequests }
-function renderApprovalRate(rows: AnyRow[], t: Thresholds) {
-  if (rows.length === 0) {
+// 4) Approval Rate rows: { tenant, numerator, denominator }
+function renderApprovalRate(currentRows: AnyRow[], priorRows: AnyRow[], t: Thresholds) {
+  if (currentRows.length === 0) {
     return "_No AI Tennis proposals found for this period._";
   }
 
-  const normalized = rows.map((r) => {
+  // Build prior map by tenant
+  const priorByTenant = new Map(priorRows.map((r) => [safeStr(r.tenant), r]));
+
+  const normalized = currentRows.map((r) => {
     const tenant = safeStr(r.tenant ?? "—");
-    const totalRequests = safeNum(r.totalRequests ?? r.total_requests ?? 0);
-    const r7 = totalRequests > 0 ? safeNum(r.rate7Pct ?? r.rate_7_pct ?? r.approval7Pct ?? r.pct7 ?? r.rate7) : null;
-    const r30 = totalRequests > 0 ? safeNum(r.rate30Pct ?? r.rate_30_pct ?? r.approval30Pct ?? r.pct30 ?? r.rate30) : null;
-    const wowPp = totalRequests > 0 ? safeNum(r.wowDeltaPp ?? r.wow_delta_pp ?? r.wowPp ?? r.wow) : null;
-    // For approval rate: a negative delta (drop) is bad; compare magnitude
-    let flag: Flag = "—" as any;
-    if (r7 !== null) {
-      const drop = -wowPp!; // if wow is -2pp, drop is +2pp
-      flag = "✅";
-      if (drop >= t.approvalDropCritPp) flag = "🚨";
-      else if (drop >= t.approvalDropWarnPp) flag = "⚠️";
+    const prior = priorByTenant.get(tenant) || {};
+
+    const currRate = toRate(safeNum(r.numerator), safeNum(r.denominator));
+    const priorRate = toRate(safeNum(prior.numerator), safeNum(prior.denominator));
+    const wow = deltaPct(currRate.rate, priorRate.rate);
+    // Approval rate: use delta-based flagging (drop > threshold is bad)
+    let flag: Flag | "" = "";
+    if (wow.delta !== null) {
+      const drop = -wow.delta; // negative delta = drop
+      if (drop >= t.approvalDropCritPp / 100) flag = "🚨";
+      else if (drop >= t.approvalDropWarnPp / 100) flag = "⚠️";
+      else flag = "✅";
     }
-    return { tenant, r7, r30, wowPp, flag };
+
+    return { tenant, currRate, wow, flag };
   });
 
   const table = mdTable(
-    ["tenant", "7-day %", "30-day %", "WoW Δ", "Flag"],
-    normalized.map((r) => [
-      r.tenant,
-      r.r7 !== null ? pct(r.r7) : "N/A",
-      r.r30 !== null ? pct(r.r30) : "N/A",
-      r.wowPp !== null ? ppDelta(r.wowPp) : "N/A",
-      r.flag
-    ])
+    ["tenant", "This Week", "WoW Δ", "Flag"],
+    normalized.map((r) => [r.tenant, r.currRate.text, r.wow.text, r.flag || "—"])
   );
   const note = `**Interpretation:** falling approval rate indicates UX friction or quality degradation.`;
   return `${table}\n\n${note}`;
 }
 
-// 5) Cache Hit Rate rows: { tenant, hit7Pct, hit30Pct, totalRequests }
-function renderCacheHitRate(rows: AnyRow[], t: Thresholds) {
-  if (rows.length === 0) {
+// 5) Cache Hit Rate rows: { tenant, numerator, denominator }
+function renderCacheHitRate(currentRows: AnyRow[], priorRows: AnyRow[], t: Thresholds) {
+  if (currentRows.length === 0) {
     return "_No AI Tennis proposals found for this period._";
   }
 
-  const normalized = rows.map((r) => {
+  const priorByTenant = new Map(priorRows.map((r) => [safeStr(r.tenant), r]));
+
+  const normalized = currentRows.map((r) => {
     const tenant = safeStr(r.tenant ?? "—");
-    const totalRequests = safeNum(r.totalRequests ?? r.total_requests ?? 0);
-    const h7 = totalRequests > 0 ? safeNum(r.hit7Pct ?? r.hit_7_pct ?? r.cacheHit7Pct ?? r.pct7 ?? r.hit7) : null;
-    const h30 = totalRequests > 0 ? safeNum(r.hit30Pct ?? r.hit_30_pct ?? r.cacheHit30Pct ?? r.pct30 ?? r.hit30) : null;
-    // Don't flag if no data (N/A)
-    const flag = h7 !== null ? flagFromRateGoodIsHigh(h7, t.cacheHitWarnPct, t.cacheHitCritPct) : ("—" as any);
-    return { tenant, h7, h30, flag };
+    const prior = priorByTenant.get(tenant) || {};
+
+    const currRate = toRate(safeNum(r.numerator), safeNum(r.denominator));
+    const priorRate = toRate(safeNum(prior.numerator), safeNum(prior.denominator));
+    const wow = deltaPct(currRate.rate, priorRate.rate);
+    const flag = flagLowRate(currRate.rate, t.cacheHitWarnPct / 100, t.cacheHitCritPct / 100); // cache hit: low is bad
+
+    return { tenant, currRate, wow, flag };
   });
 
   const table = mdTable(
-    ["tenant", "7-day %", "30-day %", "Flag"],
-    normalized.map((r) => [
-      r.tenant,
-      r.h7 !== null ? pct(r.h7) : "N/A",
-      r.h30 !== null ? pct(r.h30) : "N/A",
-      r.flag
-    ])
+    ["tenant", "This Week", "WoW Δ", "Flag"],
+    normalized.map((r) => [r.tenant, r.currRate.text, r.wow.text, r.flag || "—"])
   );
   const note = `**Interpretation:** low cache hit rate can indicate missing idempotency usage or too-short TTL.`;
   return `${table}\n\n${note}`;
 }
 
-// 6) Stale Takeover Rate rows: { tenant, rate7Pct, rate30Pct, totalRequests }
-function renderStaleTakeoverRate(rows: AnyRow[], t: Thresholds) {
-  if (rows.length === 0) {
+// 6) Stale Takeover Rate rows: { tenant, numerator, denominator }
+function renderStaleTakeoverRate(currentRows: AnyRow[], priorRows: AnyRow[], t: Thresholds) {
+  if (currentRows.length === 0) {
     return "_No AI Tennis proposals found for this period._";
   }
 
-  const normalized = rows.map((r) => {
+  const priorByTenant = new Map(priorRows.map((r) => [safeStr(r.tenant), r]));
+
+  const normalized = currentRows.map((r) => {
     const tenant = safeStr(r.tenant ?? "—");
-    const totalRequests = safeNum(r.totalRequests ?? r.total_requests ?? 0);
-    const s7 = totalRequests > 0 ? safeNum(r.rate7Pct ?? r.rate_7_pct ?? r.stale7Pct ?? r.pct7 ?? r.rate7) : null;
-    const s30 = totalRequests > 0 ? safeNum(r.rate30Pct ?? r.rate_30_pct ?? r.stale30Pct ?? r.pct30 ?? r.rate30) : null;
-    const flag = s7 !== null ? flagFromRateBadIsHigh(s7, t.staleTakeoverWarnPct, t.staleTakeoverCritPct) : ("—" as any);
-    return { tenant, s7, s30, flag };
+    const prior = priorByTenant.get(tenant) || {};
+
+    const currRate = toRate(safeNum(r.numerator), safeNum(r.denominator));
+    const priorRate = toRate(safeNum(prior.numerator), safeNum(prior.denominator));
+    const wow = deltaPct(currRate.rate, priorRate.rate);
+    const flag = flagHighRate(currRate.rate, t.staleTakeoverWarnPct / 100, t.staleTakeoverCritPct / 100); // stale takeover: high is bad
+
+    return { tenant, currRate, wow, flag };
   });
 
   const table = mdTable(
-    ["tenant", "7-day %", "30-day %", "Flag"],
-    normalized.map((r) => [
-      r.tenant,
-      r.s7 !== null ? pct(r.s7) : "N/A",
-      r.s30 !== null ? pct(r.s30) : "N/A",
-      r.flag
-    ])
+    ["tenant", "This Week", "WoW Δ", "Flag"],
+    normalized.map((r) => [r.tenant, r.currRate.text, r.wow.text, r.flag || "—"])
   );
-  const note = `**Interpretation:** rising takeover rate suggests instability or stuck jobs.`;
+  const note = `**Interpretation:** rising stale takeover rate indicates cache invalidation issues or race conditions.`;
   return `${table}\n\n${note}`;
 }
 
@@ -366,14 +423,17 @@ export function buildMarkdown(
   envName: string,
   thresholds: Thresholds = DEFAULT_THRESHOLDS
 ): string {
-  // Expect these keys (match whatever you used in canonicalQueries):
-  // stopReasonDistribution, needsHumanRate, costPerApproval, approvalRate, cacheHitRate, staleTakeoverRate
+  // Extract current and prior window rows
   const stopReasonRows = extractRows(results.stopReasonDistribution);
-  const needsHumanRows = extractRows(results.needsHumanRate);
+  const needsHumanCurrentRows = extractRows(results.needsHumanRateCurrent);
+  const needsHumanPriorRows = extractRows(results.needsHumanRatePrior);
   const costRows = extractRows(results.costPerApproval);
-  const approvalRows = extractRows(results.approvalRate);
-  const cacheRows = extractRows(results.cacheHitRate);
-  const staleRows = extractRows(results.staleTakeoverRate);
+  const approvalCurrentRows = extractRows(results.approvalRateCurrent);
+  const approvalPriorRows = extractRows(results.approvalRatePrior);
+  const cacheCurrentRows = extractRows(results.cacheHitRateCurrent);
+  const cachePriorRows = extractRows(results.cacheHitRatePrior);
+  const staleCurrentRows = extractRows(results.staleTakeoverRateCurrent);
+  const stalePriorRows = extractRows(results.staleTakeoverRatePrior);
 
   // Check if we have any real data
   const hasData = stopReasonRows.filter((r) => safeStr(r.stopReason ?? r.stop_reason ?? r.reason).trim().length > 0).length > 0;
@@ -392,20 +452,24 @@ export function buildMarkdown(
 
   const driftFlag = overallFlagFromSection(stopReasonRendered, (r) => r.flag);
 
-  const needsHumanRendered = needsHumanRows.map((r) => ({
-    flag: flagFromRateBadIsHigh(safeNum(r.ratePct ?? r.rate_pct ?? r.needsHumanPct ?? r.pct), thresholds.needsHumanWarnPct, thresholds.needsHumanCritPct),
-  }));
-  const humanFlag = overallFlagFromSection(needsHumanRendered, (r) => r.flag);
+  const needsHumanRendered = needsHumanCurrentRows.map((r) => {
+    const rate = toRate(safeNum(r.numerator), safeNum(r.denominator));
+    const flag = flagHighRate(rate.rate, thresholds.needsHumanWarnPct / 100, thresholds.needsHumanCritPct / 100);
+    return { flag: flag || "✅" };
+  });
+  const humanFlag = overallFlagFromSection(needsHumanRendered, (r) => r.flag as Flag);
 
   const efficiencyRendered = costRows.map((r) => ({
     flag: flagFromRateBadIsHigh(safeNum(r.wowDeltaPct ?? r.wow_delta_pct ?? r.wow), thresholds.costDeltaWarnPct, thresholds.costDeltaCritPct),
   }));
   const efficiencyFlag = overallFlagFromSection(efficiencyRendered, (r) => r.flag);
 
-  const reliabilityRendered = staleRows.map((r) => ({
-    flag: flagFromRateBadIsHigh(safeNum(r.rate7Pct ?? r.rate_7_pct ?? r.pct7 ?? r.rate7), thresholds.staleTakeoverWarnPct, thresholds.staleTakeoverCritPct),
-  }));
-  const reliabilityFlag = overallFlagFromSection(reliabilityRendered, (r) => r.flag);
+  const reliabilityRendered = staleCurrentRows.map((r) => {
+    const rate = toRate(safeNum(r.numerator), safeNum(r.denominator));
+    const flag = flagHighRate(rate.rate, thresholds.staleTakeoverWarnPct / 100, thresholds.staleTakeoverCritPct / 100);
+    return { flag: flag || "✅" };
+  });
+  const reliabilityFlag = overallFlagFromSection(reliabilityRendered, (r) => r.flag as Flag);
 
   const integrityFlag: Flag = "✅"; // reserved: canary/leak checks can feed this later
 
@@ -425,11 +489,11 @@ export function buildMarkdown(
 
   const body =
     section("1️⃣ StopReason Distribution (Drift Canary)", renderStopReasonDistribution(stopReasonRows, thresholds)) +
-    section("2️⃣ needsHuman Rate (Protocol Mismatch Detector)", renderNeedsHumanRate(needsHumanRows, thresholds)) +
+    section("2️⃣ needsHuman Rate (Protocol Mismatch Detector)", renderNeedsHumanRate(needsHumanCurrentRows, needsHumanPriorRows, thresholds)) +
     section("3️⃣ Cost per Approval (Efficiency Index)", renderCostPerApproval(costRows, thresholds)) +
-    section("4️⃣ Approval Rate (Business Friction Signal)", renderApprovalRate(approvalRows, thresholds)) +
-    section("5️⃣ Cache Hit Rate (Idempotency Health)", renderCacheHitRate(cacheRows, thresholds)) +
-    section("6️⃣ Stale Takeover Rate (Stability Detector)", renderStaleTakeoverRate(staleRows, thresholds)) +
+    section("4️⃣ Approval Rate (Business Friction Signal)", renderApprovalRate(approvalCurrentRows, approvalPriorRows, thresholds)) +
+    section("5️⃣ Cache Hit Rate (Idempotency Health)", renderCacheHitRate(cacheCurrentRows, cachePriorRows, thresholds)) +
+    section("6️⃣ Stale Takeover Rate (Stability Detector)", renderStaleTakeoverRate(staleCurrentRows, stalePriorRows, thresholds)) +
     section(
       "📊 Summary",
       summarize({
