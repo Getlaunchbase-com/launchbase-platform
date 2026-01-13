@@ -7,6 +7,7 @@
 import { ModelRegistry } from "./modelRegistry";
 import { MODEL_POLICIES } from "./modelPolicy.config";
 import { ModelConstraints, ModelResolution, NormalizedModel } from "./modelRouting.types";
+import { hasAllCapabilities } from "./featureAliases";
 
 function matchesPattern(modelId: string, pattern: string): boolean {
   // simple glob: "*" matches any chars
@@ -30,8 +31,9 @@ function passesConstraints(m: NormalizedModel, c: ModelConstraints): { ok: boole
   }
 
   if (c.requiredFeatures?.length) {
-    for (const f of c.requiredFeatures) {
-      if (!m.features.includes(f)) return { ok: false, why: "features" };
+    // Use alias resolution to check capabilities
+    if (!hasAllCapabilities(m.features, c.requiredFeatures)) {
+      return { ok: false, why: "features" };
     }
   }
 

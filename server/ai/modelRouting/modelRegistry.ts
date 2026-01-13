@@ -7,6 +7,7 @@
 
 import OpenAI from "openai";
 import { NormalizedModel, ModelRegistryState, ModelType } from "./modelRouting.types";
+import { normalizeFeatures, inferTypeFromId } from "./modelNormalize";
 
 export type ModelRegistryOpts = {
   ttlMs: number;
@@ -15,14 +16,7 @@ export type ModelRegistryOpts = {
   logger?: { info: (...a: any[]) => void; warn: (...a: any[]) => void; error: (...a: any[]) => void };
 };
 
-function inferTypeFromId(id: string): ModelType {
-  const s = id.toLowerCase();
-  if (s.includes("embed")) return "embedding";
-  if (s.includes("image") || s.includes("vision")) return "image";
-  if (s.includes("audio") || s.includes("tts") || s.includes("whisper")) return "audio";
-  if (s.includes("video")) return "video";
-  return "text";
-}
+// inferTypeFromId moved to modelNormalize.ts for testability
 
 /**
  * Normalizes OpenAI-compatible /models payload:
@@ -33,13 +27,7 @@ function normalizeModel(raw: any): NormalizedModel {
   const id = String(raw.id);
   const info = raw.info ?? {};
   
-  // AIML returns features as array of strings, not object
-  const rawFeatures = raw.features ?? [];
-  const features = Array.isArray(rawFeatures)
-    ? rawFeatures.filter((f) => typeof f === "string")
-    : Object.entries(rawFeatures)
-        .filter(([, v]) => Boolean(v))
-        .map(([k]) => k);
+  const features = normalizeFeatures(raw.features);
 
   return {
     id,

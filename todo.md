@@ -382,3 +382,59 @@ We proceed one clean PR at a time.
 - [ ] Pick best successful prompt and call twice with identical inputs
 - [ ] Verify second call returns cached result
 - [ ] Verify weekly report shows cache hit numerator/denominator > 0
+
+## PR 3: Production Hardening (Phase 1 Finish Line)
+
+**Goal:** Lock down production readiness with cleanup + resilience (no new behavior)
+
+**Tasks:**
+
+### 1️⃣ Remove Debug Logging ✅ COMPLETE
+- [x] Remove temporary console.log from model routing debug
+- [x] Remove temporary console.log from schema validation debug (runAiTennis.ts)
+- [x] Remove temporary console.log from AIML response inspection (aiTennisCopyRefine.ts)
+- [x] Keep: structured error logs, fingerprinted failures, traceId-based logging
+- [x] Keep: Weekly report logging (shows query progress + row counts)
+- [x] Verify: No prompt/provider payload logging
+
+### 2️⃣ Feature Alias Layer (Provider-Agnostic) ✅ COMPLETE
+- [x] Create `server/ai/modelRouting/featureAliases.ts` with alias map
+- [x] Map internal capabilities to vendor-specific strings:
+  - `json_schema` → `["json_schema", "openai/chat-completion.response-format", "anthropic/structured-output"]`
+  - `structured_outputs` → `["structured_outputs", "openai/chat-completion.response-format"]`
+  - `function_calling`, `vision` (future-proofed)
+- [x] Update `modelPolicy.ts` to use `hasAllCapabilities()` from featureAliases
+- [x] Update `modelPolicy.config.ts` to use internal capability names (`json_schema` instead of vendor strings)
+- [x] Helpers: `resolveFeatureAliases()`, `hasCapability()`, `hasAllCapabilities()`
+
+### 3️⃣ Micro-Tests (Regression Armor) ✅ COMPLETE
+- [x] Extract pure helpers: `normalizeFeatures()`, `inferTypeFromId()` in `modelNormalize.ts`
+- [x] Add `server/ai/modelRouting/modelNormalize.test.ts` (17 tests):
+  - Feature normalization: array → correct names (filters non-strings, whitespace)
+  - Feature normalization: object → correct names (truthy values only)
+  - Edge cases: undefined, null, primitives
+  - Regression: Phase 1.3 bug (array → numeric indices)
+  - Type inference: embedding, audio, image, text (case-insensitive)
+- [x] Add `server/ai/modelRouting/featureAliases.test.ts` (13 tests):
+  - Alias resolution: json_schema → ["json_schema", "openai/chat-completion.response-format", ...]
+  - hasCapability: direct match + vendor alias match
+  - hasAllCapabilities: multiple requirements
+  - Regression: prevents policy/registry mismatch, vendor rename breakage
+- [x] All 30 tests passing (no AIML/env dependencies)
+- [ ] Future: Add `server/ai/promptPacks/schemaValidation.test.ts` (optional, for prompt/schema drift detection)
+
+### 4️⃣ PR3 Completion ✅ COMPLETE
+- [x] Create `docs/PR3_COMPLETE.md` with:
+  - Summary of changes (3 tasks: debug cleanup, alias layer, micro-tests)
+  - Verification results (model routing test, 30/30 unit tests passing)
+  - Impact assessment (stability, cost reduction, maintainability)
+  - Next steps (Phase 2: Swarm Premium)
+- [x] Save final checkpoint
+- [x] Mark PR3 complete in todo.mdE in todo.md
+
+**Definition of Done:**
+- ✅ No debug logs in production code
+- ✅ Feature alias layer implemented and tested
+- ✅ Micro-tests passing (regression protection)
+- ✅ Phase 1 declared COMPLETE
+- ✅ Ready for Phase 2 (Swarm Premium)
