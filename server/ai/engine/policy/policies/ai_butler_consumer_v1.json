@@ -1,0 +1,23 @@
+{
+  "policyId": "ai_butler_consumer_v1",
+  "engineVersion": "v1",
+  "caps": {
+    "maxRounds": 1,
+    "costCapUsd": 0.5,
+    "maxTokensTotal": 8000
+  },
+  "routing": {
+    "requiredCaps": ["json_output"]
+  },
+  "swarm": {
+    "enabled": false
+  },
+  "presentationDefaults": {
+    "mode": "side_by_side",
+    "allowUserProviderPreference": true
+  },
+  "logging": {
+    "customerTrailEnabled": true,
+    "internalTrailEnabled": false
+  }
+}

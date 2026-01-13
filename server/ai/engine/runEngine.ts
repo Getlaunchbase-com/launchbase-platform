@@ -11,24 +11,52 @@ import { createHmac } from "crypto";
 import type {
   AiWorkOrderV1,
   AiWorkResultV1,
-  EnginePolicyV1,
   StopReasonV1,
 } from "./types";
+import { resolvePolicy } from "./policy/policyRegistry";
+import type { PolicyV1 } from "./policy/policyTypes";
 
 // ============================================
-// POLICY REGISTRY (MINIMAL HOOK)
+// POLICY CAPS ENFORCEMENT
 // ============================================
 
 /**
- * Get policy by ID (Phase 2.2 will implement full registry)
+ * Check if WorkOrder exceeds policy caps
  * 
- * RULE: Policy is a reference, not logic.
- * No tier branching in code; policy resolution returns config.
+ * RULE: Reject (don't clamp) if WorkOrder exceeds policy caps.
+ * This is more honest than silent clamping.
  */
-export function getPolicyV1(policyId: string): EnginePolicyV1 | null {
-  // TODO Phase 2.2: Load from POLICY_REGISTRY
-  // For now, return null (all policies invalid)
-  return null;
+function checkPolicyCaps(
+  order: AiWorkOrderV1,
+  policy: PolicyV1
+): { ok: true } | { ok: false; reason: string } {
+  // Check cost cap
+  if (order.constraints.costCapUsd && order.constraints.costCapUsd > policy.caps.costCapUsd) {
+    return {
+      ok: false,
+      reason: `WorkOrder costCapUsd (${order.constraints.costCapUsd}) exceeds policy cap (${policy.caps.costCapUsd})`,
+    };
+  }
+
+  // Check rounds cap
+  if (order.constraints.maxRounds && order.constraints.maxRounds > policy.caps.maxRounds) {
+    return {
+      ok: false,
+      reason: `WorkOrder maxRounds (${order.constraints.maxRounds}) exceeds policy cap (${policy.caps.maxRounds})`,
+    };
+  }
+
+  // Check tokens cap (if policy defines it)
+  if (policy.caps.maxTokensTotal && order.constraints.maxTokensTotal) {
+    if (order.constraints.maxTokensTotal > policy.caps.maxTokensTotal) {
+      return {
+        ok: false,
+        reason: `WorkOrder maxTokensTotal (${order.constraints.maxTokensTotal}) exceeds policy cap (${policy.caps.maxTokensTotal})`,
+      };
+    }
+  }
+
+  return { ok: true };
 }
 
 // ============================================
@@ -286,36 +314,31 @@ export async function runEngine(order: AiWorkOrderV1): Promise<AiWorkResultV1> {
   }
 
   // Step 3: Resolve policy (can fail gracefully, separate from validation)
-  const policy = getPolicyV1(order.policyId);
-  if (!policy) {
-    // Policy doesn't exist yet (Phase 2.2 will implement registry)
-    // For Phase 2.1, return in_progress (validation passed, execution pending)
-    return {
-      version: "v1",
-      status: "in_progress",
-      stopReason: "in_progress",
-      needsHuman: true,
-      traceId,
-      artifacts: [],
-      customerSafe: true,
-      extensions: {
-        _stub: true,
-        _message: "Phase 2.1: Policy not found (registry pending Phase 2.2)",
-        _computedKey: computedKey,
-      },
-    };
+  const policyResult = resolvePolicy(order.policyId);
+  if (!policyResult.ok) {
+    // Policy resolution failed (not found or invalid)
+    return stop(false, policyResult.stopReason, traceId);
   }
 
-  // Step 4: Verify idempotency keyHash (optional check)
-  // In Phase 2.2+, check: if (order.idempotency.keyHash !== computedKey) return stop(...)
+  const policy = policyResult.policy;
+
+  // Step 4: Check policy caps (reject if WorkOrder exceeds caps)
+  const capsCheck = checkPolicyCaps(order, policy);
+  if (!capsCheck.ok) {
+    console.log(`[runEngine] Policy caps exceeded: ${capsCheck.reason}`);
+    return stop(false, "policy_rejected", traceId);
+  }
+
+  // Step 5: Verify idempotency keyHash (optional check)
+  // In Phase 2.3+, check: if (order.idempotency.keyHash !== computedKey) return stop(...)
   console.log(`[runEngine] Idempotency key computed: ${computedKey}`);
 
-  // Step 5: Check cache (idempotency)
-  // TODO Phase 2.2: Implement cache lookup using order.idempotency.keyHash
+  // Step 6: Check cache (idempotency)
+  // TODO Phase 2.3: Implement cache lookup using order.idempotency.keyHash
   // For now, always execute (no cache)
 
-  // Step 6: Execute according to policy
-  // TODO Phase 2.2: Route to single model or swarm based on policy
+  // Step 7: Execute according to policy
+  // TODO Phase 2.3: Route to single model or swarm based on policy
   // For now, return stubbed result
 
   return {

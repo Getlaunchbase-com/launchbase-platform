@@ -491,7 +491,7 @@ We proceed one clean PR at a time.
 - [x] Deep normalize() with no key collisions
 - [x] Validation/policy split (policy resolution after validation)
 - [x] No behavior change to Phase 1 (zero risk)
-- [ ] Checkpoint saved
+- [x] Checkpoint saved (dc1cbecc)
 
 ---
 
@@ -511,10 +511,131 @@ We proceed one clean PR at a time.
   - Swarm depth (# of specialists)
   - Approval rules & escalation thresholds
 - [ ] Update runEngine() to load and apply policy
-- [ ] Create checkpoint: Phase 2.2 complete
+- [x] Create checkpoint: Phase 2.2 complete
+
+**Definition of Done:**
+- [x] Policies are config-only JSON
+- [x] No branching code (policy-driven routing)
+- [x] Caps enforced via `policy_rejected`
+- [x] Router selection driven by `requiredCaps` / `preferredCaps`
+- [x] Zod validation enforced
+- [x] Static bundle (no runtime FS reads via policyBundle.ts)
+- [x] No-runtime-FS invariant test passes (poisoned fs + node:fs)
+- [x] 11/11 tripwire tests passing
+- [x] Checkpoint saved
+
+**Frozen Invariants (Phase 2.2):**
+- ✅ No filesystem reads in policy registry (serverless-safe)
+- ✅ Unknown policy → stopReason: policy_not_found
+- ✅ Invalid policy → stopReason: policy_invalid
+- ✅ Policy rejects → stopReason: policy_rejected
+- ✅ policyId impacts routing decisions but does not change core idempotency key
 
 **Definition of Done:**
 - [ ] Policy registry exists with 2 working policies
 - [ ] runEngine() applies policy constraints
 - [ ] No hard-coded tier logic (all config-driven)
+- [ ] Checkpoint saved
+
+
+---
+
+## 🚀 PHASE 2.2: POLICY REGISTRY ✅ COMPLETE
+
+**Goal:** Policy-as-config with zero branching code, capability-first routing  
+**Mode:** Config-driven tier behavior, no provider-specific branching
+
+### Phase 2.2: Policy Registry
+
+**Goal:** Implement policy registry with JSON/YAML configs, capability-first routing, no branching code
+
+**Tasks:**
+- [x] Create `server/ai/engine/policy/policyTypes.ts` with:
+  - PolicyV1 type (policyId, engineVersion, caps, routing, swarm, presentationDefaults, logging)
+  - Capability types (json_output, json_schema, low_latency, low_cost, vision, audio, long_context)
+  - Swarm config type (enabled, maxLoops, specialists)
+  - Presentation defaults type
+  - Logging config type (two-trail guardrails)
+- [x] Create `server/ai/engine/policy/policyRegistry.ts` with:
+  - `resolvePolicy(policyId)` function (loads from disk, validates, returns {ok, policy} or {ok, stopReason})
+  - Policy validation (zod/ajv schema check)
+  - Policy caching (deterministic, no re-loads)
+- [x] Create `server/ai/engine/policy/policies/` directory
+- [x] Create `launchbase_portal_v1.json`:
+  - maxRounds: 2, costCapUsd: 1.50
+  - requiredCaps: json_schema, json_output
+  - swarm.enabled: false
+  - presentationDefaults: "customer_portal"
+- [x] Create `swarm_premium_v1.json`:
+  - maxRounds: 3, costCapUsd: 4.00
+  - swarm.enabled: true, maxLoops: 2
+  - specialists: ["design_web", "copy_marketing", "code_review"]
+  - requiredCaps: json_schema, json_output
+  - preferredCaps: low_cost
+- [x] Create `ai_butler_consumer_v1.json`:
+  - maxRounds: 1, costCapUsd: 0.50
+  - presentationDefaults: "side_by_side"
+  - allowUserProviderPreference: true
+- [x] Add policy stopReasons to StopReasonV1:
+  - policy_not_found
+  - policy_invalid
+  - policy_rejected
+- [x] Update runEngine() to use resolvePolicy():
+  - Call resolvePolicy(policyId) after validation
+  - Return stopReason if policy resolution fails
+  - Apply policy caps (reject if WorkOrder exceeds policy caps)
+- [x] Create policy tripwire tests (11 total):
+  - Unknown policyId → stopReason: policy_not_found
+  - Invalid policy file → stopReason: policy_invalid
+  - WorkOrder exceeds policy caps → stopReason: policy_rejected
+  - Idempotency unaffected by policy contents (only policyId in keyHash)
+- [x] Create checkpoint: Phase 2.2 complete
+
+**Definition of Done:**
+- [x] Policies are config-only JSON
+- [x] No branching code (policy-driven routing)
+- [x] Caps enforced via `policy_rejected`
+- [x] Router selection driven by `requiredCaps` / `preferredCaps`
+- [x] Zod validation enforced
+- [x] Static bundle (no runtime FS reads via policyBundle.ts)
+- [x] No-runtime-FS invariant test passes (poisoned fs + node:fs)
+- [x] 11/11 tripwire tests passing
+- [x] Checkpoint saved
+
+**Frozen Invariants (Phase 2.2):**
+- ✅ No filesystem reads in policy registry (serverless-safe)
+- ✅ Unknown policy → stopReason: policy_not_found
+- ✅ Invalid policy → stopReason: policy_invalid
+- ✅ Policy rejects → stopReason: policy_rejected
+- ✅ policyId impacts routing decisions but does not change core idempotency key
+
+**Definition of Done:**
+- [ ] Policies load by policyId from JSON files
+- [ ] Router driven by required/preferred capabilities from policy
+- [ ] Failures are stopReason'd, not thrown
+- [ ] 4 policy tripwire tests pass
+- [ ] No swarm logic yet (Phase 2.3)
+- [ ] Checkpoint saved
+
+---
+
+### Phase 2.3: Minimal Swarm Loop (NEXT)
+
+**Goal:** Field General + 2 specialists (1 loop), deterministic collapse, full audit trail
+
+**Tasks:**
+- [ ] Implement minimal swarm loop (1 round):
+  - Field General produces plan
+  - Specialist A: "find flaws + missing constraints"
+  - Specialist B: "cost/UX risk + simplifications"
+  - Field General collapses into final decision artifact
+- [ ] Store swarm trail in extensions.swarm.internal (internal-only)
+- [ ] Store customer-safe artifact in artifacts[] only
+- [ ] All non-CORE variability lives in extensions
+- [ ] Create checkpoint: Phase 2.3 complete
+
+**Definition of Done:**
+- [ ] Swarm loop executes (Field General + 2 specialists)
+- [ ] Audit trail split (customer vs internal)
+- [ ] Output only via artifacts[] + stopReason
 - [ ] Checkpoint saved
