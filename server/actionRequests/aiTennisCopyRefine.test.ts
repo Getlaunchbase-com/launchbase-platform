@@ -2,7 +2,7 @@
  * AI Tennis Copy Refine Service Tests
  * 
  * Tests for:
- * - Service creates ActionRequest from decision_collapse.selectedProposal
+ * - Service creates ActionRequest from CopyProposal.variants[0] (or DecisionCollapse.selectedProposal)
  * - needsHuman path returns structured failure
  * - No-prompt-leak contract
  */
@@ -23,7 +23,7 @@ describe("aiTennisCopyRefine", () => {
     delete process.env.AI_PROVIDER;
   });
 
-  it("creates ActionRequest from decision_collapse.selectedProposal", async () => {
+  it("creates ActionRequest from CopyProposal.variants[0]", async () => {
     // Seed all three phases for complete AI Tennis flow
     // Use wildcard jobId (any string works with wildcard matching)
     const testJobId = "*";
