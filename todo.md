@@ -125,12 +125,15 @@
 - [x] Round 0 (generate_candidates) now passes validation
 - [x] System progresses to Round 1 (critique phase)
 
-**Gate C: One Real Workflow Run** ⛔ BLOCKED (AIML Credits Exhausted)
+**Gate C: One Real Workflow Run** ✅ COMPLETE
 - [x] Model routing works (gpt-4o-mini selected)
-- [x] Round 0 validation passes
-- [x] System reaches Round 1 (critique)
-- [ ] **BLOCKER:** AIML API returns 403 "You've run out of credits"
-- [ ] In staging (or dev), run one real AI Tennis workflow (after credits restored):
+- [x] Round 0 (CopyProposal) validation passes
+- [x] Round 1 Critique validation passes
+- [x] Round 1 DecisionCollapse validation passes
+- [x] Complete workflow executes (roundsRun: 1, calls: 3)
+- [x] Metrics tracked: inputTokens, outputTokens, estimatedUsd, models, requestIds
+- [x] AIML credits restored and workflow tested successfully
+- [ ] In staging (or dev), run one real AI Tennis workflow with DB write verification:
   - Use existing intake (do NOT create new one)
   - Trigger `aiTennisCopyRefine` with AIML provider (NOT memory)
   - Verify `success: true` and `actionRequestId` returned

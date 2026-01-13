@@ -268,14 +268,13 @@ export async function runAiTennis<TFinal = any>(
       if (score10 >= stopScore) break;
     }
 
-    const col = await callJson("decision_collapse", "decision_collapse", roles.collapse, {
-      ...input,
-      draft: current,
-      critique: critV,
-    }, round);
-
-    const colVResult = validateAiOutputTyped("decision_collapse", col);
+     const col = await callJson("decision_collapse", "decision_collapse", roles.collapse, { ...input, draft: current, critique: critV }, round);
+    console.log('[runAiTennis] decision_collapse raw response:', JSON.stringify(col, null, 2));
+    
+    const colVResult = validateAiOutputTyped(opts.outputTypeFinal, col);
+    console.log('[runAiTennis] colVResult.ok:', colVResult.ok);
     if (!colVResult.ok) {
+      console.log('[runAiTennis] DecisionCollapse validation errors:', colVResult.errors);
       throw new Error(`AI output failed schema validation (decision_collapse): ${colVResult.errors.join("; ")}`);
     }
     const colV = colVResult.data;

@@ -1,11 +1,11 @@
 # Task: Select Best Proposal or Escalate
 
 ## Input
-- `intentParse`: {{INTENT_PARSE_JSON}}
-- `proposal`: {{PROPOSAL_JSON}}
+- `draft`: {{DRAFT_JSON}}
 - `critique`: {{CRITIQUE_JSON}}
-- `roundLimit`: 2
-- `costCapUsd`: 10
+- `userText`: {{USER_TEXT}}
+- `roundLimit`: {{ROUND_LIMIT}}
+- `costCapUsd`: {{COST_CAP_USD}}
 
 ## Output Requirements
 
@@ -18,17 +18,19 @@ Your output MUST match the `decision_collapse` schema (schemaVersion: "v1").
 ```json
 {
   "schemaVersion": "v1",
-  "requiresApproval": true,
   "selectedProposal": {
+    "type": "copy",
     "targetKey": "hero.headline",
-    "proposedValue": "Your headline here",
-    "rationale": "Why this was chosen"
+    "value": "Your headline here"
   },
+  "reason": "Why this proposal was selected",
   "approvalText": "Customer-friendly summary",
-  "previewRecommended": true | false,
-  "confidence": 0.0 to 1.0,
+  "previewRecommended": true,
   "needsHuman": false,
-  "escalationReason": null
+  "confidence": 0.9,
+  "requiresApproval": true,
+  "roundLimit": 2,
+  "costCapUsd": 10
 }
 ```
 
@@ -46,7 +48,7 @@ Your output MUST match the `decision_collapse` schema (schemaVersion: "v1").
 - Fix is non-trivial
 - Multiple violations
 - Confidence drops below 0.7
-- Set `needsHuman=true` with clear `escalationReason`
+- Set `needsHuman=true` with clear `needsHumanReason`
 
 ### 2. If critique.pass === true
 
@@ -60,40 +62,67 @@ Your output MUST match the `decision_collapse` schema (schemaVersion: "v1").
 
 - `requiresApproval=true` (non-negotiable)
 - `previewRecommended=true` for meaningful changes
-- `approvalText`: Short, customer-friendly summary (1-2 sentences)
+- `approvalText`: Short, customer-friendly summary (max 200 chars)
+- `reason`: Why this proposal was selected (max 300 chars)
+- `roundLimit` and `costCapUsd`: Echo from input
+
+## Required Fields
+
+**Always required:**
+- `schemaVersion`: "v1"
+- `selectedProposal`: Object with `type`, `targetKey`, `value` OR null if needsHuman=true
+- `reason`: Why selected (max 300 chars)
+- `approvalText`: Customer summary (max 200 chars)
+- `previewRecommended`: boolean
+- `needsHuman`: boolean
+- `confidence`: 0.0 to 1.0
+- `requiresApproval`: true (always)
+- `roundLimit`: Echo from input
+- `costCapUsd`: Echo from input
+
+**Optional:**
+- `needsHumanReason`: Required if needsHuman=true (max 200 chars)
+- `assumptions`: Array of strings (max 5 items, 120 chars each)
 
 ## Guidance
 
-1. **Trivial fixes (safe to apply):**
+1. **selectedProposal structure:**
+   - Must have `type: "copy"` for copy proposals
+   - Must have `targetKey` from allowed keys
+   - Must have `value` (not `proposedValue`)
+   - Set to `null` if needsHuman=true
+
+2. **Trivial fixes (safe to apply):**
    - Trim whitespace
    - Remove single superlative word
    - Shorten by 1-5 chars
    - Fix capitalization
 
-2. **Non-trivial fixes (escalate):**
+3. **Non-trivial fixes (escalate):**
    - Rewrite entire sentence
    - Change meaning
    - Multiple violations
    - Unclear how to fix
 
-3. **Confidence scoring:**
+4. **Confidence scoring:**
    - 0.9+: Very confident, clear winner
    - 0.7-0.9: Confident but some trade-offs
    - <0.7: Uncertain, escalate to human
 
-4. **approvalText guidelines:**
+5. **approvalText guidelines:**
    - Customer-friendly language
-   - 1-2 sentences max
+   - Max 200 chars
    - Explain what changed and why
    - Example: "Made your headline shorter and more direct to improve clarity."
 
-5. **previewRecommended:**
-   - `true`: For hero changes, major copy edits, design changes
-   - `false`: For minor tweaks (CTA button text, small wording changes)
+6. **previewRecommended:**
+   - `true`: For hero changes, major copy edits
+   - `false`: For minor tweaks
 
-6. **If unsure:**
+7. **If unsure:**
    - Set `needsHuman=true`
-   - Provide specific `escalationReason`
+   - Provide specific `needsHumanReason`
+   - Set `selectedProposal=null`
    - Don't guess or force a decision
 
 ## Examples
@@ -102,76 +131,55 @@ Your output MUST match the `decision_collapse` schema (schemaVersion: "v1").
 ```json
 {
   "schemaVersion": "v1",
-  "requiresApproval": true,
   "selectedProposal": {
+    "type": "copy",
     "targetKey": "hero.headline",
-    "proposedValue": "Professional Snow Removal for Chicago Homes",
-    "rationale": "Most direct and location-specific. Passed critique with no violations."
+    "value": "Professional Snow Removal for Chicago Homes"
   },
+  "reason": "Most direct and location-specific. Passed critique with no violations.",
   "approvalText": "Made your headline more direct and added your service area (Chicago) for clarity.",
   "previewRecommended": true,
+  "needsHuman": false,
   "confidence": 0.91,
-  "needsHuman": false,
-  "escalationReason": null
+  "requiresApproval": true,
+  "roundLimit": 2,
+  "costCapUsd": 10
 }
 ```
 
-**Example 2: Trivial fix applied**
+**Example 2: Escalation (non-trivial fix needed)**
 ```json
 {
   "schemaVersion": "v1",
-  "requiresApproval": true,
-  "selectedProposal": {
-    "targetKey": "hero.headline",
-    "proposedValue": "Snow Removal You Can Count On",
-    "rationale": "Best variant after removing 'best' superlative. Simple fix, meaning unchanged."
-  },
-  "approvalText": "Shortened your headline slightly to meet length requirements while keeping the same message.",
-  "previewRecommended": true,
-  "confidence": 0.87,
-  "needsHuman": false,
-  "escalationReason": null
-}
-```
-
-**Example 3: Escalation (non-trivial fix needed)**
-```json
-{
-  "schemaVersion": "v1",
-  "requiresApproval": true,
   "selectedProposal": null,
-  "approvalText": null,
+  "reason": "All variants contain unverified claims not found in business facts. Fixing requires complete rewrite.",
+  "approvalText": "We need your input to clarify which claims are accurate before proceeding.",
   "previewRecommended": false,
+  "needsHuman": true,
+  "needsHumanReason": "All variants contain unverified claims ('industry-leading', 'award-winning') not found in businessFacts. Human review needed.",
   "confidence": 0.62,
-  "needsHuman": true,
-  "escalationReason": "All variants contain unverified claims ('industry-leading', 'award-winning') not found in businessFacts. Fixing requires complete rewrite, which exceeds AI confidence threshold. Human review needed to clarify which claims are accurate."
+  "requiresApproval": true,
+  "roundLimit": 2,
+  "costCapUsd": 10
 }
 ```
 
-**Example 4: Escalation (ambiguous intent)**
+**Example 3: Simple selection**
 ```json
 {
   "schemaVersion": "v1",
+  "selectedProposal": {
+    "type": "copy",
+    "targetKey": "hero.headline",
+    "value": "Welcome"
+  },
+  "reason": "Shortest and most direct option. Meets all requirements.",
+  "approvalText": "Shortened your headline to be more concise and inviting.",
+  "previewRecommended": true,
+  "needsHuman": false,
+  "confidence": 0.9,
   "requiresApproval": true,
-  "selectedProposal": null,
-  "approvalText": null,
-  "previewRecommended": false,
-  "confidence": 0.58,
-  "needsHuman": true,
-  "escalationReason": "User request is ambiguous: 'make it better' could mean headline, subheadline, or entire hero section. Need clarification on which specific element to improve."
-}
-```
-
-**Example 5: Escalation (multiple violations)**
-```json
-{
-  "schemaVersion": "v1",
-  "requiresApproval": true,
-  "selectedProposal": null,
-  "approvalText": null,
-  "previewRecommended": false,
-  "confidence": 0.55,
-  "needsHuman": true,
-  "escalationReason": "Critique found 4 violations: length cap (95 chars), superlatives ('best', '#1'), unverified claim ('20 years experience' not in businessFacts), and unclear service area. Requires human review to determine accurate facts and rewrite."
+  "roundLimit": 1,
+  "costCapUsd": 1
 }
 ```
