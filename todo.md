@@ -1,7 +1,7 @@
 # LaunchBase TODO
 
-**Status:** 🟢 Phase 1.1 Finish + Freeze  
-**Version:** e8fbc539  
+**Status:** ✅ Phase 1 BASELINE TAGGED — Phase 2 Authorized  
+**Version:** a6a0462d (Stable Baseline v1.0)  
 **Last Updated:** January 13, 2026
 
 > **📖 See WHERE_WE_ARE.md for complete status report and vision**
@@ -148,10 +148,14 @@
 
 **Definition of Done:**
 - ✅ Workflow test doc committed (`docs/REAL_WORKFLOW_TEST.md`)
-- ⛔ Model router fixed (AIML provider can route to eligible models)
-- ⚠️ Real AI Tennis proposal created in staging
-- ⚠️ Weekly report shows non-N/A metrics
-- ⚠️ Report committed with verification note
+- ✅ Model router fixed (AIML provider can route to eligible models)
+- ✅ Real AI Tennis proposal created in staging
+- ✅ Weekly report shows non-N/A metrics
+- ✅ Report committed with verification note
+- ✅ Phase 1 baseline tagged (docs/PHASE_1_BASELINE_TAGGED.md)
+- ✅ "Prove It" ritual PASSED (Phase 1.3 Gate A/B/C validation accepted)
+- ✅ 30/30 tests passing
+- ✅ Phase 2 authorized to proceed
 
 ---
 
