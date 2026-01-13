@@ -55,17 +55,26 @@ const QUERIES = {
     ORDER BY count DESC
   `,
 
-  // 2. needsHuman Rate (7-day)
-  needsHumanRate: `
+  // 2. needsHuman Rate (7-day) - Current Window
+  needsHumanRateCurrent: `
     ${BASE_CTE}
     SELECT
       '7-day' AS period,
-      ROUND(
-        SUM(CASE WHEN needs_human = 1 OR stop_reason = 'needs_human' THEN 1 ELSE 0 END) * 100.0 / COUNT(*),
-        1
-      ) AS ratePct
+      SUM(CASE WHEN needs_human = 1 OR stop_reason = 'needs_human' THEN 1 ELSE 0 END) AS numerator,
+      COUNT(*) AS denominator
     FROM ai_proposals
     WHERE created_at >= NOW() - INTERVAL 7 DAY
+  `,
+
+  // 2b. needsHuman Rate (7-day) - Prior Window
+  needsHumanRatePrior: `
+    ${BASE_CTE}
+    SELECT
+      '7-day' AS period,
+      SUM(CASE WHEN needs_human = 1 OR stop_reason = 'needs_human' THEN 1 ELSE 0 END) AS numerator,
+      COUNT(*) AS denominator
+    FROM ai_proposals
+    WHERE created_at >= NOW() - INTERVAL 14 DAY AND created_at < NOW() - INTERVAL 7 DAY
   `,
 
   // 3. Cost per Approval (7-day by tenant)
@@ -90,59 +99,88 @@ const QUERIES = {
     ORDER BY avg7Usd DESC
   `,
 
-  // 4. Approval Rate (7-day by tenant)
-  approvalRate: `
+  // 4. Approval Rate (7-day by tenant) - Current Window
+  approvalRateCurrent: `
     ${BASE_CTE}
     SELECT
       tenant,
-      ROUND(
-        SUM(CASE WHEN status IN ('applied','confirmed','locked') THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0),
-        1
-      ) AS rate7Pct,
-      0 AS rate30Pct,
-      0 AS wowDeltaPp,
-      COUNT(*) AS totalRequests
+      SUM(CASE WHEN status IN ('applied','confirmed','locked') THEN 1 ELSE 0 END) AS numerator,
+      COUNT(*) AS denominator
     FROM ai_proposals
     WHERE created_at >= NOW() - INTERVAL 7 DAY
     GROUP BY tenant
     HAVING COUNT(*) > 0
-    ORDER BY rate7Pct DESC
+    ORDER BY tenant
   `,
 
-  // 5. Cache Hit Rate (7-day by tenant)
-  cacheHitRate: `
+  // 4b. Approval Rate (7-day by tenant) - Prior Window
+  approvalRatePrior: `
     ${BASE_CTE}
     SELECT
       tenant,
-      ROUND(
-        SUM(CASE WHEN stop_reason = 'cached' THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0),
-        1
-      ) AS hit7Pct,
-      0 AS hit30Pct,
-      COUNT(*) AS totalRequests
+      SUM(CASE WHEN status IN ('applied','confirmed','locked') THEN 1 ELSE 0 END) AS numerator,
+      COUNT(*) AS denominator
     FROM ai_proposals
-    WHERE created_at >= NOW() - INTERVAL 7 DAY
+    WHERE created_at >= NOW() - INTERVAL 14 DAY AND created_at < NOW() - INTERVAL 7 DAY
     GROUP BY tenant
     HAVING COUNT(*) > 0
-    ORDER BY hit7Pct DESC
+    ORDER BY tenant
   `,
 
-  // 6. Stale Takeover Rate (7-day by tenant)
-  staleTakeoverRate: `
+  // 5. Cache Hit Rate (7-day by tenant) - Current Window
+  cacheHitRateCurrent: `
     ${BASE_CTE}
     SELECT
       tenant,
-      ROUND(
-        SUM(CASE WHEN stop_reason = 'stale_takeover' THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0),
-        1
-      ) AS rate7Pct,
-      0 AS rate30Pct,
-      COUNT(*) AS totalRequests
+      SUM(CASE WHEN stop_reason = 'cached' THEN 1 ELSE 0 END) AS numerator,
+      COUNT(*) AS denominator
     FROM ai_proposals
     WHERE created_at >= NOW() - INTERVAL 7 DAY
     GROUP BY tenant
     HAVING COUNT(*) > 0
-    ORDER BY rate7Pct DESC
+    ORDER BY tenant
+  `,
+
+  // 5b. Cache Hit Rate (7-day by tenant) - Prior Window
+  cacheHitRatePrior: `
+    ${BASE_CTE}
+    SELECT
+      tenant,
+      SUM(CASE WHEN stop_reason = 'cached' THEN 1 ELSE 0 END) AS numerator,
+      COUNT(*) AS denominator
+    FROM ai_proposals
+    WHERE created_at >= NOW() - INTERVAL 14 DAY AND created_at < NOW() - INTERVAL 7 DAY
+    GROUP BY tenant
+    HAVING COUNT(*) > 0
+    ORDER BY tenant
+  `,
+
+  // 6. Stale Takeover Rate (7-day by tenant) - Current Window
+  staleTakeoverRateCurrent: `
+    ${BASE_CTE}
+    SELECT
+      tenant,
+      SUM(CASE WHEN stop_reason = 'stale_takeover' THEN 1 ELSE 0 END) AS numerator,
+      COUNT(*) AS denominator
+    FROM ai_proposals
+    WHERE created_at >= NOW() - INTERVAL 7 DAY
+    GROUP BY tenant
+    HAVING COUNT(*) > 0
+    ORDER BY tenant
+  `,
+
+  // 6b. Stale Takeover Rate (7-day by tenant) - Prior Window
+  staleTakeoverRatePrior: `
+    ${BASE_CTE}
+    SELECT
+      tenant,
+      SUM(CASE WHEN stop_reason = 'stale_takeover' THEN 1 ELSE 0 END) AS numerator,
+      COUNT(*) AS denominator
+    FROM ai_proposals
+    WHERE created_at >= NOW() - INTERVAL 14 DAY AND created_at < NOW() - INTERVAL 7 DAY
+    GROUP BY tenant
+    HAVING COUNT(*) > 0
+    ORDER BY tenant
   `,
 };
 

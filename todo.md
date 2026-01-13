@@ -219,3 +219,75 @@ We proceed one clean gate at a time.
 - [ ] Verify ActionRequest created with rawInbound.aiTennis metadata
 - [ ] Re-run weekly report and confirm metrics populate correctly
 - [ ] Commit final checkpoint with all Phase 1.1 gates complete
+
+---
+
+## 📋 Phase 1.2: WoW Deltas + Report Contract Lock
+
+**Status:** Ready to start (Phase 1.1 complete)
+
+**Goal:** Turn the weekly report into a learning engine using real data and WoW deltas. Still no UI, no dashboards, no new tables.
+
+### 1. Real Workflow Test on Staging (First "Live" Datapoint)
+**Goal:** Produce one real AI Tennis proposal end-to-end and confirm it shows up in the weekly report.
+
+**Checklist:**
+- [ ] Trigger `actionRequests.aiProposeCopy` with a real-ish prompt
+- [ ] Verify new ActionRequest is created
+- [ ] Verify `rawInbound.aiTennis` has all required fields (traceId, jobId, rounds, models, requestIds, usage, costUsd, stopReason, needsHuman, confidence)
+- [ ] Verify `rawInbound.proposal` includes rationale/confidence/risks/assumptions
+- [ ] Run weekly report script → confirm non-empty denominators + no false flags
+- [ ] Commit the generated report from staging (or paste output) + "first datapoint verified" note
+
+**Deliverable:** Generated report from staging + verification note
+
+### 2. WoW Delta Calculations (Replace Placeholders) ✅ COMPLETE
+**Goal:** Same 6 metrics, two windows: Current 7d (now-7d → now) + Prior 7d (now-14d → now-7d)
+
+**Implementation:**
+- [x] Add prior 7d window queries to `generateWeeklyAiReport.ts`
+- [x] Compute absolute delta (pp for rates, $ for cost)
+- [x] Compute relative delta (optional)
+- [x] Update section renderers to show: this week, last week, delta
+- [x] Apply anomaly flags using deltas + absolute thresholds (per Drift Protocol)
+- [x] Added canonical helpers: `deltaPct()`, `flagHighNumber()`, `toDollarsPerApproval()`, `getWindows()`
+- [x] Refactored SQL queries to return numerator/denominator instead of precomputed rates
+- [x] Created current/prior query pairs for all 4 rate metrics
+- [x] Updated renderers to use `toRate()` + `deltaPct()` + canonical flag helpers
+- [x] Tested report generation: produces correct N/A behavior on empty data
+
+**Deliverable:** Report sections show real WoW deltas with proper flags ✅
+
+### 3. Lock "Report Contract" (Prevent Drift)
+**Goal:** Freeze metric definitions so they can't drift accidentally
+
+**Add Report Contract section:**
+- [ ] Metric names frozen (6 canonical metrics)
+- [ ] Denominator rules frozen (N/A when denominator = 0)
+- [ ] Flag rules frozen (warn/critical thresholds)
+- [ ] Output path frozen (`reports/ai_weekly_<YYYY-MM-DD>.md`)
+
+**Deliverable:** Doc block at top of script OR `docs/AI_WEEKLY_REPORT_CONTRACT.md`
+
+### 4. Safe Synthetic Seeding for Local/Dev (Optional but High Leverage)
+**Goal:** Devs can validate report formatting without touching prod/staging
+
+**Implementation:**
+- [ ] Create `scripts/seedAiTennisTestData.ts` that refuses production (env check)
+- [ ] Generate N proposals across 3 stopReasons with realistic distributions
+- [ ] Ensure denominators > 0 so flags can be seen/tested
+- [ ] Create `scripts/cleanupAiTennisTestData.ts` for cleanup
+- [ ] Add doc snippet explaining safe seeding workflow
+
+**Deliverable:** Seed script + cleanup script + doc snippet
+
+---
+
+## 🎯 Momentum Rule (Prevent Invisible Progress)
+
+Every change must end in one of these artifacts:
+1. **Passing tests summary** (e.g., "23/23 tests passing")
+2. **Generated report markdown** (committed or pasted)
+3. **Doc update that freezes a contract** (e.g., FOREVER_CONTRACTS.md)
+
+**No "invisible progress."**
