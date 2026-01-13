@@ -1,8 +1,8 @@
 # LaunchBase TODO
 
-**Status:** 🟢 Constitutional Layer Frozen — Phase 1.1 In Progress  
-**Version:** b930c6cf  
-**Last Updated:** January 12, 2026
+**Status:** 🟢 Phase 1.1 Finish + Freeze  
+**Version:** e8fbc539  
+**Last Updated:** January 13, 2026
 
 > **📖 See WHERE_WE_ARE.md for complete status report and vision**
 
@@ -49,95 +49,226 @@
 - [x] No prompt/data leakage (verified by tests + grep)
 - [x] Deterministic learning surface (same inputs → same outputs or cached)
 
-### ✅ Extraction Logic Hardened (COMPLETE)
-- [x] Shape-tolerant extraction (DecisionCollapse.selectedProposal OR CopyProposal.variants[0])
-- [x] Strict validation (rejects null/undefined, allows falsy-valid values)
-- [x] No error logging that could leak prompts/provider errors
-- [x] Customer-safe stopReason vocabulary enforced
+### ✅ WoW Delta Implementation (COMPLETE)
+- [x] Canonical helpers: `deltaPct()`, `flagHighNumber()`, `toDollarsPerApproval()`, `getWindows()`
+- [x] SQL queries refactored to return numerator/denominator pairs
+- [x] Current/prior window query pairs for all 4 rate metrics
+- [x] Renderers use `toRate()` + `deltaPct()` + canonical flag helpers
+- [x] Report generation tested: correct N/A behavior on empty data
+- [x] Documentation: `docs/CHANGELOG_WOW_DELTAS.md`
 
 ---
 
-## 🚀 PHASE 1.1: Weekly Metrics Report (Read-Only)
+## 🚀 PHASE 1.1: FINISH + FREEZE
 
-**Goal:** Produce a single, immutable markdown report that reflects the truth of system behavior  
-**Mode:** SQL-first, read-only, no writes, no dashboards, no interpretation  
+**Goal:** Lock the weekly report contract and validate with real data  
+**Mode:** Read-only, no writes, no dashboards, no interpretation  
 **Rule:** Observe only. No behavior changes. No auto-tuning.
 
-**Enterprise Principle:** Truth before tooling. Dashboards lie before schemas stabilize.
+### PR 1: Weekly Report Contract Freeze ✅ COMPLETE
 
-### 🔐 Hard Guardrails (Non-Negotiable)
-- ❌ No writes to DB
-- ❌ No schema changes
-- ❌ No new tables
-- ❌ No dashboards
-- ❌ No interpretation text
-- ❌ No prompt content ever
+**Goal:** Lock markdown section order + headings so they can't drift
 
-- ✅ Read-only SQL
-- ✅ Deterministic markdown
-- ✅ Human-readable
-- ✅ Git-friendly
+**Tasks:**
+- [x] Create `docs/AI_WEEKLY_REPORT_CONTRACT.md` with:
+  - Frozen section order (1-6 + Summary)
+  - Frozen metric names (stopReason, needsHuman, costPerApproval, approvalRate, cacheHit, staleTakeover)
+  - Frozen denominator rules (N/A when denominator = 0)
+  - Frozen flag rules (warn/critical thresholds)
+  - Frozen output path (`reports/ai_weekly_<YYYY-MM-DD>.md`)
+  - Frozen data source (action_requests.rawInbound.aiTennis)
+  - Frozen JSON paths ($.aiTennis.*)
+  - Security/redaction rules (no prompts, no provider payloads, no PII)
+- [x] Add contract version number (v1.0)
+- [x] Add "Changes require versioning + architectural review" clause
+- [x] Add change policy (patch/minor/major version semantics)
+- [x] Add changelog section
+- [x] Link to AI_DRIFT_PROTOCOL_V1.md and AI_METRICS_QUERIES.md
 
-### Gate 1: Missing Test Coverage ✅ COMPLETE
-- [x] Extracted proposal selection into pure helper functions
-- [x] Created unit tests for both extraction paths (DecisionCollapse + CopyProposal)
-- [x] 19 unit tests passing for extraction logic
-- [x] 4 service tests passing for aiTennisCopyRefine
-- [x] Verified customer-safe contract (no prompt leakage)
-- [x] Total: 23 tests passing
-
-### Gate 2: Weekly Report Script ✅ COMPLETE
-- [x] Created `scripts/generateWeeklyAiReport.ts`
-- [x] Created `scripts/_weeklyAiReportMarkdown.ts` (markdown builder)
-- [x] Wired up 6 canonical SQL queries from `AI_METRICS_QUERIES.md`
-- [x] Implemented WoW delta calculations (placeholders for now)
-- [x] Applied anomaly thresholds (warn/critical flags)
-- [x] Generated markdown report: `reports/ai_weekly_2026-01-12.md`
-- [x] Tested locally on development database
-- [x] First report artifact produced (71 lines, 2.0 KB)
-- [x] Ready for human review and commit
-
-**Report Structure (Frozen - Do Not Reorder):**
-1. Header (metadata: version, build SHA, timestamp, environment)
-2. Executive Snapshot (numbers only, no commentary)
-3. stopReason Distribution (drift canary)
-4. needsHuman Rate (protocol fit)
-5. Cost per Approval (primary cost signal)
-6. Approval Rate (business friction)
-7. Idempotency Health (cache hit + stale takeover)
-8. Raw Query Provenance (link to AI_METRICS_QUERIES.md)
-
-**Anomaly Thresholds (Frozen):**
-| Metric | Warn | Critical |
-|--------|------|----------|
-| provider_failed rate | > 5% | > 10% |
-| ajv_failed rate | > 2% | > 5% |
-| needsHuman rate | > 15% | > 25% |
-| cost per approval Δ | > +10% | > +20% |
-| approval rate drop | > -5pp | > -10pp |
-| cache hit rate | < 85% | < 75% |
-| stale takeover | > 3% | > 5% |
-
-### Gate 3: Dev/### Gate 3: Snapshot Workflow Doc ✅ COMPLETE
-- [x] Created `docs/DEV_STAGING_SNAPSHOT_WORKFLOW.md`
-- [x] Documented schema-only and masked snapshot workflows
-- [x] Defined read-only rules for production (no seeding, no cleanup)
-- [x] Added hard guardrails (env checks) that abort in prod
-- [x] Included incident response protocol
-- [x] Referenced FOREVER CONTRACT §8 (No Production Seeding)# ✅ Completion Criteria for Phase 1.1
-This phase is complete only when:
-- [ ] Gate 1: Missing test coverage added and passing
-- [ ] Gate 2: Script runs successfully and produces markdown report
-- [ ] Gate 2: First report reviewed by human
-- [ ] Gate 2: Report committed to repo
-- [ ] Gate 3: Snapshot workflow doc created and reviewed
-- [ ] No follow-up actions taken (observe only)
-
-**Only then do we proceed to Phase 2 (Learning Loop).**
+**Definition of Done:**
+- ✅ Contract doc committed
+- ✅ No code behavior changes required
+- ✅ Boring PR (contract-only)
 
 ---
 
-## 🚫 BLOCKED UNTIL PHASE 1.1 COMPLETE
+### PR 2: Real Workflow Test in Staging
+
+**Goal:** Produce one real AI Tennis proposal end-to-end and confirm it shows up in the weekly report
+
+**Tasks:**
+- [ ] Create `docs/REAL_WORKFLOW_TEST.md` with:
+  - Exact steps to trigger `actionRequests.aiProposeCopy`
+  - Expected DB fields: `rawInbound.source="ai_tennis"`, `rawInbound.aiTennis.*`
+  - "What good looks like" (denominators > 0, flags behave, WoW shows real numbers)
+- [ ] In staging (or dev snapshot), run one real AI Tennis workflow:
+  - Trigger `actionRequests.aiProposeCopy` with real-ish prompt
+  - Verify new ActionRequest created
+  - Verify `rawInbound.aiTennis` has all required fields (traceId, jobId, rounds, models, requestIds, usage, costUsd, stopReason, needsHuman, confidence)
+  - Verify `rawInbound.proposal` includes rationale/confidence/risks/assumptions
+- [ ] Re-run weekly report and confirm:
+  - Denominators > 0
+  - Flags behave as expected (no false alarms)
+  - WoW delta shows real numbers (not N/A)
+- [ ] Commit generated report from staging (or paste output) + "first datapoint verified" note
+
+**Definition of Done:**
+- Workflow test doc committed
+- Real AI Tennis proposal created in staging
+- Weekly report shows non-N/A metrics
+- Report committed with verification note
+
+---
+
+## 🔬 PHASE 1.2: OBSERVATION & DRIFT CONTAINMENT
+
+**Goal:** Turn the weekly report into a learning engine (still no UI, no dashboards, no new tables)  
+**Mode:** Observe + learn. No automation. Human-governed.
+
+### PR 3: Cost-per-Approval WoW Delta
+
+**Goal:** Same current/prior pair approach for cost metrics
+
+**Tasks:**
+- [ ] Refactor `costPerApproval` query to return:
+  - `costUsdSum` (numerator)
+  - `approvalsCount` (denominator)
+- [ ] Create `costPerApprovalCurrent` / `costPerApprovalPrior` query pair
+- [ ] Update `renderCostPerApproval()` to:
+  - Use `toDollarsPerApproval(costSum, approvals)` for N/A-safe calculation
+  - Compute dollar delta: `current.value - prior.value`
+  - Use `flagHighNumber()` for flagging (high cost is bad)
+- [ ] Test with real data from staging
+- [ ] Update `buildMarkdown()` to pass current/prior rows
+
+**Definition of Done:**
+- Cost-per-approval shows WoW dollar delta
+- N/A behavior preserved when approvals = 0
+- Flags use `flagHighNumber()` consistently
+
+---
+
+### PR 4: Weekly Ritual Setup
+
+**Goal:** Establish weekly review cadence (human-governed learning loop)
+
+**Tasks:**
+- [ ] Create `docs/WEEKLY_RITUAL.md` with:
+  - Schedule: Every Monday 9am (or chosen time)
+  - Process:
+    1. Run `pnpm tsx scripts/generateWeeklyAiReport.ts`
+    2. Review 5 ActionRequests (what customers approve/decline, why, friction points)
+    3. Note any anomalies (flags, stopReason spikes, cost jumps)
+    4. Extract learnings (prompt improvements, protocol mismatches, model drift)
+    5. Update `docs/LEARNINGS.md` with findings
+  - Escalation rules: When to investigate vs when to wait
+- [ ] Add calendar reminder or cron job (optional)
+- [ ] Create `docs/LEARNINGS.md` template
+
+**Definition of Done:**
+- Ritual doc committed
+- First weekly review completed
+- Learnings doc initialized
+
+---
+
+## 🌐 PHASE 2: SWARM PREMIUM WORKFLOW
+
+**Goal:** Multi-AI collaboration for showroom websites (design + code across AIs)  
+**Mode:** Field General orchestrates specialists. All decisions audited.
+
+### PR 5: Showrooms Repo Structure
+
+**Goal:** Source of truth for all 4 showroom websites
+
+**Tasks:**
+- [ ] Create GitHub repo: `launchbase-showrooms`
+- [ ] Structure:
+  ```
+  showrooms/
+    site-1-basic/
+      README.md (goals, constraints, tier, success criteria)
+      launchbase.yaml (scope + guardrails + budgets)
+      src/ (HTML/CSS/JS)
+    site-2-standard/
+      README.md
+      launchbase.yaml
+      src/
+    site-3-premium/
+      README.md
+      launchbase.yaml
+      src/
+    site-4-enterprise/
+      README.md
+      launchbase.yaml
+      src/
+  ```
+- [ ] Each `README.md` includes:
+  - Business goals (conversion, trust, speed)
+  - Design constraints (colors, fonts, layout)
+  - Tier features (Basic: 3 pages, Standard: 5 pages, Premium: 10 pages, Enterprise: unlimited)
+  - "What success looks like" (metrics, user feedback)
+- [ ] Each `launchbase.yaml` includes:
+  - Scope (pages, components, integrations)
+  - Guardrails (no external dependencies, accessibility standards)
+  - Budgets (max file size, max load time)
+
+**Definition of Done:**
+- Repo created and structured
+- All 4 sites have README + launchbase.yaml
+- First site committed (Basic tier)
+
+---
+
+### PR 6: Swarm Protocol (Field General + Specialists)
+
+**Goal:** Deterministic multi-AI collaboration with audit trail
+
+**Tasks:**
+- [ ] Create `docs/SWARM_PROTOCOL.md` with:
+  - Roles:
+    - **Field General (FG)**: GPT-5.2 — writes task + constraints + acceptance tests
+    - **Specialist A**: Proposes solution
+    - **Specialist B**: Critiques proposal
+    - **FG**: Collapses to decision + next action
+  - Decision trail storage:
+    - Use existing `ActionRequest` + `events` pattern
+    - New `rawInbound.source = "swarm"`
+    - Store: task, proposal, critique, decision, rationale
+  - Escalation rules: When FG needs human input
+- [ ] Implement swarm router in `server/routers/swarm.ts`
+- [ ] Add swarm tests in `server/swarm.test.ts`
+- [ ] Run first swarm workflow: "Design Basic tier homepage"
+
+**Definition of Done:**
+- Swarm protocol doc committed
+- Swarm router implemented and tested
+- First swarm decision trail stored in DB
+- First showroom site generated via swarm
+
+---
+
+## 🎯 MOMENTUM RULE
+
+**One PR at a time with a single goal:**
+
+1. ✅ Weekly report contract freeze
+2. ✅ Real workflow test in staging
+3. ✅ Cost-per-approval WoW
+4. ✅ Weekly ritual setup
+5. ✅ Showrooms repo structure
+6. ✅ Swarm protocol implementation
+
+**Every PR must end in one of these artifacts:**
+1. **Passing tests summary** (e.g., "23/23 tests passing")
+2. **Generated report markdown** (committed or pasted)
+3. **Doc update that freezes a contract** (e.g., FOREVER_CONTRACTS.md)
+
+**No "invisible progress."**
+
+---
+
+## 🚫 BLOCKED UNTIL PHASE 2 COMPLETE
 
 **These items are explicitly blocked and must not be started:**
 
@@ -168,126 +299,15 @@ This phase is complete only when:
 - [ ] Fix actionRequestSequencer.ts resendMessageId type error
 - [ ] Run `pnpm tsc --noEmit` to verify fixes
 
-**Note:** These errors do not block Phase 1.1 work. Fix only if time permits.
-
----
-
-## 🧠 Strategic Insight
-
-**You've separated learning from execution.**
-
-- **Execution** = Deterministic, safe, boring (good)
-- **Learning** = Slow, deliberate, human-governed
-
-This enables scaling trust and cost efficiency simultaneously.
-
-**The weekly report is the keel of the ship.**
-
-Before dashboards. Before optimization. Before pricing changes. Before swarm AI. Before customer UI changes.
-
-**Truth first. Always.**
+**Note:** These errors do not block Phase 1.1/1.2/2 work. Fix only if time permits.
 
 ---
 
 ## 📋 Next Command
 
 When ready to proceed:
-- `"Implement Gate 1: Add DecisionCollapse.selectedProposal test"`
-- `"Implement Gate 2: Generate weekly report script"`
-- `"Implement Gate 3: Create snapshot workflow doc"`
+- `"Implement PR 1: Weekly Report Contract Freeze"`
+- `"Implement PR 2: Real Workflow Test in Staging"`
+- `"Implement PR 3: Cost-per-Approval WoW Delta"`
 
-We proceed one clean gate at a time.
-
-
----
-
-## ✅ Phase 1.1 Progress Update (January 12, 2026)
-
-### Empty-Data Fix COMPLETE
-- [x] Added denominators to SQL queries (totalRequests)
-- [x] Added HAVING clauses to filter empty periods  
-- [x] Implemented denominator checks in markdown builder
-- [x] Show "N/A" when denominator is 0 (no false flags)
-- [x] Added canonical helper functions: `toRate()`, `flagLowRate()`, `flagHighRate()`
-- [x] No-data banner shows when no AI Tennis proposals found
-- [x] Cache hit rate: N/A with "—" flag (not 0% with 🚨)
-- [x] Approval rate: N/A with "—" flag (not 0% with 🚨)
-- [x] Stale takeover rate: N/A with "—" flag
-
-### Next: Real Workflow Test
-- [ ] Run 1 real copy refine request on staging
-- [ ] Verify ActionRequest created with rawInbound.aiTennis metadata
-- [ ] Re-run weekly report and confirm metrics populate correctly
-- [ ] Commit final checkpoint with all Phase 1.1 gates complete
-
----
-
-## 📋 Phase 1.2: WoW Deltas + Report Contract Lock
-
-**Status:** Ready to start (Phase 1.1 complete)
-
-**Goal:** Turn the weekly report into a learning engine using real data and WoW deltas. Still no UI, no dashboards, no new tables.
-
-### 1. Real Workflow Test on Staging (First "Live" Datapoint)
-**Goal:** Produce one real AI Tennis proposal end-to-end and confirm it shows up in the weekly report.
-
-**Checklist:**
-- [ ] Trigger `actionRequests.aiProposeCopy` with a real-ish prompt
-- [ ] Verify new ActionRequest is created
-- [ ] Verify `rawInbound.aiTennis` has all required fields (traceId, jobId, rounds, models, requestIds, usage, costUsd, stopReason, needsHuman, confidence)
-- [ ] Verify `rawInbound.proposal` includes rationale/confidence/risks/assumptions
-- [ ] Run weekly report script → confirm non-empty denominators + no false flags
-- [ ] Commit the generated report from staging (or paste output) + "first datapoint verified" note
-
-**Deliverable:** Generated report from staging + verification note
-
-### 2. WoW Delta Calculations (Replace Placeholders) ✅ COMPLETE
-**Goal:** Same 6 metrics, two windows: Current 7d (now-7d → now) + Prior 7d (now-14d → now-7d)
-
-**Implementation:**
-- [x] Add prior 7d window queries to `generateWeeklyAiReport.ts`
-- [x] Compute absolute delta (pp for rates, $ for cost)
-- [x] Compute relative delta (optional)
-- [x] Update section renderers to show: this week, last week, delta
-- [x] Apply anomaly flags using deltas + absolute thresholds (per Drift Protocol)
-- [x] Added canonical helpers: `deltaPct()`, `flagHighNumber()`, `toDollarsPerApproval()`, `getWindows()`
-- [x] Refactored SQL queries to return numerator/denominator instead of precomputed rates
-- [x] Created current/prior query pairs for all 4 rate metrics
-- [x] Updated renderers to use `toRate()` + `deltaPct()` + canonical flag helpers
-- [x] Tested report generation: produces correct N/A behavior on empty data
-
-**Deliverable:** Report sections show real WoW deltas with proper flags ✅
-
-### 3. Lock "Report Contract" (Prevent Drift)
-**Goal:** Freeze metric definitions so they can't drift accidentally
-
-**Add Report Contract section:**
-- [ ] Metric names frozen (6 canonical metrics)
-- [ ] Denominator rules frozen (N/A when denominator = 0)
-- [ ] Flag rules frozen (warn/critical thresholds)
-- [ ] Output path frozen (`reports/ai_weekly_<YYYY-MM-DD>.md`)
-
-**Deliverable:** Doc block at top of script OR `docs/AI_WEEKLY_REPORT_CONTRACT.md`
-
-### 4. Safe Synthetic Seeding for Local/Dev (Optional but High Leverage)
-**Goal:** Devs can validate report formatting without touching prod/staging
-
-**Implementation:**
-- [ ] Create `scripts/seedAiTennisTestData.ts` that refuses production (env check)
-- [ ] Generate N proposals across 3 stopReasons with realistic distributions
-- [ ] Ensure denominators > 0 so flags can be seen/tested
-- [ ] Create `scripts/cleanupAiTennisTestData.ts` for cleanup
-- [ ] Add doc snippet explaining safe seeding workflow
-
-**Deliverable:** Seed script + cleanup script + doc snippet
-
----
-
-## 🎯 Momentum Rule (Prevent Invisible Progress)
-
-Every change must end in one of these artifacts:
-1. **Passing tests summary** (e.g., "23/23 tests passing")
-2. **Generated report markdown** (committed or pasted)
-3. **Doc update that freezes a contract** (e.g., FOREVER_CONTRACTS.md)
-
-**No "invisible progress."**
+We proceed one clean PR at a time.
