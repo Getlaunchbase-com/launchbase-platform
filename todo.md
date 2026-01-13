@@ -1021,4 +1021,40 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [x] All tripwire tests passing (59/59)
 - [x] Coffee shop benchmarks re-run with deterministic collapse ($0.0198, 14.4s, needs_human)
 - [x] Frozen layers remain green (59/59 tests)
-- [ ] Checkpoint saved with collapse logic
+- [x] Checkpoint saved (version: 1b849740)
+
+
+---
+
+## Homepage Copy Implementation (Tier 2 Premium) ✅ COMPLETE
+
+**Goal:** Implement Pass 3 winner homepage copy to lock in upgraded positioning and establish conversion baseline
+
+**Sections to implement (in exact order):**
+- [x] 1. Hero (Stop carrying the system in your head)
+- [x] 2. Why this exists (No one owns the system)
+- [x] 3. What stops being your job (Before/After mental load)
+- [x] 4. How it works (4 steps)
+- [x] 5. Observability (Trust section with activity feed)
+- [x] 6. Suite (Social Media, Intelligence, GBP, QuickBooks)
+- [x] 7. Not for you (Filter section)
+- [x] 8. Pricing (Core Website + Example)
+- [x] 9. FAQ (5 questions)
+- [x] 10. Final CTA (You've been carrying this long enough)
+
+**CTAs (must be consistent):**
+- Primary: "Hand It Off" ✅ (used 3 times)
+- Supporting: "See your real site before you pay. Cancel anytime." ✅ (used 3 times)
+
+**Hard Rules:**
+- [x] No pricing changes (copy updates only)
+- [x] Keep existing CTA routing/functionality
+- [x] Maintain responsive design
+- [x] No new components (use existing UI patterns)
+
+**Definition of Done:**
+- [x] All 10 sections implemented in exact order
+- [x] CTAs consistent throughout
+- [x] No pricing changes
+- [x] Homepage tested locally (dev server running, screenshot verified)
+- [ ] Checkpoint saved with new copy
