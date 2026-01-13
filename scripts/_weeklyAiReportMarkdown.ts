@@ -21,6 +21,40 @@ type QueryResults = Record<
 
 type Flag = "✅" | "⚠️" | "🚨";
 
+type RateResult = { text: string; rate: number | null };
+
+/**
+ * Convert numerator/denominator to rate percentage.
+ * Returns N/A if denominator is 0 or invalid.
+ */
+function toRate(numerator: number, denominator: number, decimals = 1): RateResult {
+  if (!Number.isFinite(denominator) || denominator <= 0) return { text: "N/A", rate: null };
+  const rate = numerator / denominator;
+  return { text: `${(rate * 100).toFixed(decimals)}%`, rate };
+}
+
+/**
+ * Flag rate where LOW is BAD (e.g., cache hit rate, approval rate).
+ * Returns empty string if rate is null (N/A).
+ */
+function flagLowRate(rate: number | null, warnBelow: number, criticalBelow: number): Flag | "" {
+  if (rate === null) return ""; // N/A => no flags
+  if (rate < criticalBelow) return "🚨";
+  if (rate < warnBelow) return "⚠️";
+  return "✅";
+}
+
+/**
+ * Flag rate where HIGH is BAD (e.g., stale takeover rate, error rate).
+ * Returns empty string if rate is null (N/A).
+ */
+function flagHighRate(rate: number | null, warnAbove: number, criticalAbove: number): Flag | "" {
+  if (rate === null) return "";
+  if (rate > criticalAbove) return "🚨";
+  if (rate > warnAbove) return "⚠️";
+  return "✅";
+}
+
 type Thresholds = {
   providerFailedWarnPct: number; // e.g. 5
   providerFailedCritPct: number; // e.g. 10
@@ -136,7 +170,17 @@ function section(title: string, body: string): string {
 
 // 1) stopReason Distribution rows: { stopReason, count, pct, wowDeltaPct? }
 function renderStopReasonDistribution(rows: AnyRow[], t: Thresholds) {
-  const normalized = rows.map((r) => {
+  // Filter out empty/null stopReasons
+  const filtered = rows.filter((r) => {
+    const stopReason = safeStr(r.stopReason ?? r.stop_reason ?? r.reason).trim();
+    return stopReason.length > 0;
+  });
+
+  if (filtered.length === 0) {
+    return "_No AI Tennis proposals found for this period._";
+  }
+
+  const normalized = filtered.map((r) => {
     const stopReason = normalizeStopReason(safeStr(r.stopReason ?? r.stop_reason ?? r.reason));
     const count = safeNum(r.count ?? r.cnt);
     const pctVal = safeNum(r.pct ?? r.percent ?? r.ratePct);
@@ -197,55 +241,96 @@ function renderCostPerApproval(rows: AnyRow[], t: Thresholds) {
   return `${table}\n\n${note}`;
 }
 
-// 4) Approval Rate rows: { tenant, rate7Pct, rate30Pct, wowDeltaPp? }
+// 4) Approval Rate rows: { tenant, rate7Pct, rate30Pct, wowDeltaPp?, totalRequests }
 function renderApprovalRate(rows: AnyRow[], t: Thresholds) {
+  if (rows.length === 0) {
+    return "_No AI Tennis proposals found for this period._";
+  }
+
   const normalized = rows.map((r) => {
     const tenant = safeStr(r.tenant ?? "—");
-    const r7 = safeNum(r.rate7Pct ?? r.rate_7_pct ?? r.approval7Pct ?? r.pct7 ?? r.rate7);
-    const r30 = safeNum(r.rate30Pct ?? r.rate_30_pct ?? r.approval30Pct ?? r.pct30 ?? r.rate30);
-    const wowPp = safeNum(r.wowDeltaPp ?? r.wow_delta_pp ?? r.wowPp ?? r.wow);
+    const totalRequests = safeNum(r.totalRequests ?? r.total_requests ?? 0);
+    const r7 = totalRequests > 0 ? safeNum(r.rate7Pct ?? r.rate_7_pct ?? r.approval7Pct ?? r.pct7 ?? r.rate7) : null;
+    const r30 = totalRequests > 0 ? safeNum(r.rate30Pct ?? r.rate_30_pct ?? r.approval30Pct ?? r.pct30 ?? r.rate30) : null;
+    const wowPp = totalRequests > 0 ? safeNum(r.wowDeltaPp ?? r.wow_delta_pp ?? r.wowPp ?? r.wow) : null;
     // For approval rate: a negative delta (drop) is bad; compare magnitude
-    const drop = -wowPp; // if wow is -2pp, drop is +2pp
-    let flag: Flag = "✅";
-    if (drop >= t.approvalDropCritPp) flag = "🚨";
-    else if (drop >= t.approvalDropWarnPp) flag = "⚠️";
+    let flag: Flag = "—" as any;
+    if (r7 !== null) {
+      const drop = -wowPp!; // if wow is -2pp, drop is +2pp
+      flag = "✅";
+      if (drop >= t.approvalDropCritPp) flag = "🚨";
+      else if (drop >= t.approvalDropWarnPp) flag = "⚠️";
+    }
     return { tenant, r7, r30, wowPp, flag };
   });
 
   const table = mdTable(
     ["tenant", "7-day %", "30-day %", "WoW Δ", "Flag"],
-    normalized.map((r) => [r.tenant, pct(r.r7), pct(r.r30), ppDelta(r.wowPp), r.flag])
+    normalized.map((r) => [
+      r.tenant,
+      r.r7 !== null ? pct(r.r7) : "N/A",
+      r.r30 !== null ? pct(r.r30) : "N/A",
+      r.wowPp !== null ? ppDelta(r.wowPp) : "N/A",
+      r.flag
+    ])
   );
   const note = `**Interpretation:** falling approval rate indicates UX friction or quality degradation.`;
   return `${table}\n\n${note}`;
 }
 
-// 5) Cache Hit Rate rows: { tenant, hit7Pct, hit30Pct }
+// 5) Cache Hit Rate rows: { tenant, hit7Pct, hit30Pct, totalRequests }
 function renderCacheHitRate(rows: AnyRow[], t: Thresholds) {
+  if (rows.length === 0) {
+    return "_No AI Tennis proposals found for this period._";
+  }
+
   const normalized = rows.map((r) => {
     const tenant = safeStr(r.tenant ?? "—");
-    const h7 = safeNum(r.hit7Pct ?? r.hit_7_pct ?? r.cacheHit7Pct ?? r.pct7 ?? r.hit7);
-    const h30 = safeNum(r.hit30Pct ?? r.hit_30_pct ?? r.cacheHit30Pct ?? r.pct30 ?? r.hit30);
-    const flag = flagFromRateGoodIsHigh(h7, t.cacheHitWarnPct, t.cacheHitCritPct);
+    const totalRequests = safeNum(r.totalRequests ?? r.total_requests ?? 0);
+    const h7 = totalRequests > 0 ? safeNum(r.hit7Pct ?? r.hit_7_pct ?? r.cacheHit7Pct ?? r.pct7 ?? r.hit7) : null;
+    const h30 = totalRequests > 0 ? safeNum(r.hit30Pct ?? r.hit_30_pct ?? r.cacheHit30Pct ?? r.pct30 ?? r.hit30) : null;
+    // Don't flag if no data (N/A)
+    const flag = h7 !== null ? flagFromRateGoodIsHigh(h7, t.cacheHitWarnPct, t.cacheHitCritPct) : ("—" as any);
     return { tenant, h7, h30, flag };
   });
 
-  const table = mdTable(["tenant", "7-day %", "30-day %", "Flag"], normalized.map((r) => [r.tenant, pct(r.h7), pct(r.h30), r.flag]));
+  const table = mdTable(
+    ["tenant", "7-day %", "30-day %", "Flag"],
+    normalized.map((r) => [
+      r.tenant,
+      r.h7 !== null ? pct(r.h7) : "N/A",
+      r.h30 !== null ? pct(r.h30) : "N/A",
+      r.flag
+    ])
+  );
   const note = `**Interpretation:** low cache hit rate can indicate missing idempotency usage or too-short TTL.`;
   return `${table}\n\n${note}`;
 }
 
-// 6) Stale Takeover Rate rows: { tenant, rate7Pct, rate30Pct }
+// 6) Stale Takeover Rate rows: { tenant, rate7Pct, rate30Pct, totalRequests }
 function renderStaleTakeoverRate(rows: AnyRow[], t: Thresholds) {
+  if (rows.length === 0) {
+    return "_No AI Tennis proposals found for this period._";
+  }
+
   const normalized = rows.map((r) => {
     const tenant = safeStr(r.tenant ?? "—");
-    const s7 = safeNum(r.rate7Pct ?? r.rate_7_pct ?? r.stale7Pct ?? r.pct7 ?? r.rate7);
-    const s30 = safeNum(r.rate30Pct ?? r.rate_30_pct ?? r.stale30Pct ?? r.pct30 ?? r.rate30);
-    const flag = flagFromRateBadIsHigh(s7, t.staleTakeoverWarnPct, t.staleTakeoverCritPct);
+    const totalRequests = safeNum(r.totalRequests ?? r.total_requests ?? 0);
+    const s7 = totalRequests > 0 ? safeNum(r.rate7Pct ?? r.rate_7_pct ?? r.stale7Pct ?? r.pct7 ?? r.rate7) : null;
+    const s30 = totalRequests > 0 ? safeNum(r.rate30Pct ?? r.rate_30_pct ?? r.stale30Pct ?? r.pct30 ?? r.rate30) : null;
+    const flag = s7 !== null ? flagFromRateBadIsHigh(s7, t.staleTakeoverWarnPct, t.staleTakeoverCritPct) : ("—" as any);
     return { tenant, s7, s30, flag };
   });
 
-  const table = mdTable(["tenant", "7-day %", "30-day %", "Flag"], normalized.map((r) => [r.tenant, pct(r.s7), pct(r.s30), r.flag]));
+  const table = mdTable(
+    ["tenant", "7-day %", "30-day %", "Flag"],
+    normalized.map((r) => [
+      r.tenant,
+      r.s7 !== null ? pct(r.s7) : "N/A",
+      r.s30 !== null ? pct(r.s30) : "N/A",
+      r.flag
+    ])
+  );
   const note = `**Interpretation:** rising takeover rate suggests instability or stuck jobs.`;
   return `${table}\n\n${note}`;
 }
@@ -290,6 +375,9 @@ export function buildMarkdown(
   const cacheRows = extractRows(results.cacheHitRate);
   const staleRows = extractRows(results.staleTakeoverRate);
 
+  // Check if we have any real data
+  const hasData = stopReasonRows.filter((r) => safeStr(r.stopReason ?? r.stop_reason ?? r.reason).trim().length > 0).length > 0;
+
   // Compute summary flags (worst-of)
   const stopReasonRendered = stopReasonRows.map((r) => {
     const stopReason = normalizeStopReason(safeStr(r.stopReason ?? r.stop_reason ?? r.reason));
@@ -321,13 +409,19 @@ export function buildMarkdown(
 
   const integrityFlag: Flag = "✅"; // reserved: canary/leak checks can feed this later
 
+  const noDataBanner = !hasData
+    ? `\n> ⚠️ **No AI Tennis proposals found for this period.**  \n` +
+      `> This report will populate once AI Tennis workflows create ActionRequests with \`rawInbound.source = 'ai_tennis'\`.\n\n`
+    : "";
+
   const header =
     `# AI Tennis Weekly Metrics Report — ${reportDateISO}\n\n` +
     `**System:** LaunchBase  \n` +
     `**Version:** ${meta.version ?? "—"}  \n` +
     `**Build SHA:** ${meta.buildSha ?? "—"}  \n` +
     `**Generated:** ${new Date().toISOString()}  \n` +
-    `**Environment:** ${envName}\n\n---\n`;
+    `**Environment:** ${envName}\n\n---\n` +
+    noDataBanner;
 
   const body =
     section("1️⃣ StopReason Distribution (Drift Canary)", renderStopReasonDistribution(stopReasonRows, thresholds)) +

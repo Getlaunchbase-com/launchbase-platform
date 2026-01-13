@@ -118,14 +118,13 @@
 | cache hit rate | < 85% | < 75% |
 | stale takeover | > 3% | > 5% |
 
-### Gate 3: Dev/Staging Snapshot Workflow Doc 📋 PENDING
-- [ ] Create `docs/DEV_STAGING_SNAPSHOT_WORKFLOW.md`
-- [ ] Document how to create dev/staging snapshots safely
-- [ ] Define synthetic seeding rules (explicitly NOT production)
-- [ ] Add hard guardrails (env checks) that abort in prod
-- [ ] Prevent production database seeding incidents (FOREVER CONTRACT §8)
-
-### ✅ Completion Criteria for Phase 1.1
+### Gate 3: Dev/### Gate 3: Snapshot Workflow Doc ✅ COMPLETE
+- [x] Created `docs/DEV_STAGING_SNAPSHOT_WORKFLOW.md`
+- [x] Documented schema-only and masked snapshot workflows
+- [x] Defined read-only rules for production (no seeding, no cleanup)
+- [x] Added hard guardrails (env checks) that abort in prod
+- [x] Included incident response protocol
+- [x] Referenced FOREVER CONTRACT §8 (No Production Seeding)# ✅ Completion Criteria for Phase 1.1
 This phase is complete only when:
 - [ ] Gate 1: Missing test coverage added and passing
 - [ ] Gate 2: Script runs successfully and produces markdown report
@@ -198,3 +197,25 @@ When ready to proceed:
 - `"Implement Gate 3: Create snapshot workflow doc"`
 
 We proceed one clean gate at a time.
+
+
+---
+
+## ✅ Phase 1.1 Progress Update (January 12, 2026)
+
+### Empty-Data Fix COMPLETE
+- [x] Added denominators to SQL queries (totalRequests)
+- [x] Added HAVING clauses to filter empty periods  
+- [x] Implemented denominator checks in markdown builder
+- [x] Show "N/A" when denominator is 0 (no false flags)
+- [x] Added canonical helper functions: `toRate()`, `flagLowRate()`, `flagHighRate()`
+- [x] No-data banner shows when no AI Tennis proposals found
+- [x] Cache hit rate: N/A with "—" flag (not 0% with 🚨)
+- [x] Approval rate: N/A with "—" flag (not 0% with 🚨)
+- [x] Stale takeover rate: N/A with "—" flag
+
+### Next: Real Workflow Test
+- [ ] Run 1 real copy refine request on staging
+- [ ] Verify ActionRequest created with rawInbound.aiTennis metadata
+- [ ] Re-run weekly report and confirm metrics populate correctly
+- [ ] Commit final checkpoint with all Phase 1.1 gates complete
