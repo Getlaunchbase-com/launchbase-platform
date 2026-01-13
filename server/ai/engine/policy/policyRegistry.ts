@@ -26,17 +26,38 @@ const registry = new Map<string, PolicyV1>();
  * This avoids runtime FS reads and keeps determinism in serverless envs.
  * 
  * @param policies Array of unknown policy objects (will be validated)
+ * @param opts Options for registration behavior
+ * @param opts.strict If true, throw on first invalid policy (default: false)
  */
-export function registerPolicies(policies: unknown[]): void {
+export function registerPolicies(policies: unknown[], opts?: { strict?: boolean }): void {
+  const strict = opts?.strict ?? false;
+  
   for (const raw of policies) {
     const parsed = PolicyV1Schema.safeParse(raw);
     if (!parsed.success) {
-      // Invalid policies won't be registered (silent skip)
+      if (strict) {
+        // Strict mode: throw on first invalid policy
+        throw new Error(`[PolicyRegistry] Policy validation failed: ${parsed.error.message}`);
+      }
+      // Default: skip invalid policies (robust boot)
       console.warn(`[PolicyRegistry] Skipping invalid policy:`, parsed.error.issues);
       continue;
     }
     registry.set(parsed.data.policyId, parsed.data);
   }
+}
+
+// ============================================
+// INTROSPECTION (TEST-ONLY)
+// ============================================
+
+/**
+ * Get all registered policy IDs (test-only introspection)
+ * 
+ * @returns Array of registered policy IDs (sorted)
+ */
+export function _getRegisteredPolicyIds(): string[] {
+  return Array.from(registry.keys()).sort();
 }
 
 // ============================================

@@ -799,3 +799,70 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - **LaunchBase Portal** renders single "final proposal" artifact
 - **AI Butler** renders side-by-side artifacts per specialist, or provider comparisons
 - Same engine, different presentation. No rewrite.
+
+
+---
+
+### Gate 4: Showrooms Repository ✅ COMPLETE
+
+**Goal:** Create training and regression harness for AI Swarm Protocol
+
+**Completed:** January 13, 2026  
+**Repository:** https://github.com/Getlaunchbase-com/launchbase-showrooms  
+**Commit:** a843d23
+
+**Tasks:**
+- [x] Create repository structure (4 showrooms, protocols, tools)
+- [x] Document LaunchBase showroom (SHOWROOM_BRIEF, SUCCESS_CRITERIA, BASELINE_COST, CHANGELOG)
+- [x] Create placeholder files for site_gpt, site_manus, site_4
+- [x] Write SWARM_PROTOCOL_V1.md
+- [x] Write REVIEW_CHECKLIST.md
+- [x] Write measure_cost.md methodology
+- [x] Initialize git repo and commit
+- [x] Push to GitHub (Getlaunchbase-com/launchbase-showrooms)
+
+**Definition of Done:**
+- [x] All 4 sites in repo
+- [x] Each has brief + success criteria (LaunchBase complete, others placeholders)
+- [x] Protocols documented
+- [x] Cost measurement methodology defined
+- [x] Version control established
+
+---
+
+### Gate 2: Specialist Intelligence (IN PROGRESS)
+
+**Goal:** Replace memory transport with real provider calls for specialists
+
+**Tasks:**
+- [ ] Update swarmRunner.ts to call real providers:
+  - Craft specialist: real AIML provider call (cheaper model)
+  - Critic specialist: real AIML provider call (cheaper model with strict schema)
+  - Field General: deterministic orchestration (no provider call yet)
+- [ ] Implement cost accounting:
+  - Track tokens and USD per specialist
+  - Sum costs across all specialists
+  - Enforce policy cost cap (stop if exceeded)
+- [ ] Implement failure isolation:
+  - Specialist failure → controlled collapse (no throw)
+  - Return stopReason: "provider_failed" with partial artifacts
+  - Log failure details in internal metadata
+- [ ] Add Gate 2 tripwire tests:
+  - [ ] Craft specialist fails → controlled collapse
+  - [ ] Critic specialist fails → controlled collapse
+  - [ ] Cost cap hit → policy_rejected or cost_cap_exceeded
+  - [ ] Schema validation failure → controlled collapse
+  - [ ] Successful run → cost accounting accurate
+
+**Hard Invariants:**
+- Artifact order frozen (plan → craft → critic → collapse)
+- Only collapse is customerSafe=true
+- Idempotency keyHash unchanged
+- stopReason always present
+
+**Definition of Done:**
+- [ ] 2 specialists call real provider (AIML)
+- [ ] Cost accounting sums across specialist calls
+- [ ] Cost cap stops further calls and collapses safely
+- [ ] Specialist failure → controlled collapse (no throw, no leaked error)
+- [ ] New tripwire tests passing (5 tests)
