@@ -96,14 +96,16 @@ const QUERIES = {
     SELECT
       tenant,
       ROUND(
-        SUM(CASE WHEN status IN ('applied','confirmed','locked') THEN 1 ELSE 0 END) * 100.0 / COUNT(*),
+        SUM(CASE WHEN status IN ('applied','confirmed','locked') THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0),
         1
       ) AS rate7Pct,
       0 AS rate30Pct,
-      0 AS wowDeltaPp
+      0 AS wowDeltaPp,
+      COUNT(*) AS totalRequests
     FROM ai_proposals
     WHERE created_at >= NOW() - INTERVAL 7 DAY
     GROUP BY tenant
+    HAVING COUNT(*) > 0
     ORDER BY rate7Pct DESC
   `,
 
@@ -113,13 +115,15 @@ const QUERIES = {
     SELECT
       tenant,
       ROUND(
-        SUM(CASE WHEN stop_reason = 'cached' THEN 1 ELSE 0 END) * 100.0 / COUNT(*),
+        SUM(CASE WHEN stop_reason = 'cached' THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0),
         1
       ) AS hit7Pct,
-      0 AS hit30Pct
+      0 AS hit30Pct,
+      COUNT(*) AS totalRequests
     FROM ai_proposals
     WHERE created_at >= NOW() - INTERVAL 7 DAY
     GROUP BY tenant
+    HAVING COUNT(*) > 0
     ORDER BY hit7Pct DESC
   `,
 
@@ -129,13 +133,15 @@ const QUERIES = {
     SELECT
       tenant,
       ROUND(
-        SUM(CASE WHEN stop_reason = 'stale_takeover' THEN 1 ELSE 0 END) * 100.0 / COUNT(*),
+        SUM(CASE WHEN stop_reason = 'stale_takeover' THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0),
         1
       ) AS rate7Pct,
-      0 AS rate30Pct
+      0 AS rate30Pct,
+      COUNT(*) AS totalRequests
     FROM ai_proposals
     WHERE created_at >= NOW() - INTERVAL 7 DAY
     GROUP BY tenant
+    HAVING COUNT(*) > 0
     ORDER BY rate7Pct DESC
   `,
 };
