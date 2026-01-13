@@ -338,9 +338,19 @@ export async function runEngine(order: AiWorkOrderV1): Promise<AiWorkResultV1> {
   // For now, always execute (no cache)
 
   // Step 7: Execute according to policy
-  // TODO Phase 2.3: Route to single model or swarm based on policy
-  // For now, return stubbed result
+  // Route to swarm or single-pass execution
+  if (policy.swarm?.enabled === true) {
+    // Swarm execution (Phase 2.3 Gate 1)
+    const { runSwarmV1 } = await import("./swarmRunner");
+    return runSwarmV1(order, policy, {
+      traceId,
+      tenant: order.tenant,
+      scope: order.scope,
+    });
+  }
 
+  // Single-pass execution (stub for now)
+  // TODO Phase 2.4+: Implement single model execution
   return {
     version: "v1",
     status: "in_progress",
