@@ -92,31 +92,45 @@
 
 ---
 
-### PR 2: Real Workflow Test in Staging
+### PR 2: Real Workflow Test in Staging ⛔ BLOCKED
 
 **Goal:** Produce one real AI Tennis proposal end-to-end and confirm it shows up in the weekly report
 
+**Status:** ⛔ **BLOCKED** - Model router cannot find eligible models for `task=json`
+
+**Blocker Details:**
+- Error: "No eligible models for task=json constraints={type:text, requiredFeatures:[json_schema,structured_outputs], minContextLength:16000, preferPinned:true}"
+- Root cause: ModelRegistry either hasn't loaded models from AIML, or loaded models don't have required features, or `preferPinned:true` is too restrictive
+- Required fix: Verify AIML_API_KEY, check ModelRegistry refresh logic, verify AIML API returns models with required features
+
 **Tasks:**
-- [ ] Create `docs/REAL_WORKFLOW_TEST.md` with:
-  - Exact steps to trigger `actionRequests.aiProposeCopy`
-  - Expected DB fields: `rawInbound.source="ai_tennis"`, `rawInbound.aiTennis.*`
-  - "What good looks like" (denominators > 0, flags behave, WoW shows real numbers)
-- [ ] In staging (or dev snapshot), run one real AI Tennis workflow:
-  - Trigger `actionRequests.aiProposeCopy` with real-ish prompt
+- [x] Create `docs/REAL_WORKFLOW_TEST.md` with:
+  - Pre-flight checklist (env vars, existing intake, model availability)
+  - Step-by-step workflow (find intake, trigger AI Tennis, verify DB, run report)
+  - Expected DB fields: `rawInbound.source="ai_tennis"`, `rawInbound.aiTennis.*`, `rawInbound.proposal.*`
+  - "What good looks like" (non-N/A metrics, sample report sections)
+  - Troubleshooting guide (needsHuman, model routing, N/A persistence)
+  - Definition of Done checklist
+- [ ] **FIX BLOCKER:** Debug model router and AIML provider configuration
+- [ ] In staging (or dev), run one real AI Tennis workflow:
+  - Use existing intake (do NOT create new one)
+  - Trigger `aiTennisCopyRefine` with AIML provider (NOT memory)
+  - Verify `success: true` and `actionRequestId` returned
   - Verify new ActionRequest created
-  - Verify `rawInbound.aiTennis` has all required fields (traceId, jobId, rounds, models, requestIds, usage, costUsd, stopReason, needsHuman, confidence)
+  - Verify `rawInbound.aiTennis` has all required fields
   - Verify `rawInbound.proposal` includes rationale/confidence/risks/assumptions
 - [ ] Re-run weekly report and confirm:
   - Denominators > 0
   - Flags behave as expected (no false alarms)
   - WoW delta shows real numbers (not N/A)
-- [ ] Commit generated report from staging (or paste output) + "first datapoint verified" note
+- [ ] Commit generated report from staging + "first datapoint verified" note
 
 **Definition of Done:**
-- Workflow test doc committed
-- Real AI Tennis proposal created in staging
-- Weekly report shows non-N/A metrics
-- Report committed with verification note
+- ✅ Workflow test doc committed (`docs/REAL_WORKFLOW_TEST.md`)
+- ⛔ Model router fixed (AIML provider can route to eligible models)
+- ⚠️ Real AI Tennis proposal created in staging
+- ⚠️ Weekly report shows non-N/A metrics
+- ⚠️ Report committed with verification note
 
 ---
 
