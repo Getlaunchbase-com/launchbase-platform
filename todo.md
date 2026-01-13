@@ -346,3 +346,39 @@ When ready to proceed:
 - `"Implement PR 3: Cost-per-Approval WoW Delta"`
 
 We proceed one clean PR at a time.
+
+## Phase 1.3: Realistic Prompt Testing & Weekly Report Validation
+
+**Gate A: Run 5 Realistic Prompts (Success-Path Testing)** ✅ COMPLETE
+- [x] Prompt 1: Specific rewrite + constraints → ESCALATED (vague terms)
+- [x] Prompt 2: Value prop with audience + outcome → SUCCESS (confidence: 0.9)
+- [x] Prompt 3: Compare/contrast → ESCALATED (unverified claims)
+- [x] Prompt 4: High specificity + structure → SUCCESS (confidence: 0.85)
+- [x] Prompt 5: Tight directive → ESCALATED (unverified "26/26 tests" claim)
+- [x] Result: 2/5 succeeded (target: ≥2) ✅ PASS
+- [x] Total cost: $0.34, Total time: 71s
+
+**Gate B: Verify Success Outcomes (Definition of Done)**
+- [ ] At least 2/5 prompts succeed with:
+  - `needsHuman: false`
+  - `stopReason: "ok"`
+  - `roundsRun >= 1`
+  - `createdActionRequestIds.length >= 1`
+  - `rawInbound.aiTennis.costUsd` populated
+  - `rawInbound.proposal.*` populated (targetKey, value, rationale, confidence, risks, assumptions)
+
+**Gate C: Weekly Report Validation** ✅ COMPLETE
+- [x] Run weekly report script
+- [x] Confirm non-N/A metrics for:
+  - stopReason distribution (3 records, 100% "ok")
+  - needsHuman rate (0.0%, denominator: 3)
+  - cost per approval ($0.156 avg)
+  - cache hit rate (0.0% - expected for service-only)
+  - stale takeover rate (0.0%)
+- [x] Report artifact saved: `reports/ai_weekly_2026-01-12.md`
+- [x] All metrics showing real data (no N/A except WoW deltas)
+
+**Bonus: Idempotency Proof**
+- [ ] Pick best successful prompt and call twice with identical inputs
+- [ ] Verify second call returns cached result
+- [ ] Verify weekly report shows cache hit numerator/denominator > 0

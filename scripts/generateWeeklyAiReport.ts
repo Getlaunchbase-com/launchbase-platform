@@ -18,6 +18,34 @@ import { format } from "date-fns";
 import { getDb } from "../server/db";
 import { buildMarkdown } from "./_weeklyAiReportMarkdown";
 
+type AnyRow = Record<string, any>;
+
+/**
+ * Unwrap driver-specific result formats to plain rows array.
+ * Handles: [rows, fields], { rows }, already-rows, non-select packets.
+ */
+function unwrapRows(result: any): AnyRow[] {
+  if (!result) return [];
+
+  // mysql2 / some drivers: [rows, fields]
+  if (Array.isArray(result)) {
+    const first = result[0];
+    if (Array.isArray(first)) return first as AnyRow[];
+    if (first && typeof first === "object" && Array.isArray((first as any).rows)) return (first as any).rows;
+    // If it's already rows (rare)
+    if (first && typeof first === "object" && !("affectedRows" in first)) return result as AnyRow[];
+    return [];
+  }
+
+  // drizzle sometimes: { rows: [...] }
+  if (typeof result === "object" && Array.isArray((result as any).rows)) {
+    return (result as any).rows as AnyRow[];
+  }
+
+  // mysql2 "OkPacket" etc — not a rowset
+  return [];
+}
+
 // ============================================
 // CANONICAL SQL QUERIES (from AI_METRICS_QUERIES.md)
 // ============================================
@@ -209,7 +237,9 @@ async function main() {
     for (const [name, sql] of Object.entries(QUERIES)) {
       console.log(`[Weekly Report] Running query: ${name}...`);
       const result = await db.execute(sql);
-      results[name] = result;
+      const rows = unwrapRows(result);
+      console.log(`[Weekly Report] ${name}: ${rows.length} rows`);
+      results[name] = rows;
     }
   } catch (error: any) {
     console.error("❌ [Weekly Report] Query execution failed:", error.message);
