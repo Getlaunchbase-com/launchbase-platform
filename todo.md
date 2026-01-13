@@ -442,3 +442,79 @@ We proceed one clean PR at a time.
 - ✅ Micro-tests passing (regression protection)
 - ✅ Phase 1 declared COMPLETE
 - ✅ Ready for Phase 2 (Swarm Premium)
+
+
+---
+
+## 🚀 PHASE 2.0: ENGINE INTERFACE V1 (IN PROGRESS)
+
+**Goal:** Establish stable contract layer that enables future app skins without rewrites  
+**Mode:** Engine/skin separation, policy-as-config, audit-ready
+
+### Phase 2.1: Engine Interface V1
+
+**Goal:** Create the "Ferrari chassis" — stable interface for all future skins (LaunchBase, AI Butler, etc.)
+
+**Tasks:**
+- [x] Create `docs/ENGINE_INTERFACE_V1.md` with:
+  - Purpose + non-goals (engine vs skin separation)
+  - AiWorkOrderV1 contract (intent, inputs, constraints, policy, trace)
+  - AiWorkResultV1 contract (customer-safe + internal meta split)
+  - StopReason semantics (FOREVER CONTRACT-aligned)
+  - Redaction & security rules (no prompts, hashes only)
+  - Change policy (patch/minor/major versioning)
+- [x] Create `server/ai/engine/types.ts` with:
+  - EngineIntent type (copy_refine, landing_page_section, ad_set, etc.)
+  - PresentationMode type (single_best, side_by_side, diff_view)
+  - ProviderPreference type (provider hints, policy can override)
+  - EngineTrace type (tenant, jobId, requestId, intakeId, actor)
+  - EngineConstraints type (maxRounds, costCapUsd, maxTokensTotal, strictMode, timeCapMs)
+  - EnginePolicyRef type (policyId, policyVersion)
+  - EngineInputs type (userText, targetSection, currentCopy, context, assets)
+  - AiWorkOrderV1 type (complete work order contract)
+  - StopReason type (reuse from Phase 1, no new vocabulary)
+  - CustomerSafeResult type (ok, stopReason, needsHuman, confidence, output, traceId, cached)
+  - InternalMeta type (workOrderHash, userTextHash, policyId, roundsRun, usage, swarm, redactionsApplied)
+  - AiWorkResultV1 type (customer + internal split)
+- [x] Create `server/ai/engine/runEngine.ts` skeleton:
+  - Validate order.schemaVersion === "v1"
+  - Check policy existence (hard fail if not registered)
+  - Derive idempotency key (hash, never store raw userText)
+  - Return stubbed AiWorkResultV1 (no execution yet)
+- [x] Create checkpoint: Phase 2.1 complete
+
+**Definition of Done:**
+- [x] ENGINE_INTERFACE_V1.md committed (source of truth)
+- [x] TypeScript types exist and compile
+- [x] runEngine() skeleton validates inputs
+- [x] 8/8 contract tripwire tests passing
+- [x] Deep normalize() with no key collisions
+- [x] Validation/policy split (policy resolution after validation)
+- [x] No behavior change to Phase 1 (zero risk)
+- [ ] Checkpoint saved
+
+---
+
+### Phase 2.2: Policy Registry (NEXT)
+
+**Goal:** Policy-as-config system (no branching code, just tier configs)
+
+**Tasks:**
+- [ ] Create `server/ai/policies/types.ts` with PolicyConfig type
+- [ ] Create `server/ai/policies/registry.ts` with POLICY_REGISTRY
+- [ ] Implement 2 initial policies:
+  - `launchbase_standard` (single model, basic constraints)
+  - `launchbase_swarm_premium` (Field General + specialists, higher caps)
+- [ ] Each policy defines:
+  - Allowed capabilities (structured_output, json_schema, etc.)
+  - Cost caps & retry rules
+  - Swarm depth (# of specialists)
+  - Approval rules & escalation thresholds
+- [ ] Update runEngine() to load and apply policy
+- [ ] Create checkpoint: Phase 2.2 complete
+
+**Definition of Done:**
+- [ ] Policy registry exists with 2 working policies
+- [ ] runEngine() applies policy constraints
+- [ ] No hard-coded tier logic (all config-driven)
+- [ ] Checkpoint saved
