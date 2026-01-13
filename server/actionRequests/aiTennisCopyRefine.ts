@@ -65,6 +65,42 @@ export type AiCopyRefineResult =
     };
 
 // ============================================
+// HELPERS
+// ============================================
+
+/**
+ * Extract a single selected proposal from either shape:
+ * - DecisionCollapse: { selectedProposal: {...} }
+ * - CopyProposal: { variants: [{...}] }
+ * 
+ * @param proposal - Raw proposal object from AI Tennis
+ * @returns Selected proposal object or null if not found
+ */
+export function extractSelectedProposal(proposal: any): any | null {
+  return (
+    proposal?.selectedProposal ??
+    proposal?.variants?.[0] ??
+    null
+  );
+}
+
+/**
+ * Validate that a selected proposal has required fields.
+ * Be strict about presence; allow falsy-but-valid values.
+ * 
+ * @param selected - Selected proposal object
+ * @returns true if valid, false otherwise
+ */
+export function validateSelectedProposal(selected: any): boolean {
+  if (!selected) return false;
+  
+  const hasTargetKey = typeof selected.targetKey === "string" && selected.targetKey.trim().length > 0;
+  const hasValue = selected.value !== undefined && selected.value !== null;
+  
+  return hasTargetKey && hasValue;
+}
+
+// ============================================
 // SERVICE
 // ============================================
 
@@ -133,15 +169,9 @@ export async function aiTennisCopyRefine(
     };
   }
 
-  // Step 2: Extract a single selected proposal from either shape:
-  // - DecisionCollapse: { selectedProposal: {...} }
-  // - CopyProposal: { variants: [{...}] }
+  // Step 2: Extract and validate selected proposal
   const proposal = aiResult.proposal as any;
-
-  const selected =
-    proposal?.selectedProposal ??
-    proposal?.variants?.[0] ??
-    null;
+  const selected = extractSelectedProposal(proposal);
 
   if (!selected) {
     return {
@@ -157,12 +187,7 @@ export async function aiTennisCopyRefine(
     };
   }
 
-  // Validate required fields. Be strict about presence; allow falsy-but-valid values.
-  // (e.g. value could be "" or 0 depending on schema; only reject null/undefined)
-  const hasTargetKey = typeof selected.targetKey === "string" && selected.targetKey.trim().length > 0;
-  const hasValue = selected.value !== undefined && selected.value !== null;
-
-  if (!hasTargetKey || !hasValue) {
+  if (!validateSelectedProposal(selected)) {
     return {
       success: false,
       stopReason: "invalid_selected_proposal",
