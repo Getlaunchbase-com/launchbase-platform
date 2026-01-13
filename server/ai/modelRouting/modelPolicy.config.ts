@@ -31,8 +31,8 @@ export const MODEL_POLICIES: TaskPolicy[] = [
     preferredModelIds: ["gpt-*-latest", "gpt-4.1*", "gpt-4o-mini*"],
     constraints: {
       type: "chat-completion",
-      // AIML uses "openai/chat-completion.response-format" for JSON mode
-      requiredFeatures: ["openai/chat-completion.response-format"],
+      // Use internal capability name; featureAliases.ts maps to vendor strings
+      requiredFeatures: ["json_schema"],
       minContextLength: 16000,
       preferPinned: false, // AIML doesn't expose pinned status, disable filter
     },

@@ -131,7 +131,7 @@ export async function aiTennisCopyRefine(
     );
   } catch (error) {
     // Never log error details (could contain prompts/provider errors)
-    console.log('[aiTennisCopyRefine] CAUGHT ERROR:', error instanceof Error ? error.message : 'unknown');
+    // Error caught during AI Tennis execution
     return {
       success: false,
       stopReason: "ai_tennis_failed",
@@ -140,11 +140,8 @@ export async function aiTennisCopyRefine(
     };
   }
 
-  console.log('[aiTennisCopyRefine] aiResult:', JSON.stringify(aiResult, null, 2));
-
-  // Check needsHuman FIRST before checking proposal (needsHuman path has no proposal)
+  // Check if AI escalated to needsHuman
   if (aiResult.needsHuman) {
-    console.log('[aiTennisCopyRefine] aiResult.needsHuman is TRUE');
     return {
       success: false,
       stopReason: "needs_human",
