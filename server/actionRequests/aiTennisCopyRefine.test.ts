@@ -24,12 +24,75 @@ describe("aiTennisCopyRefine", () => {
   });
 
   it("creates ActionRequest from decision_collapse.selectedProposal", async () => {
+    // Seed all three phases for complete AI Tennis flow
+    // Use wildcard jobId (any string works with wildcard matching)
+    const testJobId = "*";
+    
+    // Phase 1: copy_proposal (round 0 - generate)
+    const copyProposal = {
+      schemaVersion: "v1",
+      variants: [
+        {
+          targetKey: "hero.headline",
+          value: "Transform Your Business with AI",
+          rationale: "Clear value proposition",
+          confidence: 0.9,
+          risks: [],
+        },
+      ],
+      requiresApproval: true,
+      confidence: 0.9,
+      risks: [],
+      assumptions: [],
+    };
+    seedMemoryTraceResponse("copy_proposal", "router", testJobId, 0, JSON.stringify(copyProposal));
+
+    // Phase 2: critique (round 1)
+    const critique = {
+      schemaVersion: "v1",
+      pass: true,
+      issues: [],
+      suggestedFixes: [],
+      confidence: 0.9,
+      requiresApproval: true,
+      evaluationCriteria: {
+        clarity: 0.9,
+        trust: 0.85,
+        scanability: 0.88,
+        mobileFold: 0.9,
+        sectionContractCompliance: 0.9,
+      },
+    };
+    seedMemoryTraceResponse("critique", "router", testJobId, 1, JSON.stringify(critique));
+
+    // Phase 3: decision_collapse (round 1)
+    const decisionCollapse = {
+      schemaVersion: "v1",
+      selectedProposal: {
+        type: "copy" as const,
+        targetKey: "hero.headline" as const,
+        value: "Transform Your Business with AI",
+      },
+      reason: "Approved after review",
+      approvalText: "This looks good",
+      previewRecommended: false,
+      needsHuman: false,
+      confidence: 0.9,
+      requiresApproval: true,
+      roundLimit: 2,
+      costCapUsd: 10,
+    };
+    seedMemoryTraceResponse("decision_collapse", "router", testJobId, 1, JSON.stringify(decisionCollapse));
+
     const result = await aiTennisCopyRefine(
       {
         tenant: "launchbase",
         intakeId: 1,
         userText: "Rewrite my homepage headline to be more compelling",
         targetSection: "hero",
+        constraints: {
+          maxRounds: 1, // Clamp to 1 to guarantee only round 0 + round 1
+        },
       },
       "memory"
     );
@@ -66,7 +129,59 @@ describe("aiTennisCopyRefine", () => {
   });
 
   it("handles needsHuman path with structured failure", async () => {
-    // Seed a needsHuman decision_collapse response using trace-based key
+    // Seed all three phases with needsHuman decision_collapse
+    const testJobId = "*";
+    
+    // Phase 1: copy_proposal (round 0 - generate)
+    const copyProposal = {
+      schemaVersion: "v1",
+      variants: [
+        {
+          targetKey: "hero.headline",
+          value: "Complex Headline Needs Review",
+          rationale: "Uncertain",
+          confidence: 0.5,
+          risks: ["Low confidence"],
+        },
+      ],
+      requiresApproval: true,
+      confidence: 0.5,
+      risks: ["Low confidence"],
+      assumptions: [],
+    };
+    seedMemoryTraceResponse("copy_proposal", "router", testJobId, 0, JSON.stringify(copyProposal));
+
+    // Phase 2: critique (round 1)
+    const critique = {
+      schemaVersion: "v1",
+      pass: false,
+      issues: [
+        {
+          severity: "major" as const,
+          description: "Low confidence in proposal",
+          affectedKey: "hero.headline",
+        },
+      ],
+      suggestedFixes: [
+        {
+          targetKey: "hero.headline",
+          fix: "Needs human review",
+          rationale: "Uncertain proposal quality",
+        },
+      ],
+      confidence: 0.5,
+      requiresApproval: true,
+      evaluationCriteria: {
+        clarity: 0.5,
+        trust: 0.5,
+        scanability: 0.5,
+        mobileFold: 0.5,
+        sectionContractCompliance: 0.5,
+      },
+    };
+    seedMemoryTraceResponse("critique", "router", testJobId, 1, JSON.stringify(critique));
+
+    // Phase 3: decision_collapse with needsHuman=true
     const needsHumanCollapse = {
       schemaVersion: "v1",
       selectedProposal: null,
@@ -74,16 +189,13 @@ describe("aiTennisCopyRefine", () => {
       approvalText: "Please review before applying.",
       previewRecommended: true,
       needsHuman: true,
+      needsHumanReason: "Low confidence in proposal quality",
       confidence: 0.4,
       requiresApproval: true,
       roundLimit: 1,
       costCapUsd: 1,
     };
 
-    // Seed using trace-based key (deterministic, no prompt dependency)
-    // The jobId will be "copy-refine-{timestamp}" but we can't predict the exact timestamp
-    // So we'll seed with a pattern that matches the test
-    const testJobId = "copy-refine-test-needshuman";
     seedMemoryTraceResponse("decision_collapse", "router", testJobId, 1, JSON.stringify(needsHumanCollapse));
 
     const result = await aiTennisCopyRefine(
@@ -93,7 +205,7 @@ describe("aiTennisCopyRefine", () => {
         userText: "Complex request requiring human review",
         constraints: {
           maxRounds: 1,
-          costCapUsd: 0.0001,
+          // No costCapUsd - memory provider has zero cost
         },
       },
       "memory"
