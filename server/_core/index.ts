@@ -41,6 +41,19 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
  * Start the HTTP server
  */
 async function startServer() {
+  // Initialize policy registry before starting server
+  if (process.env.NODE_ENV !== "test") {
+    const { registerPolicies } = await import("../ai/engine/policy/policyRegistry");
+    const { ALL_POLICIES } = await import("../ai/engine/policy/policyBundle");
+    try {
+      registerPolicies(ALL_POLICIES);
+      console.log(`[PolicyRegistry] Registered ${ALL_POLICIES.length} policies`);
+    } catch (err) {
+      console.error("[PolicyRegistry] Failed to register policies:", err);
+      console.warn("[PolicyRegistry] Server will start but engine may not work correctly");
+    }
+  }
+
   // Initialize model registry before starting server
   if (process.env.NODE_ENV !== "test") {
     const { initializeModelRegistry, startModelRegistryRefresh } = await import("../ai");

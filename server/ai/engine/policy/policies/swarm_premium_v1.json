@@ -12,8 +12,9 @@
   },
   "swarm": {
     "enabled": true,
-    "maxLoops": 2,
-    "specialists": ["design_web", "copy_marketing", "code_review"]
+    "specialists": ["craft", "critic"],
+    "maxSwirlRounds": 1,
+    "collapseStrategy": "field_general"
   },
   "presentationDefaults": {
     "mode": "single_best",

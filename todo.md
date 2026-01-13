@@ -639,3 +639,163 @@ We proceed one clean PR at a time.
 - [ ] Audit trail split (customer vs internal)
 - [ ] Output only via artifacts[] + stopReason
 - [ ] Checkpoint saved
+
+
+---
+
+## 🚀 PHASE 2.3: MINIMAL SWARM LOOP (IN PROGRESS)
+
+**Goal:** Field General orchestrates 2 specialists (craft + critic) with deterministic collapse and audit artifacts  
+**Mode:** Flow-first implementation with memory transport, then provider wiring
+
+### Gate 0: Bootstrap Policy Registration ✅ COMPLETE
+
+**Goal:** Policies exist in-process before any engine call
+
+**Completed:** January 13, 2026
+
+**Tasks:**
+- [x] Add policy registration at server startup:
+  - Import `registerPolicies` and `ALL_POLICIES`
+  - Call `registerPolicies(ALL_POLICIES)` in server bootstrap
+  - Location: `server/index.ts` or equivalent entry point
+- [x] Create bootstrap tripwire test:
+  - Server boot → `resolvePolicy("launchbase_portal_v1")` works
+  - No FS access (poisoned-FS test remains as invariant)
+
+**Definition of Done:**
+- [x] Server starts with policies loaded
+- [x] No runtime FS reads
+- [x] 4/4 bootstrap tests passing
+
+---
+
+### Gate 1: Swarm Orchestration Skeleton ✅ COMPLETE
+
+**Goal:** Implement flow first, not "smartness" (memory/log transport only)
+
+**Completed:** January 13, 2026  
+**Summary:** Field General orchestration with 4-step swarm flow (plan → craft → critic → collapse). Memory transport only, no provider spend. 7/7 tripwire tests passing.
+
+**Tasks:**
+- [x] Update `runEngine()` swarm path:
+  - After policy resolution, check `policy.swarm?.enabled`
+  - If `false` or undefined → single-pass execution (stub for now)
+  - If `true` → swarm loop v0
+- [x] Implement swarm loop v0 (4 steps):
+  1. Field General "plan" (memory transport returns mock plan)
+  2. Specialist: craft (memory transport returns mock proposal)
+  3. Specialist: critic (memory transport returns mock critique)
+  4. Field General "collapse" (memory transport returns mock decision)
+- [x] Emit artifacts in fixed order:
+  1. `kind: "swarm.plan"` (customerSafe: false)
+  2. `kind: "swarm.specialist.craft"` (customerSafe: false)
+  3. `kind: "swarm.specialist.critic"` (customerSafe: false)
+  4. `kind: "swarm.collapse"` (customerSafe: true)
+- [x] Update `swarm_premium_v1.json` policy:
+  - Add `swarm.enabled: true`
+  - Add `swarm.specialists: ["craft", "critic"]`
+  - Add `swarm.maxSwirlRounds: 1` (v0 hard lock)
+  - Add `swarm.collapseStrategy: "field_general"`
+
+**Hard Rules:**
+- No new tables
+- All non-CORE experimental fields live under `extensions`
+- `stopReason` always present (even "ok")
+- No AIML spend yet (memory transport only)
+
+**Definition of Done:**
+- [x] Swarm runs end-to-end with memory transport
+- [x] Deterministic artifacts (4 kinds, fixed order)
+- [x] No leakage (customerSafe enforced)
+- [x] stopReason always present
+- [x] 7/7 swarm tripwire tests passing
+- [x] runEngine() behavior unchanged for non-swarm policies
+
+**Frozen Invariants (Gate 1):**
+- ✅ Artifact order: plan, craft, critic, collapse (immutable)
+- ✅ Only collapse is customerSafe=true
+- ✅ stopReason always present ("ok" on success)
+- ✅ Idempotency unchanged (same CORE → same keyHash)
+- ✅ Policy toggle controls swarm enable/disable
+
+---
+
+### Gate 2: Swarm Tripwire Tests
+
+**Goal:** Lock in behavior like Phase 1 did
+
+**Required Tests:**
+- [ ] Test 1: Artifact order + kinds frozen
+  - Swarm policy produces exactly 4 artifacts in order
+  - Kinds: swarm.plan, swarm.specialist.craft, swarm.specialist.critic, swarm.collapse
+- [ ] Test 2: Idempotency stability
+  - Same CORE → same keyHash
+  - Different CORE → different keyHash
+- [ ] Test 3: Policy toggles behavior
+  - Non-swarm policy never emits swarm artifacts
+  - Swarm policy always emits swarm artifacts
+- [ ] Test 4: Cost cap enforcement
+  - If estimated cost exceeds cap → stopReason: policy_rejected
+- [ ] Test 5: No leakage
+  - Artifacts marked customerSafe=true never contain forbidden keys/strings
+  - No prompts, no provider payloads, no PII
+
+**Definition of Done:**
+- [ ] 5/5 tripwire tests passing
+- [ ] Tests use memory/log transport (no AIML spend)
+- [ ] Contracts locked (artifact structure frozen)
+
+---
+
+### Gate 3: Provider Wiring
+
+**Goal:** Wire real providers only after contracts frozen
+
+**Tasks:**
+- [ ] Field General model routing:
+  - Use model router to select structured output model
+  - Apply policy caps (costCapUsd, maxRounds)
+- [ ] Specialist model routing:
+  - Use cheaper models for specialists
+  - Keep provider preferences in policy config only
+- [ ] Cost accounting:
+  - Track inputTokens, outputTokens, estimatedUsd per specialist
+  - Aggregate costs across swarm loop
+  - Verify cost cap enforcement
+- [ ] Real swarm run:
+  - Execute at least one real swarm workflow
+  - Verify swarm.collapse success
+  - Verify safe artifacts + cost accounting
+
+**Definition of Done:**
+- [ ] At least one real swarm run produces swarm.collapse success
+- [ ] Safe artifacts (no leakage)
+- [ ] Cost accounting accurate
+- [ ] All tripwire tests still passing with real providers
+
+---
+
+### Phase 2.3 Checkpoint
+
+**Tasks:**
+- [ ] Mark all Gate 0-3 tasks complete
+- [ ] Run all tests (contract + policy + swarm)
+- [ ] Create checkpoint: Phase 2.3 complete
+
+**Definition of Done:**
+- [ ] Server bootstraps policies at startup
+- [ ] Swarm orchestration works (memory + real providers)
+- [ ] 5/5 swarm tripwire tests passing
+- [ ] Cost accounting accurate
+- [ ] No leakage (customerSafe enforced)
+- [ ] Checkpoint saved
+
+---
+
+**Why This Prevents Future Overhaul:**
+
+Engine output becomes "artifacts + final result" regardless of UI skin:
+- **LaunchBase Portal** renders single "final proposal" artifact
+- **AI Butler** renders side-by-side artifacts per specialist, or provider comparisons
+- Same engine, different presentation. No rewrite.
