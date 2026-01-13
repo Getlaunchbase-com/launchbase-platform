@@ -909,4 +909,53 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [x] Gate 3 tripwire tests written (6 tests)
 - [x] All tripwire tests passing
 - [x] Frozen layers remain green (44/44 tests)
-- [ ] Checkpoint saved with tag: phase2.3-gate3-stable
+- [x] Checkpoint saved (version: 42ff0603)
+
+
+---
+
+## Phase 2.3 Gate 4: Showroom Runner + Benchmark Runs
+
+**Goal:** Deterministic output packaging, cost telemetry, and filesystem persistence for repeatable benchmark runs
+
+**Tripwires (7 tests, write first):**
+- [x] T1: Stable output envelope (status, stopReason, artifacts always present)
+- [x] T2: Frozen artifact ordering preserved (plan → craft → critic → collapse)
+- [x] T3: Telemetry required (roleCostsUsd, totalCostUsd, roleModels)
+- [x] T4: Cost caps enforced, non-chaotic (per-role + total)
+- [x] T5: Run persistence contract (input.json, output.json, summary.md)
+- [x] T6: No prompt/provider internals leak (no raw prompts, stack traces, system content)
+- [x] T7: Showroom-to-policy mapping deterministic (same keyHash for same inputs)
+
+**Implementation:**
+- [x] Build showroom runner script:
+  - [x] Create WorkOrder from showroom brief
+  - [x] Run engine with policyId: swarm_premium_v1
+  - [x] Output run folder structure: runs/<YYYY-MM-DD>/run_<NN>/
+  - [x] Write input.json, output.json, summary.md
+- [x] Execute 3 coffee shop benchmark runs:
+  - [x] Run A: baseline brief ($0.0182, 10.1s)
+  - [x] Run B: +audience/tone constraints ($0.0203, 12.2s)
+  - [x] Run C: +strict "no claims" constraint ($0.0179, 13.9s)
+  - [x] Log: totalCostUsd, needsHuman, keyHash, output summary
+- [x] Verify frozen layers remain green:
+  - [x] Gate 0 (Bootstrap): 4/4
+  - [x] Gate 1 (Swarm Skeleton): 7/7
+  - [x] Gate 2 (Specialist Intelligence): 8/8
+  - [x] Gate 3 (Cost Accounting): 6/6
+  - [x] Gate 4 (Showroom Runner): 7/7
+
+**Hard Invariants (MUST NOT CHANGE):**
+- Artifact order frozen (plan → craft → critic → collapse)
+- Only collapse is customerSafe=true
+- No new stopReason values
+- No artifact structure changes
+- Gates 0/1/2/3 contracts remain intact
+
+**Definition of Done:**
+- [x] Gate 4 tripwire tests written (7 tests)
+- [x] All tripwire tests passing
+- [x] Showroom runner script complete
+- [x] 3 coffee shop benchmark runs executed
+- [x] Frozen layers remain green (51/51 tests)
+- [ ] Checkpoint saved with benchmark results
