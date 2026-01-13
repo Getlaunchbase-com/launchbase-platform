@@ -93,7 +93,10 @@ export type StopReasonV1 =
   | "rate_limited"
   | "cost_cap_exceeded"
   | "round_cap_exceeded"
-  | "invalid_request";
+  | "invalid_request"
+  | "policy_not_found"
+  | "policy_invalid"
+  | "policy_rejected";
 
 /**
  * Artifact (output payload)

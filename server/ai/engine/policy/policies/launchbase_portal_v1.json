@@ -1,0 +1,23 @@
+{
+  "policyId": "launchbase_portal_v1",
+  "engineVersion": "v1",
+  "caps": {
+    "maxRounds": 2,
+    "costCapUsd": 1.5,
+    "maxTokensTotal": 12000
+  },
+  "routing": {
+    "requiredCaps": ["json_schema", "json_output"]
+  },
+  "swarm": {
+    "enabled": false
+  },
+  "presentationDefaults": {
+    "mode": "customer_portal",
+    "allowUserProviderPreference": false
+  },
+  "logging": {
+    "customerTrailEnabled": true,
+    "internalTrailEnabled": true
+  }
+}

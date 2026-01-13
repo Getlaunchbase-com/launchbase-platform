@@ -1,0 +1,26 @@
+{
+  "policyId": "swarm_premium_v1",
+  "engineVersion": "v1",
+  "caps": {
+    "maxRounds": 3,
+    "costCapUsd": 4.0,
+    "maxTokensTotal": 16000
+  },
+  "routing": {
+    "requiredCaps": ["json_schema", "json_output"],
+    "preferredCaps": ["low_cost"]
+  },
+  "swarm": {
+    "enabled": true,
+    "maxLoops": 2,
+    "specialists": ["design_web", "copy_marketing", "code_review"]
+  },
+  "presentationDefaults": {
+    "mode": "single_best",
+    "allowUserProviderPreference": false
+  },
+  "logging": {
+    "customerTrailEnabled": true,
+    "internalTrailEnabled": true
+  }
+}
