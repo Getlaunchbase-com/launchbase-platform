@@ -8,9 +8,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Link } from "wouter";
-import { useState, useEffect } from "react";
-import { getPrefs, subscribePrefs } from "@/lib/prefs";
-import { heroCopy } from "@/lib/heroCopy";
 
 // Website Preview Component
 function WebsitePreview() {
@@ -63,90 +60,10 @@ function WebsitePreview() {
   );
 }
 
-// Live Context Panel Component (Observability)
-function LiveContextPanel() {
-  const [time, setTime] = useState(new Date());
-  
-  useEffect(() => {
-    const interval = setInterval(() => setTime(new Date()), 60000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="bg-[#151518] border border-white/10 rounded-2xl p-5 font-mono text-sm">
-      <div className="text-gray-500 mb-3 text-xs uppercase tracking-wider">What LaunchBase is doing right now</div>
-      <div className="space-y-2 text-gray-300 mb-4 text-xs">
-        <div className="flex items-center gap-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-[#1ED760]" />
-          <span>Monitoring your service area</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-[#1ED760]" />
-          <span>Deciding whether posting is safe</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-[#1ED760]" />
-          <span>Applying your industry profile</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-yellow-500" />
-          <span>Waiting — intentionally</span>
-        </div>
-      </div>
-      <div className="border-t border-white/10 pt-3">
-        <div className="flex items-center gap-2 text-xs text-gray-400">
-          <Eye className="w-3.5 h-3.5 text-[#FF6A00]" />
-          <span>You can see all of it — in plain language.</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function Home() {
-  const [prefs, setPrefs] = useState(() => getPrefs());
-  
-  useEffect(() => subscribePrefs(() => setPrefs(getPrefs())), []);
-  
-  const { audience, language } = prefs;
-
-  // Get copy from heroCopy map (includes EN, ES, PL)
-  const rawCopy = heroCopy[language]?.[audience] ?? heroCopy.en.biz;
-  
-  // Transform text into JSX with proper formatting
-  const c = {
-    h1: (
-      <>
-        {rawCopy.h1.split("\n").map((line, i) => (
-          i === 0 ? line : (
-            <>
-              <br />
-              <span className="text-[#FF6A00]">{line}</span>
-            </>
-          )
-        ))}
-      </>
-    ),
-    p: (
-      <>
-        {rawCopy.p.split("\n").map((line, i) => (
-          i === 0 ? line : (
-            <>
-              <br />
-              <span className="text-white">{line}</span>
-            </>
-          )
-        ))}
-      </>
-    ),
-    badge: rawCopy.badge,
-    ctaPrimary: rawCopy.ctaPrimary,
-    ctaSecondary: rawCopy.ctaSecondary,
-  };
-
   return (
     <div className="min-h-screen bg-[#0B0B0C] text-white">
-      {/* Hero Section - Reframed around responsibility */}
+      {/* Hero Section */}
       <section className="pt-32 pb-20 px-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#FF6A00]/5 via-transparent to-transparent pointer-events-none" />
         
@@ -159,42 +76,41 @@ export default function Home() {
               </div>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 leading-tight">
-                {c.h1}
+                Stop carrying the system <span className="text-[#FF6A00]">in your head.</span>
               </h1>
               
-              <p className="text-lg md:text-xl text-gray-400 mb-6 leading-relaxed">
-                {c.p}
+              <p className="text-lg md:text-xl text-gray-400 mb-8 leading-relaxed">
+                Your website exists. Your tools work. But no one owns the system.
+                <br />
+                <span className="text-white">LaunchBase takes ongoing responsibility—so you stop thinking about it.</span>
               </p>
               
-              {/* Killer insight - elevated */}
-              <div className="bg-[#FF6A00]/10 border border-[#FF6A00]/30 rounded-xl px-5 py-4 mb-8">
-                <p className="text-[#FF6A00] font-medium flex items-center gap-2">
-                  <Eye className="w-5 h-5" />
-                  {c.badge}
-                </p>
-              </div>
-              
-              {/* Audience Fork - Explicit Choice */}
-              <div className="space-y-4">
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <Link href="/apply?audience=biz">
-                    <Button size="lg" className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white text-lg px-8 py-6 w-full">
-                      <Users className="w-5 h-5 mr-2" />
-                      For Your Business
-                    </Button>
-                  </Link>
-                  <Link href="/apply?audience=org">
-                    <Button size="lg" className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white text-lg px-8 py-6 w-full">
-                      <TrendingUp className="w-5 h-5 mr-2" />
-                      For Your Organization
-                    </Button>
-                  </Link>
-                </div>
-                <Link href="/how-it-works" className="block text-center">
-                  <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/5 text-lg px-8 py-6 w-full sm:w-auto">
-                    {c.ctaSecondary}
+              {/* CTAs */}
+              <div className="space-y-4 mb-6">
+                <Link href="/apply">
+                  <Button size="lg" className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white text-lg px-8 py-6 w-full sm:w-auto">
+                    Hand It Off
+                    <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
                 </Link>
+                <Link href="/how-it-works" className="block sm:inline-block sm:ml-4">
+                  <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/5 text-lg px-8 py-6 w-full sm:w-auto">
+                    See how it works
+                  </Button>
+                </Link>
+              </div>
+              
+              {/* Trust line */}
+              <p className="text-sm text-gray-500 mb-4">
+                See your real site before you pay. Cancel anytime.
+              </p>
+              
+              {/* Micro-proof chips */}
+              <div className="flex flex-wrap gap-2 text-xs text-gray-400">
+                <span className="bg-white/5 px-3 py-1.5 rounded-full">Monitoring</span>
+                <span className="bg-white/5 px-3 py-1.5 rounded-full">Safety gating</span>
+                <span className="bg-white/5 px-3 py-1.5 rounded-full">Approval-first changes</span>
+                <span className="bg-white/5 px-3 py-1.5 rounded-full">Full activity log</span>
               </div>
             </div>
             
@@ -205,7 +121,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* The Real Problem - Lack of Responsibility */}
+      {/* The Problem */}
       <section className="py-20 px-4 border-b border-white/5">
         <div className="container max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
@@ -215,56 +131,68 @@ export default function Home() {
           <p className="text-gray-400 text-lg mb-8 max-w-2xl mx-auto">
             You have a website. You have tools. You have logins.
             <br />
-            But you're still the one checking if everything's okay.
+            But you're still the one quietly checking if everything's okay.
           </p>
           
           <div className="bg-white/5 border border-white/10 rounded-xl p-6 max-w-xl mx-auto">
-            <p className="text-gray-300 text-lg mb-4">
-              That background anxiety — <span className="text-white">"Am I missing something?"</span> — never goes away.
+            <p className="text-gray-300 text-lg mb-2">
+              That background anxiety—<span className="text-white">"Am I missing something?"</span>—doesn't go away…
             </p>
             <p className="text-[#FF6A00] font-medium">
-              Until someone else takes responsibility.
+              until someone else takes responsibility.
             </p>
           </div>
         </div>
       </section>
 
-      {/* What Disappears From Your Life */}
+      {/* What Stops Being Your Job */}
       <section className="py-20 px-4 border-b border-white/5 bg-white/[0.02]">
         <div className="container max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              What stops being your job.
-            </h2>
-            
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
               LaunchBase doesn't add features. It removes mental load.
-            </p>
+            </h2>
           </div>
           
           <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto mb-8">
             <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-              <p className="text-gray-500 text-sm mb-2 line-through">You used to think about:</p>
-              <ul className="space-y-2 text-gray-400">
+              <p className="text-gray-500 text-sm mb-4 font-medium">You used to think about:</p>
+              <ul className="space-y-3 text-gray-400">
                 <li>"Is my site still up?"</li>
-                <li>"Should I post something today?"</li>
                 <li>"Did that form actually send?"</li>
-                <li>"Is my SSL certificate expiring?"</li>
+                <li>"Should I post something today?"</li>
+                <li>"Is my SSL expiring?"</li>
+                <li>"Did that update break something?"</li>
               </ul>
             </div>
             <div className="bg-[#FF6A00]/5 border border-[#FF6A00]/20 rounded-xl p-6">
-              <p className="text-[#FF6A00] text-sm mb-2">Now you don't:</p>
-              <ul className="space-y-2 text-gray-300">
-                <li>LaunchBase monitors it.</li>
-                <li>LaunchBase decides when it's safe.</li>
-                <li>LaunchBase logs every action.</li>
-                <li>LaunchBase handles it.</li>
+              <p className="text-[#FF6A00] text-sm mb-4 font-medium">Now you don't:</p>
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-[#FF6A00] shrink-0 mt-0.5" />
+                  <span>LaunchBase monitors it.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-[#FF6A00] shrink-0 mt-0.5" />
+                  <span>LaunchBase decides when it's safe.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-[#FF6A00] shrink-0 mt-0.5" />
+                  <span>LaunchBase logs every action.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-[#FF6A00] shrink-0 mt-0.5" />
+                  <span>LaunchBase can pause instead of guessing.</span>
+                </li>
               </ul>
             </div>
           </div>
           
-          <p className="text-center text-gray-500 text-lg">
+          <p className="text-center text-lg text-gray-300 mb-4">
             You retain visibility. You lose the burden.
+          </p>
+          <p className="text-center text-white font-medium">
+            Non-action is always safe. Change is reversible.
           </p>
         </div>
       </section>
@@ -274,277 +202,216 @@ export default function Home() {
         <div className="container max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Here's exactly what happens.
+              Here's exactly what happens. No mystery. No surprises.
             </h2>
-            <p className="text-gray-400 text-lg">
-              No mystery. No surprises.
+          </div>
+          
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div className="text-center">
+              <div className="w-12 h-12 bg-[#FF6A00]/10 border border-[#FF6A00]/30 rounded-full flex items-center justify-center text-[#FF6A00] font-bold text-xl mx-auto mb-4">
+                1
+              </div>
+              <h3 className="font-bold text-lg mb-2">Tell us about your business</h3>
+              <p className="text-gray-400 text-sm">5 minutes. English, Spanish, or Polish.</p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-12 h-12 bg-[#FF6A00]/10 border border-[#FF6A00]/30 rounded-full flex items-center justify-center text-[#FF6A00] font-bold text-xl mx-auto mb-4">
+                2
+              </div>
+              <h3 className="font-bold text-lg mb-2">Review your real site</h3>
+              <p className="text-gray-400 text-sm">Not a mockup. Your actual website.</p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-12 h-12 bg-[#FF6A00]/10 border border-[#FF6A00]/30 rounded-full flex items-center justify-center text-[#FF6A00] font-bold text-xl mx-auto mb-4">
+                3
+              </div>
+              <h3 className="font-bold text-lg mb-2">Approve & launch</h3>
+              <p className="text-gray-400 text-sm">Nothing deploys until you approve.</p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-12 h-12 bg-[#FF6A00]/10 border border-[#FF6A00]/30 rounded-full flex items-center justify-center text-[#FF6A00] font-bold text-xl mx-auto mb-4">
+                4
+              </div>
+              <h3 className="font-bold text-lg mb-2">LaunchBase stays on</h3>
+              <p className="text-gray-400 text-sm">Monitoring, deciding, protecting—continuously.</p>
+            </div>
+          </div>
+          
+          <p className="text-center text-sm text-gray-500">
+            Silence is a valid decision. We log it.
+          </p>
+        </div>
+      </section>
+
+      {/* Observability (Trust Section) */}
+      <section className="py-20 px-4 border-b border-white/5 bg-white/[0.02]">
+        <div className="container max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+              You never wonder what LaunchBase is doing.
+            </h2>
+            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+              Most platforms hide their automation. LaunchBase shows you—in plain language.
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[#FF6A00]/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-[#FF6A00]">1</span>
+          <div className="bg-[#151518] border border-white/10 rounded-2xl p-6 max-w-2xl mx-auto mb-8">
+            <div className="space-y-3 text-gray-300 text-sm font-mono">
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-[#1ED760]" />
+                <span>Monitoring uptime and forms</span>
               </div>
-              <h3 className="text-lg font-semibold mb-2">Tell us about your business</h3>
-              <p className="text-gray-400 text-sm">
-                5 minutes. English, Spanish, or Polish.
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[#FF6A00]/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-[#FF6A00]">2</span>
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-[#1ED760]" />
+                <span>Checking SSL + domain health</span>
               </div>
-              <h3 className="text-lg font-semibold mb-2">Review your real site</h3>
-              <p className="text-gray-400 text-sm">
-                Not a mockup. Your actual website.
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[#FF6A00]/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-[#FF6A00]">3</span>
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                <span>Preparing a post (waiting for safe window)</span>
               </div>
-              <h3 className="text-lg font-semibold mb-2">Approve & launch</h3>
-              <p className="text-gray-400 text-sm">
-                Only after you approve do we deploy.
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[#FF6A00]/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-[#FF6A00]">4</span>
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-[#1ED760]" />
+                <span>Applying your industry profile</span>
               </div>
-              <h3 className="text-lg font-semibold mb-2">LaunchBase stays on</h3>
-              <p className="text-gray-400 text-sm">
-                Monitoring, deciding, protecting — continuously.
-              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-gray-500" />
+                <span>Holding action intentionally (with reason)</span>
+              </div>
             </div>
           </div>
           
-          {/* Safety assurance */}
-          <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-center">
-            <div className="bg-white/5 border border-white/10 rounded-xl px-5 py-3">
-              <p className="text-gray-400 text-sm flex items-center gap-2">
-                <Shield className="w-4 h-4 text-[#1ED760]" />
-                Non-action is always safe. Change is reversible.
-              </p>
-            </div>
-            <div className="bg-white/5 border border-white/10 rounded-xl px-5 py-3">
-              <p className="text-gray-400 text-sm flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-[#FF6A00]" />
-                Silence is a valid decision. We log it.
-              </p>
-            </div>
+          <div className="text-center">
+            <Link href="/how-it-works#observability">
+              <Button variant="outline" className="border-white/20 text-white hover:bg-white/5">
+                See how observability works
+                <ChevronRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Observability - Your Secret Weapon */}
-      <section className="py-20 px-4 border-b border-white/5 bg-white/[0.02]">
-        <div className="container max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                You never wonder what LaunchBase is doing.
-              </h2>
-              
-              <p className="text-gray-400 text-lg mb-6 leading-relaxed">
-                Most platforms hide their automation.
-                <br />
-                LaunchBase shows you — in plain language.
-              </p>
-              
-              <p className="text-gray-500 mb-8">
-                Right now, LaunchBase may be monitoring your service area, deciding whether posting is safe,
-                applying your industry profile, or waiting — intentionally.
-              </p>
-              
-              <Link href="/how-it-works">
-                <Button variant="outline" className="border-white/20 text-white hover:bg-white/5">
-                  See how observability works <ChevronRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
-            </div>
-            
-            <div className="hidden lg:block">
-              <LiveContextPanel />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* LaunchBase Suite */}
-      {/* LaunchBase Suite */}
+      {/* The Suite */}
       <section className="py-20 px-4 border-b border-white/5">
         <div className="container max-w-6xl mx-auto">
-          <div className="text-center mb-4">
-            <div className="inline-flex items-center gap-2 bg-[#FF6A00]/10 border border-[#FF6A00]/20 rounded-full px-4 py-1.5 text-sm text-[#FF6A00] mb-6">
-              <Zap className="w-4 h-4" />
-              <span>LaunchBase Suite</span>
-            </div>
-          </div>
-          
-          <div className="text-center mb-12">
+          <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
               Expand when you're ready. Not before.
             </h2>
-            
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-8">
-              LaunchBase isn't a bundle you're locked into.<br />
-              It's a system you build on — intentionally.
+            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+              LaunchBase isn't a bundle you're locked into. It's a system you build on—intentionally.
             </p>
           </div>
           
-          {/* Social Media Intelligence Card */}
-          <Card className="bg-white/5 border-white/10 max-w-4xl mx-auto mb-8">
-            <CardContent className="p-8">
-              <h3 className="text-2xl font-bold mb-3 text-white">Social Media Intelligence</h3>
-              <p className="text-gray-400 mb-6">
-                Context-aware posting that adapts to your business, location, and timing.
-              </p>
-              
-              <div className="mb-6">
-                <h4 className="text-sm font-semibold text-gray-300 mb-3">Choose your posting volume:</h4>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-white/10">
-                        <th className="text-left py-3 px-4 text-gray-400 font-medium">Posts per month</th>
-                        <th className="text-right py-3 px-4 text-gray-400 font-medium">Setup</th>
-                        <th className="text-right py-3 px-4 text-gray-400 font-medium">Monthly</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="border-b border-white/5">
-                        <td className="py-3 px-4 text-white">4 posts</td>
-                        <td className="text-right py-3 px-4 text-white">$149</td>
-                        <td className="text-right py-3 px-4 text-white">$59</td>
-                      </tr>
-                      <tr className="border-b border-white/5">
-                        <td className="py-3 px-4 text-white">8 posts</td>
-                        <td className="text-right py-3 px-4 text-white">$199</td>
-                        <td className="text-right py-3 px-4 text-white">$99</td>
-                      </tr>
-                      <tr>
-                        <td className="py-3 px-4 text-white">12 posts</td>
-                        <td className="text-right py-3 px-4 text-white">$249</td>
-                        <td className="text-right py-3 px-4 text-white">$149</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-              
-              <ul className="space-y-2 mb-6 text-sm text-gray-300">
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-[#1ED760] flex-shrink-0" />
-                  Scheduled posting
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-[#1ED760] flex-shrink-0" />
-                  Platform-safe formatting
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-[#1ED760] flex-shrink-0" />
-                  Approval workflow
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-[#1ED760] flex-shrink-0" />
-                  Full activity log
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-[#1ED760] flex-shrink-0" />
-                  Pause or change anytime
-                </li>
-              </ul>
-              
-              <div className="bg-[#FF6A00]/10 border border-[#FF6A00]/20 rounded-lg p-6 mt-6">
-                <h4 className="text-lg font-semibold text-white mb-2">Intelligent Enrichment Layer (Optional)</h4>
-                <p className="text-sm text-gray-300 mb-4">
-                  Automation that understands when not to act.
-                </p>
-                <div className="flex items-center gap-6 mb-4">
-                  <div>
-                    <div className="text-xs text-gray-400 mb-1">Setup</div>
-                    <div className="text-xl font-bold text-[#FF6A00]">$199</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-400 mb-1">Monthly</div>
-                    <div className="text-xl font-bold text-[#FF6A00]">+$79/mo</div>
-                  </div>
-                </div>
-                <ul className="space-y-2 text-sm text-gray-300">
-                  <li className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#FF6A00]" />
-                    Weather-aware logic
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#FF6A00]" />
-                    Local context awareness
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#FF6A00]" />
-                    Industry timing rules
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#FF6A00]" />
-                    Safety gating
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#FF6A00]" />
-                    Decision logging ("why this posted")
-                  </li>
-                </ul>
-                <p className="text-sm text-[#FF6A00] mt-4 font-medium">
-                  Intelligence is valuable. We price it like it is.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-          
-          {/* Other Modules */}
-          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-8">
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            {/* Social Media Intelligence */}
             <Card className="bg-white/5 border-white/10">
               <CardContent className="p-6">
-                <h3 className="text-lg font-semibold mb-2 text-white">Google Business Profile</h3>
-                <p className="text-gray-400 text-sm mb-4">
-                  Setup and ongoing visibility monitoring.
+                <h3 className="text-xl font-bold mb-3">Social Media Intelligence</h3>
+                <p className="text-gray-400 text-sm mb-6">
+                  Context-aware posting that adapts to your business, location, and timing.
                 </p>
-                <div className="flex items-center gap-6">
-                  <div>
-                    <div className="text-xs text-gray-400 mb-1">Setup</div>
-                    <div className="text-lg font-bold text-white">$149</div>
+                
+                <div className="space-y-3 mb-6">
+                  <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-medium">4 posts / month</span>
+                      <span className="text-sm text-gray-400">Setup $149 • Monthly $59</span>
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-xs text-gray-400 mb-1">Monthly</div>
-                    <div className="text-lg font-bold text-white">$29/mo</div>
+                  <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-medium">8 posts / month</span>
+                      <span className="text-sm text-gray-400">Setup $199 • Monthly $99</span>
+                    </div>
+                  </div>
+                  <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-medium">12 posts / month</span>
+                      <span className="text-sm text-gray-400">Setup $249 • Monthly $149</span>
+                    </div>
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 mt-4">
+                
+                <div className="text-xs text-gray-500 space-y-1">
+                  <p>• Scheduled posting</p>
+                  <p>• Platform-safe formatting</p>
+                  <p>• Approval workflow</p>
+                  <p>• Full activity log</p>
+                  <p>• Pause or change anytime</p>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Intelligent Enrichment Layer */}
+            <Card className="bg-white/5 border-white/10">
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold mb-3">Intelligent Enrichment Layer</h3>
+                <p className="text-gray-400 text-sm mb-6">
+                  Automation that understands when not to act.
+                </p>
+                
+                <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-6">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-medium">Optional</span>
+                    <span className="text-sm text-gray-400">Setup $199 • Monthly +$79/mo</span>
+                  </div>
+                </div>
+                
+                <div className="text-xs text-gray-500 space-y-1 mb-4">
+                  <p>• Weather-aware logic</p>
+                  <p>• Local context awareness</p>
+                  <p>• Industry timing rules</p>
+                  <p>• Safety gating</p>
+                  <p>• Decision logging ("why this posted")</p>
+                </div>
+                
+                <p className="text-sm text-[#FF6A00] font-medium">
+                  Intelligence is valuable. We price it like it is.
+                </p>
+              </CardContent>
+            </Card>
+            
+            {/* Google Business Profile */}
+            <Card className="bg-white/5 border-white/10">
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold mb-3">Google Business Profile</h3>
+                <p className="text-gray-400 text-sm mb-6">
+                  Setup and ongoing visibility monitoring.
+                </p>
+                
+                <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-4">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">GBP Management</span>
+                    <span className="text-sm text-gray-400">Setup $149 • Monthly $29/mo</span>
+                  </div>
+                </div>
+                
+                <p className="text-xs text-gray-500">
                   Includes profile setup or cleanup, posting sync (if enabled), and health monitoring.
                 </p>
               </CardContent>
             </Card>
             
+            {/* QuickBooks Sync */}
             <Card className="bg-white/5 border-white/10">
               <CardContent className="p-6">
-                <h3 className="text-lg font-semibold mb-2 text-white">QuickBooks Sync</h3>
-                <p className="text-gray-400 text-sm mb-4">
+                <h3 className="text-xl font-bold mb-3">QuickBooks Sync</h3>
+                <p className="text-gray-400 text-sm mb-6">
                   Accounting visibility and error monitoring.
                 </p>
-                <div className="flex items-center gap-6">
-                  <div>
-                    <div className="text-xs text-gray-400 mb-1">Setup</div>
-                    <div className="text-lg font-bold text-white">$199</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-400 mb-1">Monthly</div>
-                    <div className="text-lg font-bold text-white">$39/mo</div>
+                
+                <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-4">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">QB Integration</span>
+                    <span className="text-sm text-gray-400">Setup $199 • Monthly $39/mo</span>
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 mt-4">
+                
+                <p className="text-xs text-gray-500">
                   Includes revenue visibility, payment sync, and activity logging.
                 </p>
               </CardContent>
@@ -552,268 +419,228 @@ export default function Home() {
           </div>
           
           <div className="text-center">
-            <Link href="/expand">
-              <Button variant="outline" className="border-[#FF6A00]/50 text-[#FF6A00] hover:bg-[#FF6A00]/10">
-                Explore the Suite <ChevronRight className="w-4 h-4 ml-2" />
+            <Link href="/suite">
+              <Button variant="outline" className="border-white/20 text-white hover:bg-white/5">
+                Explore the Suite
+                <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Social Proof */}
-      <section className="py-12 px-4 border-b border-white/5 bg-white/[0.02]">
-        <div className="container max-w-4xl mx-auto text-center">
-          <p className="text-gray-500 text-lg">
-            Used by early service businesses across trades, appointments, and professional services.
+      {/* Who It's For / Not For You */}
+      <section className="py-20 px-4 border-b border-white/5 bg-white/[0.02]">
+        <div className="container max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-8">
+            This is not for you if…
+          </h2>
+          
+          <div className="bg-white/5 border border-white/10 rounded-xl p-8 mb-8">
+            <ul className="space-y-4 text-gray-400 text-left">
+              <li className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-gray-500 shrink-0 mt-0.5" />
+                <span>You want to tweak settings, plugins, or layouts yourself</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-gray-500 shrink-0 mt-0.5" />
+                <span>You enjoy experimenting with tools and integrations</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-gray-500 shrink-0 mt-0.5" />
+                <span>You want maximum flexibility over consistency</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-gray-500 shrink-0 mt-0.5" />
+                <span>You're looking for a one-time project, not ongoing ownership</span>
+              </li>
+            </ul>
+          </div>
+          
+          <p className="text-lg text-white font-medium">
+            LaunchBase is for owners who want the system handled—not managed.
           </p>
         </div>
       </section>
 
-      {/* Pre-qualification - This is not for you if... */}
-      <section className="py-16 px-4 border-b border-white/5">
-        <div className="container max-w-3xl mx-auto">
-          <div className="bg-white/[0.02] border border-white/10 rounded-2xl p-8">
-            <h3 className="text-xl font-semibold mb-6 text-center">
-              This is not for you if…
-            </h3>
-            
-            <ul className="space-y-4 mb-8">
-              <li className="flex items-start gap-3 text-gray-400">
-                <span className="text-gray-600 mt-0.5">•</span>
-                <span>You want to tweak settings, plugins, or layouts yourself</span>
-              </li>
-              <li className="flex items-start gap-3 text-gray-400">
-                <span className="text-gray-600 mt-0.5">•</span>
-                <span>You enjoy experimenting with tools and integrations</span>
-              </li>
-              <li className="flex items-start gap-3 text-gray-400">
-                <span className="text-gray-600 mt-0.5">•</span>
-                <span>You want maximum flexibility over consistency</span>
-              </li>
-              <li className="flex items-start gap-3 text-gray-400">
-                <span className="text-gray-600 mt-0.5">•</span>
-                <span>You're looking for a one-time project, not ongoing ownership</span>
-              </li>
-            </ul>
-            
-            <p className="text-center text-gray-300">
-              LaunchBase is for owners who want the system <span className="text-white font-medium">handled</span> — not managed.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      {/* Pricing Section */}
-      <section id="pricing" className="py-20 px-4 border-b border-white/5">
+      {/* Pricing */}
+      <section className="py-20 px-4 border-b border-white/5">
         <div className="container max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Pricing, done honestly.
             </h2>
             <p className="text-gray-400 text-lg">
-              You're not buying software.<br />
-              You're handing off responsibility.
+              You're not buying software. You're handing off responsibility.
             </p>
           </div>
           
-          {/* Core Website Card */}
-          <Card className="bg-white/5 border-white/10 max-w-3xl mx-auto mb-12 relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-[#FF6A00]" />
-            <CardContent className="p-8">
-              <div className="text-sm text-[#FF6A00] font-medium mb-2">Core Website</div>
-              <h3 className="text-2xl font-bold mb-2 text-white">LaunchBase Website</h3>
-              
-              <div className="flex items-center gap-8 mb-6">
-                <div>
-                  <div className="text-sm text-gray-400 mb-1">Setup</div>
-                  <div className="text-3xl font-bold text-white">$499</div>
-                  <div className="text-xs text-gray-500">(base)</div>
+          <div className="max-w-2xl mx-auto mb-12">
+            <Card className="bg-white/5 border-white/10">
+              <CardContent className="p-8">
+                <h3 className="text-2xl font-bold mb-2">LaunchBase Website</h3>
+                <div className="flex items-baseline gap-4 mb-6">
+                  <span className="text-3xl font-bold text-[#FF6A00]">$499</span>
+                  <span className="text-gray-400">setup</span>
+                  <span className="text-gray-500">+</span>
+                  <span className="text-3xl font-bold text-[#FF6A00]">$49</span>
+                  <span className="text-gray-400">/month</span>
                 </div>
-                <div>
-                  <div className="text-sm text-gray-400 mb-1">Monthly</div>
-                  <div className="text-3xl font-bold text-white">$49<span className="text-lg">/mo</span></div>
+                
+                <div className="space-y-2 text-sm text-gray-400 mb-6">
+                  <p className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#FF6A00]" />
+                    Custom website design
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#FF6A00]" />
+                    Mobile optimization
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#FF6A00]" />
+                    Hosting & SSL
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#FF6A00]" />
+                    Contact forms & lead capture
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#FF6A00]" />
+                    SEO fundamentals
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#FF6A00]" />
+                    Monitoring & safety
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-[#FF6A00]" />
+                    Full visibility into every action
+                  </p>
                 </div>
-              </div>
-              
-              <ul className="space-y-3 mb-8">
-                {[
-                  "Custom website design",
-                  "Mobile optimization",
-                  "Hosting & SSL",
-                  "Contact forms & lead capture",
-                  "SEO fundamentals",
-                  "Monitoring & safety",
-                  "Full visibility into every action",
-                ].map((feature) => (
-                  <li key={feature} className="flex items-center gap-3 text-sm text-gray-300">
-                    <CheckCircle className="w-4 h-4 text-[#1ED760] flex-shrink-0" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              
-              <div className="bg-[#FF6A00]/10 border border-[#FF6A00]/20 rounded-lg p-4 mb-6">
-                <p className="text-sm text-[#FF6A00]">
+                
+                <p className="text-xs text-gray-500">
                   Final pricing is confirmed during onboarding before anything is charged.
                 </p>
-              </div>
-              
-              <Link href="/apply">
-                <Button className="w-full bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white">
-                  Hand It Off
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
           
-          {/* Example Pricing */}
-          <div className="max-w-3xl mx-auto">
-            <h3 className="text-xl font-semibold text-white mb-6 text-center">Example (no math surprises)</h3>
-            <div className="bg-white/5 border border-white/10 rounded-xl p-6 mb-6">
-              <p className="text-gray-300 mb-4 font-medium">
-                Website + Social (8 posts) + Intelligence
-              </p>
-              <div className="space-y-2 text-sm text-gray-400 mb-4">
-                <div className="flex justify-between">
-                  <span>Setup:</span>
-                  <span className="text-white">$499 + $199 + $199 = $897</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Monthly:</span>
-                  <span className="text-white">$49 + $99 + $79 = $227</span>
-                </div>
+          <div className="bg-white/5 border border-white/10 rounded-xl p-8 max-w-2xl mx-auto mb-8">
+            <h3 className="text-xl font-bold mb-4">Example (no math surprises)</h3>
+            <p className="text-gray-400 mb-4">Website + Social (8 posts) + Intelligence</p>
+            
+            <div className="space-y-2 text-sm mb-4">
+              <div className="flex justify-between">
+                <span className="text-gray-400">Setup:</span>
+                <span className="text-white">$499 + $199 + $199 = <span className="font-bold text-[#FF6A00]">$897</span></span>
               </div>
-              <p className="text-xs text-gray-500 text-center">
-                No calls. No negotiation. No confusion.
-              </p>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Monthly:</span>
+                <span className="text-white">$49 + $99 + $79 = <span className="font-bold text-[#FF6A00]">$227</span></span>
+              </div>
             </div>
             
-            <div className="text-center">
-              <Link href="/apply">
-                <Button size="lg" className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white">
-                  Hand It Off <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
-              </Link>
-              <p className="text-sm text-gray-500 mt-4">
-                See your real site before you pay. Cancel anytime.
-              </p>
-            </div>
+            <p className="text-sm text-gray-500">
+              No calls. No negotiation. No confusion.
+            </p>
+          </div>
+          
+          <div className="text-center space-y-4">
+            <Link href="/apply">
+              <Button size="lg" className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white text-lg px-8 py-6">
+                Hand It Off
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
+            <p className="text-sm text-gray-500">
+              See your real site before you pay. Cancel anytime.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="py-20 px-4 bg-white/[0.02]">
+      {/* FAQ */}
+      <section className="py-20 px-4 border-b border-white/5 bg-white/[0.02]">
         <div className="container max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            Questions? Answers.
-          </h2>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Questions? Answers.
+            </h2>
+          </div>
           
           <Accordion type="single" collapsible className="space-y-4">
-            <AccordionItem value="what-is" className="border border-white/10 rounded-xl px-6 bg-white/[0.02]">
-              <AccordionTrigger className="text-left text-white hover:no-underline py-6">
+            <AccordionItem value="item-1" className="bg-white/5 border border-white/10 rounded-xl px-6">
+              <AccordionTrigger className="text-left hover:no-underline">
                 What kind of businesses is LaunchBase for?
               </AccordionTrigger>
-              <AccordionContent className="text-gray-400 pb-6">
-                LaunchBase serves local service businesses: trades (plumbers, HVAC, electricians, 
-                contractors), health & wellness (dentists, chiropractors), beauty (salons, barbers), 
-                food & beverage (restaurants, cafés), fitness (gyms, trainers), automotive (repair shops), 
-                and professional services (lawyers, accountants). We build websites that convert visitors 
-                into customers for your specific industry.
+              <AccordionContent className="text-gray-400">
+                Early service businesses across trades, appointments, and professional services—especially owners who want ongoing ownership, not another tool.
               </AccordionContent>
             </AccordionItem>
             
-            <AccordionItem value="how-long" className="border border-white/10 rounded-xl px-6 bg-white/[0.02]">
-              <AccordionTrigger className="text-left text-white hover:no-underline py-6">
+            <AccordionItem value="item-2" className="bg-white/5 border border-white/10 rounded-xl px-6">
+              <AccordionTrigger className="text-left hover:no-underline">
                 How long does it take to get my website?
               </AccordionTrigger>
-              <AccordionContent className="text-gray-400 pb-6">
-                Most websites go live within 48 hours of completing your application. You'll review 
-                a preview, request any changes, and approve before we launch. No endless back-and-forth.
+              <AccordionContent className="text-gray-400">
+                You'll review a real working site early in the process. Final launch timing depends on content and approvals, and nothing goes live without your sign-off.
               </AccordionContent>
             </AccordionItem>
             
-            <AccordionItem value="not-builder" className="border border-white/10 rounded-xl px-6 bg-white/[0.02]">
-              <AccordionTrigger className="text-left text-white hover:no-underline py-6">
+            <AccordionItem value="item-3" className="bg-white/5 border border-white/10 rounded-xl px-6">
+              <AccordionTrigger className="text-left hover:no-underline">
                 Is this a website builder?
               </AccordionTrigger>
-              <AccordionContent className="text-gray-400 pb-6">
-                No. Builders help you create a site. LaunchBase operates it. If you want to design pages 
-                and tweak layouts yourself, use a builder. If you want your business to stay visible 
-                without thinking about it, use LaunchBase.
+              <AccordionContent className="text-gray-400">
+                No. You're not configuring templates. LaunchBase handles the system and keeps it healthy over time.
               </AccordionContent>
             </AccordionItem>
             
-            <AccordionItem value="approval" className="border border-white/10 rounded-xl px-6 bg-white/[0.02]">
-              <AccordionTrigger className="text-left text-white hover:no-underline py-6">
+            <AccordionItem value="item-4" className="bg-white/5 border border-white/10 rounded-xl px-6">
+              <AccordionTrigger className="text-left hover:no-underline">
                 Do I have to approve everything?
               </AccordionTrigger>
-              <AccordionContent className="text-gray-400 pb-6">
-                You're always in control. For your website, you approve the design before it goes live. 
-                For Suite modules like Social Media Intelligence, you can choose Auto mode (we handle it), 
-                Guided mode (you approve posts), or Custom mode (full control). Most customers start 
-                with Guided and move to Auto once they trust the system.
+              <AccordionContent className="text-gray-400">
+                You control what deploys. LaunchBase can monitor and prepare changes, but approvals gate anything that affects your public presence.
               </AccordionContent>
             </AccordionItem>
             
-            <AccordionItem value="cancel" className="border border-white/10 rounded-xl px-6 bg-white/[0.02]">
-              <AccordionTrigger className="text-left text-white hover:no-underline py-6">
+            <AccordionItem value="item-5" className="bg-white/5 border border-white/10 rounded-xl px-6">
+              <AccordionTrigger className="text-left hover:no-underline">
                 Can I cancel anytime?
               </AccordionTrigger>
-              <AccordionContent className="text-gray-400 pb-6">
-                Yes. No contracts, no cancellation fees. If you decide LaunchBase isn't for you, 
-                cancel anytime and we'll help you export your content. We want customers who stay 
-                because they love the service, not because they're locked in.
+              <AccordionContent className="text-gray-400">
+                Yes. No long contracts. You can pause or cancel when you want.
               </AccordionContent>
             </AccordionItem>
           </Accordion>
         </div>
       </section>
 
-      {/* Final CTA - Relief framing */}
+      {/* Final CTA */}
       <section className="py-20 px-4">
         <div className="container max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             You've been carrying this long enough.
           </h2>
-          <p className="text-gray-400 text-lg mb-4">
-            You're not signing up for software.
+          
+          <p className="text-lg text-gray-400 mb-8 max-w-xl mx-auto">
+            You're not signing up for software. You're handing off responsibility—with full visibility.
           </p>
-          <p className="text-white text-xl font-medium mb-8">
-            You're handing off responsibility — with full visibility.
-          </p>
-          <Link href="/apply">
-            <Button size="lg" className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white text-lg px-10 py-6">
-              Hand It Off <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-          </Link>
-          <p className="text-gray-600 text-sm mt-6">
-            See your real site before you pay. Cancel anytime.
-          </p>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-12 px-4 border-t border-white/10">
-        <div className="container max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2">
-              <img src="/logo-cropped.png" alt="LaunchBase" className="h-6 w-auto" />
-            </div>
-            <div className="flex items-center gap-6 text-sm text-gray-500">
-              <Link href="/how-it-works" className="hover:text-white transition">How It Works</Link>
-              <Link href="/expand" className="hover:text-white transition">Suite</Link>
-              <a href="#pricing" className="hover:text-white transition">Pricing</a>
-              <Link href="/trust" className="hover:text-white transition">Trust & Commitments</Link>
-            </div>
-            <p className="text-gray-600 text-sm">
-              © {new Date().getFullYear()} LaunchBase. All rights reserved.
+          
+          <div className="space-y-4">
+            <Link href="/apply">
+              <Button size="lg" className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white text-lg px-8 py-6">
+                Hand It Off
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
+            <p className="text-sm text-gray-500">
+              See your real site before you pay. Cancel anytime.
             </p>
           </div>
         </div>
-      </footer>
+      </section>
     </div>
   );
 }
