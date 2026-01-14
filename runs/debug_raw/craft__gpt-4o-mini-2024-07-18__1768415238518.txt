@@ -1,0 +1,42 @@
+=== RAW RESPONSE (craft) ===
+Model: gpt-4o-mini-2024-07-18
+Request ID: chatcmpl-CxzsJPcrUyXZBEVTWwFQln0uj9Epi
+Input Tokens: 1257
+Output Tokens: 136
+Finish Reason: stop
+
+=== RAW TEXT (588 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "hero.headline",
+      "value": "Welcome to The Daily Grind: Your Local Coffee Haven",
+      "rationale": "This headline instantly identifies the business and its purpose, creating a warm and inviting atmosphere.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "hero.subheadline",
+      "value": "Savor our locally roasted coffee in a cozy space designed for community gatherings.",
+      "rationale": "Clarifies the offerings and emphasizes the inviting atmosphere, enhancing the appeal.",
+      "confidence": 0.87
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "hero.headline",
+      "value": "Welcome to The Daily Grind: Your Local Coffee Haven",
+      "rationale": "This headline instantly identifies the business and its purpose, creating a warm and inviting atmosphere.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "hero.subheadline",
+      "value": "Savor our locally roasted coffee in a cozy space designed for community gatherings.",
+      "rationale": "Clarifies the offerings and emphasizes the inviting atmosphere, enhancing the appeal.",
+      "confidence": 0.87
+    }
+  ]
+}

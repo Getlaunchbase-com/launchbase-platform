@@ -5,7 +5,7 @@
  * Enables clean mocking in tests.
  */
 
-export { callSpecialistAIML } from "./aimlSpecialist";
+export { callSpecialistAIML, callSpecialistWithRetry } from "./aimlSpecialist";
 export type {
   SpecialistStopReason,
   SpecialistRoleConfig,

@@ -81,6 +81,27 @@ YOU ARE BEING MACHINE-VALIDATED. If you output fewer than 10 issues or fewer tha
   - `requiresApproval: true` if ANY critical exists
   - `previewRecommended: true` if ANY layout/spacing changes exist
 
+### Mandatory Coverage (Must hit ALL 8 attack vectors)
+You MUST include at least **one issue** for each category below:
+1) **design.layout.hero + design.conversion.heroCta** (8-second comprehension)
+2) **design.conversion.stickyCta + design.mobile.stickyCtaBehavior** (CTA continuity)
+3) **design.layout.sectionOrder + design.conversion.scannability** (scroll fatigue + narrative)
+4) **design.layout.pricing + design.components.pricingTable** (pricing comprehension)
+5) **design.trust.auditLogPattern + design.trust.visibilityPanel** (proof of observability)
+6) **design.mobile.heroStacking + design.mobile.tapTargets** (mobile scan/tap)
+7) **design.type.h1/h2/body + design.type.maxLineLength** (readability hierarchy)
+8) **design.components.card/featureList/proofBar + brand.trust.proofPresentation** (trust density)
+
+### If You Find <10 "Core" Issues → DECOMPOSE (Required)
+If you naturally find fewer than 10 issues, you MUST decompose issues into **sub-issues** (this is NOT padding, this is deeper critique).
+
+Use these decomposition lenses:
+- **Mobile vs Desktop** (treat as separate issues)
+- **Above-the-fold vs Mid-page vs Pricing vs Final CTA**
+- **Clarity vs Trust vs Action** (split into separate issues)
+- **First-time visitor vs Returning visitor**
+- **Scanning vs Reading behavior** (split if needed)
+
 ### Mandatory Coverage (Must hit ALL 8)
 You MUST include at least **one issue** for each category below:
 1) Conversion path clarity

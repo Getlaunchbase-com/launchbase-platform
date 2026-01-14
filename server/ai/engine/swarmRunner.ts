@@ -30,7 +30,7 @@ export async function runSwarmV1(
   policy: PolicyV1,
   ctx: { traceId: string }
 ): Promise<AiWorkResultV1> {
-  console.log("[SWARM_DEBUG] runner=", __filename, "fn=runSwarmV1", "build=", process.env.NODE_ENV);
+  console.log("[SWARM_DEBUG] runner=swarmRunner.ts", "fn=runSwarmV1", "build=", process.env.NODE_ENV);
   const artifacts: ArtifactV1[] = [];
   const costs: Array<{
     specialist: string;
