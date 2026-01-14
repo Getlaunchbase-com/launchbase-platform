@@ -143,6 +143,9 @@ export async function callSpecialistAIML(
     for (const craft of specInput.craftArtifacts) {
       userPrompt += `## ${craft.role}\n\n${JSON.stringify(craft.output, null, 2)}\n\n`;
     }
+    console.log("[SWARM_DEBUG] critic_prompt_has_upstream", true, "promptLen=", userPrompt.length);
+  } else if (role.includes("critic")) {
+    console.log("[SWARM_DEBUG] critic_prompt_has_upstream", false, "craftArtifactsCount=", specInput.craftArtifacts?.length ?? 0);
   }
 
   // Determine Zod schema for validation

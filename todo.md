@@ -1456,3 +1456,49 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 5. **Generate LADDER_REPORT.md + apply-ready final patch list**
 6. **Add Truthfulness Index penalties to scoring**
 7. **Run 60-run pressure test suite (adversarial briefs)**
+
+
+---
+
+## 🔧 PHASE 2B: RUN RELIABILITY ENGINEERING (CURRENT)
+
+**Goal:** Fix throughput/reliability bugs to enable massive tournament testing
+
+### Step 1: Debug Logging ✅ IN PROGRESS
+- [ ] Add [SWARM_DEBUG] runner path log to confirm correct code execution
+- [ ] Log craftArtifactsCount before critic call
+- [ ] Log specialist_done after each designer completes
+- [ ] Log critic_prompt_has_upstream to confirm injection
+
+### Step 2: Fault-Tolerant Artifact Collection
+- [ ] Change collector rule: collect if Zod passed, regardless of stopReason
+- [ ] Allow timeout/provider_failed artifacts if JSON is usable
+- [ ] Test with partial outputs
+
+### Step 3: Timeout Downgrade Ladder
+- [ ] Add fallback chain: GPT-5.2 Pro (120s) → GPT-5.2 (120s) → GPT-4o (90s)
+- [ ] Implement per-role timeout configuration
+- [ ] Add retry logic with exponential backoff
+
+### Step 4: Reduce Designer Output Load
+- [ ] Cap proposedChanges to exactly 8 (not 6-12)
+- [ ] Force max 120 chars for rationale
+- [ ] Force max 1 sentence for rationale
+
+### Step 5: Critic Robustness
+- [ ] Make critic handle missing upstream gracefully
+- [ ] If upstream missing → critique from brief + mark assumptions[]
+- [ ] Never hard-stop run due to missing upstream
+
+### Step 6: 4-Run Reliability Gate
+- [ ] Run 4 tests with champion stack (gpt-4o + claude-opus-4.1)
+- [ ] Validate 4/4 success: ≥10 issues, ≥10 fixes, valid keys, no markdown
+- [ ] Confirm craftArtifacts injection working
+
+### Step 7: Mega Tournament V2
+- [ ] Lane A: Web Design (32 runs, GPT-5.2/5.2-Pro/Opus/Gemini)
+- [ ] Lane B: App UI (32 runs)
+- [ ] Lane C: Marketing (32 runs)
+- [ ] Lane D: Artwork (32 runs, image-gen models)
+- [ ] Add Truthfulness Index penalties to scoring
+- [ ] Generate final leaderboard + liar hunt report

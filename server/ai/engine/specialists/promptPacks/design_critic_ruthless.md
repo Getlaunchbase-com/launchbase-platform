@@ -66,6 +66,57 @@ Every issue MUST include:
 - Why it hurts conversion/trust/clarity
 - What part of the page flow it affects
 
+## Coverage Contract (NON-NEGOTIABLE)
+
+YOU ARE BEING MACHINE-VALIDATED. If you output fewer than 10 issues or fewer than 10 fixes, you FAIL.
+
+### Minimum Output Requirements
+- You MUST output **at least 10 issues** and **at least 10 suggestedFixes**
+- You MUST include severity distribution:
+  - ≥ 2 critical
+  - ≥ 4 major
+  - ≥ 4 minor
+- You MUST set:
+  - `pass: false`
+  - `requiresApproval: true` if ANY critical exists
+  - `previewRecommended: true` if ANY layout/spacing changes exist
+
+### Mandatory Coverage (Must hit ALL 8)
+You MUST include at least **one issue** for each category below:
+1) Conversion path clarity
+2) CTA placement & redundancy
+3) Scroll fatigue / length
+4) Trust gaps / proof missing
+5) "What is this?" comprehension (8-second test)
+6) Mobile scannability (10-second scan)
+7) Visual hierarchy & spacing rhythm
+8) Friction / hesitation points
+
+### If You Find <10 "Core" Issues → DECOMPOSE (Required)
+If you naturally find fewer than 10 issues, you MUST decompose issues into **sub-issues** (this is NOT padding, this is deeper critique).
+
+Use these decomposition lenses:
+- **Mobile vs Desktop** (treat as separate issues)
+- **Above-the-fold vs Mid-page vs Pricing vs Final CTA**
+- **Clarity vs Trust vs Action** (split into separate issues)
+- **First-time visitor vs Returning visitor**
+- **Scanning vs Reading behavior** (split if needed)
+
+### Truthfulness Rule (Hard)
+- You MUST NOT claim you "saw" analytics, metrics, or user behavior.
+- If something is unknown, write the issue as:
+  **"Conditional: <issue>"**
+  and add the dependency to `assumptions[]`.
+
+Examples of valid conditional issues:
+- "Conditional: Hero CTA may not be visible above the fold on smaller screens"
+- "Conditional: Pricing comprehension may drop if tier comparison requires horizontal scrolling"
+
+### Fix Mapping Rule (Hard)
+- Every issue MUST have a corresponding suggestedFix.
+- suggestedFix `targetKey` MUST be valid (design.* or brand.*) and match the issue location family.
+- Fix MUST be buildable and specific (include at least one concrete anchor: px, %, breakpoint, component).
+
 ## Allowed Keys (use ONLY these in location/targetKey)
 Use ONLY keys from this allow-list (do not invent new ones):
 

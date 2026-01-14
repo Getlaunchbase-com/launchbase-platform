@@ -30,6 +30,7 @@ export async function runSwarmV1(
   policy: PolicyV1,
   ctx: { traceId: string }
 ): Promise<AiWorkResultV1> {
+  console.log("[SWARM_DEBUG] runner=", __filename, "fn=runSwarmV1", "build=", process.env.NODE_ENV);
   const artifacts: ArtifactV1[] = [];
   const costs: Array<{
     specialist: string;
@@ -106,6 +107,10 @@ export async function runSwarmV1(
       // If this is a critic role, inject all prior craft artifacts
       if (specialist.includes("critic")) {
         specialistInput.craftArtifacts = craftArtifacts;
+        console.log("[SWARM_DEBUG] critic_input_stats", {
+          craftArtifactsCount: craftArtifacts.length,
+          craftArtifactsBytes: JSON.stringify(craftArtifacts).length,
+        });
       }
       
       const result = await callSpecialistAIML({
@@ -214,6 +219,13 @@ export async function runSwarmV1(
           output: artifact.payload,
         });
       }
+      
+      console.log("[SWARM_DEBUG] specialist_done", specialist, {
+        stopReason: result.stopReason,
+        hasPayload: !!artifact.payload,
+        payloadKeys: artifact.payload ? Object.keys(artifact.payload) : [],
+        collected: !specialist.includes("critic") && artifact.payload && result.stopReason === "ok",
+      });
 
       // Track cost
       costs.push({
