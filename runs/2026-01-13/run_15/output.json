@@ -1,0 +1,156 @@
+{
+  "version": "v1",
+  "status": "succeeded",
+  "stopReason": "needs_human",
+  "needsHuman": true,
+  "traceId": "trc_1768342964683_22580e4f2fdb9",
+  "artifacts": [
+    {
+      "kind": "swarm.plan",
+      "payload": {
+        "scope": "showroom.getlaunchbase.premium",
+        "inputs": {
+          "task": "Review and improve homepage copy for LaunchBase",
+          "business": "LaunchBase",
+          "description": "AI-powered website operations system that handles website updates, social media, and business intelligence for small businesses. Core value: responsibility transfer (hand off operations, keep visibility). Not a website builder - a complete operations handoff with observability, reversibility, and safety gating.",
+          "currentCopy": {
+            "hero": "Stop carrying the system in your head. Hand it off. Keep visibility.",
+            "problem": "No one owns the system. You're the fallback for everything.",
+            "solution": "LaunchBase becomes the owner. You stay informed, not involved.",
+            "trust": "Safe by default. Fully logged. Reversible."
+          },
+          "audience": "Small business owners (fitness studios, coffee shops, consulting firms, e-commerce) who are tired of being the bottleneck for their website and marketing operations",
+          "tone": "Direct, honest, reassuring. B2B professional. Emphasize responsibility transfer and observability.",
+          "constraints": "No hype language. No unverifiable claims. Focus on concrete benefits: mental load reduction, visibility, reversibility, safety gating."
+        },
+        "specialists": [
+          "craft",
+          "critic"
+        ],
+        "fingerprint": "trc_1768342964683_22580e4f2fdb9:plan"
+      },
+      "customerSafe": false
+    },
+    {
+      "kind": "swarm.specialist.craft",
+      "payload": {
+        "proposedChanges": [
+          {
+            "targetKey": "hero.headline",
+            "value": "Stop carrying the burden of operations. Hand it off.",
+            "rationale": "The word 'burden' adds emotional weight and clarity to the operations aspect, reinforcing the message of responsibility transfer.",
+            "confidence": 0.88
+          },
+          {
+            "targetKey": "hero.subheadline",
+            "value": "LaunchBase takes ownership of your website operations while you maintain visibility.",
+            "rationale": "This rephrasing clarifies the role of LaunchBase and emphasizes the balance between ownership and visibility.",
+            "confidence": 0.87
+          },
+          {
+            "targetKey": "problem.headline",
+            "value": "No clear ownership of your operations can lead to chaos.",
+            "rationale": "This change highlights the negative impact of the current situation, making the problem more relatable and urgent.",
+            "confidence": 0.86
+          },
+          {
+            "targetKey": "solution",
+            "value": "With LaunchBase, you transfer ownership of operations and focus on your business.",
+            "rationale": "This wording emphasizes the benefit of focusing on the core business while LaunchBase handles operations, making the solution more appealing.",
+            "confidence": 0.85
+          }
+        ],
+        "role": "craft",
+        "stopReason": "ok"
+      },
+      "customerSafe": false
+    },
+    {
+      "kind": "swarm.specialist.critic",
+      "payload": {
+        "pass": false,
+        "issues": [
+          {
+            "severity": "critical",
+            "description": "Claims 'AI-powered website operations system' without proof in input",
+            "location": "description",
+            "rationale": "Unverified claim - introduces AI capability not present in input"
+          },
+          {
+            "severity": "critical",
+            "description": "Phrase 'fully logged' implies monitoring capabilities not explicitly stated",
+            "location": "trust",
+            "rationale": "Unverified claim - suggests a feature not confirmed in input"
+          }
+        ],
+        "suggestedFixes": [
+          {
+            "targetKey": "description",
+            "fix": "Website operations system that handles updates, social media, and business intelligence for small businesses.",
+            "rationale": "Removes unverifiable AI claim, focuses on core functionality"
+          },
+          {
+            "targetKey": "trust",
+            "fix": "Safe by default. Operations can be reverted.",
+            "rationale": "Clarifies safety without implying unverified logging feature"
+          }
+        ],
+        "requiresApproval": true,
+        "previewRecommended": true,
+        "risks": [],
+        "assumptions": [],
+        "role": "critic",
+        "stopReason": "ok"
+      },
+      "customerSafe": false
+    },
+    {
+      "kind": "swarm.collapse",
+      "customerSafe": true,
+      "payload": null
+    }
+  ],
+  "customerSafe": true,
+  "extensions": {
+    "swarm": {
+      "costs": [
+        {
+          "specialist": "craft",
+          "inputTokens": 1685,
+          "outputTokens": 280,
+          "costUsd": 0.02525,
+          "model": "gpt-4o-mini-2024-07-18",
+          "latencyMs": 6745,
+          "stopReason": "ok"
+        },
+        {
+          "specialist": "critic",
+          "inputTokens": 1857,
+          "outputTokens": 253,
+          "costUsd": 0.026160000000000003,
+          "model": "gpt-4o-mini-2024-07-18",
+          "latencyMs": 5644,
+          "stopReason": "ok"
+        }
+      ],
+      "totalCostUsd": 0.051410000000000004,
+      "roleCostsUsd": {
+        "craft": 0.02525,
+        "critic": 0.026160000000000003
+      },
+      "roleModels": {
+        "craft": "gpt-4o-mini-2024-07-18",
+        "critic": "gpt-4o-mini-2024-07-18"
+      },
+      "collapseDebug": {
+        "craftStop": "ok",
+        "criticStop": "ok",
+        "pass": false,
+        "requiresApproval": true,
+        "issueCount": 2,
+        "criticalIssueCount": 2,
+        "hasChanges": true
+      }
+    }
+  }
+}

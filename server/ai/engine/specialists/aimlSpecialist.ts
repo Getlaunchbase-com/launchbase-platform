@@ -9,8 +9,13 @@
  * - Minimal JSON schemas (draft/notes for craft, issues/verdict for critic)
  */
 
+import { readFileSync } from "fs";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
 import { completeJson } from "../../providers/providerFactory";
 import type { ArtifactV1 } from "../types";
+import { CraftOutputSchema } from "./schemas/craft.schema";
+import { CriticOutputSchema } from "./schemas/critic.schema";
 
 /**
  * Specialist stopReasons (frozen list)
@@ -41,7 +46,7 @@ export interface SpecialistRoleConfig {
  * Specialist call input
  */
 export interface SpecialistInput {
-  role: "craft" | "critic";
+  role: "craft" | "critic" | "designer_systems" | "designer_brand" | "design_critic" | "design_critic_ruthless" | "prompt_architect" | "prompt_auditor";
   trace: {
     jobId: string;
     runId: string;
@@ -70,31 +75,38 @@ export interface SpecialistOutput {
 }
 
 /**
- * Craft specialist JSON schema (minimal)
+ * Load prompt pack from file
  */
-const CRAFT_SCHEMA = {
-  type: "object",
-  properties: {
-    draft: { type: "string" },
-    notes: { type: "array", items: { type: "string" } },
-  },
-  required: ["draft", "notes"],
-  additionalProperties: false,
-};
+function loadPromptPack(role: string): string {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+  
+  // Map role names to prompt pack files
+  const promptMap: Record<string, string> = {
+    craft: "craft.md",
+    critic: "critic.md",
+    designer_systems: "designer_systems.md",
+    designer_brand: "designer_brand_conversion.md",
+    design_critic: "design_critic.md",
+    design_critic_ruthless: "design_critic_ruthless.md",
+    prompt_architect: "prompt_architect.md",
+    prompt_auditor: "prompt_auditor.md",
+  };
+  
+  const promptFile = promptMap[role] || `${role}.md`;
+  const promptPath = join(__dirname, "promptPacks", promptFile);
+  return readFileSync(promptPath, "utf-8");
+}
 
-/**
- * Critic specialist JSON schema (minimal)
- */
-const CRITIC_SCHEMA = {
-  type: "object",
-  properties: {
-    issues: { type: "array", items: { type: "string" } },
-    verdict: { type: "string", enum: ["pass", "revise"] },
-    suggestions: { type: "array", items: { type: "string" } },
-  },
-  required: ["issues", "verdict", "suggestions"],
-  additionalProperties: false,
-};
+// Load prompt packs at module initialization
+const CRAFT_PROMPT = loadPromptPack("craft");
+const CRITIC_PROMPT = loadPromptPack("critic");
+const DESIGNER_SYSTEMS_PROMPT = loadPromptPack("designer_systems");
+const DESIGNER_BRAND_PROMPT = loadPromptPack("designer_brand");
+const DESIGN_CRITIC_PROMPT = loadPromptPack("design_critic");
+const DESIGN_CRITIC_RUTHLESS_PROMPT = loadPromptPack("design_critic_ruthless");
+const PROMPT_ARCHITECT_PROMPT = loadPromptPack("prompt_architect");
+const PROMPT_AUDITOR_PROMPT = loadPromptPack("prompt_auditor");
 
 /**
  * Call AIML provider for specialist role
@@ -107,19 +119,29 @@ export async function callSpecialistAIML(
 ): Promise<SpecialistOutput> {
   const { role, trace, input: specInput, roleConfig } = input;
 
-  // Build system prompt based on role
-  const systemPrompt =
-    role === "craft"
-      ? "You are a craft specialist. Generate high-quality proposals based on the task and inputs. Return JSON with 'draft' (string) and 'notes' (array of strings)."
-      : "You are a critic specialist. Find flaws, edge cases, and regressions in proposals. Return JSON with 'issues' (array of strings), 'verdict' ('pass' or 'revise'), and 'suggestions' (array of strings).";
+  // Load prompt pack for this role
+  const promptMap: Record<string, string> = {
+    craft: CRAFT_PROMPT,
+    critic: CRITIC_PROMPT,
+    designer_systems: DESIGNER_SYSTEMS_PROMPT,
+    designer_brand: DESIGNER_BRAND_PROMPT,
+    design_critic: DESIGN_CRITIC_PROMPT,
+    design_critic_ruthless: DESIGN_CRITIC_RUTHLESS_PROMPT,
+    prompt_architect: PROMPT_ARCHITECT_PROMPT,
+    prompt_auditor: PROMPT_AUDITOR_PROMPT,
+  };
+  const systemPrompt = promptMap[role] || CRAFT_PROMPT;
 
-  // Build user prompt
-  const userPrompt = `Plan: ${JSON.stringify(specInput.plan, null, 2)}${
-    specInput.context ? `\n\nContext: ${JSON.stringify(specInput.context, null, 2)}` : ""
-  }\n\nProvide your ${role} response in JSON format.`;
+  // Build user prompt with inputs
+  const userPrompt = `# Input Data\n\n${JSON.stringify(specInput.plan, null, 2)}${
+    specInput.context ? `\n\n# Context\n\n${JSON.stringify(specInput.context, null, 2)}` : ""
+  }`;
 
-  // Determine expected schema
-  const expectedSchema = role === "craft" ? CRAFT_SCHEMA : CRITIC_SCHEMA;
+  // Determine Zod schema for validation
+  // Designer roles use Craft schema (proposedChanges[])
+  // Critic roles use Critic schema (issues[] + suggestedFixes[])
+  const useCraftSchema = ["craft", "designer_systems", "designer_brand"].includes(role);
+  const zodSchema = useCraftSchema ? CraftOutputSchema : CriticOutputSchema;
 
   try {
     // Call provider with timeout
@@ -172,42 +194,19 @@ export async function callSpecialistAIML(
       };
     }
 
-    // Validate JSON against schema (simple check, not full Ajv)
-    if (!result.json || typeof result.json !== "object") {
-      return {
-        artifact: {
-          kind: `swarm.specialist.${role}`,
-          payload: {
-            ok: false,
-            stopReason: "json_parse_failed",
-            fingerprint: `${trace.jobId}:${role}:json_parse`,
-          },
-          customerSafe: false,
-        },
-        meta: {
-          model: result.meta.model,
-          requestId: result.meta.requestId,
-          latencyMs: result.latencyMs,
-          inputTokens: result.usage.inputTokens,
-          outputTokens: result.usage.outputTokens,
-          costUsd: result.cost.estimatedUsd,
-        },
-        stopReason: "json_parse_failed",
-      };
-    }
-
-    // Basic schema validation
-    const requiredFields = role === "craft" ? ["draft", "notes"] : ["issues", "verdict", "suggestions"];
-    const missingFields = requiredFields.filter((field) => !(field in result.json));
-    if (missingFields.length > 0) {
+    // Validate JSON with Zod schema (hard gate)
+    const parseResult = zodSchema.safeParse(result.json);
+    
+    if (!parseResult.success) {
+      // Zod validation failed - return error artifact
       return {
         artifact: {
           kind: `swarm.specialist.${role}`,
           payload: {
             ok: false,
             stopReason: "ajv_failed",
-            fingerprint: `${trace.jobId}:${role}:ajv`,
-            missingFields,
+            fingerprint: `${trace.jobId}:${role}:zod_validation`,
+            errors: parseResult.error.errors.map((e) => `${e.path.join(".")}: ${e.message}`),
           },
           customerSafe: false,
         },

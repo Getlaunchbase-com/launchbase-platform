@@ -484,6 +484,22 @@ export async function completeJson(
 /**
  * Helper to build CompleteJsonResult from provider response
  */
+/**
+ * Strip markdown code fences from JSON response
+ * Claude Opus often wraps JSON in ```json ... ```
+ */
+function stripJsonFences(raw: string): string {
+  const s = raw.trim();
+  // Remove ```json ... ``` or ``` ... ```
+  if (s.startsWith("```")) {
+    return s
+      .replace(/^```[a-zA-Z]*\n?/, "") // Remove opening fence + optional language tag
+      .replace(/```$/, "")              // Remove closing fence
+      .trim();
+  }
+  return s;
+}
+
 function buildCompleteJsonResult(
   response: AiChatResponse,
   model: string,
@@ -494,7 +510,9 @@ function buildCompleteJsonResult(
   let json: any | null = null;
 
   try {
-    json = JSON.parse(response.rawText);
+    // Strip markdown fences before parsing
+    const cleanedText = stripJsonFences(response.rawText);
+    json = JSON.parse(cleanedText);
   } catch (err) {
     // NEVER log rawText preview. Log only a hash + length.
     console.warn("[AI] Failed to parse JSON response", {

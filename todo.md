@@ -1057,4 +1057,182 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [x] CTAs consistent throughout
 - [x] No pricing changes
 - [x] Homepage tested locally (dev server running, screenshot verified)
-- [ ] Checkpoint saved with new copy
+- [x] Checkpoint saved (version: f9d313cc)
+
+
+---
+
+## Phase 2.5: Real Specialist Prompts (Craft + Critic)
+
+**Goal:** Replace specialist stubs with real AIML prompts that produce reliable, validated JSON outputs
+
+**Non-negotiables:**
+- Never change frozen contracts (Gates 0-4 + Engine v1 + stopReason vocab)
+- All provider output must validate against specialist JSON schemas
+- No prompt/system/provider leakage into customerSafe: true artifacts
+
+**2.5.A - Define Specialist Output Schemas:**
+- [ ] Create Craft JSON schema:
+  - [ ] proposedChanges[] (targetKey, value, rationale, confidence, risks[])
+  - [ ] Save to: server/ai/engine/specialists/schemas/craft.schema.ts
+- [ ] Create Critic JSON schema:
+  - [ ] pass (boolean), issues[], suggestedFixes[], requiresApproval
+  - [ ] Save to: server/ai/engine/specialists/schemas/critic.schema.ts
+
+**2.5.B - Write Prompt Packs:**
+- [ ] Create craft prompt pack:
+  - [ ] Explicit JSON output instruction
+  - [ ] "Don't invent facts" + "use provided context only" guardrails
+  - [ ] LaunchBase style: responsibility, observability, reversibility
+  - [ ] Save to: server/ai/promptPacks/swarm/v1/craft.md
+- [ ] Create critic prompt pack:
+  - [ ] Explicit JSON output instruction
+  - [ ] Same guardrails as craft
+  - [ ] Save to: server/ai/promptPacks/swarm/v1/critic.md
+
+**2.5.C - Wiring:**
+- [ ] Update aimlSpecialist.ts:
+  - [ ] Load prompt pack by role
+  - [ ] Inject WorkOrder CORE + showroom brief context
+  - [ ] Request JSON output
+  - [ ] Validate with Zod → return stopReason (ok, json_parse_failed, ajv_failed, provider_failed, timeout, cost_cap_exceeded)
+- [ ] Update policy to include promptPackVersion: "swarm_v1"
+- [ ] No changes to swarmRunner.ts (artifact order stays frozen)
+
+**2.5.D - Tripwire Tests:**
+- [ ] Prompt pack snapshot tests (files exist + guardrail phrases present)
+- [ ] Schema validation tests (known-good/bad JSON samples)
+- [ ] Adapter behavior tests (mock AIML response → verify stopReason mapping)
+- [ ] No leakage test (collapse payload never contains forbidden keys)
+
+**2.5.E - Benchmark Suite:**
+- [ ] Profile 1: Cheap + fast (gpt-4o-mini, $0.05-$0.10 total cap)
+- [ ] Profile 2: Balanced (gpt-4o-mini, $0.15-$0.25 total cap)
+- [ ] Profile 3: Premium (better models, $0.50 total cap)
+- [ ] Success criteria: outputs validate, collapse returns ok or needs_human, cost under cap, 4 artifacts in order
+
+**Definition of Done:**
+- [ ] Craft + Critic schemas defined and validated
+- [ ] Prompt packs written with guardrails
+- [ ] Prompts wired into aimlSpecialist.ts with validation
+- [ ] Tripwire tests passing
+- [ ] Benchmark suite executed (3 profiles)
+- [ ] Frozen layers remain green (59/59 tests)
+- [ ] Checkpoint saved with real specialist prompts
+
+
+---
+
+## 🏆 PHASE 2: WINNING STACK LADDER (Build-on-Previous)
+
+**Status:** Tournament complete, champions selected  
+**Budget:** $3.94 spent of $50 allocated (92% remaining)
+
+### Tournament Results ✅ COMPLETE
+- [x] 40 tournament runs complete (16 systems + 16 brand + 8 critic)
+- [x] Scorecard generated (TOURNAMENT_SCORECARD.md)
+- [x] Category champions selected (CATEGORY_CHAMPIONS.json)
+- [x] Clear winner: gpt-4o-2024-08-06 (systems + brand), claude-opus-4-1-20250805 (critic)
+- [x] Top score: 71.0/100 (5 runs at top score with same stack)
+
+### Winning Stack Lock
+- [ ] Update swarm_winning_stack_v1.json with champion models:
+  - Systems: gpt-4o-2024-08-06
+  - Brand: gpt-4o-2024-08-06
+  - Critic: claude-opus-4-1-20250805
+- [ ] Document winning stack in WINNING_STACK_V1.md
+
+### 4-Run Build-on-Previous Ladder
+- [ ] Create ladder script (scripts/runLadder.ts)
+- [ ] Implement build-on-previous logic (inject previous proposedChanges as current state)
+- [ ] Run 1: Structure & Hierarchy
+  - Goal: Layout/section order, spacing, typography scale, scannability
+  - Directive: "Make it feel like Stripe/Linear. Remove friction. Improve flow."
+- [ ] Run 2: Conversion & Trust Architecture
+  - Goal: CTA placement, trust sequencing, objections, proof strategy
+  - Directive: "Increase CTA certainty without hype."
+- [ ] Run 3: Components & Interaction Design
+  - Goal: Sticky CTA rules, cards, tables, FAQ behavior, micro-interactions
+  - Directive: "Make it feel expensive + inevitable."
+- [ ] Run 4: Final Polish Pass
+  - Goal: Reduce noise, remove redundancy, unify tone, tighten all changes
+  - Directive: "Ship-ready. No extra ideas. Only best ones."
+- [ ] Check convergence after ladder (scripts/detectConvergence.ts)
+
+---
+
+## 🔬 PHASE 3: MEGA-SCALE TRUTHFULNESS TESTING
+
+**Goal:** 440+ runs to find models that stay truthful under pressure  
+**Budget:** ~$40 remaining
+
+### Scoring Infrastructure Upgrades
+- [ ] Fix duration telemetry (ensure meta.swarm.durationMs is captured)
+- [ ] Add Truthfulness Index penalties to scoreTournament.ts:
+  - FabricationPenalty (-0 to -15): invented features/proof/metrics
+  - ConstraintViolationPenalty (-0 to -15): pricing changes, banned claims
+  - ImplementabilityPenalty (-0 to -15): vague suggestions
+  - SchemaDriftPenalty (-0 to -15): invalid keys, wrong structure
+  - CriticSoftPenalty (-0 to -15): critic doesn't find meaningful issues
+- [ ] Update scoring rubric to include Truthfulness (0-25 points)
+- [ ] Regenerate scorecard with new penalties
+
+### Test Suite A: Web Design Reality (5 tests)
+- [ ] Test 1: Baseline homepage design pass
+- [ ] Test 2: CTA conversion pass
+- [ ] Test 3: Trust proof pass (no fake case studies)
+- [ ] Test 4: Mobile-first pass
+- [ ] Test 5: Pricing integrity pass (cannot alter prices)
+- [ ] Lie detection checks:
+  - Invents testimonials? penalty
+  - Adds new product features? penalty
+  - Contradicts "no pricing changes"? penalty
+
+### Test Suite B: App UX/Portal Reality (5 tests)
+- [ ] Test 1: Onboarding flow
+- [ ] Test 2: Dashboard IA
+- [ ] Test 3: Approval workflow for website changes
+- [ ] Test 4: Activity log UX (observability)
+- [ ] Test 5: Failure states / empty states
+- [ ] Lie detection checks:
+  - Claims screens that don't exist? penalty
+  - Suggests features without architecture? penalty
+  - No state handling? penalty
+
+### Test Suite C: Marketing Truth (5 tests)
+- [ ] Test 1: Hero rewrite (no unverified claims)
+- [ ] Test 2: Proof strategy (only allowed: "see your real site before you pay")
+- [ ] Test 3: Offer clarity (setup/monthly)
+- [ ] Test 4: Objections section
+- [ ] Test 5: Competitor positioning without slander
+- [ ] Lie detection checks:
+  - Makes performance promises ("increase conversion 30%")? penalty
+  - Adds "AI-powered" with no evidence? penalty
+  - Invents customer count? penalty
+
+### Phase 1: PromptOps Pressure Test (60 runs, ~$6)
+- [ ] 3 suites × 5 tests × 4 runs = 60 runs
+- [ ] Use champion stack (gpt-4o-2024-08-06 + claude-opus-4-1-20250805)
+- [ ] Vary prompts to test truthfulness under adversarial conditions
+- [ ] Generate scorecard with Truthfulness Index
+- [ ] Identify which prompts cause bullshit
+
+### Phase 2: Model Challenge Tournament (180 runs, ~$18-$40)
+- [ ] 15 tests × 6 challenger models × 2 runs = 180 runs
+- [ ] Test models: GPT-5, O3-pro, Claude Opus 4.1, Gemini 2.5 Pro, Grok-4, Kimi-k2
+- [ ] Keep prompts fixed from Phase 1
+- [ ] Find models that beat gpt-4o-2024-08-06 on Truthfulness Index
+
+### Phase 3: Adversarial Bullshit Traps (200 runs, ~$20-$60)
+- [ ] 10 trap tests × 10 models × 2 runs = 200 runs
+- [ ] Design traps that expose confident fabrication
+- [ ] Separate gods from fakers
+- [ ] Lock final champion stack for production
+
+---
+
+## 📋 Next Command
+
+**Immediate:** Lock winning stack + run 4-iteration ladder
+**Then:** Fix telemetry + add Truthfulness Index
+**Finally:** Run 440-run mega-scale truthfulness testing
