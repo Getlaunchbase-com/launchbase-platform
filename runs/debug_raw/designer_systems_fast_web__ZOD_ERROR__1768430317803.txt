@@ -1,0 +1,49 @@
+=== ZOD VALIDATION ERROR (designer_systems_fast_web) ===
+Model: google/gemini-2.5-pro
+Request ID: 2RpoafrxLeCbm9IP5qSB-QI
+
+=== ERRORS ===
+
+
+=== RAW TEXT ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Place the sub-headline directly below the main H1. Position the primary CTA button immediately below the sub-headline. Add 'No credit card required' text below the CTA.",
+      "rationale": "This tightens the value proposition and CTA, making the core offer scannable in 3 seconds. The 'no CC' text reduces sign-up friction.",
+      "confidence": 0.95,
+      "risks": [
+        "May feel too dense if the hero visual is complex."
+      ]
+    },
+    {
+      "targetKey": "design.mobile.heroStacking",
+      "value": "On mobile, stack elements: H1, Sub-headline, Primary CTA, then the hero visual. Ensure the CTA is fully visible above the fold on most phone screen sizes.",
+      "rationale": "Prioritizes the core message and action on mobile, which is critical for immediate engagement and preventing bounces.",
+      "confidence": 0.92,
+      "risks": [
+        "Hero visual may lose impact being pushed below the fold."
+      ]
+    },
+    {
+      "targetKey": "design.trust.placementStrategy",
+      "value": "Introduce a compact logo strip ('Trusted by...') or a single, powerful testimonial directly below the hero section, before the 'Problem' section.",
+      "rationale": "Establishes immediate social proof, validating the service before the user invests time in understanding the problem/solution details.",
+      "confidence": 0.90,
+      "risks": [
+        "Could distract from the problem/solution narrative if too bold."
+      ]
+    },
+    {
+      "targetKey": "design.layout.problem",
+      "value": "Reformat the 'Problem' section into a 3-column layout using icons and short headings for each pain point (e.g., 'Wasted Time,' 'Lost Control,' 'No Growth').",
+      "rationale": "Reduces cognitive load by breaking down complex problems into easily scannable chunks, making the user feel understood more quickly.",
+      "confidence": 0.88,
+      "risks": [
+        "Icons must be chosen carefully to avoid ambiguity."
+      ]
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Visually highlight the 'Most Popular' tier

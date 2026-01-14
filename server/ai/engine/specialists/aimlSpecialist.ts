@@ -292,6 +292,32 @@ export async function callSpecialistAIML(
       console.warn("[DEBUG] Failed to write raw response:", debugErr);
     }
 
+    // Short-circuit if JSON parse failed (BEFORE Zod validation)
+    // This separates parse failures (retryable) from schema mismatches (non-retryable)
+    if (result.json == null) {
+      return {
+        artifact: {
+          kind: `swarm.specialist.${role}`,
+          payload: {
+            ok: false,
+            stopReason: "invalid_json",
+            fingerprint: `${trace.jobId}:${role}:json_parse_failed`,
+            errors: ["JSON parse failed: result.json was null"],
+          },
+          customerSafe: false,
+        },
+        meta: {
+          model: result.meta.model,
+          requestId: result.meta.requestId,
+          latencyMs: result.latencyMs,
+          inputTokens: result.usage.inputTokens,
+          outputTokens: result.usage.outputTokens,
+          costUsd: result.cost.estimatedUsd,
+        },
+        stopReason: "invalid_json",
+      };
+    }
+
     // Validate JSON with Zod schema (hard gate)
     const parseResult = zodSchema.safeParse(result.json);
     
@@ -388,7 +414,11 @@ export async function callSpecialistAIML(
   } catch (err) {
     // Determine stopReason from error
     const errorMessage = err instanceof Error ? err.message : String(err);
+    const errorStack = err instanceof Error ? err.stack : undefined;
     let stopReason: SpecialistStopReason = "provider_failed";
+
+    console.error(`[SPECIALIST_ERROR] role=${role} error=${errorMessage}`);
+    console.error(`[SPECIALIST_ERROR_STACK]`, errorStack);
 
     if (errorMessage.includes("timeout")) {
       stopReason = "timeout";
@@ -437,7 +467,8 @@ export async function callSpecialistAIML(
  */
 export async function callSpecialistWithRetry(
   input: SpecialistInput,
-  enableLadder: boolean = false
+  enableLadder: boolean = false,
+  enableContentValidation: boolean = true
 ): Promise<SpecialistOutput & { retryMeta?: RetryMetadata }> {
   const { role, roleConfig } = input;
   
@@ -503,7 +534,7 @@ export async function callSpecialistWithRetry(
       }
       
       // Content Contract Validator: Check output shape BEFORE declaring success
-      if (result.stopReason === "ok") {
+      if (enableContentValidation && result.stopReason === "ok") {
         const contentValidation = validateContentContract(role, result.artifact?.payload);
         
         if (!contentValidation.valid) {

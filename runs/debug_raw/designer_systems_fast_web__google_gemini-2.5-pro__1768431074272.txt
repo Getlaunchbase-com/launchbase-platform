@@ -1,0 +1,16 @@
+=== RAW RESPONSE (designer_systems_fast_web) ===
+Model: google/gemini-2.5-pro
+Request ID: zx1oacGIGpObm9IPkorW0AQ
+Input Tokens: 1114
+Output Tokens: 65
+Finish Reason: length
+
+=== RAW TEXT (241 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Place a simplified, 3-column feature highlight (e.g., 'Ongoing Updates', 'Performance Monitoring', 'Expert Support') directly below the main H1 headline,
+
+=== PARSED JSON ===
+NULL (parse failed)
