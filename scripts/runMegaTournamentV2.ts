@@ -52,15 +52,15 @@ const TOURNAMENT_CONFIG = {
       provider: "openai", // For concurrency management
     },
     {
-      id: "gpt_5_2_pro",
-      name: "GPT-5.2 Pro Stack",
-      policy: "swarm_gpt_5_2_pro",
+      id: "gpt_5_pro",
+      name: "GPT-5 Pro Stack",
+      policy: "swarm_gpt_5_pro",
       provider: "openai",
     },
     {
-      id: "gpt_5_2",
-      name: "GPT-5.2 Stack",
-      policy: "swarm_gpt_5_2",
+      id: "gpt_5",
+      name: "GPT-5 Stack",
+      policy: "swarm_gpt_5",
       provider: "openai",
     },
     {
@@ -186,37 +186,52 @@ async function runSingleTest(
     
     // Run systems designer (lane-specific prompt)
     const systemsResult = await callSpecialistWithRetry({
-      role: `designer_systems_fast${promptSuffix}`,
-      brief,
+      role: `designer_systems_fast${promptSuffix}` as any,
+      trace: {
+        jobId: runId,
+        runId: runId,
+      },
+      input: {
+        plan: { brief },
+      },
       roleConfig: policy.specialists.roles.designer_systems_fast,
-      enableLadder: true,
-    });
+    }, true);
     
     // Run brand designer (lane-specific prompt)
     const brandResult = await callSpecialistWithRetry({
-      role: `designer_brand_fast${promptSuffix}`,
-      brief,
+      role: `designer_brand_fast${promptSuffix}` as any,
+      trace: {
+        jobId: runId,
+        runId: runId,
+      },
+      input: {
+        plan: { brief },
+      },
       roleConfig: policy.specialists.roles.designer_brand_fast,
-      enableLadder: true,
-    });
+    }, true);
     
     // Run critic (lane-specific prompt)
     const criticResult = await callSpecialistWithRetry({
-      role: `design_critic_ruthless${promptSuffix}`,
-      brief,
-      upstream: {
-        systems: systemsResult.payload,
-        brand: brandResult.payload,
+      role: `design_critic_ruthless${promptSuffix}` as any,
+      trace: {
+        jobId: runId,
+        runId: runId,
+      },
+      input: {
+        plan: { brief },
+        craftArtifacts: [
+          { role: 'systems', output: systemsResult.artifact.payload },
+          { role: 'brand', output: brandResult.artifact.payload },
+        ],
       },
       roleConfig: policy.specialists.roles.design_critic_ruthless,
-      enableLadder: true,
-    });
+    }, true);
     
     // Calculate truthfulness
     const truthfulness = calculateAggregateTruthfulness(
-      systemsResult.payload,
-      brandResult.payload,
-      criticResult.payload
+      systemsResult.artifact.payload,
+      brandResult.artifact.payload,
+      criticResult.artifact.payload
     );
     
     // Calculate scores
@@ -265,9 +280,9 @@ async function runSingleTest(
       stackName,
       repNumber,
       brief,
-      systemsResult: systemsResult.payload,
-      brandResult: brandResult.payload,
-      criticResult: criticResult.payload,
+      systemsResult: systemsResult.artifact.payload,
+      brandResult: brandResult.artifact.payload,
+      criticResult: criticResult.artifact.payload,
       truthfulness,
       baseScore,
       truthPenalty,

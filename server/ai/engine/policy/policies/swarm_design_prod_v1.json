@@ -1,125 +1,26 @@
 {
-  "name": "swarm_design_prod_v1",
-  "description": "Production Runner v1 - Sacred baseline for daily design operations. Proven 100% reliable in Gate B v2 (10/10 pass, 0 retries, 0 escalations). This is the control stack and daily driver.",
-  "version": "1.0.0",
-  "locked": true,
-  "constraints": {
-    "maxRounds": 1,
-    "costCapUsd": 5.0,
-    "maxTokensTotal": 50000
-  },
   "specialists": {
     "roles": {
       "designer_systems_fast": {
-        "transport": "aiml",
         "model": "gpt-4o-2024-08-06",
-        "capabilities": ["craft"],
         "timeoutMs": 90000,
-        "costCapUsd": 0.50,
-        "maxTokens": 2000,
-        "validator": "enabled",
-        "ladder": [
-          {
-            "model": "gpt-4o-2024-08-06",
-            "timeoutMs": 90000,
-            "retryOn": ["timeout", "provider_failed", "invalid_json", "content_failed"]
-          },
-          {
-            "model": "openai/gpt-5.2",
-            "timeoutMs": 150000,
-            "retryOn": ["timeout", "provider_failed", "invalid_json", "content_failed"]
-          },
-          {
-            "model": "openai/gpt-5.2-pro",
-            "timeoutMs": 180000,
-            "retryOn": ["timeout", "provider_failed", "invalid_json", "content_failed"]
-          }
-        ]
+        "maxTokens": 2000
       },
       "designer_brand_fast": {
-        "transport": "aiml",
         "model": "gpt-4o-2024-08-06",
-        "capabilities": ["craft"],
         "timeoutMs": 90000,
-        "costCapUsd": 0.50,
-        "maxTokens": 2000,
-        "validator": "enabled",
-        "ladder": [
-          {
-            "model": "gpt-4o-2024-08-06",
-            "timeoutMs": 90000,
-            "retryOn": ["timeout", "provider_failed", "invalid_json", "content_failed"]
-          },
-          {
-            "model": "openai/gpt-5.2",
-            "timeoutMs": 150000,
-            "retryOn": ["timeout", "provider_failed", "invalid_json", "content_failed"]
-          },
-          {
-            "model": "openai/gpt-5.2-pro",
-            "timeoutMs": 180000,
-            "retryOn": ["timeout", "provider_failed", "invalid_json", "content_failed"]
-          }
-        ]
+        "maxTokens": 2000
       },
       "design_critic_ruthless": {
-        "transport": "aiml",
         "model": "claude-opus-4-1-20250805",
-        "capabilities": ["critic"],
         "timeoutMs": 90000,
-        "costCapUsd": 0.50,
-        "maxTokens": 4000,
-        "validator": "enabled",
-        "ladder": [
-          {
-            "model": "claude-opus-4-1-20250805",
-            "timeoutMs": 90000,
-            "maxTokens": 4000,
-            "retryOn": ["timeout", "provider_failed", "invalid_json", "content_failed"]
-          },
-          {
-            "model": "claude-opus-4-1-20250805",
-            "timeoutMs": 150000,
-            "maxTokens": 4000,
-            "retryOn": ["timeout", "provider_failed", "invalid_json", "content_failed"]
-          },
-          {
-            "model": "claude-opus-4-1-20250805",
-            "timeoutMs": 180000,
-            "maxTokens": 4000,
-            "retryOn": ["timeout", "provider_failed", "invalid_json", "content_failed"]
-          }
-        ]
+        "maxTokens": 4000
       }
     }
   },
-  "metadata": {
-    "gateResults": {
-      "gateA": {
-        "runs": 10,
-        "passRate": 1.0,
-        "retries": 0,
-        "escalations": 0,
-        "avgCostUsd": 0.0,
-        "avgDurationMs": 76100
-      },
-      "gateBv2": {
-        "runs": 10,
-        "passRate": 1.0,
-        "retries": 0,
-        "escalations": 0,
-        "avgCostUsd": 0.0,
-        "avgDurationMs": 74000
-      }
-    },
-    "validator": {
-      "type": "ContentContractValidator",
-      "anchorTypes": ["quantitative", "uiPrimitive", "structuralMove"],
-      "threshold": "≥5/8 anchored",
-      "enforces": ["exactCount", "validKeys", "implementability"]
-    },
-    "createdAt": "2026-01-14T21:30:00.000Z",
-    "lockedBy": "Gate B v2 success (10/10)",
-    "purpose": "Production-safe design swarm for daily operations and control baseline for tournaments"
+  "routing": {
+    "allowFallback": false,
+    "abortOnModelMissing": true,
+    "logResolvedModel": true
   }
 }

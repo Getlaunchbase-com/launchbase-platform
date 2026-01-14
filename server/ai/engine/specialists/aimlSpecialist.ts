@@ -101,6 +101,19 @@ function loadPromptPack(role: string): string {
     design_critic_ruthless: "design_critic_ruthless.md",
     prompt_architect: "prompt_architect.md",
     prompt_auditor: "prompt_auditor.md",
+    // Lane-specific prompts (Mega Tournament V2)
+    designer_systems_fast_web: "designer_systems_fast_web.md",
+    designer_brand_fast_web: "designer_brand_fast_web.md",
+    design_critic_ruthless_web: "design_critic_ruthless_web.md",
+    designer_systems_fast_app: "designer_systems_fast_app.md",
+    designer_brand_fast_app: "designer_brand_fast_app.md",
+    design_critic_ruthless_app: "design_critic_ruthless_app.md",
+    designer_systems_fast_marketing: "designer_systems_fast_marketing.md",
+    designer_brand_fast_marketing: "designer_brand_fast_marketing.md",
+    design_critic_ruthless_marketing: "design_critic_ruthless_marketing.md",
+    designer_systems_fast_artwork: "designer_systems_fast_artwork.md",
+    designer_brand_fast_artwork: "designer_brand_fast_artwork.md",
+    design_critic_ruthless_artwork: "design_critic_ruthless_artwork.md",
   };
   
   const promptFile = promptMap[role] || `${role}.md`;
@@ -119,6 +132,20 @@ const DESIGN_CRITIC_PROMPT = loadPromptPack("design_critic");
 const DESIGN_CRITIC_RUTHLESS_PROMPT = loadPromptPack("design_critic_ruthless");
 const PROMPT_ARCHITECT_PROMPT = loadPromptPack("prompt_architect");
 const PROMPT_AUDITOR_PROMPT = loadPromptPack("prompt_auditor");
+// Lane-specific prompts (Mega Tournament V2)
+const DESIGNER_SYSTEMS_FAST_WEB_PROMPT = loadPromptPack("designer_systems_fast_web");
+const DESIGNER_BRAND_FAST_WEB_PROMPT = loadPromptPack("designer_brand_fast_web");
+const DESIGN_CRITIC_RUTHLESS_WEB_PROMPT = loadPromptPack("design_critic_ruthless_web");
+const DESIGNER_SYSTEMS_FAST_APP_PROMPT = loadPromptPack("designer_systems_fast_app");
+const DESIGNER_BRAND_FAST_APP_PROMPT = loadPromptPack("designer_brand_fast_app");
+const DESIGN_CRITIC_RUTHLESS_APP_PROMPT = loadPromptPack("design_critic_ruthless_app");
+const DESIGNER_SYSTEMS_FAST_MARKETING_PROMPT = loadPromptPack("designer_systems_fast_marketing");
+const DESIGNER_BRAND_FAST_MARKETING_PROMPT = loadPromptPack("designer_brand_fast_marketing");
+const DESIGN_CRITIC_RUTHLESS_MARKETING_PROMPT = loadPromptPack("design_critic_ruthless_marketing");
+const DESIGNER_SYSTEMS_FAST_ARTWORK_PROMPT = loadPromptPack("designer_systems_fast_artwork");
+const DESIGNER_BRAND_FAST_ARTWORK_PROMPT = loadPromptPack("designer_brand_fast_artwork");
+const DESIGN_CRITIC_RUTHLESS_ARTWORK_PROMPT = loadPromptPack("design_critic_ruthless_artwork");
+
 
 /**
  * Call AIML provider for specialist role
@@ -143,6 +170,19 @@ export async function callSpecialistAIML(
     design_critic_ruthless: DESIGN_CRITIC_RUTHLESS_PROMPT,
     prompt_architect: PROMPT_ARCHITECT_PROMPT,
     prompt_auditor: PROMPT_AUDITOR_PROMPT,
+    // Lane-specific prompts (Mega Tournament V2)
+    designer_systems_fast_web: DESIGNER_SYSTEMS_FAST_WEB_PROMPT,
+    designer_brand_fast_web: DESIGNER_BRAND_FAST_WEB_PROMPT,
+    design_critic_ruthless_web: DESIGN_CRITIC_RUTHLESS_WEB_PROMPT,
+    designer_systems_fast_app: DESIGNER_SYSTEMS_FAST_APP_PROMPT,
+    designer_brand_fast_app: DESIGNER_BRAND_FAST_APP_PROMPT,
+    design_critic_ruthless_app: DESIGN_CRITIC_RUTHLESS_APP_PROMPT,
+    designer_systems_fast_marketing: DESIGNER_SYSTEMS_FAST_MARKETING_PROMPT,
+    designer_brand_fast_marketing: DESIGNER_BRAND_FAST_MARKETING_PROMPT,
+    design_critic_ruthless_marketing: DESIGN_CRITIC_RUTHLESS_MARKETING_PROMPT,
+    designer_systems_fast_artwork: DESIGNER_SYSTEMS_FAST_ARTWORK_PROMPT,
+    designer_brand_fast_artwork: DESIGNER_BRAND_FAST_ARTWORK_PROMPT,
+    design_critic_ruthless_artwork: DESIGN_CRITIC_RUTHLESS_ARTWORK_PROMPT,
   };
   const systemPrompt = promptMap[role];
   if (!systemPrompt) throw new Error(`Missing prompt for role: ${role}`);
