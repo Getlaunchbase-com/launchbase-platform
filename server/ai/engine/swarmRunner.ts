@@ -14,7 +14,7 @@
 
 import type { AiWorkOrderV1, AiWorkResultV1, ArtifactV1, StopReasonV1 } from "./types";
 import type { PolicyV1 } from "./policy/policyTypes";
-import { callSpecialistAIML } from "./specialists";
+import { callSpecialistAIML, callSpecialistWithRetry } from "./specialists";
 import { buildDeterministicCollapse } from "./swarm/collapseDeterministic";
 
 /**
@@ -113,7 +113,9 @@ export async function runSwarmV1(
         });
       }
       
-      const result = await callSpecialistAIML({
+      // Use retry wrapper with ladder disabled by default (enable via policy flag)
+      const enableLadder = policy.swarm?.enableRetryLadder ?? false;
+      const result = await callSpecialistWithRetry({
         role: specialist as "craft" | "critic",
         trace: {
           jobId: ctx.traceId,
@@ -213,11 +215,21 @@ export async function runSwarmV1(
       artifacts.push(artifact);
       
       // If this is a craft/designer role, collect for critic
-      if (!specialist.includes("critic") && artifact.payload && result.stopReason === "ok") {
-        craftArtifacts.push({
-          role: specialist,
-          output: artifact.payload,
-        });
+      // Collect if payload exists and has usable data (proposedChanges), even if timeout/provider_failed
+      // This allows critic to work with partial successes
+      if (!specialist.includes("critic") && artifact.payload) {
+        // Check if payload has proposedChanges (craft output)
+        const hasUsableOutput = artifact.payload.proposedChanges && Array.isArray(artifact.payload.proposedChanges) && artifact.payload.proposedChanges.length > 0;
+        if (hasUsableOutput) {
+          craftArtifacts.push({
+            role: specialist,
+            output: artifact.payload,
+          });
+          console.log("[SWARM_DEBUG] collected_craft_artifact", specialist, {
+            stopReason: result.stopReason,
+            changesCount: artifact.payload.proposedChanges.length,
+          });
+        }
       }
       
       console.log("[SWARM_DEBUG] specialist_done", specialist, {

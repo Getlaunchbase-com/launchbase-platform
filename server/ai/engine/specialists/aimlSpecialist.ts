@@ -14,8 +14,15 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { completeJson } from "../../providers/providerFactory";
 import type { ArtifactV1 } from "../types";
-import { CraftOutputSchema } from "./schemas/craft.schema";
+import { CraftOutputSchema, getCraftSchemaForRole } from "./schemas/craft.schema";
 import { CriticOutputSchema } from "./schemas/critic.schema";
+import {
+  getModelLadderForRole,
+  shouldRetry,
+  exceedsBudgetThreshold,
+  getNextModel,
+  type RetryMetadata,
+} from "./retryLadder";
 
 /**
  * Specialist stopReasons (frozen list)
@@ -87,6 +94,8 @@ function loadPromptPack(role: string): string {
     critic: "critic.md",
     designer_systems: "designer_systems.md",
     designer_brand: "designer_brand_conversion.md",
+    designer_systems_fast: "designer_systems_fast.md",
+    designer_brand_fast: "designer_brand_fast.md",
     design_critic: "design_critic.md",
     design_critic_ruthless: "design_critic_ruthless.md",
     prompt_architect: "prompt_architect.md",
@@ -151,8 +160,9 @@ export async function callSpecialistAIML(
   // Determine Zod schema for validation
   // Designer roles use Craft schema (proposedChanges[])
   // Critic roles use Critic schema (issues[] + suggestedFixes[])
-  const useCraftSchema = ["craft", "designer_systems", "designer_brand"].includes(role);
-  const zodSchema = useCraftSchema ? CraftOutputSchema : CriticOutputSchema;
+  // Fast designers use CraftOutputSchemaFast (EXACTLY 8 changes)
+  const useCraftSchema = ["craft", "designer_systems", "designer_brand", "designer_systems_fast", "designer_brand_fast"].includes(role);
+  const zodSchema = useCraftSchema ? getCraftSchemaForRole(role) : CriticOutputSchema;
 
   try {
     // Call provider with timeout
@@ -356,4 +366,135 @@ export async function callSpecialistAIML(
       stopReason,
     };
   }
+}
+
+/**
+ * Call specialist with automatic retry + fallback ladder
+ * 
+ * Implements timeout ladder with automatic model fallback:
+ * 1. gpt-5.2-pro (180s) → 2. gpt-5.2 (150s) → 3. gpt-4o (90s)
+ * 
+ * Retry rules:
+ * - Max 2 retries (3 attempts total)
+ * - Retry only on: timeout, provider_failed, invalid_json
+ * - Budget safety: auto-escalate if cost > $2
+ * 
+ * @param input - Specialist input
+ * @param enableLadder - Enable model fallback ladder (default: false for reliability gate)
+ * @returns SpecialistOutput with retry metadata
+ */
+export async function callSpecialistWithRetry(
+  input: SpecialistInput,
+  enableLadder: boolean = false
+): Promise<SpecialistOutput & { retryMeta?: RetryMetadata }> {
+  const { role, roleConfig } = input;
+  
+  // Get model ladder for this role
+  const ladder = getModelLadderForRole(role);
+  
+  // If ladder disabled, use original model only
+  const effectiveLadder = enableLadder ? ladder : [{ model: roleConfig.model, timeoutMs: roleConfig.timeoutMs || 90000 }];
+  
+  // Retry metadata
+  const retryMeta: RetryMetadata = {
+    attemptCount: 0,
+    attemptModels: [],
+    finalModelUsed: roleConfig.model,
+    finalTimeoutMs: roleConfig.timeoutMs || 90000,
+    totalCost: 0,
+  };
+  
+  let lastError: Error | null = null;
+  
+  // Try each model in the ladder
+  for (let i = 0; i < effectiveLadder.length && i < 3; i++) {
+    const currentConfig = effectiveLadder[i];
+    retryMeta.attemptCount++;
+    retryMeta.attemptModels.push(currentConfig.model);
+    
+    console.log(`[RETRY_LADDER] Attempt ${retryMeta.attemptCount}: ${currentConfig.model} (timeout: ${currentConfig.timeoutMs}ms)`);
+    
+    // Update roleConfig with current model + timeout
+    const modifiedInput = {
+      ...input,
+      roleConfig: {
+        ...roleConfig,
+        model: currentConfig.model,
+        timeoutMs: currentConfig.timeoutMs,
+      },
+    };
+    
+    try {
+      // Call specialist
+      const result = await callSpecialistAIML(modifiedInput);
+      
+      // Update retry metadata
+      retryMeta.finalModelUsed = currentConfig.model;
+      retryMeta.finalTimeoutMs = currentConfig.timeoutMs;
+      retryMeta.totalCost += result.meta.costUsd;
+      
+      // Budget safety check
+      if (exceedsBudgetThreshold(retryMeta.totalCost)) {
+        console.warn(`[RETRY_LADDER] Budget threshold exceeded: $${retryMeta.totalCost.toFixed(4)}`);
+        return {
+          ...result,
+          artifact: {
+            ...result.artifact,
+            payload: {
+              ...result.artifact.payload,
+              requiresApproval: true,
+              budgetExceeded: true,
+            },
+          },
+          retryMeta,
+        };
+      }
+      
+      // If successful, return immediately
+      if (result.stopReason === "ok") {
+        console.log(`[RETRY_LADDER] Success on attempt ${retryMeta.attemptCount}`);
+        return { ...result, retryMeta };
+      }
+      
+      // If not retryable, return failure immediately
+      if (!shouldRetry(result.stopReason)) {
+        console.log(`[RETRY_LADDER] Non-retryable failure: ${result.stopReason}`);
+        return { ...result, retryMeta };
+      }
+      
+      // Retryable failure - log and continue to next model
+      console.log(`[RETRY_LADDER] Retryable failure: ${result.stopReason}, trying next model...`);
+      lastError = new Error(`Specialist failed with: ${result.stopReason}`);
+      
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+      console.error(`[RETRY_LADDER] Attempt ${retryMeta.attemptCount} threw error:`, lastError.message);
+    }
+  }
+  
+  // All retries exhausted - return final failure
+  console.error(`[RETRY_LADDER] All ${retryMeta.attemptCount} attempts failed`);
+  
+  return {
+    artifact: {
+      kind: `swarm.specialist.${role}`,
+      payload: {
+        ok: false,
+        stopReason: "provider_failed",
+        fingerprint: `${input.trace.jobId}:${role}:all_retries_failed`,
+        role,
+      },
+      customerSafe: false,
+    },
+    meta: {
+      model: retryMeta.finalModelUsed,
+      requestId: "none",
+      latencyMs: 0,
+      inputTokens: 0,
+      outputTokens: 0,
+      costUsd: retryMeta.totalCost,
+    },
+    stopReason: "provider_failed",
+    retryMeta,
+  };
 }

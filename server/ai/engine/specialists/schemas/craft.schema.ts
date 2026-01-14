@@ -46,6 +46,10 @@ export const CraftProposedChangeSchema = z.object({
   risks: z.array(z.string()).optional(),
 });
 
+/**
+ * Base Craft Output Schema (6-12 changes)
+ * Used for standard designer roles
+ */
 export const CraftOutputSchema = z.object({
   /**
    * Array of proposed changes to the website
@@ -65,6 +69,40 @@ export const CraftOutputSchema = z.object({
    */
   assumptions: z.array(z.string()).optional(),
 });
+
+/**
+ * Fast Craft Output Schema (EXACTLY 8 changes)
+ * Used for designer_systems_fast and designer_brand_fast roles
+ */
+export const CraftOutputSchemaFast = z.object({
+  /**
+   * Array of proposed changes to the website
+   * MUST contain EXACTLY 8 changes (no more, no less)
+   */
+  proposedChanges: z.array(CraftProposedChangeSchema).length(8),
+
+  /**
+   * Optional overall risks or assumptions for the entire set of changes
+   */
+  risks: z.array(z.string()).optional(),
+
+  /**
+   * Optional assumptions made during the crafting process
+   */
+  assumptions: z.array(z.string()).optional(),
+});
+
+/**
+ * Get the appropriate Craft schema based on role
+ * Fast designers (systems_fast, brand_fast) require EXACTLY 8 changes
+ * Standard designers require 6-12 changes
+ */
+export function getCraftSchemaForRole(role: string) {
+  if (role.includes("_fast")) {
+    return CraftOutputSchemaFast;
+  }
+  return CraftOutputSchema;
+}
 
 export type CraftProposedChange = z.infer<typeof CraftProposedChangeSchema>;
 export type CraftOutput = z.infer<typeof CraftOutputSchema>;
