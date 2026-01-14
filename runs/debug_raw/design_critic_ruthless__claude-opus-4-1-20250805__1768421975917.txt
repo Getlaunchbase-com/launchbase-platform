@@ -1,0 +1,154 @@
+=== RAW RESPONSE (design_critic_ruthless) ===
+Model: claude-opus-4-1-20250805
+Request ID: msg_01HLzC2J8Av53bEGaembUXNJ
+Input Tokens: 3022
+Output Tokens: 2000
+Finish Reason: max_tokens
+
+=== RAW TEXT (8134 chars) ===
+{
+  "pass": false,
+  "issues": [
+    {
+      "severity": "critical",
+      "description": "Hero lacks immediate 'what is this' comprehension - 'operating system for small businesses' is too abstract without visual anchoring or concrete examples within 8-second scan",
+      "location": "design.layout.hero",
+      "rationale": "Visitors will bounce if they cannot understand the core value proposition immediately. Abstract metaphors like 'operating system' require instant clarification through visuals or supporting text"
+    },
+    {
+      "severity": "critical",
+      "description": "No clear primary CTA in hero section - missing explicit action verb and destination clarity for conversion path",
+      "location": "design.conversion.heroCta",
+      "rationale": "Without a dominant CTA above the fold, visitors have no clear next step, causing decision paralysis and reducing conversion by 30-50%"
+    },
+    {
+      "severity": "major",
+      "description": "Trust-building elements not present in initial viewport - no logos, testimonials, or credibility indicators visible without scrolling",
+      "location": "design.trust.auditLogPattern",
+      "rationale": "Small business owners need immediate trust signals before engaging. Lack of social proof above fold increases bounce rate"
+    },
+    {
+      "severity": "major",
+      "description": "Mobile hero stacking unclear - if headline/subhead/CTA stack vertically, comprehension time exceeds 10 seconds on mobile devices",
+      "location": "design.mobile.heroStacking",
+      "rationale": "Mobile users scan faster and abandon quicker. Poor stacking hierarchy causes cognitive overload and increases mobile bounce"
+    },
+    {
+      "severity": "major",
+      "description": "Pricing section placement and structure undefined - risk of burying pricing too deep or presenting tiers without clear differentiation",
+      "location": "design.layout.pricing",
+      "rationale": "Small business owners are price-sensitive and need transparent pricing early. Hidden or complex pricing creates friction"
+    },
+    {
+      "severity": "major",
+      "description": "No sticky CTA behavior defined for scroll engagement - users lose conversion path during content consumption",
+      "location": "design.conversion.stickyCta",
+      "rationale": "Once users scroll past hero, they need persistent access to conversion action without scrolling back up"
+    },
+    {
+      "severity": "minor",
+      "description": "Typography hierarchy not optimized for scanning - if body text exceeds 65 characters per line, readability drops significantly",
+      "location": "design.type.maxLineLength",
+      "rationale": "Long line lengths cause eye fatigue and reduce comprehension, especially for time-pressed business owners"
+    },
+    {
+      "severity": "minor",
+      "description": "Section order may create scroll fatigue - if benefits come after features, users miss emotional hooks",
+      "location": "design.layout.sectionOrder",
+      "rationale": "Leading with features instead of outcomes causes premature abandonment before value is communicated"
+    },
+    {
+      "severity": "minor",
+      "description": "Proof density insufficient - single proof bar inadequate for skeptical small business audience",
+      "location": "design.components.proofBar",
+      "rationale": "Small business owners need multiple trust touchpoints throughout the page, not just one proof element"
+    },
+    {
+      "severity": "minor",
+      "description": "Mobile tap targets potentially undersized - if CTAs are under 48px height, mobile conversion drops",
+      "location": "design.mobile.tapTargets",
+      "rationale": "Small tap targets cause mis-taps and frustration, especially for users multitasking or on-the-go"
+    },
+    {
+      "severity": "major",
+      "description": "Visibility panel implementation unclear - 'control without losing control' promise needs concrete UI demonstration",
+      "location": "design.trust.visibilityPanel",
+      "rationale": "Abstract promises without visual proof create credibility gaps. Users need to see the dashboard/control interface"
+    },
+    {
+      "severity": "minor",
+      "description": "Card components lack trust signals - if feature cards don't include mini-proofs or outcome metrics, they appear generic",
+      "location": "design.components.card",
+      "rationale": "Every component should reinforce trust and outcomes, not just list features"
+    }
+  ],
+  "suggestedFixes": [
+    {
+      "targetKey": "design.layout.hero",
+      "fix": "Add visual dashboard preview or animated mockup showing actual business metrics within hero section at 600px height minimum",
+      "rationale": "Concrete visualization makes abstract 'operating system' concept instantly comprehensible"
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "fix": "Implement dual CTA pattern: primary 'Start Free Trial' button at 56px height + secondary 'See How It Works' link",
+      "rationale": "Dual CTAs serve both ready-to-convert and research-mode visitors without choice paralysis"
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "fix": "Add horizontal logo bar with 5-6 customer logos immediately below hero at 80px height with subtle animation",
+      "rationale": "Immediate social proof prevents bounce and builds credibility within first scroll depth"
+    },
+    {
+      "targetKey": "design.mobile.heroStacking",
+      "fix": "Stack order: headline (32px) → visual preview (200px) → subhead (18px) → CTA (48px) within 568px viewport height",
+      "rationale": "Visual-first stacking on mobile provides instant comprehension before text processing"
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "fix": "Position pricing as third section with 3-column comparison table, recommended tier highlighted with 20% larger CTA",
+      "rationale": "Early transparent pricing with clear recommendation reduces decision friction"
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "fix": "Trigger sticky header CTA bar at 400px scroll depth with condensed value prop + primary CTA at 48px height",
+      "rationale": "Persistent conversion opportunity maintains momentum without forcing scroll-back behavior"
+    },
+    {
+      "targetKey": "design.type.body",
+      "fix": "Constrain body text to 65ch max-width with 1.6 line-height for optimal readability across devices",
+      "rationale": "Optimal line length reduces cognitive load and increases content consumption rate"
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "fix": "Reorder: Hero → Problem/Pain → Solution Preview → Benefits → How It Works → Pricing → FAQ",
+      "rationale": "Emotional problem-first narrative creates urgency before feature exposition"
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "fix": "Distribute proof across 4 touchpoints: logo bar, testimonial cards, metric callouts, and case study previews",
+      "rationale": "Multiple proof formats appeal to different trust triggers and reinforce credibility"
+    },
+    {
+      "targetKey": "design.mobile.tapTargets",
+      "fix": "Set all interactive elements to minimum 48px height with 8px spacing between tappable areas",
+      "rationale": "Generous tap targets reduce friction and improve mobile conversion rates"
+    },
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "fix": "Include live dashboard screenshot or interactive demo showing real-time business metrics within How It Works section",
+      "rationale": "Tangible interface demonstration proves the 'visibility' promise with concrete evidence"
+    },
+    {
+      "targetKey": "design.components.card",
+      "fix": "Add micro-metrics to each feature card (e.g., '2 hours saved weekly') with icon indicators at 24px size",
+      "rationale": "Outcome-focused cards with specific metrics increase perceived value and trust"
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Dashboard preview in hero may require legal/compliance review for data representation",
+    "
+
+=== PARSED JSON ===
+NULL (parse failed)

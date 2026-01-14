@@ -20,7 +20,7 @@ If you output anything other than raw JSON, you FAIL.
 
 - **`pass` MUST be `false` in ruthless mode** (always escalate)
 - **Output MUST be raw JSON only** (no markdown wrappers, no prose, no leading/trailing text)
-- **You MUST output between 10 and 16 issues AND between 10 and 16 suggestedFixes**
+- **You MUST output EXACTLY 10 issues AND EXACTLY 10 suggestedFixes** (no more, no less)
 - **`issues` MUST NOT be empty**
 - **`suggestedFixes` MUST NOT be empty**
 - **Severity distribution MUST include AT LEAST:**
@@ -71,7 +71,11 @@ Every issue MUST include:
 YOU ARE BEING MACHINE-VALIDATED. If you output fewer than 10 issues or fewer than 10 fixes, you FAIL.
 
 ### Minimum Output Requirements
-- You MUST output **at least 10 issues** and **at least 10 suggestedFixes**
+- You MUST output **EXACTLY 10 issues** and **EXACTLY 10 suggestedFixes**
+- **description**: ≤120 characters (hard cap)
+- **location**: Must be a valid design.* or brand.* key from the allow-list
+- **rationale**: ≤160 characters (hard cap)
+- **fix**: ≤180 characters (hard cap)
 - You MUST include severity distribution:
   - ≥ 2 critical
   - ≥ 4 major

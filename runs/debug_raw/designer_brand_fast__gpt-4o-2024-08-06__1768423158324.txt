@@ -1,0 +1,160 @@
+=== RAW RESPONSE (designer_brand_fast) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy1vxuqXstkNyFf26sEeNnOX0s6i6
+Input Tokens: 878
+Output Tokens: 545
+Finish Reason: stop
+
+=== RAW TEXT (2057 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "Font size 48px, weight 700",
+      "rationale": "Enhances hierarchy and draws attention",
+      "confidence": 0.9,
+      "risks": ["May affect mobile view"]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "Font size 16px, line height 1.6",
+      "rationale": "Improves readability and comfort",
+      "confidence": 0.85,
+      "risks": ["May increase page length"]
+    },
+    {
+      "targetKey": "brand.type.cta",
+      "value": "Font weight 600, uppercase",
+      "rationale": "Increases visibility and urgency",
+      "confidence": 0.87,
+      "risks": ["Could appear too aggressive"]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "Increase to 80px",
+      "rationale": "Enhances visual flow and separation",
+      "confidence": 0.9,
+      "risks": ["May reduce content density"]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Rounded corners 8px, shadow 2px",
+      "rationale": "Modern look, improves clickability",
+      "confidence": 0.88,
+      "risks": ["Shadow may affect contrast"]
+    },
+    {
+      "targetKey": "brand.components.card",
+      "value": "Add subtle hover effect",
+      "rationale": "Encourages interaction, adds depth",
+      "confidence": 0.85,
+      "risks": ["May increase cognitive load"]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#0056D2",
+      "rationale": "Stronger association with trust",
+      "confidence": 0.9,
+      "risks": ["Might not match existing palette"]
+    },
+    {
+      "targetKey": "brand.color.contrast",
+      "value": "Increase contrast ratio to 4.5:1",
+      "rationale": "Improves accessibility and readability",
+      "confidence": 0.92,
+      "risks": ["Could affect brand aesthetic"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["Potential layout shifts", "Brand consistency issues"],
+  "assumptions": ["Current design lacks hierarchy", "Readability needs enhancement"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "Font size 48px, weight 700",
+      "rationale": "Enhances hierarchy and draws attention",
+      "confidence": 0.9,
+      "risks": [
+        "May affect mobile view"
+      ]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "Font size 16px, line height 1.6",
+      "rationale": "Improves readability and comfort",
+      "confidence": 0.85,
+      "risks": [
+        "May increase page length"
+      ]
+    },
+    {
+      "targetKey": "brand.type.cta",
+      "value": "Font weight 600, uppercase",
+      "rationale": "Increases visibility and urgency",
+      "confidence": 0.87,
+      "risks": [
+        "Could appear too aggressive"
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "Increase to 80px",
+      "rationale": "Enhances visual flow and separation",
+      "confidence": 0.9,
+      "risks": [
+        "May reduce content density"
+      ]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Rounded corners 8px, shadow 2px",
+      "rationale": "Modern look, improves clickability",
+      "confidence": 0.88,
+      "risks": [
+        "Shadow may affect contrast"
+      ]
+    },
+    {
+      "targetKey": "brand.components.card",
+      "value": "Add subtle hover effect",
+      "rationale": "Encourages interaction, adds depth",
+      "confidence": 0.85,
+      "risks": [
+        "May increase cognitive load"
+      ]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#0056D2",
+      "rationale": "Stronger association with trust",
+      "confidence": 0.9,
+      "risks": [
+        "Might not match existing palette"
+      ]
+    },
+    {
+      "targetKey": "brand.color.contrast",
+      "value": "Increase contrast ratio to 4.5:1",
+      "rationale": "Improves accessibility and readability",
+      "confidence": 0.92,
+      "risks": [
+        "Could affect brand aesthetic"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Potential layout shifts",
+    "Brand consistency issues"
+  ],
+  "assumptions": [
+    "Current design lacks hierarchy",
+    "Readability needs enhancement"
+  ]
+}

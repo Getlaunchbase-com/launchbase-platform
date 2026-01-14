@@ -1,0 +1,160 @@
+=== RAW RESPONSE (designer_brand_fast) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy1dOgniLH29QpSuQL2ZRxQ2wrvLE
+Input Tokens: 878
+Output Tokens: 552
+Finish Reason: stop
+
+=== RAW TEXT (2075 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "Font size 48px, weight 700",
+      "rationale": "Enhances hierarchy and readability",
+      "confidence": 0.92,
+      "risks": ["May require layout adjustments"]
+    },
+    {
+      "targetKey": "brand.type.h2",
+      "value": "Font size 36px, weight 600",
+      "rationale": "Defines secondary hierarchy, supports H1",
+      "confidence": 0.90,
+      "risks": ["Minor spacing shifts"]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "Font size 16px, line height 1.5",
+      "rationale": "Improves readability and comfort",
+      "confidence": 0.88,
+      "risks": ["Slightly increased page length"]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Rounded corners, 12px padding",
+      "rationale": "Increases touch target and modern appeal",
+      "confidence": 0.85,
+      "risks": ["May alter existing button sizes"]
+    },
+    {
+      "targetKey": "brand.components.card",
+      "value": "Shadow depth 4px, border radius 8px",
+      "rationale": "Enhances depth and focus on content",
+      "confidence": 0.86,
+      "risks": ["Visual weight increase"]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#2A9D8F",
+      "rationale": "Provides a fresh, trustworthy look",
+      "confidence": 0.89,
+      "risks": ["Existing brand associations"]
+    },
+    {
+      "targetKey": "brand.color.text",
+      "value": "#333333",
+      "rationale": "Ensures strong contrast for readability",
+      "confidence": 0.90,
+      "risks": ["May affect visual tone"]
+    },
+    {
+      "targetKey": "brand.system.consistency",
+      "value": "Align iconography styles across UI",
+      "rationale": "Ensures uniformity and reduces cognitive load",
+      "confidence": 0.87,
+      "risks": ["Minor redesign of some elements"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["Potential layout shifts", "Brand identity changes"],
+  "assumptions": ["Assume responsive design", "Assume existing brand assets"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "Font size 48px, weight 700",
+      "rationale": "Enhances hierarchy and readability",
+      "confidence": 0.92,
+      "risks": [
+        "May require layout adjustments"
+      ]
+    },
+    {
+      "targetKey": "brand.type.h2",
+      "value": "Font size 36px, weight 600",
+      "rationale": "Defines secondary hierarchy, supports H1",
+      "confidence": 0.9,
+      "risks": [
+        "Minor spacing shifts"
+      ]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "Font size 16px, line height 1.5",
+      "rationale": "Improves readability and comfort",
+      "confidence": 0.88,
+      "risks": [
+        "Slightly increased page length"
+      ]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Rounded corners, 12px padding",
+      "rationale": "Increases touch target and modern appeal",
+      "confidence": 0.85,
+      "risks": [
+        "May alter existing button sizes"
+      ]
+    },
+    {
+      "targetKey": "brand.components.card",
+      "value": "Shadow depth 4px, border radius 8px",
+      "rationale": "Enhances depth and focus on content",
+      "confidence": 0.86,
+      "risks": [
+        "Visual weight increase"
+      ]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#2A9D8F",
+      "rationale": "Provides a fresh, trustworthy look",
+      "confidence": 0.89,
+      "risks": [
+        "Existing brand associations"
+      ]
+    },
+    {
+      "targetKey": "brand.color.text",
+      "value": "#333333",
+      "rationale": "Ensures strong contrast for readability",
+      "confidence": 0.9,
+      "risks": [
+        "May affect visual tone"
+      ]
+    },
+    {
+      "targetKey": "brand.system.consistency",
+      "value": "Align iconography styles across UI",
+      "rationale": "Ensures uniformity and reduces cognitive load",
+      "confidence": 0.87,
+      "risks": [
+        "Minor redesign of some elements"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Potential layout shifts",
+    "Brand identity changes"
+  ],
+  "assumptions": [
+    "Assume responsive design",
+    "Assume existing brand assets"
+  ]
+}

@@ -172,6 +172,9 @@ export async function callSpecialistAIML(
   try {
     // Call provider with timeout
     const timeoutMs = roleConfig.timeoutMs || 25000;
+    const requestedMaxTokens = roleConfig.maxTokens ?? 2000;
+    console.log(`[AIML_CALL_REQUEST] role=${role} model=${roleConfig.model} requested_max_tokens=${requestedMaxTokens}`);
+
     const result = await Promise.race([
       completeJson(
         {
@@ -181,7 +184,7 @@ export async function callSpecialistAIML(
             { role: "user", content: userPrompt },
           ],
           temperature: 0.7,
-          maxTokens: 2000,
+          maxTokens: requestedMaxTokens,
           trace: {
             jobId: trace.jobId,
             step: `swarm.specialist.${role}`,
@@ -195,6 +198,9 @@ export async function callSpecialistAIML(
         setTimeout(() => reject(new Error("Specialist timeout")), timeoutMs)
       ),
     ]);
+
+    // Log response details
+    console.log(`[AIML_CALL_RESPONSE] role=${role} model=${result.meta.model} finish=${result.meta.finishReason} outTok=${result.usage.outputTokens} inTok=${result.usage.inputTokens}`);
 
     // Check cost cap
     if (roleConfig.costCapUsd && result.cost.estimatedUsd > roleConfig.costCapUsd) {
