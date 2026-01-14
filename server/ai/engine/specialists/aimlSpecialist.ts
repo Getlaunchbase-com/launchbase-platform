@@ -112,6 +112,8 @@ const CRAFT_PROMPT = loadPromptPack("craft");
 const CRITIC_PROMPT = loadPromptPack("critic");
 const DESIGNER_SYSTEMS_PROMPT = loadPromptPack("designer_systems");
 const DESIGNER_BRAND_PROMPT = loadPromptPack("designer_brand");
+const DESIGNER_SYSTEMS_FAST_PROMPT = loadPromptPack("designer_systems_fast");
+const DESIGNER_BRAND_FAST_PROMPT = loadPromptPack("designer_brand_fast");
 const DESIGN_CRITIC_PROMPT = loadPromptPack("design_critic");
 const DESIGN_CRITIC_RUTHLESS_PROMPT = loadPromptPack("design_critic_ruthless");
 const PROMPT_ARCHITECT_PROMPT = loadPromptPack("prompt_architect");
@@ -134,12 +136,15 @@ export async function callSpecialistAIML(
     critic: CRITIC_PROMPT,
     designer_systems: DESIGNER_SYSTEMS_PROMPT,
     designer_brand: DESIGNER_BRAND_PROMPT,
+    designer_systems_fast: DESIGNER_SYSTEMS_FAST_PROMPT,
+    designer_brand_fast: DESIGNER_BRAND_FAST_PROMPT,
     design_critic: DESIGN_CRITIC_PROMPT,
     design_critic_ruthless: DESIGN_CRITIC_RUTHLESS_PROMPT,
     prompt_architect: PROMPT_ARCHITECT_PROMPT,
     prompt_auditor: PROMPT_AUDITOR_PROMPT,
   };
-  const systemPrompt = promptMap[role] || CRAFT_PROMPT;
+  const systemPrompt = promptMap[role];
+  if (!systemPrompt) throw new Error(`Missing prompt for role: ${role}`);
 
   // Build user prompt with inputs
   let userPrompt = `# Input Data\n\n${JSON.stringify(specInput.plan, null, 2)}${

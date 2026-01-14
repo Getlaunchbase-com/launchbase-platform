@@ -1,0 +1,160 @@
+=== RAW RESPONSE (designer_brand_fast) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy1JdMcJyXPbzHY5QXzJ8CenQO7qo
+Input Tokens: 878
+Output Tokens: 551
+Finish Reason: stop
+
+=== RAW TEXT (2220 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "48px",
+      "rationale": "Enhances visual hierarchy and draws attention to key messages.",
+      "confidence": 0.9,
+      "risks": ["May require layout adjustments"]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "16px",
+      "rationale": "Improves readability and maintains a comfortable reading experience.",
+      "confidence": 0.85,
+      "risks": ["May affect text wrapping"]
+    },
+    {
+      "targetKey": "brand.type.cta",
+      "value": "18px bold",
+      "rationale": "Increases prominence of call-to-action, boosting click-through rate.",
+      "confidence": 0.92,
+      "risks": ["Might overpower other elements"]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#0044CC",
+      "rationale": "Conveys trust and reliability, aligning with brand promise.",
+      "confidence": 0.88,
+      "risks": ["May require contrast adjustments"]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Rounded corners, 12px padding",
+      "rationale": "Improves aesthetics and touch targets, enhancing usability.",
+      "confidence": 0.9,
+      "risks": ["Could clash with existing design"]
+    },
+    {
+      "targetKey": "brand.components.proofPattern",
+      "value": "Client logos with subtle grayscale",
+      "rationale": "Increases credibility without distracting from main content.",
+      "confidence": 0.85,
+      "risks": ["Logos may lose visibility"]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "32px",
+      "rationale": "Enhances content separation and improves readability.",
+      "confidence": 0.9,
+      "risks": ["Might require layout changes"]
+    },
+    {
+      "targetKey": "brand.system.accessibility",
+      "value": "Ensure WCAG 2.1 AA compliance",
+      "rationale": "Improves accessibility, broadening audience reach.",
+      "confidence": 0.95,
+      "risks": ["May limit color choices"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["Design inconsistencies", "Potential layout issues"],
+  "assumptions": ["Current design lacks trust elements", "Target audience values clarity"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "48px",
+      "rationale": "Enhances visual hierarchy and draws attention to key messages.",
+      "confidence": 0.9,
+      "risks": [
+        "May require layout adjustments"
+      ]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "16px",
+      "rationale": "Improves readability and maintains a comfortable reading experience.",
+      "confidence": 0.85,
+      "risks": [
+        "May affect text wrapping"
+      ]
+    },
+    {
+      "targetKey": "brand.type.cta",
+      "value": "18px bold",
+      "rationale": "Increases prominence of call-to-action, boosting click-through rate.",
+      "confidence": 0.92,
+      "risks": [
+        "Might overpower other elements"
+      ]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#0044CC",
+      "rationale": "Conveys trust and reliability, aligning with brand promise.",
+      "confidence": 0.88,
+      "risks": [
+        "May require contrast adjustments"
+      ]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Rounded corners, 12px padding",
+      "rationale": "Improves aesthetics and touch targets, enhancing usability.",
+      "confidence": 0.9,
+      "risks": [
+        "Could clash with existing design"
+      ]
+    },
+    {
+      "targetKey": "brand.components.proofPattern",
+      "value": "Client logos with subtle grayscale",
+      "rationale": "Increases credibility without distracting from main content.",
+      "confidence": 0.85,
+      "risks": [
+        "Logos may lose visibility"
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "32px",
+      "rationale": "Enhances content separation and improves readability.",
+      "confidence": 0.9,
+      "risks": [
+        "Might require layout changes"
+      ]
+    },
+    {
+      "targetKey": "brand.system.accessibility",
+      "value": "Ensure WCAG 2.1 AA compliance",
+      "rationale": "Improves accessibility, broadening audience reach.",
+      "confidence": 0.95,
+      "risks": [
+        "May limit color choices"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Design inconsistencies",
+    "Potential layout issues"
+  ],
+  "assumptions": [
+    "Current design lacks trust elements",
+    "Target audience values clarity"
+  ]
+}
