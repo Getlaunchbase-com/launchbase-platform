@@ -9,7 +9,7 @@
  * - Minimal JSON schemas (draft/notes for craft, issues/verdict for critic)
  */
 
-import { readFileSync } from "fs";
+import { readFileSync, writeFileSync, mkdirSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { completeJson } from "../../providers/providerFactory";
@@ -194,10 +194,56 @@ export async function callSpecialistAIML(
       };
     }
 
+    // DEBUG: Log raw response before validation (for 80-token failure debugging)
+    try {
+      const debugDir = join("/home/ubuntu/launchbase/runs", "debug_raw");
+      mkdirSync(debugDir, { recursive: true });
+      const debugFile = join(debugDir, `${role}__${result.meta.model.replace(/[^\w.-]/g, "_")}__${Date.now()}.txt`);
+      const debugContent = [
+        `=== RAW RESPONSE (${role}) ===`,
+        `Model: ${result.meta.model}`,
+        `Request ID: ${result.meta.requestId}`,
+        `Input Tokens: ${result.usage.inputTokens}`,
+        `Output Tokens: ${result.usage.outputTokens}`,
+        `Finish Reason: ${result.meta.finishReason}`,
+        ``,
+        `=== RAW TEXT (${result.rawText.length} chars) ===`,
+        result.rawText,
+        ``,
+        `=== PARSED JSON ===`,
+        result.json ? JSON.stringify(result.json, null, 2) : "NULL (parse failed)",
+      ].join("\n");
+      writeFileSync(debugFile, debugContent, "utf8");
+      console.log(`[DEBUG] Raw response saved to: ${debugFile}`);
+    } catch (debugErr) {
+      console.warn("[DEBUG] Failed to write raw response:", debugErr);
+    }
+
     // Validate JSON with Zod schema (hard gate)
     const parseResult = zodSchema.safeParse(result.json);
     
     if (!parseResult.success) {
+      // DEBUG: Log Zod validation errors
+      try {
+        const debugDir = join("/home/ubuntu/launchbase/runs", "debug_raw");
+        const debugFile = join(debugDir, `${role}__ZOD_ERROR__${Date.now()}.txt`);
+        const debugContent = [
+          `=== ZOD VALIDATION ERROR (${role}) ===`,
+          `Model: ${result.meta.model}`,
+          `Request ID: ${result.meta.requestId}`,
+          ``,
+          `=== ERRORS ===`,
+          JSON.stringify(parseResult.error.errors, null, 2),
+          ``,
+          `=== RAW TEXT ===`,
+          result.rawText,
+        ].join("\n");
+        writeFileSync(debugFile, debugContent, "utf8");
+        console.log(`[DEBUG] Zod error saved to: ${debugFile}`);
+      } catch (debugErr) {
+        console.warn("[DEBUG] Failed to write Zod error:", debugErr);
+      }
+
       // Zod validation failed - return error artifact
       return {
         artifact: {

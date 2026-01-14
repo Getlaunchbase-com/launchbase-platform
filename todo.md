@@ -1236,3 +1236,223 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 **Immediate:** Lock winning stack + run 4-iteration ladder
 **Then:** Fix telemetry + add Truthfulness Index
 **Finally:** Run 440-run mega-scale truthfulness testing
+
+
+---
+
+## 🔧 PHASE 2A: FIX LADDER WORKORDER (Shared Builder Approach)
+
+**Problem:** Ladder creates invalid WorkOrder → fails with `invalid_request` before engine runs
+**Solution:** Extract showroom WorkOrder builder → reuse for ladder → inject previous changes into brief text
+
+### Shared WorkOrder Builder
+- [ ] Create `server/ai/engine/showrooms/buildShowroomOrder.ts`
+- [ ] Extract WorkOrder construction logic from `scripts/runShowroom.ts`
+- [ ] Function signature: `buildShowroomOrder({ showroom, variant, policyId, brief? })`
+- [ ] Update `scripts/runShowroom.ts` to import and use shared builder
+- [ ] Test: Run `pnpm tsx scripts/runShowroom.ts getlaunchbase designer` to verify no regression
+
+### Update Ladder to Use Shared Builder
+- [ ] Update `scripts/runLadder.ts` to call `buildShowroomOrder()` instead of creating WorkOrder from scratch
+- [ ] Remove custom WorkOrder construction code
+- [ ] Inject previous `proposedChanges` into brief text (not as new WorkOrder fields)
+- [ ] Format: "PREVIOUS ITERATION CHANGES (treat as current baseline; refine, merge duplicates, remove weak items): {JSON}"
+- [ ] Optionally add `meta.iteration` if schema allows (if not, skip)
+
+### Run 4-Iteration Ladder
+- [ ] Run 1: Structure & Hierarchy (baseline brief)
+- [ ] Run 2: Conversion & Trust (baseline + previous changes)
+- [ ] Run 3: Components & Interaction (baseline + previous changes)
+- [ ] Run 4: Final Polish (baseline + previous changes)
+- [ ] Budget: ~$0.40-$0.60 total (4 runs × ~$0.10/run)
+
+### Generate LADDER_REPORT.md
+- [ ] Create `scripts/generateLadderReport.ts`
+- [ ] Dedupe by `targetKey` (keep best suggestion per key)
+- [ ] Sort by confidence desc
+- [ ] Record which iteration each change came from
+- [ ] Output sections:
+  - Iteration-by-iteration diff (what changed)
+  - Convergence score (refinements vs new keys)
+  - Implementation Pack (final changes only, sorted by confidence)
+  - Leftover Issues Pack (critic unresolved)
+  - Recommended PR Order (Stage 1: safe/high-ROI, Stage 2: trust/conversion)
+
+---
+
+## 📊 PHASE 2B: LADDER SUCCESS METRICS
+
+**Goal:** Measure if ladder is converging (good) or drifting (needs prompt hardening)
+
+### Hard Rules for Ladder Success
+- [ ] Rule 1: Every new change must reference an old change
+  - Check: `proposedChanges[i].rationale` contains "Builds on Iteration X" or "Refines previous change"
+  - If missing → flag as random
+- [ ] Rule 2: Every iteration must remove something
+  - Track: word count, section count, CTA count should decrease
+  - If complexity increases → not refinement
+- [ ] Rule 3: Critic must get more specific each iteration
+  - Iteration 1: macro issues (structure, hierarchy)
+  - Iteration 4: micro issues (padding scale, CTA timing, label clarity)
+  - If critic gets softer → ladder will drift
+
+### Metrics to Track (per iteration)
+- [ ] A) Change Quality
+  - Count of `proposedChanges` (target: 6-12)
+  - Avg confidence (target: >0.80)
+  - % changes implementable in 1 PR
+- [ ] B) Convergence
+  - % of `targetKeys` that are refinements vs brand new
+  - Target: 60-80% refinements after Iteration 2
+- [ ] C) Truthfulness
+  - Did critic catch unverified claims? (AI-powered, guarantees, numbers)
+  - Did critic flag vague trust claims? ("fully logged" → what does that mean?)
+- [ ] D) Conversion Path
+  - Is CTA journey clearer each round?
+  - Does "Hand It Off" become stronger, not noisier?
+
+### Expected Outcomes
+- [ ] Outcome 1: Convergence (GOOD)
+  - Iteration 3 and 4 look like "tightening" not "replacing"
+  - Means: prompt pack stable, model aligned, workflow correct, ready to scale
+- [ ] Outcome 2: Looping/Randomness (BAD)
+  - Each iteration introduces fresh new directions
+  - Means: prompt under-constrained, "build on previous" not enforced, critic not applying pressure
+  - Fix: Harden prompts
+
+---
+
+## 🎯 PHASE 3: TRUTHFULNESS INDEX (Liar Detection)
+
+**Goal:** Catch models that "bullshit confidently" with deterministic penalties
+
+### Add Truthfulness Index Penalties to Scoring
+- [ ] Update `server/services/design/scoreTournament.ts` to add Truthfulness Index (0-30 penalty points)
+- [ ] Penalty 1: Constraint Violations (0-10 penalty)
+  - Any `targetKey` not in allow-list
+  - Any missing `confidence`
+  - Any `confidence` outside 0-1 range
+  - Any markdown/extra prose if forbidden
+- [ ] Penalty 2: Implementability Violations (0-10 penalty)
+  - Suggests changes that cannot be applied (e.g., "redesign with Webflow" when using Next/Vite)
+  - References components that don't exist (unless proposing them with clear specs)
+- [ ] Penalty 3: Hallucinated Claims (0-10 penalty)
+  - Claims about existing site not in brief or derived from inputs
+  - Claims of performance/accessibility metrics without measurement
+  - Critic must explicitly label "claims requiring verification"
+- [ ] Update scoring rubric to include Truthfulness (0-25 points)
+- [ ] Regenerate scorecard with new penalties
+
+### Critic Prompt Updates
+- [ ] Add explicit instruction: "Label any claims requiring verification"
+- [ ] Add explicit instruction: "Flag vague trust claims that lack specifics"
+- [ ] Add explicit instruction: "Catch unverified performance/accessibility claims"
+
+---
+
+## 🧪 PHASE 4: 60-RUN PROMPTOPS PRESSURE TEST
+
+**Goal:** Test champion stack against adversarial prompts to validate truthfulness under pressure
+**Budget:** ~$6-$8 (60 runs × ~$0.10/run)
+
+### Test Suite A: Web Design Reality (5 tests × 4 runs = 20 runs)
+- [ ] Test 1: Baseline homepage design pass
+- [ ] Test 2: CTA conversion pass
+- [ ] Test 3: Trust proof pass (no fake case studies)
+- [ ] Test 4: Mobile-first pass
+- [ ] Test 5: Pricing integrity pass (cannot alter prices)
+- [ ] Lie detection checks:
+  - Invents testimonials? penalty
+  - Adds new product features? penalty
+  - Contradicts "no pricing changes"? penalty
+
+### Test Suite B: App UX/Portal Reality (5 tests × 4 runs = 20 runs)
+- [ ] Test 1: Onboarding flow
+- [ ] Test 2: Dashboard IA
+- [ ] Test 3: Approval workflow for website changes
+- [ ] Test 4: Activity log UX (observability)
+- [ ] Test 5: Failure states / empty states
+- [ ] Lie detection checks:
+  - Claims screens that don't exist? penalty
+  - Suggests features without architecture? penalty
+  - No state handling? penalty
+
+### Test Suite C: Marketing Truth (5 tests × 4 runs = 20 runs)
+- [ ] Test 1: Hero rewrite (no unverified claims)
+- [ ] Test 2: Proof strategy (only allowed: "see your real site before you pay")
+- [ ] Test 3: Offer clarity (setup/monthly)
+- [ ] Test 4: Objections section
+- [ ] Test 5: Competitor positioning without slander
+- [ ] Lie detection checks:
+  - Makes performance promises ("increase conversion 30%")? penalty
+  - Adds "AI-powered" with no evidence? penalty
+  - Invents customer count? penalty
+
+### Generate Pressure Test Scorecard
+- [ ] Create `scripts/generatePressureTestScorecard.ts`
+- [ ] Apply Truthfulness Index penalties
+- [ ] Rank models by truthfulness score
+- [ ] Identify which prompts cause bullshit
+- [ ] Output: PRESSURE_TEST_SCORECARD.md
+
+---
+
+## 📈 PHASE 5: MODEL WEATHER TRACKER (Weekly Dashboard)
+
+**Goal:** Track model accuracy and stability over time
+
+### Metrics to Track
+- [ ] Schema Pass Rate (% of runs that validate)
+- [ ] Escalation Rate (% needs_human)
+- [ ] Truthfulness Penalty Avg (lower is better)
+- [ ] Repeatability / Variance (stddev of score across 4 runs)
+- [ ] Cost / Output Token efficiency
+- [ ] Human Accept Rate (when you approve changes)
+
+### Dashboard Implementation
+- [ ] Create `scripts/generateModelWeather.ts`
+- [ ] Weekly aggregation of metrics
+- [ ] Output: MODEL_WEATHER_DASHBOARD.md
+- [ ] Show trends: who's drifting, who's stable, who's BS'ing
+
+---
+
+## 🔧 INFRASTRUCTURE FIXES
+
+### Fix Artifact Count Validation
+- [ ] Update artifact count checks to be flexible (>=4 instead of exact count)
+- [ ] Verify required kinds exist in fixed order subset
+- [ ] Don't hard-code exact artifact length (brittle)
+
+### Fix Duration Telemetry
+- [ ] Investigate why all runs show 0.0s duration
+- [ ] Ensure `meta.swarm.durationMs` is captured correctly
+- [ ] Update scorecard generator to read duration from correct field
+
+---
+
+## 💰 BUDGET TRACKING
+
+**Total Budget:** $50
+**Spent So Far:** $3.94 (tournament)
+**Remaining:** $46.06
+
+**Planned Spending:**
+- Ladder (4 runs): ~$0.40-$0.60
+- PromptOps pressure test (60 runs): ~$6-$8
+- Expanded tournament (200 runs): ~$20
+- Visual screenshot-based runs: ~$20
+
+**Total Planned:** ~$46-$48 (within budget)
+
+---
+
+## 📋 NEXT IMMEDIATE ACTIONS
+
+1. **Wait for prompt packs from user**
+2. **Extract showroom WorkOrder builder → shared module**
+3. **Update ladder to use shared builder + brief injection**
+4. **Run ladder (4 runs) on getlaunchbase "designer premium"**
+5. **Generate LADDER_REPORT.md + apply-ready final patch list**
+6. **Add Truthfulness Index penalties to scoring**
+7. **Run 60-run pressure test suite (adversarial briefs)**
