@@ -26,6 +26,16 @@ import {
 import { validateContentContract } from "./contentValidator";
 
 /**
+ * Convert Zod error to string array (handles both .issues and .errors)
+ */
+function zodIssuesToStrings(err: unknown): string[] {
+  const anyErr = err as any;
+  const issues = anyErr?.issues ?? anyErr?.errors;
+  if (!Array.isArray(issues)) return ["Zod validation failed (no issues)"];
+  return issues.map((e: any) => `${(e.path ?? []).join(".")}: ${e.message ?? "Invalid"}`);
+}
+
+/**
  * Specialist stopReasons (frozen list)
  * 
  * These are internal-only. Swarm runner may convert to customer-safe stopReasons.
@@ -203,12 +213,23 @@ export async function callSpecialistAIML(
     console.log("[SWARM_DEBUG] critic_prompt_has_upstream", false, "craftArtifactsCount=", specInput.craftArtifacts?.length ?? 0);
   }
 
-  // Determine Zod schema for validation
-  // Designer roles use Craft schema (proposedChanges[])
-  // Critic roles use Critic schema (issues[] + suggestedFixes[])
-  // Fast designers use CraftOutputSchemaFast (EXACTLY 8 changes)
-  const useCraftSchema = ["craft", "designer_systems", "designer_brand", "designer_systems_fast", "designer_brand_fast"].includes(role);
-  const zodSchema = useCraftSchema ? getCraftSchemaForRole(role) : CriticOutputSchema;
+  // Bulletproof role classifiers (prefix-based, handles suffixes like _web, _app)
+  const isCraftRole = (r: string) =>
+    r === "craft" ||
+    r.startsWith("designer_systems") ||
+    r.startsWith("designer_brand") ||
+    r.startsWith("designer_fast");
+
+  const isCriticRole = (r: string) =>
+    r === "critic" ||
+    r.startsWith("design_critic");
+
+  // Single schema selector (uses getCraftSchemaForRole for fast vs normal)
+  const getSchemaForRole = (r: string) => {
+    if (isCraftRole(r)) return getCraftSchemaForRole(r);
+    if (isCriticRole(r)) return CriticOutputSchema;
+    throw new Error(`[SCHEMA_ROUTER] Unknown role="${r}" — no schema available`);
+  };
 
   try {
     // Call provider with timeout
@@ -292,6 +313,14 @@ export async function callSpecialistAIML(
       console.warn("[DEBUG] Failed to write raw response:", debugErr);
     }
 
+    // Guardrail: Warn if output shape doesn't match expected schema
+    if (result.json && isCraftRole(role) && (result.json as any)?.issues) {
+      console.warn(`[SCHEMA_WARN] role="${role}" looks like critic output; check prompt mapping.`);
+    }
+    if (result.json && isCriticRole(role) && (result.json as any)?.proposedChanges) {
+      console.warn(`[SCHEMA_WARN] role="${role}" looks like craft output; check prompt mapping.`);
+    }
+
     // Short-circuit if JSON parse failed (BEFORE Zod validation)
     // This separates parse failures (retryable) from schema mismatches (non-retryable)
     if (result.json == null) {
@@ -318,6 +347,9 @@ export async function callSpecialistAIML(
       };
     }
 
+    // Select schema for validation (after result exists, before Zod)
+    const zodSchema = getSchemaForRole(role);
+
     // Validate JSON with Zod schema (hard gate)
     const parseResult = zodSchema.safeParse(result.json);
     
@@ -332,7 +364,7 @@ export async function callSpecialistAIML(
           `Request ID: ${result.meta.requestId}`,
           ``,
           `=== ERRORS ===`,
-          JSON.stringify(parseResult.error.errors, null, 2),
+          JSON.stringify(zodIssuesToStrings(parseResult.error), null, 2),
           ``,
           `=== RAW TEXT ===`,
           result.rawText,
@@ -343,7 +375,16 @@ export async function callSpecialistAIML(
         console.warn("[DEBUG] Failed to write Zod error:", debugErr);
       }
 
-      // Zod validation failed - return error artifact
+      // Zod validation failed - log details and return error artifact
+      console.error(
+        `[ZOD_FAIL] role=${role} issues=${(parseResult.error as any).issues?.length ?? 0}`,
+        ((parseResult.error as any).issues ?? []).map((i: any) => ({
+          path: i.path,
+          message: i.message,
+          code: i.code,
+        }))
+      );
+      
       return {
         artifact: {
           kind: `swarm.specialist.${role}`,
@@ -351,7 +392,7 @@ export async function callSpecialistAIML(
             ok: false,
             stopReason: "ajv_failed",
             fingerprint: `${trace.jobId}:${role}:zod_validation`,
-            errors: parseResult.error.errors.map((e) => `${e.path.join(".")}: ${e.message}`),
+            errors: zodIssuesToStrings(parseResult.error),
           },
           customerSafe: false,
         },

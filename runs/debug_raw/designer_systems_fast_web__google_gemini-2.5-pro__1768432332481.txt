@@ -1,0 +1,16 @@
+=== RAW RESPONSE (designer_systems_fast_web) ===
+Model: google/gemini-2.5-pro
+Request ID: uCJoaYrKItOFidsPh5GigQs
+Input Tokens: 1114
+Output Tokens: 66
+Finish Reason: length
+
+=== RAW TEXT (217 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Below the main H1, add a 3-column row with icons and short text labels (e.g., 'Updates,' 'Security,' 'Support') to quickly define
+
+=== PARSED JSON ===
+NULL (parse failed)

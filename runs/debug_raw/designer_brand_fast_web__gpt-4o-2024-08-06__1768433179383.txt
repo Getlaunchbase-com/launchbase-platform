@@ -1,0 +1,160 @@
+=== RAW RESPONSE (designer_brand_fast_web) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy4XacseKYGWzkBQpMwMtr8STnf5b
+Input Tokens: 943
+Output Tokens: 533
+Finish Reason: stop
+
+=== RAW TEXT (2004 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "48px, weight 700",
+      "rationale": "Enhances readability and hierarchy",
+      "confidence": 0.90,
+      "risks": ["May seem too large"]
+    },
+    {
+      "targetKey": "brand.type.h2",
+      "value": "36px, weight 600",
+      "rationale": "Clear distinction from H1, readable",
+      "confidence": 0.88,
+      "risks": ["Too close to body size"]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "18px, weight 400",
+      "rationale": "Increases readability, professional feel",
+      "confidence": 0.85,
+      "risks": ["Increased line height needed"]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#0056b3",
+      "rationale": "Conveys trust and professionalism",
+      "confidence": 0.92,
+      "risks": ["May not stand out against backgrounds"]
+    },
+    {
+      "targetKey": "brand.color.trust",
+      "value": "#008080",
+      "rationale": "Enhances trust signals, calming effect",
+      "confidence": 0.93,
+      "risks": ["Might clash with other colors"]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "40px",
+      "rationale": "Provides consistent breathing room",
+      "confidence": 0.87,
+      "risks": ["Page might feel too spaced out"]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Rounded corners, 16px padding",
+      "rationale": "Modern and approachable style",
+      "confidence": 0.89,
+      "risks": ["Might reduce click area"]
+    },
+    {
+      "targetKey": "brand.visual.consistency",
+      "value": "Align text and images uniformly",
+      "rationale": "Creates a professional, clean look",
+      "confidence": 0.91,
+      "risks": ["Elements might appear rigid"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["Might impact load times", "Potential color misalignment"],
+  "assumptions": ["Current layout supports these changes", "Audience prefers clarity"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "48px, weight 700",
+      "rationale": "Enhances readability and hierarchy",
+      "confidence": 0.9,
+      "risks": [
+        "May seem too large"
+      ]
+    },
+    {
+      "targetKey": "brand.type.h2",
+      "value": "36px, weight 600",
+      "rationale": "Clear distinction from H1, readable",
+      "confidence": 0.88,
+      "risks": [
+        "Too close to body size"
+      ]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "18px, weight 400",
+      "rationale": "Increases readability, professional feel",
+      "confidence": 0.85,
+      "risks": [
+        "Increased line height needed"
+      ]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#0056b3",
+      "rationale": "Conveys trust and professionalism",
+      "confidence": 0.92,
+      "risks": [
+        "May not stand out against backgrounds"
+      ]
+    },
+    {
+      "targetKey": "brand.color.trust",
+      "value": "#008080",
+      "rationale": "Enhances trust signals, calming effect",
+      "confidence": 0.93,
+      "risks": [
+        "Might clash with other colors"
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "40px",
+      "rationale": "Provides consistent breathing room",
+      "confidence": 0.87,
+      "risks": [
+        "Page might feel too spaced out"
+      ]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Rounded corners, 16px padding",
+      "rationale": "Modern and approachable style",
+      "confidence": 0.89,
+      "risks": [
+        "Might reduce click area"
+      ]
+    },
+    {
+      "targetKey": "brand.visual.consistency",
+      "value": "Align text and images uniformly",
+      "rationale": "Creates a professional, clean look",
+      "confidence": 0.91,
+      "risks": [
+        "Elements might appear rigid"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Might impact load times",
+    "Potential color misalignment"
+  ],
+  "assumptions": [
+    "Current layout supports these changes",
+    "Audience prefers clarity"
+  ]
+}

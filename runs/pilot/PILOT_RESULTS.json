@@ -1,6 +1,6 @@
 [
   {
-    "runId": "pilot_control_champion_rep1_1768430857768",
+    "runId": "pilot_control_champion_rep1_1768432749562",
     "stackId": "control_champion",
     "stackName": "Control Champion (4o + Opus)",
     "rep": 1,
@@ -9,12 +9,12 @@
     "criticResult": null,
     "truthfulness": null,
     "cost": 0,
-    "duration": 11701,
+    "duration": 1,
     "success": false,
     "error": "Systems failed: provider_failed"
   },
   {
-    "runId": "pilot_control_champion_rep2_1768430869469",
+    "runId": "pilot_control_champion_rep2_1768432749563",
     "stackId": "control_champion",
     "stackName": "Control Champion (4o + Opus)",
     "rep": 2,
@@ -23,12 +23,12 @@
     "criticResult": null,
     "truthfulness": null,
     "cost": 0,
-    "duration": 30586,
+    "duration": 0,
     "success": false,
     "error": "Systems failed: provider_failed"
   },
   {
-    "runId": "pilot_gpt_5_rep1_1768430900055",
+    "runId": "pilot_gpt_5_rep1_1768432749563",
     "stackId": "gpt_5",
     "stackName": "GPT-5 Stack",
     "rep": 1,
@@ -37,12 +37,12 @@
     "criticResult": null,
     "truthfulness": null,
     "cost": 0,
-    "duration": 89447,
+    "duration": 0,
     "success": false,
     "error": "Systems failed: provider_failed"
   },
   {
-    "runId": "pilot_gpt_5_rep2_1768430989502",
+    "runId": "pilot_gpt_5_rep2_1768432749563",
     "stackId": "gpt_5",
     "stackName": "GPT-5 Stack",
     "rep": 2,
@@ -51,12 +51,12 @@
     "criticResult": null,
     "truthfulness": null,
     "cost": 0,
-    "duration": 61807,
+    "duration": 1,
     "success": false,
     "error": "Systems failed: provider_failed"
   },
   {
-    "runId": "pilot_o3_pro_rep1_1768431051309",
+    "runId": "pilot_o3_pro_rep1_1768432749564",
     "stackId": "o3_pro",
     "stackName": "O3-Pro Stack",
     "rep": 1,
@@ -65,12 +65,12 @@
     "criticResult": null,
     "truthfulness": null,
     "cost": 0,
-    "duration": 2280,
+    "duration": 0,
     "success": false,
     "error": "Systems failed: provider_failed"
   },
   {
-    "runId": "pilot_o3_pro_rep2_1768431053589",
+    "runId": "pilot_o3_pro_rep2_1768432749564",
     "stackId": "o3_pro",
     "stackName": "O3-Pro Stack",
     "rep": 2,
@@ -79,12 +79,12 @@
     "criticResult": null,
     "truthfulness": null,
     "cost": 0,
-    "duration": 1313,
+    "duration": 0,
     "success": false,
     "error": "Systems failed: provider_failed"
   },
   {
-    "runId": "pilot_gemini_2_5_pro_rep1_1768431054902",
+    "runId": "pilot_gemini_2_5_pro_rep1_1768432749564",
     "stackId": "gemini_2_5_pro",
     "stackName": "Gemini 2.5 Pro Stack",
     "rep": 1,
@@ -93,12 +93,12 @@
     "criticResult": null,
     "truthfulness": null,
     "cost": 0,
-    "duration": 19371,
+    "duration": 0,
     "success": false,
     "error": "Systems failed: provider_failed"
   },
   {
-    "runId": "pilot_gemini_2_5_pro_rep2_1768431074273",
+    "runId": "pilot_gemini_2_5_pro_rep2_1768432749564",
     "stackId": "gemini_2_5_pro",
     "stackName": "Gemini 2.5 Pro Stack",
     "rep": 2,
@@ -107,7 +107,7 @@
     "criticResult": null,
     "truthfulness": null,
     "cost": 0,
-    "duration": 34195,
+    "duration": 1,
     "success": false,
     "error": "Systems failed: provider_failed"
   }
