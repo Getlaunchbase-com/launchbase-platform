@@ -26,41 +26,59 @@ Critique the LaunchBase homepage design proposals (systems + brand) and identify
 
 ## Output format (STRICT)
 
+### ⚠️ NON-NEGOTIABLE SCHEMA CONTRACT ⚠️
+
+**Critical field names (DO NOT DEVIATE):**
+- In `issues[]`, the field name is **`location`** (string). DO NOT use `affectedKeys`, `keys`, or `targetKeys`.
+- `location` MUST be a single valid key matching: `^(design|brand)\.[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*$`
+- You MUST include **`suggestedFixes`** (array, min 10). DO NOT use `fixes`.
+- You MUST include **`requiresApproval`** (boolean).
+- You MUST include **`previewRecommended`** (boolean) - set true if layout/spacing/typography/CTA changes proposed.
+- Return **raw JSON only** (no markdown fences, no prose).
+
+**Mapping rule for multiple affected keys:**
+If you would normally output multiple affected keys: pick the most relevant single key and put it into `location`. Put the others (if needed) into the issue `description` text.
+
+**Schema linter:**
+If you are about to output `affectedKeys`, replace it with `location`.
+If you are about to output `fixes`, replace it with `suggestedFixes`.
+
 **HARD RULES:**
 - Return ONLY valid JSON. NO markdown wrappers.
 - You MUST return EXACTLY 10 issues (no more, no less)
-- You MUST return EXACTLY 10 fixes (no more, no less)
-- Each issue must reference specific targetKeys from upstream
+- You MUST return EXACTLY 10 suggestedFixes (no more, no less)
+- Each issue must have a valid `location` (single targetKey)
 - Each fix must be actionable and specific
 - `pass` MUST be false (ruthless mode)
 
 **Output caps:**
 - `description`: max 160 characters
 - `severity`: "critical" | "major" | "minor"
-- `category`: "conversion" | "trust" | "mobile" | "hierarchy" | "brand"
+- `rationale`: max 160 characters
 - `fix`: max 180 characters
 
 Schema:
 
 ```json
 {
+  "pass": false,
   "issues": [
     {
-      "description": "string",
-      "severity": "string",
-      "category": "string",
-      "affectedKeys": ["string"]
+      "severity": "critical" | "major" | "minor",
+      "description": "string (max 160 chars)",
+      "location": "design.hero.headline" (single key, NOT array),
+      "rationale": "string (optional)"
     }
   ],
-  "fixes": [
+  "suggestedFixes": [
     {
-      "targetKey": "string",
-      "fix": "string",
-      "rationale": "string"
+      "targetKey": "design.hero.headline",
+      "fix": "string (max 180 chars)",
+      "rationale": "string (max 160 chars)"
     }
   ],
-  "pass": false,
-  "overallAssessment": "string"
+  "requiresApproval": true,
+  "previewRecommended": true
 }
 ```
 

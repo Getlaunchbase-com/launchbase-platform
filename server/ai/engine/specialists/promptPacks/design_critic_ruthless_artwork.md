@@ -19,39 +19,54 @@ Critique the LaunchBase artwork design proposals and identify:
 
 ## Output format (STRICT)
 
+### ⚠️ NON-NEGOTIABLE SCHEMA CONTRACT ⚠️
+
+**Critical field names (DO NOT DEVIATE):**
+- In `issues[]`, the field name is **`location`** (string). DO NOT use `affectedKeys`, `keys`, or `targetKeys`.
+- `location` MUST be a single valid key matching: `^(design|brand)\.[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*$`
+- You MUST include **`suggestedFixes`** (array, min 10). DO NOT use `fixes`.
+- You MUST include **`requiresApproval`** (boolean).
+- You MUST include **`previewRecommended`** (boolean).
+- Return **raw JSON only** (no markdown fences, no prose).
+
+**Mapping rule:** If multiple keys affected, pick most relevant single key for `location`. Mention others in `description`.
+
+**Schema linter:** If you are about to output `affectedKeys`, replace with `location`. If you are about to output `fixes`, replace with `suggestedFixes`.
+
 **HARD RULES:**
 - Return ONLY valid JSON. NO markdown wrappers.
 - You MUST return EXACTLY 10 issues (no more, no less)
-- You MUST return EXACTLY 10 fixes (no more, no less)
+- You MUST return EXACTLY 10 suggestedFixes (no more, no less)
 - `pass` MUST be false (ruthless mode)
 
 **Output caps:**
 - `description`: max 160 characters
 - `severity`: "critical" | "major" | "minor"
-- `category`: "icons" | "illustration" | "trustVisuals" | "motifs" | "hero"
+- `rationale`: max 160 characters
 - `fix`: max 180 characters
 
 Schema:
 
 ```json
 {
+  "pass": false,
   "issues": [
     {
-      "description": "string",
-      "severity": "string",
-      "category": "string",
-      "affectedKeys": ["string"]
+      "severity": "critical" | "major" | "minor",
+      "description": "string (max 160 chars)",
+      "location": "design.hero.illustration" (single key, NOT array),
+      "rationale": "string (optional)"
     }
   ],
-  "fixes": [
+  "suggestedFixes": [
     {
-      "targetKey": "string",
-      "fix": "string",
-      "rationale": "string"
+      "targetKey": "design.hero.illustration",
+      "fix": "string (max 180 chars)",
+      "rationale": "string (max 160 chars)"
     }
   ],
-  "pass": false,
-  "overallAssessment": "string"
+  "requiresApproval": true,
+  "previewRecommended": true
 }
 ```
 

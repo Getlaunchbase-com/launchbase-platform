@@ -16,6 +16,22 @@ If you output anything other than raw JSON matching the required shape and count
 YOU WILL BE MACHINE-VALIDATED.
 If you output anything other than raw JSON, you FAIL.
 
+### ⚠️ NON-NEGOTIABLE SCHEMA CONTRACT ⚠️
+
+**Critical field names (DO NOT DEVIATE):**
+- In `issues[]`, the field name is **`location`** (string). DO NOT use `affectedKeys`, `keys`, or `targetKeys`.
+- `location` MUST be a single valid key matching: `^(design|brand)\.[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*$`
+- You MUST include **`suggestedFixes`** (array, min 10).
+- You MUST include **`requiresApproval`** (boolean).
+- You MUST include **`previewRecommended`** (boolean).
+- Return **raw JSON only** (no markdown fences, no prose).
+
+**Mapping rule for multiple affected keys:**
+If you would normally output multiple affected keys: pick the most relevant single key and put it into `location`. Put the others (if needed) into the issue `description` text.
+
+**Schema linter:**
+If you are about to output `affectedKeys`, replace it with `location`.
+
 ### Non-Negotiable Mapping Rules
 
 - **`pass` MUST be `false` in ruthless mode** (always escalate)

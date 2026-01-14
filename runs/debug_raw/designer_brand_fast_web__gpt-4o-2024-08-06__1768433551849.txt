@@ -1,0 +1,160 @@
+=== RAW RESPONSE (designer_brand_fast_web) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy4dc3ZE1iFcMdyQxpFc3fuWGbxlr
+Input Tokens: 943
+Output Tokens: 532
+Finish Reason: stop
+
+=== RAW TEXT (2020 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "48px, weight 700",
+      "rationale": "Enhances readability and hierarchy",
+      "confidence": 0.92,
+      "risks": ["Might dominate on small screens"]
+    },
+    {
+      "targetKey": "brand.type.h2",
+      "value": "36px, weight 600",
+      "rationale": "Improves subheader readability",
+      "confidence": 0.90,
+      "risks": ["May look similar to H1"]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "16px, weight 400",
+      "rationale": "Ensures readability across devices",
+      "confidence": 0.93,
+      "risks": ["Possible legibility issues on large displays"]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#3A7D44",
+      "rationale": "Conveys trust and professionalism",
+      "confidence": 0.89,
+      "risks": ["May clash with existing colors"]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Rounded corners, 8px padding",
+      "rationale": "Improves clickability and aesthetics",
+      "confidence": 0.91,
+      "risks": ["Could appear less professional"]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "40px",
+      "rationale": "Creates consistent breathing room",
+      "confidence": 0.88,
+      "risks": ["Might reduce content density"]
+    },
+    {
+      "targetKey": "brand.components.badge",
+      "value": "Flat design, color #FFCC33",
+      "rationale": "Supports trust without distraction",
+      "confidence": 0.90,
+      "risks": ["Could be too attention-grabbing"]
+    },
+    {
+      "targetKey": "brand.visual.consistency",
+      "value": "Align elements with 12-column grid",
+      "rationale": "Ensures visual harmony",
+      "confidence": 0.94,
+      "risks": ["Complex implementation"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["Implementation delays", "Design inconsistencies"],
+  "assumptions": ["Current design is responsive", "Client prefers green palette"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "48px, weight 700",
+      "rationale": "Enhances readability and hierarchy",
+      "confidence": 0.92,
+      "risks": [
+        "Might dominate on small screens"
+      ]
+    },
+    {
+      "targetKey": "brand.type.h2",
+      "value": "36px, weight 600",
+      "rationale": "Improves subheader readability",
+      "confidence": 0.9,
+      "risks": [
+        "May look similar to H1"
+      ]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "16px, weight 400",
+      "rationale": "Ensures readability across devices",
+      "confidence": 0.93,
+      "risks": [
+        "Possible legibility issues on large displays"
+      ]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#3A7D44",
+      "rationale": "Conveys trust and professionalism",
+      "confidence": 0.89,
+      "risks": [
+        "May clash with existing colors"
+      ]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Rounded corners, 8px padding",
+      "rationale": "Improves clickability and aesthetics",
+      "confidence": 0.91,
+      "risks": [
+        "Could appear less professional"
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "40px",
+      "rationale": "Creates consistent breathing room",
+      "confidence": 0.88,
+      "risks": [
+        "Might reduce content density"
+      ]
+    },
+    {
+      "targetKey": "brand.components.badge",
+      "value": "Flat design, color #FFCC33",
+      "rationale": "Supports trust without distraction",
+      "confidence": 0.9,
+      "risks": [
+        "Could be too attention-grabbing"
+      ]
+    },
+    {
+      "targetKey": "brand.visual.consistency",
+      "value": "Align elements with 12-column grid",
+      "rationale": "Ensures visual harmony",
+      "confidence": 0.94,
+      "risks": [
+        "Complex implementation"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Implementation delays",
+    "Design inconsistencies"
+  ],
+  "assumptions": [
+    "Current design is responsive",
+    "Client prefers green palette"
+  ]
+}
