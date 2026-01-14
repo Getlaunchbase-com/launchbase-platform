@@ -71,16 +71,16 @@ export const CriticOutputSchema = z.object({
 
   /**
    * List of issues found during review
-   * MUST contain at least 10 issues (enforced)
+   * MUST contain between 10 and 16 issues (enforced)
    */
-  issues: z.array(CriticIssueSchema).min(10),
+  issues: z.array(CriticIssueSchema).min(10).max(16),
 
   /**
    * Suggested fixes for the issues
    * Each fix should map to a specific targetKey
-   * MUST contain at least 10 fixes (enforced)
+   * MUST contain between 10 and 16 fixes (enforced)
    */
-  suggestedFixes: z.array(CriticSuggestedFixSchema).min(10),
+  suggestedFixes: z.array(CriticSuggestedFixSchema).min(10).max(16),
 
   /**
    * Does this change set require human approval before implementation?

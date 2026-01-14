@@ -485,19 +485,52 @@ export async function completeJson(
  * Helper to build CompleteJsonResult from provider response
  */
 /**
- * Strip markdown code fences from JSON response
- * Claude Opus often wraps JSON in ```json ... ```
+ * Strip markdown code fences from JSON response (loose matching)
+ * Handles leading/trailing whitespace, BOM, and extra text
  */
-function stripJsonFences(raw: string): string {
+function stripJsonFencesLoose(raw: string): string {
+  let s = raw.trim();
+  // Remove leading ```json / ```JSON / ``` (with optional language)
+  s = s.replace(/^```[a-zA-Z]*\s*/m, "");
+  // Remove trailing ```
+  s = s.replace(/\s*```$/m, "");
+  return s.trim();
+}
+
+/**
+ * Extract first JSON object from text
+ * Finds first { and last } and extracts everything between
+ */
+function extractFirstJsonObject(raw: string): string | null {
   const s = raw.trim();
-  // Remove ```json ... ``` or ``` ... ```
-  if (s.startsWith("```")) {
-    return s
-      .replace(/^```[a-zA-Z]*\n?/, "") // Remove opening fence + optional language tag
-      .replace(/```$/, "")              // Remove closing fence
-      .trim();
+  const firstBrace = s.indexOf("{");
+  const lastBrace = s.lastIndexOf("}");
+  
+  if (firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace) {
+    return null;
   }
-  return s;
+  
+  return s.slice(firstBrace, lastBrace + 1);
+}
+
+/**
+ * Normalize raw model output to clean JSON text
+ * Bulletproof: handles fences, prose, whitespace, BOM
+ */
+function normalizeToJsonText(rawText: string): string {
+  const stripped = stripJsonFencesLoose(rawText);
+  
+  // If it already looks like JSON, great
+  if (stripped.startsWith("{") && stripped.endsWith("}")) {
+    return stripped;
+  }
+  
+  // Otherwise, attempt to extract first JSON object
+  return (
+    extractFirstJsonObject(stripped) ??
+    extractFirstJsonObject(rawText) ??
+    stripped
+  );
 }
 
 function buildCompleteJsonResult(
@@ -510,8 +543,8 @@ function buildCompleteJsonResult(
   let json: any | null = null;
 
   try {
-    // Strip markdown fences before parsing
-    const cleanedText = stripJsonFences(response.rawText);
+    // Normalize to clean JSON text (bulletproof)
+    const cleanedText = normalizeToJsonText(response.rawText);
     json = JSON.parse(cleanedText);
   } catch (err) {
     // NEVER log rawText preview. Log only a hash + length.

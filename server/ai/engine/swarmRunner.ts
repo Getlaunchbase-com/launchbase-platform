@@ -83,6 +83,9 @@ export async function runSwarmV1(
   artifacts.push(planArtifact);
 
   // Step 2-3: Run specialists (craft, critic) - skip field_general
+  // Collect craft artifacts to pass to critic
+  const craftArtifacts: any[] = [];
+  
   for (const specialist of specialists) {
     const roleConfig = roles[specialist];
     if (!roleConfig) continue;
@@ -94,16 +97,24 @@ export async function runSwarmV1(
     }
 
     try {
+      // Build specialist input: critics receive prior craft artifacts
+      const specialistInput: any = {
+        plan: planArtifact.payload,
+        context: workOrder.inputs,
+      };
+      
+      // If this is a critic role, inject all prior craft artifacts
+      if (specialist.includes("critic")) {
+        specialistInput.craftArtifacts = craftArtifacts;
+      }
+      
       const result = await callSpecialistAIML({
         role: specialist as "craft" | "critic",
         trace: {
           jobId: ctx.traceId,
           step: `swarm.specialist.${specialist}`,
         },
-        input: {
-          plan: planArtifact.payload,
-          context: workOrder.inputs,
-        },
+        input: specialistInput,
         roleConfig,
       });
 
@@ -195,6 +206,14 @@ export async function runSwarmV1(
         stopReason: result.stopReason,
       };
       artifacts.push(artifact);
+      
+      // If this is a craft/designer role, collect for critic
+      if (!specialist.includes("critic") && artifact.payload && result.stopReason === "ok") {
+        craftArtifacts.push({
+          role: specialist,
+          output: artifact.payload,
+        });
+      }
 
       // Track cost
       costs.push({

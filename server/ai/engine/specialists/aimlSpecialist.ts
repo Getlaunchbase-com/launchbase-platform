@@ -133,9 +133,17 @@ export async function callSpecialistAIML(
   const systemPrompt = promptMap[role] || CRAFT_PROMPT;
 
   // Build user prompt with inputs
-  const userPrompt = `# Input Data\n\n${JSON.stringify(specInput.plan, null, 2)}${
+  let userPrompt = `# Input Data\n\n${JSON.stringify(specInput.plan, null, 2)}${
     specInput.context ? `\n\n# Context\n\n${JSON.stringify(specInput.context, null, 2)}` : ""
   }`;
+  
+  // If this is a critic role and craftArtifacts are provided, inject them
+  if (role.includes("critic") && specInput.craftArtifacts && Array.isArray(specInput.craftArtifacts)) {
+    userPrompt += "\n\n# Upstream Designer Outputs\n\n";
+    for (const craft of specInput.craftArtifacts) {
+      userPrompt += `## ${craft.role}\n\n${JSON.stringify(craft.output, null, 2)}\n\n`;
+    }
+  }
 
   // Determine Zod schema for validation
   // Designer roles use Craft schema (proposedChanges[])
@@ -268,11 +276,38 @@ export async function callSpecialistAIML(
       };
     }
 
+    // Auto-reject pass=true in ruthless critic mode (QA guardrail)
+    let finalPayload = result.json;
+    if (role.includes("critic") && role.includes("ruthless") && finalPayload.pass === true) {
+      console.warn(`[CRITIC] Auto-rejecting pass=true in ruthless mode (${role})`);
+      finalPayload = {
+        ...finalPayload,
+        pass: false,
+        issues: [
+          ...finalPayload.issues,
+          {
+            severity: "major",
+            description: "Critic returned pass=true in ruthless mode; treating as failure to follow contract.",
+            location: "design.conversion.scannability",
+            rationale: "Ruthless mode must always escalate (pass=false)",
+          },
+        ],
+        suggestedFixes: [
+          ...finalPayload.suggestedFixes,
+          {
+            targetKey: "design.conversion.scannability",
+            fix: "Enforce ruthless mode contract: always return pass=false",
+            rationale: "QA guardrail to ensure deterministic pipeline behavior",
+          },
+        ],
+      };
+    }
+
     // Success
     return {
       artifact: {
         kind: `swarm.specialist.${role}`,
-        payload: result.json,
+        payload: finalPayload,
         customerSafe: false, // Always false for specialists
       },
       meta: {
