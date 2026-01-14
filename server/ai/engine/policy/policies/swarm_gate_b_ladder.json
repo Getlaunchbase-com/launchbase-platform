@@ -1,0 +1,92 @@
+{
+  "name": "swarm_gate_b_ladder",
+  "description": "Gate B: Ladder reliability test with retry fallback (gpt-5.2-pro → gpt-5.2 → gpt-4o)",
+  "version": "1.0.0",
+  "constraints": {
+    "maxRounds": 1,
+    "costCapUsd": 5.0,
+    "maxTokensTotal": 50000
+  },
+  "specialists": {
+    "roles": {
+      "designer_systems_fast": {
+        "transport": "aiml",
+        "model": "gpt-4o-2024-08-06",
+        "capabilities": ["craft"],
+        "timeoutMs": 90000,
+        "costCapUsd": 0.50,
+        "maxTokens": 2000,
+        "ladder": [
+          {
+            "model": "gpt-5.2-pro",
+            "timeoutMs": 180000,
+            "retryOn": ["timeout", "provider_failed", "invalid_json"]
+          },
+          {
+            "model": "gpt-5.2",
+            "timeoutMs": 150000,
+            "retryOn": ["timeout", "provider_failed", "invalid_json"]
+          },
+          {
+            "model": "gpt-4o-2024-08-06",
+            "timeoutMs": 90000,
+            "retryOn": ["timeout", "provider_failed", "invalid_json"]
+          }
+        ]
+      },
+      "designer_brand_fast": {
+        "transport": "aiml",
+        "model": "gpt-4o-2024-08-06",
+        "capabilities": ["craft"],
+        "timeoutMs": 90000,
+        "costCapUsd": 0.50,
+        "maxTokens": 2000,
+        "ladder": [
+          {
+            "model": "gpt-5.2-pro",
+            "timeoutMs": 180000,
+            "retryOn": ["timeout", "provider_failed", "invalid_json"]
+          },
+          {
+            "model": "gpt-5.2",
+            "timeoutMs": 150000,
+            "retryOn": ["timeout", "provider_failed", "invalid_json"]
+          },
+          {
+            "model": "gpt-4o-2024-08-06",
+            "timeoutMs": 90000,
+            "retryOn": ["timeout", "provider_failed", "invalid_json"]
+          }
+        ]
+      },
+      "design_critic_ruthless": {
+        "transport": "aiml",
+        "model": "claude-opus-4-1-20250805",
+        "capabilities": ["critic"],
+        "timeoutMs": 90000,
+        "costCapUsd": 0.50,
+        "maxTokens": 4000,
+        "ladder": [
+          {
+            "model": "claude-opus-4-1-20250805",
+            "timeoutMs": 180000,
+            "maxTokens": 4000,
+            "retryOn": ["timeout", "provider_failed", "invalid_json"]
+          },
+          {
+            "model": "claude-opus-4-1-20250805",
+            "timeoutMs": 150000,
+            "maxTokens": 4000,
+            "retryOn": ["timeout", "provider_failed", "invalid_json"]
+          },
+          {
+            "model": "claude-opus-4-1-20250805",
+            "timeoutMs": 90000,
+            "maxTokens": 4000,
+            "retryOn": ["timeout", "provider_failed", "invalid_json"]
+          }
+        ]
+      }
+    }
+  }
+}

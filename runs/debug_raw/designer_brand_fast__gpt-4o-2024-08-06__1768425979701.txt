@@ -1,0 +1,160 @@
+=== RAW RESPONSE (designer_brand_fast) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy2fTUI623jeXRiWSsjD7xtSzfs2F
+Input Tokens: 878
+Output Tokens: 527
+Finish Reason: stop
+
+=== RAW TEXT (2045 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "48px",
+      "rationale": "Increase H1 size for stronger visual hierarchy.",
+      "confidence": 0.9,
+      "risks": ["Might require layout adjustment"]
+    },
+    {
+      "targetKey": "brand.type.scale",
+      "value": "1.25",
+      "rationale": "Use a consistent type scale for readability.",
+      "confidence": 0.85,
+      "risks": ["Might affect existing layout"]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "64px",
+      "rationale": "Increase section gap for clearer separation.",
+      "confidence": 0.9,
+      "risks": ["Could reduce above-the-fold content"]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "16px padding",
+      "rationale": "Improve touch target size for better usability.",
+      "confidence": 0.92,
+      "risks": ["May need button text adjustment"]
+    },
+    {
+      "targetKey": "brand.components.card",
+      "value": "8px shadow",
+      "rationale": "Add subtle shadow for depth and focus.",
+      "confidence": 0.88,
+      "risks": ["Shadow might affect load time"]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#0056b3",
+      "rationale": "Use a deeper blue for premium feel.",
+      "confidence": 0.9,
+      "risks": ["Might require contrast testing"]
+    },
+    {
+      "targetKey": "brand.color.text",
+      "value": "#333333",
+      "rationale": "Ensure high contrast for readability.",
+      "confidence": 0.93,
+      "risks": ["May impact existing color harmony"]
+    },
+    {
+      "targetKey": "brand.system.restraint",
+      "value": "Limit to 2 font families",
+      "rationale": "Increase brand consistency and load speed.",
+      "confidence": 0.87,
+      "risks": ["Limited typography flexibility"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["Potential layout shifts", "Color balance impacts"],
+  "assumptions": ["Current design uses multiple font sizes", "Existing buttons are under 16px"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "48px",
+      "rationale": "Increase H1 size for stronger visual hierarchy.",
+      "confidence": 0.9,
+      "risks": [
+        "Might require layout adjustment"
+      ]
+    },
+    {
+      "targetKey": "brand.type.scale",
+      "value": "1.25",
+      "rationale": "Use a consistent type scale for readability.",
+      "confidence": 0.85,
+      "risks": [
+        "Might affect existing layout"
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "64px",
+      "rationale": "Increase section gap for clearer separation.",
+      "confidence": 0.9,
+      "risks": [
+        "Could reduce above-the-fold content"
+      ]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "16px padding",
+      "rationale": "Improve touch target size for better usability.",
+      "confidence": 0.92,
+      "risks": [
+        "May need button text adjustment"
+      ]
+    },
+    {
+      "targetKey": "brand.components.card",
+      "value": "8px shadow",
+      "rationale": "Add subtle shadow for depth and focus.",
+      "confidence": 0.88,
+      "risks": [
+        "Shadow might affect load time"
+      ]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#0056b3",
+      "rationale": "Use a deeper blue for premium feel.",
+      "confidence": 0.9,
+      "risks": [
+        "Might require contrast testing"
+      ]
+    },
+    {
+      "targetKey": "brand.color.text",
+      "value": "#333333",
+      "rationale": "Ensure high contrast for readability.",
+      "confidence": 0.93,
+      "risks": [
+        "May impact existing color harmony"
+      ]
+    },
+    {
+      "targetKey": "brand.system.restraint",
+      "value": "Limit to 2 font families",
+      "rationale": "Increase brand consistency and load speed.",
+      "confidence": 0.87,
+      "risks": [
+        "Limited typography flexibility"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Potential layout shifts",
+    "Color balance impacts"
+  ],
+  "assumptions": [
+    "Current design uses multiple font sizes",
+    "Existing buttons are under 16px"
+  ]
+}

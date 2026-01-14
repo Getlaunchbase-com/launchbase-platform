@@ -1,0 +1,160 @@
+=== RAW RESPONSE (designer_brand_fast) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy2J3BeHfOpexEplYjVwivRkF5wzm
+Input Tokens: 878
+Output Tokens: 567
+Finish Reason: stop
+
+=== RAW TEXT (2237 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "48px size, 1.2 weight",
+      "rationale": "Enhances visibility and hierarchy for main headlines.",
+      "confidence": 0.9,
+      "risks": ["Might overpower other text elements"]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "16px size, 1.6 lineHeight",
+      "rationale": "Improves readability and legibility in body text.",
+      "confidence": 0.85,
+      "risks": ["May affect layout density"]
+    },
+    {
+      "targetKey": "brand.type.scale",
+      "value": "1.25 scaling factor",
+      "rationale": "Creates a more harmonious typographic hierarchy.",
+      "confidence": 0.88,
+      "risks": ["Potential impact on layout consistency"]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "40px gap",
+      "rationale": "Ensures clear separation between sections.",
+      "confidence": 0.87,
+      "risks": ["Could increase page length"]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Rounded corners, 8px padding",
+      "rationale": "Enhances touch target and modernizes look.",
+      "confidence": 0.9,
+      "risks": ["May not align with existing brand style"]
+    },
+    {
+      "targetKey": "brand.components.trustBadge",
+      "value": "Use a blue accent color",
+      "rationale": "Blue is perceived as trustworthy, enhancing credibility.",
+      "confidence": 0.92,
+      "risks": ["Might clash with brand colors"]
+    },
+    {
+      "targetKey": "brand.color.text",
+      "value": "Dark charcoal #333333",
+      "rationale": "Improves text contrast for better readability.",
+      "confidence": 0.93,
+      "risks": ["Could affect overall aesthetic"]
+    },
+    {
+      "targetKey": "brand.system.accessibility",
+      "value": "Ensure 4.5:1 contrast ratio",
+      "rationale": "Improves accessibility for visually impaired users.",
+      "confidence": 0.95,
+      "risks": ["May limit color palette choices"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["Might affect brand consistency", "Could increase development time"],
+  "assumptions": ["The current design lacks a clear hierarchy", "Typography needs improved readability"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "48px size, 1.2 weight",
+      "rationale": "Enhances visibility and hierarchy for main headlines.",
+      "confidence": 0.9,
+      "risks": [
+        "Might overpower other text elements"
+      ]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "16px size, 1.6 lineHeight",
+      "rationale": "Improves readability and legibility in body text.",
+      "confidence": 0.85,
+      "risks": [
+        "May affect layout density"
+      ]
+    },
+    {
+      "targetKey": "brand.type.scale",
+      "value": "1.25 scaling factor",
+      "rationale": "Creates a more harmonious typographic hierarchy.",
+      "confidence": 0.88,
+      "risks": [
+        "Potential impact on layout consistency"
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "40px gap",
+      "rationale": "Ensures clear separation between sections.",
+      "confidence": 0.87,
+      "risks": [
+        "Could increase page length"
+      ]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Rounded corners, 8px padding",
+      "rationale": "Enhances touch target and modernizes look.",
+      "confidence": 0.9,
+      "risks": [
+        "May not align with existing brand style"
+      ]
+    },
+    {
+      "targetKey": "brand.components.trustBadge",
+      "value": "Use a blue accent color",
+      "rationale": "Blue is perceived as trustworthy, enhancing credibility.",
+      "confidence": 0.92,
+      "risks": [
+        "Might clash with brand colors"
+      ]
+    },
+    {
+      "targetKey": "brand.color.text",
+      "value": "Dark charcoal #333333",
+      "rationale": "Improves text contrast for better readability.",
+      "confidence": 0.93,
+      "risks": [
+        "Could affect overall aesthetic"
+      ]
+    },
+    {
+      "targetKey": "brand.system.accessibility",
+      "value": "Ensure 4.5:1 contrast ratio",
+      "rationale": "Improves accessibility for visually impaired users.",
+      "confidence": 0.95,
+      "risks": [
+        "May limit color palette choices"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Might affect brand consistency",
+    "Could increase development time"
+  ],
+  "assumptions": [
+    "The current design lacks a clear hierarchy",
+    "Typography needs improved readability"
+  ]
+}

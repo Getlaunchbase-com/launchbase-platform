@@ -1,0 +1,150 @@
+{
+  "artifact": {
+    "kind": "swarm.specialist.design_critic_ruthless",
+    "payload": {
+      "pass": false,
+      "issues": [
+        {
+          "severity": "critical",
+          "description": "Hero lacks '8-second test' comprehension — visitor won't understand 'operating system for small businesses'",
+          "location": "design.layout.hero",
+          "rationale": "Abstract metaphor requires explanation, losing immediate conversion opportunity"
+        },
+        {
+          "severity": "critical",
+          "description": "No sticky CTA creates dead zones during 3000px+ scroll journey",
+          "location": "design.conversion.stickyCta",
+          "rationale": "User must scroll back up to convert after being convinced mid-page"
+        },
+        {
+          "severity": "major",
+          "description": "Trust proof density too low — no audit log pattern or visibility panel above fold",
+          "location": "design.trust.auditLogPattern",
+          "rationale": "Core promise is 'control' but no immediate proof of observability features"
+        },
+        {
+          "severity": "major",
+          "description": "Mobile hero stacking buries primary CTA below fold on 667px screens",
+          "location": "design.mobile.heroStacking",
+          "rationale": "60% of traffic loses immediate action opportunity, increasing bounce"
+        },
+        {
+          "severity": "major",
+          "description": "Pricing table lacks risk reversal messaging — no trial, guarantee, or exit clause",
+          "location": "design.layout.pricing",
+          "rationale": "Small businesses fear lock-in but see no escape hatch"
+        },
+        {
+          "severity": "major",
+          "description": "Section order buries 'how it works' after features — narrative backwards",
+          "location": "design.layout.sectionOrder",
+          "rationale": "Users need process clarity before feature lists to build mental model"
+        },
+        {
+          "severity": "minor",
+          "description": "Typography hierarchy weak — H1/H2 size ratio <1.4x reduces scannability",
+          "location": "design.type.h1",
+          "rationale": "Insufficient contrast between heading levels slows pattern recognition"
+        },
+        {
+          "severity": "minor",
+          "description": "Proof bar missing or buried — no logo parade or metric badges above fold",
+          "location": "design.components.proofBar",
+          "rationale": "Social proof delayed until after commitment request"
+        },
+        {
+          "severity": "minor",
+          "description": "Mobile tap targets under 48px for secondary CTAs and nav items",
+          "location": "design.mobile.tapTargets",
+          "rationale": "Precision tapping frustrates thumb users, especially 45+ demographic"
+        },
+        {
+          "severity": "minor",
+          "description": "Card components lack visual hierarchy — all elements equal weight",
+          "location": "design.components.card",
+          "rationale": "Feature cards become walls of text without clear entry points"
+        }
+      ],
+      "suggestedFixes": [
+        {
+          "targetKey": "design.layout.hero",
+          "fix": "Add 'Before/After' split-screen showing chaos→calm transformation with 48px headline",
+          "rationale": "Visual metaphor communicates value faster than abstract 'operating system' copy"
+        },
+        {
+          "targetKey": "design.conversion.stickyCta",
+          "fix": "Implement sticky bottom bar (mobile) and sticky header CTA (desktop) with 80px trigger offset",
+          "rationale": "Maintains conversion opportunity throughout 3000px journey"
+        },
+        {
+          "targetKey": "design.trust.visibilityPanel",
+          "fix": "Add live activity feed widget (240px wide) showing real-time business operations",
+          "rationale": "Demonstrates observability promise with concrete visual proof"
+        },
+        {
+          "targetKey": "design.mobile.heroStacking",
+          "fix": "Compress hero to 85vh max-height with CTA pinned at 500px absolute position",
+          "rationale": "Guarantees CTA visibility on all devices while maintaining visual impact"
+        },
+        {
+          "targetKey": "design.components.pricingTable",
+          "fix": "Add '30-day money back' badge + 'Cancel anytime' microcopy under each tier",
+          "rationale": "Explicit risk reversal reduces commitment anxiety for cautious SMBs"
+        },
+        {
+          "targetKey": "design.layout.sectionOrder",
+          "fix": "Reorder: Hero → How It Works (3 steps) → Problem/Solution → Features → Pricing",
+          "rationale": "Process-first narrative builds understanding before feature overwhelm"
+        },
+        {
+          "targetKey": "design.type.h2",
+          "fix": "Increase H1 to 56px, H2 to 36px, body to 18px for 1.55x ratio cascade",
+          "rationale": "Stronger hierarchy enables 10-second scanning pattern"
+        },
+        {
+          "targetKey": "design.components.proofBar",
+          "fix": "Insert 120px proof bar with 5 logos + '10,000+ businesses' between hero and first section",
+          "rationale": "Early trust injection before cognitive investment"
+        },
+        {
+          "targetKey": "design.mobile.tapTargets",
+          "fix": "Enforce 48px minimum touch target with 8px padding on all interactive elements",
+          "rationale": "Meets accessibility standards and reduces mis-taps for target demographic"
+        },
+        {
+          "targetKey": "brand.components.cards",
+          "fix": "Add 24px bold headline, 16px body, 20px CTA button hierarchy to card template",
+          "rationale": "Creates scannable F-pattern within each card module"
+        }
+      ],
+      "requiresApproval": true,
+      "previewRecommended": true,
+      "risks": [],
+      "assumptions": [
+        "Homepage is 3000px+ in length based on typical SaaS patterns",
+        "Mobile traffic represents 60% based on SMB audience behavior",
+        "No existing sticky CTA implementation based on conversion gap critique",
+        "Typography scale not yet optimized based on hierarchy issues"
+      ]
+    },
+    "customerSafe": false
+  },
+  "meta": {
+    "model": "claude-opus-4-1-20250805",
+    "requestId": "msg_01DZ3NmvJe87GTUaYUVWhuCn",
+    "latencyMs": 46684,
+    "inputTokens": 3091,
+    "outputTokens": 1522,
+    "costUsd": 0.07657
+  },
+  "stopReason": "ok",
+  "retryMeta": {
+    "attemptCount": 1,
+    "attemptModels": [
+      "claude-opus-4-1-20250805"
+    ],
+    "finalModelUsed": "claude-opus-4-1-20250805",
+    "finalTimeoutMs": 90000,
+    "totalCost": 0.07657
+  }
+}

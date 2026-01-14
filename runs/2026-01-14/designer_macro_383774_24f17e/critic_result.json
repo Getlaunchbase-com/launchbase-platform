@@ -1,0 +1,150 @@
+{
+  "artifact": {
+    "kind": "swarm.specialist.design_critic_ruthless",
+    "payload": {
+      "pass": false,
+      "issues": [
+        {
+          "severity": "critical",
+          "description": "Hero lacks 8-second comprehension of 'operating system for small businesses'",
+          "location": "design.layout.hero",
+          "rationale": "Visitors won't understand the core value prop without clear OS metaphor above the fold"
+        },
+        {
+          "severity": "critical",
+          "description": "No sticky CTA creates decision paralysis after scrolling past hero",
+          "location": "design.conversion.stickyCta",
+          "rationale": "Users lose the conversion path after 2 scrolls, causing 40%+ bounce on mobile"
+        },
+        {
+          "severity": "major",
+          "description": "Trust proof (audit logs/visibility) buried below fold kills credibility",
+          "location": "design.trust.auditLogPattern",
+          "rationale": "Control-anxious SMB owners need immediate proof of observability promise"
+        },
+        {
+          "severity": "major",
+          "description": "Mobile hero stacking buries CTA below 568px viewport height",
+          "location": "design.mobile.heroStacking",
+          "rationale": "Primary action invisible on iPhone SE/older Android requires immediate scroll"
+        },
+        {
+          "severity": "major",
+          "description": "Pricing table lacks risk reversal messaging for hesitant SMBs",
+          "location": "design.layout.pricing",
+          "rationale": "No trial/guarantee near pricing creates last-second abandonment for risk-averse buyers"
+        },
+        {
+          "severity": "major",
+          "description": "Section order puts features before problem/pain identification",
+          "location": "design.layout.sectionOrder",
+          "rationale": "Leading with features instead of SMB pain points reduces emotional engagement"
+        },
+        {
+          "severity": "minor",
+          "description": "Typography hierarchy lacks clear H1→H2→body progression",
+          "location": "design.type.h1",
+          "rationale": "Weak visual hierarchy forces reading instead of scanning, increasing cognitive load"
+        },
+        {
+          "severity": "minor",
+          "description": "Card components lack consistent trust indicators/badges",
+          "location": "design.components.card",
+          "rationale": "Missing security/compliance badges on feature cards reduces perceived safety"
+        },
+        {
+          "severity": "minor",
+          "description": "Proof bar placement at footer instead of near hero reduces impact",
+          "location": "design.components.proofBar",
+          "rationale": "Social proof too far from initial decision point weakens conversion momentum"
+        },
+        {
+          "severity": "minor",
+          "description": "Mobile tap targets under 44px for secondary CTAs cause misclicks",
+          "location": "design.mobile.tapTargets",
+          "rationale": "Sub-standard touch targets frustrate mobile users trying to explore features"
+        }
+      ],
+      "suggestedFixes": [
+        {
+          "targetKey": "design.layout.hero",
+          "fix": "Add OS dashboard mockup with 'Your Business Command Center' headline + 3 key metrics visible",
+          "rationale": "Visual OS metaphor + concrete dashboard creates instant comprehension"
+        },
+        {
+          "targetKey": "design.conversion.stickyCta",
+          "fix": "Implement sticky bottom bar on mobile (60px) and floating right CTA on desktop after 400px scroll",
+          "rationale": "Persistent conversion path reduces decision friction throughout page journey"
+        },
+        {
+          "targetKey": "design.trust.visibilityPanel",
+          "fix": "Add mini audit log preview (3 recent actions) directly under hero with 'See everything happening' label",
+          "rationale": "Immediate proof of observability promise builds trust before feature exploration"
+        },
+        {
+          "targetKey": "design.mobile.heroStacking",
+          "fix": "Stack hero as: headline (32px) → subhead (18px) → CTA (48px height) within 568px viewport",
+          "rationale": "Ensures primary action visible without scroll on all devices"
+        },
+        {
+          "targetKey": "design.components.pricingTable",
+          "fix": "Add '30-day money-back guarantee' badge + 'No setup fees' chip above pricing tiers",
+          "rationale": "Risk reversal messaging removes final purchase hesitation"
+        },
+        {
+          "targetKey": "design.layout.sectionOrder",
+          "fix": "Reorder to: Hero → Problem ('Losing control?') → Visibility proof → Features → Pricing",
+          "rationale": "Pain-first narrative creates emotional buy-in before feature presentation"
+        },
+        {
+          "targetKey": "design.type.h2",
+          "fix": "Set H1 at 48px, H2 at 32px, body at 18px with 1.5 ratio progression + 600/400 weights",
+          "rationale": "Clear typographic hierarchy enables 10-second page scanning"
+        },
+        {
+          "targetKey": "brand.trust.proofPresentation",
+          "fix": "Add SOC2/GDPR compliance badges to all feature cards + '256-bit encryption' microcopy",
+          "rationale": "Security indicators on every component builds cumulative trust"
+        },
+        {
+          "targetKey": "design.components.proofBar",
+          "fix": "Move proof bar (logos/testimonials) to position directly after hero, before first scroll",
+          "rationale": "Early social proof capitalizes on initial interest momentum"
+        },
+        {
+          "targetKey": "design.mobile.tapTargets",
+          "fix": "Set all interactive elements to minimum 48px height with 8px spacing between targets",
+          "rationale": "Apple/Google compliant touch targets prevent frustration and misclicks"
+        }
+      ],
+      "requiresApproval": true,
+      "previewRecommended": true,
+      "risks": [],
+      "assumptions": [
+        "Missing upstream designer outputs — critiquing based on standard conversion patterns",
+        "Assuming standard mobile viewport distribution (375-428px width)",
+        "Assuming pricing exists but lacks risk reversal messaging",
+        "Assuming hero exists but lacks OS metaphor clarity"
+      ]
+    },
+    "customerSafe": false
+  },
+  "meta": {
+    "model": "claude-opus-4-1-20250805",
+    "requestId": "msg_014gybaqTWczHDTy39xYMVW5",
+    "latencyMs": 44689,
+    "inputTokens": 3091,
+    "outputTokens": 1534,
+    "costUsd": 0.07693
+  },
+  "stopReason": "ok",
+  "retryMeta": {
+    "attemptCount": 1,
+    "attemptModels": [
+      "claude-opus-4-1-20250805"
+    ],
+    "finalModelUsed": "claude-opus-4-1-20250805",
+    "finalTimeoutMs": 90000,
+    "totalCost": 0.07693
+  }
+}

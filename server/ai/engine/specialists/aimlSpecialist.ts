@@ -23,6 +23,7 @@ import {
   getNextModel,
   type RetryMetadata,
 } from "./retryLadder";
+import { validateContentContract } from "./contentValidator";
 
 /**
  * Specialist stopReasons (frozen list)
@@ -461,8 +462,19 @@ export async function callSpecialistWithRetry(
         };
       }
       
-      // If successful, return immediately
+      // Content Contract Validator: Check output shape BEFORE declaring success
       if (result.stopReason === "ok") {
+        const contentValidation = validateContentContract(role, result.artifact?.payload);
+        
+        if (!contentValidation.valid) {
+          console.warn(`[CONTENT_VALIDATOR] Failed: ${contentValidation.reason}`);
+          console.log(`[RETRY_LADDER] Content validation failed, trying next model...`);
+          
+          // Mark as content_failed and retry
+          lastError = new Error(`Content validation failed: ${contentValidation.reason}`);
+          continue; // Try next model in ladder
+        }
+        
         console.log(`[RETRY_LADDER] Success on attempt ${retryMeta.attemptCount}`);
         return { ...result, retryMeta };
       }

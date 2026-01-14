@@ -1,0 +1,26 @@
+{
+  "runId": "designer_macro_383773_e7970b",
+  "enableLadder": true,
+  "ok": false,
+  "systems": {
+    "ok": false,
+    "stopReason": "provider_failed",
+    "tokens": {},
+    "changes": 0
+  },
+  "brand": {
+    "ok": false,
+    "stopReason": "provider_failed",
+    "tokens": {},
+    "changes": 0
+  },
+  "critic": {
+    "ok": true,
+    "stopReason": "ok",
+    "tokens": {},
+    "issues": 10,
+    "fixes": 10,
+    "requiresApproval": true
+  },
+  "totalCostUsd": 0
+}
