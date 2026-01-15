@@ -1912,18 +1912,18 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [x] Create PILOT_INTEGRATION_NEXT.md with wiring steps
 - [x] No behavior changes (safe to merge)
 
-### Commit A: runPilotMacro Policy + Normalization Wiring
-- [ ] Add runMode parameter to runPilotMacro()
-- [ ] Create validation policy with runMode + allowNormalization
-- [ ] Pass policy to specialist calls in context
-- [ ] Apply normalization AFTER parse, BEFORE schema validation (systems + brand)
-- [ ] Track normalization events in meta.normalization
-- [ ] Log truncation: [NORMALIZE_FAST] systems proposedChanges 10 → 8
+### Commit A: runPilotMacro Policy + Normalization Wiring ✅ COMPLETE
+- [x] Add runMode parameter to runPilotMacro()
+- [x] Create validation policy with runMode + allowNormalization
+- [x] Pass policy to specialist calls in context
+- [x] Apply normalization AFTER parse, BEFORE schema validation (systems + brand)
+- [x] Track normalization events in meta.normalization
+- [x] Log truncation: [NORMALIZE_FAST] systems proposedChanges 10 → 8
 
-### Commit B: Per-Role Usage Tracking
-- [ ] Capture specialist output meta for each role (systems/brand/critic)
-- [ ] Calculate totals (inputTokens/outputTokens/latencyMs/costUsd)
-- [ ] Add meta.usage to PilotRun artifact
+### Commit B: Per-Role Usage Tracking ✅ COMPLETE
+- [x] Capture specialist output meta for each role (systems/brand/critic)
+- [x] Calculate totals (inputTokens/outputTokens/latencyMs/costUsd)
+- [x] Add meta.usage to PilotRun artifact
 
 ### Commit C: Obedience Probes + Dashboard Aggregator
 - [ ] Create runObedienceProbe.ts (test single model/role/lane with 3 reps)

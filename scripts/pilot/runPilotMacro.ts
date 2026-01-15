@@ -13,6 +13,9 @@ import { callSpecialistWithRetry, type SpecialistInput, type SpecialistOutput, t
 import { calculateDesignerTruthPenalty, calculateCriticTruthPenalty } from '../../server/ai/pilotRuntime';
 import { validateDesignSwarmPayloadOrThrow, type DesignSwarmSchemaKey } from '../../server/ai/engine/validation/designSwarmValidate';
 import { toRoleConfig } from './adapters';
+import type { RunMode, ValidationPolicy, NormalizationTracking, UsageTracking } from './types';
+import { createValidationPolicy, createNormalizationTracking, createUsageTracking } from './types';
+import { normalizeCraftFastPayload, logNormalizationEvent } from './normalizer';
 
 type Lane = 'web' | 'marketing' | 'app' | 'artwork';
 type StepKind = 'craft' | 'critic';
@@ -28,6 +31,7 @@ export interface PilotRun {
   rep: number;
   runId: string;
   timestamp: string;
+  runMode: RunMode;
   status: 'VALID' | 'RETRIED' | 'FAILED';
   systems: {
     changes: any[];
@@ -52,6 +56,8 @@ export interface PilotRun {
     models: { systems: string; brand: string; critic: string };
     stopReasons: { systems: string; brand: string; critic: string };
     requestIds: { systems: string; brand: string; critic: string };
+    normalization: NormalizationTracking;
+    usage: UsageTracking;
   };
 }
 
@@ -266,9 +272,16 @@ export async function runPilotMacro(params: {
   context: any;
   stack: PilotStack;
   maxAttempts?: number;
+  runMode?: RunMode;
 }): Promise<PilotRun> {
   const { lane, rep, runId, jobId, plan, context, stack } = params;
   const maxAttempts = params.maxAttempts ?? 3;
+  const runMode = params.runMode ?? 'tournament';
+
+  // Create validation policy and tracking objects
+  const policy = createValidationPolicy(runMode);
+  const normalizationTracking = createNormalizationTracking(policy.allowNormalization);
+  const usageTracking = createUsageTracking();
 
   let attempts = 0;
   let lastErr: unknown = null;
@@ -312,9 +325,20 @@ export async function runPilotMacro(params: {
       );
 
       // 1) Parse and unwrap payload
-      const systemsPayload = cleanParseArtifactPayload(systemsOut.artifact);
+      let systemsPayload = cleanParseArtifactPayload(systemsOut.artifact);
       
-      // 2) Schema validate payload (Zod strict validation)
+      // 2) Apply normalization if enabled (AFTER parse, BEFORE schema validation)
+      if (policy.allowNormalization) {
+        const result = normalizeCraftFastPayload(systemsPayload);
+        systemsPayload = result.payload;
+        normalizationTracking.events.systems = result.event;
+        if (result.event.truncated) {
+          normalizationTracking.applied = true;
+          logNormalizationEvent('systems', result.event);
+        }
+      }
+      
+      // 3) Schema validate payload (Zod strict validation)
       validateDesignSwarmPayloadOrThrow('designer_systems_fast', systemsPayload);
       
       // 3) Content validation (after schema)
@@ -356,9 +380,20 @@ export async function runPilotMacro(params: {
       );
 
       // 1) Parse and unwrap payload
-      const brandPayload = cleanParseArtifactPayload(brandOut.artifact);
+      let brandPayload = cleanParseArtifactPayload(brandOut.artifact);
       
-      // 2) Schema validate payload (Zod strict validation)
+      // 2) Apply normalization if enabled (AFTER parse, BEFORE schema validation)
+      if (policy.allowNormalization) {
+        const result = normalizeCraftFastPayload(brandPayload);
+        brandPayload = result.payload;
+        normalizationTracking.events.brand = result.event;
+        if (result.event.truncated) {
+          normalizationTracking.applied = true;
+          logNormalizationEvent('brand', result.event);
+        }
+      }
+      
+      // 3) Schema validate payload (Zod strict validation)
       validateDesignSwarmPayloadOrThrow('designer_brand_fast', brandPayload);
       
       // 3) Content validation (after schema)
@@ -440,11 +475,38 @@ export async function runPilotMacro(params: {
       const totalLatencyMs =
         systemsOut.meta.latencyMs + brandOut.meta.latencyMs + criticOut.meta.latencyMs;
 
+      // Capture usage tracking
+      usageTracking.systems = {
+        inputTokens: systemsOut.meta.inputTokens || 0,
+        outputTokens: systemsOut.meta.outputTokens || 0,
+        latencyMs: systemsOut.meta.latencyMs || 0,
+        costUsd: systemsOut.meta.costUsd || 0,
+      };
+      usageTracking.brand = {
+        inputTokens: brandOut.meta.inputTokens || 0,
+        outputTokens: brandOut.meta.outputTokens || 0,
+        latencyMs: brandOut.meta.latencyMs || 0,
+        costUsd: brandOut.meta.costUsd || 0,
+      };
+      usageTracking.critic = {
+        inputTokens: criticOut.meta.inputTokens || 0,
+        outputTokens: criticOut.meta.outputTokens || 0,
+        latencyMs: criticOut.meta.latencyMs || 0,
+        costUsd: criticOut.meta.costUsd || 0,
+      };
+      usageTracking.totals = {
+        inputTokens: usageTracking.systems.inputTokens + usageTracking.brand.inputTokens + usageTracking.critic.inputTokens,
+        outputTokens: usageTracking.systems.outputTokens + usageTracking.brand.outputTokens + usageTracking.critic.outputTokens,
+        latencyMs: usageTracking.systems.latencyMs + usageTracking.brand.latencyMs + usageTracking.critic.latencyMs,
+        costUsd: usageTracking.systems.costUsd + usageTracking.brand.costUsd + usageTracking.critic.costUsd,
+      };
+
       return {
         lane,
         rep,
         runId,
         timestamp: new Date().toISOString(),
+        runMode,
         status: attempts === 1 ? 'VALID' : 'RETRIED',
         systems: {
           changes: systemsPayload.proposedChanges || [],
@@ -457,8 +519,8 @@ export async function runPilotMacro(params: {
         critic: {
           issues: criticPayload.issues || [],
           suggestedFixes: criticPayload.suggestedFixes || [],
+          pass: criticPayload.pass ?? false,
         },
-        pass: criticPayload.pass ?? false,
         finalScore,
         truthPenalty,
         qualityPenalty,
@@ -481,6 +543,8 @@ export async function runPilotMacro(params: {
             brand: brandOut.meta.requestId,
             critic: criticOut.meta.requestId,
           },
+          normalization: normalizationTracking,
+          usage: usageTracking,
         },
       };
     } catch (err) {
@@ -507,6 +571,7 @@ export async function runPilotMacro(params: {
     rep,
     runId,
     timestamp: new Date().toISOString(),
+    runMode,
     status: 'FAILED',
     systems: { changes: [], anchorCount: 0 },
     brand: { changes: [], anchorCount: 0 },
@@ -525,6 +590,8 @@ export async function runPilotMacro(params: {
       },
       stopReasons: { systems: 'unknown', brand: 'unknown', critic: 'unknown' },
       requestIds: { systems: '', brand: '', critic: '' },
+      normalization: normalizationTracking,
+      usage: usageTracking,
     },
   };
 }
