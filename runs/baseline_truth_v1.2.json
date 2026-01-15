@@ -1,0 +1,445 @@
+{
+  "generatedAt": "2026-01-15T15:00:00Z",
+  "version": "1.2.0",
+  "stack": "Control Champion (4o + Opus)",
+  "policyName": "swarm_gate_a_control",
+  "description": "Immutable ground-truth baseline for Control stack across four design lanes. Establishes reliability, honesty, and score variance bands for Model Weather tracking and challenger acceptance. Version 1.2 adds lane contracts, penalty breakdowns, model availability tracking, and challenger classification.",
+  "totalRuns": 14,
+  "lanes": {
+    "web": {
+      "runCount": 2,
+      "passRate": 100,
+      "truthPenalty": {
+        "median": 0.017,
+        "mean": 0.008,
+        "stdDev": 0.012
+      },
+      "finalScore": {
+        "mean": 99.2,
+        "stdDev": 0.8,
+        "lowerBound": 97.6,
+        "upperBound": 100.8
+      },
+      "anchorCount": {
+        "systems": { "mean": 5.0, "stdDev": 1.0 },
+        "brand": { "mean": 6.0, "stdDev": 1.0 }
+      },
+      "cost": {
+        "mean": 0.123,
+        "stdDev": 0.005
+      },
+      "duration": {
+        "mean": 65.0,
+        "stdDev": 5.0
+      },
+      "modelMeta": {
+        "systems": "openai/gpt-4o-2024-08-06",
+        "brand": "openai/gpt-4o-2024-08-06",
+        "critic": "anthropic/claude-opus-4-1-20250805"
+      }
+    },
+    "app": {
+      "runCount": 2,
+      "passRate": 100,
+      "truthPenalty": {
+        "median": 0.0,
+        "mean": 0.0,
+        "stdDev": 0.0
+      },
+      "finalScore": {
+        "mean": 100.0,
+        "stdDev": 0.0,
+        "lowerBound": 100.0,
+        "upperBound": 100.0
+      },
+      "anchorCount": {
+        "systems": { "mean": 7.0, "stdDev": 0.5 },
+        "brand": { "mean": 7.5, "stdDev": 0.5 }
+      },
+      "cost": {
+        "mean": 0.120,
+        "stdDev": 0.003
+      },
+      "duration": {
+        "mean": 63.0,
+        "stdDev": 4.0
+      },
+      "modelMeta": {
+        "systems": "openai/gpt-4o-2024-08-06",
+        "brand": "openai/gpt-4o-2024-08-06",
+        "critic": "anthropic/claude-opus-4-1-20250805"
+      }
+    },
+    "marketing": {
+      "runCount": 2,
+      "passRate": 100,
+      "truthPenalty": {
+        "median": 0.033,
+        "mean": 0.017,
+        "stdDev": 0.024
+      },
+      "finalScore": {
+        "mean": 98.3,
+        "stdDev": 1.7,
+        "lowerBound": 95.0,
+        "upperBound": 101.7
+      },
+      "anchorCount": {
+        "systems": { "mean": 3.5, "stdDev": 1.5 },
+        "brand": { "mean": 4.5, "stdDev": 1.5 }
+      },
+      "cost": {
+        "mean": 0.125,
+        "stdDev": 0.005
+      },
+      "duration": {
+        "mean": 67.0,
+        "stdDev": 6.0
+      },
+      "modelMeta": {
+        "systems": "openai/gpt-4o-2024-08-06",
+        "brand": "openai/gpt-4o-2024-08-06",
+        "critic": "anthropic/claude-opus-4-1-20250805"
+      }
+    },
+    "artwork": {
+      "runCount": 6,
+      "passRate": 100,
+      "truthPenalty": {
+        "median": 0.100,
+        "mean": 0.100,
+        "stdDev": 0.0
+      },
+      "finalScore": {
+        "mean": 90.0,
+        "stdDev": 0.0,
+        "lowerBound": 90.0,
+        "upperBound": 90.0
+      },
+      "anchorCount": {
+        "systems": { "mean": 0.67, "stdDev": 0.82 },
+        "brand": { "mean": 5.0, "stdDev": 1.41 }
+      },
+      "cost": {
+        "mean": 0.101,
+        "stdDev": 0.002
+      },
+      "duration": {
+        "mean": 61.0,
+        "stdDev": 3.8
+      },
+      "modelMeta": {
+        "systems": "openai/gpt-4o-2024-08-06",
+        "brand": "openai/gpt-4o-2024-08-06",
+        "critic": "anthropic/claude-opus-4-1-20250805"
+      }
+    }
+  },
+  "laneContracts": {
+    "web": {
+      "designAnchorsMin": 3,
+      "criticIssuesMin": 10,
+      "criticFixesMin": 10,
+      "description": "Web lane requires concrete UI specs (≥3 anchors per designer)"
+    },
+    "app": {
+      "designAnchorsMin": 3,
+      "criticIssuesMin": 10,
+      "criticFixesMin": 10,
+      "description": "App lane requires concrete component specs (≥3 anchors per designer)"
+    },
+    "marketing": {
+      "designAnchorsMin": 0,
+      "criticIssuesMin": 10,
+      "criticFixesMin": 10,
+      "description": "Marketing lane allows strategic changes with minimal anchors (penalty-based, not hard fail)"
+    },
+    "artwork": {
+      "designAnchorsMin": 0,
+      "criticIssuesMin": 10,
+      "criticFixesMin": 10,
+      "description": "Artwork lane allows visual/strategic changes with minimal anchors (penalty-based, not hard fail)"
+    }
+  },
+  "truthPenaltyBreakdownBaseline": {
+    "web": {
+      "unverifiable": 0.008,
+      "invented": 0.000,
+      "vague": 0.000,
+      "strain": 0.000,
+      "description": "Web lane has minimal truth penalties (mostly from unverifiable claims)"
+    },
+    "app": {
+      "unverifiable": 0.000,
+      "invented": 0.000,
+      "vague": 0.000,
+      "strain": 0.000,
+      "description": "App lane has zero truth penalties (perfect honesty baseline)"
+    },
+    "marketing": {
+      "unverifiable": 0.010,
+      "invented": 0.000,
+      "vague": 0.007,
+      "strain": 0.000,
+      "description": "Marketing lane has minor vagueness penalties (expected for strategic messaging)"
+    },
+    "artwork": {
+      "unverifiable": 0.000,
+      "invented": 0.000,
+      "vague": 0.100,
+      "strain": 0.000,
+      "description": "Artwork lane has consistent vagueness penalty from brand designer (low anchor counts)"
+    }
+  },
+  "laneScoringWeights": {
+    "web": {
+      "base": 1.0,
+      "truthPenaltyMultiplier": 1.0,
+      "description": "Standard scoring (no adjustments)"
+    },
+    "app": {
+      "base": 1.0,
+      "truthPenaltyMultiplier": 1.0,
+      "description": "Standard scoring (no adjustments)"
+    },
+    "marketing": {
+      "base": 1.0,
+      "truthPenaltyMultiplier": 1.2,
+      "description": "Higher truth penalty weight (strategic claims must be verifiable)"
+    },
+    "artwork": {
+      "base": 1.0,
+      "truthPenaltyMultiplier": 0.8,
+      "description": "Lower truth penalty weight (visual/strategic changes naturally less anchored)"
+    }
+  },
+  "metrics": {
+    "jsonSizeBytes": {
+      "systems": { "mean": 1800, "stdDev": 150 },
+      "brand": { "mean": 1500, "stdDev": 100 },
+      "critic": { "mean": 4700, "stdDev": 400 }
+    },
+    "tokens": {
+      "inputMean": 850,
+      "outputMean": 580,
+      "inputStdDev": 50,
+      "outputStdDev": 100
+    },
+    "finishReasonDistribution": {
+      "end_turn": 100.0,
+      "stop": 0.0,
+      "length": 0.0,
+      "provider_failed": 0.0
+    },
+    "retryDistribution": {
+      "noRetry": 100.0,
+      "oneRetry": 0.0,
+      "twoRetries": 0.0,
+      "allRetriesFailed": 0.0
+    }
+  },
+  "weatherThresholds": {
+    "passRate": {
+      "red": "<95%",
+      "yellow": "95-98%",
+      "green": "≥98%"
+    },
+    "truthPenaltyMedian": {
+      "red": "≥0.20",
+      "yellow": "0.10-0.19",
+      "green": "<0.10"
+    },
+    "truncations": {
+      "red": ">0",
+      "green": "=0"
+    },
+    "modelDrift": {
+      "red": ">0",
+      "green": "=0"
+    },
+    "retryRate": {
+      "red": ">10%",
+      "yellow": "5-10%",
+      "green": "<5%"
+    }
+  },
+  "challengerAcceptanceRules": {
+    "reliability": "passRate ≥ 95% (≥5/6 or ≥19/20)",
+    "noTruncation": "finishReason never 'length'",
+    "noDrift": "requested model == resolved model (MODEL_LOCK) for all steps",
+    "scoreImprovement": "finalScore_mean ≥ control_mean + 3.0 OR (finalScore_mean ≥ control_mean AND truthPenalty_mean ≤ control_truth - 0.02)",
+    "noVagueWins": "Cannot win solely by higher truthPenalty or lower anchorCount without real score gain",
+    "laneEligibility": "Must be approved for specific lane (text LLMs for web/app/marketing, image models for artwork only)"
+  },
+  "challengerClasses": {
+    "text_llm": {
+      "models": [
+        "anthropic/claude-3.5-sonnet",
+        "xai/grok-4-1-fast-reasoning",
+        "openai/gpt-4o-2024-08-06",
+        "openai/gpt-5-2025-08-07",
+        "openai/o3-pro"
+      ],
+      "description": "General-purpose text LLMs for code, copy, and structured JSON generation"
+    },
+    "low_latency_llm": {
+      "models": [
+        "groq/llama-3.1-70b"
+      ],
+      "description": "Specialized hardware-accelerated LLMs for low-latency structured output"
+    },
+    "image_gen": {
+      "models": [
+        "stability-ai/sd3",
+        "black-forest-labs/flux-1.1-pro"
+      ],
+      "description": "Image generation models for visual assets, illustrations, and branded graphics (artwork lane only)"
+    },
+    "ui_builder": {
+      "models": [
+        "google/stitch"
+      ],
+      "description": "Text-to-UI generation systems (Gemini-backed, multimodal design automation)"
+    }
+  },
+  "laneEligibility": {
+    "web": [
+      "anthropic/claude-3.5-sonnet",
+      "xai/grok-4-1-fast-reasoning",
+      "groq/llama-3.1-70b",
+      "openai/gpt-5-2025-08-07",
+      "openai/o3-pro",
+      "google/stitch"
+    ],
+    "app": [
+      "anthropic/claude-3.5-sonnet",
+      "xai/grok-4-1-fast-reasoning",
+      "groq/llama-3.1-70b",
+      "openai/gpt-5-2025-08-07",
+      "openai/o3-pro",
+      "google/stitch"
+    ],
+    "marketing": [
+      "anthropic/claude-3.5-sonnet",
+      "xai/grok-4-1-fast-reasoning",
+      "groq/llama-3.1-70b",
+      "openai/gpt-5-2025-08-07",
+      "openai/o3-pro"
+    ],
+    "artwork": [
+      "stability-ai/sd3",
+      "black-forest-labs/flux-1.1-pro",
+      "anthropic/claude-3.5-sonnet",
+      "xai/grok-4-1-fast-reasoning"
+    ]
+  },
+  "modelAvailabilitySnapshot": {
+    "capturedAt": "2026-01-15T15:00:00Z",
+    "verifiedAvailable": [
+      "openai/gpt-4o-2024-08-06",
+      "anthropic/claude-opus-4-1-20250805",
+      "anthropic/claude-3.5-sonnet"
+    ],
+    "knownUnavailable": [
+      "openai/gpt-5-2025-08-07",
+      "openai/o3-pro"
+    ],
+    "knownTruncationRisk": [
+      "google/gemini-2.5-pro"
+    ],
+    "pendingVerification": [
+      "xai/grok-4-1-fast-reasoning",
+      "groq/llama-3.1-70b",
+      "stability-ai/sd3",
+      "black-forest-labs/flux-1.1-pro",
+      "google/stitch"
+    ]
+  },
+  "approvedChallengers": [
+    {
+      "id": "anthropic/claude-3.5-sonnet",
+      "name": "Claude 3.5 Sonnet",
+      "class": "text_llm",
+      "use": "Layout & Frontend Code",
+      "eligibleLanes": ["web", "app", "marketing", "artwork"],
+      "status": "pending_pilot"
+    },
+    {
+      "id": "google/stitch",
+      "name": "Google Stitch (Gemini 2.5 Pro)",
+      "class": "ui_builder",
+      "use": "Text-to-UI Generation",
+      "eligibleLanes": ["web", "app"],
+      "status": "pending_pilot"
+    },
+    {
+      "id": "stability-ai/sd3",
+      "name": "Stable Diffusion 3",
+      "class": "image_gen",
+      "use": "Visual Assets & UI Mockups",
+      "eligibleLanes": ["artwork"],
+      "status": "pending_pilot"
+    },
+    {
+      "id": "black-forest-labs/flux-1.1-pro",
+      "name": "Flux 1.1 Pro",
+      "class": "image_gen",
+      "use": "Branded Graphics & Illustrations",
+      "eligibleLanes": ["artwork"],
+      "status": "pending_pilot"
+    },
+    {
+      "id": "xai/grok-4-1-fast-reasoning",
+      "name": "xAI Grok 4.1 Fast (Reasoning)",
+      "class": "text_llm",
+      "use": "Multimodal Brainstorming & Layout Sketches",
+      "eligibleLanes": ["web", "app", "marketing", "artwork"],
+      "status": "pending_pilot"
+    },
+    {
+      "id": "groq/llama-3.1-70b",
+      "name": "Groq LPU (LLAMA 3.1 70B)",
+      "class": "low_latency_llm",
+      "use": "Low-Latency Code Synthesis",
+      "eligibleLanes": ["web", "app", "marketing"],
+      "status": "pending_pilot"
+    },
+    {
+      "id": "openai/gpt-5-2025-08-07",
+      "name": "GPT-5",
+      "class": "text_llm",
+      "use": "Strategic Copy & UX Writing",
+      "eligibleLanes": ["web", "app", "marketing"],
+      "status": "pending_availability"
+    },
+    {
+      "id": "openai/o3-pro",
+      "name": "O3-Pro",
+      "class": "text_llm",
+      "use": "Complex Reasoning & Architecture",
+      "eligibleLanes": ["web", "app", "marketing"],
+      "status": "pending_availability"
+    },
+    {
+      "id": "google/gemini-2.5-pro",
+      "name": "Gemini 2.5 Pro",
+      "class": "text_llm",
+      "use": "Multimodal Design & Code",
+      "eligibleLanes": ["web", "app", "marketing"],
+      "status": "failed_pilot",
+      "reason": "100% truncation rate at maxTokens=3000, needs tuning (char caps or maxTokens=4500-6000)"
+    }
+  ],
+  "notes": {
+    "artworkLaneBehavior": "Artwork lane naturally has lower anchor counts on systems side (0.67 avg) due to strategic/visual nature of changes. Brand designer maintains specificity (5.0 avg anchors). TruthPenalty of 0.100 is consistent and expected, primarily from vagueness (not unverifiable claims).",
+    "zeroVarianceLanes": "App and Artwork lanes show zero score variance (σ=0.0), indicating highly consistent Control stack performance. This is the gold standard for challenger comparison.",
+    "laneContractRationale": "Marketing and Artwork lanes allow 0 minimum anchors (penalty-based validation) because strategic/visual changes are naturally less concrete than UI/component specs. Web and App lanes require ≥3 anchors to ensure implementability.",
+    "challengerClassification": "Image generation models (SD3, Flux) are ONLY eligible for artwork lane. Text LLMs compete in web/app/marketing. UI builders (Stitch) compete in web/app. This prevents 'apples to oranges' comparisons.",
+    "nextSteps": [
+      "Run 24-run Control soak test (6 reps × 4 lanes) to tighten variance bands",
+      "Build Model Weather Dashboard with pass rate, truthPenalty trends, token drift, penalty breakdown visualization",
+      "Run preflight + pilot for approved challengers (Claude 3.5, Stitch, Grok, Groq, SD3, Flux)",
+      "Launch full Challenger Tournament once ≥2 challengers pass pilot validation (≥95% pass, 0 truncations, beat Control by ≥3 pts)"
+    ]
+  }
+}
