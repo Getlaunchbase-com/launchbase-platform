@@ -1602,8 +1602,21 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 
 ### Phase 6: Documentation & Checkpoint
 - [x] Document audit-proof tournament infrastructure in TOURNAMENT_INFRASTRUCTURE.md
-- [ ] Save checkpoint with all improvements
+- [x] Save checkpoint with all improvements
 - [x] Generate tournament readiness report
+
+---
+
+## 🎯 PILOT #1: CLAUDE 3.5 SONNET AS CRITIC
+
+- [x] Cross-reference AI design tools with AIML API availability
+- [x] Confirm Claude 3.5 Sonnet model ID: `claude-3-5-sonnet-20240620`
+- [x] Create pilot_1_claude_sonnet_critic.json configuration
+- [x] Create runPilot1_ClaudeSonnetCritic.ts runner script
+- [ ] Run Pilot #1 (Web + Marketing, 2 reps each = 4 runs)
+- [ ] Verify 4/4 valid, 0 truncation, 0 drift
+- [ ] Generate PILOT_1_SCORECARD.md and PILOT_1_VS_CONTROL.md
+- [ ] Check acceptance criteria: pass rate ≥95%, beat Control by ≥3 OR match with lower penalty
 
 
 ---

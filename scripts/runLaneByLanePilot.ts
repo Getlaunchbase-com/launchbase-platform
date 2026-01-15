@@ -16,6 +16,10 @@ import { enforceIntegrityAtStartup, enforceIntegrityPerCall, enforceIntegrityPos
 import { validateChallengerStack } from '../server/ai/engine/validation/preflightCheck';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const BASELINE_PATH = path.join(__dirname, '../runs/baseline_truth_v1.2.json');
 const OUTPUT_DIR = path.join(__dirname, '../runs', new Date().toISOString().split('T')[0]);

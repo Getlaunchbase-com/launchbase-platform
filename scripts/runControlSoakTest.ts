@@ -18,6 +18,10 @@ import { callSpecialistWithRetry } from '../server/ai/engine/specialists/aimlSpe
 import { enforceIntegrityAtStartup, enforceIntegrityPerCall, enforceIntegrityPostRun } from '../server/ai/engine/validation/integrityEnforcement';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const BASELINE_PATH = path.join(__dirname, '../runs/baseline_truth_v1.2.json');
 const OUTPUT_DIR = path.join(__dirname, '../runs', new Date().toISOString().split('T')[0]);

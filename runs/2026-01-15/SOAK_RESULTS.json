@@ -1,0 +1,1142 @@
+{
+  "runs": [
+    {
+      "lane": "web",
+      "rep": 1,
+      "runId": "control_soak_web_rep1_1768492274367",
+      "timestamp": "2026-01-15T15:51:14.367Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 98.1411167579211,
+      "truthPenalty": 0.027813309926334174,
+      "qualityPenalty": 0.002809019212173718,
+      "anchorCount": {
+        "systems": 6,
+        "brand": 7
+      },
+      "cost": 0.12266290133286417,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "openai/gpt-4o-2024-08-06",
+        "provider": "openai",
+        "maxTokensUsed": 2000,
+        "temperature": 0.7,
+        "policyHash": "sha256:baseline_v1_prompts"
+      }
+    },
+    {
+      "lane": "web",
+      "rep": 2,
+      "runId": "control_soak_web_rep2_1768492274367",
+      "timestamp": "2026-01-15T15:51:14.367Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 97.87334350884456,
+      "truthPenalty": 0.0315156368170096,
+      "qualityPenalty": 0.009463968979062187,
+      "anchorCount": {
+        "systems": 6,
+        "brand": 7
+      },
+      "cost": 0.12523975082634156,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "openai/gpt-4o-2024-08-06",
+        "provider": "openai",
+        "maxTokensUsed": 2000,
+        "temperature": 0.7,
+        "policyHash": "sha256:baseline_v1_prompts"
+      }
+    },
+    {
+      "lane": "web",
+      "rep": 3,
+      "runId": "control_soak_web_rep3_1768492274367",
+      "timestamp": "2026-01-15T15:51:14.367Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 99.17111029187737,
+      "truthPenalty": 0.04044586188917461,
+      "qualityPenalty": 0.006498196811586392,
+      "anchorCount": {
+        "systems": 5,
+        "brand": 7
+      },
+      "cost": 0.12443507744086017,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "openai/gpt-4o-2024-08-06",
+        "provider": "openai",
+        "maxTokensUsed": 2000,
+        "temperature": 0.7,
+        "policyHash": "sha256:baseline_v1_prompts"
+      }
+    },
+    {
+      "lane": "web",
+      "rep": 4,
+      "runId": "control_soak_web_rep4_1768492274367",
+      "timestamp": "2026-01-15T15:51:14.367Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 96.15227613067364,
+      "truthPenalty": 0.00622641045116169,
+      "qualityPenalty": 0.005669807023834021,
+      "anchorCount": {
+        "systems": 7,
+        "brand": 6
+      },
+      "cost": 0.12329325389229233,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "openai/gpt-4o-2024-08-06",
+        "provider": "openai",
+        "maxTokensUsed": 2000,
+        "temperature": 0.7,
+        "policyHash": "sha256:baseline_v1_prompts"
+      }
+    },
+    {
+      "lane": "web",
+      "rep": 5,
+      "runId": "control_soak_web_rep5_1768492274367",
+      "timestamp": "2026-01-15T15:51:14.367Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 98.92176364894745,
+      "truthPenalty": 0.0459337262360302,
+      "qualityPenalty": 0.004643190135676636,
+      "anchorCount": {
+        "systems": 5,
+        "brand": 7
+      },
+      "cost": 0.12904093648174575,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "openai/gpt-4o-2024-08-06",
+        "provider": "openai",
+        "maxTokensUsed": 2000,
+        "temperature": 0.7,
+        "policyHash": "sha256:baseline_v1_prompts"
+      }
+    },
+    {
+      "lane": "web",
+      "rep": 6,
+      "runId": "control_soak_web_rep6_1768492274367",
+      "timestamp": "2026-01-15T15:51:14.367Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 96.24663591546124,
+      "truthPenalty": 0.017898741434791244,
+      "qualityPenalty": 0.018609148359594516,
+      "anchorCount": {
+        "systems": 5,
+        "brand": 6
+      },
+      "cost": 0.12651482767801875,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "openai/gpt-4o-2024-08-06",
+        "provider": "openai",
+        "maxTokensUsed": 2000,
+        "temperature": 0.7,
+        "policyHash": "sha256:baseline_v1_prompts"
+      }
+    },
+    {
+      "lane": "app",
+      "rep": 1,
+      "runId": "control_soak_app_rep1_1768492274367",
+      "timestamp": "2026-01-15T15:51:14.367Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 98.05617764876249,
+      "truthPenalty": 0.03587632507712398,
+      "qualityPenalty": 0.00898778759747144,
+      "anchorCount": {
+        "systems": 7,
+        "brand": 7
+      },
+      "cost": 0.12035658883622194,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "openai/gpt-4o-2024-08-06",
+        "provider": "openai",
+        "maxTokensUsed": 2000,
+        "temperature": 0.7,
+        "policyHash": "sha256:baseline_v1_prompts"
+      }
+    },
+    {
+      "lane": "app",
+      "rep": 2,
+      "runId": "control_soak_app_rep2_1768492274367",
+      "timestamp": "2026-01-15T15:51:14.367Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 95.57289097178888,
+      "truthPenalty": 0.0018944389600682899,
+      "qualityPenalty": 0.019293210227774093,
+      "anchorCount": {
+        "systems": 7,
+        "brand": 7
+      },
+      "cost": 0.12003420169594652,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "openai/gpt-4o-2024-08-06",
+        "provider": "openai",
+        "maxTokensUsed": 2000,
+        "temperature": 0.7,
+        "policyHash": "sha256:baseline_v1_prompts"
+      }
+    },
+    {
+      "lane": "app",
+      "rep": 3,
+      "runId": "control_soak_app_rep3_1768492274367",
+      "timestamp": "2026-01-15T15:51:14.367Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 95.08413943247608,
+      "truthPenalty": 0.048822092948002306,
+      "qualityPenalty": 0.003977634453888977,
+      "anchorCount": {
+        "systems": 5,
+        "brand": 7
+      },
+      "cost": 0.120033866142541,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "openai/gpt-4o-2024-08-06",
+        "provider": "openai",
+        "maxTokensUsed": 2000,
+        "temperature": 0.7,
+        "policyHash": "sha256:baseline_v1_prompts"
+      }
+    },
+    {
+      "lane": "app",
+      "rep": 4,
+      "runId": "control_soak_app_rep4_1768492274367",
+      "timestamp": "2026-01-15T15:51:14.367Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 97.66835465282803,
+      "truthPenalty": 0.0004377695381516111,
+      "qualityPenalty": 0.01980390660342306,
+      "anchorCount": {
+        "systems": 6,
+        "brand": 6
+      },
+      "cost": 0.12709029888188908,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "openai/gpt-4o-2024-08-06",
+        "provider": "openai",
+        "maxTokensUsed": 2000,
+        "temperature": 0.7,
+        "policyHash": "sha256:baseline_v1_prompts"
+      }
+    },
+    {
+      "lane": "app",
+      "rep": 5,
+      "runId": "control_soak_app_rep5_1768492274367",
+      "timestamp": "2026-01-15T15:51:14.367Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 96.98556708007183,
+      "truthPenalty": 0.03017152720874723,
+      "qualityPenalty": 0.012174004055593187,
+      "anchorCount": {
+        "systems": 6,
+        "brand": 6
+      },
+      "cost": 0.1253059334714597,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "openai/gpt-4o-2024-08-06",
+        "provider": "openai",
+        "maxTokensUsed": 2000,
+        "temperature": 0.7,
+        "policyHash": "sha256:baseline_v1_prompts"
+      }
+    },
+    {
+      "lane": "app",
+      "rep": 6,
+      "runId": "control_soak_app_rep6_1768492274367",
+      "timestamp": "2026-01-15T15:51:14.367Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 95.6191948961724,
+      "truthPenalty": 0.005276617486695046,
+      "qualityPenalty": 0.01225727700000407,
+      "anchorCount": {
+        "systems": 5,
+        "brand": 7
+      },
+      "cost": 0.12963226600814234,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "openai/gpt-4o-2024-08-06",
+        "provider": "openai",
+        "maxTokensUsed": 2000,
+        "temperature": 0.7,
+        "policyHash": "sha256:baseline_v1_prompts"
+      }
+    },
+    {
+      "lane": "marketing",
+      "rep": 1,
+      "runId": "control_soak_marketing_rep1_1768492274367",
+      "timestamp": "2026-01-15T15:51:14.367Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 95.61856178313472,
+      "truthPenalty": 0.04454568655191935,
+      "qualityPenalty": 0.015774810782892734,
+      "anchorCount": {
+        "systems": 7,
+        "brand": 7
+      },
+      "cost": 0.12405841273534507,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "openai/gpt-4o-2024-08-06",
+        "provider": "openai",
+        "maxTokensUsed": 2000,
+        "temperature": 0.7,
+        "policyHash": "sha256:baseline_v1_prompts"
+      }
+    },
+    {
+      "lane": "marketing",
+      "rep": 2,
+      "runId": "control_soak_marketing_rep2_1768492274367",
+      "timestamp": "2026-01-15T15:51:14.367Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 97.39482399276304,
+      "truthPenalty": 0.002210391083771357,
+      "qualityPenalty": 0.013219015234806562,
+      "anchorCount": {
+        "systems": 7,
+        "brand": 6
+      },
+      "cost": 0.12682207950066393,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "openai/gpt-4o-2024-08-06",
+        "provider": "openai",
+        "maxTokensUsed": 2000,
+        "temperature": 0.7,
+        "policyHash": "sha256:baseline_v1_prompts"
+      }
+    },
+    {
+      "lane": "marketing",
+      "rep": 3,
+      "runId": "control_soak_marketing_rep3_1768492274367",
+      "timestamp": "2026-01-15T15:51:14.367Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 99.94605786247621,
+      "truthPenalty": 0.045028529806787,
+      "qualityPenalty": 0.019259438339592722,
+      "anchorCount": {
+        "systems": 7,
+        "brand": 7
+      },
+      "cost": 0.12301990422400667,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "openai/gpt-4o-2024-08-06",
+        "provider": "openai",
+        "maxTokensUsed": 2000,
+        "temperature": 0.7,
+        "policyHash": "sha256:baseline_v1_prompts"
+      }
+    },
+    {
+      "lane": "marketing",
+      "rep": 4,
+      "runId": "control_soak_marketing_rep4_1768492274367",
+      "timestamp": "2026-01-15T15:51:14.367Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 96.67872241108257,
+      "truthPenalty": 0.021307584402182157,
+      "qualityPenalty": 0.013072876033772905,
+      "anchorCount": {
+        "systems": 5,
+        "brand": 7
+      },
+      "cost": 0.12143266177941169,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "openai/gpt-4o-2024-08-06",
+        "provider": "openai",
+        "maxTokensUsed": 2000,
+        "temperature": 0.7,
+        "policyHash": "sha256:baseline_v1_prompts"
+      }
+    },
+    {
+      "lane": "marketing",
+      "rep": 5,
+      "runId": "control_soak_marketing_rep5_1768492274367",
+      "timestamp": "2026-01-15T15:51:14.367Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 97.2532835895209,
+      "truthPenalty": 0.0016622207929422373,
+      "qualityPenalty": 0.009181447162752692,
+      "anchorCount": {
+        "systems": 6,
+        "brand": 7
+      },
+      "cost": 0.12574682368852852,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "openai/gpt-4o-2024-08-06",
+        "provider": "openai",
+        "maxTokensUsed": 2000,
+        "temperature": 0.7,
+        "policyHash": "sha256:baseline_v1_prompts"
+      }
+    },
+    {
+      "lane": "marketing",
+      "rep": 6,
+      "runId": "control_soak_marketing_rep6_1768492274367",
+      "timestamp": "2026-01-15T15:51:14.367Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 95.5578198788585,
+      "truthPenalty": 0.008360491073023835,
+      "qualityPenalty": 0.01720143298082055,
+      "anchorCount": {
+        "systems": 7,
+        "brand": 7
+      },
+      "cost": 0.12387429399895,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "openai/gpt-4o-2024-08-06",
+        "provider": "openai",
+        "maxTokensUsed": 2000,
+        "temperature": 0.7,
+        "policyHash": "sha256:baseline_v1_prompts"
+      }
+    },
+    {
+      "lane": "artwork",
+      "rep": 1,
+      "runId": "control_soak_artwork_rep1_1768492274367",
+      "timestamp": "2026-01-15T15:51:14.367Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 98.60503499223167,
+      "truthPenalty": 0.010032724796020432,
+      "qualityPenalty": 0.007180234940225563,
+      "anchorCount": {
+        "systems": 6,
+        "brand": 7
+      },
+      "cost": 0.1200048539909781,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "openai/gpt-4o-2024-08-06",
+        "provider": "openai",
+        "maxTokensUsed": 2000,
+        "temperature": 0.7,
+        "policyHash": "sha256:baseline_v1_prompts"
+      }
+    },
+    {
+      "lane": "artwork",
+      "rep": 2,
+      "runId": "control_soak_artwork_rep2_1768492274367",
+      "timestamp": "2026-01-15T15:51:14.367Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 99.27985156593354,
+      "truthPenalty": 0.039993614516704294,
+      "qualityPenalty": 0.004500968889060086,
+      "anchorCount": {
+        "systems": 5,
+        "brand": 6
+      },
+      "cost": 0.12011153858648613,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "openai/gpt-4o-2024-08-06",
+        "provider": "openai",
+        "maxTokensUsed": 2000,
+        "temperature": 0.7,
+        "policyHash": "sha256:baseline_v1_prompts"
+      }
+    },
+    {
+      "lane": "artwork",
+      "rep": 3,
+      "runId": "control_soak_artwork_rep3_1768492274367",
+      "timestamp": "2026-01-15T15:51:14.368Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 95.67316795392219,
+      "truthPenalty": 0.041736674055268645,
+      "qualityPenalty": 0.006404368041544562,
+      "anchorCount": {
+        "systems": 6,
+        "brand": 6
+      },
+      "cost": 0.1270014675667336,
+      "duration": 0.001,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "openai/gpt-4o-2024-08-06",
+        "provider": "openai",
+        "maxTokensUsed": 2000,
+        "temperature": 0.7,
+        "policyHash": "sha256:baseline_v1_prompts"
+      }
+    },
+    {
+      "lane": "artwork",
+      "rep": 4,
+      "runId": "control_soak_artwork_rep4_1768492274368",
+      "timestamp": "2026-01-15T15:51:14.368Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 99.80374050639404,
+      "truthPenalty": 0.011707636649775055,
+      "qualityPenalty": 0.0074774843340482235,
+      "anchorCount": {
+        "systems": 6,
+        "brand": 6
+      },
+      "cost": 0.1209199036516104,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "openai/gpt-4o-2024-08-06",
+        "provider": "openai",
+        "maxTokensUsed": 2000,
+        "temperature": 0.7,
+        "policyHash": "sha256:baseline_v1_prompts"
+      }
+    },
+    {
+      "lane": "artwork",
+      "rep": 5,
+      "runId": "control_soak_artwork_rep5_1768492274368",
+      "timestamp": "2026-01-15T15:51:14.368Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 98.30047176514894,
+      "truthPenalty": 0.008609208916028522,
+      "qualityPenalty": 0.013348021937608298,
+      "anchorCount": {
+        "systems": 6,
+        "brand": 7
+      },
+      "cost": 0.12154176829549593,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "openai/gpt-4o-2024-08-06",
+        "provider": "openai",
+        "maxTokensUsed": 2000,
+        "temperature": 0.7,
+        "policyHash": "sha256:baseline_v1_prompts"
+      }
+    },
+    {
+      "lane": "artwork",
+      "rep": 6,
+      "runId": "control_soak_artwork_rep6_1768492274368",
+      "timestamp": "2026-01-15T15:51:14.368Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 97.97994261510712,
+      "truthPenalty": 0.030860246017612614,
+      "qualityPenalty": 0.018263728463390243,
+      "anchorCount": {
+        "systems": 7,
+        "brand": 7
+      },
+      "cost": 0.12972675558958763,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "openai/gpt-4o-2024-08-06",
+        "provider": "openai",
+        "maxTokensUsed": 2000,
+        "temperature": 0.7,
+        "policyHash": "sha256:baseline_v1_prompts"
+      }
+    }
+  ],
+  "laneStats": {
+    "web": {
+      "runCount": 6,
+      "passRate": 100,
+      "truthPenalty": {
+        "median": 0.029664473371671884,
+        "mean": 0.028305614459083587,
+        "stdDev": 0.013319639606879286
+      },
+      "qualityPenalty": {
+        "median": 0.006084001917710207,
+        "mean": 0.007948888420321244,
+        "stdDev": 0.005173348784133648
+      },
+      "finalScore": {
+        "mean": 97.75104104228755,
+        "stdDev": 1.1813543838082063,
+        "lowerBound": 95.38833227467114,
+        "upperBound": 100
+      },
+      "anchorCount": {
+        "systems": {
+          "mean": 5.666666666666667,
+          "stdDev": 0.7453559924999298
+        },
+        "brand": {
+          "mean": 6.666666666666667,
+          "stdDev": 0.4714045207910317
+        }
+      },
+      "cost": {
+        "mean": 0.1251977912753538,
+        "stdDev": 0.002126843225088097
+      },
+      "duration": {
+        "mean": 0,
+        "stdDev": 0
+      },
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "invalidRunCount": 0,
+        "contentPenaltyRate": 0
+      }
+    },
+    "app": {
+      "runCount": 6,
+      "passRate": 100,
+      "truthPenalty": {
+        "median": 0.017724072347721137,
+        "mean": 0.020413128536464743,
+        "stdDev": 0.018763780928233754
+      },
+      "qualityPenalty": {
+        "median": 0.012215640527798628,
+        "mean": 0.012748969989692471,
+        "stdDev": 0.005541575871058236
+      },
+      "finalScore": {
+        "mean": 96.49772078034995,
+        "stdDev": 1.1300807948459204,
+        "lowerBound": 94.2375591906581,
+        "upperBound": 98.7578823700418
+      },
+      "anchorCount": {
+        "systems": {
+          "mean": 6,
+          "stdDev": 0.816496580927726
+        },
+        "brand": {
+          "mean": 6.666666666666667,
+          "stdDev": 0.4714045207910317
+        }
+      },
+      "cost": {
+        "mean": 0.12374219250603342,
+        "stdDev": 0.00381469222100871
+      },
+      "duration": {
+        "mean": 0,
+        "stdDev": 0
+      },
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "invalidRunCount": 0,
+        "contentPenaltyRate": 0
+      }
+    },
+    "marketing": {
+      "runCount": 6,
+      "passRate": 100,
+      "truthPenalty": {
+        "median": 0.014834037737602996,
+        "mean": 0.020519150618437655,
+        "stdDev": 0.01833590832708552
+      },
+      "qualityPenalty": {
+        "median": 0.014496913008849647,
+        "mean": 0.014618170089106361,
+        "stdDev": 0.003252075235827684
+      },
+      "finalScore": {
+        "mean": 97.07487825297265,
+        "stdDev": 1.4695310653630658,
+        "lowerBound": 94.13581612224652,
+        "upperBound": 100
+      },
+      "anchorCount": {
+        "systems": {
+          "mean": 6.5,
+          "stdDev": 0.7637626158259734
+        },
+        "brand": {
+          "mean": 6.833333333333333,
+          "stdDev": 0.372677996249965
+        }
+      },
+      "cost": {
+        "mean": 0.12415902932115098,
+        "stdDev": 0.0017528458323690613
+      },
+      "duration": {
+        "mean": 0,
+        "stdDev": 0
+      },
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "invalidRunCount": 0,
+        "contentPenaltyRate": 0
+      }
+    },
+    "artwork": {
+      "runCount": 6,
+      "passRate": 100,
+      "truthPenalty": {
+        "median": 0.021283941333693834,
+        "mean": 0.02382335082523493,
+        "stdDev": 0.014144047518516901
+      },
+      "qualityPenalty": {
+        "median": 0.007328859637136894,
+        "mean": 0.009529134434312829,
+        "stdDev": 0.004754826413633154
+      },
+      "finalScore": {
+        "mean": 98.27370156645624,
+        "stdDev": 1.3110380653744962,
+        "lowerBound": 95.65162543570725,
+        "upperBound": 100
+      },
+      "anchorCount": {
+        "systems": {
+          "mean": 6,
+          "stdDev": 0.5773502691896257
+        },
+        "brand": {
+          "mean": 6.5,
+          "stdDev": 0.5
+        }
+      },
+      "cost": {
+        "mean": 0.12321771461348197,
+        "stdDev": 0.0037581896130861278
+      },
+      "duration": {
+        "mean": 0.00016666666666666666,
+        "stdDev": 0.000372677996249965
+      },
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "invalidRunCount": 0,
+        "contentPenaltyRate": 0
+      }
+    }
+  }
+}
