@@ -32,6 +32,10 @@
       "truthPenalty": "5b41900eb362010cd8473d5c8e499885c2542770ebbec56cd453977c3b25f712"
     }
   },
+  "integrity": {
+    "requireSchemaHashMatch": true,
+    "notes": "If true, tournament runners MUST validate current schema hashes against inputs.schemaHashes before execution. Any mismatch marks the entire run batch as INVALID (drift) and stops execution. This prevents contamination from silent schema changes."
+  },
   "evalConfig": {
     "baselineMode": {
       "enableLadder": false,

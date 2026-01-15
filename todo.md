@@ -1560,3 +1560,47 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [ ] Analyze variance and establish truth baseline
 - [ ] Lock Model Weather Control Chart thresholds
 - [ ] Save checkpoint with complete tournament infrastructure
+
+
+---
+
+## 🏆 TOURNAMENT INFRASTRUCTURE V1.2 (IN PROGRESS)
+
+**Baseline Truth v1.2 Complete - Now implementing audit-proof infrastructure**
+
+### Phase 1: Schema Hash Validation & Integrity Enforcement
+- [x] Add `integrity.requireSchemaHashMatch: true` flag to baseline_truth_v1.2.json
+- [x] Build runtime schema hash validator (computes current hashes, compares to baseline)
+- [x] Add drift detection guard: if hash mismatch → mark run as INVALID and stop
+- [ ] Test schema hash validation with intentional drift scenario
+
+### Phase 2: Control Soak Test (24 runs)
+- [x] Create `runControlSoakTest.ts` script (4 lanes × 6 reps = 24 runs)
+- [x] Enforce strict mode: enableLadder=false, allowModelFallback=false
+- [x] Generate outputs: SOAK_RESULTS.json, SOAK_SCORECARD.md
+- [ ] Run Control soak test to collect actual data
+- [ ] Update baseline_truth_v1.2.json with tightened variance bands
+- [ ] Add explicit controlBands (lower/upper bounds) for challenger comparisons
+
+### Phase 3: Preflight Check System
+- [x] Build preflight validator using registrySnapshot + preflightRecords
+- [x] Block stacks with missingModels.length > 0
+- [x] Auto-apply maxTokensRecommendation for models with known truncation risk
+- [x] Add preflight check to all tournament runners (pilot, soak, full tournament)
+
+### Phase 4: Lane-by-Lane Pilot System
+- [x] Create `runLaneByLanePilot.ts` script
+- [x] Implement 2-lane validation (Web + Marketing × 2 reps = 4 runs)
+- [x] Enforce pilot acceptance criteria: ≥95% pass (4/4), 0 truncations, 0 drift, beat Control by ≥3 OR match with lower truthPenalty
+- [x] Only expand to all 4 lanes after 2-lane pilot passes
+
+### Phase 5: Asset Model Lane Rules
+- [x] Add lane rule in challengerCatalog: asset models (Flux/SD3/Stitch) use separate scoring rubric
+- [x] Create asset model evaluation schema (image quality, artifact validity, not LLM truthPenalty)
+- [x] Prevent asset models from being judged by LLM designer schema (avoid false "liar" labels)
+- [x] Document asset model lane rules in ASSET_MODEL_LANE_RULES.md
+
+### Phase 6: Documentation & Checkpoint
+- [x] Document audit-proof tournament infrastructure in TOURNAMENT_INFRASTRUCTURE.md
+- [ ] Save checkpoint with all improvements
+- [x] Generate tournament readiness report
