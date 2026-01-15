@@ -25,6 +25,8 @@ type PilotStack = {
   designer_systems_fast: { modelId: string; provider: string; maxTokens: number; temperature: number; timeoutMs?: number };
   designer_brand_fast: { modelId: string; provider: string; maxTokens: number; temperature: number; timeoutMs?: number };
   design_critic_ruthless: { modelId: string; provider: string; maxTokens: number; temperature: number; timeoutMs?: number };
+  // Optional: selector for creative production mode
+  selector?: { modelId: string; provider: string; maxTokens: number; temperature: number; timeoutMs?: number };
 };
 
 export interface PilotRun {
@@ -129,6 +131,80 @@ function cleanParseArtifactV1(artifact: any): any {
  */
 function cleanParseJsonArtifact(artifact: any): any {
   return cleanParseArtifactPayload(artifact);
+}
+
+/**
+ * Cap changes array to prevent token bombs
+ * (Selector handles ranking; cap is only safety belt)
+ */
+function capChanges<T extends { targetKey: string }>(changes: T[], cap: number): T[] {
+  if (!Array.isArray(changes)) return [];
+  return changes.slice(0, Math.max(0, cap));
+}
+
+/**
+ * Build selector input plan
+ */
+function buildSelectorPlan(params: {
+  lane: Lane;
+  roleKind: 'systems' | 'brand';
+  candidateChanges: any[];
+  goals?: string[];
+  constraints?: any;
+}) {
+  return {
+    lane: params.lane,
+    roleKind: params.roleKind,
+    goals: params.goals ?? [],
+    constraints: params.constraints ?? {},
+    candidateChanges: params.candidateChanges,
+  };
+}
+
+/**
+ * Call selector through specialist pipeline
+ * Returns selected 8 changes + meta
+ */
+async function runSelector(params: {
+  runId: string;
+  jobId: string;
+  lane: Lane;
+  roleKind: 'systems' | 'brand';
+  candidateChanges: any[];
+  context: any;
+  roleConfig: any;
+}): Promise<{ selectedChanges: any[]; meta: any; stopReason: string }> {
+  const selectorPlan = buildSelectorPlan({
+    lane: params.lane,
+    roleKind: params.roleKind,
+    candidateChanges: params.candidateChanges,
+  });
+
+  const selectorOut = await callSpecialistWithRetry(
+    {
+      role: 'change_selector_fast',
+      trace: {
+        jobId: params.jobId,
+        runId: params.runId,
+      },
+      input: {
+        plan: selectorPlan,
+        context: params.context,
+      },
+      roleConfig: params.roleConfig,
+    },
+    false // enableLadder
+  );
+
+  // Parse + validate using existing flow
+  const selectorPayload = cleanParseArtifactPayload(selectorOut.artifact);
+  validateDesignSwarmPayloadOrThrow('change_selector_fast', selectorPayload);
+
+  return {
+    selectedChanges: selectorPayload.selectedChanges || [],
+    meta: selectorOut.meta,
+    stopReason: selectorOut.stopReason,
+  };
 }
 
 // Validation is now handled by validateDesignSwarmPayloadOrThrow from designSwarmValidate.ts
@@ -283,6 +359,9 @@ export async function runPilotMacro(params: {
   const policy = createValidationPolicy(runMode);
   const normalizationTracking = createNormalizationTracking(policy.allowNormalization);
   const usageTracking = createUsageTracking();
+  
+  // Initialize selection tracking (will be populated if creative mode is enabled)
+  let selectionTracking: any = null;
 
   let attempts = 0;
   let lastErr: unknown = null;
@@ -336,23 +415,83 @@ export async function runPilotMacro(params: {
       // 1) Parse and unwrap payload
       let systemsPayload = cleanParseArtifactPayload(systemsOut.artifact);
       
-      // 2) Apply normalization if enabled (AFTER parse, BEFORE schema validation)
-      if (policy.allowNormalization) {
+      // 2) Creative mode: Cap → Selector → Use selected 8
+      const creativeMode = (context as any)?.creativeMode;
+      if (creativeMode?.enabled && stack.selector) {
+        console.log(`[${runId}] Creative mode enabled for systems`);
+        
+        // Cap candidates to prevent token bombs
+        const cap = creativeMode.capBeforeSelect ?? 24;
+        const originalCount = systemsPayload.proposedChanges?.length || 0;
+        const candidates = capChanges(systemsPayload.proposedChanges || [], cap);
+        
+        console.log(`[${runId}] Systems: ${originalCount} candidates → capped to ${candidates.length}`);
+        
+        // Call selector
+        const sel = await runSelector({
+          runId,
+          jobId,
+          lane,
+          roleKind: 'systems',
+          candidateChanges: candidates,
+          context,
+          roleConfig: toRoleConfig(
+            stack.selector.modelId,
+            stack.selector.provider,
+            lane,
+            { timeoutMs: stack.selector.timeoutMs || 30_000 }
+          ),
+        });
+        
+        // Replace payload with selected 8
+        systemsPayload = { proposedChanges: sel.selectedChanges };
+        
+        // Initialize selection tracking if not already done
+        if (!selectionTracking) {
+          selectionTracking = {
+            enabled: true,
+            systems: { candidatesCount: 0, cappedCount: 0, selectedCount: 0, selectorModel: stack.selector.modelId },
+            brand: { candidatesCount: 0, cappedCount: 0, selectedCount: 0, selectorModel: stack.selector.modelId },
+          };
+        }
+        
+        // Track systems selection
+        selectionTracking.systems.candidatesCount = originalCount;
+        selectionTracking.systems.cappedCount = candidates.length;
+        selectionTracking.systems.selectedCount = sel.selectedChanges.length;
+        
+        // Track selection in meta (initialize if needed)
+        if (!usageTracking.selector) {
+          usageTracking.selector = {
+            inputTokens: 0,
+            outputTokens: 0,
+            latencyMs: 0,
+            costUsd: 0,
+          };
+        }
+        usageTracking.selector.inputTokens += sel.meta.inputTokens || 0;
+        usageTracking.selector.outputTokens += sel.meta.outputTokens || 0;
+        usageTracking.selector.latencyMs += sel.meta.latencyMs || 0;
+        usageTracking.selector.costUsd += sel.meta.costUsd || 0;
+        
+        console.log(`[${runId}] Selector returned ${sel.selectedChanges.length} changes`);
+      } else if (policy.allowNormalization) {
+        // 2b) Standard normalization (production mode without creative)
         const result = normalizeCraftFastPayload(systemsPayload);
         systemsPayload = result.payload;
         normalizationTracking.events.systems = {
-      kind: 'truncate',
-      applied: result.event.truncated,
-      from: result.event.from,
-      to: result.event.to,
-    };
+          kind: 'truncate',
+          applied: result.event.truncated,
+          from: result.event.from,
+          to: result.event.to,
+        };
         if (result.event.truncated) {
           normalizationTracking.applied = true;
           logNormalizationEvent('systems', result.event);
         }
       }
       
-      // 3) Schema validate payload (Zod strict validation)
+      // 3) Schema validate payload (Zod strict validation - now guaranteed exact 8)
       validateDesignSwarmPayloadOrThrow('designer_systems_fast', systemsPayload);
       
       // 4) Content validation (after schema)
@@ -404,8 +543,67 @@ export async function runPilotMacro(params: {
       // 1) Parse and unwrap payload
       let brandPayload = cleanParseArtifactPayload(brandOut.artifact);
       
-      // 2) Apply normalization if enabled (AFTER parse, BEFORE schema validation)
-      if (policy.allowNormalization) {
+      // 2) Creative mode: Cap → Selector → Use selected 8
+      if (creativeMode?.enabled && stack.selector) {
+        console.log(`[${runId}] Creative mode enabled for brand`);
+        
+        // Cap candidates to prevent token bombs
+        const cap = creativeMode.capBeforeSelect ?? 24;
+        const originalCount = brandPayload.proposedChanges?.length || 0;
+        const candidates = capChanges(brandPayload.proposedChanges || [], cap);
+        
+        console.log(`[${runId}] Brand: ${originalCount} candidates → capped to ${candidates.length}`);
+        
+        // Call selector
+        const sel = await runSelector({
+          runId,
+          jobId,
+          lane,
+          roleKind: 'brand',
+          candidateChanges: candidates,
+          context,
+          roleConfig: toRoleConfig(
+            stack.selector.modelId,
+            stack.selector.provider,
+            lane,
+            { timeoutMs: stack.selector.timeoutMs || 30_000 }
+          ),
+        });
+        
+        // Replace payload with selected 8
+        brandPayload = { proposedChanges: sel.selectedChanges };
+        
+        // Initialize selection tracking if not already done
+        if (!selectionTracking) {
+          selectionTracking = {
+            enabled: true,
+            systems: { candidatesCount: 0, cappedCount: 0, selectedCount: 0, selectorModel: stack.selector.modelId },
+            brand: { candidatesCount: 0, cappedCount: 0, selectedCount: 0, selectorModel: stack.selector.modelId },
+          };
+        }
+        
+        // Track brand selection
+        selectionTracking.brand.candidatesCount = originalCount;
+        selectionTracking.brand.cappedCount = candidates.length;
+        selectionTracking.brand.selectedCount = sel.selectedChanges.length;
+        
+        // Track selector usage (accumulate)
+        if (!usageTracking.selector) {
+          usageTracking.selector = {
+            inputTokens: 0,
+            outputTokens: 0,
+            latencyMs: 0,
+            costUsd: 0,
+          };
+        }
+        usageTracking.selector.inputTokens += sel.meta.inputTokens || 0;
+        usageTracking.selector.outputTokens += sel.meta.outputTokens || 0;
+        usageTracking.selector.latencyMs += sel.meta.latencyMs || 0;
+        usageTracking.selector.costUsd += sel.meta.costUsd || 0;
+        
+        console.log(`[${runId}] Selector returned ${sel.selectedChanges.length} changes`);
+      } else if (policy.allowNormalization) {
+        // 2b) Standard normalization (production mode without creative)
         const result = normalizeCraftFastPayload(brandPayload);
         brandPayload = result.payload;
         normalizationTracking.events.brand = {
@@ -420,7 +618,7 @@ export async function runPilotMacro(params: {
         }
       }
       
-      // 3) Schema validate payload (Zod strict validation)
+      // 3) Schema validate payload (Zod strict validation - now guaranteed exact 8)
       validateDesignSwarmPayloadOrThrow('designer_brand_fast', brandPayload);
       
       // 4) Content validation (after schema)
@@ -530,10 +728,10 @@ export async function runPilotMacro(params: {
 
       // Calculate usage totals (individual role usage already captured above)
       usageTracking.totals = {
-        inputTokens: usageTracking.systems.inputTokens + usageTracking.brand.inputTokens + usageTracking.critic.inputTokens,
-        outputTokens: usageTracking.systems.outputTokens + usageTracking.brand.outputTokens + usageTracking.critic.outputTokens,
-        latencyMs: usageTracking.systems.latencyMs + usageTracking.brand.latencyMs + usageTracking.critic.latencyMs,
-        costUsd: usageTracking.systems.costUsd + usageTracking.brand.costUsd + usageTracking.critic.costUsd,
+        inputTokens: usageTracking.systems.inputTokens + usageTracking.brand.inputTokens + (usageTracking.selector?.inputTokens || 0) + usageTracking.critic.inputTokens,
+        outputTokens: usageTracking.systems.outputTokens + usageTracking.brand.outputTokens + (usageTracking.selector?.outputTokens || 0) + usageTracking.critic.outputTokens,
+        latencyMs: usageTracking.systems.latencyMs + usageTracking.brand.latencyMs + (usageTracking.selector?.latencyMs || 0) + usageTracking.critic.latencyMs,
+        costUsd: usageTracking.systems.costUsd + usageTracking.brand.costUsd + (usageTracking.selector?.costUsd || 0) + usageTracking.critic.costUsd,
       };
 
       return {
@@ -580,6 +778,7 @@ export async function runPilotMacro(params: {
           },
           normalization: normalizationTracking,
           usage: usageTracking,
+          ...(selectionTracking ? { selection: selectionTracking } : {}),
         },
       };
     } catch (err) {

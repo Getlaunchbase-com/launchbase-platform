@@ -1,0 +1,82 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTT2nmm-4YNCb4-9be926612ce920eb
+Input Tokens: 2677
+Output Tokens: 516
+Finish Reason: stop
+
+=== RAW TEXT (2445 chars) ===
+Here's the Python code that implements the change selector:
+
+```python
+import json
+
+# Load input data
+input_data = json.loads(input_data)
+
+# Define a function to evaluate changes
+def evaluate_change(change):
+    # Prioritize changes with higher confidence
+    if change["confidence"] < 0.7:
+        return False  # Reject changes with low confidence
+
+    # Check if the change is specific and can be implemented
+    if "unbuildable" in change and change["unbuildable"]:
+        return False  # Reject unbuildable changes
+
+    # Check if the change duplicates a target key
+    if any(other_change["targetKey"] == change["targetKey"] for other_change in input_data["candidateChanges"]):
+        return False  # Reject duplicate target keys
+
+    # Check if the change is vague or has a vague rationale
+    if "rationale" in change and "vague" in change["rationale"].lower():
+        return False  # Reject vague changes
+
+    return True  # Select the change
+
+# Define a function to rank changes
+def rank_changes(changes):
+    # Prioritize changes with higher confidence
+    changes.sort(key=lambda change: change["confidence"], reverse=True)
+
+    # Prioritize changes that are specific and can be implemented
+    changes.sort(key=lambda change: evaluate_change(change), reverse=True)
+
+    return changes
+
+# Select exactly 8 changes
+selected_changes = []
+changes = input_data["candidateChanges"]
+while len(selected_changes) < 8 and changes:
+    change = changes.pop(0)
+    if evaluate_change(change):
+        selected_changes.append(change)
+
+# Fill remaining slots with the least-bad options
+while len(selected_changes) < 8:
+    for change in input_data["candidateChanges"]:
+        if not evaluate_change(change):
+            selected_changes.append(change)
+            break
+
+# Rank changes
+selected_changes = rank_changes(selected_changes)
+
+# Construct the output
+output = {
+    "lane": input_data["lane"],
+    "selectedChanges": selected_changes
+}
+
+# Validate the output
+if len(selected_changes) != 8:
+    print("Error: Selected changes do not have exactly 8 elements")
+
+# Print the output
+print(json.dumps(output, indent=4))
+```
+
+This code implements the change selector according to the provided specification. It first evaluates each change based on the selection criteria, then selects exactly 8 changes, and finally ranks the changes based on their confidence and specificity. The output is a JSON object that contains the selected changes.
+
+=== PARSED JSON ===
+NULL (parse failed)

@@ -8,6 +8,9 @@ import {
   CriticIssueSchema,
   CriticSuggestedFixSchema,
 } from "../specialists/schemas/critic.schema";
+import {
+  SelectorOutputSchemaFast,
+} from "../specialists/schemas/selector.schema";
 
 /**
  * Ruthless Critic Schema: EXACTLY 10 issues + 10 fixes, pass=false
@@ -57,7 +60,8 @@ export const CriticOutputSchemaRuthlessStrict = z.object({
 export type DesignSwarmSchemaKey =
   | "designer_systems_fast"
   | "designer_brand_fast"
-  | "design_critic_ruthless";
+  | "design_critic_ruthless"
+  | "change_selector_fast";
 
 /**
  * Validate Design Swarm payload using Zod schemas
@@ -70,6 +74,8 @@ export function validateDesignSwarmPayloadOrThrow(
   const schema =
     schemaKey === "design_critic_ruthless"
       ? CriticOutputSchemaRuthlessStrict
+      : schemaKey === "change_selector_fast"
+      ? SelectorOutputSchemaFast
       : CraftOutputSchemaFast;
 
   const parsed = schema.safeParse(payload);

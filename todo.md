@@ -1962,3 +1962,25 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 ### Pilot #1: Claude 3.5 Sonnet as Critic
 - [ ] Run full pilot (Web×2 + Marketing×2 = 4 runs)
 - [ ] Generate PILOT_1_RESULTS.json + PILOT_1_SCORECARD.md
+
+---
+
+## 🎯 SELECTOR PROBE: Find Best Model for Creator→Selector→Critic Pipeline
+
+### Selector Probe Infrastructure
+- [ ] Create fixed deterministic input (20 items: duplicates + risky items)
+- [ ] Create selector-only probe runner (no full macro)
+- [ ] Create probe config: Qwen 7B vs Llama 8B vs Gemma 12B (10 reps each)
+- [ ] Pass criteria: Valid%≥95%, Exact8%=100%, AvgAtt≤1.2, IntroducedNewIdeas%=0%
+
+### Run Selector Probe
+- [ ] Run probe: Qwen/Qwen2.5-7B-Instruct-Turbo (10 reps)
+- [ ] Run probe: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo (10 reps)
+- [ ] Run probe: google/gemma-3-12b-it (10 reps)
+- [ ] Generate selector weather table (Valid%, Exact8%, AvgAtt, Cost, Latency)
+
+### Promote Winner & Wire Pipeline
+- [ ] Promote selector winner (meets all pass criteria)
+- [ ] Wire Creator (5.2) → Selector (winner) → Critic (Sonnet 4.0) pipeline
+- [ ] Add hard cap: if creator > 24, slice to 24 before selector
+- [ ] Test full pipeline: Web × 3 reps (production mode)

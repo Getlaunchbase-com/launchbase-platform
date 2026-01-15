@@ -66,8 +66,25 @@ export interface RoleUsage {
 export interface UsageTracking {
   systems: RoleUsage;
   brand: RoleUsage;
+  selector?: RoleUsage; // Optional: only present in creative production mode
   critic: RoleUsage;
   totals: RoleUsage;
+}
+
+export interface SelectionTracking {
+  enabled: boolean;
+  systems: {
+    candidatesCount: number;
+    cappedCount: number;
+    selectedCount: number;
+    selectorModel: string;
+  };
+  brand: {
+    candidatesCount: number;
+    cappedCount: number;
+    selectedCount: number;
+    selectorModel: string;
+  };
 }
 
 export interface PilotRun {
@@ -126,6 +143,9 @@ export interface PilotRun {
     
     // NEW: Per-role usage tracking
     usage: UsageTracking;
+    
+    // NEW: Selection tracking (creative production mode only)
+    selection?: SelectionTracking;
   };
 }
 

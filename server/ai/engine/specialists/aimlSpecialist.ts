@@ -64,7 +64,7 @@ export interface SpecialistRoleConfig {
  * Specialist call input
  */
 export interface SpecialistInput {
-  role: "craft" | "critic" | "designer_systems" | "designer_brand" | "design_critic" | "design_critic_ruthless" | "prompt_architect" | "prompt_auditor";
+  role: "craft" | "critic" | "designer_systems" | "designer_brand" | "design_critic" | "design_critic_ruthless" | "change_selector_fast" | "prompt_architect" | "prompt_auditor";
   trace: {
     jobId: string;
     runId: string;
@@ -109,6 +109,7 @@ function loadPromptPack(role: string): string {
     designer_brand_fast: "designer_brand_fast.md",
     design_critic: "design_critic.md",
     design_critic_ruthless: "design_critic_ruthless.md",
+    change_selector_fast: "change_selector_fast.md",
     prompt_architect: "prompt_architect.md",
     prompt_auditor: "prompt_auditor.md",
     // Lane-specific prompts (Mega Tournament V2)
@@ -140,6 +141,7 @@ const DESIGNER_SYSTEMS_FAST_PROMPT = loadPromptPack("designer_systems_fast");
 const DESIGNER_BRAND_FAST_PROMPT = loadPromptPack("designer_brand_fast");
 const DESIGN_CRITIC_PROMPT = loadPromptPack("design_critic");
 const DESIGN_CRITIC_RUTHLESS_PROMPT = loadPromptPack("design_critic_ruthless");
+const CHANGE_SELECTOR_FAST_PROMPT = loadPromptPack("change_selector_fast");
 const PROMPT_ARCHITECT_PROMPT = loadPromptPack("prompt_architect");
 const PROMPT_AUDITOR_PROMPT = loadPromptPack("prompt_auditor");
 // Lane-specific prompts (Mega Tournament V2)
@@ -178,6 +180,7 @@ export async function callSpecialistAIML(
     designer_brand_fast: DESIGNER_BRAND_FAST_PROMPT,
     design_critic: DESIGN_CRITIC_PROMPT,
     design_critic_ruthless: DESIGN_CRITIC_RUTHLESS_PROMPT,
+    change_selector_fast: CHANGE_SELECTOR_FAST_PROMPT,
     prompt_architect: PROMPT_ARCHITECT_PROMPT,
     prompt_auditor: PROMPT_AUDITOR_PROMPT,
     // Lane-specific prompts (Mega Tournament V2)
