@@ -1895,3 +1895,45 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 
 ### Phase 5: Add Prompt Constraint
 - [ ] Add to systems/brand prompts: "Return exactly 8 proposedChanges. If you can think of more, select the best 8 by impact."
+
+---
+
+## 🎯 PHASE 3: DETERMINISTIC TRUNCATION SYSTEM
+
+**Goal:** Mode-based normalization for production-ready fixed-width outputs  
+**Mode:** Tournament mode (test obedience) vs Production mode (guarantee fixed-width)
+
+### Checkpoint: Types + Normalizer Foundation ✅ COMPLETE
+- [x] Add ValidationPolicy extension (runMode, allowNormalization)
+- [x] Add NormalizationTracking type (enabled, applied, mode, events)
+- [x] Add UsageTracking type (per-role inputTokens/outputTokens/latencyMs/costUsd)
+- [x] Create normalizeCraftFastPayload() function (truncate to 8 if >8)
+- [x] Create normalizer unit tests (6/6 passing)
+- [x] Create PILOT_INTEGRATION_NEXT.md with wiring steps
+- [x] No behavior changes (safe to merge)
+
+### Commit A: runPilotMacro Policy + Normalization Wiring
+- [ ] Add runMode parameter to runPilotMacro()
+- [ ] Create validation policy with runMode + allowNormalization
+- [ ] Pass policy to specialist calls in context
+- [ ] Apply normalization AFTER parse, BEFORE schema validation (systems + brand)
+- [ ] Track normalization events in meta.normalization
+- [ ] Log truncation: [NORMALIZE_FAST] systems proposedChanges 10 → 8
+
+### Commit B: Per-Role Usage Tracking
+- [ ] Capture specialist output meta for each role (systems/brand/critic)
+- [ ] Calculate totals (inputTokens/outputTokens/latencyMs/costUsd)
+- [ ] Add meta.usage to PilotRun artifact
+
+### Commit C: Obedience Probes + Dashboard Aggregator
+- [ ] Create runObedienceProbe.ts (test single model/role/lane with 3 reps)
+- [ ] Create aggregateDashboard.ts (scan runs, generate dashboard.json)
+- [ ] Create renderDashboardCLI.ts (ASCII table with pass rates)
+
+### Pilot #1: Claude 3.5 Sonnet as Critic
+- [ ] Run smoke test in tournament mode (allowNormalization: false)
+- [ ] Verify GPT-4o fails with >8 changes (expected)
+- [ ] Run smoke test in production mode (allowNormalization: true)
+- [ ] Verify truncation to 8 works, schema validation passes
+- [ ] Run full pilot (Web×2 + Marketing×2 = 4 runs)
+- [ ] Generate PILOT_1_RESULTS.json + PILOT_1_SCORECARD.md
