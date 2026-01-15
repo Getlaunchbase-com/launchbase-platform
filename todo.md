@@ -1946,11 +1946,18 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [ ] Create aggregateDashboard.ts (scan runs, generate dashboard.json)
 - [ ] Create renderDashboardCLI.ts (ASCII table with pass rates)
 
-### Smoke Test: Normalization Modes
-- [ ] Run smoke test: `pnpm tsx scripts/smoke/smokeNormalizationModes.ts`
-- [ ] Verify tournament mode: normalization disabled, may fail if >8
-- [ ] Verify production mode: normalization enabled, truncates to 8
-- [ ] Validate assertions: enabled/applied flags, truncation events, usage tracking
+### Smoke Test: Normalization Modes ✅ COMPLETE
+- [x] Run smoke test: `pnpm tsx scripts/smoke/smokeNormalizationModes.ts`
+- [x] Verify tournament mode: normalization disabled, may fail if >8
+- [x] Verify production mode: normalization enabled, truncates to 8
+- [x] Validate assertions: enabled/applied flags, truncation events, usage tracking
+
+### Prompt Optimization & Stability Metrics ✅ COMPLETE
+- [x] Test "create more if <8" clause → caused idea dumping (15-23 items)
+- [x] Revert to simple COUNT CONTRACT (trim rule only, no fill rule)
+- [x] Add stability metrics: p50Count, p90Count, overCountRate, underCountRate, extremeDumpRate
+- [x] Update weather table: P50, P90, Dump% columns (replaces Exact8% focus)
+- [x] Accept production normalization as reliability layer (tournament = weather metric)
 
 ### Pilot #1: Claude 3.5 Sonnet as Critic
 - [ ] Run full pilot (Web×2 + Marketing×2 = 4 runs)

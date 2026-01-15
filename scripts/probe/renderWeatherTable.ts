@@ -8,6 +8,12 @@ type ProbeResultRow = {
   timeoutRate: number;    // 0..1
   costUsdAvg: number;
   outputTokensAvg: number;
+  // Stability metrics
+  p50Count: number;
+  p90Count: number;
+  overCountRate: number;   // 0..1
+  underCountRate: number;  // 0..1
+  extremeDumpRate: number; // 0..1
 };
 
 function pct(x: number): string {
@@ -42,10 +48,10 @@ export function renderWeatherTable(opts: {
   const cols = [
     { key: "model", label: "Model", width: 30, align: "left" as const },
     { key: "valid", label: "Valid%", width: 7, align: "right" as const },
-    { key: "exact8", label: "Exact8%", width: 8, align: "right" as const },
+    { key: "p50", label: "P50", width: 4, align: "right" as const },
+    { key: "p90", label: "P90", width: 4, align: "right" as const },
+    { key: "dump", label: "Dump%", width: 6, align: "right" as const },
     { key: "avgAtt", label: "AvgAtt", width: 6, align: "right" as const },
-    { key: "schemaFail", label: "SchemaFail%", width: 12, align: "right" as const },
-    { key: "timeout", label: "Timeout%", width: 9, align: "right" as const },
     { key: "cost", label: "$Avg", width: 6, align: "right" as const },
     { key: "tokOut", label: "TokOut", width: 6, align: "right" as const },
   ];
@@ -60,19 +66,19 @@ export function renderWeatherTable(opts: {
   const body = opts.rows
     .slice()
     .sort((a, b) => {
-      // Sort by Exact8 desc, then Valid desc, then Cost asc
-      if (b.exact8Rate !== a.exact8Rate) return b.exact8Rate - a.exact8Rate;
+      // Sort by Valid desc, then Dump asc (lower dump is better), then Cost asc
       if (b.validRate !== a.validRate) return b.validRate - a.validRate;
+      if (a.extremeDumpRate !== b.extremeDumpRate) return a.extremeDumpRate - b.extremeDumpRate;
       return a.costUsdAvg - b.costUsdAvg;
     })
     .map((r) => {
       const cells: Record<string, string> = {
         model: r.model,
         valid: pct(r.validRate),
-        exact8: pct(r.exact8Rate),
+        p50: String(Math.round(r.p50Count)),
+        p90: String(Math.round(r.p90Count)),
+        dump: pct(r.extremeDumpRate),
         avgAtt: num(r.avgAttempts, 2),
-        schemaFail: pct(r.schemaFailRate),
-        timeout: pct(r.timeoutRate),
         cost: num(r.costUsdAvg, 3),
         tokOut: String(Math.round(r.outputTokensAvg)),
       };
@@ -82,7 +88,7 @@ export function renderWeatherTable(opts: {
     .join("\n");
 
   const legend =
-    "Legend: Valid% = final schema-valid result; Exact8% = proposedChanges length==8; AvgAtt = retries";
+    "Legend: P50/P90 = proposedChanges count distribution; Dump% = rate(count>=15); Valid% = role schema-valid";
 
   return [title, sep, header, sep, body, sep, legend].join("\n");
 }

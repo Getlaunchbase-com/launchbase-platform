@@ -241,6 +241,23 @@ function rate(count: number, n: number): number {
   return n === 0 ? 0 : count / n;
 }
 
+function quantile(sortedNums: number[], q: number): number {
+  // q in [0,1], sortedNums must be sorted ascending
+  if (sortedNums.length === 0) return 0;
+  const idx = (sortedNums.length - 1) * q;
+  const lo = Math.floor(idx);
+  const hi = Math.ceil(idx);
+  if (lo === hi) return sortedNums[lo];
+  const w = idx - lo;
+  return sortedNums[lo] * (1 - w) + sortedNums[hi] * w;
+}
+
+function pct1(x: number): number {
+  // keep as 0..1 for summary; renderer will format
+  if (!Number.isFinite(x)) return 0;
+  return Math.max(0, Math.min(1, x));
+}
+
 async function main() {
   const configPath = process.argv[2];
   if (!configPath) {
@@ -420,6 +437,17 @@ async function main() {
     const schemaFailRate = rate(stopReasonCounts["schema_failed"] ?? 0, n);
     const timeoutRate = rate(stopReasonCounts["timeout"] ?? 0, n);
 
+    // Compute stability metrics (count variance)
+    const lens = runs.map(r => r.counts.proposedChanges).filter(n => Number.isFinite(n));
+    lens.sort((a, b) => a - b);
+
+    const p50Count = quantile(lens, 0.50);
+    const p90Count = quantile(lens, 0.90);
+
+    const overCountRate = pct1(runs.filter(r => r.counts.proposedChanges > 8).length / n);
+    const underCountRate = pct1(runs.filter(r => r.counts.proposedChanges < 8).length / n);
+    const extremeDumpRate = pct1(runs.filter(r => r.counts.proposedChanges >= 15).length / n);
+
     results.push({
       model: modelId,
       n,
@@ -431,6 +459,12 @@ async function main() {
       tokens: { inputAvg: tokensInAvg, outputAvg: tokensOutAvg },
       latencyMsAvg: latencyAvg,
       costUsdAvg: costAvg,
+      // Stability metrics
+      p50Count,
+      p90Count,
+      overCountRate,
+      underCountRate,
+      extremeDumpRate,
     });
 
     // Also write a per-model summary file

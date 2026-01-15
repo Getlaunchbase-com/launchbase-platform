@@ -1,31 +1,19 @@
 {
-  "probeId": "obedience_web_systems_v1",
+  "probeId": "obedience_web_systems_gpt4omini_v2",
   "mode": "tournament",
   "lane": "web",
   "role": "designer_systems_fast",
-  "repsPerModel": 3,
+  "repsPerModel": 10,
   "models": [
     {
       "modelId": "gpt-4o-mini",
       "provider": "openai",
       "timeoutMs": 120000,
       "maxTokens": 2000
-    },
-    {
-      "modelId": "gpt-4o-2024-08-06",
-      "provider": "openai",
-      "timeoutMs": 120000,
-      "maxTokens": 2000
-    },
-    {
-      "modelId": "claude-3-5-sonnet-20240620",
-      "provider": "anthropic",
-      "timeoutMs": 180000,
-      "maxTokens": 2000
     }
   ],
   "workOrder": {
-    "id": "WO-PROBE-001",
+    "id": "WO-PROBE-002",
     "lane": "web",
     "inputs": {
       "pageType": "homepage",

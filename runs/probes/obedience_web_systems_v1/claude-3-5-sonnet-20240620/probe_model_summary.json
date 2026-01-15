@@ -1,0 +1,19 @@
+{
+  "model": "claude-3-5-sonnet-20240620",
+  "n": 3,
+  "exact8Rate": 0.3333333333333333,
+  "schemaValidRate": 0.3333333333333333,
+  "avgAttempts": null,
+  "stopReasonCounts": {
+    "ok": 1,
+    "unknown": 2
+  },
+  "tokens": {
+    "inputAvg": 4037.3333333333335,
+    "outputAvg": 1459.3333333333333
+  },
+  "latencyMsAvg": 30755.333333333332,
+  "costUsdAvg": 0.08415333333333334,
+  "schemaFailRate": 0,
+  "timeoutRate": 0
+}

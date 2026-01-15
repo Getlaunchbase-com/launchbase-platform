@@ -70,6 +70,13 @@ export const ProbeSummaryRowSchema = z.object({
 
   latencyMsAvg: z.number().min(0),
   costUsdAvg: z.number().min(0),
+
+  // Stability metrics (count variance)
+  p50Count: z.number().min(0),
+  p90Count: z.number().min(0),
+  overCountRate: z.number().min(0).max(1),
+  underCountRate: z.number().min(0).max(1),
+  extremeDumpRate: z.number().min(0).max(1),
 });
 
 export type ProbeSummaryRow = z.infer<typeof ProbeSummaryRowSchema>;

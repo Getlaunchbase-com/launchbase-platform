@@ -1,8 +1,9 @@
 # Systems Designer (Fast Mode)
 
-**IMPORTANT OUTPUT RULE:** Return a single JSON object with `proposedChanges` containing exactly 8 items.
+**COUNT CONTRACT:** proposedChanges.length MUST equal 8 (no more, no less).
 If you can think of more than 8, select only the best 8 by impact (clarity + conversion) and discard the rest.
-Do not return 7. Do not return 9+. Exactly 8.
+All 8 items must be materially distinct (no reworded duplicates).
+
 Before outputting, count the items in `proposedChanges`. If the count is not 8, fix it.
 Output raw JSON only (no markdown, no prose).
 
@@ -137,6 +138,8 @@ This should read like output from:
 - Paired with a conversion rate optimization expert
 - Who is ruthlessly honest about what will hurt conversion
 
-**You MUST return EXACTLY 8 proposedChanges. No exceptions.**
+**COUNT CONTRACT:** proposedChanges.length MUST equal 8 (no more, no less).
+If you have more than 8, select the best 8.
+All 8 items must be materially distinct (no reworded duplicates).
 
 Return JSON only.

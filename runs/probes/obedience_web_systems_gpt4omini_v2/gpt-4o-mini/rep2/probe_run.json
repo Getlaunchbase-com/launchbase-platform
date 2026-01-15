@@ -1,0 +1,89 @@
+{
+  "probeId": "obedience_web_systems_gpt4omini_v2",
+  "timestamp": "2026-01-15T21:08:54.698Z",
+  "lane": "web",
+  "role": "designer_systems_fast",
+  "model": "gpt-4o-mini",
+  "rep": 2,
+  "status": "FAILED",
+  "stopReason": "unknown",
+  "counts": {
+    "proposedChanges": 0,
+    "anchorCount": 0
+  },
+  "obedience": {
+    "exact8": false,
+    "schemaValid": false,
+    "normalized": false
+  },
+  "usage": {
+    "inputTokens": 3165,
+    "outputTokens": 1541,
+    "latencyMs": 37943,
+    "costUsd": 0.07788
+  },
+  "meta": {
+    "models": {
+      "systems": "gpt-4o-mini",
+      "brand": "gpt-4o-mini",
+      "critic": "gpt-4o-mini"
+    },
+    "stopReasons": {
+      "systems": "unknown",
+      "brand": "unknown",
+      "critic": "unknown"
+    },
+    "normalization": {
+      "enabled": false,
+      "applied": false,
+      "mode": "truncate_first_n",
+      "events": {
+        "systems": {
+          "kind": "truncate",
+          "applied": false,
+          "from": 0,
+          "to": 0
+        },
+        "brand": {
+          "kind": "truncate",
+          "applied": false,
+          "from": 0,
+          "to": 0
+        },
+        "critic": {
+          "kind": "coerce_risks",
+          "applied": false,
+          "coercedCount": 0,
+          "fromType": "object",
+          "toType": "string"
+        }
+      }
+    },
+    "usage": {
+      "systems": {
+        "inputTokens": 1354,
+        "outputTokens": 718,
+        "latencyMs": 18942,
+        "costUsd": 0.03508
+      },
+      "brand": {
+        "inputTokens": 1811,
+        "outputTokens": 823,
+        "latencyMs": 19001,
+        "costUsd": 0.042800000000000005
+      },
+      "critic": {
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "latencyMs": 0,
+        "costUsd": 0
+      },
+      "totals": {
+        "inputTokens": 3165,
+        "outputTokens": 1541,
+        "latencyMs": 37943,
+        "costUsd": 0.07788
+      }
+    }
+  }
+}
