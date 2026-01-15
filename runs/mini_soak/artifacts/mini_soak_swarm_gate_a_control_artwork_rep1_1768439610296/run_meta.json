@@ -1,0 +1,109 @@
+{
+  "runId": "mini_soak_swarm_gate_a_control_artwork_rep1_1768439610296",
+  "lane": "artwork",
+  "stack": "Control Champion (4o + Opus)",
+  "rep": 1,
+  "timestamp": 1768439610296,
+  "pass": false,
+  "failureReason": "Systems: 0/8, Brand: 8/8, Critic: 10/10",
+  "modelLock": {
+    "systems": {
+      "requested": "gpt-4o-2024-08-06",
+      "resolved": "gpt-4o-2024-08-06",
+      "ok": true
+    },
+    "brand": {
+      "requested": "gpt-4o-2024-08-06",
+      "resolved": "gpt-4o-2024-08-06",
+      "ok": true
+    },
+    "critic": {
+      "requested": "claude-opus-4-1-20250805",
+      "resolved": "claude-opus-4-1-20250805",
+      "ok": true
+    }
+  },
+  "finishReason": {
+    "systems": "provider_failed",
+    "brand": "ok",
+    "critic": "ok"
+  },
+  "schema": {
+    "systems": {
+      "count": 0,
+      "valid": false
+    },
+    "brand": {
+      "count": 8,
+      "valid": true
+    },
+    "critic": {
+      "issueCount": 10,
+      "fixCount": 10,
+      "valid": true
+    }
+  },
+  "retries": {
+    "systems": 0,
+    "brand": 0,
+    "critic": 0
+  },
+  "artifacts": {
+    "systems": {
+      "jsonSizeBytes": 157
+    },
+    "brand": {
+      "jsonSizeBytes": 1801
+    },
+    "critic": {
+      "jsonSizeBytes": 4578
+    }
+  },
+  "anchors": {
+    "systems": 0,
+    "brand": 0
+  },
+  "truthPenalty": {
+    "systems": 0,
+    "brand": 0.2,
+    "critic": 0.2,
+    "total": 0.13333333333333333
+  },
+  "penaltyBreakdown": {
+    "systems": {
+      "unverifiable": 0,
+      "inventedConstraints": 0,
+      "vagueness": 0,
+      "contractStrain": 0
+    },
+    "brand": {
+      "unverifiable": 0.2,
+      "inventedConstraints": 0,
+      "vagueness": 0,
+      "contractStrain": 0
+    },
+    "critic": {
+      "unverifiable": 0.2,
+      "inventedConstraints": 0,
+      "vagueness": 0,
+      "contractStrain": 0
+    }
+  },
+  "penaltyTriggers": {
+    "systems": [],
+    "brand": [
+      "Invents conversion/traffic numbers",
+      "Invents conversion/traffic numbers"
+    ],
+    "critic": [
+      "Invents conversion/traffic numbers",
+      "Invents conversion/traffic numbers"
+    ]
+  },
+  "baseScore": 100,
+  "finalScore": 86.66666666666667,
+  "costUsd": 0,
+  "isTruncated": false,
+  "isValid": true,
+  "durationMs": 57174
+}

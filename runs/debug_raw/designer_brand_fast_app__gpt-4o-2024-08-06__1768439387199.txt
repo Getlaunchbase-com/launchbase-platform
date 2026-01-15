@@ -1,0 +1,160 @@
+=== RAW RESPONSE (designer_brand_fast_app) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy69fSDmvsUi1kmjiQWUoOfhg28ij
+Input Tokens: 838
+Output Tokens: 599
+Finish Reason: stop
+
+=== RAW TEXT (2234 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.appScale",
+      "value": "14px, 16px, 18px, 24px, 32px",
+      "rationale": "Improves readability and hierarchy.",
+      "confidence": 0.9,
+      "risks": ["May affect existing layouts"]
+    },
+    {
+      "targetKey": "brand.color.status",
+      "value": "#4CAF50, #F44336, #FFC107",
+      "rationale": "Clear status indication with green, red, yellow.",
+      "confidence": 0.85,
+      "risks": ["Colorblind accessibility issues"]
+    },
+    {
+      "targetKey": "brand.color.darkMode",
+      "value": "#FFFFFF, #121212, #1F1F1F",
+      "rationale": "Supports dark mode with high contrast.",
+      "confidence": 0.9,
+      "risks": ["Increased development time"]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "8px padding, 4px radius, shadow on hover",
+      "rationale": "Enhances clickability and visual appeal.",
+      "confidence": 0.9,
+      "risks": ["May clash with current design"]
+    },
+    {
+      "targetKey": "brand.components.input",
+      "value": "2px solid border, 8px padding",
+      "rationale": "Ensures inputs are clear and accessible.",
+      "confidence": 0.9,
+      "risks": ["Input fields may look larger"]
+    },
+    {
+      "targetKey": "brand.components.card",
+      "value": "16px padding, 4px radius, subtle shadow",
+      "rationale": "Creates visual depth and separation.",
+      "confidence": 0.9,
+      "risks": ["Increased visual complexity"]
+    },
+    {
+      "targetKey": "brand.spacing.tokens",
+      "value": "4px, 8px, 16px, 24px, 32px",
+      "rationale": "Provides a flexible yet consistent spacing system.",
+      "confidence": 0.9,
+      "risks": ["May require layout adjustments"]
+    },
+    {
+      "targetKey": "brand.visual.consistency",
+      "value": "Consistent border-radius, shadow, and padding",
+      "rationale": "Maintains visual harmony across components.",
+      "confidence": 0.95,
+      "risks": ["Over-simplification risk"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["Colorblind accessibility issues", "May require layout adjustments"],
+  "assumptions": ["Current design system supports updates", "User feedback will help refine changes"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.appScale",
+      "value": "14px, 16px, 18px, 24px, 32px",
+      "rationale": "Improves readability and hierarchy.",
+      "confidence": 0.9,
+      "risks": [
+        "May affect existing layouts"
+      ]
+    },
+    {
+      "targetKey": "brand.color.status",
+      "value": "#4CAF50, #F44336, #FFC107",
+      "rationale": "Clear status indication with green, red, yellow.",
+      "confidence": 0.85,
+      "risks": [
+        "Colorblind accessibility issues"
+      ]
+    },
+    {
+      "targetKey": "brand.color.darkMode",
+      "value": "#FFFFFF, #121212, #1F1F1F",
+      "rationale": "Supports dark mode with high contrast.",
+      "confidence": 0.9,
+      "risks": [
+        "Increased development time"
+      ]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "8px padding, 4px radius, shadow on hover",
+      "rationale": "Enhances clickability and visual appeal.",
+      "confidence": 0.9,
+      "risks": [
+        "May clash with current design"
+      ]
+    },
+    {
+      "targetKey": "brand.components.input",
+      "value": "2px solid border, 8px padding",
+      "rationale": "Ensures inputs are clear and accessible.",
+      "confidence": 0.9,
+      "risks": [
+        "Input fields may look larger"
+      ]
+    },
+    {
+      "targetKey": "brand.components.card",
+      "value": "16px padding, 4px radius, subtle shadow",
+      "rationale": "Creates visual depth and separation.",
+      "confidence": 0.9,
+      "risks": [
+        "Increased visual complexity"
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.tokens",
+      "value": "4px, 8px, 16px, 24px, 32px",
+      "rationale": "Provides a flexible yet consistent spacing system.",
+      "confidence": 0.9,
+      "risks": [
+        "May require layout adjustments"
+      ]
+    },
+    {
+      "targetKey": "brand.visual.consistency",
+      "value": "Consistent border-radius, shadow, and padding",
+      "rationale": "Maintains visual harmony across components.",
+      "confidence": 0.95,
+      "risks": [
+        "Over-simplification risk"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Colorblind accessibility issues",
+    "May require layout adjustments"
+  ],
+  "assumptions": [
+    "Current design system supports updates",
+    "User feedback will help refine changes"
+  ]
+}

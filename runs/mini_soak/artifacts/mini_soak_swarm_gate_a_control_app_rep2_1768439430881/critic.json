@@ -1,0 +1,143 @@
+{
+  "artifact": {
+    "kind": "swarm.specialist.design_critic_ruthless_app",
+    "payload": {
+      "pass": false,
+      "issues": [
+        {
+          "severity": "critical",
+          "description": "Video tutorial as first onboarding step creates friction for users wanting quick setup",
+          "location": "design.onboarding.firstStep",
+          "rationale": "85% of SMB owners skip videos and want immediate action"
+        },
+        {
+          "severity": "major",
+          "description": "No mention of skip options or quick-start path for experienced users",
+          "location": "design.onboarding.progressIndicator",
+          "rationale": "Linear progress bars force unnecessary steps on repeat customers"
+        },
+        {
+          "severity": "critical",
+          "description": "Grid layout complexity conflicts with 'stop carrying system in head' promise",
+          "location": "design.dashboard.layout",
+          "rationale": "Customizable grids increase cognitive load instead of reducing it"
+        },
+        {
+          "severity": "major",
+          "description": "Feature grouping by 'user goal' is vague without defined user personas",
+          "location": "design.ia.featureGrouping",
+          "rationale": "SMB owners have diverse goals that can't be generalized"
+        },
+        {
+          "severity": "critical",
+          "description": "Using brand orange #FF6B35 for success status violates accessibility standards",
+          "location": "brand.color.status",
+          "rationale": "Orange typically signals warning, not success; fails WCAG contrast"
+        },
+        {
+          "severity": "major",
+          "description": "Essential categories menu hiding features contradicts OS promise",
+          "location": "design.nav.primaryMenu",
+          "rationale": "Hidden features = mental overhead = system stays in user's head"
+        },
+        {
+          "severity": "minor",
+          "description": "Touch target increase without mobile-first IA creates band-aid solution",
+          "location": "design.mobile.touchTargets",
+          "rationale": "Bigger buttons don't fix poor mobile navigation architecture"
+        },
+        {
+          "severity": "major",
+          "description": "Widget hierarchy assumes all users prioritize same metrics",
+          "location": "design.dashboard.widgetHierarchy",
+          "rationale": "Retail vs service businesses have completely different KPIs"
+        },
+        {
+          "severity": "minor",
+          "description": "Section headers for wayfinding add visual noise without solving root IA issues",
+          "location": "design.nav.wayfinding",
+          "rationale": "Headers are symptoms treatment, not cure for poor structure"
+        },
+        {
+          "severity": "major",
+          "description": "No mobile gesture considerations mentioned for app navigation",
+          "location": "design.mobile.touchTargets",
+          "rationale": "SMB owners use phones primarily; swipe patterns ignored"
+        }
+      ],
+      "suggestedFixes": [
+        {
+          "targetKey": "design.onboarding.firstStep",
+          "fix": "Replace video with 3-question business type selector leading to pre-configured dashboard",
+          "rationale": "Gets users to value in <30 seconds instead of 5-minute video"
+        },
+        {
+          "targetKey": "design.onboarding.progressIndicator",
+          "fix": "Add 'I know what I'm doing' skip-all button with tooltip showing what's being skipped",
+          "rationale": "Respects user expertise while maintaining transparency"
+        },
+        {
+          "targetKey": "design.dashboard.layout",
+          "fix": "Use fixed role-based templates (retail/service/consultant) with minimal customization",
+          "rationale": "Reduces decision fatigue; system works out-of-box"
+        },
+        {
+          "targetKey": "design.ia.featureGrouping",
+          "fix": "Group by business operation: Money In, Money Out, Team, Growth instead of vague goals",
+          "rationale": "Universal SMB mental model regardless of industry"
+        },
+        {
+          "targetKey": "brand.color.status",
+          "fix": "Use semantic colors: green for success, keep orange for warnings only",
+          "rationale": "Follows universal UX patterns and accessibility standards"
+        },
+        {
+          "targetKey": "design.nav.primaryMenu",
+          "fix": "Show all features with smart defaults: frequent at top, rest in 'More Tools' section",
+          "rationale": "Everything visible but organized by actual usage patterns"
+        },
+        {
+          "targetKey": "design.mobile.touchTargets",
+          "fix": "Design mobile-first with bottom tab navigation and thumb-zone optimization",
+          "rationale": "Native app patterns reduce learning curve for SMB owners"
+        },
+        {
+          "targetKey": "design.dashboard.widgetHierarchy",
+          "fix": "AI-powered widget ranking based on user's actual daily interactions after week 1",
+          "rationale": "Self-organizing dashboard learns what matters to each business"
+        },
+        {
+          "targetKey": "design.nav.wayfinding",
+          "fix": "Implement breadcrumb trail + current location indicator instead of section headers",
+          "rationale": "Shows where you are without adding visual clutter"
+        },
+        {
+          "targetKey": "design.mobile.touchTargets",
+          "fix": "Add swipe gestures: left for back, right for forward, pull-down for command palette",
+          "rationale": "Leverages native mobile patterns SMB owners already know"
+        }
+      ],
+      "requiresApproval": true,
+      "previewRecommended": true
+    },
+    "customerSafe": false
+  },
+  "meta": {
+    "model": "claude-opus-4-1-20250805",
+    "requestId": "msg_014BysktWEPJiZhMVQov6zCf",
+    "latencyMs": 39628,
+    "inputTokens": 2510,
+    "outputTokens": 1360,
+    "costUsd": 0.0659
+  },
+  "stopReason": "ok",
+  "retryMeta": {
+    "attemptCount": 1,
+    "attemptModels": [
+      "claude-opus-4-1-20250805"
+    ],
+    "finalModelUsed": "claude-opus-4-1-20250805",
+    "finalTimeoutMs": 90000,
+    "totalCost": 0.0659
+  }
+}

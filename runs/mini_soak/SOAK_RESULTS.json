@@ -1,0 +1,836 @@
+[
+  {
+    "runId": "mini_soak_swarm_gate_a_control_web_rep1_1768439236787",
+    "lane": "web",
+    "stack": "Control Champion (4o + Opus)",
+    "rep": 1,
+    "timestamp": 1768439236787,
+    "pass": true,
+    "failureReason": null,
+    "modelLock": {
+      "systems": {
+        "requested": "gpt-4o-2024-08-06",
+        "resolved": "gpt-4o-2024-08-06",
+        "ok": true
+      },
+      "brand": {
+        "requested": "gpt-4o-2024-08-06",
+        "resolved": "gpt-4o-2024-08-06",
+        "ok": true
+      },
+      "critic": {
+        "requested": "claude-opus-4-1-20250805",
+        "resolved": "claude-opus-4-1-20250805",
+        "ok": true
+      }
+    },
+    "finishReason": {
+      "systems": "ok",
+      "brand": "ok",
+      "critic": "ok"
+    },
+    "schema": {
+      "systems": {
+        "count": 8,
+        "valid": true
+      },
+      "brand": {
+        "count": 8,
+        "valid": true
+      },
+      "critic": {
+        "issueCount": 10,
+        "fixCount": 10,
+        "valid": true
+      }
+    },
+    "retries": {
+      "systems": 0,
+      "brand": 0,
+      "critic": 0
+    },
+    "artifacts": {
+      "systems": {
+        "jsonSizeBytes": 2139
+      },
+      "brand": {
+        "jsonSizeBytes": 1531
+      },
+      "critic": {
+        "jsonSizeBytes": 4612
+      }
+    },
+    "anchors": {
+      "systems": 0,
+      "brand": 0
+    },
+    "truthPenalty": {
+      "systems": 0,
+      "brand": 0,
+      "critic": 0,
+      "total": 0
+    },
+    "penaltyBreakdown": {
+      "systems": {
+        "unverifiable": 0,
+        "inventedConstraints": 0,
+        "vagueness": 0,
+        "contractStrain": 0
+      },
+      "brand": {
+        "unverifiable": 0,
+        "inventedConstraints": 0,
+        "vagueness": 0,
+        "contractStrain": 0
+      },
+      "critic": {
+        "unverifiable": 0,
+        "inventedConstraints": 0,
+        "vagueness": 0,
+        "contractStrain": 0
+      }
+    },
+    "penaltyTriggers": {
+      "systems": [],
+      "brand": [],
+      "critic": []
+    },
+    "baseScore": 100,
+    "finalScore": 100,
+    "costUsd": 0,
+    "isTruncated": false,
+    "isValid": true,
+    "durationMs": 63453
+  },
+  {
+    "runId": "mini_soak_swarm_gate_a_control_web_rep2_1768439300241",
+    "lane": "web",
+    "stack": "Control Champion (4o + Opus)",
+    "rep": 2,
+    "timestamp": 1768439300241,
+    "pass": true,
+    "failureReason": null,
+    "modelLock": {
+      "systems": {
+        "requested": "gpt-4o-2024-08-06",
+        "resolved": "gpt-4o-2024-08-06",
+        "ok": true
+      },
+      "brand": {
+        "requested": "gpt-4o-2024-08-06",
+        "resolved": "gpt-4o-2024-08-06",
+        "ok": true
+      },
+      "critic": {
+        "requested": "claude-opus-4-1-20250805",
+        "resolved": "claude-opus-4-1-20250805",
+        "ok": true
+      }
+    },
+    "finishReason": {
+      "systems": "ok",
+      "brand": "ok",
+      "critic": "ok"
+    },
+    "schema": {
+      "systems": {
+        "count": 8,
+        "valid": true
+      },
+      "brand": {
+        "count": 8,
+        "valid": true
+      },
+      "critic": {
+        "issueCount": 10,
+        "fixCount": 10,
+        "valid": true
+      }
+    },
+    "retries": {
+      "systems": 0,
+      "brand": 0,
+      "critic": 0
+    },
+    "artifacts": {
+      "systems": {
+        "jsonSizeBytes": 1954
+      },
+      "brand": {
+        "jsonSizeBytes": 1718
+      },
+      "critic": {
+        "jsonSizeBytes": 4941
+      }
+    },
+    "anchors": {
+      "systems": 0,
+      "brand": 0
+    },
+    "truthPenalty": {
+      "systems": 0,
+      "brand": 0.05,
+      "critic": 0,
+      "total": 0.016666666666666666
+    },
+    "penaltyBreakdown": {
+      "systems": {
+        "unverifiable": 0,
+        "inventedConstraints": 0,
+        "vagueness": 0,
+        "contractStrain": 0
+      },
+      "brand": {
+        "unverifiable": 0,
+        "inventedConstraints": 0,
+        "vagueness": 0.05,
+        "contractStrain": 0
+      },
+      "critic": {
+        "unverifiable": 0,
+        "inventedConstraints": 0,
+        "vagueness": 0,
+        "contractStrain": 0
+      }
+    },
+    "penaltyTriggers": {
+      "systems": [],
+      "brand": [
+        "Vibe-only change: 'Make it more modern'"
+      ],
+      "critic": []
+    },
+    "baseScore": 100,
+    "finalScore": 98.33333333333333,
+    "costUsd": 0,
+    "isTruncated": false,
+    "isValid": true,
+    "durationMs": 65061
+  },
+  {
+    "runId": "mini_soak_swarm_gate_a_control_app_rep1_1768439365303",
+    "lane": "app",
+    "stack": "Control Champion (4o + Opus)",
+    "rep": 1,
+    "timestamp": 1768439365303,
+    "pass": true,
+    "failureReason": null,
+    "modelLock": {
+      "systems": {
+        "requested": "gpt-4o-2024-08-06",
+        "resolved": "gpt-4o-2024-08-06",
+        "ok": true
+      },
+      "brand": {
+        "requested": "gpt-4o-2024-08-06",
+        "resolved": "gpt-4o-2024-08-06",
+        "ok": true
+      },
+      "critic": {
+        "requested": "claude-opus-4-1-20250805",
+        "resolved": "claude-opus-4-1-20250805",
+        "ok": true
+      }
+    },
+    "finishReason": {
+      "systems": "ok",
+      "brand": "ok",
+      "critic": "ok"
+    },
+    "schema": {
+      "systems": {
+        "count": 8,
+        "valid": true
+      },
+      "brand": {
+        "count": 8,
+        "valid": true
+      },
+      "critic": {
+        "issueCount": 10,
+        "fixCount": 10,
+        "valid": true
+      }
+    },
+    "retries": {
+      "systems": 0,
+      "brand": 0,
+      "critic": 0
+    },
+    "artifacts": {
+      "systems": {
+        "jsonSizeBytes": 2056
+      },
+      "brand": {
+        "jsonSizeBytes": 1808
+      },
+      "critic": {
+        "jsonSizeBytes": 4802
+      }
+    },
+    "anchors": {
+      "systems": 0,
+      "brand": 0
+    },
+    "truthPenalty": {
+      "systems": 0,
+      "brand": 0,
+      "critic": 0,
+      "total": 0
+    },
+    "penaltyBreakdown": {
+      "systems": {
+        "unverifiable": 0,
+        "inventedConstraints": 0,
+        "vagueness": 0,
+        "contractStrain": 0
+      },
+      "brand": {
+        "unverifiable": 0,
+        "inventedConstraints": 0,
+        "vagueness": 0,
+        "contractStrain": 0
+      },
+      "critic": {
+        "unverifiable": 0,
+        "inventedConstraints": 0,
+        "vagueness": 0,
+        "contractStrain": 0
+      }
+    },
+    "penaltyTriggers": {
+      "systems": [],
+      "brand": [],
+      "critic": []
+    },
+    "baseScore": 100,
+    "finalScore": 100,
+    "costUsd": 0,
+    "isTruncated": false,
+    "isValid": true,
+    "durationMs": 65577
+  },
+  {
+    "runId": "mini_soak_swarm_gate_a_control_app_rep2_1768439430881",
+    "lane": "app",
+    "stack": "Control Champion (4o + Opus)",
+    "rep": 2,
+    "timestamp": 1768439430881,
+    "pass": true,
+    "failureReason": null,
+    "modelLock": {
+      "systems": {
+        "requested": "gpt-4o-2024-08-06",
+        "resolved": "gpt-4o-2024-08-06",
+        "ok": true
+      },
+      "brand": {
+        "requested": "gpt-4o-2024-08-06",
+        "resolved": "gpt-4o-2024-08-06",
+        "ok": true
+      },
+      "critic": {
+        "requested": "claude-opus-4-1-20250805",
+        "resolved": "claude-opus-4-1-20250805",
+        "ok": true
+      }
+    },
+    "finishReason": {
+      "systems": "ok",
+      "brand": "ok",
+      "critic": "ok"
+    },
+    "schema": {
+      "systems": {
+        "count": 8,
+        "valid": true
+      },
+      "brand": {
+        "count": 8,
+        "valid": true
+      },
+      "critic": {
+        "issueCount": 10,
+        "fixCount": 10,
+        "valid": true
+      }
+    },
+    "retries": {
+      "systems": 0,
+      "brand": 0,
+      "critic": 0
+    },
+    "artifacts": {
+      "systems": {
+        "jsonSizeBytes": 1827
+      },
+      "brand": {
+        "jsonSizeBytes": 1770
+      },
+      "critic": {
+        "jsonSizeBytes": 4368
+      }
+    },
+    "anchors": {
+      "systems": 0,
+      "brand": 0
+    },
+    "truthPenalty": {
+      "systems": 0,
+      "brand": 0,
+      "critic": 0,
+      "total": 0
+    },
+    "penaltyBreakdown": {
+      "systems": {
+        "unverifiable": 0,
+        "inventedConstraints": 0,
+        "vagueness": 0,
+        "contractStrain": 0
+      },
+      "brand": {
+        "unverifiable": 0,
+        "inventedConstraints": 0,
+        "vagueness": 0,
+        "contractStrain": 0
+      },
+      "critic": {
+        "unverifiable": 0,
+        "inventedConstraints": 0,
+        "vagueness": 0,
+        "contractStrain": 0
+      }
+    },
+    "penaltyTriggers": {
+      "systems": [],
+      "brand": [],
+      "critic": []
+    },
+    "baseScore": 100,
+    "finalScore": 100,
+    "costUsd": 0,
+    "isTruncated": false,
+    "isValid": true,
+    "durationMs": 57778
+  },
+  {
+    "runId": "mini_soak_swarm_gate_a_control_marketing_rep1_1768439488659",
+    "lane": "marketing",
+    "stack": "Control Champion (4o + Opus)",
+    "rep": 1,
+    "timestamp": 1768439488659,
+    "pass": true,
+    "failureReason": null,
+    "modelLock": {
+      "systems": {
+        "requested": "gpt-4o-2024-08-06",
+        "resolved": "gpt-4o-2024-08-06",
+        "ok": true
+      },
+      "brand": {
+        "requested": "gpt-4o-2024-08-06",
+        "resolved": "gpt-4o-2024-08-06",
+        "ok": true
+      },
+      "critic": {
+        "requested": "claude-opus-4-1-20250805",
+        "resolved": "claude-opus-4-1-20250805",
+        "ok": true
+      }
+    },
+    "finishReason": {
+      "systems": "ok",
+      "brand": "ok",
+      "critic": "ok"
+    },
+    "schema": {
+      "systems": {
+        "count": 8,
+        "valid": true
+      },
+      "brand": {
+        "count": 8,
+        "valid": true
+      },
+      "critic": {
+        "issueCount": 10,
+        "fixCount": 10,
+        "valid": true
+      }
+    },
+    "retries": {
+      "systems": 0,
+      "brand": 0,
+      "critic": 0
+    },
+    "artifacts": {
+      "systems": {
+        "jsonSizeBytes": 2513
+      },
+      "brand": {
+        "jsonSizeBytes": 1849
+      },
+      "critic": {
+        "jsonSizeBytes": 4777
+      }
+    },
+    "anchors": {
+      "systems": 0,
+      "brand": 0
+    },
+    "truthPenalty": {
+      "systems": 0,
+      "brand": 0,
+      "critic": 0.1,
+      "total": 0.03333333333333333
+    },
+    "penaltyBreakdown": {
+      "systems": {
+        "unverifiable": 0,
+        "inventedConstraints": 0,
+        "vagueness": 0,
+        "contractStrain": 0
+      },
+      "brand": {
+        "unverifiable": 0,
+        "inventedConstraints": 0,
+        "vagueness": 0,
+        "contractStrain": 0
+      },
+      "critic": {
+        "unverifiable": 0.1,
+        "inventedConstraints": 0,
+        "vagueness": 0,
+        "contractStrain": 0
+      }
+    },
+    "penaltyTriggers": {
+      "systems": [],
+      "brand": [],
+      "critic": [
+        "Claims analytics data not provided (e.g., 'Users are bouncing...')"
+      ]
+    },
+    "baseScore": 100,
+    "finalScore": 96.66666666666667,
+    "costUsd": 0,
+    "isTruncated": false,
+    "isValid": true,
+    "durationMs": 63466
+  },
+  {
+    "runId": "mini_soak_swarm_gate_a_control_marketing_rep2_1768439552125",
+    "lane": "marketing",
+    "stack": "Control Champion (4o + Opus)",
+    "rep": 2,
+    "timestamp": 1768439552125,
+    "pass": true,
+    "failureReason": null,
+    "modelLock": {
+      "systems": {
+        "requested": "gpt-4o-2024-08-06",
+        "resolved": "gpt-4o-2024-08-06",
+        "ok": true
+      },
+      "brand": {
+        "requested": "gpt-4o-2024-08-06",
+        "resolved": "gpt-4o-2024-08-06",
+        "ok": true
+      },
+      "critic": {
+        "requested": "claude-opus-4-1-20250805",
+        "resolved": "claude-opus-4-1-20250805",
+        "ok": true
+      }
+    },
+    "finishReason": {
+      "systems": "ok",
+      "brand": "ok",
+      "critic": "ok"
+    },
+    "schema": {
+      "systems": {
+        "count": 8,
+        "valid": true
+      },
+      "brand": {
+        "count": 8,
+        "valid": true
+      },
+      "critic": {
+        "issueCount": 10,
+        "fixCount": 10,
+        "valid": true
+      }
+    },
+    "retries": {
+      "systems": 0,
+      "brand": 0,
+      "critic": 0
+    },
+    "artifacts": {
+      "systems": {
+        "jsonSizeBytes": 2102
+      },
+      "brand": {
+        "jsonSizeBytes": 1818
+      },
+      "critic": {
+        "jsonSizeBytes": 4701
+      }
+    },
+    "anchors": {
+      "systems": 0,
+      "brand": 0
+    },
+    "truthPenalty": {
+      "systems": 0,
+      "brand": 0,
+      "critic": 0,
+      "total": 0
+    },
+    "penaltyBreakdown": {
+      "systems": {
+        "unverifiable": 0,
+        "inventedConstraints": 0,
+        "vagueness": 0,
+        "contractStrain": 0
+      },
+      "brand": {
+        "unverifiable": 0,
+        "inventedConstraints": 0,
+        "vagueness": 0,
+        "contractStrain": 0
+      },
+      "critic": {
+        "unverifiable": 0,
+        "inventedConstraints": 0,
+        "vagueness": 0,
+        "contractStrain": 0
+      }
+    },
+    "penaltyTriggers": {
+      "systems": [],
+      "brand": [],
+      "critic": []
+    },
+    "baseScore": 100,
+    "finalScore": 100,
+    "costUsd": 0,
+    "isTruncated": false,
+    "isValid": true,
+    "durationMs": 58170
+  },
+  {
+    "runId": "mini_soak_swarm_gate_a_control_artwork_rep1_1768439610296",
+    "lane": "artwork",
+    "stack": "Control Champion (4o + Opus)",
+    "rep": 1,
+    "timestamp": 1768439610296,
+    "pass": false,
+    "failureReason": "Systems: 0/8, Brand: 8/8, Critic: 10/10",
+    "modelLock": {
+      "systems": {
+        "requested": "gpt-4o-2024-08-06",
+        "resolved": "gpt-4o-2024-08-06",
+        "ok": true
+      },
+      "brand": {
+        "requested": "gpt-4o-2024-08-06",
+        "resolved": "gpt-4o-2024-08-06",
+        "ok": true
+      },
+      "critic": {
+        "requested": "claude-opus-4-1-20250805",
+        "resolved": "claude-opus-4-1-20250805",
+        "ok": true
+      }
+    },
+    "finishReason": {
+      "systems": "provider_failed",
+      "brand": "ok",
+      "critic": "ok"
+    },
+    "schema": {
+      "systems": {
+        "count": 0,
+        "valid": false
+      },
+      "brand": {
+        "count": 8,
+        "valid": true
+      },
+      "critic": {
+        "issueCount": 10,
+        "fixCount": 10,
+        "valid": true
+      }
+    },
+    "retries": {
+      "systems": 0,
+      "brand": 0,
+      "critic": 0
+    },
+    "artifacts": {
+      "systems": {
+        "jsonSizeBytes": 157
+      },
+      "brand": {
+        "jsonSizeBytes": 1801
+      },
+      "critic": {
+        "jsonSizeBytes": 4578
+      }
+    },
+    "anchors": {
+      "systems": 0,
+      "brand": 0
+    },
+    "truthPenalty": {
+      "systems": 0,
+      "brand": 0.2,
+      "critic": 0.2,
+      "total": 0.13333333333333333
+    },
+    "penaltyBreakdown": {
+      "systems": {
+        "unverifiable": 0,
+        "inventedConstraints": 0,
+        "vagueness": 0,
+        "contractStrain": 0
+      },
+      "brand": {
+        "unverifiable": 0.2,
+        "inventedConstraints": 0,
+        "vagueness": 0,
+        "contractStrain": 0
+      },
+      "critic": {
+        "unverifiable": 0.2,
+        "inventedConstraints": 0,
+        "vagueness": 0,
+        "contractStrain": 0
+      }
+    },
+    "penaltyTriggers": {
+      "systems": [],
+      "brand": [
+        "Invents conversion/traffic numbers",
+        "Invents conversion/traffic numbers"
+      ],
+      "critic": [
+        "Invents conversion/traffic numbers",
+        "Invents conversion/traffic numbers"
+      ]
+    },
+    "baseScore": 100,
+    "finalScore": 86.66666666666667,
+    "costUsd": 0,
+    "isTruncated": false,
+    "isValid": true,
+    "durationMs": 57174
+  },
+  {
+    "runId": "mini_soak_swarm_gate_a_control_artwork_rep2_1768439667470",
+    "lane": "artwork",
+    "stack": "Control Champion (4o + Opus)",
+    "rep": 2,
+    "timestamp": 1768439667470,
+    "pass": true,
+    "failureReason": null,
+    "modelLock": {
+      "systems": {
+        "requested": "gpt-4o-2024-08-06",
+        "resolved": "gpt-4o-2024-08-06",
+        "ok": true
+      },
+      "brand": {
+        "requested": "gpt-4o-2024-08-06",
+        "resolved": "gpt-4o-2024-08-06",
+        "ok": true
+      },
+      "critic": {
+        "requested": "claude-opus-4-1-20250805",
+        "resolved": "claude-opus-4-1-20250805",
+        "ok": true
+      }
+    },
+    "finishReason": {
+      "systems": "ok",
+      "brand": "ok",
+      "critic": "ok"
+    },
+    "schema": {
+      "systems": {
+        "count": 8,
+        "valid": true
+      },
+      "brand": {
+        "count": 8,
+        "valid": true
+      },
+      "critic": {
+        "issueCount": 10,
+        "fixCount": 10,
+        "valid": true
+      }
+    },
+    "retries": {
+      "systems": 0,
+      "brand": 0,
+      "critic": 0
+    },
+    "artifacts": {
+      "systems": {
+        "jsonSizeBytes": 1903
+      },
+      "brand": {
+        "jsonSizeBytes": 1622
+      },
+      "critic": {
+        "jsonSizeBytes": 4372
+      }
+    },
+    "anchors": {
+      "systems": 0,
+      "brand": 0
+    },
+    "truthPenalty": {
+      "systems": 0,
+      "brand": 0,
+      "critic": 0,
+      "total": 0
+    },
+    "penaltyBreakdown": {
+      "systems": {
+        "unverifiable": 0,
+        "inventedConstraints": 0,
+        "vagueness": 0,
+        "contractStrain": 0
+      },
+      "brand": {
+        "unverifiable": 0,
+        "inventedConstraints": 0,
+        "vagueness": 0,
+        "contractStrain": 0
+      },
+      "critic": {
+        "unverifiable": 0,
+        "inventedConstraints": 0,
+        "vagueness": 0,
+        "contractStrain": 0
+      }
+    },
+    "penaltyTriggers": {
+      "systems": [],
+      "brand": [],
+      "critic": []
+    },
+    "baseScore": 100,
+    "finalScore": 100,
+    "costUsd": 0,
+    "isTruncated": false,
+    "isValid": true,
+    "durationMs": 50152
+  }
+]

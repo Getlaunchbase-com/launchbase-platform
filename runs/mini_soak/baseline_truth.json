@@ -1,0 +1,60 @@
+{
+  "generatedAt": "2026-01-15T01:15:17.623Z",
+  "stack": "Control Champion (4o + Opus)",
+  "policyName": "swarm_gate_a_control",
+  "runCount": 8,
+  "lanes": {
+    "web": {
+      "passRate": 100,
+      "truthPenalty": {
+        "median": 0.016666666666666666,
+        "mean": 0.008333333333333333
+      },
+      "finalScore": {
+        "mean": 99.16666666666666,
+        "stdDev": 0.8333333333333357,
+        "lowerBound": 97.49999999999999,
+        "upperBound": 100.83333333333333
+      }
+    },
+    "app": {
+      "passRate": 100,
+      "truthPenalty": {
+        "median": 0,
+        "mean": 0
+      },
+      "finalScore": {
+        "mean": 100,
+        "stdDev": 0,
+        "lowerBound": 100,
+        "upperBound": 100
+      }
+    },
+    "marketing": {
+      "passRate": 100,
+      "truthPenalty": {
+        "median": 0.03333333333333333,
+        "mean": 0.016666666666666666
+      },
+      "finalScore": {
+        "mean": 98.33333333333334,
+        "stdDev": 1.6666666666666643,
+        "lowerBound": 95.00000000000001,
+        "upperBound": 101.66666666666667
+      }
+    },
+    "artwork": {
+      "passRate": 50,
+      "truthPenalty": {
+        "median": 0,
+        "mean": 0
+      },
+      "finalScore": {
+        "mean": 100,
+        "stdDev": 0,
+        "lowerBound": 100,
+        "upperBound": 100
+      }
+    }
+  }
+}
