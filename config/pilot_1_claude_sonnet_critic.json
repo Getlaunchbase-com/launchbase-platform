@@ -3,7 +3,7 @@
   "pilotName": "Claude 3.5 Sonnet as Critic",
   "description": "Test Claude 3.5 Sonnet's reliability as a critic with GPT-4o designers. Web + Marketing lanes to expose implementation-hallucination and claim-hallucination.",
   "challengerModel": {
-    "id": "anthropic/claude-3-5-sonnet-20240620",
+    "id": "claude-3-5-sonnet-20240620",
     "provider": "anthropic",
     "name": "Claude 3.5 Sonnet",
     "contextWindow": 200000,
@@ -29,7 +29,7 @@
   },
   "stack": {
     "designer_systems_fast": {
-      "modelId": "openai/gpt-4o-2024-08-06",
+      "modelId": "gpt-4o-2024-08-06",
       "provider": "openai",
       "role": "systems",
       "maxTokens": 2000,
@@ -37,7 +37,7 @@
       "note": "Control baseline - reliable designer"
     },
     "designer_brand_fast": {
-      "modelId": "openai/gpt-4o-2024-08-06",
+      "modelId": "gpt-4o-2024-08-06",
       "provider": "openai",
       "role": "brand",
       "maxTokens": 2000,
@@ -45,7 +45,7 @@
       "note": "Control baseline - reliable designer"
     },
     "design_critic_ruthless": {
-      "modelId": "anthropic/claude-3-5-sonnet-20240620",
+      "modelId": "claude-3-5-sonnet-20240620",
       "provider": "anthropic",
       "role": "critic",
       "maxTokens": 4000,

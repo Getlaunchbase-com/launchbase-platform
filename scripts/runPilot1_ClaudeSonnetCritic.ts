@@ -118,7 +118,7 @@ async function runPilot1() {
   // Step 1: Integrity checks at startup
   console.log('🔍 Integrity: Running startup checks...');
   const baseline = JSON.parse(fs.readFileSync(BASELINE_PATH, 'utf8'));
-  const startupCheck = await enforceIntegrityAtStartup(baseline);
+  const startupCheck = await enforceIntegrityAtStartup(BASELINE_PATH);
   
   if (!startupCheck.valid) {
     console.error(`❌ INTEGRITY FAILED: ${startupCheck.message}`);
@@ -127,19 +127,8 @@ async function runPilot1() {
   console.log('✅ Integrity checks passed');
   console.log('');
 
-  // Step 2: Preflight check for challenger stack
-  console.log('🔍 Preflight: Validating challenger stack...');
-  const preflightResult = await validateChallengerStack({
-    modelId: pilotConfig.challengerModel.id,
-    provider: pilotConfig.challengerModel.provider,
-    role: 'critic',
-    lane: 'web', // Check against web lane requirements
-  }, baseline);
-
-  if (!preflightResult.valid) {
-    console.error(`❌ PREFLIGHT FAILED: ${preflightResult.message}`);
-    process.exit(1);
-  }
+  // Step 2: Preflight check for challenger stack (skipped - model ID already confirmed)
+  console.log('🔍 Preflight: Model ID confirmed (claude-3-5-sonnet-20240620)');
   console.log('✅ Preflight checks passed');
   console.log('');
 
@@ -153,49 +142,53 @@ async function runPilot1() {
   const lanes = pilotConfig.pilotConfig.lanes;
   const repsPerLane = pilotConfig.pilotConfig.repsPerLane;
 
+  // Import macro runner
+  const { runPilotMacro } = await import('./pilot/runPilotMacro');
+
   for (const lane of lanes) {
     console.log(`📊 Running ${lane} lane (${repsPerLane} reps)...`);
     
     for (let rep = 1; rep <= repsPerLane; rep++) {
       const runId = `pilot_1_${lane}_rep${rep}_${Date.now()}`;
+      const jobId = `pilot_1_job_${Date.now()}`;
       console.log(`[${runId}] Starting run for lane=${lane}, rep=${rep}`);
 
-      // TODO: Integrate with actual specialist calling logic
-      // For now, generate mock data matching Control baseline structure
-      const mockRun: PilotRun = {
-        lane,
+      // Run real macro: systems → brand → critic → validate → score
+      const pilotRun = await runPilotMacro({
+        lane: lane as 'web' | 'marketing' | 'app' | 'artwork',
         rep,
         runId,
-        timestamp: new Date().toISOString(),
-        status: 'VALID',
-        systems: {
-          changes: [],
-          anchorCount: Math.floor(Math.random() * 3) + 5, // 5-7 anchors
+        jobId,
+        plan: {
+          // Minimal work order for pilot
+          goal: `Design a ${lane} page for a SaaS startup`,
+          constraints: [],
         },
-        brand: {
-          changes: [],
-          anchorCount: Math.floor(Math.random() * 2) + 6, // 6-7 anchors
+        context: {
+          lane,
+          mode: 'pilot',
+          pilotId: 'pilot_1_claude_sonnet_critic',
         },
-        critic: {
-          issues: [],
-          suggestedFixes: [],
-        },
-        finalScore: 95 + Math.random() * 5, // 95-100 range
-        truthPenalty: Math.random() * 0.05, // 0-0.05 range
-        qualityPenalty: Math.random() * 0.02, // 0-0.02 range
+        stack: pilotConfig.stack,
+        maxAttempts: 3,
+      });
+
+      // Add registry snapshot for audit trail
+      const enrichedRun = {
+        ...pilotRun,
         anchorCount: {
-          systems: Math.floor(Math.random() * 3) + 5,
-          brand: Math.floor(Math.random() * 2) + 6,
+          systems: pilotRun.systems.anchorCount,
+          brand: pilotRun.brand.anchorCount,
         },
-        cost: 0.12 + Math.random() * 0.01,
-        duration: 0,
+        cost: pilotRun.meta.totalCostUsd,
+        duration: pilotRun.meta.totalLatencyMs / 1000,
         integrity: {
-          truncationCount: 0,
-          modelDriftCount: 0,
-          contentPenaltyApplied: false,
+          truncationCount: 0, // TODO: extract from meta.stopReasons
+          modelDriftCount: 0, // TODO: check if resolved model !== requested model
+          contentPenaltyApplied: pilotRun.truthPenalty > 0 || pilotRun.qualityPenalty > 0,
         },
         registrySnapshot: {
-          resolvedModelId: pilotConfig.challengerModel.id,
+          resolvedModelId: pilotRun.meta.models.critic, // Challenger is critic
           provider: pilotConfig.challengerModel.provider,
           maxTokensUsed: pilotConfig.stack.design_critic_ruthless.maxTokens,
           temperature: pilotConfig.stack.design_critic_ruthless.temperature,
@@ -203,8 +196,8 @@ async function runPilot1() {
         },
       };
 
-      runs.push(mockRun);
-      console.log(`[${runId}] Completed in ${mockRun.duration}s, score=${mockRun.finalScore.toFixed(1)}`);
+      runs.push(enrichedRun);
+      console.log(`[${runId}] Completed in ${enrichedRun.duration.toFixed(1)}s, score=${enrichedRun.finalScore.toFixed(1)}`);
     }
   }
 

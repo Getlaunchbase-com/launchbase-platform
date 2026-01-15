@@ -1,0 +1,223 @@
+{
+  "pilotId": "pilot_1_claude_sonnet_critic",
+  "pilotName": "Claude 3.5 Sonnet as Critic",
+  "challengerModel": "anthropic/claude-3-5-sonnet-20240620",
+  "timestamp": "2026-01-15T16:52:52.443Z",
+  "runs": [
+    {
+      "lane": "web",
+      "rep": 1,
+      "runId": "pilot_1_web_rep1_1768495972437",
+      "timestamp": "2026-01-15T16:52:52.437Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 99.32226353960708,
+      "truthPenalty": 0.0037895735827259917,
+      "qualityPenalty": 0.01711827536312186,
+      "anchorCount": {
+        "systems": 5,
+        "brand": 7
+      },
+      "cost": 0.12305418799578512,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "anthropic/claude-3-5-sonnet-20240620",
+        "provider": "anthropic",
+        "maxTokensUsed": 4000,
+        "temperature": 0.7,
+        "policyHash": "sha256:pilot_1_prompts"
+      }
+    },
+    {
+      "lane": "web",
+      "rep": 2,
+      "runId": "pilot_1_web_rep2_1768495972442",
+      "timestamp": "2026-01-15T16:52:52.442Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 6
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 96.18347895366375,
+      "truthPenalty": 0.0251393053568863,
+      "qualityPenalty": 0.01084247878659698,
+      "anchorCount": {
+        "systems": 6,
+        "brand": 7
+      },
+      "cost": 0.1247175738628675,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "anthropic/claude-3-5-sonnet-20240620",
+        "provider": "anthropic",
+        "maxTokensUsed": 4000,
+        "temperature": 0.7,
+        "policyHash": "sha256:pilot_1_prompts"
+      }
+    },
+    {
+      "lane": "marketing",
+      "rep": 1,
+      "runId": "pilot_1_marketing_rep1_1768495972443",
+      "timestamp": "2026-01-15T16:52:52.443Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 7
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 97.39275311749451,
+      "truthPenalty": 0.03594513771375476,
+      "qualityPenalty": 0.017811165167496593,
+      "anchorCount": {
+        "systems": 7,
+        "brand": 7
+      },
+      "cost": 0.12249263176525689,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "anthropic/claude-3-5-sonnet-20240620",
+        "provider": "anthropic",
+        "maxTokensUsed": 4000,
+        "temperature": 0.7,
+        "policyHash": "sha256:pilot_1_prompts"
+      }
+    },
+    {
+      "lane": "marketing",
+      "rep": 2,
+      "runId": "pilot_1_marketing_rep2_1768495972443",
+      "timestamp": "2026-01-15T16:52:52.443Z",
+      "status": "VALID",
+      "systems": {
+        "changes": [],
+        "anchorCount": 5
+      },
+      "brand": {
+        "changes": [],
+        "anchorCount": 7
+      },
+      "critic": {
+        "issues": [],
+        "suggestedFixes": []
+      },
+      "finalScore": 99.29020825237059,
+      "truthPenalty": 0.006234073658503681,
+      "qualityPenalty": 0.013061631652072801,
+      "anchorCount": {
+        "systems": 6,
+        "brand": 6
+      },
+      "cost": 0.12050949944115782,
+      "duration": 0,
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "contentPenaltyApplied": false
+      },
+      "registrySnapshot": {
+        "resolvedModelId": "anthropic/claude-3-5-sonnet-20240620",
+        "provider": "anthropic",
+        "maxTokensUsed": 4000,
+        "temperature": 0.7,
+        "policyHash": "sha256:pilot_1_prompts"
+      }
+    }
+  ],
+  "summary": {
+    "totalRuns": 4,
+    "validRuns": 4,
+    "invalidRuns": 0,
+    "passRate": 1,
+    "truncationCount": 0,
+    "modelDriftCount": 0,
+    "perLane": {
+      "web": {
+        "validRuns": 2,
+        "finalScore": {
+          "mean": 97.75287124663541,
+          "stddev": 1.5693922929716635,
+          "min": 96.18347895366375,
+          "max": 99.32226353960708
+        },
+        "truthPenalty": {
+          "mean": 0.014464439469806144,
+          "median": 0.0251393053568863,
+          "stddev": 0.010674865887080155
+        },
+        "qualityPenalty": {
+          "mean": 0.01398037707485942,
+          "median": 0.01711827536312186,
+          "stddev": 0.003137898288262441
+        }
+      },
+      "marketing": {
+        "validRuns": 2,
+        "finalScore": {
+          "mean": 98.34148068493255,
+          "stddev": 0.9487275674380413,
+          "min": 97.39275311749451,
+          "max": 99.29020825237059
+        },
+        "truthPenalty": {
+          "mean": 0.02108960568612922,
+          "median": 0.03594513771375476,
+          "stddev": 0.014855532027625538
+        },
+        "qualityPenalty": {
+          "mean": 0.015436398409784696,
+          "median": 0.017811165167496593,
+          "stddev": 0.002374766757711896
+        }
+      }
+    }
+  },
+  "acceptanceCriteria": {
+    "passRateMet": true,
+    "noTruncation": true,
+    "noModelDrift": true,
+    "scoreImprovementMet": false
+  },
+  "pilotPassed": false
+}

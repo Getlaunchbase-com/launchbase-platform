@@ -575,21 +575,32 @@ export async function callSpecialistWithRetry(
       }
       
       // Content Contract Validator: Check output shape BEFORE declaring success
-      if (enableContentValidation && result.stopReason === "ok") {
+      // Policy-driven: honor validation.contentValidatorPhase from context
+      const validationPolicy = input.input?.context?.validation;
+      const enableContentValidatorHere = enableContentValidation && (validationPolicy?.enableContentValidator ?? true);
+      const contentPhase = validationPolicy?.contentValidatorPhase ?? "before_schema";
+      const treatWrongCountAs = validationPolicy?.treatWrongCountAs ?? "content_noncompliance";
+      
+      if (enableContentValidatorHere && contentPhase === "before_schema" && result.stopReason === "ok") {
         const contentValidation = validateContentContract(role, result.artifact?.payload);
         
         if (!contentValidation.valid) {
-          console.warn(`[CONTENT_VALIDATOR] Failed: ${contentValidation.reason}`);
+          console.warn(`[CONTENT_VALIDATOR] Failed (before_schema): ${contentValidation.reason}`);
           console.log(`[RETRY_LADDER] Content validation failed, trying next model...`);
           
-          // Mark as content_failed and retry
-          lastError = new Error(`Content validation failed: ${contentValidation.reason}`);
+          // Mark as content_noncompliance and retry
+          lastError = Object.assign(
+            new Error(`Content validation failed: ${contentValidation.reason}`),
+            { stopReason: treatWrongCountAs }
+          );
           continue; // Try next model in ladder
         }
         
         console.log(`[RETRY_LADDER] Success on attempt ${retryMeta.attemptCount}`);
         return { ...result, retryMeta };
       }
+      
+      // If contentPhase is "after_schema", skip validation here (caller will handle it)
       
       // If not retryable, return failure immediately
       if (!shouldRetry(result.stopReason)) {

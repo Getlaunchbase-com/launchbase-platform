@@ -1740,3 +1740,158 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - **Grok (xAI):** LLM challenger (web/app/marketing lanes primarily)
 - **Groq (hardware inference):** "model delivery" + specific model (e.g., Llama variants), integrity rules prevent drift/fallback
 - **Asset/image models (Flux/SD3):** Artwork lane only, asset-appropriate truth rules (no "liar" flags for not producing layout/copy constraints)
+
+
+---
+
+## 🔌 PILOT #1 REAL INTEGRATION
+
+### Phase 1: Pilot Runtime Façade
+- [x] Create server/ai/pilotRuntime/index.ts (centralized imports)
+- [x] Export callSpecialist, cleanParseJsonArtifact, validateArtifactOrThrow, scoreRunArtifacts
+- [x] Verify Node-safe imports (no Next/React/window dependencies)
+
+### Phase 2: Adapters
+- [x] Create scripts/pilot/adapters.ts
+- [x] Implement toRoleConfig() converter (pilot config → SpecialistRoleConfig)
+- [x] Pass maxTokens/temperature via input.context
+
+### Phase 3: Macro Runner
+- [x] Create scripts/pilot/runPilotMacro.ts
+- [x] Implement systems → brand → critic call sequence
+- [x] Use correct schema routing keys: designer_systems_fast, designer_brand_fast, design_critic_ruthless
+- [x] JSON cleaning BEFORE validation (cleanParseJsonArtifact → validateArtifactOrThrow)
+- [x] Retry ladder: timeout, provider_failed, invalid_json (NOT schema_failed for critic)
+- [x] Return PilotRun with scoring + meta
+
+### Phase 4: Update Pilot Script
+- [x] Replace mock loop in runPilot1_ClaudeSonnetCritic.ts with runPilotMacro() calls
+- [ ] Add --mock flag for fast infra tests (optional enhancement)
+- [x] Default to real calls
+
+### Phase 5: Smoke Test
+- [ ] Run 1 rep Web only
+- [ ] Verify: 8 systems changes, 8 brand changes, 10 issues + 10 fixes, pass:false
+- [ ] Check: no truncation, no drift, valid scoring
+
+### Phase 6: Full Pilot
+- [ ] Run Web×2, Marketing×2 (4 runs total)
+- [ ] Verify acceptance criteria: ≥95% pass, 0 truncation, 0 drift, score improvement
+- [ ] Generate PILOT_1_SCORECARD.md, PILOT_1_VS_CONTROL.md
+
+### Phase 7: Checkpoint
+- [ ] Save checkpoint with real Pilot #1 integration
+- [ ] Document wiring pattern for future pilots
+
+
+---
+
+## 🔧 MODEL ID FIX (URGENT)
+
+### Issue: Model Drift Due to Wrong ID Format
+- [x] Diagnosed: `openai/gpt-4o-2024-08-06` not found → fallback to `gpt-4o-mini`
+- [x] Root cause: AIMLAPI expects bare IDs (`gpt-4o-2024-08-06`), not provider-prefixed
+
+### Phase 1: Fix Model IDs in Pilot Config
+- [x] Update pilot_1_claude_sonnet_critic.json:
+  - `openai/gpt-4o-2024-08-06` → `gpt-4o-2024-08-06`
+  - `anthropic/claude-3-5-sonnet-20240620` → `claude-3-5-sonnet-20240620`
+- [ ] Update baseline_truth_v1.2.json with canonical model IDs
+
+### Phase 2: Enforce MODEL_LOCK (No Fallback)
+- [ ] Disable model failover in pilot runner
+- [ ] Hard fail if `requested_model_not_in_registry`
+- [ ] Log model resolution: requested vs resolved
+
+### Phase 3: Fix cleanParseJsonArtifact
+- [ ] Verify returns correct object root shape `{ proposedChanges: [...] }`
+- [ ] Add explicit logging for artifact structure
+- [ ] Handle array root gracefully (prompt enforcement preferred)
+
+### Phase 4: Re-run Smoke Test
+- [ ] Run Web×1 with fixed model IDs
+- [ ] Verify: 8+8+10/10, no drift, no truncation
+- [ ] If 7 changes persists → treat as content_noncompliance and retry
+
+### Phase 5: Registry Canonicalization (Production-Safe)
+- [ ] Add startup registry fetch from AIMLAPI
+- [ ] Build alias → canonical ID map
+- [ ] Enforce MODEL_LOCK for all pilots/tournaments
+
+
+---
+
+## 🔧 VALIDATION ORDER FIX (CRITICAL)
+
+### Issue: Content Validator Rejecting Before Schema Validation
+- [x] Diagnosed: Got 10 changes (excellent quality) but validator expects EXACTLY 8
+- [x] Root cause: Content validator runs BEFORE schema validation
+- [x] Decision: Keep EXACTLY 8 (fast-mode contract), make wrong count retryable
+
+### Phase 1: Reorder Validation (Schema First)
+- [ ] Change validation order in runPilotMacro.ts:
+  1. cleanParseJsonArtifact()
+  2. validateArtifactOrThrow(schemaKey) ← schema enforces EXACTLY 8
+  3. contentValidate() ← anchors/quality gates only
+- [ ] Remove count enforcement from content validator (schema already enforces it)
+
+### Phase 2: Make Wrong Count Retryable
+- [ ] Add stopReason: `content_noncompliance` (retryable)
+- [ ] Update retry ladder for craft roles:
+  - timeout ✅
+  - provider_failed ✅
+  - invalid_json ✅
+  - content_noncompliance ✅ NEW
+- [ ] Keep rule: don't retry critic on schema_failed
+
+### Phase 3: Enforce EXACTLY 8 in Prompts
+- [ ] Add to designer prompts:
+  - "Return exactly 8 proposedChanges."
+  - "If you can think of more, choose the best 8 by impact."
+  - "No extra keys, no extra prose."
+
+### Phase 4: Debug "Payload must be JSON object"
+- [ ] Add debug logging before Zod:
+  - `typeof parsed`
+  - `Array.isArray(parsed)`
+  - `Object.keys(parsed)`
+- [ ] Verify cleanParseJsonArtifact returns object root (not array)
+- [ ] Check ArtifactV1 shape to ensure correct level passed to Zod
+
+
+---
+
+## 🎯 POLICY-DRIVEN VALIDATION (PRODUCTION-SAFE)
+
+### Strategy: Make validation order configurable per run (pilots vs prod)
+- [ ] Default behavior (prod): `contentValidatorPhase: "before_schema"` (unchanged)
+- [ ] Pilot behavior: `contentValidatorPhase: "after_schema"` (opt-in)
+
+### Phase 1: Add Validation Policy to Context
+- [ ] Add to runPilotMacro context:
+  ```
+  validation: {
+    mode: "schema_first",
+    enableContentValidator: true,
+    contentValidatorPhase: "after_schema",
+    treatWrongCountAs: "content_noncompliance"
+  }
+  ```
+
+### Phase 2: Patch aimlSpecialist.ts
+- [ ] Read validation policy from `input.context.validation`
+- [ ] Default to `before_schema` if policy undefined (prod behavior)
+- [ ] Skip content validation if `contentValidatorPhase === "after_schema"`
+- [ ] Throw with `stopReason: content_noncompliance` for wrong count
+
+### Phase 3: Add Content Validation in runPilotMacro
+- [ ] Call content validator AFTER `validateArtifactOrThrow()`
+- [ ] Throw retryable error for craft roles (systems/brand)
+- [ ] Keep critic non-retryable on schema_failed
+
+### Phase 4: Make content_noncompliance Retryable
+- [ ] Update retry ladder: timeout, provider_failed, invalid_json, content_noncompliance
+- [ ] Keep non-retryable: schema_failed (critic), ok
+
+### Phase 5: Add Prompt Constraint
+- [ ] Add to systems/brand prompts: "Return exactly 8 proposedChanges. If you can think of more, select the best 8 by impact."
