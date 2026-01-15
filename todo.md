@@ -1930,10 +1930,12 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [ ] Create aggregateDashboard.ts (scan runs, generate dashboard.json)
 - [ ] Create renderDashboardCLI.ts (ASCII table with pass rates)
 
+### Smoke Test: Normalization Modes
+- [ ] Run smoke test: `pnpm tsx scripts/smoke/smokeNormalizationModes.ts`
+- [ ] Verify tournament mode: normalization disabled, may fail if >8
+- [ ] Verify production mode: normalization enabled, truncates to 8
+- [ ] Validate assertions: enabled/applied flags, truncation events, usage tracking
+
 ### Pilot #1: Claude 3.5 Sonnet as Critic
-- [ ] Run smoke test in tournament mode (allowNormalization: false)
-- [ ] Verify GPT-4o fails with >8 changes (expected)
-- [ ] Run smoke test in production mode (allowNormalization: true)
-- [ ] Verify truncation to 8 works, schema validation passes
 - [ ] Run full pilot (Web×2 + Marketing×2 = 4 runs)
 - [ ] Generate PILOT_1_RESULTS.json + PILOT_1_SCORECARD.md
