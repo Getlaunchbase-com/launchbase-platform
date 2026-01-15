@@ -12,7 +12,7 @@
  * Only expands to all 4 lanes after 2-lane pilot passes.
  */
 
-import { preflightSchemaHashCheck } from '../server/ai/engine/validation/schemaHashValidator';
+import { enforceIntegrityAtStartup, enforceIntegrityPerCall, enforceIntegrityPostRun } from '../server/ai/engine/validation/integrityEnforcement';
 import { validateChallengerStack } from '../server/ai/engine/validation/preflightCheck';
 import fs from 'fs';
 import path from 'path';
@@ -45,6 +45,13 @@ interface PilotRunResult {
   truncated: boolean;
   modelDrift: boolean;
   duration: number;
+  registrySnapshot: {
+    resolvedModelId: string;
+    provider: string;
+    maxTokensUsed: number;
+    temperature: number;
+    policyHash: string;
+  };
 }
 
 interface PilotResult {
@@ -98,6 +105,13 @@ async function runPilotRun(
     truncated: false,
     modelDrift: false,
     duration: (Date.now() - startTime) / 1000,
+    registrySnapshot: {
+      resolvedModelId: challengerStack.models.systems,
+      provider: challengerStack.name.split('/')[0] || 'unknown',
+      maxTokensUsed: 2000,
+      temperature: 0.7,
+      policyHash: 'sha256:baseline_v1_prompts',
+    },
   };
 
   console.log(`  [${runId}] Completed: score=${mockResult.finalScore.toFixed(1)}, truth=${mockResult.truthPenalty.toFixed(3)}`);
@@ -181,13 +195,17 @@ async function run2LanePilot(config: PilotConfig): Promise<PilotResult> {
 async function main() {
   console.log('🏆 Lane-by-Lane Pilot Runner\n');
 
-  // Preflight: Validate schema hashes
-  console.log('🔍 Preflight: Validating schema hashes...');
+  // Integrity enforcement at startup
+  console.log('🔍 Integrity: Running startup checks...');
   try {
-    const validation = preflightSchemaHashCheck(BASELINE_PATH, true);
-    console.log(validation.message);
+    const integrityCheck = enforceIntegrityAtStartup(BASELINE_PATH);
+    if (!integrityCheck.valid) {
+      console.error('\n❌ INTEGRITY FAILED:', integrityCheck.message);
+      process.exit(1);
+    }
+    console.log(integrityCheck.message);
   } catch (error: any) {
-    console.error('\n❌ PREFLIGHT FAILED:', error.message);
+    console.error('\n❌ INTEGRITY FAILED:', error.message);
     process.exit(1);
   }
 

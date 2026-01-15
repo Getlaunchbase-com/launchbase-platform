@@ -34,7 +34,10 @@
   },
   "integrity": {
     "requireSchemaHashMatch": true,
-    "notes": "If true, tournament runners MUST validate current schema hashes against inputs.schemaHashes before execution. Any mismatch marks the entire run batch as INVALID (drift) and stops execution. This prevents contamination from silent schema changes."
+    "rejectSilentModelFallback": true,
+    "rejectTruncation": true,
+    "rejectMissingArtifacts": true,
+    "notes": "Integrity kill switch: tournament runners MUST enforce all 4 flags. (1) requireSchemaHashMatch: validate schema hashes before execution, any mismatch = INVALID. (2) rejectSilentModelFallback: requested model must equal resolved model (MODEL_LOCK), any fallback = INVALID. (3) rejectTruncation: any finishReason='length' or JSON truncation = INVALID. (4) rejectMissingArtifacts: all expected artifacts must be present, any missing = INVALID. These deterministic invalidation rules make tournaments scientifically defensible."
   },
   "evalConfig": {
     "baselineMode": {

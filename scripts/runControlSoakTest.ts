@@ -15,7 +15,7 @@
  */
 
 import { callSpecialistWithRetry } from '../server/ai/engine/specialists/aimlSpecialist';
-import { preflightSchemaHashCheck } from '../server/ai/engine/validation/schemaHashValidator';
+import { enforceIntegrityAtStartup, enforceIntegrityPerCall, enforceIntegrityPostRun } from '../server/ai/engine/validation/integrityEnforcement';
 import fs from 'fs';
 import path from 'path';
 
@@ -29,6 +29,8 @@ interface RunResult {
   rep: number;
   runId: string;
   timestamp: string;
+  status: 'VALID' | 'INVALID';
+  invalidReason?: string;
   systems: any;
   brand: any;
   critic: any;
@@ -42,6 +44,13 @@ interface RunResult {
     truncationCount: number;
     modelDriftCount: number;
     contentPenaltyApplied: boolean;
+  };
+  registrySnapshot: {
+    resolvedModelId: string;
+    provider: string;
+    maxTokensUsed: number;
+    temperature: number;
+    policyHash: string;
   };
 }
 
@@ -90,6 +99,7 @@ async function runDesignMacro(lane: string, rep: number): Promise<RunResult> {
     rep,
     runId,
     timestamp: new Date().toISOString(),
+    status: 'VALID',
     systems: { changes: [], anchorCount: 5 },
     brand: { changes: [], anchorCount: 6 },
     critic: { issues: [], suggestedFixes: [] },
@@ -104,6 +114,13 @@ async function runDesignMacro(lane: string, rep: number): Promise<RunResult> {
       modelDriftCount: 0,
       contentPenaltyApplied: false,
     },
+    registrySnapshot: {
+      resolvedModelId: 'openai/gpt-4o-2024-08-06',
+      provider: 'openai',
+      maxTokensUsed: 2000,
+      temperature: 0.7,
+      policyHash: 'sha256:baseline_v1_prompts',
+    },
   };
 
   console.log(`[${runId}] Completed in ${mockResult.duration.toFixed(1)}s, score=${mockResult.finalScore.toFixed(1)}`);
@@ -112,16 +129,28 @@ async function runDesignMacro(lane: string, rep: number): Promise<RunResult> {
 }
 
 /**
- * Calculate statistics for a lane
+ * Calculate statistics for a lane (VALID runs only)
+ * 
+ * INVALID runs are treated as "weather events" and logged separately.
  */
 function calculateLaneStats(results: RunResult[]): LaneStats {
-  const truthPenalties = results.map(r => r.truthPenalty);
-  const qualityPenalties = results.map(r => r.qualityPenalty);
-  const finalScores = results.map(r => r.finalScore);
-  const systemsAnchors = results.map(r => r.anchorCount.systems);
-  const brandAnchors = results.map(r => r.anchorCount.brand);
-  const costs = results.map(r => r.cost);
-  const durations = results.map(r => r.duration);
+  // Filter to VALID runs only
+  const validResults = results.filter(r => r.status === 'VALID');
+  const invalidResults = results.filter(r => r.status === 'INVALID');
+  
+  if (invalidResults.length > 0) {
+    console.warn(`\n⚠️  WARNING: ${invalidResults.length} INVALID run(s) detected in lane, excluding from stats:`);
+    invalidResults.forEach(r => {
+      console.warn(`  - ${r.runId}: ${r.invalidReason}`);
+    });
+  }
+  const truthPenalties = validResults.map(r => r.truthPenalty);
+  const qualityPenalties = validResults.map(r => r.qualityPenalty);
+  const finalScores = validResults.map(r => r.finalScore);
+  const systemsAnchors = validResults.map(r => r.anchorCount.systems);
+  const brandAnchors = validResults.map(r => r.anchorCount.brand);
+  const costs = validResults.map(r => r.cost);
+  const durations = validResults.map(r => r.duration);
 
   const mean = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / arr.length;
   const stdDev = (arr: number[]) => {
@@ -137,9 +166,11 @@ function calculateLaneStats(results: RunResult[]): LaneStats {
   const scoreMean = mean(finalScores);
   const scoreStdDev = stdDev(finalScores);
 
+  const passRate = (validResults.length / results.length) * 100;
+  
   return {
-    runCount: results.length,
-    passRate: 100, // All runs passed (no failures)
+    runCount: validResults.length,
+    passRate,
     truthPenalty: {
       median: median(truthPenalties),
       mean: mean(truthPenalties),
@@ -213,13 +244,17 @@ async function main() {
   console.log(`  - Concurrency: ${CONCURRENCY}`);
   console.log(`  - Baseline: ${BASELINE_PATH}\n`);
 
-  // Preflight: Validate schema hashes
-  console.log('🔍 Preflight: Validating schema hashes...');
+  // Integrity enforcement at startup
+  console.log('🔍 Integrity: Running startup checks...');
   try {
-    const validation = preflightSchemaHashCheck(BASELINE_PATH, true);
-    console.log(validation.message);
+    const integrityCheck = enforceIntegrityAtStartup(BASELINE_PATH);
+    if (!integrityCheck.valid) {
+      console.error('\n❌ INTEGRITY FAILED:', integrityCheck.message);
+      process.exit(1);
+    }
+    console.log(integrityCheck.message);
   } catch (error: any) {
-    console.error('\n❌ PREFLIGHT FAILED:', error.message);
+    console.error('\n❌ INTEGRITY FAILED:', error.message);
     process.exit(1);
   }
 

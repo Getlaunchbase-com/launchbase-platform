@@ -1604,3 +1604,126 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [x] Document audit-proof tournament infrastructure in TOURNAMENT_INFRASTRUCTURE.md
 - [ ] Save checkpoint with all improvements
 - [x] Generate tournament readiness report
+
+
+---
+
+## 🔬 SCIENTIFIC ENFORCEMENT SYSTEM (7-STEP IMPLEMENTATION)
+
+**Making tournaments audit-proof with deterministic invalidation rules**
+
+### Step 0: Integrity Kill Switch
+- [x] Add 4 enforcement flags to baseline_truth_v1.2.json:
+  - `requireSchemaHashMatch: true`
+  - `rejectSilentModelFallback: true`
+  - `rejectTruncation: true`
+  - `rejectMissingArtifacts: true`
+
+### Step 1: Runtime Schema Hash Enforcement (Hard Fail)
+- [x] Enforce schema hash matching at tournament runner startup (before any API calls)
+- [x] Add hash checks to runMegaTournamentV2.ts, runPilotTournament*.ts, runSoak*.ts
+- [x] Compare: craft schema hash, critic schema hash, content validator hash, truth penalty hash, prompt pack hashes
+- [x] Decision rule: if mismatch → throw Error("[INTEGRITY] Schema hash mismatch — refusing to run")
+- [x] Result: no accidental baseline drift ever gets scored
+
+### Step 2: MODEL_LOCK = Scientific Contract (Binding Enforcement)
+- [x] Add MODEL_LOCK binding check per specialist call
+- [x] Compare requestedModelId vs resolvedModelId (what AIML actually used)
+- [x] Rule: if requested !== resolved → return { status: "INVALID_MODEL_DRIFT" }
+- [x] Prevents fallback contamination (single biggest tournament poison)
+
+### Step 3: Global Truncation Rejection
+- [x] Rule: any finishReason === "length" or detected JSON truncation → INVALID run
+- [x] Add check: if (baseline.integrity.rejectTruncation && finishReason === "length") → return { status: "INVALID_TRUNCATION" }
+- [x] No more "it kinda parsed" runs slipping in
+
+### Step 4: Full Artifact Set Validation
+- [x] Baseline defines expected artifacts per run: systems.json, brand.json, critic.json, run_meta.json
+- [x] Enforce: if any missing → invalid
+- [x] Critical: prevents "partial runs" from creating fake averages
+
+### Step 5: 24-Run Control Soak (Real Variance Bands)
+- [x] Config: 4 lanes × 6 reps = 24 runs, Control only, ladder OFF, allowFallback false, strict artifact enforcement ON
+- [x] Outputs: SOAK_RESULTS.json, SOAK_SCORECARD.md, baseline_truth_v1.3.json (same schema, updated stats)
+- [x] Upgrade per lane: mean score, stddev, percentile bands (P10/P50/P90), truthPenalty distribution, anchorCount stats, failure mode rates
+- [x] Enhanced with VALID/INVALID status tracking and registry snapshot artifacts
+- [ ] Run actual Control soak test to collect real data
+
+### Step 6: Weather Dashboard MVP
+- [x] Compute 6 KPIs per lane + per stack:
+  1. passRate
+  2. invalidRate (drift + truncation + missing artifacts)
+  3. truthPenalty mean/median
+  4. finalScore mean/stddev
+  5. retryRate + escalationRate (if ladder enabled)
+  6. costPerValidRun
+- [x] Render: markdown dashboard, JSON export, (later: real UI)
+- [x] Created generateWeatherDashboard.ts script
+
+### Step 7: Challenger On-Ramp (Pilot Funnel)
+- [x] Phase A - Registry + Token Fit Check: registry exists, recommended maxTokens known, truncation risk flagged
+- [x] Phase B - Pilot Gate: Start with Web + Marketing, 2 reps each, 4 runs total
+- [x] Pass rules: 4/4 valid, 0 truncation, 0 drift, beat control by +3 OR match score w/ lower truthPenalty
+- [x] Only then: expand to 4 lanes, then expand reps
+- [x] Guarantees you only scale models that behave
+- [x] Added registry snapshot artifacts per pilot run
+
+### Deterministic Invalidation Rules (Core Principle)
+- drift = invalid
+- truncation = invalid
+- missing artifacts = invalid
+- schema mismatch = invalid
+- **This is what makes it "real science" instead of vibes**
+
+
+---
+
+## 🎯 NEXT 3 STEPS (CLEAN DECISION-GRADE DATA)
+
+### Step 1: Run 24-Run Control Soak Test
+- [ ] Verify strict baseline mode in runControlSoakTest.ts:
+  - enableLadder: false
+  - allowModelFallback: false
+  - integrity.requireSchemaHashMatch: true
+  - integrity.rejectTruncation: true
+  - integrity.rejectSilentModelFallback: true
+  - integrity.rejectMissingArtifacts: true
+- [ ] Run: `pnpm tsx scripts/runControlSoakTest.ts`
+- [ ] Expected outputs (hard requirement):
+  - SOAK_RESULTS.json
+  - SOAK_SCORECARD.md
+  - baseline_truth_v1.3.json (same schema as v1.2, updated stats)
+- [ ] Pass criteria: 24/24 valid runs, 0 truncations, 0 model drift, 0 missing artifacts
+- [ ] If anything INVALID → treat as "weather event", log separately, do NOT average in
+
+### Step 2: Model Weather Dashboard (MVP)
+- [ ] Generate single markdown dashboard from SOAK_RESULTS.json + baseline_truth_v1.3.json
+- [ ] Per lane × per role metrics:
+  - passRate
+  - invalidRate (drift/trunc/missing artifacts)
+  - truthPenalty (mean/median + trigger histogram)
+  - finalScore (mean/stddev + P10/P50/P90)
+  - token + jsonSize drift bands
+  - cost per valid run
+- [ ] Spots: "good but verbose" models (token drift), "confidently vague" models (truthPenalty triggers), "API weather" providers (invalid spikes)
+
+### Step 3: Challenger Pilots (Lane-by-Lane Funnel)
+- [ ] Pilot A (Web + Marketing, 2 reps each = 4 runs):
+  - Must be 4/4 valid
+  - 0 truncation
+  - 0 drift
+  - Score win rule: ≥ +3 vs Control OR tie with lower truthPenalty
+- [ ] Only then expand to Pilot B (all 4 lanes, 2 reps each = 8 runs)
+- [ ] Then tournament scale
+- [ ] Add "registry snapshot artifact" per pilot run:
+  - resolved model id
+  - provider
+  - maxTokens used
+  - temperature
+  - policy hash
+- [ ] Makes later audits dead simple ("why did this model win last Tuesday?")
+
+### Challenger Classification
+- **Grok (xAI):** LLM challenger (web/app/marketing lanes primarily)
+- **Groq (hardware inference):** "model delivery" + specific model (e.g., Llama variants), integrity rules prevent drift/fallback
+- **Asset/image models (Flux/SD3):** Artwork lane only, asset-appropriate truth rules (no "liar" flags for not producing layout/copy constraints)
