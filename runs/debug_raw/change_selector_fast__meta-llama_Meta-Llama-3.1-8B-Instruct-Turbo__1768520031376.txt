@@ -1,0 +1,65 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTT4RY5-2j9zxn-9be92e293ff69873
+Input Tokens: 2976
+Output Tokens: 396
+Finish Reason: stop
+
+=== RAW TEXT (1849 chars) ===
+To solve this problem, we will follow the selection criteria and hard rules laid out in the problem statement. We will create a Python function that takes the input data and context as arguments and returns the selected changes.
+
+```python
+import json
+
+def select_changes(input_data, context):
+    # 1. Filter out unbuildable changes
+    candidate_changes = [
+        change for change in input_data["candidateChanges"]
+        if not change.get("unbuildable", False)
+    ]
+
+    # 2. Filter out duplicate target keys
+    target_key_to_change = {}
+    for change in candidate_changes:
+        change["anchor"] = {
+            "type": "content",
+            "currentValue": context["currentDesign"].get(change["targetKey"], "")
+        }
+        if change["targetKey"] not in target_key_to_change or (
+            change["confidence"] > target_key_to_change[change["targetKey"]]["confidence"]
+        ):
+            target_key_to_change[change["targetKey"]] = change
+
+    # 3. Select exactly 8 changes
+    selected_changes = []
+    for change in target_key_to_change.values():
+        selected_changes.append(change)
+        if len(selected_changes) == 8:
+            break
+
+    # 4. Sort selected changes by confidence and then by rationale length
+    selected_changes.sort(
+        key=lambda change: (change["confidence"], len(change["rationale"]))
+    )
+
+    return {
+        "selectedChanges": selected_changes
+    }
+
+# Example usage:
+input_data = {
+    # ... copy and paste input data here ...
+}
+
+context = {
+    # ... copy and paste context here ...
+}
+
+output = select_changes(input_data, context)
+print(json.dumps(output, indent=4))
+```
+
+This code first filters out unbuildable changes and duplicates. Then it selects the top 8 changes by confidence and then by rationale length. Finally, it returns the selected changes in the desired format.
+
+=== PARSED JSON ===
+NULL (parse failed)

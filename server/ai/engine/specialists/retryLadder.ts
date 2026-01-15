@@ -48,6 +48,16 @@ export const CRITIC_MODEL_LADDER: ModelLadderConfig[] = [
 ];
 
 /**
+ * Model ladder for selector roles
+ * Fast instruct models only (no frontier models)
+ * Llama 8B primary, Qwen 7B fallback
+ */
+export const SELECTOR_MODEL_LADDER: ModelLadderConfig[] = [
+  { model: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo", timeoutMs: 60000 },
+  { model: "Qwen/Qwen2.5-7B-Instruct-Turbo", timeoutMs: 60000 },
+];
+
+/**
  * Budget safety threshold
  * If a single specialist call exceeds this, auto-escalate
  */
@@ -69,14 +79,29 @@ export function getModelLadderForRole(role: string): ModelLadderConfig[] {
   if (role.includes("critic")) {
     return CRITIC_MODEL_LADDER;
   }
+  if (role.includes("selector")) {
+    return SELECTOR_MODEL_LADDER;
+  }
   return DESIGNER_MODEL_LADDER;
 }
 
 /**
  * Check if a stopReason should trigger a retry
+ * Role-aware: selector can retry on schema_failed, others cannot
  */
-export function shouldRetry(stopReason: string): boolean {
-  return RETRYABLE_STOP_REASONS.has(stopReason);
+export function shouldRetry(stopReason: string, role?: string): boolean {
+  // Global retryable reasons (all roles)
+  if (RETRYABLE_STOP_REASONS.has(stopReason)) {
+    return true;
+  }
+  
+  // Selector-specific: allow one retry on schema failures
+  // (Small models sometimes miscount; retry is cheap and effective)
+  if (role && role.includes('selector') && (stopReason === 'schema_failed' || stopReason === 'ajv_failed')) {
+    return true;
+  }
+  
+  return false;
 }
 
 /**

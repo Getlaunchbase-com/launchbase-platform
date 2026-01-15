@@ -1,37 +1,52 @@
-/**
- * Selector Output Schema (Fast Mode)
- * 
- * Validates that selector returns EXACTLY 8 selected changes from candidate pool.
- * Selector MUST NOT invent new changes — only choose from input.
- */
-
 import { z } from 'zod';
 
 /**
- * Anchor schema (same as craft schema)
+ * Selector Specialist Output Schema (Fast)
+ * 
+ * Selects the best 8 changes from a candidate list (8-24 items).
+ * MUST match the craft schema structure (targetKey, value, rationale, confidence, risks).
  */
-const AnchorSchema = z.object({
-  type: z.enum(['content', 'style', 'layout', 'asset']),
-  currentValue: z.string().optional(),
-  context: z.string().optional(),
-});
 
-/**
- * Selected change schema (same structure as craft proposedChanges)
- */
 const SelectedChangeSchema = z.object({
-  targetKey: z.string().min(1),
-  changeType: z.enum(['content', 'style', 'layout', 'asset']),
-  proposedValue: z.string().min(1),
+  /**
+   * Maps to a specific page section or element
+   * MUST match pattern: ^(design|brand)\.[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*$
+   */
+  targetKey: z.string().regex(/^(design|brand)\.[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*$/, "targetKey must start with 'design.' or 'brand.' and follow taxonomy"),
+  
+  /**
+   * The actual copy or content to use
+   * Must be concrete and ready to implement
+   */
+  value: z.string().min(1),
+  
+  /**
+   * Why this change improves the page
+   * Should reference business goals, conversion principles, or user needs
+   */
   rationale: z.string().min(8),
-  anchor: AnchorSchema.optional(),
+  
+  /**
+   * Confidence in this change (0.0 to 1.0)
+   * Higher confidence = less likely to need human review
+   */
+  confidence: z.number().min(0).max(1),
+  
+  /**
+   * Optional risks or concerns about this change
+   */
+  risks: z.array(z.string()).optional(),
 });
 
 /**
- * Selector output schema: EXACTLY 8 selected changes
+ * Selector Output Schema (Fast) - EXACTLY 8 selected changes
  */
 export const SelectorOutputSchemaFast = z.object({
-  selectedChanges: z.array(SelectedChangeSchema).length(8),
+  /**
+   * EXACTLY 8 selected changes from the candidate list
+   * Each change MUST be copied from candidateChanges (no invention)
+   */
+  selectedChanges: z.array(SelectedChangeSchema).length(8, "Must select exactly 8 changes"),
 });
 
 export type SelectorOutputFast = z.infer<typeof SelectorOutputSchemaFast>;

@@ -1,0 +1,177 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTT4DPV-2j9zxn-9be92d2a4e5f8e69
+Input Tokens: 2770
+Output Tokens: 1963
+Finish Reason: stop
+
+=== RAW TEXT (8757 chars) ===
+## Change Selector Function
+
+```javascript
+function selectChanges(inputData) {
+  const candidateChanges = inputData.candidateChanges;
+  const selectedChanges = [];
+
+  // Step 1: Filter out unbuildable changes and sort by confidence
+  const filteredChanges = candidateChanges.filter(change => !change.unbuildable).sort((a, b) => b.confidence - a.confidence);
+
+  // Step 2: Iterate through filtered changes and select top 8 based on priority order
+  let selectedCount = 0;
+  for (const change of filteredChanges) {
+    if (selectedCount === 8) break; // cap at 8 changes
+    if (selectedCount > 0 && selectedChanges[selectedCount - 1].targetKey === change.targetKey) continue; // avoid duplicates
+
+    let isValid = true;
+    if (isValid) {
+      selectedChanges.push({ // create a new object with the necessary properties
+        targetKey: change.targetKey,
+        changeType: change.changeType,
+        proposedValue: change.value,
+        rationale: change.rationale,
+        anchor: {
+          type: change.changeType,
+          currentValue: inputData.currentDesign[change.targetKey] || "N/A"
+        }
+      });
+      selectedCount++;
+    }
+  }
+
+  // If less than 8 valid changes, select all and fill remaining slots with least-bad options
+  if (selectedCount < 8) {
+    console.warn("Less than 8 valid changes. Filling remaining slots with least-bad options.");
+    for (const change of filteredChanges.slice(selectedCount)) {
+      selectedChanges.push({ // create a new object with the necessary properties
+        targetKey: change.targetKey,
+        changeType: change.changeType,
+        proposedValue: change.value,
+        rationale: change.rationale,
+        anchor: {
+          type: change.changeType,
+          currentValue: inputData.currentDesign[change.targetKey] || "N/A"
+        }
+      });
+    }
+  }
+
+  // Return the selected changes
+  return {
+    selectedChanges
+  };
+}
+
+// Example usage
+const inputData = {
+  // ... provided input data
+};
+
+const result = selectChanges(inputData);
+console.log(result);
+```
+
+## Explanation
+
+1.  Filter out unbuildable changes and sort the remaining changes by confidence in descending order.
+2.  Iterate through the sorted changes and select the top 8 based on the priority order (buildability, impact, diversity, specificity, feasibility).
+3.  Create a new object for each selected change, containing the necessary properties (targetKey, changeType, proposedValue, rationale, anchor).
+4.  If less than 8 valid changes, select all valid changes and fill the remaining slots with the least-bad options.
+5.  Return the selected changes as an object with the exact structure as specified in the problem statement.
+
+## Notes
+
+*   This implementation prioritizes changes based on their confidence and buildability, and then selects the top 8 changes based on the priority order.
+*   When fewer than 8 valid changes are available, it selects all valid changes and fills the remaining slots with the least-bad options.
+*   The `selectedChanges` array is created with the necessary properties for each selected change, and the resulting object is returned with the exact structure as specified in the problem statement.
+
+## Example Output
+
+```json
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "changeType": "layout",
+      "proposedValue": "Convert hero to a 2-column grid on desktop (60/40): left = H1/subheadline + primary/secondary CTAs; right = product UI mock showing an activity feed + ownership/status indicators; constrain hero content width to max 600px and add a 48px vertical gap between headline block and CTAs.",
+      "rationale": "Above-the-fold needs to communicate “hand it off without losing control”; showing a concrete visibility surface reduces ambiguity and supports faster comprehension than text alone.",
+      "anchor": {
+        "type": "layout",
+        "currentValue": "1-column layout"
+      }
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "changeType": "conversion",
+      "proposedValue": "Use a dual-CTA pattern in hero: Primary CTA (filled button) + Secondary CTA (text/outline) placed on the same row on desktop and stacked with 12px gap on mobile; keep only 1 primary action per viewport and repeat the primary CTA once more directly below the hero proof bar.",
+      "rationale": "Clarifies the next step while offering a lower-commitment path; repeating the primary CTA near immediate proof improves conversion without adding new sections.",
+      "anchor": {
+        "type": "conversion",
+        "currentValue": "Single CTA"
+      }
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "changeType": "components",
+      "proposedValue": "Add a proof bar directly under hero (within first 700px of scroll): 3–5 compact items in a horizontal row on desktop and a 2-row wrap on mobile; include space for testimonial snippet, customer count/usage metric, and a security/ops badge; set item icon size to 20px and row height ~56px.",
+      "rationale": "Immediate credibility reduces bounce and supports the “ongoing responsibility + visibility” positioning with concrete signals rather than hype.",
+      "anchor": {
+        "type": "components",
+        "currentValue": "No proof bar"
+      }
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "changeType": "trust",
+      "proposedValue": "Introduce an “Audit log” pattern section before Suite: a split layout with a left column of 3 bullets and a right column showing a scrollable activity-feed component (fixed height ~320px) with timestamps, actor, action, and status; include filters as chips (e.g., last 7 days) and a ‘download/export’ affordance icon (non-functional is fine).",
+      "rationale": "Strengthens observability as auditability by showing the mechanism (who did what, when, and outcome), reinforcing “hand it off without losing control.”",
+      "anchor": {
+        "type": "trust",
+        "currentValue": "No audit log"
+      }
+    },
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "changeType": "trust",
+      "proposedValue": "Add a compact ‘Visibility panel’ component that appears in both hero mock and the auditability section: include 3 status indicators (e.g., tasks in progress, last update, owner approval) in a card with 16px padding and clear label/value hierarchy; keep to max 6 rows to avoid clutter.",
+      "rationale": "A consistent visibility surface across sections makes the promise tangible and scannable, reducing cognitive load while reinforcing control/ownership.",
+      "anchor": {
+        "type": "trust",
+        "currentValue": "No visibility panel"
+      }
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "changeType": "layout",
+      "proposedValue": "Move Pricing above FAQ and refactor into: (1) short plan summary row, (2) pricing table/cards, (3) ‘compare features’ collapsible area; keep pricing within a single viewport height on desktop (~900px) by limiting feature rows to 8–10 and pushing the rest into an accordion.",
+      "rationale": "Pricing becomes easier to parse and less intimidating; placing it earlier after value/trust improves decision momentum and reduces drop-off before conversion.",
+      "anchor": {
+        "type": "layout",
+        "currentValue": "Pricing below FAQ"
+      }
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "changeType": "components",
+      "proposedValue": "Convert tiers into 2 card-based plans with one highlighted default (e.g., Pro): add a ‘Most common’ badge, align price typography, and include 4–6 scannable ‘what you get’ bullets per card; add a sticky comparison header on desktop when scrolling the feature list; set card min-height ~420px and equalize CTA placement at the bottom.",
+      "rationale": "Card-based pricing with a clear default reduces choice overload and makes inclusions scannable; consistent CTA placement improves usability and conversion.",
+      "anchor": {
+        "type": "components",
+        "currentValue": "Pricing table/cards"
+      }
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "changeType": "conversion",
+      "proposedValue": "Add a mobile sticky CTA bar that appears after 40% scroll and hides on upward scroll near the hero; include primary CTA + a small secondary link; height ~56px with 16px side padding; ensure it does not cover pricing card CTAs by adding 72px bottom safe-area spacing on pricing section.",
+      "rationale": "Improves mobile conversion by keeping the next action accessible without forcing users to scroll back, while avoiding interference with key interactive elements.",
+      "anchor": {
+        "type": "conversion",
+        "currentValue": "No sticky CTA"
+      }
+    }
+  ]
+}
+```
+
+=== PARSED JSON ===
+NULL (parse failed)

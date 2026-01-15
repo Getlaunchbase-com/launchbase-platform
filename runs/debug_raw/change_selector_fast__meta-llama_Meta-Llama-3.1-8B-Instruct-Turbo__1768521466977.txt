@@ -1,0 +1,162 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTTBmr3-2j9zxn-9be9512cd8c95ec1
+Input Tokens: 2555
+Output Tokens: 1253
+Finish Reason: stop
+
+=== RAW TEXT (5401 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Add an audit-log pattern section using a split layout: left = 4–6 bullet points; right = scrollable log component (max height 320px desktop / 240px mobile) with timestamps, actor, action, and status. Include filters as chips (e.g., 'Website', 'Payments', 'Ops') to demonstrate auditability without extra copy.",
+      "rationale": "Strengthens trust via concrete observability artifacts (who did what, when) and supports the “hand it off without losing control” promise with a verifiable UI pattern.",
+      "confidence": 0.9,
+      "risks": [
+        "Needs careful visual design to avoid looking like a fake table screenshot"
+      ]
+    },
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "value": "Introduce a compact visibility panel component (cards) showing 3 status indicators: 'On track', 'Needs review', 'Blocked' with counts. Place it immediately after How-it-works on desktop as a 3-card row; on mobile as a horizontal scroll with snap and 16px card gaps.",
+      "rationale": "Makes the product’s responsibility + visibility concept tangible and quickly scannable, reinforcing control and auditability rather than hype.",
+      "confidence": 0.83,
+      "risks": [
+        "Horizontal scroll can be missed if affordance isn’t clear"
+      ]
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Convert pricing into a 2-card layout (Starter/Pro) with one highlighted default tier. Add a 'What you get' bullet list (5–7 bullets) inside each card and a single comparison row beneath (3 columns max) for the most-debated items. Add a monthly/annual toggle with 12px spacing and keep price typography dominant (min 32px).",
+      "rationale": "Improves pricing parse speed by reducing table scanning, clarifies inclusions per tier, and focuses attention on the decision-driving differences without overwhelming detail.",
+      "confidence": 0.88,
+      "risks": [
+        "If differences are too subtle, the highlighted tier may feel arbitrary"
+      ]
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Add a secondary CTA adjacent to the primary CTA in the hero (desktop inline; mobile stacked with 12px gap). Keep primary CTA as the only filled style; secondary as outline. Add a small reassurance row directly below CTAs (icon + 2 short items) without changing headline/subheadline.",
+      "rationale": "Creates a clearer conversion path for users not ready to start immediately while reducing friction with immediate reassurance near the decision point.",
+      "confidence": 0.8,
+      "risks": [
+        "Secondary CTA may siphon clicks if visual hierarchy isn’t strict"
+      ]
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Insert a proof bar directly under the hero (within first 600px scroll): 1-row on desktop, 2-row wrap on mobile. Include testimonial snippet card(s) + any measurable proof placeholders + security/visibility badges (chips). Cap to 4–6 items; use grayscale logos if available.",
+      "rationale": "Moves trust signals earlier to support the primary CTA and reduces reliance on later-page testimonials that many users never reach.",
+      "confidence": 0.82,
+      "risks": [
+        "If proof is weak or sparse, it can reduce trust instead of increasing it"
+      ]
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder homepage sections to: Hero → Proof bar → Problem/Solution → How it works (3 steps) → Visibility/Auditability (panel + log) → Suite/Features → Pricing → FAQ → Footer. Keep total primary sections to 7–8 and remove any redundant “benefits” sections by merging into Suite.",
+      "rationale": "Reduces cognitive load by presenting trust/observability earlier, creates a more linear decision journey, and ensures pricing appears after users understand the handoff + control model.",
+      "confidence": 0.84,
+      "risks": [
+        "If current navigation anchors depend on old order, they’ll need updating"
+      ]
+    },
+    {
+      "targetKey": "design.mobile.heroStacking",
+      "value": "On mobile, stack hero elements as: H1 → subheadline → bullets → CTA stack → proof chips → UI preview. Limit hero preview to 240–280px height and use a swipeable carousel (max 2 frames) if multiple UI states are needed.",
+      "rationale": "Improves above-the-fold clarity and reduces early scroll fatigue by prioritizing meaning and action before visuals.",
+      "confidence": 0.87,
+      "risks": [
+        "Carousel controls need clear affordance to avoid being ignored"
+      ]
+    },
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Restructure hero into a 2-column grid on desktop (7/5): left = H1 + subheadline + primary/secondary CTA row; right = product UI preview focused on visibility (activity feed + status chips). Add a 3-item bullet list under subheadline (max 3 lines each) and keep hero height to ~70vh desktop / auto on mobile.",
+      "rationale": "Clarifies the core promise above the fold, improves scannability with bullets, and visually anchors the “hand it off without losing control” concept via an audit/visibility preview rather than abstract claims.",
+      "confidence": 0.86,
+      "risks": [
+        "Requires a credible UI preview asset to avoid feeling generic"
+      ]
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Add an audit-log pattern section using a split layout: left = 4–6 bullet points; right = scrollable log component (max height 320px desktop / 240px mobile) with timestamps, actor, action, and status. Include filters as chips (e.g., 'Website', 'Payments', 'Ops') to demonstrate auditability without extra copy.",
+      "rationale": "Strengthens trust via concrete observability artifacts (who did what, when) and supports the “hand it off without losing control” promise with a verifiable UI pattern.",
+      "confidence": 0.9,
+      "risks": [
+        "Needs careful visual design to avoid looking like a fake table screenshot"
+      ]
+    },
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "value": "Introduce a compact visibility panel component (cards) showing 3 status indicators: 'On track', 'Needs review', 'Blocked' with counts. Place it immediately after How-it-works on desktop as a 3-card row; on mobile as a horizontal scroll with snap and 16px card gaps.",
+      "rationale": "Makes the product’s responsibility + visibility concept tangible and quickly scannable, reinforcing control and auditability rather than hype.",
+      "confidence": 0.83,
+      "risks": [
+        "Horizontal scroll can be missed if affordance isn’t clear"
+      ]
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Convert pricing into a 2-card layout (Starter/Pro) with one highlighted default tier. Add a 'What you get' bullet list (5–7 bullets) inside each card and a single comparison row beneath (3 columns max) for the most-debated items. Add a monthly/annual toggle with 12px spacing and keep price typography dominant (min 32px).",
+      "rationale": "Improves pricing parse speed by reducing table scanning, clarifies inclusions per tier, and focuses attention on the decision-driving differences without overwhelming detail.",
+      "confidence": 0.88,
+      "risks": [
+        "If differences are too subtle, the highlighted tier may feel arbitrary"
+      ]
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Add a secondary CTA adjacent to the primary CTA in the hero (desktop inline; mobile stacked with 12px gap). Keep primary CTA as the only filled style; secondary as outline. Add a small reassurance row directly below CTAs (icon + 2 short items) without changing headline/subheadline.",
+      "rationale": "Creates a clearer conversion path for users not ready to start immediately while reducing friction with immediate reassurance near the decision point.",
+      "confidence": 0.8,
+      "risks": [
+        "Secondary CTA may siphon clicks if visual hierarchy isn’t strict"
+      ]
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Insert a proof bar directly under the hero (within first 600px scroll): 1-row on desktop, 2-row wrap on mobile. Include testimonial snippet card(s) + any measurable proof placeholders + security/visibility badges (chips). Cap to 4–6 items; use grayscale logos if available.",
+      "rationale": "Moves trust signals earlier to support the primary CTA and reduces reliance on later-page testimonials that many users never reach.",
+      "confidence": 0.82,
+      "risks": [
+        "If proof is weak or sparse, it can reduce trust instead of increasing it"
+      ]
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder homepage sections to: Hero → Proof bar → Problem/Solution → How it works (3 steps) → Visibility/Auditability (panel + log) → Suite/Features → Pricing → FAQ → Footer. Keep total primary sections to 7–8 and remove any redundant “benefits” sections by merging into Suite.",
+      "rationale": "Reduces cognitive load by presenting trust/observability earlier, creates a more linear decision journey, and ensures pricing appears after users understand the handoff + control model.",
+      "confidence": 0.84,
+      "risks": [
+        "If current navigation anchors depend on old order, they’ll need updating"
+      ]
+    },
+    {
+      "targetKey": "design.mobile.heroStacking",
+      "value": "On mobile, stack hero elements as: H1 → subheadline → bullets → CTA stack → proof chips → UI preview. Limit hero preview to 240–280px height and use a swipeable carousel (max 2 frames) if multiple UI states are needed.",
+      "rationale": "Improves above-the-fold clarity and reduces early scroll fatigue by prioritizing meaning and action before visuals.",
+      "confidence": 0.87,
+      "risks": [
+        "Carousel controls need clear affordance to avoid being ignored"
+      ]
+    },
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Restructure hero into a 2-column grid on desktop (7/5): left = H1 + subheadline + primary/secondary CTA row; right = product UI preview focused on visibility (activity feed + status chips). Add a 3-item bullet list under subheadline (max 3 lines each) and keep hero height to ~70vh desktop / auto on mobile.",
+      "rationale": "Clarifies the core promise above the fold, improves scannability with bullets, and visually anchors the “hand it off without losing control” concept via an audit/visibility preview rather than abstract claims.",
+      "confidence": 0.86,
+      "risks": [
+        "Requires a credible UI preview asset to avoid feeling generic"
+      ]
+    }
+  ]
+}

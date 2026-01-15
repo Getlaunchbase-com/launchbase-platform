@@ -16,6 +16,7 @@ import { completeJson } from "../../providers/providerFactory";
 import type { ArtifactV1 } from "../types";
 import { CraftOutputSchema, getCraftSchemaForRole } from "./schemas/craft.schema";
 import { CriticOutputSchema } from "./schemas/critic.schema";
+import { SelectorOutputSchemaFast } from "./schemas/selector.schema";
 import {
   getModelLadderForRole,
   shouldRetry,
@@ -227,10 +228,15 @@ export async function callSpecialistAIML(
     r === "critic" ||
     r.startsWith("design_critic");
 
+  const isSelectorRole = (r: string) =>
+    r === "change_selector_fast" ||
+    r.startsWith("selector_");
+
   // Single schema selector (uses getCraftSchemaForRole for fast vs normal)
   const getSchemaForRole = (r: string) => {
     if (isCraftRole(r)) return getCraftSchemaForRole(r);
     if (isCriticRole(r)) return CriticOutputSchema;
+    if (isSelectorRole(r)) return SelectorOutputSchemaFast;
     throw new Error(`[SCHEMA_ROUTER] Unknown role="${r}" — no schema available`);
   };
 
@@ -606,7 +612,7 @@ export async function callSpecialistWithRetry(
       // If contentPhase is "after_schema", skip validation here (caller will handle it)
       
       // If not retryable, return failure immediately
-      if (!shouldRetry(result.stopReason)) {
+      if (!shouldRetry(result.stopReason, role)) {
         console.log(`[RETRY_LADDER] Non-retryable failure: ${result.stopReason}`);
         return { ...result, retryMeta };
       }

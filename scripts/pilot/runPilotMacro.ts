@@ -193,7 +193,7 @@ async function runSelector(params: {
       },
       roleConfig: params.roleConfig,
     },
-    false // enableLadder
+    true // enableLadder - retry on JSON parse failures
   );
 
   // Parse + validate using existing flow
