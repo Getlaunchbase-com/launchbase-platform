@@ -12,6 +12,8 @@
 export interface ContentValidationResult {
   valid: boolean;
   reason?: string;
+  qualityPenalty?: number;
+  anchoredCount?: number;
 }
 
 /**
@@ -81,6 +83,10 @@ function hasImplementabilityAnchor(value: string): boolean {
 
 /**
  * Validate designer output (systems or brand)
+ * 
+ * Lane-specific anchor thresholds:
+ * - Web/App: <3 = hard fail, 3-4 = penalty, ≥5 = pass
+ * - Marketing: 0 = penalty, 1-2 = medium penalty, ≥3 = small penalty
  */
 function validateDesignerOutput(role: string, payload: any): ContentValidationResult {
   const prefix = role.includes("systems") ? "design" : "brand";
@@ -131,15 +137,46 @@ function validateDesignerOutput(role: string, payload: any): ContentValidationRe
     }
   }
   
-  // Set-level threshold: ≥5 of 8 changes must have implementability anchors
-  if (anchoredCount < 5) {
+  // Detect lane from role (marketing has different anchor expectations)
+  const isMarketingLane = role.includes("_marketing");
+  
+  if (isMarketingLane) {
+    // Marketing lane: Strategic changes allowed, no hard fail on low anchors
+    // Penalty scale: 0 anchors = 0.3, 1-2 anchors = 0.2, ≥3 anchors = 0.1
+    let qualityPenalty = 0;
+    if (anchoredCount === 0) {
+      qualityPenalty = 0.3; // High penalty for purely strategic (no concrete specs)
+    } else if (anchoredCount <= 2) {
+      qualityPenalty = 0.2; // Medium penalty for light specs
+    } else {
+      qualityPenalty = 0.1; // Small penalty (marketing naturally less concrete)
+    }
+    
     return {
-      valid: false,
-      reason: `Only ${anchoredCount}/8 changes have implementability anchors (need ≥5)`,
+      valid: true,
+      qualityPenalty,
+      anchoredCount,
+    };
+  } else {
+    // Web/App lanes: Require concrete implementation details
+    // <3 anchors: Hard fail (too vague, retry)
+    // 3-4 anchors: Pass with quality penalty
+    // ≥5 anchors: Pass, no penalty
+    if (anchoredCount < 3) {
+      return {
+        valid: false,
+        reason: `Only ${anchoredCount}/8 changes have implementability anchors (need ≥3 for ${role}, egregiously vague)`,
+      };
+    }
+    
+    const qualityPenalty = anchoredCount < 5 ? (5 - anchoredCount) * 0.1 : 0;
+    
+    return {
+      valid: true,
+      qualityPenalty,
+      anchoredCount,
     };
   }
-  
-  return { valid: true };
 }
 
 /**

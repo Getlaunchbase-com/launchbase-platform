@@ -1,0 +1,33 @@
+{
+  "runId": "pilot_v2_swarm_gate_a_control_marketing_rep2_1768435023241",
+  "lane": "marketing",
+  "stack": "Control Champion (4o + Opus)",
+  "policyName": "swarm_gate_a_control",
+  "rep": 2,
+  "modelLocks": {
+    "systems": {
+      "requested": "gpt-4o-2024-08-06",
+      "resolved": "gpt-4o-2024-08-06"
+    },
+    "brand": {
+      "requested": "gpt-4o-2024-08-06",
+      "resolved": "gpt-4o-2024-08-06"
+    },
+    "critic": {
+      "requested": "claude-opus-4-1-20250805",
+      "resolved": "claude-opus-4-1-20250805"
+    }
+  },
+  "pass": false,
+  "failureReason": "Systems: 0/8, Brand: 8/8, Critic: 10/10, RequiredFields: true",
+  "validationDetails": {
+    "systemsChanges": 0,
+    "brandChanges": 8,
+    "criticIssues": 10,
+    "criticFixes": 10,
+    "hasRequiredFields": true
+  },
+  "durationMs": 58954,
+  "costUsd": 0.1078,
+  "liarFlags": []
+}

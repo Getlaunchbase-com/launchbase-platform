@@ -1,0 +1,160 @@
+=== RAW RESPONSE (designer_brand_fast_marketing) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy5Nlj3l6NLl1yV8l4NpCDXu60HmI
+Input Tokens: 738
+Output Tokens: 550
+Finish Reason: stop
+
+=== RAW TEXT (2113 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.marketingHeadline",
+      "value": "Sans-serif bold, 36px",
+      "rationale": "Enhances clarity and readability.",
+      "confidence": 0.9,
+      "risks": ["May not suit all brand identities"]
+    },
+    {
+      "targetKey": "brand.type.benefitText",
+      "value": "Serif, 18px, 1.5 line height",
+      "rationale": "Improves readability and comfort.",
+      "confidence": 0.85,
+      "risks": ["Could impact visual harmony"]
+    },
+    {
+      "targetKey": "brand.color.conversionPrimary",
+      "value": "#0066CC",
+      "rationale": "Blue conveys trust and stability.",
+      "confidence": 0.92,
+      "risks": ["May not stand out enough"]
+    },
+    {
+      "targetKey": "brand.color.trustSignals",
+      "value": "#4CAF50",
+      "rationale": "Green is associated with reliability.",
+      "confidence": 0.9,
+      "risks": ["Could blend with other elements"]
+    },
+    {
+      "targetKey": "brand.components.pricingTable",
+      "value": "Use shaded rows for hierarchy",
+      "rationale": "Improves comparison clarity.",
+      "confidence": 0.88,
+      "risks": ["May add visual clutter"]
+    },
+    {
+      "targetKey": "brand.components.trustBadge",
+      "value": "Circular with blue outline",
+      "rationale": "Enhances visibility and trust.",
+      "confidence": 0.87,
+      "risks": ["Could distract from main content"]
+    },
+    {
+      "targetKey": "brand.components.ctaButton",
+      "value": "Rounded corners, 20px padding",
+      "rationale": "Increases clickability and appeal.",
+      "confidence": 0.9,
+      "risks": ["May not fit all page designs"]
+    },
+    {
+      "targetKey": "brand.visual.tierHierarchy",
+      "value": "Larger top tier, subtle shadows",
+      "rationale": "Highlights premium options.",
+      "confidence": 0.86,
+      "risks": ["Might overshadow other tiers"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["May require A/B testing", "Could affect brand consistency"],
+  "assumptions": ["Current brand values are maintained", "Existing layout supports changes"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.marketingHeadline",
+      "value": "Sans-serif bold, 36px",
+      "rationale": "Enhances clarity and readability.",
+      "confidence": 0.9,
+      "risks": [
+        "May not suit all brand identities"
+      ]
+    },
+    {
+      "targetKey": "brand.type.benefitText",
+      "value": "Serif, 18px, 1.5 line height",
+      "rationale": "Improves readability and comfort.",
+      "confidence": 0.85,
+      "risks": [
+        "Could impact visual harmony"
+      ]
+    },
+    {
+      "targetKey": "brand.color.conversionPrimary",
+      "value": "#0066CC",
+      "rationale": "Blue conveys trust and stability.",
+      "confidence": 0.92,
+      "risks": [
+        "May not stand out enough"
+      ]
+    },
+    {
+      "targetKey": "brand.color.trustSignals",
+      "value": "#4CAF50",
+      "rationale": "Green is associated with reliability.",
+      "confidence": 0.9,
+      "risks": [
+        "Could blend with other elements"
+      ]
+    },
+    {
+      "targetKey": "brand.components.pricingTable",
+      "value": "Use shaded rows for hierarchy",
+      "rationale": "Improves comparison clarity.",
+      "confidence": 0.88,
+      "risks": [
+        "May add visual clutter"
+      ]
+    },
+    {
+      "targetKey": "brand.components.trustBadge",
+      "value": "Circular with blue outline",
+      "rationale": "Enhances visibility and trust.",
+      "confidence": 0.87,
+      "risks": [
+        "Could distract from main content"
+      ]
+    },
+    {
+      "targetKey": "brand.components.ctaButton",
+      "value": "Rounded corners, 20px padding",
+      "rationale": "Increases clickability and appeal.",
+      "confidence": 0.9,
+      "risks": [
+        "May not fit all page designs"
+      ]
+    },
+    {
+      "targetKey": "brand.visual.tierHierarchy",
+      "value": "Larger top tier, subtle shadows",
+      "rationale": "Highlights premium options.",
+      "confidence": 0.86,
+      "risks": [
+        "Might overshadow other tiers"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "May require A/B testing",
+    "Could affect brand consistency"
+  ],
+  "assumptions": [
+    "Current brand values are maintained",
+    "Existing layout supports changes"
+  ]
+}

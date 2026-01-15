@@ -1,0 +1,160 @@
+=== RAW RESPONSE (designer_brand_fast_marketing) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy4sHWY6yPOCn2sDbZiVvtUkr1MUL
+Input Tokens: 736
+Output Tokens: 541
+Finish Reason: stop
+
+=== RAW TEXT (2184 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.components.pricingTable",
+      "value": "Use contrasting headers for tiers",
+      "rationale": "Enhances tier distinction and readability",
+      "confidence": 0.90,
+      "risks": ["May clash with existing colors"]
+    },
+    {
+      "targetKey": "brand.visual.tierHierarchy",
+      "value": "Increase font size and weight for top tier",
+      "rationale": "Highlights premium options effectively",
+      "confidence": 0.88,
+      "risks": ["May shift layout"]
+    },
+    {
+      "targetKey": "brand.components.trustBadge",
+      "value": "Use a blue color scheme",
+      "rationale": "Blue is often associated with trust",
+      "confidence": 0.92,
+      "risks": ["Color perception varies"]
+    },
+    {
+      "targetKey": "brand.components.testimonial",
+      "value": "Include star ratings next to quotes",
+      "rationale": "Visually reinforces positive feedback",
+      "confidence": 0.87,
+      "risks": ["Can seem generic"]
+    },
+    {
+      "targetKey": "brand.components.ctaButton",
+      "value": "Use a slightly darker shade for hover",
+      "rationale": "Indicates interactivity without hype",
+      "confidence": 0.85,
+      "risks": ["May not be noticeable enough"]
+    },
+    {
+      "targetKey": "brand.color.conversionPrimary",
+      "value": "Opt for a calming green",
+      "rationale": "Green is associated with positive action",
+      "confidence": 0.91,
+      "risks": ["May not stand out in some contexts"]
+    },
+    {
+      "targetKey": "brand.type.marketingHeadline",
+      "value": "Use bold sans-serif fonts",
+      "rationale": "Ensures impact and readability",
+      "confidence": 0.89,
+      "risks": ["May look too modern"]
+    },
+    {
+      "targetKey": "brand.visual.comparisonClarity",
+      "value": "Add subtle dividers between features",
+      "rationale": "Improves feature comparison readability",
+      "confidence": 0.93,
+      "risks": ["Could add visual clutter"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["Visual clutter", "Color perception varies"],
+  "assumptions": ["Current design favors clarity", "Target audience values trust"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.components.pricingTable",
+      "value": "Use contrasting headers for tiers",
+      "rationale": "Enhances tier distinction and readability",
+      "confidence": 0.9,
+      "risks": [
+        "May clash with existing colors"
+      ]
+    },
+    {
+      "targetKey": "brand.visual.tierHierarchy",
+      "value": "Increase font size and weight for top tier",
+      "rationale": "Highlights premium options effectively",
+      "confidence": 0.88,
+      "risks": [
+        "May shift layout"
+      ]
+    },
+    {
+      "targetKey": "brand.components.trustBadge",
+      "value": "Use a blue color scheme",
+      "rationale": "Blue is often associated with trust",
+      "confidence": 0.92,
+      "risks": [
+        "Color perception varies"
+      ]
+    },
+    {
+      "targetKey": "brand.components.testimonial",
+      "value": "Include star ratings next to quotes",
+      "rationale": "Visually reinforces positive feedback",
+      "confidence": 0.87,
+      "risks": [
+        "Can seem generic"
+      ]
+    },
+    {
+      "targetKey": "brand.components.ctaButton",
+      "value": "Use a slightly darker shade for hover",
+      "rationale": "Indicates interactivity without hype",
+      "confidence": 0.85,
+      "risks": [
+        "May not be noticeable enough"
+      ]
+    },
+    {
+      "targetKey": "brand.color.conversionPrimary",
+      "value": "Opt for a calming green",
+      "rationale": "Green is associated with positive action",
+      "confidence": 0.91,
+      "risks": [
+        "May not stand out in some contexts"
+      ]
+    },
+    {
+      "targetKey": "brand.type.marketingHeadline",
+      "value": "Use bold sans-serif fonts",
+      "rationale": "Ensures impact and readability",
+      "confidence": 0.89,
+      "risks": [
+        "May look too modern"
+      ]
+    },
+    {
+      "targetKey": "brand.visual.comparisonClarity",
+      "value": "Add subtle dividers between features",
+      "rationale": "Improves feature comparison readability",
+      "confidence": 0.93,
+      "risks": [
+        "Could add visual clutter"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Visual clutter",
+    "Color perception varies"
+  ],
+  "assumptions": [
+    "Current design favors clarity",
+    "Target audience values trust"
+  ]
+}

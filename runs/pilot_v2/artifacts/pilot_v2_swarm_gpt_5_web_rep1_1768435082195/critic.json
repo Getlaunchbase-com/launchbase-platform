@@ -1,0 +1,119 @@
+{
+  "pass": false,
+  "issues": [
+    {
+      "severity": "critical",
+      "description": "No design system output received from upstream designer - cannot validate hero section conversion architecture",
+      "location": "design.hero.headline",
+      "rationale": "Missing core design specifications blocks conversion optimization review"
+    },
+    {
+      "severity": "critical",
+      "description": "Brand system failure prevents trust signal consistency validation across homepage touchpoints",
+      "location": "brand.colors.primary",
+      "rationale": "Inconsistent brand application destroys conversion trust"
+    },
+    {
+      "severity": "major",
+      "description": "Cannot verify CTA button hierarchy without design system color/size specifications",
+      "location": "design.hero.cta",
+      "rationale": "Undefined CTA prominence kills conversion rates"
+    },
+    {
+      "severity": "major",
+      "description": "Mobile breakpoint system undefined - responsive trust patterns cannot be validated",
+      "location": "design.layout.breakpoints",
+      "rationale": "Poor mobile experience loses 60% of small business traffic"
+    },
+    {
+      "severity": "major",
+      "description": "Typography scale missing - headline/body hierarchy for scanning undefined",
+      "location": "design.typography.scale",
+      "rationale": "No visual hierarchy means users can't scan value props"
+    },
+    {
+      "severity": "critical",
+      "description": "Social proof placement strategy absent - trust signals have no defined locations",
+      "location": "design.sections.testimonials",
+      "rationale": "Missing social proof above fold tanks conversions"
+    },
+    {
+      "severity": "major",
+      "description": "Pricing section structure undefined - transparency critical for SMB audience",
+      "location": "design.sections.pricing",
+      "rationale": "Hidden pricing creates friction for cost-conscious SMBs"
+    },
+    {
+      "severity": "critical",
+      "description": "No defined spacing system - touch targets and readability compromised",
+      "location": "design.spacing.scale",
+      "rationale": "Cramped layouts frustrate mobile users and kill engagement"
+    },
+    {
+      "severity": "major",
+      "description": "Form field styling absent - signup friction points undefined",
+      "location": "design.forms.inputs",
+      "rationale": "Poor form UX is the #1 conversion killer"
+    },
+    {
+      "severity": "critical",
+      "description": "Loading state patterns missing - perceived performance impacts trust",
+      "location": "design.states.loading",
+      "rationale": "Slow-feeling sites lose SMB users in 3 seconds"
+    }
+  ],
+  "suggestedFixes": [
+    {
+      "targetKey": "design.hero.headline",
+      "fix": "Implement 48-64px bold headline with 'Start free in 60 seconds' value prop for SMB urgency",
+      "rationale": "Clear value + time commitment reduces SMB hesitation"
+    },
+    {
+      "targetKey": "brand.colors.primary",
+      "fix": "Define trust-building blue (#2563EB) with high-contrast CTAs (#10B981 green) for conversion",
+      "rationale": "Blue builds trust, green CTAs drive action for cautious SMBs"
+    },
+    {
+      "targetKey": "design.hero.cta",
+      "fix": "Place primary CTA 'Start Free Trial' at 56px height with 24px padding, above fold on all devices",
+      "rationale": "Large touch target with clear benefit reduces friction"
+    },
+    {
+      "targetKey": "design.layout.breakpoints",
+      "fix": "Set mobile-first breakpoints: 375px base, 768px tablet, 1280px desktop with fluid scaling",
+      "rationale": "Mobile-first ensures 65% of SMB traffic converts properly"
+    },
+    {
+      "targetKey": "design.typography.scale",
+      "fix": "Use 1.5 ratio scale: 16px base, 24px subheads, 36px section heads, 48px+ hero for clear hierarchy",
+      "rationale": "Golden ratio scanning improves comprehension by 40%"
+    },
+    {
+      "targetKey": "design.sections.testimonials",
+      "fix": "Place 3 testimonials with photos directly under hero, before features - builds immediate trust",
+      "rationale": "Early social proof increases scroll depth by 70%"
+    },
+    {
+      "targetKey": "design.sections.pricing",
+      "fix": "Show 3-tier pricing grid with 'Most Popular' badge, monthly/annual toggle, clear feature lists",
+      "rationale": "Transparent pricing reduces support tickets by 50%"
+    },
+    {
+      "targetKey": "design.spacing.scale",
+      "fix": "Implement 8px grid: 16px small, 24px medium, 48px section gaps, 44px min touch targets",
+      "rationale": "Consistent spacing improves mobile usability scores"
+    },
+    {
+      "targetKey": "design.forms.inputs",
+      "fix": "Use 48px height inputs, floating labels, inline validation, progress indicators for multi-step",
+      "rationale": "Modern form UX increases completion rates by 35%"
+    },
+    {
+      "targetKey": "design.states.loading",
+      "fix": "Add skeleton screens, 200ms delay before spinners, optimistic UI updates for instant feedback",
+      "rationale": "Perceived performance improvements increase retention"
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true
+}

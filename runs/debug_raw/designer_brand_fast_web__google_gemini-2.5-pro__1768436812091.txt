@@ -1,0 +1,94 @@
+=== RAW RESPONSE (designer_brand_fast_web) ===
+Model: google/gemini-2.5-pro
+Request ID: MDRoaZqgKOCbm9IP5qSB-QI
+Input Tokens: 1038
+Output Tokens: 1281
+Finish Reason: length
+
+=== RAW TEXT (4964 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "Set font-size to clamp(36px, 5vw, 48px), font-weight to 600, and color to a near-black like #1A1A1A. Use a negative letter-spacing of -0.02em for density.",
+      "rationale": "Creates a strong but calm headline that scales fluidly. A semi-bold weight feels professional, not aggressive. Near-black is easier on the eyes than pure black.",
+      "confidence": 0.95,
+      "risks": [
+        "May feel less bold than a heavier weight, but aligns better with a 'calm' brand."
+      ]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "Define a muted, professional blue (e.g., #0052CC) as the primary action color. Avoid vibrant, high-saturation blues to build trust and appear more established.",
+      "rationale": "A mature blue inspires confidence and professionalism, differentiating from typical 'tech startup' palettes. This choice supports the 'trustworthy' brand attribute.",
+      "confidence": 0.9,
+      "risks": [
+        "Could be perceived as too 'corporate' if not balanced with ample white space."
+      ]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Primary CTAs: solid background (primary color), white text, 12px 24px padding, 6px corner radius. No border or shadow on default state. Add subtle scale(1.02) on hover.",
+      "rationale": "This creates a clear, high-contrast, and accessible call-to-action. The style is confident and avoids visual noise, focusing the user on the intended action.",
+      "confidence": 0.95,
+      "risks": [
+        "May appear too simple if other UI elements are not equally refined."
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "Standardize vertical spacing between all homepage sections to 120px on desktop and 80px on mobile. Use this consistently for a calm, predictable rhythm.",
+      "rationale": "A consistent vertical rhythm reduces cognitive load, making the page feel organized and professional. This 'breathing room' is key to a calm user experience.",
+      "confidence": 0.9,
+      "risks": [
+        "Rigid adherence might not suit all section transitions, requiring minor overrides."
+      ]
+    },
+    {
+      "targetKey": "brand.components.badge",
+      "value": "For 'As Seen On' logos, render them in grayscale (filter: grayscale(100%)) at 40% opacity. On hover, transition to full color/opacity to provide subtle feedback.",
+      "rationale": "This technique adds social proof without visually competing with primary content. It signals brand confidence and keeps the layout clean and focused.",
+      "confidence": 0.85,
+      "risks": [
+        "Some partner brands may have strict logo guidelines that forbid color modification."
+      ]
+    },
+    {
+      "targetKey": "brand.components.card",
+      "value": "For cards (e.g., pricing tiers), use a single, subtle 1px border (#EAEAEA) with an 8px-12px corner radius. Remove all box-shadows for a flatter, modern aesthetic.",
+      "rationale": "A flat design feels contemporary and less cluttered. A light border defines the card's edge without the visual weight of a shadow, enhancing transparency and clarity.",
+      "confidence": 0.8,
+      "risks": [
+        "Without shadows, cards may blend into the background if contrast is not managed well."
+      ]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "Set body text to 16px, font-weight 400, with a line-height of 1.6. Use a dark gray like #333333 for optimal readability against a white or off-white background.",
+      "rationale": "Prioritizes readability and reduces eye strain. A generous line height and high-contrast dark gray are best practices for professional, accessible web typography.",
+      "confidence": 0.95,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.visual.consistency",
+      "value": "Enforce a universal 8px corner radius on all interactive elements: buttons, form inputs, and cards. This creates a cohesive, predictable, and professional visual language.",
+      "rationale": "Consistent corner radii unify disparate components into a single design system. This small detail has a large impact on perceived quality and brand coherence.",
+      "confidence": 0.9,
+      "risks": [
+        "May require a detailed audit and refactoring of existing component styles."
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Proposed changes aim for a more neutral, professional feel which could be perceived as less energetic than the current design.",
+    "Implementing a consistent spacing and component system may require significant CSS refactoring."
+  ],
+  "assumptions": [
+    "The goal is to increase trust and clarity, even at the expense of visual flair.",
+    "The target audience responds better to a calm, professional interface than a loud, high-energy one.",
+    "The website is built with a technology
+
+=== PARSED JSON ===
+NULL (parse failed)

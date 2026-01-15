@@ -1,0 +1,87 @@
+{
+  "proposedChanges": [
+    {
+      "targetKey": "design.valueProp.benefitHierarchy",
+      "value": "In hero section, below main headline, display a 3-icon grid with short labels for 'Delegate Tasks', 'Maintain Control', and 'Predictable Cost'.",
+      "rationale": "Visually grounds the core value proposition immediately, reinforcing key differentiators (delegation, control) and addressing price transparency.",
+      "confidence": 0.9,
+      "risks": [
+        "May clutter the hero if icons are poorly designed."
+      ]
+    },
+    {
+      "targetKey": "design.objections.controlFears",
+      "value": "Directly below the hero, add a 2-column section with a headline about 'control' and 3 bullet points on dashboards, approvals, and reporting.",
+      "rationale": "Proactively addresses the primary 'loss of control' objection immediately after the value prop, building trust early in the user journey.",
+      "confidence": 0.85,
+      "risks": [
+        "Could slow the user's scroll path to pricing."
+      ]
+    },
+    {
+      "targetKey": "design.trust.proofPlacement",
+      "value": "Add a 'proof bar' with 5-6 client logos placed directly above the fold on the homepage, between the navigation and the hero headline.",
+      "rationale": "Establishes immediate credibility and social proof the instant a user lands on the page, before they even process the main headline.",
+      "confidence": 0.95,
+      "risks": [
+        "Requires recognizable client logos to be maximally effective."
+      ]
+    },
+    {
+      "targetKey": "design.pricing.tierComparison",
+      "value": "On the pricing page, replace any existing list with a full 3-column comparison table that includes a 'show all features' toggle.",
+      "rationale": "Enables direct, side-by-side comparison of tiers, while a toggle prevents overwhelming users with an exhaustive feature list by default.",
+      "confidence": 0.92,
+      "risks": [
+        "Can be challenging to display effectively on mobile screens."
+      ]
+    },
+    {
+      "targetKey": "design.objections.pricingConcerns",
+      "value": "Below the pricing table, add a 3-item FAQ accordion specifically addressing 'Why this price?', 'What if I need more?', and 'Are there hidden fees?'.",
+      "rationale": "Handles the 'too expensive' objection by framing it around value and transparency, preventing users from bouncing due to price shock.",
+      "confidence": 0.88,
+      "risks": [
+        "May draw unnecessary attention to price sensitivity."
+      ]
+    },
+    {
+      "targetKey": "design.objections.scopeClarity",
+      "value": "On the pricing page, create a 2-column 'Included / Not Included' checklist below the comparison table to define service boundaries.",
+      "rationale": "Explicitly clarifies what the service does and does not cover, addressing the 'what's included' objection and managing expectations.",
+      "confidence": 0.9,
+      "risks": [
+        "Highlighting 'Not Included' items could create negative focus."
+      ]
+    },
+    {
+      "targetKey": "design.pricing.valuePerTier",
+      "value": "In each of the 3 pricing tier cards, add a 'Best for:' label (e.g., 'Best for Founders', 'Best for Growing Teams') to help users self-segment.",
+      "rationale": "Guides users to the most appropriate plan, clarifying the intended value for different customer profiles and reducing decision fatigue.",
+      "confidence": 0.8,
+      "risks": [
+        "Users may feel incorrectly categorized or pigeonholed."
+      ]
+    },
+    {
+      "targetKey": "design.positioning.consistency",
+      "value": "In the footer of the Homepage, Pricing, and FAQ pages, add a single-line tagline: 'LaunchBase: Your business's operating system.'",
+      "rationale": "Reinforces the core 'operating system' positioning consistently across every key page, improving brand message recall and alignment.",
+      "confidence": 0.95,
+      "risks": [
+        "Could become repetitive if not implemented subtly."
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Implementing all structural changes simultaneously may disrupt established user behavior.",
+    "Changes are structural; success is still dependent on the quality of the final copy."
+  ],
+  "assumptions": [
+    "The business has at least 3 distinct pricing tiers.",
+    "The business has client logos available for use.",
+    "Key objections are 'price', 'control', and 'scope'."
+  ]
+}

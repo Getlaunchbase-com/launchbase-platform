@@ -1,0 +1,248 @@
+=== RAW RESPONSE (design_critic_ruthless_marketing) ===
+Model: claude-opus-4-1-20250805
+Request ID: msg_012VgqPpMn3deD12U48atYa7
+Input Tokens: 2502
+Output Tokens: 1365
+Finish Reason: end_turn
+
+=== RAW TEXT (5159 chars) ===
+{
+  "pass": false,
+  "issues": [
+    {
+      "severity": "critical",
+      "description": "Hero headline clarity proposal too vague - 'hand it off' message needs specific value articulation",
+      "location": "design.valueProp.headlineClarity",
+      "rationale": "Small business owners need immediate ROI understanding, not abstract concepts"
+    },
+    {
+      "severity": "major",
+      "description": "FAQ accordion for pricing objections buried below table - needs prominence during decision moment",
+      "location": "design.objections.pricingConcerns",
+      "rationale": "Cost concerns peak at pricing view, not after scrolling past"
+    },
+    {
+      "severity": "critical",
+      "description": "No control/ownership objection handling - small businesses fear vendor lock-in",
+      "location": "design.objections.pricingConcerns",
+      "rationale": "Missing critical objection type for SaaS-wary audience"
+    },
+    {
+      "severity": "major",
+      "description": "Tier comparison lacks value-per-dollar breakdown - just features won't justify pricing",
+      "location": "design.pricing.tierComparison",
+      "rationale": "Small businesses need ROI math, not feature lists"
+    },
+    {
+      "severity": "minor",
+      "description": "Trust logos above fold without context - random logos mean nothing without results",
+      "location": "design.trust.proofPlacement",
+      "rationale": "Logos need outcome context to build trust"
+    },
+    {
+      "severity": "major",
+      "description": "Testimonial grid lacks specificity - '6 testimonials' doesn't address outcome variety",
+      "location": "design.trust.testimonialEffectiveness",
+      "rationale": "Need testimonials mapped to specific objections/use cases"
+    },
+    {
+      "severity": "critical",
+      "description": "No scope creep objection handling - biggest small business fear with services",
+      "location": "design.pricing.transparencySignals",
+      "rationale": "Transparency must include scope boundaries explicitly"
+    },
+    {
+      "severity": "major",
+      "description": "Message alignment proposal lacks cross-channel consistency plan",
+      "location": "design.positioning.messageAlignment",
+      "rationale": "2-column grid doesn't ensure email/social/ads alignment"
+    },
+    {
+      "severity": "minor",
+      "description": "Button size increase arbitrary - no conversion data supporting 20% specifically",
+      "location": "brand.components.ctaButton",
+      "rationale": "Size changes need A/B testing justification"
+    },
+    {
+      "severity": "major",
+      "description": "Orange urgency color conflicts with trust-building deep blue primary",
+      "location": "brand.color.urgency",
+      "rationale": "Mixed psychological signals undermine positioning consistency"
+    }
+  ],
+  "suggestedFixes": [
+    {
+      "targetKey": "design.valueProp.headlineClarity",
+      "fix": "Test 'Save 20 hours/week on [specific task]' with rotating task examples",
+      "rationale": "Concrete time savings resonate with time-strapped small business owners"
+    },
+    {
+      "targetKey": "design.objections.pricingConcerns",
+      "fix": "Embed mini-FAQ directly in pricing cards showing ROI calculation",
+      "rationale": "Addresses objections at decision point without extra scrolling"
+    },
+    {
+      "targetKey": "design.objections.controlFears",
+      "fix": "Add 'You own everything' badge with export guarantee on pricing section",
+      "rationale": "Directly addresses vendor lock-in fears upfront"
+    },
+    {
+      "targetKey": "design.pricing.tierComparison",
+      "fix": "Show 'Cost per outcome' metric for each tier with real examples",
+      "rationale": "Transforms features into tangible business value"
+    },
+    {
+      "targetKey": "design.trust.proofPlacement",
+      "fix": "Replace logos with '500+ businesses saved X hours' social proof bar",
+      "rationale": "Outcome-focused proof beats recognition for SMB audience"
+    },
+    {
+      "targetKey": "design.trust.testimonialEffectiveness",
+      "fix": "Map testimonials to objections: pricing, control, results, support",
+      "rationale": "Strategic testimonial placement handles specific concerns"
+    },
+    {
+      "targetKey": "design.pricing.scopeClarity",
+      "fix": "Add 'What's included/not included' expandable section per tier",
+      "rationale": "Prevents scope creep anxiety with clear boundaries"
+    },
+    {
+      "targetKey": "brand.positioning.omnichannelConsistency",
+      "fix": "Create value prop testing matrix for homepage/email/ads alignment",
+      "rationale": "Ensures consistent messaging across all touchpoints"
+    },
+    {
+      "targetKey": "brand.components.ctaButton",
+      "fix": "Test button contrast ratio instead of size - aim for 7:1 minimum",
+      "rationale": "Accessibility and visibility trump arbitrary size increases"
+    },
+    {
+      "targetKey": "brand.color.urgency",
+      "fix": "Use deep blue variations for urgency - darker shade for limited offers",
+      "rationale": "Maintains trust psychology while creating subtle urgency"
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true
+}
+
+=== PARSED JSON ===
+{
+  "pass": false,
+  "issues": [
+    {
+      "severity": "critical",
+      "description": "Hero headline clarity proposal too vague - 'hand it off' message needs specific value articulation",
+      "location": "design.valueProp.headlineClarity",
+      "rationale": "Small business owners need immediate ROI understanding, not abstract concepts"
+    },
+    {
+      "severity": "major",
+      "description": "FAQ accordion for pricing objections buried below table - needs prominence during decision moment",
+      "location": "design.objections.pricingConcerns",
+      "rationale": "Cost concerns peak at pricing view, not after scrolling past"
+    },
+    {
+      "severity": "critical",
+      "description": "No control/ownership objection handling - small businesses fear vendor lock-in",
+      "location": "design.objections.pricingConcerns",
+      "rationale": "Missing critical objection type for SaaS-wary audience"
+    },
+    {
+      "severity": "major",
+      "description": "Tier comparison lacks value-per-dollar breakdown - just features won't justify pricing",
+      "location": "design.pricing.tierComparison",
+      "rationale": "Small businesses need ROI math, not feature lists"
+    },
+    {
+      "severity": "minor",
+      "description": "Trust logos above fold without context - random logos mean nothing without results",
+      "location": "design.trust.proofPlacement",
+      "rationale": "Logos need outcome context to build trust"
+    },
+    {
+      "severity": "major",
+      "description": "Testimonial grid lacks specificity - '6 testimonials' doesn't address outcome variety",
+      "location": "design.trust.testimonialEffectiveness",
+      "rationale": "Need testimonials mapped to specific objections/use cases"
+    },
+    {
+      "severity": "critical",
+      "description": "No scope creep objection handling - biggest small business fear with services",
+      "location": "design.pricing.transparencySignals",
+      "rationale": "Transparency must include scope boundaries explicitly"
+    },
+    {
+      "severity": "major",
+      "description": "Message alignment proposal lacks cross-channel consistency plan",
+      "location": "design.positioning.messageAlignment",
+      "rationale": "2-column grid doesn't ensure email/social/ads alignment"
+    },
+    {
+      "severity": "minor",
+      "description": "Button size increase arbitrary - no conversion data supporting 20% specifically",
+      "location": "brand.components.ctaButton",
+      "rationale": "Size changes need A/B testing justification"
+    },
+    {
+      "severity": "major",
+      "description": "Orange urgency color conflicts with trust-building deep blue primary",
+      "location": "brand.color.urgency",
+      "rationale": "Mixed psychological signals undermine positioning consistency"
+    }
+  ],
+  "suggestedFixes": [
+    {
+      "targetKey": "design.valueProp.headlineClarity",
+      "fix": "Test 'Save 20 hours/week on [specific task]' with rotating task examples",
+      "rationale": "Concrete time savings resonate with time-strapped small business owners"
+    },
+    {
+      "targetKey": "design.objections.pricingConcerns",
+      "fix": "Embed mini-FAQ directly in pricing cards showing ROI calculation",
+      "rationale": "Addresses objections at decision point without extra scrolling"
+    },
+    {
+      "targetKey": "design.objections.controlFears",
+      "fix": "Add 'You own everything' badge with export guarantee on pricing section",
+      "rationale": "Directly addresses vendor lock-in fears upfront"
+    },
+    {
+      "targetKey": "design.pricing.tierComparison",
+      "fix": "Show 'Cost per outcome' metric for each tier with real examples",
+      "rationale": "Transforms features into tangible business value"
+    },
+    {
+      "targetKey": "design.trust.proofPlacement",
+      "fix": "Replace logos with '500+ businesses saved X hours' social proof bar",
+      "rationale": "Outcome-focused proof beats recognition for SMB audience"
+    },
+    {
+      "targetKey": "design.trust.testimonialEffectiveness",
+      "fix": "Map testimonials to objections: pricing, control, results, support",
+      "rationale": "Strategic testimonial placement handles specific concerns"
+    },
+    {
+      "targetKey": "design.pricing.scopeClarity",
+      "fix": "Add 'What's included/not included' expandable section per tier",
+      "rationale": "Prevents scope creep anxiety with clear boundaries"
+    },
+    {
+      "targetKey": "brand.positioning.omnichannelConsistency",
+      "fix": "Create value prop testing matrix for homepage/email/ads alignment",
+      "rationale": "Ensures consistent messaging across all touchpoints"
+    },
+    {
+      "targetKey": "brand.components.ctaButton",
+      "fix": "Test button contrast ratio instead of size - aim for 7:1 minimum",
+      "rationale": "Accessibility and visibility trump arbitrary size increases"
+    },
+    {
+      "targetKey": "brand.color.urgency",
+      "fix": "Use deep blue variations for urgency - darker shade for limited offers",
+      "rationale": "Maintains trust psychology while creating subtle urgency"
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true
+}

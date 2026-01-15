@@ -1502,3 +1502,61 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [ ] Lane D: Artwork (32 runs, image-gen models)
 - [ ] Add Truthfulness Index penalties to scoring
 - [ ] Generate final leaderboard + liar hunt report
+
+
+## 🏆 PILOT TOURNAMENT (16 runs - Phase 2.5)
+
+**Goal:** Validate tournament infrastructure end-to-end before full 120-run Mega Tournament V2
+
+**Design:**
+- Lanes: Web + Marketing (2 lanes, expose most issues fast)
+- Stacks: 4 (Control/GPT-5/O3-Pro/Gemini)
+- Reps: 2 each = **16 total runs**
+- Pass criteria: ≥95% (15/16) with all validation requirements met
+
+**Tasks:**
+- [ ] Implement preflight registry check (validate all policy models exist, abort if missing)
+- [ ] Create pilot tournament runner (2 lanes × 4 stacks × 2 reps = 16 runs)
+- [ ] Add pilot pass/fail criteria validation:
+  - Designers: 8 changes each (systems+brand), valid design.* / brand.* keys
+  - Critic: ≥10 issues + ≥10 fixes, valid location, includes requiresApproval/previewRecommended
+  - No silent fallback (MODEL_LOCK enforced)
+  - No provider_failed due to schema/parse
+  - Truthfulness penalty computed
+- [ ] Execute pilot tournament (Web + Marketing lanes only)
+- [ ] Generate pilot report with:
+  - Pass rate (target: ≥95% = 15/16)
+  - Schema compliance rate
+  - Average truth penalty
+  - Retry/fallback stats
+  - Cost summary
+- [ ] Decision gate: proceed to full 120-run tournament or fix issues
+
+**Definition of Done:**
+- Preflight check prevents fake tournament runs
+- Pilot passes at ≥95% (15/16)
+- Pilot report committed
+- Authorization to proceed to Mega Tournament V2 (120 runs)
+
+
+## 🔧 PILOT V3 FIXES (Blocking Issues - Jan 14, 2026)
+- [ ] Implement lane-specific anchor validation (Marketing: 0 anchors = penalty, Web/App: <3 = hard fail)
+- [ ] Fix marketing systems prompt to force minimal anchors (placement/format/count specs)
+- [ ] Remove GPT-5 stack from pilot config (model unavailable)
+- [ ] Update pilot to 3 stacks × 2 lanes × 2 reps = 12 runs
+- [ ] Execute clean Pilot V3 with fixed validation
+- [ ] Generate PILOT_SCORECARD.md with decision recommendation
+
+
+## 🔬 BASELINE SOAK TEST (24 runs, Control stack)
+- [x] Implement TruthPenalty scoring system (v1.0 weights)
+- [x] Build truthPenalty calculator with breakdown tracking
+- [x] Create liar detection triggers (unverifiable/invented/vague/strain)
+- [ ] Build Baseline Soak Test runner (4 lanes × 6 reps = 24 runs)
+- [ ] Generate SOAK_RESULTS.json with truthPenalty per run
+- [ ] Generate SOAK_SCORECARD.md with per-lane baselines
+- [ ] Generate SOAK_LIAR_LIST.json with penalty triggers
+- [ ] Execute 24-run soak test
+- [ ] Analyze variance and establish truth baseline
+- [ ] Lock Model Weather Control Chart thresholds
+- [ ] Save checkpoint with complete tournament infrastructure

@@ -1,0 +1,160 @@
+=== RAW RESPONSE (designer_systems_fast_web) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy4y2aHRnSzVUSv3JEugaRBR2yFq7
+Input Tokens: 1056
+Output Tokens: 580
+Finish Reason: stop
+
+=== RAW TEXT (2335 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Use a clear, concise headline with a subheadline",
+      "rationale": "Improves value proposition visibility and clarity",
+      "confidence": 0.90,
+      "risks": ["Headline may not engage all users"]
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Place a single, prominent CTA button above the fold",
+      "rationale": "Reduces friction and guides user action",
+      "confidence": 0.93,
+      "risks": ["May not fit all screen sizes"]
+    },
+    {
+      "targetKey": "design.layout.trust",
+      "value": "Include a client testimonial or logo bar",
+      "rationale": "Builds immediate trust with new visitors",
+      "confidence": 0.88,
+      "risks": ["May appear cluttered"]
+    },
+    {
+      "targetKey": "design.trust.proofPattern",
+      "value": "Position trust badges near the CTA",
+      "rationale": "Enhances credibility at decision points",
+      "confidence": 0.91,
+      "risks": ["Trust badges may go unnoticed"]
+    },
+    {
+      "targetKey": "design.mobile.heroStacking",
+      "value": "Ensure hero image and text stack vertically",
+      "rationale": "Improves readability on mobile devices",
+      "confidence": 0.89,
+      "risks": ["May lengthen page scroll"]
+    },
+    {
+      "targetKey": "design.hierarchy.visualWeight",
+      "value": "Use contrasting colors for CTAs",
+      "rationale": "Increases visual prominence and clickability",
+      "confidence": 0.92,
+      "risks": ["CTAs may clash with brand colors"]
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Highlight the most popular pricing tier",
+      "rationale": "Guides users toward recommended options",
+      "confidence": 0.87,
+      "risks": ["May limit exploration of other tiers"]
+    },
+    {
+      "targetKey": "design.layout.finalCta",
+      "value": "Add a sticky final CTA to the bottom",
+      "rationale": "Keeps conversion option visible as users scroll",
+      "confidence": 0.90,
+      "risks": ["May distract from content"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["Changes might not align with brand", "May increase development time"],
+  "assumptions": ["Target audience prefers clear, direct messaging", "Mobile traffic is significant"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Use a clear, concise headline with a subheadline",
+      "rationale": "Improves value proposition visibility and clarity",
+      "confidence": 0.9,
+      "risks": [
+        "Headline may not engage all users"
+      ]
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Place a single, prominent CTA button above the fold",
+      "rationale": "Reduces friction and guides user action",
+      "confidence": 0.93,
+      "risks": [
+        "May not fit all screen sizes"
+      ]
+    },
+    {
+      "targetKey": "design.layout.trust",
+      "value": "Include a client testimonial or logo bar",
+      "rationale": "Builds immediate trust with new visitors",
+      "confidence": 0.88,
+      "risks": [
+        "May appear cluttered"
+      ]
+    },
+    {
+      "targetKey": "design.trust.proofPattern",
+      "value": "Position trust badges near the CTA",
+      "rationale": "Enhances credibility at decision points",
+      "confidence": 0.91,
+      "risks": [
+        "Trust badges may go unnoticed"
+      ]
+    },
+    {
+      "targetKey": "design.mobile.heroStacking",
+      "value": "Ensure hero image and text stack vertically",
+      "rationale": "Improves readability on mobile devices",
+      "confidence": 0.89,
+      "risks": [
+        "May lengthen page scroll"
+      ]
+    },
+    {
+      "targetKey": "design.hierarchy.visualWeight",
+      "value": "Use contrasting colors for CTAs",
+      "rationale": "Increases visual prominence and clickability",
+      "confidence": 0.92,
+      "risks": [
+        "CTAs may clash with brand colors"
+      ]
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Highlight the most popular pricing tier",
+      "rationale": "Guides users toward recommended options",
+      "confidence": 0.87,
+      "risks": [
+        "May limit exploration of other tiers"
+      ]
+    },
+    {
+      "targetKey": "design.layout.finalCta",
+      "value": "Add a sticky final CTA to the bottom",
+      "rationale": "Keeps conversion option visible as users scroll",
+      "confidence": 0.9,
+      "risks": [
+        "May distract from content"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Changes might not align with brand",
+    "May increase development time"
+  ],
+  "assumptions": [
+    "Target audience prefers clear, direct messaging",
+    "Mobile traffic is significant"
+  ]
+}

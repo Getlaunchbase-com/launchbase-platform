@@ -1,0 +1,166 @@
+=== RAW RESPONSE (designer_brand_fast_marketing) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy5PbX9DygW4xJxGKBa3zDr4oNBsc
+Input Tokens: 738
+Output Tokens: 550
+Finish Reason: stop
+
+=== RAW TEXT (2112 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.components.pricingTable",
+      "value": "Use clear columns with bold headers",
+      "rationale": "Enhances feature comparison clarity",
+      "confidence": 0.9,
+      "risks": ["Overcrowding", "Complexity"]
+    },
+    {
+      "targetKey": "brand.visual.tierHierarchy",
+      "value": "Use size variation for tier differentiation",
+      "rationale": "Increases visual hierarchy",
+      "confidence": 0.85,
+      "risks": ["Inconsistency", "Overemphasis"]
+    },
+    {
+      "targetKey": "brand.components.trustBadge",
+      "value": "Use circular badges with soft shadows",
+      "rationale": "Conveys professionalism and trust",
+      "confidence": 0.92,
+      "risks": ["Shadow overuse", "Badge overload"]
+    },
+    {
+      "targetKey": "brand.color.trustSignals",
+      "value": "Incorporate calm blue tones",
+      "rationale": "Blue is associated with trust",
+      "confidence": 0.95,
+      "risks": ["Color mismatch", "Overuse"]
+    },
+    {
+      "targetKey": "brand.components.ctaButton",
+      "value": "Use a larger primary button",
+      "rationale": "Improves clickability and urgency",
+      "confidence": 0.88,
+      "risks": ["Oversized buttons", "Dominance"]
+    },
+    {
+      "targetKey": "brand.type.marketingHeadline",
+      "value": "Use a bold sans-serif font",
+      "rationale": "Ensures headline impact",
+      "confidence": 0.91,
+      "risks": ["Font mismatch", "Readability"]
+    },
+    {
+      "targetKey": "brand.color.urgency",
+      "value": "Apply a muted red for urgency",
+      "rationale": "Red signals urgency without hype",
+      "confidence": 0.87,
+      "risks": ["Overemphasis", "Distraction"]
+    },
+    {
+      "targetKey": "brand.visual.proofTreatment",
+      "value": "Use consistent layout for testimonials",
+      "rationale": "Enhances readability and trust",
+      "confidence": 0.9,
+      "risks": ["Monotony", "Lack of engagement"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["Implementation inconsistency"],
+  "assumptions": ["Design aligns with brand values"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.components.pricingTable",
+      "value": "Use clear columns with bold headers",
+      "rationale": "Enhances feature comparison clarity",
+      "confidence": 0.9,
+      "risks": [
+        "Overcrowding",
+        "Complexity"
+      ]
+    },
+    {
+      "targetKey": "brand.visual.tierHierarchy",
+      "value": "Use size variation for tier differentiation",
+      "rationale": "Increases visual hierarchy",
+      "confidence": 0.85,
+      "risks": [
+        "Inconsistency",
+        "Overemphasis"
+      ]
+    },
+    {
+      "targetKey": "brand.components.trustBadge",
+      "value": "Use circular badges with soft shadows",
+      "rationale": "Conveys professionalism and trust",
+      "confidence": 0.92,
+      "risks": [
+        "Shadow overuse",
+        "Badge overload"
+      ]
+    },
+    {
+      "targetKey": "brand.color.trustSignals",
+      "value": "Incorporate calm blue tones",
+      "rationale": "Blue is associated with trust",
+      "confidence": 0.95,
+      "risks": [
+        "Color mismatch",
+        "Overuse"
+      ]
+    },
+    {
+      "targetKey": "brand.components.ctaButton",
+      "value": "Use a larger primary button",
+      "rationale": "Improves clickability and urgency",
+      "confidence": 0.88,
+      "risks": [
+        "Oversized buttons",
+        "Dominance"
+      ]
+    },
+    {
+      "targetKey": "brand.type.marketingHeadline",
+      "value": "Use a bold sans-serif font",
+      "rationale": "Ensures headline impact",
+      "confidence": 0.91,
+      "risks": [
+        "Font mismatch",
+        "Readability"
+      ]
+    },
+    {
+      "targetKey": "brand.color.urgency",
+      "value": "Apply a muted red for urgency",
+      "rationale": "Red signals urgency without hype",
+      "confidence": 0.87,
+      "risks": [
+        "Overemphasis",
+        "Distraction"
+      ]
+    },
+    {
+      "targetKey": "brand.visual.proofTreatment",
+      "value": "Use consistent layout for testimonials",
+      "rationale": "Enhances readability and trust",
+      "confidence": 0.9,
+      "risks": [
+        "Monotony",
+        "Lack of engagement"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Implementation inconsistency"
+  ],
+  "assumptions": [
+    "Design aligns with brand values"
+  ]
+}

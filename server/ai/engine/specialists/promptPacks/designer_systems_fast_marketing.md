@@ -48,6 +48,27 @@ Review **LaunchBase marketing clarity** across all touchpoints and propose impro
 - `risks`: max 2 items, each max 60 characters
 - `confidence`: between 0.70 and 0.95
 
+**Concreteness requirements (CRITICAL):**
+
+Each change MUST include at least one of:
+- **Placement**: above fold / after pricing / between sections / in hero / sticky CTA
+- **Format**: 2-column grid / table / 3 cards / comparison chart / proof bar / FAQ accordion
+- **Count**: 3 bullets / 5 logos / 4 tiers / 2 columns / 6 testimonials
+
+If the change is marketing-oriented (proof, offer, CTA), specify:
+- WHERE it appears (hero section, pricing card, FAQ, sticky CTA)
+- WHAT component displays it (proof bar, comparison table, pricing card, testimonial grid)
+
+Example GOOD values:
+- "Add 3-column comparison chart after pricing hero showing Basic/Standard/Premium tiers"
+- "Place 5 customer logos in proof bar above fold"
+- "Include 4-item FAQ accordion addressing 'too expensive' concern below pricing table"
+
+Example BAD values (too vague):
+- "Add a comparison chart" (WHERE? HOW MANY columns?)
+- "Include case studies" (HOW MANY? WHERE placed?)
+- "Improve messaging" (WHAT component? WHICH section?)
+
 Schema:
 
 ```json
