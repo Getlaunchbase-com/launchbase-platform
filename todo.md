@@ -1934,8 +1934,15 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [x] Refactor to discriminated union (TruncateEvent | CoerceRisksEvent)
 - [x] Type-safe NormalizationEventsByRole prevents wrong event types
 
-### Commit D: Obedience Probes + Dashboard Aggregator
-- [ ] Create runObedienceProbe.ts (test single model/role/lane with 3 reps)
+### Commit D: Obedience Probe Infrastructure ✅ COMPLETE
+- [x] Create probe/schemas.ts (Zod schemas for ProbeRun + ProbeSummary)
+- [x] Create probe/renderWeatherTable.ts (CLI formatter with exact column widths)
+- [x] Create probe/runProbe.ts (full probe runner: load config, loop models×reps, call runPilotMacro)
+- [x] Create config/probes/obedience_probe_web_systems.json (example config)
+- [x] Promotion rule: Exact8% ≥ 67%, Timeout% == 0%, AvgAtt ≤ 1.5
+- [x] Champion rule: Exact8% ≥ 95% at reps ≥ 20
+
+### Commit E: Dashboard Aggregator (NEXT)
 - [ ] Create aggregateDashboard.ts (scan runs, generate dashboard.json)
 - [ ] Create renderDashboardCLI.ts (ASCII table with pass rates)
 
