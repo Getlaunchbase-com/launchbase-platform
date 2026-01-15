@@ -97,6 +97,7 @@ export const CriticOutputSchema = z.object({
 
   /**
    * Optional risks identified during critique
+   * MUST be an array of strings. Do not use objects.
    */
   risks: z.array(z.string()).optional(),
 

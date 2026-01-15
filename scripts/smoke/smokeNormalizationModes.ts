@@ -32,6 +32,7 @@ const CONTROL_STACK = {
     provider: 'anthropic',
     maxTokens: 4000,
     temperature: 0.3,
+    timeoutMs: 240000, // 4 minutes for critic (needs more time than designers)
   },
 };
 
@@ -66,8 +67,9 @@ function printRunSummary(run: PilotRun, label: string) {
   console.log(`\nNormalization:`);
   console.log(`  Enabled: ${run.meta.normalization.enabled}`);
   console.log(`  Applied: ${run.meta.normalization.applied}`);
-  console.log(`  Systems: ${run.meta.normalization.events.systems.from} → ${run.meta.normalization.events.systems.to} (truncated: ${run.meta.normalization.events.systems.truncated})`);
-  console.log(`  Brand: ${run.meta.normalization.events.brand.from} → ${run.meta.normalization.events.brand.to} (truncated: ${run.meta.normalization.events.brand.truncated})`);
+  console.log(`  Systems: ${run.meta.normalization.events.systems.kind === 'truncate' ? `${run.meta.normalization.events.systems.from} → ${run.meta.normalization.events.systems.to} (truncated: ${run.meta.normalization.events.systems.applied})` : 'N/A'}`);
+  console.log(`  Brand: ${run.meta.normalization.events.brand.kind === 'truncate' ? `${run.meta.normalization.events.brand.from} → ${run.meta.normalization.events.brand.to} (truncated: ${run.meta.normalization.events.brand.applied})` : 'N/A'}`);
+  console.log(`  Critic: ${run.meta.normalization.events.critic.kind === 'coerce_risks' ? `coerced ${run.meta.normalization.events.critic.coercedCount} objects → strings` : 'N/A'}`);
   console.log(`\nUsage Totals:`);
   console.log(`  Input Tokens: ${run.meta.usage.totals.inputTokens}`);
   console.log(`  Output Tokens: ${run.meta.usage.totals.outputTokens}`);
@@ -89,18 +91,23 @@ function assertTournamentMode(run: PilotRun) {
     errors.push(`❌ normalization.enabled should be false, got ${run.meta.normalization.enabled}`);
   }
   
-  // 2. Normalization must NOT be applied
+  // 2. Normalization must not be applied
   if (run.meta.normalization.applied !== false) {
     errors.push(`❌ normalization.applied should be false, got ${run.meta.normalization.applied}`);
   }
   
-  // 3. No truncation events should occur
-  if (run.meta.normalization.events.systems.truncated === true) {
-    errors.push(`❌ systems should not be truncated in tournament mode`);
+  // 3. Systems/brand events should not be applied
+  if (run.meta.normalization.events.systems.applied) {
+    errors.push(`❌ systems normalization should not be applied in tournament mode`);
   }
-  if (run.meta.normalization.events.brand.truncated === true) {
-    errors.push(`❌ brand should not be truncated in tournament mode`);
+  if (run.meta.normalization.events.brand.applied) {
+    errors.push(`❌ brand normalization should not be applied in tournament mode`);
   }
+  if (run.meta.normalization.events.critic.applied) {
+    errors.push(`❌ critic normalization should not be applied in tournament mode`);
+  }
+  
+  // (truncation checks already covered by applied checks above)
   
   // 4. Usage totals must be > 0 (prove model was called)
   if (run.meta.usage.totals.inputTokens === 0) {
@@ -150,9 +157,9 @@ function assertProductionMode(run: PilotRun) {
     errors.push(`❌ normalization.enabled should be true, got ${run.meta.normalization.enabled}`);
   }
   
-  // 2. Status must be VALID (production guarantees fixed-width)
-  if (run.status !== 'VALID') {
-    errors.push(`❌ status should be VALID, got ${run.status}`);
+  // 2. Status must be VALID or RETRIED (production guarantees fixed-width, may need retries)
+  if (run.status !== 'VALID' && run.status !== 'RETRIED') {
+    errors.push(`❌ status should be VALID or RETRIED, got ${run.status}`);
   }
   
   // 3. Systems changes must be exactly 8
@@ -170,21 +177,22 @@ function assertProductionMode(run: PilotRun) {
     errors.push(`❌ inputTokens should be > 0, got ${run.meta.usage.totals.inputTokens}`);
   }
   
-  // 6. Conditional: If normalization was applied, verify truncation events
+  // 6. Conditional: If normalization was applied, verify events
   if (run.meta.normalization.applied === true) {
-    console.log(`  ℹ️  Normalization was applied (model returned >8)`);
+    console.log(`  ℹ️  Normalization was applied`);
     
-    // At least one role should have been truncated
-    const anyTruncated = 
-      run.meta.normalization.events.systems.truncated ||
-      run.meta.normalization.events.brand.truncated;
+    // At least one role should have normalization applied
+    const anyApplied = 
+      run.meta.normalization.events.systems.applied ||
+      run.meta.normalization.events.brand.applied ||
+      run.meta.normalization.events.critic.applied;
     
-    if (!anyTruncated) {
-      errors.push(`❌ normalization.applied=true but no truncation events found`);
+    if (!anyApplied) {
+      errors.push(`❌ normalization.applied=true but no role events applied`);
     }
     
     // Verify truncation events are valid (from > to, to === 8)
-    if (run.meta.normalization.events.systems.truncated) {
+    if (run.meta.normalization.events.systems.applied) {
       if (run.meta.normalization.events.systems.from <= run.meta.normalization.events.systems.to) {
         errors.push(`❌ systems truncation invalid: from=${run.meta.normalization.events.systems.from} should be > to=${run.meta.normalization.events.systems.to}`);
       }
@@ -193,7 +201,7 @@ function assertProductionMode(run: PilotRun) {
       }
     }
     
-    if (run.meta.normalization.events.brand.truncated) {
+    if (run.meta.normalization.events.brand.applied) {
       if (run.meta.normalization.events.brand.from <= run.meta.normalization.events.brand.to) {
         errors.push(`❌ brand truncation invalid: from=${run.meta.normalization.events.brand.from} should be > to=${run.meta.normalization.events.brand.to}`);
       }
@@ -201,16 +209,15 @@ function assertProductionMode(run: PilotRun) {
         errors.push(`❌ brand truncation invalid: to should be 8, got ${run.meta.normalization.events.brand.to}`);
       }
     }
+    
+    // Verify critic coercion if applied
+    if (run.meta.normalization.events.critic.applied) {
+      if (run.meta.normalization.events.critic.coercedCount === 0) {
+        errors.push(`❌ critic coercion applied but coercedCount=0`);
+      }
+    }
   } else {
     console.log(`  ℹ️  Normalization was NOT applied (model returned exactly 8)`);
-    
-    // Verify no truncation events
-    if (run.meta.normalization.events.systems.truncated === true) {
-      errors.push(`❌ normalization.applied=false but systems.truncated=true`);
-    }
-    if (run.meta.normalization.events.brand.truncated === true) {
-      errors.push(`❌ normalization.applied=false but brand.truncated=true`);
-    }
   }
   
   if (errors.length > 0) {

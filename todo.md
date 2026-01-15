@@ -1925,7 +1925,16 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [x] Calculate totals (inputTokens/outputTokens/latencyMs/costUsd)
 - [x] Add meta.usage to PilotRun artifact
 
-### Commit C: Obedience Probes + Dashboard Aggregator
+### Commit C: Critic Risks Normalization (Production-Only) ✅ COMPLETE
+- [x] Create normalizeCriticRisks() function (coerce objects → strings)
+- [x] Apply AFTER parse, BEFORE schema validation (production mode only)
+- [x] Track coercion in meta.normalization.events.critic
+- [x] Add prompt constraint: "risks must be string[], not objects"
+- [x] Update smoke test to validate critic coercion
+- [x] Refactor to discriminated union (TruncateEvent | CoerceRisksEvent)
+- [x] Type-safe NormalizationEventsByRole prevents wrong event types
+
+### Commit D: Obedience Probes + Dashboard Aggregator
 - [ ] Create runObedienceProbe.ts (test single model/role/lane with 3 reps)
 - [ ] Create aggregateDashboard.ts (scan runs, generate dashboard.json)
 - [ ] Create renderDashboardCLI.ts (ASCII table with pass rates)

@@ -24,21 +24,36 @@ export interface ValidationPolicy {
   normalizationMode?: NormalizationMode;
 }
 
-export interface NormalizationEvent {
-  truncated: boolean;
+export type TruncateEvent = {
+  kind: "truncate";
+  applied: boolean;
   from: number;
   to: number;
-}
+};
+
+export type CoerceRisksEvent = {
+  kind: "coerce_risks";
+  applied: boolean;
+  coercedCount: number;
+  fromType: "object";
+  toType: "string";
+};
+
+// Union (still useful for generic handling / logging)
+export type NormalizationEvent = TruncateEvent | CoerceRisksEvent;
+
+// Role-specific events (prevents accidentally writing the wrong kind to a role)
+export type NormalizationEventsByRole = {
+  systems: TruncateEvent;
+  brand: TruncateEvent;
+  critic: CoerceRisksEvent;
+};
 
 export interface NormalizationTracking {
   enabled: boolean;
   applied: boolean;
   mode: NormalizationMode;
-  events: {
-    systems: NormalizationEvent;
-    brand: NormalizationEvent;
-    critic: NormalizationEvent;
-  };
+  events: NormalizationEventsByRole;
 }
 
 export interface RoleUsage {
@@ -115,15 +130,24 @@ export interface PilotRun {
 }
 
 // Helper to create default normalization tracking
-export function createNormalizationTracking(enabled: boolean, mode: NormalizationMode = "truncate_first_n"): NormalizationTracking {
+export function createNormalizationTracking(
+  enabled: boolean,
+  mode: NormalizationMode = "truncate_first_n"
+): NormalizationTracking {
   return {
     enabled,
     applied: false,
     mode,
     events: {
-      systems: { truncated: false, from: 0, to: 0 },
-      brand: { truncated: false, from: 0, to: 0 },
-      critic: { truncated: false, from: 0, to: 0 },
+      systems: { kind: "truncate", applied: false, from: 0, to: 0 },
+      brand: { kind: "truncate", applied: false, from: 0, to: 0 },
+      critic: {
+        kind: "coerce_risks",
+        applied: false,
+        coercedCount: 0,
+        fromType: "object",
+        toType: "string",
+      },
     },
   };
 }

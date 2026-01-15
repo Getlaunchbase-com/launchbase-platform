@@ -16,14 +16,15 @@ import { toRoleConfig } from './adapters';
 import type { RunMode, ValidationPolicy, NormalizationTracking, UsageTracking } from './types';
 import { createValidationPolicy, createNormalizationTracking, createUsageTracking } from './types';
 import { normalizeCraftFastPayload, logNormalizationEvent } from './normalizer';
+import { normalizeCriticRisks } from './normalizeCriticRisks';
 
 type Lane = 'web' | 'marketing' | 'app' | 'artwork';
 type StepKind = 'craft' | 'critic';
 
 type PilotStack = {
-  designer_systems_fast: { modelId: string; provider: string; maxTokens: number; temperature: number };
-  designer_brand_fast: { modelId: string; provider: string; maxTokens: number; temperature: number };
-  design_critic_ruthless: { modelId: string; provider: string; maxTokens: number; temperature: number };
+  designer_systems_fast: { modelId: string; provider: string; maxTokens: number; temperature: number; timeoutMs?: number };
+  designer_brand_fast: { modelId: string; provider: string; maxTokens: number; temperature: number; timeoutMs?: number };
+  design_critic_ruthless: { modelId: string; provider: string; maxTokens: number; temperature: number; timeoutMs?: number };
 };
 
 export interface PilotRun {
@@ -324,6 +325,14 @@ export async function runPilotMacro(params: {
         false // enableLadder
       );
 
+      // Capture usage immediately (before validation, so it's tracked even if validation fails)
+      usageTracking.systems = {
+        inputTokens: systemsOut.meta.inputTokens || 0,
+        outputTokens: systemsOut.meta.outputTokens || 0,
+        latencyMs: systemsOut.meta.latencyMs || 0,
+        costUsd: systemsOut.meta.costUsd || 0,
+      };
+
       // 1) Parse and unwrap payload
       let systemsPayload = cleanParseArtifactPayload(systemsOut.artifact);
       
@@ -331,7 +340,12 @@ export async function runPilotMacro(params: {
       if (policy.allowNormalization) {
         const result = normalizeCraftFastPayload(systemsPayload);
         systemsPayload = result.payload;
-        normalizationTracking.events.systems = result.event;
+        normalizationTracking.events.systems = {
+      kind: 'truncate',
+      applied: result.event.truncated,
+      from: result.event.from,
+      to: result.event.to,
+    };
         if (result.event.truncated) {
           normalizationTracking.applied = true;
           logNormalizationEvent('systems', result.event);
@@ -341,7 +355,7 @@ export async function runPilotMacro(params: {
       // 3) Schema validate payload (Zod strict validation)
       validateDesignSwarmPayloadOrThrow('designer_systems_fast', systemsPayload);
       
-      // 3) Content validation (after schema)
+      // 4) Content validation (after schema)
       assertContentAfterSchema({ schemaKey: 'designer_systems_fast', lane, payload: systemsPayload });
 
       // 2) BRAND (fast = exactly 8)
@@ -379,6 +393,14 @@ export async function runPilotMacro(params: {
         false // enableLadder
       );
 
+      // Capture usage immediately (before validation, so it's tracked even if validation fails)
+      usageTracking.brand = {
+        inputTokens: brandOut.meta.inputTokens || 0,
+        outputTokens: brandOut.meta.outputTokens || 0,
+        latencyMs: brandOut.meta.latencyMs || 0,
+        costUsd: brandOut.meta.costUsd || 0,
+      };
+
       // 1) Parse and unwrap payload
       let brandPayload = cleanParseArtifactPayload(brandOut.artifact);
       
@@ -386,7 +408,12 @@ export async function runPilotMacro(params: {
       if (policy.allowNormalization) {
         const result = normalizeCraftFastPayload(brandPayload);
         brandPayload = result.payload;
-        normalizationTracking.events.brand = result.event;
+        normalizationTracking.events.brand = {
+          kind: 'truncate',
+          applied: result.event.truncated,
+          from: result.event.from,
+          to: result.event.to,
+        };
         if (result.event.truncated) {
           normalizationTracking.applied = true;
           logNormalizationEvent('brand', result.event);
@@ -396,7 +423,7 @@ export async function runPilotMacro(params: {
       // 3) Schema validate payload (Zod strict validation)
       validateDesignSwarmPayloadOrThrow('designer_brand_fast', brandPayload);
       
-      // 3) Content validation (after schema)
+      // 4) Content validation (after schema)
       assertContentAfterSchema({ schemaKey: 'designer_brand_fast', lane, payload: brandPayload });
 
       // 3) CRITIC (ruthless = 10 issues + 10 fixes + pass:false)
@@ -427,17 +454,43 @@ export async function runPilotMacro(params: {
             stack.design_critic_ruthless.provider,
             lane,
             {
-              timeoutMs: 90_000, // Critics need more time
+              timeoutMs: stack.design_critic_ruthless.timeoutMs || 90_000, // Use stack timeout or default
             }
           ),
         }),
         false // enableLadder
       );
 
+      // Capture usage immediately (before validation, so it's tracked even if validation fails)
+      usageTracking.critic = {
+        inputTokens: criticOut.meta.inputTokens || 0,
+        outputTokens: criticOut.meta.outputTokens || 0,
+        latencyMs: criticOut.meta.latencyMs || 0,
+        costUsd: criticOut.meta.costUsd || 0,
+      };
+
       // 1) Parse and unwrap payload
-      const criticPayload = cleanParseArtifactPayload(criticOut.artifact);
+      let criticPayload = cleanParseArtifactPayload(criticOut.artifact);
       
-      // 2) Schema validate payload (Zod strict validation: EXACTLY 10 issues/fixes, pass=false)
+      // 2) Apply critic risks normalization if enabled (AFTER parse, BEFORE schema validation)
+      if (policy.allowNormalization) {
+        const { payload: fixed, coercedCount } = normalizeCriticRisks(criticPayload);
+        criticPayload = fixed;
+        
+        if (coercedCount > 0) {
+          normalizationTracking.applied = true;
+          normalizationTracking.events.critic = {
+            kind: 'coerce_risks',
+            applied: true,
+            coercedCount,
+            fromType: 'object',
+            toType: 'string',
+          };
+          console.log(`[NORMALIZE_CRITIC] risks coerced ${coercedCount} objects → strings`);
+        }
+      }
+      
+      // 3) Schema validate payload (Zod strict validation: EXACTLY 10 issues/fixes, pass=false)
       validateDesignSwarmPayloadOrThrow('design_critic_ruthless', criticPayload);
       
       // 3) Content validation (after schema)
@@ -475,25 +528,7 @@ export async function runPilotMacro(params: {
       const totalLatencyMs =
         systemsOut.meta.latencyMs + brandOut.meta.latencyMs + criticOut.meta.latencyMs;
 
-      // Capture usage tracking
-      usageTracking.systems = {
-        inputTokens: systemsOut.meta.inputTokens || 0,
-        outputTokens: systemsOut.meta.outputTokens || 0,
-        latencyMs: systemsOut.meta.latencyMs || 0,
-        costUsd: systemsOut.meta.costUsd || 0,
-      };
-      usageTracking.brand = {
-        inputTokens: brandOut.meta.inputTokens || 0,
-        outputTokens: brandOut.meta.outputTokens || 0,
-        latencyMs: brandOut.meta.latencyMs || 0,
-        costUsd: brandOut.meta.costUsd || 0,
-      };
-      usageTracking.critic = {
-        inputTokens: criticOut.meta.inputTokens || 0,
-        outputTokens: criticOut.meta.outputTokens || 0,
-        latencyMs: criticOut.meta.latencyMs || 0,
-        costUsd: criticOut.meta.costUsd || 0,
-      };
+      // Calculate usage totals (individual role usage already captured above)
       usageTracking.totals = {
         inputTokens: usageTracking.systems.inputTokens + usageTracking.brand.inputTokens + usageTracking.critic.inputTokens,
         outputTokens: usageTracking.systems.outputTokens + usageTracking.brand.outputTokens + usageTracking.critic.outputTokens,
@@ -564,7 +599,14 @@ export async function runPilotMacro(params: {
     }
   }
 
-  // Failed after retries
+  // Failed after retries - calculate usage totals from accumulated usage
+  usageTracking.totals = {
+    inputTokens: usageTracking.systems.inputTokens + usageTracking.brand.inputTokens + usageTracking.critic.inputTokens,
+    outputTokens: usageTracking.systems.outputTokens + usageTracking.brand.outputTokens + usageTracking.critic.outputTokens,
+    latencyMs: usageTracking.systems.latencyMs + usageTracking.brand.latencyMs + usageTracking.critic.latencyMs,
+    costUsd: usageTracking.systems.costUsd + usageTracking.brand.costUsd + usageTracking.critic.costUsd,
+  };
+  
   console.error(`[${runId}] FAILED after ${attempts} attempts`);
   return {
     lane,

@@ -1,0 +1,266 @@
+=== RAW RESPONSE (design_critic_ruthless) ===
+Model: claude-opus-4-20250514
+Request ID: msg_01Q6SxwF8M5b3mk43TaoF2bV
+Input Tokens: 5038
+Output Tokens: 1611
+Finish Reason: end_turn
+
+=== RAW TEXT (6109 chars) ===
+{
+  "pass": false,
+  "issues": [
+    {
+      "severity": "critical",
+      "description": "80vh hero height will bury the lead on mobile, forcing excessive scroll to reach value prop",
+      "location": "design.layout.hero",
+      "rationale": "Small business owners scan quickly on mobile; 80vh means zero content visible without scroll"
+    },
+    {
+      "severity": "critical",
+      "description": "No clear 'What do you do?' statement in hero - fails 8-second comprehension test",
+      "location": "design.conversion.heroCta",
+      "rationale": "Professional services must instantly clarify their offering or lose busy small business owners"
+    },
+    {
+      "severity": "major",
+      "description": "Sticky CTA at 30% scroll too early - interrupts reading flow before value is established",
+      "location": "design.conversion.stickyCta",
+      "rationale": "Premature CTA appears pushy; small business owners need trust before commitment"
+    },
+    {
+      "severity": "major",
+      "description": "Audit log pattern irrelevant for consulting services - wastes prime trust real estate",
+      "location": "design.trust.auditLogPattern",
+      "rationale": "Small businesses care about testimonials and results, not technical audit trails"
+    },
+    {
+      "severity": "major",
+      "description": "Two-column problem/solution layout fails mobile stacking - creates confusing zigzag read",
+      "location": "design.layout.problemSolution",
+      "rationale": "Mobile users will see problem 1, then all solutions, breaking the narrative pairing"
+    },
+    {
+      "severity": "major",
+      "description": "Missing social proof above fold - no credibility indicators where decisions form",
+      "location": "design.conversion.socialProof",
+      "rationale": "Small businesses need immediate validation from peers before engaging with consultants"
+    },
+    {
+      "severity": "minor",
+      "description": "48px H1 too large for mobile - forces awkward line breaks in service headlines",
+      "location": "design.type.h1",
+      "rationale": "Professional service names often long; 48px causes 3-4 line wrapping on phones"
+    },
+    {
+      "severity": "minor",
+      "description": "Pill buttons with 16px padding create small tap targets - fails 48px mobile standard",
+      "location": "brand.components.buttons",
+      "rationale": "Busy small business owners need large, easy tap targets for quick mobile actions"
+    },
+    {
+      "severity": "minor",
+      "description": "65ch line length too narrow for desktop pricing comparison tables",
+      "location": "brand.tokens.typeScale",
+      "rationale": "Constrains side-by-side tier comparison, forcing vertical scroll to see all options"
+    },
+    {
+      "severity": "minor",
+      "description": "Tech-focused trust chips misaligned with consulting buyer psychology",
+      "location": "brand.trust.proofPresentation",
+      "rationale": "'Reversible changes' meaningless to service buyers who care about expertise and ROI"
+    }
+  ],
+  "suggestedFixes": [
+    {
+      "targetKey": "design.layout.hero",
+      "fix": "Reduce hero to 60vh max with 480px cap; ensure value prop + CTA visible without scroll",
+      "rationale": "Guarantees key message visible immediately, critical for mobile-first small business owners"
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "fix": "Add clear H2 subheading: 'Expert [Service] for Growing Businesses' above CTA",
+      "rationale": "Instant clarity on what you offer prevents bounce from confused visitors"
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "fix": "Trigger sticky CTA after pricing section viewed (approx 60% scroll) not arbitrary 30%",
+      "rationale": "Appears after value demonstrated, matching natural decision point in buyer journey"
+    },
+    {
+      "targetKey": "design.trust.socialProof",
+      "fix": "Replace audit log with 3-logo client bar + '500+ businesses transformed' counter",
+      "rationale": "Peer validation and scale proof resonate with risk-averse small business owners"
+    },
+    {
+      "targetKey": "design.mobile.heroStacking",
+      "fix": "Stack problem→solution pairs vertically on mobile, not all problems then all solutions",
+      "rationale": "Maintains narrative flow: each problem immediately followed by its solution"
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "fix": "Add testimonial carousel with client photo, company, and 1-line result above fold",
+      "rationale": "Human faces and specific outcomes build trust faster than abstract claims"
+    },
+    {
+      "targetKey": "design.type.h1",
+      "fix": "Use 36px H1 on mobile with 1.1 line height; scale to 48px at 768px+ breakpoint",
+      "rationale": "Prevents awkward wrapping while maintaining hierarchy across devices"
+    },
+    {
+      "targetKey": "design.mobile.tapTargets",
+      "fix": "Increase button height to 48px minimum with 24px horizontal padding for mobile",
+      "rationale": "Meets accessibility standards and reduces mis-taps for time-pressed users"
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "fix": "Allow pricing table to expand to 80ch width for clear side-by-side comparison",
+      "rationale": "Enables scanning all tiers without horizontal scroll, speeding decision making"
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "fix": "Replace tech chips with: 'Free Consultation • Money-Back Guarantee • 5-Star Rated'",
+      "rationale": "Addresses actual small business concerns: risk, quality, and initial commitment"
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Sticky CTA implementation must avoid blocking content on devices under 375px width",
+    "Social proof elements need legal review for client permission before going live"
+  ],
+  "assumptions": [
+    "Homepage content focuses on lead generation not direct sales",
+    "Primary traffic source is mobile based on small business owner behavior",
+    "Service offerings are B2B consulting not consumer services"
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "pass": false,
+  "issues": [
+    {
+      "severity": "critical",
+      "description": "80vh hero height will bury the lead on mobile, forcing excessive scroll to reach value prop",
+      "location": "design.layout.hero",
+      "rationale": "Small business owners scan quickly on mobile; 80vh means zero content visible without scroll"
+    },
+    {
+      "severity": "critical",
+      "description": "No clear 'What do you do?' statement in hero - fails 8-second comprehension test",
+      "location": "design.conversion.heroCta",
+      "rationale": "Professional services must instantly clarify their offering or lose busy small business owners"
+    },
+    {
+      "severity": "major",
+      "description": "Sticky CTA at 30% scroll too early - interrupts reading flow before value is established",
+      "location": "design.conversion.stickyCta",
+      "rationale": "Premature CTA appears pushy; small business owners need trust before commitment"
+    },
+    {
+      "severity": "major",
+      "description": "Audit log pattern irrelevant for consulting services - wastes prime trust real estate",
+      "location": "design.trust.auditLogPattern",
+      "rationale": "Small businesses care about testimonials and results, not technical audit trails"
+    },
+    {
+      "severity": "major",
+      "description": "Two-column problem/solution layout fails mobile stacking - creates confusing zigzag read",
+      "location": "design.layout.problemSolution",
+      "rationale": "Mobile users will see problem 1, then all solutions, breaking the narrative pairing"
+    },
+    {
+      "severity": "major",
+      "description": "Missing social proof above fold - no credibility indicators where decisions form",
+      "location": "design.conversion.socialProof",
+      "rationale": "Small businesses need immediate validation from peers before engaging with consultants"
+    },
+    {
+      "severity": "minor",
+      "description": "48px H1 too large for mobile - forces awkward line breaks in service headlines",
+      "location": "design.type.h1",
+      "rationale": "Professional service names often long; 48px causes 3-4 line wrapping on phones"
+    },
+    {
+      "severity": "minor",
+      "description": "Pill buttons with 16px padding create small tap targets - fails 48px mobile standard",
+      "location": "brand.components.buttons",
+      "rationale": "Busy small business owners need large, easy tap targets for quick mobile actions"
+    },
+    {
+      "severity": "minor",
+      "description": "65ch line length too narrow for desktop pricing comparison tables",
+      "location": "brand.tokens.typeScale",
+      "rationale": "Constrains side-by-side tier comparison, forcing vertical scroll to see all options"
+    },
+    {
+      "severity": "minor",
+      "description": "Tech-focused trust chips misaligned with consulting buyer psychology",
+      "location": "brand.trust.proofPresentation",
+      "rationale": "'Reversible changes' meaningless to service buyers who care about expertise and ROI"
+    }
+  ],
+  "suggestedFixes": [
+    {
+      "targetKey": "design.layout.hero",
+      "fix": "Reduce hero to 60vh max with 480px cap; ensure value prop + CTA visible without scroll",
+      "rationale": "Guarantees key message visible immediately, critical for mobile-first small business owners"
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "fix": "Add clear H2 subheading: 'Expert [Service] for Growing Businesses' above CTA",
+      "rationale": "Instant clarity on what you offer prevents bounce from confused visitors"
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "fix": "Trigger sticky CTA after pricing section viewed (approx 60% scroll) not arbitrary 30%",
+      "rationale": "Appears after value demonstrated, matching natural decision point in buyer journey"
+    },
+    {
+      "targetKey": "design.trust.socialProof",
+      "fix": "Replace audit log with 3-logo client bar + '500+ businesses transformed' counter",
+      "rationale": "Peer validation and scale proof resonate with risk-averse small business owners"
+    },
+    {
+      "targetKey": "design.mobile.heroStacking",
+      "fix": "Stack problem→solution pairs vertically on mobile, not all problems then all solutions",
+      "rationale": "Maintains narrative flow: each problem immediately followed by its solution"
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "fix": "Add testimonial carousel with client photo, company, and 1-line result above fold",
+      "rationale": "Human faces and specific outcomes build trust faster than abstract claims"
+    },
+    {
+      "targetKey": "design.type.h1",
+      "fix": "Use 36px H1 on mobile with 1.1 line height; scale to 48px at 768px+ breakpoint",
+      "rationale": "Prevents awkward wrapping while maintaining hierarchy across devices"
+    },
+    {
+      "targetKey": "design.mobile.tapTargets",
+      "fix": "Increase button height to 48px minimum with 24px horizontal padding for mobile",
+      "rationale": "Meets accessibility standards and reduces mis-taps for time-pressed users"
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "fix": "Allow pricing table to expand to 80ch width for clear side-by-side comparison",
+      "rationale": "Enables scanning all tiers without horizontal scroll, speeding decision making"
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "fix": "Replace tech chips with: 'Free Consultation • Money-Back Guarantee • 5-Star Rated'",
+      "rationale": "Addresses actual small business concerns: risk, quality, and initial commitment"
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Sticky CTA implementation must avoid blocking content on devices under 375px width",
+    "Social proof elements need legal review for client permission before going live"
+  ],
+  "assumptions": [
+    "Homepage content focuses on lead generation not direct sales",
+    "Primary traffic source is mobile based on small business owner behavior",
+    "Service offerings are B2B consulting not consumer services"
+  ]
+}
