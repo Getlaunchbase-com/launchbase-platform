@@ -1,0 +1,212 @@
+[
+  {
+    "lane": "artwork",
+    "rep": 1,
+    "pass": true,
+    "systems": {
+      "modelLock": "gpt-4o-2024-08-06",
+      "changeCount": 8,
+      "anchorCount": 0,
+      "jsonSizeBytes": 1866,
+      "truthPenalty": 0
+    },
+    "brand": {
+      "modelLock": "gpt-4o-2024-08-06",
+      "changeCount": 8,
+      "anchorCount": 4,
+      "jsonSizeBytes": 1537,
+      "truthPenalty": 0.1
+    },
+    "critic": {
+      "modelLock": "claude-opus-4-1-20250805",
+      "issueCount": 10,
+      "fixCount": 10,
+      "jsonSizeBytes": 4630,
+      "truthPenalty": 0
+    },
+    "truthPenalty": {
+      "systems": 0,
+      "brand": 0.1,
+      "critic": 0,
+      "total": 0.1
+    },
+    "finalScore": 90,
+    "costUsd": 0.10108,
+    "durationMs": 65088
+  },
+  {
+    "lane": "artwork",
+    "rep": 2,
+    "pass": true,
+    "systems": {
+      "modelLock": "gpt-4o-2024-08-06",
+      "changeCount": 8,
+      "anchorCount": 0,
+      "jsonSizeBytes": 1703,
+      "truthPenalty": 0
+    },
+    "brand": {
+      "modelLock": "gpt-4o-2024-08-06",
+      "changeCount": 8,
+      "anchorCount": 8,
+      "jsonSizeBytes": 1620,
+      "truthPenalty": 0.1
+    },
+    "critic": {
+      "modelLock": "claude-opus-4-1-20250805",
+      "issueCount": 10,
+      "fixCount": 10,
+      "jsonSizeBytes": 5047,
+      "truthPenalty": 0
+    },
+    "truthPenalty": {
+      "systems": 0,
+      "brand": 0.1,
+      "critic": 0,
+      "total": 0.1
+    },
+    "finalScore": 90,
+    "costUsd": 0.10276,
+    "durationMs": 67494
+  },
+  {
+    "lane": "artwork",
+    "rep": 3,
+    "pass": true,
+    "systems": {
+      "modelLock": "gpt-4o-2024-08-06",
+      "changeCount": 8,
+      "anchorCount": 1,
+      "jsonSizeBytes": 1968,
+      "truthPenalty": 0
+    },
+    "brand": {
+      "modelLock": "gpt-4o-2024-08-06",
+      "changeCount": 8,
+      "anchorCount": 5,
+      "jsonSizeBytes": 1438,
+      "truthPenalty": 0.1
+    },
+    "critic": {
+      "modelLock": "claude-opus-4-1-20250805",
+      "issueCount": 10,
+      "fixCount": 10,
+      "jsonSizeBytes": 4160,
+      "truthPenalty": 0
+    },
+    "truthPenalty": {
+      "systems": 0,
+      "brand": 0.1,
+      "critic": 0,
+      "total": 0.1
+    },
+    "finalScore": 90,
+    "costUsd": 0.0988,
+    "durationMs": 58966
+  },
+  {
+    "lane": "artwork",
+    "rep": 4,
+    "pass": true,
+    "systems": {
+      "modelLock": "gpt-4o-2024-08-06",
+      "changeCount": 8,
+      "anchorCount": 1,
+      "jsonSizeBytes": 1596,
+      "truthPenalty": 0
+    },
+    "brand": {
+      "modelLock": "gpt-4o-2024-08-06",
+      "changeCount": 8,
+      "anchorCount": 5,
+      "jsonSizeBytes": 1369,
+      "truthPenalty": 0.1
+    },
+    "critic": {
+      "modelLock": "claude-opus-4-1-20250805",
+      "issueCount": 10,
+      "fixCount": 10,
+      "jsonSizeBytes": 4175,
+      "truthPenalty": 0
+    },
+    "truthPenalty": {
+      "systems": 0,
+      "brand": 0.1,
+      "critic": 0,
+      "total": 0.1
+    },
+    "finalScore": 90,
+    "costUsd": 0.09757,
+    "durationMs": 54524
+  },
+  {
+    "lane": "artwork",
+    "rep": 5,
+    "pass": true,
+    "systems": {
+      "modelLock": "gpt-4o-2024-08-06",
+      "changeCount": 8,
+      "anchorCount": 0,
+      "jsonSizeBytes": 1661,
+      "truthPenalty": 0
+    },
+    "brand": {
+      "modelLock": "gpt-4o-2024-08-06",
+      "changeCount": 8,
+      "anchorCount": 4,
+      "jsonSizeBytes": 1481,
+      "truthPenalty": 0.1
+    },
+    "critic": {
+      "modelLock": "claude-opus-4-1-20250805",
+      "issueCount": 10,
+      "fixCount": 10,
+      "jsonSizeBytes": 4817,
+      "truthPenalty": 0
+    },
+    "truthPenalty": {
+      "systems": 0,
+      "brand": 0.1,
+      "critic": 0,
+      "total": 0.1
+    },
+    "finalScore": 90,
+    "costUsd": 0.10147,
+    "durationMs": 62193
+  },
+  {
+    "lane": "artwork",
+    "rep": 6,
+    "pass": true,
+    "systems": {
+      "modelLock": "gpt-4o-2024-08-06",
+      "changeCount": 8,
+      "anchorCount": 2,
+      "jsonSizeBytes": 1913,
+      "truthPenalty": 0
+    },
+    "brand": {
+      "modelLock": "gpt-4o-2024-08-06",
+      "changeCount": 8,
+      "anchorCount": 4,
+      "jsonSizeBytes": 1556,
+      "truthPenalty": 0.1
+    },
+    "critic": {
+      "modelLock": "claude-opus-4-1-20250805",
+      "issueCount": 10,
+      "fixCount": 10,
+      "jsonSizeBytes": 4645,
+      "truthPenalty": 0
+    },
+    "truthPenalty": {
+      "systems": 0,
+      "brand": 0.1,
+      "critic": 0,
+      "total": 0.1
+    },
+    "finalScore": 90,
+    "costUsd": 0.10105,
+    "durationMs": 61866
+  }
+]

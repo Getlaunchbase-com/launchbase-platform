@@ -1,0 +1,119 @@
+{
+  "pass": false,
+  "issues": [
+    {
+      "severity": "critical",
+      "description": "No icon system defined - missing grid, stroke weights, corner radius standards for consistent visual language",
+      "location": "design.icons.system",
+      "rationale": "Professional apps need unified icon system for trust and recognition"
+    },
+    {
+      "severity": "critical",
+      "description": "Missing illustration style guide - no defined complexity levels, perspective rules, or character design principles",
+      "location": "design.illustrations.style",
+      "rationale": "Inconsistent illustrations destroy professional credibility"
+    },
+    {
+      "severity": "major",
+      "description": "No trust visual metaphors specified - missing shields, locks, checkmarks, or transparency elements",
+      "location": "design.trust.visuals",
+      "rationale": "Small business owners need immediate visual trust signals"
+    },
+    {
+      "severity": "critical",
+      "description": "Absent motif library - no repeating patterns, textures, or brand recognition elements defined",
+      "location": "design.motifs.library",
+      "rationale": "Motifs create subconscious brand recognition and consistency"
+    },
+    {
+      "severity": "major",
+      "description": "Hero visual direction undefined - missing focal point strategy, messaging hierarchy, call-to-action placement",
+      "location": "design.hero.direction",
+      "rationale": "Hero visuals must immediately communicate value proposition"
+    },
+    {
+      "severity": "major",
+      "description": "No transparency metaphor execution - glass morphism, layering, or see-through elements missing",
+      "location": "design.transparency.metaphors",
+      "rationale": "Core brand promise of transparency lacks visual representation"
+    },
+    {
+      "severity": "minor",
+      "description": "Missing icon metaphor consistency - no unified approach to abstract vs literal representation",
+      "location": "design.icons.metaphors",
+      "rationale": "Mixed metaphors confuse users and weaken brand perception"
+    },
+    {
+      "severity": "major",
+      "description": "No illustration color palette constraints - risks overwhelming 'calm' brand requirement",
+      "location": "design.illustrations.colors",
+      "rationale": "Uncontrolled color usage contradicts calm, professional positioning"
+    },
+    {
+      "severity": "minor",
+      "description": "Undefined visual hierarchy system for trust badges, certifications, security indicators",
+      "location": "design.trust.hierarchy",
+      "rationale": "Trust elements need clear prominence rules to be effective"
+    },
+    {
+      "severity": "major",
+      "description": "No hero visual responsiveness strategy - desktop/mobile/tablet adaptation rules missing",
+      "location": "design.hero.responsive",
+      "rationale": "Small business owners work across devices, need consistent experience"
+    }
+  ],
+  "suggestedFixes": [
+    {
+      "targetKey": "design.icons.system",
+      "fix": "Implement 24px grid, 2px stroke weight, 2px corner radius for all icons. Create 3 sizes: 16px, 24px, 32px",
+      "rationale": "Consistent icon system builds professional trust and reduces cognitive load"
+    },
+    {
+      "targetKey": "design.illustrations.style",
+      "fix": "Adopt isometric perspective, flat color with single shadow, max 3 colors per illustration, geometric shapes only",
+      "rationale": "Simple geometric style conveys clarity and modernity without trend-chasing"
+    },
+    {
+      "targetKey": "design.trust.visuals",
+      "fix": "Create library: shield with checkmark, transparent layers, open padlock, handshake, verified badge system",
+      "rationale": "Trust visuals must be immediately recognizable and culturally universal"
+    },
+    {
+      "targetKey": "design.motifs.library",
+      "fix": "Develop dot grid pattern, subtle wave texture, transparency gradient overlays as brand recognition elements",
+      "rationale": "Consistent motifs create subconscious brand association across touchpoints"
+    },
+    {
+      "targetKey": "design.hero.direction",
+      "fix": "Split-screen layout: left side messaging hierarchy, right side transparent layered dashboard preview showing control",
+      "rationale": "Show product transparency literally while maintaining clear value communication"
+    },
+    {
+      "targetKey": "design.transparency.metaphors",
+      "fix": "Implement glass cards with 20% opacity white, subtle blur backdrop, visible layer structure in UI previews",
+      "rationale": "Visual transparency reinforces brand promise of operational clarity"
+    },
+    {
+      "targetKey": "design.icons.metaphors",
+      "fix": "Use literal icons for actions (save, delete), abstract for concepts (growth, efficiency). Document all choices",
+      "rationale": "Consistent metaphor approach reduces user confusion and learning curve"
+    },
+    {
+      "targetKey": "design.illustrations.colors",
+      "fix": "Limit to brand blue, neutral gray, single accent. Max 60-30-10 color ratio. No gradients except transparency",
+      "rationale": "Restrained palette maintains calm, professional tone throughout experience"
+    },
+    {
+      "targetKey": "design.trust.hierarchy",
+      "fix": "Trust badges: always top-right, security icons: left of sensitive inputs, certifications: footer prominence",
+      "rationale": "Predictable trust element placement builds subconscious confidence"
+    },
+    {
+      "targetKey": "design.hero.responsive",
+      "fix": "Mobile: stack vertically, hide decorative elements. Tablet: maintain split but reduce illustration. Desktop: full layout",
+      "rationale": "Responsive strategy ensures consistent trust messaging across all devices"
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true
+}

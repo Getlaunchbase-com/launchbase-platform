@@ -137,11 +137,12 @@ function validateDesignerOutput(role: string, payload: any): ContentValidationRe
     }
   }
   
-  // Detect lane from role (marketing has different anchor expectations)
+  // Detect lane from role (marketing & artwork have different anchor expectations)
   const isMarketingLane = role.includes("_marketing");
+  const isArtworkLane = role.includes("_artwork");
   
-  if (isMarketingLane) {
-    // Marketing lane: Strategic changes allowed, no hard fail on low anchors
+  if (isMarketingLane || isArtworkLane) {
+    // Marketing & Artwork lanes: Strategic/visual changes allowed, no hard fail on low anchors
     // Penalty scale: 0 anchors = 0.3, 1-2 anchors = 0.2, ≥3 anchors = 0.1
     let qualityPenalty = 0;
     if (anchoredCount === 0) {
