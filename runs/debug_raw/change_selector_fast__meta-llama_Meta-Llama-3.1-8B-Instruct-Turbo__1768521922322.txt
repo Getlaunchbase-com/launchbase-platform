@@ -1,0 +1,130 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTTE7Da-4YNCb4-9be95c4afa94758f
+Input Tokens: 2019
+Output Tokens: 835
+Finish Reason: stop
+
+=== RAW TEXT (3498 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a dual-CTA pattern in hero: primary CTA as a filled button (min 48px height) and secondary CTA as a text/button link aligned on the same row on desktop, sta...",
+      "rationale": "Improves conversion path clarity and reduces hesitation at the first decision point without increasing cognitive load.",
+      "confidence": 0.82,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder homepage sections to: Hero → Proof bar → Problem/Solution (before/after) → How it works (3 steps) → Visibility/Auditability panel section → Suite/featur...",
+      "rationale": "Moves trust and observability earlier, creates a cleaner narrative flow, and prevents users from reaching pricing without understanding ongoing responsibility +...",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Convert Problem/Solution into a single before/after two-column layout on desktop (50/50) and stacked cards on mobile: left card = “DIY + uncertainty” bullets (m...",
+      "rationale": "Reduces cognitive load and makes the differentiator scannable in under 10 seconds while reinforcing auditability via concrete UI elements.",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Compress How It Works into a 3-step horizontal stepper on desktop (Step 1–3 cards, equal width) and vertical stepper on mobile with 16px gaps. Add a persistent ...",
+      "rationale": "Improves scannability and creates a natural mid-funnel conversion moment after users understand the process.",
+      "confidence": 0.81,
+      "risks": []
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an audit-log pattern section using a split layout: left = 4-item checklist-style feature list; right = an activity feed component (10 visible rows, ti...",
+      "rationale": "Strengthens trust by showing “auditability” as a tangible artifact (who did what, when) rather than hype.",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Convert pricing into 2 card-based tiers with a clear default highlight (1 elevated card with 2px border accent). Each card: price, 6 bullet inclusions, and a si...",
+      "rationale": "Improves scannability and reduces cognitive load while preserving the ability to compare details when needed.",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.socialProof",
+      "value": "Replace single testimonial block with a proof bar + testimonial grid: proof bar near hero (3–5 logos or quantified stats), then a 2x2 testimonial card grid near...",
+      "rationale": "Increases credibility and reduces anxiety before pricing/commitment, while improving layout consistency and mobile usability.",
+      "confidence": 0.8,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move pricing higher (immediately after Suite/features) and add a short ‘plan fit’ row above the table: 2-3 chips that toggle emphasis (not price) between tiers....",
+      "rationale": "Makes pricing easier to reach and parse while keeping the section scannable and preventing feature-list overload.",
+      "confidence": 0.83,
+      "risks": []
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a dual-CTA pattern in hero: primary CTA as a filled button (min 48px height) and secondary CTA as a text/button link aligned on the same row on desktop, sta...",
+      "rationale": "Improves conversion path clarity and reduces hesitation at the first decision point without increasing cognitive load.",
+      "confidence": 0.82,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder homepage sections to: Hero → Proof bar → Problem/Solution (before/after) → How it works (3 steps) → Visibility/Auditability panel section → Suite/featur...",
+      "rationale": "Moves trust and observability earlier, creates a cleaner narrative flow, and prevents users from reaching pricing without understanding ongoing responsibility +...",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Convert Problem/Solution into a single before/after two-column layout on desktop (50/50) and stacked cards on mobile: left card = “DIY + uncertainty” bullets (m...",
+      "rationale": "Reduces cognitive load and makes the differentiator scannable in under 10 seconds while reinforcing auditability via concrete UI elements.",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Compress How It Works into a 3-step horizontal stepper on desktop (Step 1–3 cards, equal width) and vertical stepper on mobile with 16px gaps. Add a persistent ...",
+      "rationale": "Improves scannability and creates a natural mid-funnel conversion moment after users understand the process.",
+      "confidence": 0.81,
+      "risks": []
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an audit-log pattern section using a split layout: left = 4-item checklist-style feature list; right = an activity feed component (10 visible rows, ti...",
+      "rationale": "Strengthens trust by showing “auditability” as a tangible artifact (who did what, when) rather than hype.",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Convert pricing into 2 card-based tiers with a clear default highlight (1 elevated card with 2px border accent). Each card: price, 6 bullet inclusions, and a si...",
+      "rationale": "Improves scannability and reduces cognitive load while preserving the ability to compare details when needed.",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.socialProof",
+      "value": "Replace single testimonial block with a proof bar + testimonial grid: proof bar near hero (3–5 logos or quantified stats), then a 2x2 testimonial card grid near...",
+      "rationale": "Increases credibility and reduces anxiety before pricing/commitment, while improving layout consistency and mobile usability.",
+      "confidence": 0.8,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move pricing higher (immediately after Suite/features) and add a short ‘plan fit’ row above the table: 2-3 chips that toggle emphasis (not price) between tiers....",
+      "rationale": "Makes pricing easier to reach and parse while keeping the section scannable and preventing feature-list overload.",
+      "confidence": 0.83,
+      "risks": []
+    }
+  ]
+}

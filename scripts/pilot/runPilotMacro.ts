@@ -152,12 +152,26 @@ function buildSelectorPlan(params: {
   goals?: string[];
   constraints?: any;
 }) {
+  // Compact candidates for selector: only essential fields, truncated
+  // Selector doesn't need full rationales/risks - just enough to rank
+  const compactCandidates = params.candidateChanges.map(c => ({
+    targetKey: c.targetKey,
+    value: typeof c.value === 'string' && c.value.length > 160 
+      ? c.value.slice(0, 160) + '...' 
+      : c.value,
+    rationale: typeof c.rationale === 'string' && c.rationale.length > 160
+      ? c.rationale.slice(0, 160) + '...'
+      : c.rationale,
+    confidence: c.confidence,
+    // Omit risks array entirely - selector doesn't need it
+  }));
+  
   return {
     lane: params.lane,
     roleKind: params.roleKind,
     goals: params.goals ?? [],
     constraints: params.constraints ?? {},
-    candidateChanges: params.candidateChanges,
+    candidateChanges: compactCandidates,
   };
 }
 

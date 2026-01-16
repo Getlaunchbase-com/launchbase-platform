@@ -1,0 +1,13 @@
+=== ZOD VALIDATION ERROR (change_selector_fast) ===
+Model: Qwen/Qwen2.5-7B-Instruct-Turbo
+Request ID: oTTDeTS-66dFFu-9be95a178f208864
+
+=== ERRORS ===
+[
+  "selectedChanges: Must select exactly 8 changes"
+]
+
+=== RAW TEXT ===
+{
+  "selectedChanges": []
+}

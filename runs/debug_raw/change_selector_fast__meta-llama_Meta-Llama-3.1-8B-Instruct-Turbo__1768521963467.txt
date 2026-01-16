@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTTEKXc-2j9zxn-9be95d4dde65ef98
+Input Tokens: 1870
+Output Tokens: 854
+Finish Reason: stop
+
+=== RAW TEXT (3452 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Adopt a calm editorial type scale with strict measure: Hero H1 48px/1.1 (mobile 32px/1.15), H2 32px/1.2 (mobile 24px/1.25), H3 20px/1.3, body 16px/1.6, small 14...",
+      "rationale": "A restrained scale + controlled line length reads premium and operational, improves comprehension, and reduces cognitive load across desktop and mobile.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.marketing.sectionNarrativeFlow",
+      "value": "Standardize vertical spacing rhythm using an 8px base: section padding 96px top/bottom (mobile 56px), intra-section block gap 32px (mobile 24px), and component ...",
+      "rationale": "Consistent rhythm and predictable layout primitives create a calm, confident experience and reduce perceived complexity—especially on mobile.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a strict button hierarchy: Primary = filled, min-height 48px (mobile 48px), padding 12px 18px, radius 12px; Secondary = outline 1.5px with same sizing...",
+      "rationale": "Clear hierarchy and predictable states feel safe-by-default and operational, while improving tap targets and reducing signup friction on mobile.",
+      "confidence": 0.91
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Move to a premium, low-noise card system: default card background = neutral-0 with 1px neutral border at 12% opacity, radius 16px, shadow only on hover (shadow ...",
+      "rationale": "Subtle borders + restrained shadows communicate stability and safety while keeping information scannable and operational.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Define proof chips as compact tokens: height 28px (mobile 28px), padding 6px 10px, radius 999px, 1px border at 16% opacity, neutral background tint 4%; include ...",
+      "rationale": "Chips provide calm, structured proof without heavy visuals, improving scan speed and supporting safe-by-default signaling.",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Introduce an audit-log preview component with operational density: show 8–10 rows in a fixed-height card (desktop ~360px, mobile ~280px) with 44px row height; e...",
+      "rationale": "A tangible, readable log artifact increases trust and conveys safety-by-default through observability without resorting to marketing claims.",
+      "confidence": 0.92
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Shift neutrals to a cooler, premium grayscale for calm contrast: background neutral-0, surface neutral-50, border neutral-200 at 12–16% opacity, text neutral-90...",
+      "rationale": "A controlled neutral system reads premium and reduces eye strain while keeping the UI safely legible and accessible by default.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a strict button hierarchy: Primary = filled, min-height 48px (mobile 48px), padding 12px 18px, radius 12px; Secondary = outline 1.5px with same sizing...",
+      "rationale": "Clear hierarchy and predictable states feel safe-by-default and operational, while improving tap targets and reducing signup friction on mobile.",
+      "confidence": 0.91
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Adopt a calm editorial type scale with strict measure: Hero H1 48px/1.1 (mobile 32px/1.15), H2 32px/1.2 (mobile 24px/1.25), H3 20px/1.3, body 16px/1.6, small 14...",
+      "rationale": "A restrained scale + controlled line length reads premium and operational, improves comprehension, and reduces cognitive load across desktop and mobile.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.marketing.sectionNarrativeFlow",
+      "value": "Standardize vertical spacing rhythm using an 8px base: section padding 96px top/bottom (mobile 56px), intra-section block gap 32px (mobile 24px), and component ...",
+      "rationale": "Consistent rhythm and predictable layout primitives create a calm, confident experience and reduce perceived complexity—especially on mobile.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a strict button hierarchy: Primary = filled, min-height 48px (mobile 48px), padding 12px 18px, radius 12px; Secondary = outline 1.5px with same sizing...",
+      "rationale": "Clear hierarchy and predictable states feel safe-by-default and operational, while improving tap targets and reducing signup friction on mobile.",
+      "confidence": 0.91
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Move to a premium, low-noise card system: default card background = neutral-0 with 1px neutral border at 12% opacity, radius 16px, shadow only on hover (shadow ...",
+      "rationale": "Subtle borders + restrained shadows communicate stability and safety while keeping information scannable and operational.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Define proof chips as compact tokens: height 28px (mobile 28px), padding 6px 10px, radius 999px, 1px border at 16% opacity, neutral background tint 4%; include ...",
+      "rationale": "Chips provide calm, structured proof without heavy visuals, improving scan speed and supporting safe-by-default signaling.",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Introduce an audit-log preview component with operational density: show 8–10 rows in a fixed-height card (desktop ~360px, mobile ~280px) with 44px row height; e...",
+      "rationale": "A tangible, readable log artifact increases trust and conveys safety-by-default through observability without resorting to marketing claims.",
+      "confidence": 0.92
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Shift neutrals to a cooler, premium grayscale for calm contrast: background neutral-0, surface neutral-50, border neutral-200 at 12–16% opacity, text neutral-90...",
+      "rationale": "A controlled neutral system reads premium and reduces eye strain while keeping the UI safely legible and accessible by default.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a strict button hierarchy: Primary = filled, min-height 48px (mobile 48px), padding 12px 18px, radius 12px; Secondary = outline 1.5px with same sizing...",
+      "rationale": "Clear hierarchy and predictable states feel safe-by-default and operational, while improving tap targets and reducing signup friction on mobile.",
+      "confidence": 0.91
+    }
+  ]
+}
