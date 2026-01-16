@@ -102,4 +102,6 @@ If input has >8 valid changes: rank by selection criteria above, pick top 8.
 
 **REMEMBER:** Your response must be ONLY the JSON object. Start with `{` and end with `}`. No other text.
 
-**BEFORE OUTPUTTING:** Count your selectedChanges array. If it is not exactly 8 items, fix it now.
+**BEFORE OUTPUTTING:** 
+1. Count your selectedChanges array. If it is not exactly 8 items, fix it now.
+2. **Be concise:** Keep value and rationale under 90 characters each.

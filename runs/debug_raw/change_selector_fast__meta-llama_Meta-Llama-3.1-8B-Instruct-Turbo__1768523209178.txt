@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTTLi2o-4YNCb4-9be97bbb9f495ebf
+Input Tokens: 1930
+Output Tokens: 808
+Finish Reason: stop
+
+=== RAW TEXT (3462 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an “audit log” pattern module (read-only activity feed) as a reusable component: 6–8 rows, timestamps, actor, action, and status pill; include filters...",
+      "rationale": "Strengthens trust via auditability and visibility rather than hype, making the “ongoing responsibility + observability” promise tangible.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Rebuild hero into a 2-column grid on desktop (7/5 split): left = H1 + 3-bullet value summary + primary/secondary CTA row; right = static product UI preview fram...",
+      "rationale": "Clarifies the offer above the fold, increases scannability, and immediately supports the “hand it off without losing control” promise via visible status/audit c...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.pricing",
+      "value": "Move pricing higher in visual priority with a dedicated section header and convert the layout to 3 pricing cards on desktop (equal height) with one highlighted ...",
+      "rationale": "Makes pricing easier to parse by reducing dense tables, clarifying inclusions, and guiding choice architecture toward a default.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Standardize hero CTA row: primary CTA first, secondary CTA second, aligned horizontally on desktop with 16px gap; on mobile, stack buttons full-width with 12px ...",
+      "rationale": "Improves conversion path by making the next step obvious and reducing perceived risk at the decision point without adding new sections.",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder homepage flow to: Hero → Proof bar → Problem/Solution (compressed) → How it works → Trust/Observability (auditability) → Suite/Features → Pricing → FAQ ...",
+      "rationale": "Creates a clearer narrative (why → how → proof/control → what you get → cost), reduces scrolling fatigue, and foregrounds auditability before feature sprawl.",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a mobile-only sticky CTA bar that appears after 40% scroll: left = short label + trust icon, right = primary CTA button; include a secondary text link tucke...",
+      "rationale": "Maintains a persistent conversion path on mobile where users often lose the CTA after the hero, improving conversions without changing copy.",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Compress Problem/Solution into a single two-column layout on desktop: left column = 3 problem bullets; right column = 3 solution bullets with matching icons. On...",
+      "rationale": "Improves scannability and reduces cognitive load by removing long narrative blocks and making the contrast explicit.",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Convert How-it-Works into a 3-step horizontal stepper on desktop (cards with step numbers 01–03), and a vertical timeline on mobile. Each step card should inclu...",
+      "rationale": "Makes the process easy to understand quickly and ties the experience to concrete deliverables, supporting clarity and conversion readiness.",
+      "confidence": 0.81
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an “audit log” pattern module (read-only activity feed) as a reusable component: 6–8 rows, timestamps, actor, action, and status pill; include filters...",
+      "rationale": "Strengthens trust via auditability and visibility rather than hype, making the “ongoing responsibility + observability” promise tangible.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Rebuild hero into a 2-column grid on desktop (7/5 split): left = H1 + 3-bullet value summary + primary/secondary CTA row; right = static product UI preview fram...",
+      "rationale": "Clarifies the offer above the fold, increases scannability, and immediately supports the “hand it off without losing control” promise via visible status/audit c...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.pricing",
+      "value": "Move pricing higher in visual priority with a dedicated section header and convert the layout to 3 pricing cards on desktop (equal height) with one highlighted ...",
+      "rationale": "Makes pricing easier to parse by reducing dense tables, clarifying inclusions, and guiding choice architecture toward a default.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Standardize hero CTA row: primary CTA first, secondary CTA second, aligned horizontally on desktop with 16px gap; on mobile, stack buttons full-width with 12px ...",
+      "rationale": "Improves conversion path by making the next step obvious and reducing perceived risk at the decision point without adding new sections.",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder homepage flow to: Hero → Proof bar → Problem/Solution (compressed) → How it works → Trust/Observability (auditability) → Suite/Features → Pricing → FAQ ...",
+      "rationale": "Creates a clearer narrative (why → how → proof/control → what you get → cost), reduces scrolling fatigue, and foregrounds auditability before feature sprawl.",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a mobile-only sticky CTA bar that appears after 40% scroll: left = short label + trust icon, right = primary CTA button; include a secondary text link tucke...",
+      "rationale": "Maintains a persistent conversion path on mobile where users often lose the CTA after the hero, improving conversions without changing copy.",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Compress Problem/Solution into a single two-column layout on desktop: left column = 3 problem bullets; right column = 3 solution bullets with matching icons. On...",
+      "rationale": "Improves scannability and reduces cognitive load by removing long narrative blocks and making the contrast explicit.",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Convert How-it-Works into a 3-step horizontal stepper on desktop (cards with step numbers 01–03), and a vertical timeline on mobile. Each step card should inclu...",
+      "rationale": "Makes the process easy to understand quickly and ties the experience to concrete deliverables, supporting clarity and conversion readiness.",
+      "confidence": 0.81
+    }
+  ]
+}

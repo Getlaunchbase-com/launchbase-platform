@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTZWSFQ-2j9zxn-9bf023c30d43147f
+Input Tokens: 1937
+Output Tokens: 740
+Finish Reason: stop
+
+=== RAW TEXT (3146 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an Audit Log pattern section (above Suite): show a table-like activity feed (6 rows) with columns for owner, action, timestamp, and status; include fi...",
+      "rationale": "Strengthens trust via concrete auditability and visibility rather than hype, reinforcing the “ongoing responsibility + observability” promise.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Refactor pricing into card-based columns (desktop) and stacked cards (mobile): each card includes (1) price block, (2) 5 ‘what you get’ bullets, (3) one primary...",
+      "rationale": "Improves scannability and reduces comparison fatigue; mobile becomes significantly easier to read without horizontal scanning.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Compress Problem/Solution into a single section with a 2-column before/after layout on desktop and a stacked layout on mobile: left column = 3 pain bullets, rig...",
+      "rationale": "Makes the value proposition scannable and reduces redundant explanation, improving clarity early in the page.",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Convert How it Works into a 3-step horizontal stepper on desktop (each step as a card) and a vertical numbered list on mobile; include a persistent mini-CTA at ...",
+      "rationale": "Improves hierarchy and comprehension by turning process into a predictable pattern, while placing a low-friction CTA after users understand the flow.",
+      "confidence": 0.79
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move Pricing earlier (after Suite) and add a short comparison anchor above the table: 3 cards max with one highlighted default tier; include a sticky pricing he...",
+      "rationale": "Reduces friction by surfacing cost sooner and makes plans easier to parse through grouping and a clear default choice.",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.hero.headline",
+      "value": "Launch Your Business in 48 Hours",
+      "rationale": "More specific timeframe creates urgency",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Add a proof bar directly under hero CTAs (desktop) / under hero bullets (mobile): 3–5 compact items in a single row (desktop) or 2x2 grid (mobile) with small ic...",
+      "rationale": "Provides immediate trust cues without forcing users to scroll, improving conversion readiness while keeping the hero scannable.",
+      "confidence": 0.78
+    },
+    {
+      "targetKey": "design.layout.stickyCta",
+      "value": "Add a sticky primary CTA on mobile after 40% scroll (48–56px height) with a secondary text link; hide it when Pricing CTAs are visible to avoid duplication. On ...",
+      "rationale": "Improves conversion path on mobile without overwhelming the hero, while preventing CTA redundancy near pricing.",
+      "confidence": 0.85
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an Audit Log pattern section (above Suite): show a table-like activity feed (6 rows) with columns for owner, action, timestamp, and status; include fi...",
+      "rationale": "Strengthens trust via concrete auditability and visibility rather than hype, reinforcing the “ongoing responsibility + observability” promise.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Refactor pricing into card-based columns (desktop) and stacked cards (mobile): each card includes (1) price block, (2) 5 ‘what you get’ bullets, (3) one primary...",
+      "rationale": "Improves scannability and reduces comparison fatigue; mobile becomes significantly easier to read without horizontal scanning.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Compress Problem/Solution into a single section with a 2-column before/after layout on desktop and a stacked layout on mobile: left column = 3 pain bullets, rig...",
+      "rationale": "Makes the value proposition scannable and reduces redundant explanation, improving clarity early in the page.",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Convert How it Works into a 3-step horizontal stepper on desktop (each step as a card) and a vertical numbered list on mobile; include a persistent mini-CTA at ...",
+      "rationale": "Improves hierarchy and comprehension by turning process into a predictable pattern, while placing a low-friction CTA after users understand the flow.",
+      "confidence": 0.79
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move Pricing earlier (after Suite) and add a short comparison anchor above the table: 3 cards max with one highlighted default tier; include a sticky pricing he...",
+      "rationale": "Reduces friction by surfacing cost sooner and makes plans easier to parse through grouping and a clear default choice.",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.hero.headline",
+      "value": "Launch Your Business in 48 Hours",
+      "rationale": "More specific timeframe creates urgency",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Add a proof bar directly under hero CTAs (desktop) / under hero bullets (mobile): 3–5 compact items in a single row (desktop) or 2x2 grid (mobile) with small ic...",
+      "rationale": "Provides immediate trust cues without forcing users to scroll, improving conversion readiness while keeping the hero scannable.",
+      "confidence": 0.78
+    },
+    {
+      "targetKey": "design.layout.stickyCta",
+      "value": "Add a sticky primary CTA on mobile after 40% scroll (48–56px height) with a secondary text link; hide it when Pricing CTAs are visible to avoid duplication. On ...",
+      "rationale": "Improves conversion path on mobile without overwhelming the hero, while preventing CTA redundancy near pricing.",
+      "confidence": 0.85
+    }
+  ]
+}

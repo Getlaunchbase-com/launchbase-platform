@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTZW4n1-4YNCb4-9bf021ff7858fefd
+Input Tokens: 1501
+Output Tokens: 651
+Finish Reason: stop
+
+=== RAW TEXT (2895 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use a typography scale with 48px H1, 32px H2, 20px body text, and a max line length of 65ch to enhance readability and create a calm, confident atmosphere.",
+      "rationale": "A clear hierarchy and optimized line length improve clarity and user engagement.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Utilize a neutral color palette with a soft background (e.g., #F9F9F9) to create a calm and safe environment, ensuring sufficient contrast with text elements.",
+      "rationale": "A neutral background promotes focus and reduces visual fatigue.",
+      "confidence": 0.92
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a button hierarchy with primary buttons at 16px padding, rounded corners, and subtle drop shadows; secondary buttons with outline style for differenti...",
+      "rationale": "This creates a visual distinction that enhances user decision-making without overwhelming them.",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Introduce proof chips below the hero section: 'Safe by default,' 'Fully auditable,' and 'Reversible changes' in a compact row format to reinforce trust.",
+      "rationale": "These chips provide immediate visual cues enhancing user confidence in the product.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Set card styles to have a standard 16px padding, soft rounded corners (8px radius), and a consistent drop shadow to maintain a premium feel across components.",
+      "rationale": "Improves visual consistency and enhances the perception of quality and safety.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Add subtle dividers (1px solid #E0E0E0) between sections to create clear visual separation without overwhelming the user experience.",
+      "rationale": "This enhances the operational flow and organization of content.",
+      "confidence": 0.81
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Create an audit log preview pattern with a 3-column layout (timestamp, action, status) to enhance transparency and operational confidence.",
+      "rationale": "Visible logs strengthen the perception of operational integrity and safety.",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a button hierarchy with primary buttons at 16px padding, rounded corners, and subtle drop shadows; secondary buttons with outline style for differenti...",
+      "rationale": "This creates a visual distinction that enhances user decision-making without overwhelming them.",
+      "confidence": 0.8
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use a typography scale with 48px H1, 32px H2, 20px body text, and a max line length of 65ch to enhance readability and create a calm, confident atmosphere.",
+      "rationale": "A clear hierarchy and optimized line length improve clarity and user engagement.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Utilize a neutral color palette with a soft background (e.g., #F9F9F9) to create a calm and safe environment, ensuring sufficient contrast with text elements.",
+      "rationale": "A neutral background promotes focus and reduces visual fatigue.",
+      "confidence": 0.92
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a button hierarchy with primary buttons at 16px padding, rounded corners, and subtle drop shadows; secondary buttons with outline style for differenti...",
+      "rationale": "This creates a visual distinction that enhances user decision-making without overwhelming them.",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Introduce proof chips below the hero section: 'Safe by default,' 'Fully auditable,' and 'Reversible changes' in a compact row format to reinforce trust.",
+      "rationale": "These chips provide immediate visual cues enhancing user confidence in the product.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Set card styles to have a standard 16px padding, soft rounded corners (8px radius), and a consistent drop shadow to maintain a premium feel across components.",
+      "rationale": "Improves visual consistency and enhances the perception of quality and safety.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Add subtle dividers (1px solid #E0E0E0) between sections to create clear visual separation without overwhelming the user experience.",
+      "rationale": "This enhances the operational flow and organization of content.",
+      "confidence": 0.81
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Create an audit log preview pattern with a 3-column layout (timestamp, action, status) to enhance transparency and operational confidence.",
+      "rationale": "Visible logs strengthen the perception of operational integrity and safety.",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a button hierarchy with primary buttons at 16px padding, rounded corners, and subtle drop shadows; secondary buttons with outline style for differenti...",
+      "rationale": "This creates a visual distinction that enhances user decision-making without overwhelming them.",
+      "confidence": 0.8
+    }
+  ]
+}

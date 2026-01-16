@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: Qwen/Qwen2.5-7B-Instruct-Turbo
+Request ID: oTZUwFj-4YNCb4-9bf01c9d6e32503f
+Input Tokens: 1936
+Output Tokens: 834
+Finish Reason: stop
+
+=== RAW TEXT (3397 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Restructure hero into a 2-column grid on desktop (60/40): left = H1 + 3 scannable bullets (max 12 words each) + primary/secondary CTAs; right = a static product...",
+      "rationale": "Improves above-the-fold clarity and immediately demonstrates “hand it off without losing control” via an observable artifact (audit-style feed) rather than abst...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Place 2 CTAs in hero: primary CTA as a full-width button on mobile (min 48px height) and inline on desktop; secondary CTA as a text/button link to Pricing ancho...",
+      "rationale": "Creates a clear conversion path while offering a lower-friction option for hesitant users; reduces decision paralysis by limiting choices to two.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a mobile sticky CTA bar that appears after 40% scroll: left = secondary (Pricing), right = primary (Get started). Keep height 56px, with safe-area padding a...",
+      "rationale": "Recovers conversions on long pages and ensures CTA availability without forcing users to scroll back to the top.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce a reusable audit-log component pattern: timestamp, actor, action, object, status chip (e.g., queued/in-progress/done), and a ‘view details’ affordance...",
+      "rationale": "Makes “observability” concrete and trustable by showing what gets tracked and how a user can review decisions/actions.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "value": "Add a dedicated “Visibility panel” section using a split layout: left = 4-item checklist of what is visible (work in progress, owners, deadlines, evidence); rig...",
+      "rationale": "Strengthens the ‘control without doing the work’ promise with a clear UI mental model and reduces perceived risk.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder homepage flow to: Hero → Proof bar → Problem/Solution (merged) → How it works → Visibility/Auditability (panel + log) → Suite/Features → Pricing → FAQ →...",
+      "rationale": "Reduces cognitive load and aligns the narrative: promise → credibility → why it matters → how it works → how you keep control → what’s included → cost → objecti...",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move Pricing above FAQ and convert it into a 3-card layout on desktop (equal widths) and stacked on mobile. Each card: price, 5-bullet ‘included’ list, and a si...",
+      "rationale": "Makes pricing easier to parse and reduces table fatigue while preserving detail for users who want to compare.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Implement a consistent pricing component system: bullets limited to 5 lines, line-height 1.4, and a ‘What’s included’ list with check icons; add a ‘See full com...",
+      "rationale": "Improves visual hierarchy and scan speed; consistent alignment reduces cognitive load and supports faster selection.",
+      "confidence": 0.85
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Restructure hero into a 2-column grid on desktop (60/40): left = H1 + 3 scannable bullets (max 12 words each) + primary/secondary CTAs; right = a static product...",
+      "rationale": "Improves above-the-fold clarity and immediately demonstrates “hand it off without losing control” via an observable artifact (audit-style feed) rather than abst...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Place 2 CTAs in hero: primary CTA as a full-width button on mobile (min 48px height) and inline on desktop; secondary CTA as a text/button link to Pricing ancho...",
+      "rationale": "Creates a clear conversion path while offering a lower-friction option for hesitant users; reduces decision paralysis by limiting choices to two.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a mobile sticky CTA bar that appears after 40% scroll: left = secondary (Pricing), right = primary (Get started). Keep height 56px, with safe-area padding a...",
+      "rationale": "Recovers conversions on long pages and ensures CTA availability without forcing users to scroll back to the top.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce a reusable audit-log component pattern: timestamp, actor, action, object, status chip (e.g., queued/in-progress/done), and a ‘view details’ affordance...",
+      "rationale": "Makes “observability” concrete and trustable by showing what gets tracked and how a user can review decisions/actions.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "value": "Add a dedicated “Visibility panel” section using a split layout: left = 4-item checklist of what is visible (work in progress, owners, deadlines, evidence); rig...",
+      "rationale": "Strengthens the ‘control without doing the work’ promise with a clear UI mental model and reduces perceived risk.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder homepage flow to: Hero → Proof bar → Problem/Solution (merged) → How it works → Visibility/Auditability (panel + log) → Suite/Features → Pricing → FAQ →...",
+      "rationale": "Reduces cognitive load and aligns the narrative: promise → credibility → why it matters → how it works → how you keep control → what’s included → cost → objecti...",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move Pricing above FAQ and convert it into a 3-card layout on desktop (equal widths) and stacked on mobile. Each card: price, 5-bullet ‘included’ list, and a si...",
+      "rationale": "Makes pricing easier to parse and reduces table fatigue while preserving detail for users who want to compare.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Implement a consistent pricing component system: bullets limited to 5 lines, line-height 1.4, and a ‘What’s included’ list with check icons; add a ‘See full com...",
+      "rationale": "Improves visual hierarchy and scan speed; consistent alignment reduces cognitive load and supports faster selection.",
+      "confidence": 0.85
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTTKjD6-2j9zxn-9be977110c83fc83
+Input Tokens: 1907
+Output Tokens: 833
+Finish Reason: stop
+
+=== RAW TEXT (3281 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.hero.headline",
+      "value": "Launch Your Business in 48 Hours",
+      "rationale": "More specific timeframe creates urgency",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Adopt a calm, premium type scale with strict max line length: H1 48px/1.1 (mobile 34px/1.15), H2 32px/1.2 (mobile 24px/1.25), H3 22px/1.3, body 16–18px/1.6, cap...",
+      "rationale": "A restrained scale and controlled measure improves clarity and creates a confident, operational tone without feeling loud; premium readability supports conversi...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.marketing.sectionNarrativeFlow",
+      "value": "Implement a consistent vertical spacing rhythm: 96px section padding on desktop / 56px on mobile; within sections use an 8px base grid with 24px between heading...",
+      "rationale": "Predictable spacing reduces cognitive load and makes the experience feel operational and safe-by-default, improving comprehension and decision speed.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Define button hierarchy + states: Primary (min-height 44px, padding 12px 16px, radius 10px) solid fill; Secondary as outline 1.5px; Tertiary as text button with...",
+      "rationale": "Clear hierarchy and predictable interaction states communicate confidence and safety, while strong focus treatment improves accessibility and trust.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Use a premium, low-noise card spec: 1px border in neutral-200, background neutral-0, radius 14px, shadow = subtle (y=8 blur=24 opacity 0.08) only on hover; defa...",
+      "rationale": "Border-first cards feel calmer and more trustworthy than heavy shadows; consistent density improves scannability and reduces perceived complexity.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.tokens.shadow",
+      "value": "Reduce shadow reliance and standardize 3 levels: none (default), soft (0 8px 24px rgba(11,18,32,0.08)) for hover/raised, and focus elevation (0 12px 32px rgba(1...",
+      "rationale": "Subtle, consistent elevation reads premium and controlled, supporting a safe-by-default feel while keeping attention on content.",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Standardize proof chips: height 28px, padding 6px 10px, radius 999px, border 1px neutral-200, background neutral-50; include leading icon (14px) and short label...",
+      "rationale": "Compact, consistent chips create fast trust cues without adding marketing noise, reinforcing safe-by-default signals in a calm way.",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Create a proof bar component that sits below the hero: 3–4 compact proof blocks in a single row (desktop) / 2x2 grid (mobile), each with 16px icon, 14px label, ...",
+      "rationale": "Early, structured proof increases confidence quickly while maintaining a restrained, premium layout that supports clarity.",
+      "confidence": 0.85
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.hero.headline",
+      "value": "Launch Your Business in 48 Hours",
+      "rationale": "More specific timeframe creates urgency",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Adopt a calm, premium type scale with strict max line length: H1 48px/1.1 (mobile 34px/1.15), H2 32px/1.2 (mobile 24px/1.25), H3 22px/1.3, body 16–18px/1.6, cap...",
+      "rationale": "A restrained scale and controlled measure improves clarity and creates a confident, operational tone without feeling loud; premium readability supports conversi...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.marketing.sectionNarrativeFlow",
+      "value": "Implement a consistent vertical spacing rhythm: 96px section padding on desktop / 56px on mobile; within sections use an 8px base grid with 24px between heading...",
+      "rationale": "Predictable spacing reduces cognitive load and makes the experience feel operational and safe-by-default, improving comprehension and decision speed.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Define button hierarchy + states: Primary (min-height 44px, padding 12px 16px, radius 10px) solid fill; Secondary as outline 1.5px; Tertiary as text button with...",
+      "rationale": "Clear hierarchy and predictable interaction states communicate confidence and safety, while strong focus treatment improves accessibility and trust.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Use a premium, low-noise card spec: 1px border in neutral-200, background neutral-0, radius 14px, shadow = subtle (y=8 blur=24 opacity 0.08) only on hover; defa...",
+      "rationale": "Border-first cards feel calmer and more trustworthy than heavy shadows; consistent density improves scannability and reduces perceived complexity.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.tokens.shadow",
+      "value": "Reduce shadow reliance and standardize 3 levels: none (default), soft (0 8px 24px rgba(11,18,32,0.08)) for hover/raised, and focus elevation (0 12px 32px rgba(1...",
+      "rationale": "Subtle, consistent elevation reads premium and controlled, supporting a safe-by-default feel while keeping attention on content.",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Standardize proof chips: height 28px, padding 6px 10px, radius 999px, border 1px neutral-200, background neutral-50; include leading icon (14px) and short label...",
+      "rationale": "Compact, consistent chips create fast trust cues without adding marketing noise, reinforcing safe-by-default signals in a calm way.",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Create a proof bar component that sits below the hero: 3–4 compact proof blocks in a single row (desktop) / 2x2 grid (mobile), each with 16px icon, 14px label, ...",
+      "rationale": "Early, structured proof increases confidence quickly while maintaining a restrained, premium layout that supports clarity.",
+      "confidence": 0.85
+    }
+  ]
+}

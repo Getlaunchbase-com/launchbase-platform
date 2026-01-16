@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: Qwen/Qwen2.5-7B-Instruct-Turbo
+Request ID: oTTJbFt-4YNCb4-9be971a64acb23a3
+Input Tokens: 1973
+Output Tokens: 934
+Finish Reason: stop
+
+=== RAW TEXT (3384 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Adopt a calm editorial type scale with tight hierarchy: H1 48px/1.1 (mobile 34px/1.15), H2 32px/1.2 (mobile 26px/1.25), H3 22px/1.3, body 16px/1.6, small 14px/1...",
+      "rationale": "A restrained scale and controlled line length increase clarity and reduce perceived noise, supporting a premium, operational tone.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Tune neutrals for premium calm + contrast: set neutral-0 #FFFFFF, neutral-25 #F8FAFC, neutral-100 #F1F5F9, neutral-200 #E2E8F0, neutral-500 #64748B, neutral-700...",
+      "rationale": "A deliberate neutral ramp creates a safe, confident baseline and reduces reliance on loud accents while meeting accessibility expectations.",
+      "confidence": 0.92
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Define button hierarchy and states: Primary = solid primary-600 background, 44px min height, 14–16px vertical padding, 18px radius, focus ring 2px accent-500 + ...",
+      "rationale": "Clear hierarchy with predictable states signals confidence and safety-by-default while improving conversion paths without visual aggression.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Standardize card density and premium feel: 12px radius, 1px neutral-200 border, shadow = 0 1px 2px rgba(16,24,40,0.06) + 0 4px 12px rgba(16,24,40,0.08) on hover...",
+      "rationale": "Subtle elevation and consistent padding improves perceived quality and makes operational UI patterns (logs, proofs) feel structured and trustworthy.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Introduce proof chips as a compact trust primitive: 28–32px height, 12px radius, 12px text, 8px horizontal padding, 6px icon gap; default style = neutral-25 bac...",
+      "rationale": "Chips provide scannable, low-noise proof cues that feel operational and safe without heavy testimonial blocks.",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "brand.components.backgroundTreatments",
+      "value": "Use a single neutral canvas with subtle section separation: base background neutral-0; alternate sections with neutral-25 at 4% tint; add 1px top dividers (neut...",
+      "rationale": "Consistent rhythm and low-contrast sectioning creates calm structure and helps users scan without feeling marketed-to.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Define an audit-log preview pattern: a 'feed card' with max height 280px (mobile 220px), internal scroll, sticky header row (40px) with column labels; entries a...",
+      "rationale": "A consistent log language makes safety and auditability tangible, reinforcing safe-by-default and operational credibility.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.trust.securitySignals",
+      "value": "Standardize security signal placement and styling: a 'trust strip' component (desktop: 1 row, mobile: 2 rows) using 3–5 proof chips plus 1 compact badge card; b...",
+      "rationale": "Repeated, consistent trust signals reduce anxiety at key decision points without adding marketing-heavy sections.",
+      "confidence": 0.81
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Adopt a calm editorial type scale with tight hierarchy: H1 48px/1.1 (mobile 34px/1.15), H2 32px/1.2 (mobile 26px/1.25), H3 22px/1.3, body 16px/1.6, small 14px/1...",
+      "rationale": "A restrained scale and controlled line length increase clarity and reduce perceived noise, supporting a premium, operational tone.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Tune neutrals for premium calm + contrast: set neutral-0 #FFFFFF, neutral-25 #F8FAFC, neutral-100 #F1F5F9, neutral-200 #E2E8F0, neutral-500 #64748B, neutral-700...",
+      "rationale": "A deliberate neutral ramp creates a safe, confident baseline and reduces reliance on loud accents while meeting accessibility expectations.",
+      "confidence": 0.92
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Define button hierarchy and states: Primary = solid primary-600 background, 44px min height, 14–16px vertical padding, 18px radius, focus ring 2px accent-500 + ...",
+      "rationale": "Clear hierarchy with predictable states signals confidence and safety-by-default while improving conversion paths without visual aggression.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Standardize card density and premium feel: 12px radius, 1px neutral-200 border, shadow = 0 1px 2px rgba(16,24,40,0.06) + 0 4px 12px rgba(16,24,40,0.08) on hover...",
+      "rationale": "Subtle elevation and consistent padding improves perceived quality and makes operational UI patterns (logs, proofs) feel structured and trustworthy.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Introduce proof chips as a compact trust primitive: 28–32px height, 12px radius, 12px text, 8px horizontal padding, 6px icon gap; default style = neutral-25 bac...",
+      "rationale": "Chips provide scannable, low-noise proof cues that feel operational and safe without heavy testimonial blocks.",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "brand.components.backgroundTreatments",
+      "value": "Use a single neutral canvas with subtle section separation: base background neutral-0; alternate sections with neutral-25 at 4% tint; add 1px top dividers (neut...",
+      "rationale": "Consistent rhythm and low-contrast sectioning creates calm structure and helps users scan without feeling marketed-to.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Define an audit-log preview pattern: a 'feed card' with max height 280px (mobile 220px), internal scroll, sticky header row (40px) with column labels; entries a...",
+      "rationale": "A consistent log language makes safety and auditability tangible, reinforcing safe-by-default and operational credibility.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.trust.securitySignals",
+      "value": "Standardize security signal placement and styling: a 'trust strip' component (desktop: 1 row, mobile: 2 rows) using 3–5 proof chips plus 1 compact badge card; b...",
+      "rationale": "Repeated, consistent trust signals reduce anxiety at key decision points without adding marketing-heavy sections.",
+      "confidence": 0.81
+    }
+  ]
+}

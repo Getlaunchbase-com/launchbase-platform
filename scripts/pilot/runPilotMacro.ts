@@ -154,13 +154,14 @@ function buildSelectorPlan(params: {
 }) {
   // Compact candidates for selector: only essential fields, truncated
   // Selector doesn't need full rationales/risks - just enough to rank
+  // Keep value + rationale under 90 chars each (selector prompt enforces this too)
   const compactCandidates = params.candidateChanges.map(c => ({
     targetKey: c.targetKey,
-    value: typeof c.value === 'string' && c.value.length > 160 
-      ? c.value.slice(0, 160) + '...' 
+    value: typeof c.value === 'string' && c.value.length > 90 
+      ? c.value.slice(0, 90) + '...' 
       : c.value,
-    rationale: typeof c.rationale === 'string' && c.rationale.length > 160
-      ? c.rationale.slice(0, 160) + '...'
+    rationale: typeof c.rationale === 'string' && c.rationale.length > 90
+      ? c.rationale.slice(0, 90) + '...'
       : c.rationale,
     confidence: c.confidence,
     // Omit risks array entirely - selector doesn't need it
@@ -560,6 +561,44 @@ export async function runPilotMacro(params: {
       // 2) Creative mode: Cap → Selector → Use selected 8
       if (creativeMode?.enabled && stack.selector) {
         console.log(`[${runId}] Creative mode enabled for brand`);
+        
+        // Guard: if brand produced <8 candidates, retry before selector
+        // Selector must only choose from candidates, not synthesize new ones
+        if ((brandPayload.proposedChanges?.length || 0) < 8) {
+          console.log(`[${runId}] ⚠️  Brand undercount: ${brandPayload.proposedChanges?.length || 0} < 8, retrying brand creator...`);
+          const brandRetry = await callSpecialistWithRetry(
+            'designer_brand',
+            buildDesignerPlan({
+              runId,
+              plan,
+              context: {
+                ...context,
+                lane,
+                mode: 'fast',
+                systemsArtifact: systemsPayload,
+                maxTokens: stack.designer_brand_fast.maxTokens,
+                temperature: stack.designer_brand_fast.temperature,
+                validation: {
+                  mode: 'schema_first',
+                  enableContentValidator: true,
+                  contentValidatorPhase: 'after_schema',
+                  treatWrongCountAs: 'content_noncompliance',
+                },
+              },
+              roleConfig: toRoleConfig(
+                stack.designer_brand_fast.modelId,
+                stack.designer_brand_fast.provider,
+                lane,
+                {
+                  timeoutMs: stack.designer_brand_fast.maxTokens >= 2000 ? 45_000 : 30_000,
+                }
+              ),
+            }),
+            false
+          );
+          brandPayload = cleanParseArtifactPayload(brandRetry.artifact);
+          console.log(`[${runId}] Brand retry: ${brandPayload.proposedChanges?.length || 0} candidates`);
+        }
         
         // Cap candidates to prevent token bombs
         const cap = creativeMode.capBeforeSelect ?? 24;
