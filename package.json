@@ -11,6 +11,7 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "smoke": "vitest run server/__tests__/smoke.*.test.ts",
+    "smoke:intake": "tsx scripts/smoke/smokeCreditsInit.mjs",
     "db:push": "drizzle-kit generate && drizzle-kit migrate"
   },
   "dependencies": {
