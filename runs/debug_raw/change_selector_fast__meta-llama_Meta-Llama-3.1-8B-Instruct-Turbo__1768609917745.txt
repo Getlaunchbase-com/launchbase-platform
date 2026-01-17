@@ -1,0 +1,130 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTb17bG-4YNCb4-9bf1c0a6cc501c37
+Input Tokens: 1711
+Output Tokens: 671
+Finish Reason: stop
+
+=== RAW TEXT (2687 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Rebuild hero into a 2-column desktop grid (60/40) with: left = H1 + 3 scannable bullets (m...",
+      "rationale": "Clarifies promise above the fold and immediately demonstrates “hand it off without losing ...",
+      "confidence": 0.86,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a single dominant primary CTA in hero (full-height 48px button) and a secondary CTA as...",
+      "rationale": "Improves conversion focus and scannability by reducing choice overload while still offerin...",
+      "confidence": 0.83,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.socialProof",
+      "value": "Add a proof bar immediately below the hero (desktop: single row; mobile: 2-row wrap) using...",
+      "rationale": "Establishes trust early and supports the hero claim without adding long-form content.",
+      "confidence": 0.8,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move pricing higher (after Suite) and restructure into 3 pricing cards (desktop 3-column, ...",
+      "rationale": "Makes pricing easier to parse and reduces decision friction by presenting a clear default ...",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a sticky CTA on mobile after 40% scroll: 56px height bar with primary CTA + secondary ...",
+      "rationale": "Increases conversions on mobile by keeping the next action available without interrupting ...",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an audit-log pattern section using a compact activity feed component (8–10 rows)...",
+      "rationale": "Strengthens trust through auditability/observability with concrete UI patterns rather than...",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge “problem” and “solution” into one section using a 2-column before/after layout (desk...",
+      "rationale": "Reduces cognitive load and makes the value proposition scannable without forcing users thr...",
+      "confidence": 0.82,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to: Hero → Proof bar → Problem/Solution → How it Works → Visibility/Audit...",
+      "rationale": "Creates a clearer narrative path: promise → proof → pain → process → control/observability...",
+      "confidence": 0.84,
+      "risks": []
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Rebuild hero into a 2-column desktop grid (60/40) with: left = H1 + 3 scannable bullets (m...",
+      "rationale": "Clarifies promise above the fold and immediately demonstrates “hand it off without losing ...",
+      "confidence": 0.86,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a single dominant primary CTA in hero (full-height 48px button) and a secondary CTA as...",
+      "rationale": "Improves conversion focus and scannability by reducing choice overload while still offerin...",
+      "confidence": 0.83,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.socialProof",
+      "value": "Add a proof bar immediately below the hero (desktop: single row; mobile: 2-row wrap) using...",
+      "rationale": "Establishes trust early and supports the hero claim without adding long-form content.",
+      "confidence": 0.8,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move pricing higher (after Suite) and restructure into 3 pricing cards (desktop 3-column, ...",
+      "rationale": "Makes pricing easier to parse and reduces decision friction by presenting a clear default ...",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a sticky CTA on mobile after 40% scroll: 56px height bar with primary CTA + secondary ...",
+      "rationale": "Increases conversions on mobile by keeping the next action available without interrupting ...",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an audit-log pattern section using a compact activity feed component (8–10 rows)...",
+      "rationale": "Strengthens trust through auditability/observability with concrete UI patterns rather than...",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge “problem” and “solution” into one section using a 2-column before/after layout (desk...",
+      "rationale": "Reduces cognitive load and makes the value proposition scannable without forcing users thr...",
+      "confidence": 0.82,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to: Hero → Proof bar → Problem/Solution → How it Works → Visibility/Audit...",
+      "rationale": "Creates a clearer narrative path: promise → proof → pain → process → control/observability...",
+      "confidence": 0.84,
+      "risks": []
+    }
+  ]
+}

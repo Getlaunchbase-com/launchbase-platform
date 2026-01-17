@@ -1,0 +1,130 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTb3crX-2j9zxn-9bf1cc948980054d
+Input Tokens: 1721
+Output Tokens: 678
+Finish Reason: stop
+
+=== RAW TEXT (2692 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Rebuild hero into a 2-column grid on desktop (60/40): left = H1 + 3-bullet value summary +...",
+      "rationale": "Improves above-the-fold clarity and scannability while immediately demonstrating “hand it ...",
+      "confidence": 0.86,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Standardize hero CTA hierarchy: 1 primary CTA (filled) + 1 secondary CTA (outline) aligned...",
+      "rationale": "Creates a clear conversion decision point above the fold and reduces cognitive load by lim...",
+      "confidence": 0.82,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move pricing earlier (after Suite) and compress to a single viewport on desktop: use 3 pri...",
+      "rationale": "Makes pricing easier to parse and keeps users from hunting for plan differences; aligns de...",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a sticky CTA bar on mobile after 40% scroll: left = primary CTA button (min 44px heigh...",
+      "rationale": "Strengthens the conversion path for mobile users without forcing repeated full-width CTA b...",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an “Auditability” pattern section with a split layout: left = 4–6 item audit log...",
+      "rationale": "Strengthens trust by showing concrete observability mechanics (who did what, when, and wha...",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to: Hero → Proof bar → Problem/Solution → How it Works → Trust/Observabil...",
+      "rationale": "Front-loads clarity and proof, then explains the operating model, then substantiates trust...",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Add a proof bar directly under hero (desktop and mobile): a single horizontal row on deskt...",
+      "rationale": "Increases trust early without adding paragraphs; improves scan speed and reduces the need ...",
+      "confidence": 0.8,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge scattered “problem,” “pain,” and “benefits” content into one Problem/Solution sectio...",
+      "rationale": "Reduces cognitive load by collapsing redundant sections and makes the value proposition sc...",
+      "confidence": 0.83,
+      "risks": []
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Rebuild hero into a 2-column grid on desktop (60/40): left = H1 + 3-bullet value summary +...",
+      "rationale": "Improves above-the-fold clarity and scannability while immediately demonstrating “hand it ...",
+      "confidence": 0.86,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Standardize hero CTA hierarchy: 1 primary CTA (filled) + 1 secondary CTA (outline) aligned...",
+      "rationale": "Creates a clear conversion decision point above the fold and reduces cognitive load by lim...",
+      "confidence": 0.82,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move pricing earlier (after Suite) and compress to a single viewport on desktop: use 3 pri...",
+      "rationale": "Makes pricing easier to parse and keeps users from hunting for plan differences; aligns de...",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a sticky CTA bar on mobile after 40% scroll: left = primary CTA button (min 44px heigh...",
+      "rationale": "Strengthens the conversion path for mobile users without forcing repeated full-width CTA b...",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an “Auditability” pattern section with a split layout: left = 4–6 item audit log...",
+      "rationale": "Strengthens trust by showing concrete observability mechanics (who did what, when, and wha...",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to: Hero → Proof bar → Problem/Solution → How it Works → Trust/Observabil...",
+      "rationale": "Front-loads clarity and proof, then explains the operating model, then substantiates trust...",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Add a proof bar directly under hero (desktop and mobile): a single horizontal row on deskt...",
+      "rationale": "Increases trust early without adding paragraphs; improves scan speed and reduces the need ...",
+      "confidence": 0.8,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge scattered “problem,” “pain,” and “benefits” content into one Problem/Solution sectio...",
+      "rationale": "Reduces cognitive load by collapsing redundant sections and makes the value proposition sc...",
+      "confidence": 0.83,
+      "risks": []
+    }
+  ]
+}

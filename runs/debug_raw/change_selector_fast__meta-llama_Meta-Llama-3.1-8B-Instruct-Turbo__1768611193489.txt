@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTb7eco-4YNCb4-9bf1dfc7dd82e5c0
+Input Tokens: 1723
+Output Tokens: 625
+Finish Reason: stop
+
+=== RAW TEXT (2546 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Add a dedicated “Auditability” pattern section featuring a mock activity log (8–12 rows) w...",
+      "rationale": "Strengthens the core differentiator—visibility/observability—by showing concrete audit tra...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge any separate “Problem”, “Why”, and “Mental load” blocks into a single section using ...",
+      "rationale": "Improves scannability and reduces repetition by presenting contrast in one place, making t...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Convert “How it works” into a 3-step horizontal stepper on desktop and vertical stepper on...",
+      "rationale": "A stepper lowers cognitive load, sets expectations, and provides a natural midpage convers...",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Insert a proof bar immediately below the hero (within 24–32px): single-row on desktop, 2-r...",
+      "rationale": "Adds trust early without hype and supports the hero claim before users scroll into details...",
+      "confidence": 0.78
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Standardize hero CTAs: one primary button + one secondary text/button link, aligned horizo...",
+      "rationale": "Reduces decision friction and makes the conversion path unambiguous while keeping reassura...",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder homepage to: Hero → Proof bar → Problem/Solution (compressed) → How it works → Vis...",
+      "rationale": "Creates a clearer narrative: promise, proof, pain, process, control/observability, capabil...",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move pricing higher (after Suite) and restructure into: (1) plan cards (3 tiers max) with ...",
+      "rationale": "Makes pricing easier to parse and reduces the effort to compare, while keeping users in th...",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a sticky primary CTA on mobile only after 40% scroll depth; height 56px with a single ...",
+      "rationale": "Improves conversion by keeping the next action available on long scrolls while minimizing ...",
+      "confidence": 0.79
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Add a dedicated “Auditability” pattern section featuring a mock activity log (8–12 rows) w...",
+      "rationale": "Strengthens the core differentiator—visibility/observability—by showing concrete audit tra...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge any separate “Problem”, “Why”, and “Mental load” blocks into a single section using ...",
+      "rationale": "Improves scannability and reduces repetition by presenting contrast in one place, making t...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Convert “How it works” into a 3-step horizontal stepper on desktop and vertical stepper on...",
+      "rationale": "A stepper lowers cognitive load, sets expectations, and provides a natural midpage convers...",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Insert a proof bar immediately below the hero (within 24–32px): single-row on desktop, 2-r...",
+      "rationale": "Adds trust early without hype and supports the hero claim before users scroll into details...",
+      "confidence": 0.78
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Standardize hero CTAs: one primary button + one secondary text/button link, aligned horizo...",
+      "rationale": "Reduces decision friction and makes the conversion path unambiguous while keeping reassura...",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder homepage to: Hero → Proof bar → Problem/Solution (compressed) → How it works → Vis...",
+      "rationale": "Creates a clearer narrative: promise, proof, pain, process, control/observability, capabil...",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move pricing higher (after Suite) and restructure into: (1) plan cards (3 tiers max) with ...",
+      "rationale": "Makes pricing easier to parse and reduces the effort to compare, while keeping users in th...",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a sticky primary CTA on mobile only after 40% scroll depth; height 56px with a single ...",
+      "rationale": "Improves conversion by keeping the next action available on long scrolls while minimizing ...",
+      "confidence": 0.79
+    }
+  ]
+}

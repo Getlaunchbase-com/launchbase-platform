@@ -1,0 +1,130 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTb8YMR-4YNCb4-9bf1e40779ef87ab
+Input Tokens: 1721
+Output Tokens: 671
+Finish Reason: stop
+
+=== RAW TEXT (2688 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Restructure hero into a 2-column grid on desktop (60/40): left = H1 + 3-bullet value stack...",
+      "rationale": "Improves above-the-fold clarity and scannability while anchoring the “hand it off without ...",
+      "confidence": 0.86,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a single dominant primary CTA in hero (full-height button, min 48px) with one secondar...",
+      "rationale": "Reduces choice overload and creates a clearer conversion path without adding new copy.",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move Pricing earlier (after Suite) and reformat into a decision-first layout: 3 pricing ca...",
+      "rationale": "Makes pricing easier to parse and reduces effort to understand inclusions, improving conve...",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder homepage sections to: Hero → Proof bar → Problem/Solution → How it Works → Visibil...",
+      "rationale": "Creates a more logical narrative: promise → proof → mechanism → control/observability → de...",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Add a proof bar directly under the hero (desktop and mobile): 1-row strip with 3–5 items (...",
+      "rationale": "Introduces trust early and supports conversion without forcing users to scroll deep for va...",
+      "confidence": 0.82,
+      "risks": []
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an “audit log” UI pattern section: a card showing a timestamped activity feed (8...",
+      "rationale": "Strengthens trust via auditability/observability visuals rather than hype and clarifies “v...",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "value": "Add a compact “visibility panel” component adjacent to the audit log on desktop (2-column,...",
+      "rationale": "Makes ongoing responsibility feel measurable and controllable through concrete status stat...",
+      "confidence": 0.81,
+      "risks": []
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Standardize pricing card hierarchy: price block at top, then 5-bullet inclusions, then CTA...",
+      "rationale": "Improves scan patterns and reduces visual noise, making plan differences clearer at a glan...",
+      "confidence": 0.84,
+      "risks": []
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Restructure hero into a 2-column grid on desktop (60/40): left = H1 + 3-bullet value stack...",
+      "rationale": "Improves above-the-fold clarity and scannability while anchoring the “hand it off without ...",
+      "confidence": 0.86,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a single dominant primary CTA in hero (full-height button, min 48px) with one secondar...",
+      "rationale": "Reduces choice overload and creates a clearer conversion path without adding new copy.",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move Pricing earlier (after Suite) and reformat into a decision-first layout: 3 pricing ca...",
+      "rationale": "Makes pricing easier to parse and reduces effort to understand inclusions, improving conve...",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder homepage sections to: Hero → Proof bar → Problem/Solution → How it Works → Visibil...",
+      "rationale": "Creates a more logical narrative: promise → proof → mechanism → control/observability → de...",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Add a proof bar directly under the hero (desktop and mobile): 1-row strip with 3–5 items (...",
+      "rationale": "Introduces trust early and supports conversion without forcing users to scroll deep for va...",
+      "confidence": 0.82,
+      "risks": []
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an “audit log” UI pattern section: a card showing a timestamped activity feed (8...",
+      "rationale": "Strengthens trust via auditability/observability visuals rather than hype and clarifies “v...",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "value": "Add a compact “visibility panel” component adjacent to the audit log on desktop (2-column,...",
+      "rationale": "Makes ongoing responsibility feel measurable and controllable through concrete status stat...",
+      "confidence": 0.81,
+      "risks": []
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Standardize pricing card hierarchy: price block at top, then 5-bullet inclusions, then CTA...",
+      "rationale": "Improves scan patterns and reduces visual noise, making plan differences clearer at a glan...",
+      "confidence": 0.84,
+      "risks": []
+    }
+  ]
+}

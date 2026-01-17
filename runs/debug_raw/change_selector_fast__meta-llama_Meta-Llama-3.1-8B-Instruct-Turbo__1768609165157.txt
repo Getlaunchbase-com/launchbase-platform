@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTawFuH-2j9zxn-9bf1ae47cf088ce4
+Input Tokens: 1724
+Output Tokens: 630
+Finish Reason: stop
+
+=== RAW TEXT (2528 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Add an “audit log” pattern section using a table-like activity feed component (8–10 rows) ...",
+      "rationale": "Strengthens trust as auditability/observability with a concrete artifact, reducing relianc...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Present “How it works” as a 3-step horizontal stepper on desktop and a vertical numbered l...",
+      "rationale": "Clarifies the operating model and reinforces “ongoing responsibility + visibility” with co...",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a single dominant primary CTA in hero (full-height button, min 48px) and one secondary...",
+      "rationale": "Reduces cognitive load by narrowing choices while still offering an alternate path; adds i...",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Restructure pricing into 3 tier cards (desktop: 3-column grid; mobile: stacked) with one h...",
+      "rationale": "Makes pricing easier to parse quickly while preserving detail for evaluators without overw...",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a mobile-only sticky CTA bar after 40% scroll: primary CTA + optional secondary icon b...",
+      "rationale": "Improves conversion path on mobile where users lose access to the primary CTA quickly.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Rebuild hero into a 2-column desktop grid (60/40) with: left = H1 + 3-bullet value summary...",
+      "rationale": "Improves above-the-fold clarity and makes the “hand it off without losing control” promise...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to: Hero → Proof bar → Problem/Solution → How it works → Visibility/Audit...",
+      "rationale": "Moves trust/observability earlier (before feature sprawl), creating a clearer narrative an...",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Insert a compact proof bar directly under hero (desktop: 1 row, 4–6 items; mobile: horizon...",
+      "rationale": "Adds immediate credibility and scannability without forcing users into long testimonial bl...",
+      "confidence": 0.82
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Add an “audit log” pattern section using a table-like activity feed component (8–10 rows) ...",
+      "rationale": "Strengthens trust as auditability/observability with a concrete artifact, reducing relianc...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Present “How it works” as a 3-step horizontal stepper on desktop and a vertical numbered l...",
+      "rationale": "Clarifies the operating model and reinforces “ongoing responsibility + visibility” with co...",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a single dominant primary CTA in hero (full-height button, min 48px) and one secondary...",
+      "rationale": "Reduces cognitive load by narrowing choices while still offering an alternate path; adds i...",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Restructure pricing into 3 tier cards (desktop: 3-column grid; mobile: stacked) with one h...",
+      "rationale": "Makes pricing easier to parse quickly while preserving detail for evaluators without overw...",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a mobile-only sticky CTA bar after 40% scroll: primary CTA + optional secondary icon b...",
+      "rationale": "Improves conversion path on mobile where users lose access to the primary CTA quickly.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Rebuild hero into a 2-column desktop grid (60/40) with: left = H1 + 3-bullet value summary...",
+      "rationale": "Improves above-the-fold clarity and makes the “hand it off without losing control” promise...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to: Hero → Proof bar → Problem/Solution → How it works → Visibility/Audit...",
+      "rationale": "Moves trust/observability earlier (before feature sprawl), creating a clearer narrative an...",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Insert a compact proof bar directly under hero (desktop: 1 row, 4–6 items; mobile: horizon...",
+      "rationale": "Adds immediate credibility and scannability without forcing users into long testimonial bl...",
+      "confidence": 0.82
+    }
+  ]
+}

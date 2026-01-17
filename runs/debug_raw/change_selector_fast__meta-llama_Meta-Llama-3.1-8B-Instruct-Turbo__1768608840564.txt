@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTaubPh-4YNCb4-9bf1a65a8c849bf9
+Input Tokens: 1721
+Output Tokens: 615
+Finish Reason: stop
+
+=== RAW TEXT (2543 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Rebuild hero into a 2-column grid on desktop (60/40): left = existing H1/subhead + 2 CTAs;...",
+      "rationale": "Improves above-the-fold clarity and reduces abstractness by showing the control/visibility...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Limit hero to 1 primary CTA + 1 secondary CTA only; place primary CTA first and repeat it ...",
+      "rationale": "Reduces cognitive load and clarifies the next step while maintaining a short conversion pa...",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge any separate “problem”, “mental load”, and “benefits” blocks into one section using ...",
+      "rationale": "Cuts repetition and makes the value proposition easier to scan without adding new messagin...",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Convert How-it-Works into a 3-step numbered component with a left-to-right horizontal step...",
+      "rationale": "Improves comprehension of the process and provides a natural mid-funnel conversion moment ...",
+      "confidence": 0.81
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an “audit log” UI pattern as a dedicated section: a table/feed component showing...",
+      "rationale": "Strengthens trust through concrete auditability/observability rather than hype, reinforcin...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move pricing above FAQ and redesign as a 3-card layout on desktop (one highlighted default...",
+      "rationale": "Makes pricing faster to parse and reduces overwhelm by deferring detail until users ask fo...",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Replace any wide table with pricing cards + a toggled comparison grid: on desktop, show 6–...",
+      "rationale": "Improves readability on desktop and prevents mobile pricing from becoming an endless scrol...",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "value": "Standardize a “visibility panel” component used in 2 places (hero + trust section): includ...",
+      "rationale": "Creates a consistent mental model of control/visibility across the page, improving clarity...",
+      "confidence": 0.84
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Rebuild hero into a 2-column grid on desktop (60/40): left = existing H1/subhead + 2 CTAs;...",
+      "rationale": "Improves above-the-fold clarity and reduces abstractness by showing the control/visibility...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Limit hero to 1 primary CTA + 1 secondary CTA only; place primary CTA first and repeat it ...",
+      "rationale": "Reduces cognitive load and clarifies the next step while maintaining a short conversion pa...",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge any separate “problem”, “mental load”, and “benefits” blocks into one section using ...",
+      "rationale": "Cuts repetition and makes the value proposition easier to scan without adding new messagin...",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Convert How-it-Works into a 3-step numbered component with a left-to-right horizontal step...",
+      "rationale": "Improves comprehension of the process and provides a natural mid-funnel conversion moment ...",
+      "confidence": 0.81
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an “audit log” UI pattern as a dedicated section: a table/feed component showing...",
+      "rationale": "Strengthens trust through concrete auditability/observability rather than hype, reinforcin...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move pricing above FAQ and redesign as a 3-card layout on desktop (one highlighted default...",
+      "rationale": "Makes pricing faster to parse and reduces overwhelm by deferring detail until users ask fo...",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Replace any wide table with pricing cards + a toggled comparison grid: on desktop, show 6–...",
+      "rationale": "Improves readability on desktop and prevents mobile pricing from becoming an endless scrol...",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "value": "Standardize a “visibility panel” component used in 2 places (hero + trust section): includ...",
+      "rationale": "Creates a consistent mental model of control/visibility across the page, improving clarity...",
+      "confidence": 0.84
+    }
+  ]
+}

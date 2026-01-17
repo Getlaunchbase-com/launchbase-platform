@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTb4VJj-4YNCb4-9bf1d0b9aab1147f
+Input Tokens: 1650
+Output Tokens: 624
+Finish Reason: stop
+
+=== RAW TEXT (2538 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Rebuild hero into a 2-column grid on desktop (60/40). Left column: H1 + 3-bullet value lis...",
+      "rationale": "Clarifies the promise above the fold, reduces reading load, and immediately demonstrates o...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a single primary CTA style in hero (one button) and demote the secondary action to a t...",
+      "rationale": "Reduces choice paralysis and strengthens the main conversion action without removing the a...",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to: Hero → Proof bar → Problem/Solution (before/after) → How it works → V...",
+      "rationale": "Creates a clearer narrative flow: promise → credibility → pain/solution → process → trust/...",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Present How-it-Works as a 3-step horizontal stepper on desktop (Step 1–3) and vertical ste...",
+      "rationale": "Makes the 'hand it off without losing control' workflow concrete and easy to scan, while n...",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Add an 'Audit log' pattern section using a table-like activity feed component (8 rows) sho...",
+      "rationale": "Strengthens trust by showing auditability/observability as a tangible artifact rather than...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Restructure pricing into 3 plan cards in a single row on desktop and stacked on mobile; hi...",
+      "rationale": "Makes pricing faster to parse, supports quick decision-making, and avoids overwhelming use...",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a mobile-only sticky CTA bar that appears after 40% scroll or after the hero leaves vi...",
+      "rationale": "Improves conversion path on mobile by keeping the primary action available without requiri...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Convert Problem/Solution into a single before/after two-column layout on desktop with 2 ca...",
+      "rationale": "Improves scannability and reduces cognitive load by compressing multiple narrative blocks ...",
+      "confidence": 0.79
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Rebuild hero into a 2-column grid on desktop (60/40). Left column: H1 + 3-bullet value lis...",
+      "rationale": "Clarifies the promise above the fold, reduces reading load, and immediately demonstrates o...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a single primary CTA style in hero (one button) and demote the secondary action to a t...",
+      "rationale": "Reduces choice paralysis and strengthens the main conversion action without removing the a...",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to: Hero → Proof bar → Problem/Solution (before/after) → How it works → V...",
+      "rationale": "Creates a clearer narrative flow: promise → credibility → pain/solution → process → trust/...",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Present How-it-Works as a 3-step horizontal stepper on desktop (Step 1–3) and vertical ste...",
+      "rationale": "Makes the 'hand it off without losing control' workflow concrete and easy to scan, while n...",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Add an 'Audit log' pattern section using a table-like activity feed component (8 rows) sho...",
+      "rationale": "Strengthens trust by showing auditability/observability as a tangible artifact rather than...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Restructure pricing into 3 plan cards in a single row on desktop and stacked on mobile; hi...",
+      "rationale": "Makes pricing faster to parse, supports quick decision-making, and avoids overwhelming use...",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a mobile-only sticky CTA bar that appears after 40% scroll or after the hero leaves vi...",
+      "rationale": "Improves conversion path on mobile by keeping the primary action available without requiri...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Convert Problem/Solution into a single before/after two-column layout on desktop with 2 ca...",
+      "rationale": "Improves scannability and reduces cognitive load by compressing multiple narrative blocks ...",
+      "confidence": 0.79
+    }
+  ]
+}

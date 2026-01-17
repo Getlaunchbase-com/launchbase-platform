@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTawLYs-4YNCb4-9bf1aea95b6b7b78
+Input Tokens: 1603
+Output Tokens: 589
+Finish Reason: stop
+
+=== RAW TEXT (2426 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Set max line length for body text to 65ch to improve readability and reduce cognitive load",
+      "rationale": "Enhances clarity and comprehension, making users feel more at ease while reading",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use a type scale with H1 at 48px, H2 at 32px, H3 at 24px, body text at 16px to create a ca...",
+      "rationale": "Establishes a clear visual hierarchy that promotes confidence and calmness",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Use primary buttons with 16px padding, rounded corners, and a subtle shadow for a premium ...",
+      "rationale": "Creates a visually appealing and approachable button style that conveys confidence",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Implement card components with 16px padding, subtle shadows, and a consistent 8px radius f...",
+      "rationale": "Enhances the premium appearance of content and improves user comfort while interacting",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Add proof chips under key sections displaying trust signals such as 'Safe by default' and ...",
+      "rationale": "Provides immediate trust signals that help users feel secure in their choices",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Create a clear audit log preview pattern using a table layout with alternating row colors ...",
+      "rationale": "Increases transparency and user trust by clearly displaying actions and accountability",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Design proof chips with a minimalistic style, 4px corner radius, and 10px padding for a so...",
+      "rationale": "Conveys a calming and premium aesthetic that aligns with the brand's values",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Utilize a neutral color palette with high contrast ratios (4.5:1) for body text to improve...",
+      "rationale": "Ensures content is easy to read for all users, enhancing the feeling of safety",
+      "confidence": 0.9
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Set max line length for body text to 65ch to improve readability and reduce cognitive load",
+      "rationale": "Enhances clarity and comprehension, making users feel more at ease while reading",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use a type scale with H1 at 48px, H2 at 32px, H3 at 24px, body text at 16px to create a ca...",
+      "rationale": "Establishes a clear visual hierarchy that promotes confidence and calmness",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Use primary buttons with 16px padding, rounded corners, and a subtle shadow for a premium ...",
+      "rationale": "Creates a visually appealing and approachable button style that conveys confidence",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Implement card components with 16px padding, subtle shadows, and a consistent 8px radius f...",
+      "rationale": "Enhances the premium appearance of content and improves user comfort while interacting",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Add proof chips under key sections displaying trust signals such as 'Safe by default' and ...",
+      "rationale": "Provides immediate trust signals that help users feel secure in their choices",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Create a clear audit log preview pattern using a table layout with alternating row colors ...",
+      "rationale": "Increases transparency and user trust by clearly displaying actions and accountability",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Design proof chips with a minimalistic style, 4px corner radius, and 10px padding for a so...",
+      "rationale": "Conveys a calming and premium aesthetic that aligns with the brand's values",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Utilize a neutral color palette with high contrast ratios (4.5:1) for body text to improve...",
+      "rationale": "Ensures content is easy to read for all users, enhancing the feeling of safety",
+      "confidence": 0.9
+    }
+  ]
+}

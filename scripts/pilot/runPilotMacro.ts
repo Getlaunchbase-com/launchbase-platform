@@ -564,11 +564,14 @@ export async function runPilotMacro(params: {
         
         // Guard: if brand produced <8 candidates, retry before selector
         // Selector must only choose from candidates, not synthesize new ones
-        if ((brandPayload.proposedChanges?.length || 0) < 8) {
+        const forceUndercount = process.env.FORCE_BRAND_UNDERCOUNT === '1';
+        if (forceUndercount || (brandPayload.proposedChanges?.length || 0) < 8) {
           console.log(`[${runId}] ⚠️  Brand undercount: ${brandPayload.proposedChanges?.length || 0} < 8, retrying brand creator...`);
           const brandRetry = await callSpecialistWithRetry(
-            'designer_brand',
-            buildDesignerPlan({
+            makeInput({
+              role: 'designer_brand',
+              lane,
+              jobId,
               runId,
               plan,
               context: {
@@ -584,6 +587,7 @@ export async function runPilotMacro(params: {
                   contentValidatorPhase: 'after_schema',
                   treatWrongCountAs: 'content_noncompliance',
                 },
+                retryReason: 'brand_undercount',
               },
               roleConfig: toRoleConfig(
                 stack.designer_brand_fast.modelId,
@@ -594,7 +598,7 @@ export async function runPilotMacro(params: {
                 }
               ),
             }),
-            false
+            false // enableLadder
           );
           brandPayload = cleanParseArtifactPayload(brandRetry.artifact);
           console.log(`[${runId}] Brand retry: ${brandPayload.proposedChanges?.length || 0} candidates`);

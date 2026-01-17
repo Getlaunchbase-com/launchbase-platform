@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTb1Cgv-4YNCb4-9bf1c111f94d5332
+Input Tokens: 1675
+Output Tokens: 591
+Finish Reason: stop
+
+=== RAW TEXT (2418 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use a typography scale with H1 at 48px, H2 at 36px, H3 at 28px, and body text at 16px with...",
+      "rationale": "This creates a clear hierarchy and improves readability, contributing to a confident and p...",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.tokens.color.primary",
+      "value": "Implement a primary color that conveys confidence (e.g., deep blue #003366) to be used in ...",
+      "rationale": "This color choice enhances the premium feel and promotes trust.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Establish a button hierarchy with primary buttons at 48px height and secondary buttons at ...",
+      "rationale": "This clear distinction in button sizes conveys confidence and encourages user interaction.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Design cards with a density of 4px padding and 16px margin between them; use a shadow effe...",
+      "rationale": "This spacing creates a calm layout that feels operational and organized.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Utilize proof chips with a consistent design style, positioned below the hero, displaying ...",
+      "rationale": "This reinforces trust immediately and provides a sense of security to users.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Adopt a neutral color palette with shades of gray (e.g., #F5F5F5 for backgrounds, #E0E0E0 ...",
+      "rationale": "This supports a safe-by-default design, making users feel at ease.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Design chips with 12px font size and 4px corner radius, using a background color that cont...",
+      "rationale": "This ensures that key information is accessible while maintaining a calm aesthetic.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Use soft dividers with 1px thickness and neutral color between sections to maintain a calm...",
+      "rationale": "This creates visual separation without being distracting, supporting a premium feel.",
+      "confidence": 0.82
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use a typography scale with H1 at 48px, H2 at 36px, H3 at 28px, and body text at 16px with...",
+      "rationale": "This creates a clear hierarchy and improves readability, contributing to a confident and p...",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.tokens.color.primary",
+      "value": "Implement a primary color that conveys confidence (e.g., deep blue #003366) to be used in ...",
+      "rationale": "This color choice enhances the premium feel and promotes trust.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Establish a button hierarchy with primary buttons at 48px height and secondary buttons at ...",
+      "rationale": "This clear distinction in button sizes conveys confidence and encourages user interaction.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Design cards with a density of 4px padding and 16px margin between them; use a shadow effe...",
+      "rationale": "This spacing creates a calm layout that feels operational and organized.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Utilize proof chips with a consistent design style, positioned below the hero, displaying ...",
+      "rationale": "This reinforces trust immediately and provides a sense of security to users.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Adopt a neutral color palette with shades of gray (e.g., #F5F5F5 for backgrounds, #E0E0E0 ...",
+      "rationale": "This supports a safe-by-default design, making users feel at ease.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Design chips with 12px font size and 4px corner radius, using a background color that cont...",
+      "rationale": "This ensures that key information is accessible while maintaining a calm aesthetic.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Use soft dividers with 1px thickness and neutral color between sections to maintain a calm...",
+      "rationale": "This creates visual separation without being distracting, supporting a premium feel.",
+      "confidence": 0.82
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTb5Dwh-2j9zxn-9bf1d43998fda509
+Input Tokens: 1712
+Output Tokens: 614
+Finish Reason: stop
+
+=== RAW TEXT (2533 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an 'Audit Log' pattern inside the Visibility/Auditability section: a card with 6...",
+      "rationale": "Turns trust from hype into auditability by showing concrete, inspectable artifacts users c...",
+      "confidence": 0.91
+    },
+    {
+      "targetKey": "design.pricing",
+      "value": "Simplify pricing to 3 tier cards (desktop in a 3-column grid; mobile as stacked cards) wit...",
+      "rationale": "Makes pricing easier to parse quickly while still offering depth for comparison, improving...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use one primary CTA and one secondary CTA in hero; place primary first and repeat it once ...",
+      "rationale": "Clarifies the conversion path above the fold and reduces cognitive load while maintaining ...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Add a compact proof bar directly under the hero CTAs (desktop) / under the hero preview (m...",
+      "rationale": "Increases scannability and trust early without adding a full new section, supporting conve...",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder to: Hero → Problem/Solution (compressed) → How it Works → Visibility/Auditability ...",
+      "rationale": "Moves mechanism + observability earlier so users understand how control is retained before...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Rebuild hero as a 2-column grid on desktop (60/40): left = H1 + 3-bullet value summary + p...",
+      "rationale": "Improves above-the-fold clarity and immediately demonstrates the 'hand it off without losi...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a sticky primary CTA on mobile that appears after 40% scroll and hides on upward scrol...",
+      "rationale": "Maintains a clear conversion path on long pages without forcing users to return to the top...",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Implement a compact comparison table revealed on interaction: default collapsed on page lo...",
+      "rationale": "Reduces cognitive load on first pass while preserving detailed evaluation for high-intent ...",
+      "confidence": 0.81
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an 'Audit Log' pattern inside the Visibility/Auditability section: a card with 6...",
+      "rationale": "Turns trust from hype into auditability by showing concrete, inspectable artifacts users c...",
+      "confidence": 0.91
+    },
+    {
+      "targetKey": "design.pricing",
+      "value": "Simplify pricing to 3 tier cards (desktop in a 3-column grid; mobile as stacked cards) wit...",
+      "rationale": "Makes pricing easier to parse quickly while still offering depth for comparison, improving...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use one primary CTA and one secondary CTA in hero; place primary first and repeat it once ...",
+      "rationale": "Clarifies the conversion path above the fold and reduces cognitive load while maintaining ...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Add a compact proof bar directly under the hero CTAs (desktop) / under the hero preview (m...",
+      "rationale": "Increases scannability and trust early without adding a full new section, supporting conve...",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder to: Hero → Problem/Solution (compressed) → How it Works → Visibility/Auditability ...",
+      "rationale": "Moves mechanism + observability earlier so users understand how control is retained before...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Rebuild hero as a 2-column grid on desktop (60/40): left = H1 + 3-bullet value summary + p...",
+      "rationale": "Improves above-the-fold clarity and immediately demonstrates the 'hand it off without losi...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a sticky primary CTA on mobile that appears after 40% scroll and hides on upward scrol...",
+      "rationale": "Maintains a clear conversion path on long pages without forcing users to return to the top...",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Implement a compact comparison table revealed on interaction: default collapsed on page lo...",
+      "rationale": "Reduces cognitive load on first pass while preserving detailed evaluation for high-intent ...",
+      "confidence": 0.81
+    }
+  ]
+}

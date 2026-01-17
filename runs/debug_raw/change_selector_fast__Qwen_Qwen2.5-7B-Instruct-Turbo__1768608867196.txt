@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: Qwen/Qwen2.5-7B-Instruct-Turbo
+Request ID: oTauiJ9-62bZhn-9bf1a6ebbf6b6c17
+Input Tokens: 1586
+Output Tokens: 545
+Finish Reason: stop
+
+=== RAW TEXT (2115 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 16px body text with line-height 1.5, max line length of 70ch to enhance readability and...",
+      "rationale": "Improves text clarity and reduces cognitive load.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a primary button style with 16px font size, 12px padding, and a subtle shadow to...",
+      "rationale": "Enhances user confidence in interaction.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Use a card style with 16px padding, rounded corners (8px radius), and a consistent shadow ...",
+      "rationale": "Improves visual hierarchy and density.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Design proof chips with a consistent size (32px height) and a neutral color palette for a ...",
+      "rationale": "Reinforces safety and trust.",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Introduce a clean, organized layout for the audit log with alternating row colors to enhan...",
+      "rationale": "Builds user confidence and reinforces transparency.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.tokens.color.primary",
+      "value": "Use a calming blue (#007BFF) as the primary color for components to convey safety and trus...",
+      "rationale": "Harmonizes brand identity.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Implement a light neutral background color (#F7F7F7) to enhance contrast and reduce visual...",
+      "rationale": "Improves accessibility and aesthetic.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Introduce subtle dividers (1px solid #E0E0E0) between sections to create a structured layo...",
+      "rationale": "Promotes visual separation without overwhelming users.",
+      "confidence": 0.84
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 16px body text with line-height 1.5, max line length of 70ch to enhance readability and...",
+      "rationale": "Improves text clarity and reduces cognitive load.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a primary button style with 16px font size, 12px padding, and a subtle shadow to...",
+      "rationale": "Enhances user confidence in interaction.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Use a card style with 16px padding, rounded corners (8px radius), and a consistent shadow ...",
+      "rationale": "Improves visual hierarchy and density.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Design proof chips with a consistent size (32px height) and a neutral color palette for a ...",
+      "rationale": "Reinforces safety and trust.",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Introduce a clean, organized layout for the audit log with alternating row colors to enhan...",
+      "rationale": "Builds user confidence and reinforces transparency.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.tokens.color.primary",
+      "value": "Use a calming blue (#007BFF) as the primary color for components to convey safety and trus...",
+      "rationale": "Harmonizes brand identity.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Implement a light neutral background color (#F7F7F7) to enhance contrast and reduce visual...",
+      "rationale": "Improves accessibility and aesthetic.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Introduce subtle dividers (1px solid #E0E0E0) between sections to create a structured layo...",
+      "rationale": "Promotes visual separation without overwhelming users.",
+      "confidence": 0.84
+    }
+  ]
+}

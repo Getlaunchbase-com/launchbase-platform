@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTayGsE-2j9zxn-9bf1b7e2e8c80ba9
+Input Tokens: 1706
+Output Tokens: 612
+Finish Reason: stop
+
+=== RAW TEXT (2549 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "On desktop, switch hero to a 2-column grid (60/40): left = H1 + 3 scannable bullets; right...",
+      "rationale": "Improves above-the-fold clarity and makes the “hand it off without losing control” promise...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Standardize hero CTA cluster: 1 primary button + 1 secondary text/button on the same row (...",
+      "rationale": "Reduces decision friction and creates a clearer conversion path while adding reassurance w...",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a mobile sticky CTA bar that appears after 40% scroll and hides on upward scroll; incl...",
+      "rationale": "Improves conversion continuity on mobile where users often skim and lose the primary actio...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to: Hero → Proof bar → Problem/Solution (compressed) → How it works → Vis...",
+      "rationale": "Creates a clearer narrative: credibility first, then framing, then process, then auditabil...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an “Audit log” pattern section (or subsection) with a lightweight table/feed com...",
+      "rationale": "Strengthens observability as auditability with concrete artifacts (events, timestamps, app...",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Make pricing a 3-card layout (desktop) and stacked cards (mobile) with one highlighted def...",
+      "rationale": "Improves pricing parse speed and reduces comparison fatigue; bullets clarify value without...",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "If a comparison table exists, move it below pricing cards and collapse it behind an accord...",
+      "rationale": "Keeps initial decision lightweight while still supporting detailed evaluation for advanced...",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "design.conversion.objectionHandling",
+      "value": "Add a mid-page CTA block immediately after Pricing with a 2-column layout: left = short ch...",
+      "rationale": "Captures high intent right after pricing and directly addresses the core objection (handof...",
+      "confidence": 0.81
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "On desktop, switch hero to a 2-column grid (60/40): left = H1 + 3 scannable bullets; right...",
+      "rationale": "Improves above-the-fold clarity and makes the “hand it off without losing control” promise...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Standardize hero CTA cluster: 1 primary button + 1 secondary text/button on the same row (...",
+      "rationale": "Reduces decision friction and creates a clearer conversion path while adding reassurance w...",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a mobile sticky CTA bar that appears after 40% scroll and hides on upward scroll; incl...",
+      "rationale": "Improves conversion continuity on mobile where users often skim and lose the primary actio...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to: Hero → Proof bar → Problem/Solution (compressed) → How it works → Vis...",
+      "rationale": "Creates a clearer narrative: credibility first, then framing, then process, then auditabil...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an “Audit log” pattern section (or subsection) with a lightweight table/feed com...",
+      "rationale": "Strengthens observability as auditability with concrete artifacts (events, timestamps, app...",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Make pricing a 3-card layout (desktop) and stacked cards (mobile) with one highlighted def...",
+      "rationale": "Improves pricing parse speed and reduces comparison fatigue; bullets clarify value without...",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "If a comparison table exists, move it below pricing cards and collapse it behind an accord...",
+      "rationale": "Keeps initial decision lightweight while still supporting detailed evaluation for advanced...",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "design.conversion.objectionHandling",
+      "value": "Add a mid-page CTA block immediately after Pricing with a 2-column layout: left = short ch...",
+      "rationale": "Captures high intent right after pricing and directly addresses the core objection (handof...",
+      "confidence": 0.81
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTatMV3-2j9zxn-9bf1a072ceb7b642
+Input Tokens: 1527
+Output Tokens: 580
+Finish Reason: stop
+
+=== RAW TEXT (2466 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Utilize a neutral color palette with high contrast between text and background for accessi...",
+      "rationale": "High contrast ensures readability and helps convey operational clarity and safety.",
+      "confidence": 0.95
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Use 8px radius for all buttons and card corners to create a cohesive and soft visual ident...",
+      "rationale": "Consistent radius across components fosters a calm and friendly user interface.",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Set card density to 20px padding with 8px radius and subtle shadow for a premium feel.",
+      "rationale": "This design provides a clean, premium look while maintaining readability and hierarchy.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Use 48px height primary buttons with 16px padding, and 40% opacity on hover for a confiden...",
+      "rationale": "Consistent button size and subtle hover effects instill a sense of confidence and operatio...",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Implement proof chips with a soft shadow and 4px radius to denote safety and trustworthine...",
+      "rationale": "Soft shadows on chips create a premium feel while highlighting important trust signals.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Design audit log previews to be compact with 6–8 rows, using 14px font size for legibility...",
+      "rationale": "A clear and compact audit log enhances the sense of safety and accountability.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Introduce subtle dividers (1px, neutral color) with 16px spacing to delineate sections cle...",
+      "rationale": "Clear section separation promotes calm and organized content flow, enhancing overall clari...",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 16px for body text with a maximum line length of 65ch to enhance readability and promo...",
+      "rationale": "A clear and calm reading experience is achieved through optimal text size and line length.",
+      "confidence": 0.85
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Utilize a neutral color palette with high contrast between text and background for accessi...",
+      "rationale": "High contrast ensures readability and helps convey operational clarity and safety.",
+      "confidence": 0.95
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Use 8px radius for all buttons and card corners to create a cohesive and soft visual ident...",
+      "rationale": "Consistent radius across components fosters a calm and friendly user interface.",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Set card density to 20px padding with 8px radius and subtle shadow for a premium feel.",
+      "rationale": "This design provides a clean, premium look while maintaining readability and hierarchy.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Use 48px height primary buttons with 16px padding, and 40% opacity on hover for a confiden...",
+      "rationale": "Consistent button size and subtle hover effects instill a sense of confidence and operatio...",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Implement proof chips with a soft shadow and 4px radius to denote safety and trustworthine...",
+      "rationale": "Soft shadows on chips create a premium feel while highlighting important trust signals.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Design audit log previews to be compact with 6–8 rows, using 14px font size for legibility...",
+      "rationale": "A clear and compact audit log enhances the sense of safety and accountability.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Introduce subtle dividers (1px, neutral color) with 16px spacing to delineate sections cle...",
+      "rationale": "Clear section separation promotes calm and organized content flow, enhancing overall clari...",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 16px for body text with a maximum line length of 65ch to enhance readability and promo...",
+      "rationale": "A clear and calm reading experience is achieved through optimal text size and line length.",
+      "confidence": 0.85
+    }
+  ]
+}

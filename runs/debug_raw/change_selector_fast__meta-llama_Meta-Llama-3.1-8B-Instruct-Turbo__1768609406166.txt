@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTaxVVD-4YNCb4-9bf1b428b8b4ff1a
+Input Tokens: 1734
+Output Tokens: 639
+Finish Reason: stop
+
+=== RAW TEXT (2553 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Add an 'audit log' pattern inside the Trust/Observability section: a 3-row activity feed c...",
+      "rationale": "Strengthens trust via concrete auditability and reversibility cues instead of hype, showin...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a single primary CTA in the hero plus one secondary text-link CTA (no second button). ...",
+      "rationale": "Reduces choice overload and creates a clearer conversion path without adding new copy sect...",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Enable a mobile sticky CTA bar after 40% scroll: primary CTA button (min 44px height) + se...",
+      "rationale": "Increases conversions by keeping the next step available during long scroll while respecti...",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Convert How It Works into a 3-step horizontal sequence on desktop (stepper with 1-2-3) and...",
+      "rationale": "Reduces cognitive load by turning process into a predictable, scannable pattern and sets e...",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Redesign pricing as 3 cards (desktop in a 3-column grid, mobile as stacked) with one highl...",
+      "rationale": "Improves pricing parseability and scannability while keeping feature comparison accessible...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to: Hero → Problem/Solution → How It Works → Trust/Observability (auditab...",
+      "rationale": "Creates a more logical narrative: promise → pain → process → proof of control/visibility →...",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.conversion.objectionHandling",
+      "value": "Add an objection-handling block immediately above Pricing: 3 compact cards in a row on des...",
+      "rationale": "Pre-empts the main conversion blockers (loss of control, lack of transparency) right befor...",
+      "confidence": 0.79
+    },
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Rebuild hero into a 2-column grid on desktop (60/40): left = H1 + 3 scannable bullets (max...",
+      "rationale": "Improves above-the-fold clarity and scannability while immediately demonstrating the 'hand...",
+      "confidence": 0.82
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Add an 'audit log' pattern inside the Trust/Observability section: a 3-row activity feed c...",
+      "rationale": "Strengthens trust via concrete auditability and reversibility cues instead of hype, showin...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a single primary CTA in the hero plus one secondary text-link CTA (no second button). ...",
+      "rationale": "Reduces choice overload and creates a clearer conversion path without adding new copy sect...",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Enable a mobile sticky CTA bar after 40% scroll: primary CTA button (min 44px height) + se...",
+      "rationale": "Increases conversions by keeping the next step available during long scroll while respecti...",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Convert How It Works into a 3-step horizontal sequence on desktop (stepper with 1-2-3) and...",
+      "rationale": "Reduces cognitive load by turning process into a predictable, scannable pattern and sets e...",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Redesign pricing as 3 cards (desktop in a 3-column grid, mobile as stacked) with one highl...",
+      "rationale": "Improves pricing parseability and scannability while keeping feature comparison accessible...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to: Hero → Problem/Solution → How It Works → Trust/Observability (auditab...",
+      "rationale": "Creates a more logical narrative: promise → pain → process → proof of control/visibility →...",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.conversion.objectionHandling",
+      "value": "Add an objection-handling block immediately above Pricing: 3 compact cards in a row on des...",
+      "rationale": "Pre-empts the main conversion blockers (loss of control, lack of transparency) right befor...",
+      "confidence": 0.79
+    },
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Rebuild hero into a 2-column grid on desktop (60/40): left = H1 + 3 scannable bullets (max...",
+      "rationale": "Improves above-the-fold clarity and scannability while immediately demonstrating the 'hand...",
+      "confidence": 0.82
+    }
+  ]
+}

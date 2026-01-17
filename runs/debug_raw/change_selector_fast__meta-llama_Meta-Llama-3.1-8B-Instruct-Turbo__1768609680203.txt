@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTaytgd-4YNCb4-9bf1bad3db8ab298
+Input Tokens: 1717
+Output Tokens: 607
+Finish Reason: stop
+
+=== RAW TEXT (2553 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Enable a mobile sticky CTA that appears after ~40% scroll and hides on upward scroll; incl...",
+      "rationale": "Improves conversion path on mobile where navigation and long pages increase drop-off, with...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Replace dense tables with pricing cards + a lightweight comparison grid only for key diffe...",
+      "rationale": "Improves readability and reduces cognitive load while maintaining comparability for users ...",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an “audit log” pattern section: a card containing a timestamped activity feed (8...",
+      "rationale": "Turns observability into concrete auditability, strengthening trust without marketing clai...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Add a proof bar immediately below the hero (desktop and mobile): a single-row strip with 3...",
+      "rationale": "Introduces trust early without hype and supports the “hand it off without losing control” ...",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a single primary CTA and one secondary CTA in the hero; place them directly under the ...",
+      "rationale": "Tightens the decision path at the highest-intent moment and improves scannability without ...",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge problem + solution into one section using a two-column layout on desktop (50/50) and...",
+      "rationale": "Improves scannability and comprehension by presenting contrast quickly, while keeping user...",
+      "confidence": 0.81
+    },
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "value": "Add a compact visibility panel component adjacent to the audit log on desktop (2-column, 6...",
+      "rationale": "Reinforces control and oversight at a glance, aligning with the site promise of delegating...",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move pricing higher (after Suite) and rebuild into a 3-card layout on desktop with one hig...",
+      "rationale": "Makes pricing easier to parse and reduces decision friction by presenting a clear default ...",
+      "confidence": 0.85
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Enable a mobile sticky CTA that appears after ~40% scroll and hides on upward scroll; incl...",
+      "rationale": "Improves conversion path on mobile where navigation and long pages increase drop-off, with...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Replace dense tables with pricing cards + a lightweight comparison grid only for key diffe...",
+      "rationale": "Improves readability and reduces cognitive load while maintaining comparability for users ...",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an “audit log” pattern section: a card containing a timestamped activity feed (8...",
+      "rationale": "Turns observability into concrete auditability, strengthening trust without marketing clai...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Add a proof bar immediately below the hero (desktop and mobile): a single-row strip with 3...",
+      "rationale": "Introduces trust early without hype and supports the “hand it off without losing control” ...",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a single primary CTA and one secondary CTA in the hero; place them directly under the ...",
+      "rationale": "Tightens the decision path at the highest-intent moment and improves scannability without ...",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge problem + solution into one section using a two-column layout on desktop (50/50) and...",
+      "rationale": "Improves scannability and comprehension by presenting contrast quickly, while keeping user...",
+      "confidence": 0.81
+    },
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "value": "Add a compact visibility panel component adjacent to the audit log on desktop (2-column, 6...",
+      "rationale": "Reinforces control and oversight at a glance, aligning with the site promise of delegating...",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move pricing higher (after Suite) and rebuild into a 3-card layout on desktop with one hig...",
+      "rationale": "Makes pricing easier to parse and reduces decision friction by presenting a clear default ...",
+      "confidence": 0.85
+    }
+  ]
+}

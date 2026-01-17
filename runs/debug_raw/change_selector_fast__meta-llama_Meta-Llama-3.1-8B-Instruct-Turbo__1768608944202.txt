@@ -1,0 +1,130 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTav8He-4YNCb4-9bf1a8e42cab5d68
+Input Tokens: 1514
+Output Tokens: 569
+Finish Reason: stop
+
+=== RAW TEXT (2248 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 16px for body text with a line height of 1.6 for improved readability and calmness.",
+      "rationale": "Enhances reading comfort and maintains a professional appearance.",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 32px for H2 headings with line height of 1.3 to create a clear hierarchy.",
+      "rationale": "Establishes a confident structure within content sections.",
+      "confidence": 0.82,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Design primary buttons with 20px padding, rounded corners (8px radius)",
+      "rationale": "Creates a premium feel while ensuring buttons are easily tappable.",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Set card padding to 24px with a max width of 300px for a clean, spacious layout.",
+      "rationale": "Increases density without overwhelming users.",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Implement a proof chip component with a maximum of 5 chips laid out in a row.",
+      "rationale": "Offers immediate trust signals without clutter.",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Use a light gray (#F5F5F5) background for the audit log section to enhance visibility.",
+      "rationale": "Increases contrast and accessibility.",
+      "confidence": 0.91,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Introduce soft dividers (1px, #E0E0E0) between sections to create a calming separation.",
+      "rationale": "Enhances clarity and organization between content areas.",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Design chips with a subtle shadow and 4px radius to enhance their tactile appearance.",
+      "rationale": "Creates a premium feeling.",
+      "confidence": 0.86,
+      "risks": []
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 16px for body text with a line height of 1.6 for improved readability and calmness.",
+      "rationale": "Enhances reading comfort and maintains a professional appearance.",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 32px for H2 headings with line height of 1.3 to create a clear hierarchy.",
+      "rationale": "Establishes a confident structure within content sections.",
+      "confidence": 0.82,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Design primary buttons with 20px padding, rounded corners (8px radius)",
+      "rationale": "Creates a premium feel while ensuring buttons are easily tappable.",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Set card padding to 24px with a max width of 300px for a clean, spacious layout.",
+      "rationale": "Increases density without overwhelming users.",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Implement a proof chip component with a maximum of 5 chips laid out in a row.",
+      "rationale": "Offers immediate trust signals without clutter.",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Use a light gray (#F5F5F5) background for the audit log section to enhance visibility.",
+      "rationale": "Increases contrast and accessibility.",
+      "confidence": 0.91,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Introduce soft dividers (1px, #E0E0E0) between sections to create a calming separation.",
+      "rationale": "Enhances clarity and organization between content areas.",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Design chips with a subtle shadow and 4px radius to enhance their tactile appearance.",
+      "rationale": "Creates a premium feeling.",
+      "confidence": 0.86,
+      "risks": []
+    }
+  ]
+}

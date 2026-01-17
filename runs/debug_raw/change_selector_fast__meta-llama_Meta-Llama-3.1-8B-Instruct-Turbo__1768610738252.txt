@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTb5KZn-4YNCb4-9bf1d4b04d058f7a
+Input Tokens: 1580
+Output Tokens: 565
+Finish Reason: stop
+
+=== RAW TEXT (2451 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use a type scale with H1 at 48px, H2 at 32px, and body text at 16px with a line-height of ...",
+      "rationale": "A larger hierarchy creates a confident visual structure while enhancing readability.",
+      "confidence": 0.92
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Adopt a neutral color palette with soft grays and whites for backgrounds, ensuring a calm ...",
+      "rationale": "A softer palette reduces visual noise and promotes focus on content.",
+      "confidence": 0.91
+    },
+    {
+      "targetKey": "brand.tokens.color.primary",
+      "value": "Use a primary color that is easily distinguishable and has a contrast ratio of at least 4....",
+      "rationale": "High contrast ensures accessibility while maintaining a confident visual presence.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Design cards with 16px padding, rounded corners (8px radius), and a subtle shadow to creat...",
+      "rationale": "Enhanced card styling communicates operational efficiency and a premium experience.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Utilize a button hierarchy with primary buttons in 16px padding, secondary buttons with 12...",
+      "rationale": "This differentiation allows users to navigate confidently while maintaining focus on actio...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Implement a streamlined audit log preview pattern that displays the last three actions tak...",
+      "rationale": "This pattern fosters a sense of safety and accountability by allowing users to see their a...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Design proof chips with a subtle background color and 8px padding to create a tactile, pre...",
+      "rationale": "This design approach reinforces trust and safety through tactile interaction.",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Incorporate soft, thin dividers with a neutral color to create clear separation between se...",
+      "rationale": "This enhances organization and clarity, promoting a calm exploration of content.",
+      "confidence": 0.87
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use a type scale with H1 at 48px, H2 at 32px, and body text at 16px with a line-height of ...",
+      "rationale": "A larger hierarchy creates a confident visual structure while enhancing readability.",
+      "confidence": 0.92
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Adopt a neutral color palette with soft grays and whites for backgrounds, ensuring a calm ...",
+      "rationale": "A softer palette reduces visual noise and promotes focus on content.",
+      "confidence": 0.91
+    },
+    {
+      "targetKey": "brand.tokens.color.primary",
+      "value": "Use a primary color that is easily distinguishable and has a contrast ratio of at least 4....",
+      "rationale": "High contrast ensures accessibility while maintaining a confident visual presence.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Design cards with 16px padding, rounded corners (8px radius), and a subtle shadow to creat...",
+      "rationale": "Enhanced card styling communicates operational efficiency and a premium experience.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Utilize a button hierarchy with primary buttons in 16px padding, secondary buttons with 12...",
+      "rationale": "This differentiation allows users to navigate confidently while maintaining focus on actio...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Implement a streamlined audit log preview pattern that displays the last three actions tak...",
+      "rationale": "This pattern fosters a sense of safety and accountability by allowing users to see their a...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Design proof chips with a subtle background color and 8px padding to create a tactile, pre...",
+      "rationale": "This design approach reinforces trust and safety through tactile interaction.",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Incorporate soft, thin dividers with a neutral color to create clear separation between se...",
+      "rationale": "This enhances organization and clarity, promoting a calm exploration of content.",
+      "confidence": 0.87
+    }
+  ]
+}

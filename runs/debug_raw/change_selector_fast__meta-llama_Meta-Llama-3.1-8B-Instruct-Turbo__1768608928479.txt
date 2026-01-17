@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTav3cQ-2j9zxn-9bf1a881fdd13016
+Input Tokens: 1727
+Output Tokens: 624
+Finish Reason: stop
+
+=== RAW TEXT (2536 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Restructure hero into a 2-column grid on desktop (60/40): left = H1 + 3 scannable bullets;...",
+      "rationale": "Clarifies the offer above the fold and immediately demonstrates “hand it off without losin...",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a single dominant primary CTA in hero with one secondary text-link CTA beneath it; pla...",
+      "rationale": "Reduces choice overload while keeping an escape hatch; tight placement under the scannable...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Add a proof bar directly below the hero (within 24–32px): 4–6 logo/metric chips in a singl...",
+      "rationale": "Introduces trust immediately without adding heavy copy, improving perceived legitimacy and...",
+      "confidence": 0.78
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder homepage to: Hero → Proof bar → Problem/Solution (compressed) → How it works → Vis...",
+      "rationale": "Creates a clearer narrative: why → how → control/visibility → what’s included → cost → obj...",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "value": "Introduce a dedicated “visibility panel” section using a 2-column layout on desktop: left ...",
+      "rationale": "Makes observability tangible and auditability-focused (status + actions + approvals) witho...",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Add an audit-log pattern component inside the visibility section: a vertical activity feed...",
+      "rationale": "Directly supports “auditability” and reverses skepticism by showing how actions are tracke...",
+      "confidence": 0.81
+    },
+    {
+      "targetKey": "design.pricing",
+      "value": "Move pricing higher (after Suite) and simplify into 3 pricing cards max in a 3-column grid...",
+      "rationale": "Makes pricing easier to parse quickly, reduces comparison fatigue, and keeps the conversio...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Replace any wide table with a card-first pricing component: each card has (1) price block,...",
+      "rationale": "Card layouts are more scannable on mobile and reduce cognitive load; a lightweight summary...",
+      "confidence": 0.85
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Restructure hero into a 2-column grid on desktop (60/40): left = H1 + 3 scannable bullets;...",
+      "rationale": "Clarifies the offer above the fold and immediately demonstrates “hand it off without losin...",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a single dominant primary CTA in hero with one secondary text-link CTA beneath it; pla...",
+      "rationale": "Reduces choice overload while keeping an escape hatch; tight placement under the scannable...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Add a proof bar directly below the hero (within 24–32px): 4–6 logo/metric chips in a singl...",
+      "rationale": "Introduces trust immediately without adding heavy copy, improving perceived legitimacy and...",
+      "confidence": 0.78
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder homepage to: Hero → Proof bar → Problem/Solution (compressed) → How it works → Vis...",
+      "rationale": "Creates a clearer narrative: why → how → control/visibility → what’s included → cost → obj...",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "value": "Introduce a dedicated “visibility panel” section using a 2-column layout on desktop: left ...",
+      "rationale": "Makes observability tangible and auditability-focused (status + actions + approvals) witho...",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Add an audit-log pattern component inside the visibility section: a vertical activity feed...",
+      "rationale": "Directly supports “auditability” and reverses skepticism by showing how actions are tracke...",
+      "confidence": 0.81
+    },
+    {
+      "targetKey": "design.pricing",
+      "value": "Move pricing higher (after Suite) and simplify into 3 pricing cards max in a 3-column grid...",
+      "rationale": "Makes pricing easier to parse quickly, reduces comparison fatigue, and keeps the conversio...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Replace any wide table with a card-first pricing component: each card has (1) price block,...",
+      "rationale": "Card layouts are more scannable on mobile and reduce cognitive load; a lightweight summary...",
+      "confidence": 0.85
+    }
+  ]
+}

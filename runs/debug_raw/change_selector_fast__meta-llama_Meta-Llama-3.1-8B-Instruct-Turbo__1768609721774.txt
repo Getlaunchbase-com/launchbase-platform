@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTaz7Go-2j9zxn-9bf1bbdcce9cfefe
+Input Tokens: 1724
+Output Tokens: 633
+Finish Reason: stop
+
+=== RAW TEXT (2540 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an ‘Audit log’ pattern section: a compact activity feed component (6 rows) showi...",
+      "rationale": "Strengthens trust through observable proof (auditability) instead of hype, and concretely ...",
+      "confidence": 0.91
+    },
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Restructure hero into a 2-column grid on desktop (60/40): left = H1 + 3 scannable bullets;...",
+      "rationale": "Clarifies the promise above the fold and immediately demonstrates ‘hand it off without los...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Add a persistent proof bar pattern used twice: (1) directly under hero CTAs, (2) above pri...",
+      "rationale": "Places trust signals at the two highest-intent moments (entry + pricing) without adding a ...",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Convert Problem/Solution into a single section with a 2-column layout on desktop: left = 3...",
+      "rationale": "Improves scannability and reduces repetition by pairing claims and outcomes in one pass.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Convert pricing into 3 card-based tiers with one highlighted default tier; each card inclu...",
+      "rationale": "Makes pricing easier to parse and compare quickly, while clarifying baseline inclusions wi...",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a single primary CTA + one secondary CTA in the hero; place them directly below the bu...",
+      "rationale": "Reduces cognitive load and creates a clear conversion path while preserving an alternate l...",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Change How-it-Works to a 3-step horizontal stepper on desktop (Step 1–3 with icons) and a ...",
+      "rationale": "Makes the operational handoff feel controlled and auditable by showing checkpoints, not ju...",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Add a persistent proof bar pattern used twice: (1) directly under hero CTAs, (2) above pri...",
+      "rationale": "Places trust signals at the two highest-intent moments (entry + pricing) without adding a ...",
+      "confidence": 0.8
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an ‘Audit log’ pattern section: a compact activity feed component (6 rows) showi...",
+      "rationale": "Strengthens trust through observable proof (auditability) instead of hype, and concretely ...",
+      "confidence": 0.91
+    },
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Restructure hero into a 2-column grid on desktop (60/40): left = H1 + 3 scannable bullets;...",
+      "rationale": "Clarifies the promise above the fold and immediately demonstrates ‘hand it off without los...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Add a persistent proof bar pattern used twice: (1) directly under hero CTAs, (2) above pri...",
+      "rationale": "Places trust signals at the two highest-intent moments (entry + pricing) without adding a ...",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Convert Problem/Solution into a single section with a 2-column layout on desktop: left = 3...",
+      "rationale": "Improves scannability and reduces repetition by pairing claims and outcomes in one pass.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Convert pricing into 3 card-based tiers with one highlighted default tier; each card inclu...",
+      "rationale": "Makes pricing easier to parse and compare quickly, while clarifying baseline inclusions wi...",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a single primary CTA + one secondary CTA in the hero; place them directly below the bu...",
+      "rationale": "Reduces cognitive load and creates a clear conversion path while preserving an alternate l...",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Change How-it-Works to a 3-step horizontal stepper on desktop (Step 1–3 with icons) and a ...",
+      "rationale": "Makes the operational handoff feel controlled and auditable by showing checkpoints, not ju...",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Add a persistent proof bar pattern used twice: (1) directly under hero CTAs, (2) above pri...",
+      "rationale": "Places trust signals at the two highest-intent moments (entry + pricing) without adding a ...",
+      "confidence": 0.8
+    }
+  ]
+}

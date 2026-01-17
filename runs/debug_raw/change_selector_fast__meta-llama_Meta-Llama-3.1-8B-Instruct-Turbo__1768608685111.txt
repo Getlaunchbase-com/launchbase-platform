@@ -1,0 +1,130 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTatoEd-4YNCb4-9bf1a2901bf6b8b9
+Input Tokens: 1524
+Output Tokens: 625
+Finish Reason: stop
+
+=== RAW TEXT (2564 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Use a neutral color palette with high contrast ratios (minimum 4.5:1) to ensure accessibil...",
+      "rationale": "Improves readability for all users, reinforcing a safe and calm experience.",
+      "confidence": 0.95,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use a type scale of 16px for body text, 20px for subheadings, and 24px for headings with a...",
+      "rationale": "Improves clarity and readability, reducing cognitive load for users.",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a button hierarchy with primary buttons at 16px padding and secondary buttons at...",
+      "rationale": "Creates a clear distinction between primary and secondary actions, enhancing user confiden...",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Introduce a timestamped activity feed in the audit log section with alternating background...",
+      "rationale": "Enhances the trustworthiness of the platform by showcasing activity in an easily readable ...",
+      "confidence": 0.92,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Design cards with a 16px border radius and 20px padding. Use a consistent 1.5x vertical rh...",
+      "rationale": "Balances density and whitespace, promoting a calm layout.",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Add a proof bar beneath the hero section featuring three key trust signals: 'Safe by defau...",
+      "rationale": "Reinforces trust at the initial point of interaction, setting a confident tone.",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Use subtle dividers (1px solid, neutral color) with 40px vertical spacing between key sect...",
+      "rationale": "Enhances clarity and organization, helping users navigate the interface confidently.",
+      "confidence": 0.89,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Standardize all component corners to a 4px radius for a modern and premium look across but...",
+      "rationale": "Creates a cohesive visual language that feels premium and approachable.",
+      "confidence": 0.84,
+      "risks": []
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Use a neutral color palette with high contrast ratios (minimum 4.5:1) to ensure accessibil...",
+      "rationale": "Improves readability for all users, reinforcing a safe and calm experience.",
+      "confidence": 0.95,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use a type scale of 16px for body text, 20px for subheadings, and 24px for headings with a...",
+      "rationale": "Improves clarity and readability, reducing cognitive load for users.",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a button hierarchy with primary buttons at 16px padding and secondary buttons at...",
+      "rationale": "Creates a clear distinction between primary and secondary actions, enhancing user confiden...",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Introduce a timestamped activity feed in the audit log section with alternating background...",
+      "rationale": "Enhances the trustworthiness of the platform by showcasing activity in an easily readable ...",
+      "confidence": 0.92,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Design cards with a 16px border radius and 20px padding. Use a consistent 1.5x vertical rh...",
+      "rationale": "Balances density and whitespace, promoting a calm layout.",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Add a proof bar beneath the hero section featuring three key trust signals: 'Safe by defau...",
+      "rationale": "Reinforces trust at the initial point of interaction, setting a confident tone.",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Use subtle dividers (1px solid, neutral color) with 40px vertical spacing between key sect...",
+      "rationale": "Enhances clarity and organization, helping users navigate the interface confidently.",
+      "confidence": 0.89,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Standardize all component corners to a 4px radius for a modern and premium look across but...",
+      "rationale": "Creates a cohesive visual language that feels premium and approachable.",
+      "confidence": 0.84,
+      "risks": []
+    }
+  ]
+}

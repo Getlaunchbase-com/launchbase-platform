@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTavyKJ-4YNCb4-9bf1aceafbaf8e12
+Input Tokens: 1526
+Output Tokens: 579
+Finish Reason: stop
+
+=== RAW TEXT (2417 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use a type scale that includes 48px H1, 32px H2, 24px H3, and 16px body text for improved ...",
+      "rationale": "Establishing a clear hierarchy enhances confidence and operational clarity.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Create a button hierarchy with primary buttons at 16px padding and secondary buttons at 12...",
+      "rationale": "Clear button hierarchy aids in decision-making and provides a calm user experience.",
+      "confidence": 0.92
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Adopt a neutral color palette with soft tones (e.g., light greys and whites) to create a c...",
+      "rationale": "A calming color palette contributes to a safe-by-default atmosphere.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Introduce proof chips with a 3-chip layout below the hero section to communicate trust fac...",
+      "rationale": "This pattern enhances user confidence by presenting key trust signals in a digestible form...",
+      "confidence": 0.91
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Use 80px vertical spacing between sections to create breathing room and improve clarity.",
+      "rationale": "Adequate spacing fosters a calm experience and aids in content digestibility.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Set a consistent 4px radius for all interactive elements to create a cohesive, premium fee...",
+      "rationale": "Rounded edges enhance the perception of safety and approachability in the UI.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Implement card design with 16px padding, subtle shadow, and 4px radius to evoke a premium ...",
+      "rationale": "A more spacious card design reduces density and enhances the user's sense of safety.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Design the audit log preview with a maximum height of 280px and a scrollable interface for...",
+      "rationale": "This approach enhances user trust by ensuring transparency in operations.",
+      "confidence": 0.84
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use a type scale that includes 48px H1, 32px H2, 24px H3, and 16px body text for improved ...",
+      "rationale": "Establishing a clear hierarchy enhances confidence and operational clarity.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Create a button hierarchy with primary buttons at 16px padding and secondary buttons at 12...",
+      "rationale": "Clear button hierarchy aids in decision-making and provides a calm user experience.",
+      "confidence": 0.92
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Adopt a neutral color palette with soft tones (e.g., light greys and whites) to create a c...",
+      "rationale": "A calming color palette contributes to a safe-by-default atmosphere.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Introduce proof chips with a 3-chip layout below the hero section to communicate trust fac...",
+      "rationale": "This pattern enhances user confidence by presenting key trust signals in a digestible form...",
+      "confidence": 0.91
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Use 80px vertical spacing between sections to create breathing room and improve clarity.",
+      "rationale": "Adequate spacing fosters a calm experience and aids in content digestibility.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Set a consistent 4px radius for all interactive elements to create a cohesive, premium fee...",
+      "rationale": "Rounded edges enhance the perception of safety and approachability in the UI.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Implement card design with 16px padding, subtle shadow, and 4px radius to evoke a premium ...",
+      "rationale": "A more spacious card design reduces density and enhances the user's sense of safety.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Design the audit log preview with a maximum height of 280px and a scrollable interface for...",
+      "rationale": "This approach enhances user trust by ensuring transparency in operations.",
+      "confidence": 0.84
+    }
+  ]
+}
