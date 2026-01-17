@@ -97,9 +97,6 @@ export interface SpecialistOutput {
  * Load prompt pack from file
  */
 function loadPromptPack(role: string): string {
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = dirname(__filename);
-  
   // Map role names to prompt pack files
   const promptMap: Record<string, string> = {
     craft: "craft.md",
@@ -129,7 +126,18 @@ function loadPromptPack(role: string): string {
   };
   
   const promptFile = promptMap[role] || `${role}.md`;
-  const promptPath = join(__dirname, "promptPacks", promptFile);
+  
+  // In production (bundled), prompts are copied to dist/ai/engine/specialists/promptPacks/
+  // In development, they're in server/ai/engine/specialists/promptPacks/
+  let promptPath: string;
+  if (process.env.NODE_ENV === "production") {
+    promptPath = join(process.cwd(), "dist", "ai", "engine", "specialists", "promptPacks", promptFile);
+  } else {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+    promptPath = join(__dirname, "promptPacks", promptFile);
+  }
+  
   return readFileSync(promptPath, "utf-8");
 }
 

@@ -1984,3 +1984,9 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [ ] Wire Creator (5.2) → Selector (winner) → Critic (Sonnet 4.0) pipeline
 - [ ] Add hard cap: if creator > 24, slice to 24 before selector
 - [ ] Test full pipeline: Web × 3 reps (production mode)
+
+## 🔧 URGENT FIXES
+
+- [x] Fix Vite HMR WebSocket configuration for Manus public URL
+
+- [x] Fix deployment: Copy AI prompt files to dist directory during build
