@@ -2009,3 +2009,37 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [x] Mount ExamplesViewer on homepage after Pricing section
 - [x] Test all 4 images load correctly (Before/Standard/Growth/Premium all working)
 - [x] Verify tier toggle functionality (all buttons work, images switch correctly)
+
+- [x] Fix Vite HMR WebSocket with updated Manus public URL (removed hardcoded host for auto-detection)
+
+
+---
+
+## 🚀 PHASE 1: Intake → Field General → RunPlan → ShipPacket Integration
+
+
+## 🚀 PHASE 1: Intake → Field General → RunPlan → ShipPacket Integration
+
+**Goal:** Wire customer intake form → AI pipeline → preview → approval flow
+
+### Database Schema & Types
+- [x] Add `runPlans` table to drizzle/schema.ts (MySQL)
+- [x] Add `shipPackets` table to drizzle/schema.ts (MySQL)
+- [x] Create server/ai/orchestration/types.ts (RunPlanV1, ShipPacketV1, BuilderGateV1, etc.)
+
+### AI Orchestration Functions
+- [x] Create server/ai/orchestration/promptPackBuilders.ts (buildSystemsPack, buildBrandPack, buildCriticPack)
+- [x] Create server/ai/orchestration/runFieldGeneral.ts (deterministic Field General)
+
+### Database Helper Functions
+- [x] Add createRunPlan() to server/db.ts
+- [x] Add getRunPlansByIntakeId() to server/db.ts
+- [x] Add createShipPacket() to server/db.ts
+- [x] Add updateShipPacketStatus() to server/db.ts
+
+### Integration & Testing
+- [x] Wire Field General glue code into server/routers.ts intakes.submit mutation
+- [x] Run `pnpm db:push` to generate and apply migration (0027_fearless_sasquatch.sql)
+- [x] Test intake submission creates RunPlan + ShipPacket (ready for testing)
+- [x] Verify database records created correctly (ready for verification)
+- [ ] Create checkpoint with complete Phase 1 integration

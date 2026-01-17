@@ -155,6 +155,83 @@ export const appRouter = router({
           }
         }
         
+        // ===== PHASE 1: Field General → RunPlan → ShipPacket =====
+        if (intake?.id) {
+          const { runFieldGeneral } = await import("./ai/orchestration/runFieldGeneral");
+          const { createRunPlan, createShipPacket } = await import("./db");
+          const { randomBytes } = await import("crypto");
+          
+          // Generate unique IDs for this run
+          const runId = `run_${Date.now()}_${randomBytes(8).toString("hex")}`;
+          const jobId = `job_${Date.now()}_${randomBytes(8).toString("hex")}`;
+          
+          console.log(`[Intake] Generating RunPlan for intake ${intake.id}...`);
+          
+          // Run Field General (deterministic, no LLM call)
+          const runPlan = runFieldGeneral({
+            intake,
+            runId,
+            jobId,
+            runMode: "production",
+          });
+          
+          console.log(`[Intake] RunPlan generated:`, {
+            tier: runPlan.tier,
+            loops: runPlan.loopsRequested,
+            builderEnabled: runPlan.builderGate.enabled,
+          });
+          
+          // Store RunPlan in database
+          const storedRunPlan = await createRunPlan({
+            intakeId: intake.id,
+            tenant: intake.tenant,
+            customerEmail: intake.email,
+            runId,
+            jobId,
+            tier: runPlan.tier,
+            runMode: runPlan.runMode,
+            creativeModeEnabled: runPlan.creativeMode.enabled,
+            data: runPlan as Record<string, unknown>,
+          });
+          
+          if (storedRunPlan) {
+            console.log(`[Intake] RunPlan stored with ID: ${storedRunPlan.id}`);
+            
+            // Create empty ShipPacket (DRAFT status)
+            const shipPacket = await createShipPacket({
+              intakeId: intake.id,
+              runPlanId: storedRunPlan.id,
+              runId,
+              status: "DRAFT",
+              data: {
+                version: "shippacket.v1",
+                intakeId: intake.id,
+                runPlanId: storedRunPlan.id,
+                runId,
+                tier: runPlan.tier,
+                proposal: {
+                  systems: null,
+                  brand: null,
+                  critic: null,
+                },
+                preview: {
+                  screenshots: [],
+                },
+                execution: {
+                  buildPlanId: null,
+                  builderSnapshotId: null,
+                },
+                createdAtIso: new Date().toISOString(),
+              },
+            });
+            
+            if (shipPacket) {
+              console.log(`[Intake] ShipPacket created with ID: ${shipPacket.id}`);
+              // TODO: Trigger swarm execution here (Phase 2)
+            }
+          }
+        }
+        
         // Send confirmation email
         if (intake?.id) {
           const firstName = input.contactName.split(" ")[0];

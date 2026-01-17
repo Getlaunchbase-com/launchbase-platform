@@ -11,6 +11,8 @@ import {
   intelligenceLayers, InsertIntelligenceLayer, IntelligenceLayer,
   socialPosts, InsertSocialPost, SocialPost,
   postUsage, InsertPostUsage, PostUsage,
+  runPlans, InsertRunPlan, RunPlan,
+  shipPackets, InsertShipPacket, ShipPacket,
 } from "../drizzle/schema";
 import { TEMPLATE_VERSION_CURRENT } from "../shared/templateVersion";
 import { ENV } from './_core/env';
@@ -650,4 +652,147 @@ export async function runDeployment(id: number) {
     });
     return { success: false, error: errorMessage };
   }
+}
+
+
+// ============ RUN PLAN FUNCTIONS ============
+
+export async function createRunPlan(data: {
+  intakeId: number;
+  tenant: string;
+  customerEmail: string;
+  runId: string;
+  jobId: string;
+  tier: "standard" | "growth" | "premium";
+  runMode: "tournament" | "production";
+  creativeModeEnabled: boolean;
+  data: Record<string, unknown>;
+}): Promise<{ id: number } & typeof data | null> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create run plan: database not available");
+    return null;
+  }
+
+  const values: InsertRunPlan = {
+    intakeId: data.intakeId,
+    tenant: data.tenant,
+    customerEmail: data.customerEmail,
+    runId: data.runId,
+    jobId: data.jobId,
+    tier: data.tier,
+    runMode: data.runMode,
+    creativeModeEnabled: data.creativeModeEnabled ? 1 : 0,
+    data: data.data,
+  };
+
+  const result = await db.insert(runPlans).values(values);
+  const insertId = Number(result[0].insertId);
+
+  return { id: insertId, ...data };
+}
+
+export async function getRunPlansByIntakeId(intakeId: number): Promise<RunPlan[]> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get run plans: database not available");
+    return [];
+  }
+
+  return db.select().from(runPlans).where(eq(runPlans.intakeId, intakeId)).orderBy(desc(runPlans.createdAt));
+}
+
+export async function getRunPlanByRunId(runId: string): Promise<RunPlan | null> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get run plan: database not available");
+    return null;
+  }
+
+  const results = await db.select().from(runPlans).where(eq(runPlans.runId, runId)).limit(1);
+  return results[0] ?? null;
+}
+
+// ============ SHIP PACKET FUNCTIONS ============
+
+export async function createShipPacket(data: {
+  intakeId: number;
+  runPlanId: number;
+  runId: string;
+  status?: "DRAFT" | "READY_FOR_REVIEW" | "APPROVED" | "REJECTED";
+  previewUrl?: string;
+  previewToken?: string;
+  data: Record<string, unknown>;
+}): Promise<{ id: number } & typeof data | null> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create ship packet: database not available");
+    return null;
+  }
+
+  const values: InsertShipPacket = {
+    intakeId: data.intakeId,
+    runPlanId: data.runPlanId,
+    runId: data.runId,
+    status: data.status ?? "DRAFT",
+    previewUrl: data.previewUrl ?? null,
+    previewToken: data.previewToken ?? null,
+    data: data.data,
+  };
+
+  const result = await db.insert(shipPackets).values(values);
+  const insertId = Number(result[0].insertId);
+
+  return { id: insertId, ...data };
+}
+
+export async function getShipPacketsByIntakeId(intakeId: number): Promise<ShipPacket[]> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get ship packets: database not available");
+    return [];
+  }
+
+  return db.select().from(shipPackets).where(eq(shipPackets.intakeId, intakeId)).orderBy(desc(shipPackets.createdAt));
+}
+
+export async function getShipPacketByRunId(runId: string): Promise<ShipPacket | null> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get ship packet: database not available");
+    return null;
+  }
+
+  const results = await db.select().from(shipPackets).where(eq(shipPackets.runId, runId)).limit(1);
+  return results[0] ?? null;
+}
+
+export async function updateShipPacketStatus(
+  id: number,
+  status: "DRAFT" | "READY_FOR_REVIEW" | "APPROVED" | "REJECTED",
+  updates?: {
+    previewUrl?: string;
+    previewToken?: string;
+    data?: Record<string, unknown>;
+  }
+): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update ship packet: database not available");
+    return;
+  }
+
+  const updateSet: Record<string, unknown> = { status };
+  
+  if (updates?.previewUrl !== undefined) {
+    updateSet.previewUrl = updates.previewUrl;
+  }
+  if (updates?.previewToken !== undefined) {
+    updateSet.previewToken = updates.previewToken;
+  }
+  if (updates?.data !== undefined) {
+    updateSet.data = updates.data;
+  }
+
+  await db.update(shipPackets).set(updateSet).where(eq(shipPackets.id, id));
 }

@@ -190,6 +190,13 @@
       "when": 1768249372686,
       "tag": "0026_short_sandman",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "5",
+      "when": 1768673486467,
+      "tag": "0027_fearless_sasquatch",
+      "breakpoints": true
     }
   ]
 }
