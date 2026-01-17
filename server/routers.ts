@@ -1122,6 +1122,7 @@ export const appRouter = router({
         const db = await getDb();
         if (!db) throw new Error("Database not available");
         
+        const { getDefaultIntakeCredits } = await import("./db-helpers");
         const result = await db.insert(intakes).values({
           businessName: `Test ${input.scenario} - ${new Date().toISOString()}`,
           contactName: "Test User",
@@ -1131,6 +1132,7 @@ export const appRouter = router({
           status: "new",
           rawPayload: selections,
           tenant: "launchbase",
+          ...getDefaultIntakeCredits("standard"), // CRITICAL: Explicit credit defaults
         });
         
         const insertId = result[0]?.insertId;
