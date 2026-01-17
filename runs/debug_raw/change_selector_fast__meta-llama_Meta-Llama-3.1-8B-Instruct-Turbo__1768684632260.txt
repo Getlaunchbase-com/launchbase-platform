@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oThc3Zc-4YNCb4-9bf8e0bb6cd54b48
+Input Tokens: 1764
+Output Tokens: 634
+Finish Reason: stop
+
+=== RAW TEXT (2529 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Restructure hero into a 2-column grid on desktop (60/40): left = H1 + 3-bullet value list ...",
+      "rationale": "Improves above-the-fold clarity and makes the “hand it off without losing control” promise...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an “audit log” pattern as a dedicated trust module: a compact table/feed (6–10 r...",
+      "rationale": "Reframes observability as concrete auditability and control, strengthening trust without h...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to: Hero → Proof bar → Problem/Solution (compressed) → How it Works → Vis...",
+      "rationale": "Moves trust and observability earlier (as auditability), improves narrative flow, and ensu...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a single primary CTA (Call) and one secondary CTA (e.g., view pricing/see process) in ...",
+      "rationale": "Reduces decision fatigue and creates a clear conversion path without relying on excessive ...",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Convert How It Works into a 3-step numbered timeline with a horizontal layout on desktop a...",
+      "rationale": "Clarifies the operating model quickly and provides a natural mid-funnel conversion moment.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move pricing to a single, clean section with: (a) 3-tier card layout on desktop, stacked o...",
+      "rationale": "Makes pricing easier to parse and compare, reduces scanning effort, and aligns decision-ma...",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a mobile-only sticky CTA bar that appears after 40% scroll: primary button = Call; sec...",
+      "rationale": "Improves conversion path on mobile where navigation and CTAs are easily lost, without addi...",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge any separate “problem”, “mental load”, and “why us” blocks into one section using a ...",
+      "rationale": "Cuts cognitive load and makes the value proposition scannable without adding new claims.",
+      "confidence": 0.83
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Restructure hero into a 2-column grid on desktop (60/40): left = H1 + 3-bullet value list ...",
+      "rationale": "Improves above-the-fold clarity and makes the “hand it off without losing control” promise...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an “audit log” pattern as a dedicated trust module: a compact table/feed (6–10 r...",
+      "rationale": "Reframes observability as concrete auditability and control, strengthening trust without h...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to: Hero → Proof bar → Problem/Solution (compressed) → How it Works → Vis...",
+      "rationale": "Moves trust and observability earlier (as auditability), improves narrative flow, and ensu...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a single primary CTA (Call) and one secondary CTA (e.g., view pricing/see process) in ...",
+      "rationale": "Reduces decision fatigue and creates a clear conversion path without relying on excessive ...",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Convert How It Works into a 3-step numbered timeline with a horizontal layout on desktop a...",
+      "rationale": "Clarifies the operating model quickly and provides a natural mid-funnel conversion moment.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move pricing to a single, clean section with: (a) 3-tier card layout on desktop, stacked o...",
+      "rationale": "Makes pricing easier to parse and compare, reduces scanning effort, and aligns decision-ma...",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a mobile-only sticky CTA bar that appears after 40% scroll: primary button = Call; sec...",
+      "rationale": "Improves conversion path on mobile where navigation and CTAs are easily lost, without addi...",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge any separate “problem”, “mental load”, and “why us” blocks into one section using a ...",
+      "rationale": "Cuts cognitive load and makes the value proposition scannable without adding new claims.",
+      "confidence": 0.83
+    }
+  ]
+}

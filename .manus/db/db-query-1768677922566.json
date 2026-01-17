@@ -1,0 +1,26 @@
+{
+  "query": "SELECT id, businessName, email, status, previewToken, createdAt FROM intakes ORDER BY id DESC LIMIT 2;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT id, businessName, email, status, previewToken, createdAt FROM intakes ORDER BY id DESC LIMIT 2;",
+  "rows": [
+    {
+      "id": "2",
+      "businessName": "Test User 2",
+      "email": "test2@launchbase.test",
+      "status": "ready_for_review",
+      "previewToken": "preview_1768677892160_6b9bcbd75ba46cc3",
+      "createdAt": "2026-01-17 19:24:52"
+    },
+    {
+      "id": "1",
+      "businessName": "Standard Smoke Test",
+      "email": "test-standard@launchbase.test",
+      "status": "ready_for_review",
+      "previewToken": "preview_1768677041616_0113e3c51e954a57",
+      "createdAt": "2026-01-17 19:10:41"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tbusinessName\temail\tstatus\tpreviewToken\tcreatedAt\n2\tTest User 2\ttest2@launchbase.test\tready_for_review\tpreview_1768677892160_6b9bcbd75ba46cc3\t2026-01-17 19:24:52\n1\tStandard Smoke Test\ttest-standard@launchbase.test\tready_for_review\tpreview_1768677041616_0113e3c51e954a57\t2026-01-17 19:10:41\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

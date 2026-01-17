@@ -1,0 +1,9 @@
+{
+  "query": "SELECT id, intakeId, runPlanId, runId, status, previewUrl, previewToken, createdAt, updatedAt FROM ship_packets WHERE intakeId = 1 ORDER BY id DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT id, intakeId, runPlanId, runId, status, previewUrl, previewToken, createdAt, updatedAt FROM ship_packets WHERE intakeId = 1 ORDER BY id DESC LIMIT 5;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 49
+}

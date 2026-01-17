@@ -2090,3 +2090,71 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [ ] Test requestChanges with 0 credits (should block + show checkout)
 - [ ] Test approve flow (should not consume credits)
 - [ ] Create checkpoint with complete Phase 2 integration
+
+
+---
+
+## 🚀 PHASE 3: Testing Ladder + Builder.io Site Finishing
+
+**Goal:** Validate complete flow across all tiers (Standard/Growth/Premium) and finish LaunchBase marketing site
+
+### Level 0: Smoke Test (Intake → RunPlan → ShipPacket Wiring)
+- [ ] Create 3 test intakes (Standard/Growth/Premium tiers)
+- [ ] Verify intake row created with correct credits (1/3/10)
+- [ ] Verify RunPlan created and stored in database
+- [ ] Verify ShipPacket created with DRAFT status
+- [ ] Verify email queued/sent with preview token/link
+
+### Level 1: Standard Tier Test (1 Loop, Showroom Only)
+- [ ] Submit Standard test intake (Lakeview Plumbing)
+- [ ] Verify exactly 1 loop executed via runPilotMacro
+- [ ] Verify ShipPacket updated with proposal (systems/brand/critic)
+- [ ] Verify ShipPacket status → READY_FOR_REVIEW (if critic passes)
+- [ ] Verify preview link works (showroom screenshots or HTML snapshot)
+- [ ] Test "Approve" mutation (should consume 0 credits)
+- [ ] Test "Request Changes" mutation (should consume 1 credit and block with needsPurchase)
+
+### Level 2: Growth Tier Test (3 Loops, Multi-Iteration)
+- [ ] Submit Growth test intake (BrightSmile Dental)
+- [ ] Verify initial 2-3 loops executed
+- [ ] Test "Request Changes" twice (should decrement credits by 2)
+- [ ] Test 4th "Request Changes" (should return needsPurchase: true)
+- [ ] Verify Stripe buy-more checkout link generated
+- [ ] Verify re-run uses prior context (customer memory/inquiry truth)
+
+### Level 3: Premium Tier Test (Real LaunchBase Job with Builder.io)
+- [ ] Submit Premium intake for getlaunchbase.com
+- [ ] Include explicit note: "UI-only. Do not touch auth, Stripe, QuickBooks OAuth, server, DB"
+- [ ] Verify RunPlan marks BuilderGate.enabled = true
+- [ ] Verify allowed surfaces: homepage_ui, landing_page_ui, pricing_ui
+- [ ] Verify explicit exclusions: server/*, auth, stripe, qb, db, routers
+- [ ] Swarm creates plan: Systems/Brand creators → Selector picks 8 → Critic validates
+- [ ] Verify ShipPacket contains: proposedChanges, rationale, risks, preview requirements
+- [ ] Builder applies plan to Home/Pricing/How It Works (PR-only workflow)
+- [ ] Pressure-test loop: Critic → Selector → Builder patch (repeat until credits exhausted or arbiter says ship)
+- [ ] Final Arbiter (GPT-5.2) produces ShipPacket "READY_FOR_REVIEW"
+- [ ] Test customer approval triggers publish/PR merge
+- [ ] Test "Request Changes" decrements Premium credits correctly
+
+### Builder.io Site Finishing (Marketing Pages Only)
+- [ ] Define safe pages for Builder: Pricing, How It Works, Examples, FAQ, About, Contact, Features
+- [ ] Lock Builder permissions: client/src/pages/**, client/src/components/marketing/** only
+- [ ] Create page completion checklist (hero, CTA, trust proof, outcomes, FAQ, final CTA)
+- [ ] Define site-wide consistency rules (buttons, headings, spacing, nav, footer)
+- [ ] Builder task 1: Finish Pricing page (tier cards with credit model, before/after viewer)
+- [ ] Builder task 2: Finish How It Works page
+- [ ] Builder task 3: Finish Examples/Showcase page (tier gallery with toggle)
+- [ ] Builder task 4: Finish FAQ page
+- [ ] Builder task 5: Finish Footer + global CTA patterns
+- [ ] For each page: Send PR → Preview → Approve → Merge
+- [ ] After Builder finishes: Sonnet 4.0 critic checks UX + conversion risks
+- [ ] Selector picks top 8 improvements → Builder applies patch (1-3 loops, credits-limited)
+
+### Documentation & Architecture Answers
+- [ ] Document where intakes land (endpoint + tier field)
+- [ ] Document how runs start (job runner trigger: immediate vs queued)
+- [ ] Document where previews are generated (showroom screenshots vs HTML snapshot vs Builder preview URL)
+- [ ] Document how approve/request-changes arrive (email reply parsing vs portal buttons vs both)
+- [ ] Document BuilderGate allowlist (exact surfaces + exact folders allowed)
+- [ ] Create TESTING_LADDER.md with all test cases and pass conditions
+- [ ] Create BUILDER_INTEGRATION.md with safe pages, permissions, and workflow

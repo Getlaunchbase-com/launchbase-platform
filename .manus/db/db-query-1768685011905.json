@@ -1,0 +1,16 @@
+{
+  "query": "UPDATE intakes SET creditsRemaining = 1 WHERE id = 8; SELECT id, creditsIncluded, creditsRemaining, creditsConsumed FROM intakes WHERE id = 8;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute UPDATE intakes SET creditsRemaining = 1 WHERE id = 8; SELECT id, creditsIncluded, creditsRemaining, creditsConsumed FROM intakes WHERE id = 8;",
+  "rows": [
+    {
+      "id": "8",
+      "creditsIncluded": "1",
+      "creditsRemaining": "1",
+      "creditsConsumed": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcreditsIncluded\tcreditsRemaining\tcreditsConsumed\n8\t1\t1\t1\n",
+  "stderr": "",
+  "execution_time_ms": 66
+}

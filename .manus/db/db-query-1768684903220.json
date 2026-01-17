@@ -1,0 +1,18 @@
+{
+  "query": "SELECT id, businessName, email, creditsIncluded, creditsRemaining, creditsConsumed FROM intakes WHERE id = 8;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT id, businessName, email, creditsIncluded, creditsRemaining, creditsConsumed FROM intakes WHERE id = 8;",
+  "rows": [
+    {
+      "id": "8",
+      "businessName": "Debug Test 7",
+      "email": "test7@example.com",
+      "creditsIncluded": "1",
+      "creditsRemaining": "1",
+      "creditsConsumed": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tbusinessName\temail\tcreditsIncluded\tcreditsRemaining\tcreditsConsumed\n8\tDebug Test 7\ttest7@example.com\t1\t1\t0\n",
+  "stderr": "",
+  "execution_time_ms": 48
+}

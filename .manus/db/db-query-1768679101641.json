@@ -1,0 +1,13 @@
+{
+  "query": "SHOW TABLES LIKE 'ship_packets';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SHOW TABLES LIKE 'ship_packets';",
+  "rows": [
+    {
+      "Tables_in_H86jcAdP392wwbWXRcEDMs (ship_packets)": "ship_packets"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_H86jcAdP392wwbWXRcEDMs (ship_packets)\nship_packets\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

@@ -74,6 +74,14 @@ import { actionRequestsRouter } from "./routers/actionRequestsRouter";
 import { designJobsRouter } from "./routers/designJobsRouter";
 import { aiCopyRefineRouter } from "./routers/aiCopyRefineRouter";
 import { portalRouter } from "./routers/portal";
+import fs from "node:fs";
+
+fs.appendFileSync(
+  "/tmp/launchbase_boot.log",
+  `[BOOT] routers.ts loaded ${new Date().toISOString()}\n`
+);
+
+console.log("[BOOT] routers.ts loaded", import.meta.url);
 
 export const appRouter = router({
   system: systemRouter,
@@ -114,10 +122,39 @@ export const appRouter = router({
         promoCode: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
+        fs.appendFileSync(
+          "/tmp/launchbase_intakes.log",
+          `[HIT] intakes.submit ${new Date().toISOString()} email=${input.email}\n`
+        );
+        
+        console.error("[HIT] intakes.submit", {
+          email: input?.email,
+          ts: new Date().toISOString(),
+        });
         const db = await getDb();
         if (!db) throw new Error("Database not available");
         
         const intake = await createIntake(input);
+        
+        fs.appendFileSync(
+          "/tmp/launchbase_intakes.log",
+          `[AFTER_CREATE] got intake=${JSON.stringify(intake)}\n`
+        );
+        
+        const intakeId =
+          (intake as any)?.id ??
+          (intake as any)?.intakeId ??
+          (typeof (intake as any) === "number" ? (intake as any) : null);
+        
+        console.error("[Intake] createIntake() result", {
+          intakeType: typeof intake,
+          keys: intake && typeof intake === "object" ? Object.keys(intake as any) : null,
+          intakeId,
+        });
+        
+        if (!intakeId) {
+          throw new Error("createIntake() did not return an intake id");
+        }
         
         // Handle promo code if provided
         if (input.promoCode && intake?.id) {
@@ -158,16 +195,36 @@ export const appRouter = router({
         }
         
         // ===== PHASE 1: Field General → RunPlan → ShipPacket =====
-        if (intake?.id) {
-          const { runFieldGeneral } = await import("./ai/orchestration/runFieldGeneral");
-          const { createRunPlan, createShipPacket } = await import("./db");
+        // ✅ All Phase 1 work MUST complete before mutation returns
+        let runPlanRow: any = null;
+        let shipPacketRow: any = null;
+        let runId: string | null = null;
+        
+        fs.appendFileSync(
+          "/tmp/launchbase_intakes.log",
+          `[PHASE1_CHECK] intakeId=${intakeId} truthy=${Boolean(intakeId)}\n`
+        );
+        
+        if (intakeId) {
+          const fgMod = await import("./ai/orchestration/runFieldGeneral");
+          const runFieldGeneral = (fgMod as any).runFieldGeneral ?? (fgMod as any).default;
+          if (typeof runFieldGeneral !== "function") {
+            throw new Error("runFieldGeneral export not found (named or default)");
+          }
+          
+          const dbMod = await import("./db");
+          const createRunPlan = (dbMod as any).createRunPlan;
+          const createShipPacket = (dbMod as any).createShipPacket;
+          
+          if (typeof createRunPlan !== "function") throw new Error("createRunPlan export not found");
+          if (typeof createShipPacket !== "function") throw new Error("createShipPacket export not found");
           const { randomBytes } = await import("crypto");
           
           // Generate unique IDs for this run
-          const runId = `run_${Date.now()}_${randomBytes(8).toString("hex")}`;
+          runId = `run_${Date.now()}_${randomBytes(8).toString("hex")}`;
           const jobId = `job_${Date.now()}_${randomBytes(8).toString("hex")}`;
           
-          console.log(`[Intake] Generating RunPlan for intake ${intake.id}...`);
+          console.log(`[Intake] Generating RunPlan for intake ${intakeId}...`);
           
           // Run Field General (deterministic, no LLM call)
           const runPlan = runFieldGeneral({
@@ -183,9 +240,9 @@ export const appRouter = router({
             builderEnabled: runPlan.builderGate.enabled,
           });
           
-          // Store RunPlan in database
-          const storedRunPlan = await createRunPlan({
-            intakeId: intake.id,
+          // ✅ Await RunPlan persistence
+          runPlanRow = await createRunPlan({
+            intakeId,
             tenant: intake.tenant,
             customerEmail: intake.email,
             runId,
@@ -196,46 +253,78 @@ export const appRouter = router({
             data: runPlan as Record<string, unknown>,
           });
           
-          if (storedRunPlan) {
-            console.log(`[Intake] RunPlan stored with ID: ${storedRunPlan.id}`);
-            
-            // Create empty ShipPacket (DRAFT status)
-            const shipPacket = await createShipPacket({
-              intakeId: intake.id,
-              runPlanId: storedRunPlan.id,
+          fs.appendFileSync(
+            "/tmp/launchbase_intakes.log",
+            `[RUNPLAN] persisted runPlanRow=${JSON.stringify(runPlanRow)}\n`
+          );
+          
+          console.log(`[Intake] RunPlan stored with ID: ${runPlanRow.id}`);
+          
+          // ✅ Await ShipPacket persistence
+          shipPacketRow = await createShipPacket({
+            intakeId,
+            runPlanId: runPlanRow.id,
+            runId,
+            status: "DRAFT",
+            previewToken: intake.previewToken ?? null,
+            data: {
+              version: "shippacket.v1",
+              intakeId,
+              runPlanId: runPlanRow.id,
               runId,
-              status: "DRAFT",
-              data: {
-                version: "shippacket.v1",
-                intakeId: intake.id,
-                runPlanId: storedRunPlan.id,
-                runId,
-                tier: runPlan.tier,
-                proposal: {
-                  systems: null,
-                  brand: null,
-                  critic: null,
-                },
-                preview: {
-                  screenshots: [],
-                },
-                execution: {
-                  buildPlanId: null,
-                  builderSnapshotId: null,
-                },
-                createdAtIso: new Date().toISOString(),
+              tier: runPlan.tier,
+              proposal: {
+                systems: null,
+                brand: null,
+                critic: null,
               },
-            });
-            
-            if (shipPacket) {
-              console.log(`[Intake] ShipPacket created with ID: ${shipPacket.id}`);
-              
-              // Phase 2: Enqueue async execution
-              const { enqueueExecuteRunPlan } = await import("./jobs/runPlanQueue");
-              enqueueExecuteRunPlan(runId);
-              console.log(`[Intake] Enqueued execution for runId: ${runId}`);
+              preview: {
+                screenshots: [],
+              },
+              execution: {
+                buildPlanId: null,
+                builderSnapshotId: null,
+              },
+              createdAtIso: new Date().toISOString(),
+            },
+          });
+          
+          fs.appendFileSync(
+            "/tmp/launchbase_intakes.log",
+            `[SHIPPACKET] persisted shipPacketRow=${JSON.stringify(shipPacketRow)}\n`
+          );
+          
+          console.log(`[Intake] ShipPacket created with ID: ${shipPacketRow.id}`);
+          
+          // ✅ Fire-and-forget enqueue (with error logging)
+          const mod = await import("./jobs/runPlanQueue");
+          fs.appendFileSync(
+            "/tmp/launchbase_intakes.log",
+            `[ENQUEUE_IMPORT] exports=${JSON.stringify(Object.keys(mod))}\n`
+          );
+          const enqueueExecuteRunPlan = mod.enqueueExecuteRunPlan;
+          
+          if (enqueueExecuteRunPlan) {
+            try {
+              const maybe = enqueueExecuteRunPlan(runId);
+              if (maybe && typeof (maybe as any).catch === "function") {
+                (maybe as Promise<unknown>).catch((err) =>
+                  console.error("[Intake] enqueueExecuteRunPlan failed", { intakeId, runId, err })
+                );
+              }
+            } catch (err) {
+              console.error("[Intake] enqueueExecuteRunPlan threw", { intakeId, runId, err });
             }
+          } else {
+            console.error("[Intake] enqueueExecuteRunPlan is undefined", { intakeId, runId, availableExports: Object.keys(mod) });
           }
+          
+          fs.appendFileSync(
+            "/tmp/launchbase_intakes.log",
+            `[ENQUEUE] runId=${runId}\n`
+          );
+          
+          console.log(`[Intake] Enqueued execution for runId: ${runId}`);
         }
         
         // Send confirmation email
@@ -265,7 +354,14 @@ export const appRouter = router({
           await AdminNotifications.newIntake(input.businessName, 85);
         }
         
-        return { success: true, intakeId: intake?.id, referralDiscount };
+        return { 
+          success: true, 
+          intakeId: intake?.id, 
+          runId,
+          runPlanId: runPlanRow?.id,
+          shipPacketId: shipPacketRow?.id,
+          referralDiscount 
+        };
       }),
     // Get intake by preview token (for customer preview page)
     getByPreviewToken: publicProcedure

@@ -1,0 +1,25 @@
+{
+  "query": "SELECT id, businessName, email FROM intakes ORDER BY id DESC LIMIT 3;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT id, businessName, email FROM intakes ORDER BY id DESC LIMIT 3;",
+  "rows": [
+    {
+      "id": "3",
+      "businessName": "Test User 3",
+      "email": "test3@example.com"
+    },
+    {
+      "id": "2",
+      "businessName": "Test User 2",
+      "email": "test2@launchbase.test"
+    },
+    {
+      "id": "1",
+      "businessName": "Standard Smoke Test",
+      "email": "test-standard@launchbase.test"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tbusinessName\temail\n3\tTest User 3\ttest3@example.com\n2\tTest User 2\ttest2@launchbase.test\n1\tStandard Smoke Test\ttest-standard@launchbase.test\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}
