@@ -1,0 +1,158 @@
+=== RAW RESPONSE (designer_brand) ===
+Model: gpt-4o-mini-2024-07-18
+Request ID: chatcmpl-CyoxOvD0qvjFeVOVlfVF8W5gp6VCT
+Input Tokens: 1601
+Output Tokens: 813
+Finish Reason: stop
+
+=== RAW TEXT (3410 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use a type scale with 32px H1, 24px H2, 18px body, and 16px small text to create a calm and confident hierarchy.",
+      "rationale": "Establishes a clear hierarchy and improves readability, contributing to a premium feel.",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Set max line length for body copy to 70ch to enhance readability and maintain a calm user experience.",
+      "rationale": "Helps avoid overwhelming users and supports better comprehension.",
+      "confidence": 0.80,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Use 16px padding and 8px border-radius for card components to create a premium and approachable feel.",
+      "rationale": "Softens the card appearance while maintaining a professional look.",
+      "confidence": 0.90,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a three-tier button hierarchy: primary buttons with 16px padding, secondary buttons with 12px padding, and tertiary buttons with 8px padding.",
+      "rationale": "Creates clear distinction and visual importance among actions, enhancing user confidence.",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Use subtle dividers with 1px height and 20% opacity to maintain a clean layout while providing necessary separation.",
+      "rationale": "Promotes a calm and organized visual flow without distraction.",
+      "confidence": 0.82,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Incorporate proof chips below critical CTAs with a consistent style: 3 chips, 80px spacing, and 18px font size.",
+      "rationale": "Reinforces trust and confidence at decision points, improving conversion rates.",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Display audit logs in a clean card format, 16px padding, with a background color 10% lighter than the base.",
+      "rationale": "Enhances transparency and safety perception, contributing to a safe-by-default feel.",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Adjust neutral colors to have higher contrast ratios, aiming for at least a 4.5:1 ratio for body text and background.",
+      "rationale": "Improves accessibility and ensures all users feel safe and confident when interacting with the site.",
+      "confidence": 0.90,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Use rounded chips with 12px padding and subtle shadows to create a premium feel while maintaining clarity.",
+      "rationale": "Enhances the visual hierarchy and encourages user engagement.",
+      "confidence": 0.86,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.backgroundTreatments",
+      "value": "Incorporate soft, neutral background treatments with 5% opacity to create a calming effect without overwhelming visuals.",
+      "rationale": "Supports a premium and operational atmosphere, enhancing user focus.",
+      "confidence": 0.83,
+      "risks": []
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use a type scale with 32px H1, 24px H2, 18px body, and 16px small text to create a calm and confident hierarchy.",
+      "rationale": "Establishes a clear hierarchy and improves readability, contributing to a premium feel.",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Set max line length for body copy to 70ch to enhance readability and maintain a calm user experience.",
+      "rationale": "Helps avoid overwhelming users and supports better comprehension.",
+      "confidence": 0.8,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Use 16px padding and 8px border-radius for card components to create a premium and approachable feel.",
+      "rationale": "Softens the card appearance while maintaining a professional look.",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a three-tier button hierarchy: primary buttons with 16px padding, secondary buttons with 12px padding, and tertiary buttons with 8px padding.",
+      "rationale": "Creates clear distinction and visual importance among actions, enhancing user confidence.",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Use subtle dividers with 1px height and 20% opacity to maintain a clean layout while providing necessary separation.",
+      "rationale": "Promotes a calm and organized visual flow without distraction.",
+      "confidence": 0.82,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Incorporate proof chips below critical CTAs with a consistent style: 3 chips, 80px spacing, and 18px font size.",
+      "rationale": "Reinforces trust and confidence at decision points, improving conversion rates.",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Display audit logs in a clean card format, 16px padding, with a background color 10% lighter than the base.",
+      "rationale": "Enhances transparency and safety perception, contributing to a safe-by-default feel.",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Adjust neutral colors to have higher contrast ratios, aiming for at least a 4.5:1 ratio for body text and background.",
+      "rationale": "Improves accessibility and ensures all users feel safe and confident when interacting with the site.",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Use rounded chips with 12px padding and subtle shadows to create a premium feel while maintaining clarity.",
+      "rationale": "Enhances the visual hierarchy and encourages user engagement.",
+      "confidence": 0.86,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.backgroundTreatments",
+      "value": "Incorporate soft, neutral background treatments with 5% opacity to create a calming effect without overwhelming visuals.",
+      "rationale": "Supports a premium and operational atmosphere, enhancing user focus.",
+      "confidence": 0.83,
+      "risks": []
+    }
+  ]
+}
