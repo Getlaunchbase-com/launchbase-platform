@@ -1990,3 +1990,22 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [x] Fix Vite HMR WebSocket configuration for Manus public URL
 
 - [x] Fix deployment: Copy AI prompt files to dist directory during build
+
+- [x] Fix Vite HMR WebSocket with correct host URL configuration
+
+- [x] Add missing VITE environment variables for analytics (already set by user)
+
+## 🎨 NEW FEATURE: Before/After Toggle
+
+- [x] Copy updated Home.tsx from merged GitHub PR (commit: 9cc11140)
+- [ ] Design before/after toggle component (slider or tab-based)
+- [x] Capture Before screenshot (old hero)
+- [x] Capture Standard screenshot (polish pass)
+- [x] Capture Growth screenshot (+ trust/proof)
+- [x] Capture Premium screenshot (golden baseline)
+- [ ] Integrate toggle into pricing or examples section
+- [ ] Test toggle functionality
+- [x] Create ExamplesViewer component with tier toggle
+- [x] Mount ExamplesViewer on homepage after Pricing section
+- [x] Test all 4 images load correctly (Before/Standard/Growth/Premium all working)
+- [x] Verify tier toggle functionality (all buttons work, images switch correctly)

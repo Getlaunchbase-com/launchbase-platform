@@ -37,6 +37,7 @@ export default defineConfig({
       "127.0.0.1",
     ],
     hmr: {
+      host: "3000-i5756872j51bc0a4y6pic-cd298783.us2.manus.computer",
       clientPort: 443,
       protocol: "wss",
     },
