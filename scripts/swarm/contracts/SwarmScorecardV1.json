@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SwarmScorecardV1",
+  "description": "Write after tests to grade each agent's claims",
+  "type": "object",
+  "required": ["version", "runId", "results", "overall", "timestampIso"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "swarm_scorecard.v1"
+    },
+    "runId": {
+      "type": "string",
+      "description": "Unique identifier for this smoke test run",
+      "example": "smoke_2026_01_17_001"
+    },
+    "results": {
+      "type": "array",
+      "description": "Grading results for each claim",
+      "items": {
+        "type": "object",
+        "required": ["claimId", "pass", "evidence"],
+        "properties": {
+          "claimId": {
+            "type": "string",
+            "description": "Reference to claim ID from SwarmTraceV1",
+            "example": "C1"
+          },
+          "pass": {
+            "type": "boolean",
+            "description": "Whether the claim was validated"
+          },
+          "evidence": {
+            "type": "string",
+            "description": "Evidence supporting the pass/fail decision",
+            "example": "smoke:e2e:intake shows NEEDS_INFO no enqueue marker"
+          }
+        }
+      }
+    },
+    "overall": {
+      "type": "object",
+      "required": ["pass", "hardGatesPassed", "hardGatesTotal"],
+      "properties": {
+        "pass": {
+          "type": "boolean",
+          "description": "Overall pass/fail for the implementation"
+        },
+        "hardGatesPassed": {
+          "type": "integer",
+          "description": "Number of hard gates that passed"
+        },
+        "hardGatesTotal": {
+          "type": "integer",
+          "description": "Total number of hard gates"
+        }
+      }
+    },
+    "timestampIso": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp"
+    }
+  }
+}
