@@ -64,58 +64,61 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#0B0B0C] text-white">
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FF6A00]/5 via-transparent to-transparent pointer-events-none" />
-        
-        <div className="container max-w-6xl mx-auto relative">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 text-sm text-gray-400 mb-6">
-                <Sparkles className="w-4 h-4 text-[#FF6A00]" />
-                <span>Operating system for small businesses</span>
-              </div>
-              
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 leading-tight">
-                Stop carrying the system <span className="text-[#FF6A00]">in your head.</span>
+      <section className="relative min-h-screen flex items-center pt-20 pb-20 px-4 overflow-hidden">
+        {/* Background gradient accents */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#FF6A00]/8 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-l from-[#FF6A00]/5 to-transparent rounded-full blur-3xl pointer-events-none" />
+
+        <div className="container max-w-5xl mx-auto relative z-10">
+          <div className="space-y-10 max-w-3xl">
+            {/* Premium badge */}
+            <div className="inline-flex items-center gap-2 bg-white/8 border border-white/15 rounded-full px-4 py-2 text-sm text-gray-300 hover:bg-white/10 transition">
+              <Sparkles className="w-4 h-4 text-[#FF6A00]" />
+              <span>Premium business automation platform</span>
+            </div>
+
+            {/* Main headline */}
+            <div className="space-y-6">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">
+                <span className="block">Your Business</span>
+                <span className="block"><span className="text-[#FF6A00]">Runs Itself</span></span>
               </h1>
-              
-              <p className="text-lg md:text-xl text-gray-400 mb-8 leading-relaxed">
-                Your website exists. Your tools work. But no one owns the system.
-                <br />
-                <span className="text-white">LaunchBase takes ongoing responsibility—so you stop thinking about it.</span>
+
+              {/* Subheadline */}
+              <p className="text-xl md:text-2xl text-gray-300 leading-relaxed max-w-2xl">
+                Intelligent automation that handles your website, communications, and business operations. <span className="text-white font-medium">So you focus on what matters.</span>
               </p>
-              
-              {/* CTAs */}
-              <div className="space-y-4 mb-6">
-                <Link href="/apply">
-                  <Button size="lg" className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white text-lg px-8 py-6 w-full sm:w-auto">
-                    Hand It Off
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </Button>
-                </Link>
-                <Link href="/how-it-works" className="block sm:inline-block sm:ml-4">
-                  <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/5 text-lg px-8 py-6 w-full sm:w-auto">
-                    See how it works
-                  </Button>
-                </Link>
+            </div>
+
+            {/* Trust indicators */}
+            <div className="flex flex-wrap gap-4 pt-4">
+              <div className="flex items-center gap-2 text-sm text-gray-400">
+                <div className="w-2 h-2 rounded-full bg-[#1ED760]" />
+                <span>No credit card required</span>
               </div>
-              
-              {/* Trust line */}
-              <p className="text-sm text-gray-500 mb-4">
-                See your real site before you pay. Cancel anytime.
-              </p>
-              
-              {/* Micro-proof chips */}
-              <div className="flex flex-wrap gap-2 text-xs text-gray-400">
-                <span className="bg-white/5 px-3 py-1.5 rounded-full">Monitoring</span>
-                <span className="bg-white/5 px-3 py-1.5 rounded-full">Safety gating</span>
-                <span className="bg-white/5 px-3 py-1.5 rounded-full">Approval-first changes</span>
-                <span className="bg-white/5 px-3 py-1.5 rounded-full">Full activity log</span>
+              <div className="flex items-center gap-2 text-sm text-gray-400">
+                <div className="w-2 h-2 rounded-full bg-[#1ED760]" />
+                <span>See your site before you pay</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-400">
+                <div className="w-2 h-2 rounded-full bg-[#1ED760]" />
+                <span>Cancel anytime</span>
               </div>
             </div>
-            
-            <div className="hidden lg:block">
-              <WebsitePreview />
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 pt-8">
+              <Link href="/apply">
+                <Button size="lg" className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white text-base px-8 py-6 rounded-lg font-medium shadow-lg hover:shadow-xl transition w-full sm:w-auto">
+                  Get Started
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+              <Link href="/how-it-works">
+                <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/5 hover:border-white/40 text-base px-8 py-6 rounded-lg font-medium transition w-full sm:w-auto">
+                  Watch Demo
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
