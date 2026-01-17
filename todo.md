@@ -2042,4 +2042,51 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [x] Run `pnpm db:push` to generate and apply migration (0027_fearless_sasquatch.sql)
 - [x] Test intake submission creates RunPlan + ShipPacket (ready for testing)
 - [x] Verify database records created correctly (ready for verification)
-- [ ] Create checkpoint with complete Phase 1 integration
+- [x] Create checkpoint with complete Phase 1 integration (version: dfe63433)
+
+
+---
+
+## 🚀 PHASE 2: Customer Portal + Credit System + Jobs Runner
+
+**Goal:** Complete customer workflow with credit limits, async job execution, and request changes flow
+
+### Credit System Implementation
+- [x] Add credits columns to intakes table (creditsIncluded, creditsRemaining, creditsConsumed)
+- [x] Create credit helper functions (decrementIntakeCredit, addIntakeCredits)
+- [x] Update intakes.submit mutation to set initial credits based on tier
+- [x] Run `pnpm db:push` to apply migration (0028_warm_puma.sql)
+
+### executeRunPlan Integration
+- [x] Create server/ai/orchestration/executeRunPlan.ts
+- [x] Implement executeRunPlan() function (takes runId)
+- [x] Wire to existing runPilotMacro with correct stack/context/plan/lane mapping
+- [x] Update ShipPacket with proposal results after execution
+
+### Jobs Runner (In-Process Queue)
+- [x] Create server/jobs/runPlanQueue.ts with in-process queue
+- [x] Implement enqueueExecuteRunPlan() function
+- [x] Implement pump() worker with error handling
+- [x] Wire enqueue into intakes.submit mutation
+- [ ] Test job execution with logging
+
+### Portal API (Request Changes + Credits Gate)
+- [x] Create server/routers/portal.ts with requestChanges mutation
+- [x] Implement credits check (if remaining <= 0, return needsPurchase)
+- [x] Implement credit decrement (consume 1 credit per request)
+- [x] Enqueue executeRunPlan job on successful request
+- [x] Add approve mutation (0 credits consumed)
+
+### Stripe Buy-More Integration
+- [ ] Create credit pack products in Stripe (1/3/10 credits)
+- [ ] Add createStripeCreditCheckout() function
+- [ ] Wire webhook handler to increment credits on payment
+- [ ] Test buy-more flow end-to-end
+
+### Testing & Validation
+- [ ] Submit test intake and verify RunPlan + ShipPacket created
+- [ ] Verify job executes and updates ShipPacket with proposal
+- [ ] Test requestChanges with credits remaining (should work)
+- [ ] Test requestChanges with 0 credits (should block + show checkout)
+- [ ] Test approve flow (should not consume credits)
+- [ ] Create checkpoint with complete Phase 2 integration

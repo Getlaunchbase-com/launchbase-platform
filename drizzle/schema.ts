@@ -58,6 +58,10 @@ export const intakes = mysqlTable("intakes", {
   stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
   stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }),
   paidAt: timestamp("paidAt"),
+  // Credits tracking (Standard: 1, Growth: 3, Premium: 10)
+  creditsIncluded: int("creditsIncluded").notNull().default(1),
+  creditsRemaining: int("creditsRemaining").notNull().default(1),
+  creditsConsumed: int("creditsConsumed").notNull().default(0),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

@@ -166,6 +166,10 @@ export async function createIntake(data: {
   const { deriveTenantFromEmail } = await import("./_core/tenant");
   const tenant = data.tenant ?? deriveTenantFromEmail(data.email);
 
+  // Set initial credits based on tier (default: standard = 1)
+  // TODO: Derive tier from Stripe product/promo code in Phase 2
+  const initialCredits = 1; // Standard tier default
+
   const values: InsertIntake = {
     businessName: data.businessName,
     contactName: data.contactName,
@@ -185,6 +189,9 @@ export async function createIntake(data: {
     brandColors: data.brandColors || null,
     rawPayload: mergedRawPayload,
     status: "new" as const,
+    creditsIncluded: initialCredits,
+    creditsRemaining: initialCredits,
+    creditsConsumed: 0,
   };
 
   const result = await db.insert(intakes).values(values);
@@ -340,6 +347,41 @@ export async function updateIntakeStatus(id: number, status: Intake['status']) {
   }
 
   await db.update(intakes).set({ status }).where(eq(intakes.id, id));
+}
+
+export async function decrementIntakeCredit(intakeId: number, by: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Simple + safe: read current then update
+  const rows = await db.select().from(intakes).where(eq(intakes.id, intakeId)).limit(1);
+  const intake = rows[0];
+  if (!intake) throw new Error("Intake not found");
+
+  const remaining = Math.max(0, (intake.creditsRemaining ?? 0) - by);
+  const consumed = (intake.creditsConsumed ?? 0) + by;
+
+  await db
+    .update(intakes)
+    .set({ creditsRemaining: remaining, creditsConsumed: consumed })
+    .where(eq(intakes.id, intakeId));
+}
+
+export async function addIntakeCredits(intakeId: number, amount: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const rows = await db.select().from(intakes).where(eq(intakes.id, intakeId)).limit(1);
+  const intake = rows[0];
+  if (!intake) throw new Error("Intake not found");
+
+  const remaining = (intake.creditsRemaining ?? 0) + amount;
+  const included = (intake.creditsIncluded ?? 0) + amount;
+
+  await db
+    .update(intakes)
+    .set({ creditsRemaining: remaining, creditsIncluded: included })
+    .where(eq(intakes.id, intakeId));
 }
 
 // ============ BUILD PLAN FUNCTIONS ============
@@ -795,4 +837,10 @@ export async function updateShipPacketStatus(
   }
 
   await db.update(shipPackets).set(updateSet).where(eq(shipPackets.id, id));
+}
+
+export async function updateShipPacketData(id: number, data: Record<string, unknown>): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(shipPackets).set({ data: data as any }).where(eq(shipPackets.id, id));
 }

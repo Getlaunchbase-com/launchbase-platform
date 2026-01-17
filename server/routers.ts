@@ -73,6 +73,7 @@ function generateReferralCode(): string {
 import { actionRequestsRouter } from "./routers/actionRequestsRouter";
 import { designJobsRouter } from "./routers/designJobsRouter";
 import { aiCopyRefineRouter } from "./routers/aiCopyRefineRouter";
+import { portalRouter } from "./routers/portal";
 
 export const appRouter = router({
   system: systemRouter,
@@ -80,6 +81,7 @@ export const appRouter = router({
   actionRequests: actionRequestsRouter,
   designJobs: designJobsRouter,
   aiCopyRefine: aiCopyRefineRouter,
+  portal: portalRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
@@ -227,7 +229,11 @@ export const appRouter = router({
             
             if (shipPacket) {
               console.log(`[Intake] ShipPacket created with ID: ${shipPacket.id}`);
-              // TODO: Trigger swarm execution here (Phase 2)
+              
+              // Phase 2: Enqueue async execution
+              const { enqueueExecuteRunPlan } = await import("./jobs/runPlanQueue");
+              enqueueExecuteRunPlan(runId);
+              console.log(`[Intake] Enqueued execution for runId: ${runId}`);
             }
           }
         }
