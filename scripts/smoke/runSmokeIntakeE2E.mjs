@@ -34,8 +34,9 @@ async function testE2EIntake() {
         language: 'en',
         audience: 'biz',
         websiteStatus: 'none',
+        vertical: 'professional',
         services: ['Web design', 'SEO'],
-        serviceArea: 'San Francisco, CA',
+        serviceArea: ['San Francisco, CA'],
         primaryCTA: 'book',
         rawPayload: {
           businessName: `Test ${tier} Business`,
