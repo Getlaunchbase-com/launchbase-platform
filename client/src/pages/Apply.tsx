@@ -667,7 +667,7 @@ export default function ApplyPage() {
                     </div>
                     <div className="mt-4 p-3 rounded-lg bg-white/5 border border-white/10">
                       <div className="text-xs text-white/60">
-                        <strong className="text-white/80">What's a credit?</strong> Each time you hit "Request changes" on your preview, it uses 1 credit.
+                        <strong className="text-white/80">What's a credit?</strong> Each "Request changes" uses 1 credit.
                       </div>
                     </div>
                   </div>
