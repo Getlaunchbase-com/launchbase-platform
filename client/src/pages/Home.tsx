@@ -22,7 +22,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Link } from "wouter";
-import { ExamplesViewer } from "@/components/examples/ExamplesViewer";
 
 // Website Preview Component
 function WebsitePreview() {
@@ -654,9 +653,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Examples */}
-      <ExamplesViewer />
 
       {/* FAQ */}
       <section className="py-20 px-4 border-b border-white/5 bg-white/[0.02]">

@@ -40,11 +40,7 @@ export interface PromptPack {
 // PROMPT LOADER
 // ============================================
 
-// In production (bundled), prompts are copied to dist/v1/
-// In development, they're in server/ai/promptPacks/v1/
-const PROMPT_DIR = process.env.NODE_ENV === "production" 
-  ? join(process.cwd(), "dist", "v1")
-  : join(__dir, "v1");
+const PROMPT_DIR = join(__dir, "v1");
 
 function loadPrompt(filename: string): string {
   const path = join(PROMPT_DIR, filename);

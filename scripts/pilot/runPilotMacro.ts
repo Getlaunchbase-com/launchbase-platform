@@ -430,6 +430,10 @@ export async function runPilotMacro(params: {
       // 1) Parse and unwrap payload
       let systemsPayload = cleanParseArtifactPayload(systemsOut.artifact);
       
+      // DEBUG: Log payload keys to diagnose missing proposedChanges
+      console.log(`[${runId}] Systems payload keys:`, Object.keys(systemsPayload || {}));
+      console.log(`[${runId}] Systems payload preview:`, JSON.stringify(systemsPayload)?.slice(0, 500));
+      
       // 2) Creative mode: Cap → Selector → Use selected 8
       const creativeMode = (context as any)?.creativeMode;
       if (creativeMode?.enabled && stack.selector) {

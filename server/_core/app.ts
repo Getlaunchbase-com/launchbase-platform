@@ -22,7 +22,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { registerFacebookOAuthRoutes } from "./facebookOAuthRoutes";
 import { createFacebookWebhookRoutes } from "./facebookWebhookRoutes";
-import { appRouter } from "../routers.ts";
+import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { handleStripeWebhook } from "../stripe/webhook";
 import { handleDeploymentWorker } from "../worker/deploymentWorker";
@@ -40,15 +40,7 @@ import { getDb } from "../db";
 import { deployments } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 
-console.log("[BOOT] app.ts loaded", import.meta.url);
-
 export async function createApp(): Promise<Express> {
-  const fs = await import("node:fs");
-  fs.appendFileSync(
-    "/tmp/launchbase_boot.log",
-    `[BOOT] app.ts createApp() entered ${new Date().toISOString()}\n`
-  );
-  
   const app = express();
 
   // 1. Stripe webhook (raw body MUST be first, before body parsers)

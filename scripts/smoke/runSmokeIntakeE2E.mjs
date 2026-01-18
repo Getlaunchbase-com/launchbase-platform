@@ -7,6 +7,8 @@ import { getDb, createIntake } from '../../server/db.js';
 import { shipPackets } from '../../drizzle/schema.js';
 import { eq } from 'drizzle-orm';
 import { runPreflight } from '../../server/ai/orchestration/runPreflight.js';
+import { writeFailurePacket } from '../../server/utils/failurePacket.js';
+import { mkdirSync } from 'node:fs';
 
 const TIERS = [
   { name: 'standard', complete: true },
@@ -34,9 +36,8 @@ async function testE2EIntake() {
         language: 'en',
         audience: 'biz',
         websiteStatus: 'none',
-        vertical: 'professional',
         services: ['Web design', 'SEO'],
-        serviceArea: ['San Francisco, CA'],
+        serviceArea: 'San Francisco, CA',
         primaryCTA: 'book',
         rawPayload: {
           businessName: `Test ${tier} Business`,
@@ -163,5 +164,37 @@ async function testE2EIntake() {
 
 testE2EIntake().catch(err => {
   console.error('SMOKE TEST FAILED:', err);
+  
+  // Write FailurePacket for swarm fix
+  const runId = `smoke_intake_e2e_${Date.now()}`;
+  const outDir = `runs/smoke/${runId}`;
+  mkdirSync(outDir, { recursive: true });
+  
+  const failurePacket = {
+    version: 'failurePacket.v1',
+    id: runId,
+    createdAtIso: new Date().toISOString(),
+    context: {
+      system: 'local',
+      component: 'smoke:e2e:intake',
+      command: 'node scripts/smoke/runSmokeIntakeE2E.mjs',
+    },
+    failure: {
+      type: 'test_failure',
+      error: err.message,
+      stack: err.stack,
+      stopReason: 'test_assertion_failed',
+    },
+    hints: [
+      'Check intake creation',
+      'Check preflight validation',
+      'Check ShipPacket creation',
+    ],
+  };
+  
+  const failurePacketPath = writeFailurePacket(`${outDir}/failurePacket.json`, failurePacket);
+  console.error(`\n📦 FailurePacket written: ${failurePacketPath}`);
+  console.error(`   Run: pnpm swarm:fix --from ${failurePacketPath}`);
+  
   process.exit(1);
 });

@@ -166,10 +166,6 @@ export async function createIntake(data: {
   const { deriveTenantFromEmail } = await import("./_core/tenant");
   const tenant = data.tenant ?? deriveTenantFromEmail(data.email);
 
-  // Set initial credits based on tier (default: standard = 1)
-  // TODO: Derive tier from Stripe product/promo code in Phase 2
-  const initialCredits = 1; // Standard tier default
-
   const values: InsertIntake = {
     businessName: data.businessName,
     contactName: data.contactName,
@@ -189,9 +185,6 @@ export async function createIntake(data: {
     brandColors: data.brandColors || null,
     rawPayload: mergedRawPayload,
     status: "new" as const,
-    creditsIncluded: initialCredits,
-    creditsRemaining: initialCredits,
-    creditsConsumed: 0,
   };
 
   const result = await db.insert(intakes).values(values);
@@ -347,41 +340,6 @@ export async function updateIntakeStatus(id: number, status: Intake['status']) {
   }
 
   await db.update(intakes).set({ status }).where(eq(intakes.id, id));
-}
-
-export async function decrementIntakeCredit(intakeId: number, by: number): Promise<void> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-
-  // Simple + safe: read current then update
-  const rows = await db.select().from(intakes).where(eq(intakes.id, intakeId)).limit(1);
-  const intake = rows[0];
-  if (!intake) throw new Error("Intake not found");
-
-  const remaining = Math.max(0, (intake.creditsRemaining ?? 0) - by);
-  const consumed = (intake.creditsConsumed ?? 0) + by;
-
-  await db
-    .update(intakes)
-    .set({ creditsRemaining: remaining, creditsConsumed: consumed })
-    .where(eq(intakes.id, intakeId));
-}
-
-export async function addIntakeCredits(intakeId: number, amount: number): Promise<void> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-
-  const rows = await db.select().from(intakes).where(eq(intakes.id, intakeId)).limit(1);
-  const intake = rows[0];
-  if (!intake) throw new Error("Intake not found");
-
-  const remaining = (intake.creditsRemaining ?? 0) + amount;
-  const included = (intake.creditsIncluded ?? 0) + amount;
-
-  await db
-    .update(intakes)
-    .set({ creditsRemaining: remaining, creditsIncluded: included })
-    .where(eq(intakes.id, intakeId));
 }
 
 // ============ BUILD PLAN FUNCTIONS ============
@@ -701,58 +659,46 @@ export async function runDeployment(id: number) {
 
 export async function createRunPlan(data: {
   intakeId: number;
-  tenant: string;
-  customerEmail: string;
   runId: string;
   jobId: string;
   tier: "standard" | "growth" | "premium";
-  runMode: "tournament" | "production";
-  creativeModeEnabled: boolean;
-  data: Record<string, unknown>;
-}): Promise<{ id: number } & typeof data | null> {
+  data: InsertRunPlan["data"];
+}): Promise<number> {
   const db = await getDb();
-  if (!db) {
-    console.warn("[Database] Cannot create run plan: database not available");
-    return null;
-  }
-
-  const values: InsertRunPlan = {
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(runPlans).values({
     intakeId: data.intakeId,
-    tenant: data.tenant,
-    customerEmail: data.customerEmail,
     runId: data.runId,
     jobId: data.jobId,
     tier: data.tier,
-    runMode: data.runMode,
-    creativeModeEnabled: data.creativeModeEnabled ? 1 : 0,
+    status: "PENDING",
     data: data.data,
-  };
-
-  const result = await db.insert(runPlans).values(values);
-  const insertId = Number(result[0].insertId);
-
-  return { id: insertId, ...data };
-}
-
-export async function getRunPlansByIntakeId(intakeId: number): Promise<RunPlan[]> {
-  const db = await getDb();
-  if (!db) {
-    console.warn("[Database] Cannot get run plans: database not available");
-    return [];
-  }
-
-  return db.select().from(runPlans).where(eq(runPlans.intakeId, intakeId)).orderBy(desc(runPlans.createdAt));
+  });
+  
+  return result[0].insertId;
 }
 
 export async function getRunPlanByRunId(runId: string): Promise<RunPlan | null> {
   const db = await getDb();
-  if (!db) {
-    console.warn("[Database] Cannot get run plan: database not available");
-    return null;
-  }
-
-  const results = await db.select().from(runPlans).where(eq(runPlans.runId, runId)).limit(1);
+  if (!db) return null;
+  
+  const results = await db.select().from(runPlans).where(eq(runPlans.runId, runId));
   return results[0] ?? null;
+}
+
+export async function getRunPlansByIntakeId(intakeId: number): Promise<RunPlan[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(runPlans).where(eq(runPlans.intakeId, intakeId)).orderBy(desc(runPlans.createdAt));
+}
+
+export async function updateRunPlanStatus(id: number, status: RunPlan["status"]): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  
+  await db.update(runPlans).set({ status }).where(eq(runPlans.id, id));
 }
 
 // ============ SHIP PACKET FUNCTIONS ============
@@ -761,86 +707,49 @@ export async function createShipPacket(data: {
   intakeId: number;
   runPlanId: number;
   runId: string;
-  status?: "DRAFT" | "READY_FOR_REVIEW" | "APPROVED" | "REJECTED";
-  previewUrl?: string;
-  previewToken?: string;
-  data: Record<string, unknown>;
-}): Promise<{ id: number } & typeof data | null> {
+  tier: "standard" | "growth" | "premium";
+  data: InsertShipPacket["data"];
+}): Promise<number> {
   const db = await getDb();
-  if (!db) {
-    console.warn("[Database] Cannot create ship packet: database not available");
-    return null;
-  }
-
-  const values: InsertShipPacket = {
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(shipPackets).values({
     intakeId: data.intakeId,
     runPlanId: data.runPlanId,
     runId: data.runId,
-    status: data.status ?? "DRAFT",
-    previewUrl: data.previewUrl ?? null,
-    previewToken: data.previewToken ?? null,
+    tier: data.tier,
+    status: "DRAFT",
     data: data.data,
-  };
-
-  const result = await db.insert(shipPackets).values(values);
-  const insertId = Number(result[0].insertId);
-
-  return { id: insertId, ...data };
-}
-
-export async function getShipPacketsByIntakeId(intakeId: number): Promise<ShipPacket[]> {
-  const db = await getDb();
-  if (!db) {
-    console.warn("[Database] Cannot get ship packets: database not available");
-    return [];
-  }
-
-  return db.select().from(shipPackets).where(eq(shipPackets.intakeId, intakeId)).orderBy(desc(shipPackets.createdAt));
+  });
+  
+  return result[0].insertId;
 }
 
 export async function getShipPacketByRunId(runId: string): Promise<ShipPacket | null> {
   const db = await getDb();
-  if (!db) {
-    console.warn("[Database] Cannot get ship packet: database not available");
-    return null;
-  }
-
-  const results = await db.select().from(shipPackets).where(eq(shipPackets.runId, runId)).limit(1);
+  if (!db) return null;
+  
+  const results = await db.select().from(shipPackets).where(eq(shipPackets.runId, runId));
   return results[0] ?? null;
 }
 
-export async function updateShipPacketStatus(
-  id: number,
-  status: "DRAFT" | "READY_FOR_REVIEW" | "APPROVED" | "REJECTED",
-  updates?: {
-    previewUrl?: string;
-    previewToken?: string;
-    data?: Record<string, unknown>;
-  }
-): Promise<void> {
+export async function getShipPacketsByIntakeId(intakeId: number): Promise<ShipPacket[]> {
   const db = await getDb();
-  if (!db) {
-    console.warn("[Database] Cannot update ship packet: database not available");
-    return;
-  }
-
-  const updateSet: Record<string, unknown> = { status };
+  if (!db) return [];
   
-  if (updates?.previewUrl !== undefined) {
-    updateSet.previewUrl = updates.previewUrl;
-  }
-  if (updates?.previewToken !== undefined) {
-    updateSet.previewToken = updates.previewToken;
-  }
-  if (updates?.data !== undefined) {
-    updateSet.data = updates.data;
-  }
-
-  await db.update(shipPackets).set(updateSet).where(eq(shipPackets.id, id));
+  return db.select().from(shipPackets).where(eq(shipPackets.intakeId, intakeId)).orderBy(desc(shipPackets.createdAt));
 }
 
-export async function updateShipPacketData(id: number, data: Record<string, unknown>): Promise<void> {
+export async function updateShipPacketStatus(id: number, status: ShipPacket["status"]): Promise<void> {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  await db.update(shipPackets).set({ data: data as any }).where(eq(shipPackets.id, id));
+  if (!db) return;
+  
+  await db.update(shipPackets).set({ status }).where(eq(shipPackets.id, id));
+}
+
+export async function updateShipPacketData(id: number, data: ShipPacket["data"]): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  
+  await db.update(shipPackets).set({ data }).where(eq(shipPackets.id, id));
 }

@@ -13,7 +13,7 @@
 
 import type { StopReasonV1 } from "../types";
 
-type Severity = "critical" | "major" | "minor";
+type Severity = "low" | "medium" | "high";
 
 type CraftSubset = {
   proposedChanges?: Array<{ targetKey: string; value: unknown; rationale: string }>;
@@ -23,8 +23,7 @@ type CraftSubset = {
 
 type CriticSubset = {
   pass?: boolean;
-  issues?: Array<{ severity?: Severity; description?: string; location?: string }>;
-  requiresApproval?: boolean;
+  issues?: Array<{ severity?: Severity; message?: string }>;
   previewRecommended?: boolean;
   risks?: string[];
   assumptions?: string[];
@@ -145,18 +144,16 @@ function readCriticSubset(payload: unknown): CriticSubset {
           .filter(Boolean)
           .map((x) => ({
             severity:
-              x!.severity === "critical" || x!.severity === "major" || x!.severity === "minor"
+              x!.severity === "low" || x!.severity === "medium" || x!.severity === "high"
                 ? (x!.severity as Severity)
                 : undefined,
-            description: typeof x!.description === "string" ? clampStr(x!.description, 500) : undefined,
-            location: typeof x!.location === "string" ? clampStr(x!.location, 200) : undefined,
+            message: typeof x!.message === "string" ? clampStr(x!.message, 500) : undefined,
           }))
       : undefined;
 
   return {
     pass: typeof payload.pass === "boolean" ? payload.pass : undefined,
     issues,
-    requiresApproval: typeof payload.requiresApproval === "boolean" ? payload.requiresApproval : undefined,
     previewRecommended: typeof payload.previewRecommended === "boolean" ? payload.previewRecommended : undefined,
     risks: uniqStrings(payload.risks),
     assumptions: uniqStrings(payload.assumptions),
@@ -200,17 +197,14 @@ export function buildDeterministicCollapse(input: CollapseInput): {
   const critic = readCriticSubset(input.critic.payload);
 
   const pass = critic.pass === true;
-  const requiresApproval = critic.requiresApproval === true;
   const issues = critic.issues ?? [];
-  const criticalIssues = issues.filter((i) => i?.severity === "critical");
+  const highIssues = issues.filter((i) => i?.severity === "high");
   const hasChanges = Array.isArray(craft.proposedChanges) && craft.proposedChanges.length > 0;
 
   // Determine if human escalation is needed (schema-based checks)
-  // Escalate if: critic failed, requires approval, has critical issues, or no changes proposed
   const needsHuman =
     !pass ||
-    requiresApproval ||
-    criticalIssues.length > 0 ||
+    highIssues.length > 0 ||
     !hasChanges;
 
   // Merge risks and assumptions from both specialists
@@ -219,9 +213,8 @@ export function buildDeterministicCollapse(input: CollapseInput): {
 
   // Build next actions based on critic feedback
   const nextActions: string[] = [];
-  if (!pass) nextActions.push("Address critic issues and re-run");
-  if (requiresApproval) nextActions.push("Human review required before implementation");
-  if (criticalIssues.length > 0) nextActions.push("Resolve critical-severity issues");
+  if (!pass) nextActions.push("Provide missing context and re-run");
+  if (highIssues.length > 0) nextActions.push("Resolve high-severity issues");
   if (critic.previewRecommended) nextActions.push("Preview before publish");
 
   // Build payload (null if needs_human)
@@ -237,7 +230,7 @@ export function buildDeterministicCollapse(input: CollapseInput): {
         nextActions,
         criticSummary: {
           pass: true,
-          criticalIssueCount: 0,
+          highIssueCount: 0,
           issueCount: issues.length,
         },
       };
@@ -248,9 +241,8 @@ export function buildDeterministicCollapse(input: CollapseInput): {
       craftStop,
       criticStop,
       pass,
-      requiresApproval,
       issueCount: issues.length,
-      criticalIssueCount: criticalIssues.length,
+      highIssueCount: highIssues.length,
       hasChanges,
     }),
   };

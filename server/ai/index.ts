@@ -23,7 +23,7 @@ if (!AIML_API_KEY) {
 export const openaiClient = new OpenAI({
   apiKey: AIML_API_KEY || "dummy-key-for-tests",
   baseURL: AIML_BASE_URL,
-  timeout: 90000, // 90s to support premium models (GPT-5, GPT-4o with large prompts)
+  timeout: 10000,
 });
 
 // ============================================

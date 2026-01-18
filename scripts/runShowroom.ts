@@ -47,107 +47,6 @@ const SHOWROOM_BRIEFS: Record<string, Record<string, any>> = {
       constraints: "No unverified claims, no superlatives without evidence, focus on facts",
     },
   },
-  "getlaunchbase": {
-    baseline: {
-      task: "Review and improve homepage copy for LaunchBase",
-      business: "LaunchBase",
-      description: "AI-powered website operations system that handles website updates, social media, and business intelligence for small businesses. Core value: responsibility transfer (hand off operations, keep visibility). Not a website builder - a complete operations handoff with observability, reversibility, and safety gating.",
-      currentCopy: {
-        hero: "Stop carrying the system in your head. Hand it off. Keep visibility.",
-        problem: "No one owns the system. You're the fallback for everything.",
-        solution: "LaunchBase becomes the owner. You stay informed, not involved.",
-        trust: "Safe by default. Fully logged. Reversible.",
-      },
-      audience: "Small business owners (fitness studios, coffee shops, consulting firms, e-commerce) who are tired of being the bottleneck for their website and marketing operations",
-      tone: "Direct, honest, reassuring. B2B professional. Emphasize responsibility transfer and observability.",
-      constraints: "No hype language. No unverifiable claims. Focus on concrete benefits: mental load reduction, visibility, reversibility, safety gating.",
-    },
-    premium: {
-      task: "Review and improve homepage copy for LaunchBase",
-      business: "LaunchBase",
-      description: "AI-powered website operations system that handles website updates, social media, and business intelligence for small businesses. Core value: responsibility transfer (hand off operations, keep visibility). Not a website builder - a complete operations handoff with observability, reversibility, and safety gating.",
-      currentCopy: {
-        hero: "Stop carrying the system in your head. Hand it off. Keep visibility.",
-        problem: "No one owns the system. You're the fallback for everything.",
-        solution: "LaunchBase becomes the owner. You stay informed, not involved.",
-        trust: "Safe by default. Fully logged. Reversible.",
-      },
-      audience: "Small business owners (fitness studios, coffee shops, consulting firms, e-commerce) who are tired of being the bottleneck for their website and marketing operations",
-      tone: "Direct, honest, reassuring. B2B professional. Emphasize responsibility transfer and observability.",
-      constraints: "No hype language. No unverifiable claims. Focus on concrete benefits: mental load reduction, visibility, reversibility, safety gating.",
-    },
-    designer: {
-      task: "Design and improve the LaunchBase homepage from first principles",
-      business: "LaunchBase",
-      whitePaper: `LaunchBase is an operating system for small businesses.
-Not a website builder. Not another tool. Not a one-time agency project.
-
-LaunchBase is ongoing ownership of a business's digital operating layer:
-- website uptime + maintenance
-- lead capture + forms
-- monitoring + safety decisions
-- updates + publishing cadence
-- integrations + visibility
-- logging + accountability
-
-LaunchBase exists because most small businesses already have tools, but no one owns the system.
-They have a website, a payment tool, a calendar, a Google profile, and logins…
-…but the owner still carries the burden of making sure everything works.
-
-LaunchBase sells relief from that cognitive load.
-
-Core customer pain: The customer isn't buying a website. They're buying the ability to stop thinking about:
-- "Is it still working?"
-- "Did that form actually send?"
-- "What should I post?"
-- "Is anything broken?"
-- "Am I missing something?"
-
-This is background anxiety, not a feature gap.
-The enemy is not "lack of tools."
-The enemy is lack of ownership.
-
-LaunchBase replaces the customer as the default system-checker.
-
-Promise:
-✅ Change is reversible
-✅ Non-action is safe
-✅ Silence is a valid decision
-✅ Every action is logged
-✅ Customer sees their real site before paying
-✅ LaunchBase acts only after approval
-
-The brand is accountability.
-LaunchBase is responsibility-as-a-service.
-
-Target customer:
-- owner-operator
-- service business
-- small team
-- not "tech obsessed"
-- wants a business to run, not to "manage tools"
-
-Tone: calm, competent, honest, operationally serious, safety-first, premium but not flashy.
-This is a systems product, not a "creative brand party."
-
-Design objective:
-✅ Create instant trust
-✅ Communicate the contract clearly
-✅ Show the "safe-by-default" nature
-✅ Make "Hand It Off" feel low-risk
-✅ Explain observability in plain English
-✅ Look premium enough to justify recurring ownership`,
-      currentCopy: {
-        hero: "Stop carrying the system in your head. Hand it off. Keep visibility.",
-        problem: "No one owns the system. You're the fallback for everything.",
-        solution: "LaunchBase becomes the owner. You stay informed, not involved.",
-        trust: "Safe by default. Fully logged. Reversible.",
-      },
-      audience: "Owner-operators of service businesses (fitness studios, coffee shops, consulting firms) who want stability and accountability, not tool management",
-      tone: "Calm, minimal, trustworthy, premium. Avoid hype. Avoid 'AI magic.' Avoid exaggerated claims.",
-      constraints: "Mobile-first. Must feel like 'responsibility-as-a-service.' Must emphasize safety, reversibility, observability. Must reduce mental load while reading.",
-    },
-  },
 };
 
 // ============================================
@@ -166,17 +65,12 @@ async function runShowroom(showroom: string, variant: string) {
   // Register policies
   registerPolicies(ALL_POLICIES);
 
-  // Determine policy based on variant
-  let policyId = "swarm_premium_v1";
-  if (variant === "premium") policyId = "swarm_premium_v2";
-  if (variant === "designer") policyId = "swarm_designer_premium";
-
   // Create work order
   const order: AiWorkOrderV1 = {
     version: "v1",
     tenant: "launchbase",
     scope: `showroom.${showroom}.${variant}`,
-    policyId,
+    policyId: "swarm_premium_v1",
     inputs: brief,
     constraints: { maxRounds: 1, costCapUsd: 1.0 },
     idempotency: {

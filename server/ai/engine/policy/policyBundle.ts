@@ -7,10 +7,6 @@
 
 import launchbasePortalV1 from "./policies/launchbase_portal_v1.json";
 import swarmPremiumV1 from "./policies/swarm_premium_v1.json";
-import swarmPremiumV2 from "./policies/swarm_premium_v2.json";
-import swarmDesignerPremium from "./policies/swarm_designer_premium.json";
-import swarmDesignTournamentV1 from "./policies/swarm_design_tournament_v1.json";
-import swarmDesignWinnerV1 from "./policies/swarm_design_winner_v1.json";
 import aiButlerConsumerV1 from "./policies/ai_butler_consumer_v1.json";
 
 /**
@@ -21,9 +17,5 @@ import aiButlerConsumerV1 from "./policies/ai_butler_consumer_v1.json";
 export const ALL_POLICIES: unknown[] = [
   launchbasePortalV1,
   swarmPremiumV1,
-  swarmPremiumV2,
-  swarmDesignerPremium,
-  swarmDesignTournamentV1,
-  swarmDesignWinnerV1,
   aiButlerConsumerV1,
 ];
