@@ -2505,12 +2505,13 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 
 **Wire into 3 places that caused the last spiral:**
 
-- [ ] **A) CI smoke test runner (FIRST - lowest blast radius)**
+- [x] **A) CI smoke test runner (FIRST - lowest blast radius)**
   - File: `scripts/smoke/smokeIntakeFlow.mjs`
   - Add `scripts/utils/failurePacket.mjs` helper
   - Wrap `main()` in try/catch
   - On error: write FailurePacket → run `pnpm swarm:fix --from <path> --mode plan-only` → exit 1
   - **Acceptance:** Intentional break produces `runs/failures/.../failurePacket.json` + `runs/repair/.../repairPacket.json` + console prints both paths
+  - **Completed:** Commit 50de0ee - Self-healing end-to-end with normalizer
 
 - [ ] B) Preflight runner
   - File: whichever runs `smoke:preflight`
