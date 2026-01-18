@@ -186,47 +186,155 @@
       }
     },
     {
-      "id": "add-ons",
-      "type": "addons",
-      "components": ["Section", "Container", "Heading", "Text", "Card", "Badge", "Divider", "Link"],
+      "id": "addons-engines",
+      "type": "engine_cards",
+      "components": ["Section", "Container", "Heading", "Text", "Card", "Badge", "Divider", "Link", "Button"],
       "content": {
-        "h2": "Optional add-ons",
-        "intro": "Add-ons connect your tools and automate workflows. They require account access and can be enabled after your site is in a good place.",
-        "addons": [
+        "h2": "Add-On Engines",
+        "intro": "Optional upgrades that connect your business systems. Each has setup + ongoing care.",
+        "interaction": {
+          "desktop": "hoverPopover",
+          "mobile": "detailsModal"
+        },
+        "engines": [
           {
+            "id": "engine-inbox",
             "name": "Inbox Engine",
-            "badge": "Email",
-            "description": "Routing, auto-replies, follow-ups.",
-            "requires": ["Email provider access (e.g., Google Workspace/Microsoft)"]
+            "tagline": "Never miss a lead. Auto-reply + route.",
+            "pricing": { "setupLabel": "Setup", "setupValue": "Quoted", "careLabel": "Care", "careValue": "From $/mo" },
+            "creditsImpact": "Typical: +1 loop",
+            "bullets": [
+              "Business email setup + deliverability basics",
+              "Autoresponder + lead routing",
+              "Templates for quotes / scheduling / FAQs"
+            ],
+            "details": {
+              "whatItDoes": [
+                "Sets up business email and ensures leads land reliably.",
+                "Auto-responds instantly and routes requests to the right place."
+              ],
+              "requires": ["Domain access (DNS)", "Mailbox provider (Google Workspace / Microsoft 365 or preferred)"],
+              "defaultAutomations": ["Instant reply", "Missed-lead follow-up", "Internal notify"],
+              "maintenance": ["Inbox rules tuning", "Template updates", "Light deliverability monitoring"],
+              "oftenUsedWith": ["Phone Engine", "Ads Engine"]
+            }
           },
           {
+            "id": "engine-phone",
             "name": "Phone Engine",
-            "badge": "Calls",
-            "description": "Call forwarding, missed-call capture, follow-up texts/emails.",
-            "requires": ["Call routing destination(s)", "Forwarding provider configuration"]
+            "tagline": "Forward calls + capture missed callers.",
+            "pricing": { "setupLabel": "Setup", "setupValue": "Quoted", "careLabel": "Care", "careValue": "From $/mo" },
+            "creditsImpact": "Typical: +1 loop",
+            "bullets": [
+              "Call forwarding / routing by hours",
+              "Missed-call follow-up via SMS/email",
+              "Optional call tracking"
+            ],
+            "details": {
+              "whatItDoes": [
+                "Routes calls correctly and turns missed calls into follow-ups.",
+                "Adds lightweight tracking where needed."
+              ],
+              "requires": ["Carrier/forwarding access or provider connection"],
+              "defaultAutomations": ["Missed-call follow-up", "After-hours message", "Call summary to inbox (optional)"],
+              "maintenance": ["Routing tweaks", "Message updates", "Spam filtering"],
+              "oftenUsedWith": ["Inbox Engine", "Ads Engine"]
+            }
           },
           {
+            "id": "engine-social",
             "name": "Social Engine",
-            "badge": "Social",
-            "description": "Auto-posting and content loop.",
-            "requires": ["Social account access"]
+            "tagline": "Stay active automatically.",
+            "pricing": { "setupLabel": "Setup", "setupValue": "Quoted", "careLabel": "Care", "careValue": "From $/mo" },
+            "creditsImpact": "Typical: +1 loop",
+            "bullets": [
+              "Weekly auto-post schedule",
+              "Content prompts tied to services",
+              "Optional review/request loop"
+            ],
+            "details": {
+              "whatItDoes": [
+                "Keeps posting consistent without manual effort.",
+                "Generates a simple content cadence aligned to offers."
+              ],
+              "requires": ["Social account connections (FB/IG/LinkedIn, etc.)"],
+              "defaultAutomations": ["Scheduled post queue", "Before/after prompt", "Seasonal promo templates"],
+              "maintenance": ["Light review", "Monthly refresh", "Offer updates"],
+              "oftenUsedWith": ["Ads Engine", "Inbox Engine"]
+            }
           },
           {
+            "id": "engine-ads",
             "name": "Ads Engine",
-            "badge": "Ads",
-            "description": "Google Ads setup + landing alignment.",
-            "requires": ["Google Ads account access"]
+            "tagline": "Turn intent into booked calls.",
+            "pricing": { "setupLabel": "Setup", "setupValue": "Quoted", "careLabel": "Care", "careValue": "From $/mo" },
+            "creditsImpact": "Typical: +2 loops",
+            "bullets": [
+              "Google Ads starter campaign structure",
+              "Landing page alignment (CTA + copy)",
+              "Basic tracking checklist"
+            ],
+            "details": {
+              "whatItDoes": [
+                "Sets up a starter campaign framework and aligns the landing page.",
+                "Ensures you can measure conversions correctly."
+              ],
+              "requires": ["Google Ads access", "Billing method", "Conversion goal definition"],
+              "defaultAutomations": ["Lead follow-up sequence", "Keyword → CTA matching checklist", "Weekly pacing guardrails (if supported)"],
+              "maintenance": ["Budget pacing", "Keyword hygiene", "Landing tweaks"],
+              "oftenUsedWith": ["Phone Engine", "Books Engine"]
+            }
           },
           {
+            "id": "engine-books",
             "name": "Books Engine",
-            "badge": "Accounting",
-            "description": "QuickBooks connection + invoicing triggers.",
-            "requires": ["QuickBooks OAuth approval"]
+            "tagline": "Lead → invoice with less chaos.",
+            "pricing": { "setupLabel": "Setup", "setupValue": "Quoted", "careLabel": "Care", "careValue": "From $/mo" },
+            "creditsImpact": "Typical: +2 loops",
+            "bullets": [
+              "QuickBooks connection (OAuth)",
+              "Estimate/invoice workflow (basic)",
+              "Optional payment reminders"
+            ],
+            "details": {
+              "whatItDoes": [
+                "Connects QuickBooks and streamlines customer + invoice creation.",
+                "Adds simple reminders and workflow guardrails."
+              ],
+              "requires": ["QuickBooks Online admin access (OAuth)"],
+              "defaultAutomations": ["Create customer", "Draft invoice/estimate", "Reminder schedule (optional)"],
+              "maintenance": ["Workflow tuning", "Category mapping checks", "Failure alerts"],
+              "oftenUsedWith": ["Inbox Engine", "Phone Engine"]
+            }
           }
         ],
+        "cta": {
+          "primaryText": "Add an Engine",
+          "secondaryText": "Talk to us first",
+          "note": "We'll confirm required access before setup."
+        }
+      },
+      "layout": {
+        "cardsLayout": "3-up desktop, 2-up tablet, 1-up mobile",
+        "cardPadding": "p-6 desktop / p-4 mobile",
+        "gap": "lg",
         "notes": [
-          "Do not claim integrations are enabled by default.",
-          "State clearly: add-ons require explicit connections and approvals."
+          "Mobile uses tap-to-open details (no hover-only interactions).",
+          "Each Engine shows Setup + Care pricing labels (even if values are 'Quoted'/'From $/mo').",
+          "All cards stack 1-column on mobile with no horizontal scroll."
+        ]
+      },
+      "acceptance": {
+        "mustPass": [
+          "Mobile uses tap-to-open details (no hover-only interactions).",
+          "Each Engine shows Setup + Care pricing labels (even if values are 'Quoted'/'From $/mo').",
+          "Each Engine includes 'Requires' + 'Maintenance' + 'Often used with' in details view.",
+          "No claims about outcomes/performance unless provided in intake.",
+          "All cards stack 1-column on mobile with no horizontal scroll."
+        ],
+        "shouldPass": [
+          "Details modal has close button and traps focus.",
+          "Cards use consistent spacing + typography per premium design system contract."
         ]
       }
     },
