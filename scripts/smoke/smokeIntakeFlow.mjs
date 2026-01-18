@@ -20,6 +20,14 @@ const TEST_EMAIL = `smoke-test-${Date.now()}@example.com`;
 async function main() {
   console.log('🧪 Smoke Test: Apply Intake Flow\n');
 
+  // Schema guard: ensure tier and enginesSelected are present
+  for (const col of ['tier', 'enginesSelected']) {
+    if (!(col in intakes)) {
+      throw new Error(`Smoke test schema mismatch: intakes.${col} not in imported schema`);
+    }
+  }
+  console.log('✅ Schema guard passed: tier and enginesSelected present in intakes');
+
   const db = await getDb();
 
   try {
@@ -42,7 +50,13 @@ async function main() {
     // Step 2: Verify database persistence
     console.log('\nStep 2: Verifying database persistence...');
     const [retrieved] = await db
-      .select()
+      .select({
+        id: intakes.id,
+        email: intakes.email,
+        tier: intakes.tier,
+        enginesSelected: intakes.enginesSelected,
+        createdAt: intakes.createdAt,
+      })
       .from(intakes)
       .where(eq(intakes.email, TEST_EMAIL))
       .orderBy(desc(intakes.createdAt))
@@ -52,7 +66,12 @@ async function main() {
       throw new Error('Failed to retrieve test intake');
     }
 
+    console.log('DB row readback:', JSON.stringify(retrieved, null, 2));
+
     // Verify tier
+    if (retrieved.tier == null) {
+      throw new Error(`tier missing/null in DB row (tier=${retrieved.tier})`);
+    }
     if (retrieved.tier !== 'premium') {
       throw new Error(`Expected tier=premium, got tier=${retrieved.tier}`);
     }
