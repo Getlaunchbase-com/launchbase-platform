@@ -1,6 +1,8 @@
 import { Link } from "wouter";
 import { ArrowRight, Check, Info } from "lucide-react";
 import { useState } from "react";
+import { ENGINES } from "../data/engines";
+import CompareTiers from "../components/CompareTiers";
 
 export default function Pricing() {
   const [selectedEngine, setSelectedEngine] = useState<string | null>(null);
@@ -107,6 +109,9 @@ export default function Pricing() {
               />
             </div>
           </div>
+
+          {/* Compare Tiers */}
+          <CompareTiers />
 
           {/* Credits Explainer */}
           <div className="mb-20 rounded-2xl border border-white/10 bg-white/5 p-8">
