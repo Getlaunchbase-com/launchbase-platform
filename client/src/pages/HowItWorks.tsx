@@ -1,4 +1,4 @@
-import { Check, ArrowRight } from "lucide-react";
+import { ArrowRight, ArrowDown, Check } from "lucide-react";
 import { Link } from "wouter";
 
 export default function HowItWorks() {
@@ -195,8 +195,122 @@ export default function HowItWorks() {
         </div>
       </section>
 
-      {/* Critic Checks Section */}
+      {/* Choose Tier + Engines Section */}
       <section className="py-16 md:py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center">Choose a tier + optional engines</h2>
+          <p className="text-center text-white/70 mb-12 max-w-2xl mx-auto">
+            Start by selecting your tier, then add engines if you need email, phone, social, ads, or QuickBooks integration.
+          </p>
+          
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Visual Flow */}
+            <div className="space-y-6">
+              <div className="bg-white/5 border border-white/10 rounded-xl p-6">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#FF6A00] text-white font-bold text-sm">
+                    1
+                  </div>
+                  <h3 className="text-xl font-semibold">Select your tier</h3>
+                </div>
+                <p className="text-white/70 text-sm">
+                  Choose Standard (1 credit), Growth (3 credits), or Premium (10 credits) based on how much iteration you need.
+                </p>
+              </div>
+              
+              <div className="flex justify-center">
+                <ArrowDown className="h-6 w-6 text-white/40" />
+              </div>
+              
+              <div className="bg-white/5 border border-white/10 rounded-xl p-6">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#FF6A00] text-white font-bold text-sm">
+                    2
+                  </div>
+                  <h3 className="text-xl font-semibold">Add engines (optional)</h3>
+                </div>
+                <p className="text-white/70 text-sm mb-3">
+                  Engines automate email, phone, social posting, ads, or QuickBooks. You can add them now or later.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {["Inbox", "Phone", "Social", "Ads", "Books"].map((engine) => (
+                    <span key={engine} className="text-xs px-2 py-1 rounded bg-white/10 text-white/80">
+                      {engine}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="flex justify-center">
+                <ArrowDown className="h-6 w-6 text-white/40" />
+              </div>
+              
+              <div className="bg-white/5 border border-white/10 rounded-xl p-6">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#FF6A00] text-white font-bold text-sm">
+                    3
+                  </div>
+                  <h3 className="text-xl font-semibold">Submit & review</h3>
+                </div>
+                <p className="text-white/70 text-sm">
+                  We generate your build plan, run the swarm, and send you a preview. You can approve or request changes using your credits.
+                </p>
+              </div>
+            </div>
+            
+            {/* What Happens Next */}
+            <div className="bg-gradient-to-br from-[#FF6A00]/10 to-[#FF6A00]/5 border border-[#FF6A00]/30 rounded-xl p-8">
+              <h3 className="text-2xl font-bold mb-6">What happens next</h3>
+              
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <Check className="h-5 w-5 text-[#1ED760] mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-semibold mb-1">Preflight checks</p>
+                    <p className="text-sm text-white/70">We validate your inputs and flag any missing details before generation starts.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <Check className="h-5 w-5 text-[#1ED760] mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-semibold mb-1">Swarm generates proposal</p>
+                    <p className="text-sm text-white/70">Field General orchestrates specialists to produce a coherent build plan within your tier budget.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <Check className="h-5 w-5 text-[#1ED760] mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-semibold mb-1">Critic validates quality</p>
+                    <p className="text-sm text-white/70">Automated checks ensure mobile clarity, hierarchy, and truth-safe copy before you see it.</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <Check className="h-5 w-5 text-[#1ED760] mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-semibold mb-1">You review & decide</p>
+                    <p className="text-sm text-white/70">Approve to ship, or request changes. Each "Request changes" uses 1 credit from your tier.</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-8 pt-6 border-t border-white/10">
+                <Link 
+                  href="/apply"
+                  className="block w-full text-center bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white px-6 py-3 rounded-lg font-semibold transition"
+                >
+                  Start your intake
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Critic Checks Section */}
+      <section className="py-16 md:py-20 px-4 bg-white/5">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">What the critic checks</h2>
           

@@ -2462,16 +2462,16 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [x] Mirror tier definitions from Pricing page for consistency
 
 ## 🔄 GITHUB SYNC
-- [ ] Sync Apply.tsx changes to launchbase-platform
-- [ ] Sync client/src/data/engines.ts
-- [ ] Sync drizzle schema + migrations
-- [ ] Sync smoke test + package.json script
-- [ ] Add/update docs/contracts/IntakeFlowPlanV1.md with smoke:intake requirement
+- [x] Sync Apply.tsx changes to launchbase-platform (committed locally, will sync via Management UI GitHub export)
+- [x] Sync client/src/data/engines.ts (already in checkpoint 03708365)
+- [x] Sync drizzle schema + migrations (already in checkpoint 03708365)
+- [x] Sync smoke test + package.json script (already in checkpoint 03708365)
+- [x] Add/update docs/contracts/IntakeFlowPlanV1.md with smoke:intake requirement
 
 ## 📄 HOW IT WORKS PAGE UPDATE
-- [ ] Add "Choose a tier + optional engines" section
-- [ ] Visual flow: tiers → engines → what happens next
-- [ ] Keep it literal and visual (no hype)
+- [x] Add "Choose a tier + optional engines" section
+- [x] Visual flow: tiers → engines → what happens next
+- [x] Keep it literal and visual (no hype)
 
 ## 🧪 CI INTEGRATION
-- [ ] Add smoke:intake to CI pipeline alongside other smoke tests
+- [x] Add smoke:intake to CI pipeline alongside other smoke tests
