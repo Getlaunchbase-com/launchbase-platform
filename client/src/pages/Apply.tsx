@@ -608,20 +608,67 @@ export default function ApplyPage() {
                     <h2 className="text-2xl font-semibold mb-2">Choose your tier</h2>
                     <p className="text-white/70 mb-6">Select the level of transformation that fits your needs.</p>
                     <div className="grid gap-4">
-                      {[{id: "standard", name: "Standard", desc: "One focused improvement loop."}, {id: "growth", name: "Growth", desc: "Conversion-focused improvements and iteration."}, {id: "premium", name: "Premium", desc: "Full transformation and deeper iteration."}].map(tier => (
-                        <button
-                          key={tier.id}
-                          onClick={() => setForm(f => ({...f, tier: tier.id as any}))}
-                          className={`p-4 rounded-lg border text-left transition ${
-                            form.tier === tier.id
-                              ? "border-[#FF6A00] bg-[#FF6A00]/10"
-                              : "border-white/20 hover:border-white/40"
-                          }`}
-                        >
-                          <div className="font-semibold text-lg">{tier.name}</div>
-                          <div className="text-sm text-white/70 mt-1">{tier.desc}</div>
-                        </button>
-                      ))}
+                      {/* Standard Tier */}
+                      <button
+                        onClick={() => setForm(f => ({...f, tier: "standard"}))}
+                        className={`p-5 rounded-lg border text-left transition ${
+                          form.tier === "standard"
+                            ? "border-[#FF6A00] bg-[#FF6A00]/10"
+                            : "border-white/20 hover:border-white/40"
+                        }`}
+                      >
+                        <div className="font-semibold text-xl mb-1">Standard</div>
+                        <div className="text-sm text-white/60 mb-3">Credits included: 1 credit</div>
+                        <div className="text-sm text-white/80 mb-3">Best for: One focused improvement pass.</div>
+                        <div className="text-sm text-white/70 space-y-1">
+                          <div>• Clearer hero + single primary CTA</div>
+                          <div>• Stronger section order + messaging hierarchy</div>
+                          <div>• Mobile cleanup + quick conversion polish</div>
+                        </div>
+                      </button>
+
+                      {/* Growth Tier */}
+                      <button
+                        onClick={() => setForm(f => ({...f, tier: "growth"}))}
+                        className={`p-5 rounded-lg border text-left transition ${
+                          form.tier === "growth"
+                            ? "border-[#FF6A00] bg-[#FF6A00]/10"
+                            : "border-white/20 hover:border-white/40"
+                        }`}
+                      >
+                        <div className="font-semibold text-xl mb-1">Growth</div>
+                        <div className="text-sm text-white/60 mb-3">Credits included: 3 credits</div>
+                        <div className="text-sm text-white/80 mb-3">Best for: Conversion-focused iteration and refinement.</div>
+                        <div className="text-sm text-white/70 space-y-1">
+                          <div>• Proof + trust layer upgrades (reviews, guarantees, clarity)</div>
+                          <div>• CTA placement + funnel tightening</div>
+                          <div>• 3 improvement loops to refine outcomes</div>
+                        </div>
+                      </button>
+
+                      {/* Premium Tier */}
+                      <button
+                        onClick={() => setForm(f => ({...f, tier: "premium"}))}
+                        className={`p-5 rounded-lg border text-left transition ${
+                          form.tier === "premium"
+                            ? "border-[#FF6A00] bg-[#FF6A00]/10"
+                            : "border-white/20 hover:border-white/40"
+                        }`}
+                      >
+                        <div className="font-semibold text-xl mb-1">Premium</div>
+                        <div className="text-sm text-white/60 mb-3">Credits included: 10 credits</div>
+                        <div className="text-sm text-white/80 mb-3">Best for: Full transformation + deeper iteration.</div>
+                        <div className="text-sm text-white/70 space-y-1">
+                          <div>• Strongest design system + page-wide consistency</div>
+                          <div>• Full funnel rebuild + structure improvements</div>
+                          <div>• 10 loops for aggressive refinement</div>
+                        </div>
+                      </button>
+                    </div>
+                    <div className="mt-4 p-3 rounded-lg bg-white/5 border border-white/10">
+                      <div className="text-xs text-white/60">
+                        <strong className="text-white/80">What's a credit?</strong> Each time you hit "Request changes" on your preview, it uses 1 credit.
+                      </div>
                     </div>
                   </div>
                 )}

@@ -2453,3 +2453,25 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [x] Add dev-only sessionStorage persistence for form + step (survive remounts during dev)
 - [x] Create E2E smoke test: tier=premium + engines=[inbox,ads] → verify DB + Review renders both
 - [x] Remove debug <pre> blocks after fixes validated
+
+## 💰 TIER PRICING DISPLAY (Apply.tsx)
+- [x] Add tier pricing to tier selection cards (monthly/per-build + credits + best for + what you get)
+- [x] Ensure mobile visibility (pricing + credits visible without expanding)
+- [x] Single primary CTA ("Continue")
+- [x] Truth-safe copy only (no invented claims)
+- [x] Mirror tier definitions from Pricing page for consistency
+
+## 🔄 GITHUB SYNC
+- [ ] Sync Apply.tsx changes to launchbase-platform
+- [ ] Sync client/src/data/engines.ts
+- [ ] Sync drizzle schema + migrations
+- [ ] Sync smoke test + package.json script
+- [ ] Add/update docs/contracts/IntakeFlowPlanV1.md with smoke:intake requirement
+
+## 📄 HOW IT WORKS PAGE UPDATE
+- [ ] Add "Choose a tier + optional engines" section
+- [ ] Visual flow: tiers → engines → what happens next
+- [ ] Keep it literal and visual (no hype)
+
+## 🧪 CI INTEGRATION
+- [ ] Add smoke:intake to CI pipeline alongside other smoke tests
