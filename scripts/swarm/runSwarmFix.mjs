@@ -18,6 +18,80 @@ import { dirname } from "node:path";
 import { runRepairSwarm } from "../../server/ai/orchestration/runRepairSwarm.ts";
 import { createScoreCard } from "../../server/contracts/index.ts";
 
+/**
+ * Normalize FailurePacket to handle both old and new shapes.
+ * Reads from any structure and returns the canonical internal format.
+ */
+function normalizeFailurePacket(fp) {
+  const version = fp?.version ?? fp?.kind ?? "failurePacket.unknown";
+
+  // Prefer new shape (signal.*), fall back to old shapes
+  const command =
+    fp?.signal?.command ??
+    fp?.command ??
+    fp?.meta?.command ??
+    "unknown";
+
+  const errorMessage =
+    fp?.signal?.errorMessage ??
+    fp?.errorMessage ??
+    fp?.error?.message ??
+    fp?.error?.causeMessage ??
+    fp?.summary ??
+    "unknown error";
+
+  const stack =
+    fp?.error?.stack ??
+    fp?.signal?.stack ??
+    fp?.extra?.stack ??
+    undefined;
+
+  const system =
+    fp?.system ??
+    fp?.source ??
+    "unknown";
+
+  const summary =
+    fp?.summary ??
+    fp?.title ??
+    "failure";
+
+  const extra =
+    fp?.extra ??
+    fp?.context ??
+    {};
+
+  // Return the exact structure runRepairSwarm expects
+  return {
+    version,
+    system,
+    summary,
+    command,
+    failure: {
+      type: fp?.failure?.type ?? fp?.type ?? "error",
+      errorMessage,
+      stopReason: fp?.failure?.stopReason ?? fp?.stopReason ?? "unknown",
+      stack,
+    },
+    error: {
+      message: errorMessage,
+      stack,
+    },
+    context: {
+      ...extra,
+      component: extra.component ?? fp?.component ?? "unknown",
+      command: fp?.signal?.command ?? fp?.command ?? "unknown",
+      logs: extra.logs ?? fp?.logs ?? [],
+    },
+    meta: {
+      jobId: fp?.meta?.jobId ?? fp?.id ?? "repair_job",
+      runId: fp?.meta?.runId ?? fp?.id ?? "repair_run",
+      sha: fp?.meta?.sha ?? fp?.sha ?? "unknown",
+    },
+    raw: fp, // keep original for debugging
+  };
+}
+
 function arg(name) {
   const i = process.argv.indexOf(name);
   return i >= 0 ? process.argv[i + 1] : null;
@@ -52,10 +126,11 @@ async function main() {
   const shouldTest = flag("--test");
 
   console.log(`[SwarmFix] Reading FailurePacket from: ${from}`);
-  const failurePacket = JSON.parse(readFileSync(from, "utf8"));
+  const raw = JSON.parse(readFileSync(from, "utf8"));
+  const failurePacket = normalizeFailurePacket(raw);
 
   // Hard stop for permission blockers
-  const msg = failurePacket.failure.errorMessage?.toLowerCase() || "";
+  const msg = failurePacket.error?.message?.toLowerCase() || "";
   if (msg.includes("workflows permission") || msg.includes("insufficient permissions")) {
     console.error("❌ BLOCKED: GitHub App permission. Do not swarm this.");
     console.error("Manual action required: Fix GitHub App permissions in repo settings.");

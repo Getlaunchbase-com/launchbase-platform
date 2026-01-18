@@ -13,6 +13,7 @@
 
 import { execSync } from 'node:child_process';
 import mysql from 'mysql2/promise';
+import { writeFailurePacket } from '../utils/failurePacket.mjs';
 import { getDb } from '../../server/db.ts';
 import { intakes } from '../../drizzle/schema.ts';
 import { desc, eq } from 'drizzle-orm';
@@ -21,19 +22,6 @@ const TEST_EMAIL = `smoke-test-${Date.now()}@example.com`;
 
 async function main() {
   console.log('🧪 Smoke Test: Apply Intake Flow\n');
-
-  // Apply schema migrations non-interactively (CI-safe)
-  console.log('Applying database migrations...');
-  try {
-    execSync('pnpm drizzle-kit migrate', {
-      stdio: 'inherit',
-      env: process.env,
-    });
-    console.log('✅ Migrations applied\n');
-  } catch (error) {
-    console.error('❌ Failed to apply migrations:', error.message);
-    throw error;
-  }
 
   // Schema guard: ensure tier and enginesSelected are present
   for (const col of ['tier', 'enginesSelected']) {
@@ -212,4 +200,39 @@ async function main() {
   }
 }
 
-main();
+main().catch((err) => {
+  const errorMessage =
+    err?.cause?.sqlMessage ||
+    err?.sqlMessage ||
+    err?.message ||
+    String(err);
+
+  const fp = writeFailurePacket({
+    system: "smoke:intake",
+    summary: "smoke:intake failed",
+    command: "pnpm smoke:intake",
+    errorMessage,
+    extra: {
+      node: process.version,
+      hasDatabaseUrl: Boolean(process.env.DATABASE_URL),
+    },
+  });
+
+  console.error("============================================================");
+  console.error("❌ SMOKE TEST FAILED");
+  console.error("============================================================");
+  console.error(errorMessage);
+  console.error("🧾 FailurePacket:", fp);
+
+  // Plan-only (cannot apply patches). Generates RepairPacket + scorecard artifacts.
+  try {
+    execSync(`pnpm swarm:fix --from ${fp} --mode plan-only`, {
+      stdio: "inherit",
+      env: process.env,
+    });
+  } catch (swarmErr) {
+    console.error("⚠️ swarm:fix failed (plan-only):", swarmErr?.message || swarmErr);
+  }
+
+  process.exit(1);
+});
