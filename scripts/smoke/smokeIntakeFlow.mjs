@@ -12,7 +12,7 @@
  */
 
 import { getDb } from '../../server/db.ts';
-import { intakes } from '../../drizzle/schema.ts';
+import { intakes } from '../../drizzle/schema';
 import { desc, eq } from 'drizzle-orm';
 
 const TEST_EMAIL = `smoke-test-${Date.now()}@example.com`;
