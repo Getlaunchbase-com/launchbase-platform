@@ -11,6 +11,8 @@
  *   pnpm smoke:intake
  */
 
+import { execSync } from 'node:child_process';
+import mysql from 'mysql2/promise';
 import { getDb } from '../../server/db.ts';
 import { intakes } from '../../drizzle/schema.ts';
 import { desc, eq } from 'drizzle-orm';
@@ -20,6 +22,19 @@ const TEST_EMAIL = `smoke-test-${Date.now()}@example.com`;
 async function main() {
   console.log('🧪 Smoke Test: Apply Intake Flow\n');
 
+  // Apply schema migrations non-interactively (CI-safe)
+  console.log('Applying database migrations...');
+  try {
+    execSync('pnpm drizzle-kit migrate', {
+      stdio: 'inherit',
+      env: process.env,
+    });
+    console.log('✅ Migrations applied\n');
+  } catch (error) {
+    console.error('❌ Failed to apply migrations:', error.message);
+    throw error;
+  }
+
   // Schema guard: ensure tier and enginesSelected are present
   for (const col of ['tier', 'enginesSelected']) {
     if (!(col in intakes)) {
@@ -27,6 +42,47 @@ async function main() {
     }
   }
   console.log('✅ Schema guard passed: tier and enginesSelected present in intakes');
+
+  // Enforce DB schema: create columns if missing (don't trust migration messages)
+  console.log('Enforcing database schema...');
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error('Missing DATABASE_URL');
+
+  const conn = await mysql.createConnection(url);
+
+  try {
+    // Create tier column if missing
+    await conn.execute(`
+      ALTER TABLE intakes
+      ADD COLUMN IF NOT EXISTS tier ENUM('standard','growth','premium') NULL
+    `);
+
+    // Create enginesSelected column if missing
+    await conn.execute(`
+      ALTER TABLE intakes
+      ADD COLUMN IF NOT EXISTS enginesSelected JSON NULL
+    `);
+
+    // Hard verify columns exist
+    const [rows] = await conn.execute(`
+      SELECT COLUMN_NAME
+      FROM INFORMATION_SCHEMA.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'intakes'
+        AND COLUMN_NAME IN ('tier','enginesSelected')
+    `);
+
+    const cols = new Set(rows.map(r => r.COLUMN_NAME));
+    if (!cols.has('tier') || !cols.has('enginesSelected')) {
+      throw new Error(
+        `Schema verify failed after ALTER: have=[${[...cols].join(',')}]`
+      );
+    }
+
+    console.log('✅ DB schema ensured: tier + enginesSelected exist\n');
+  } finally {
+    await conn.end();
+  }
 
   const db = await getDb();
 

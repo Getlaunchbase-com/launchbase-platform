@@ -2475,3 +2475,138 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 
 ## 🧪 CI INTEGRATION
 - [x] Add smoke:intake to CI pipeline alongside other smoke tests
+
+
+---
+
+## 🔧 PHASE 2.5: SELF-HEALING & SITE POLISH (REGROUPED)
+
+**Goal:** Make self-healing mandatory + finish getlaunchbase.com overhaul  
+**Mode:** No more CI/workflow thrash. Product shipping only.  
+**Priority Order:** 3 → 2 → 1 (self-heal → site polish → builder real)
+
+### Priority 3: Make Self-Healing Mandatory Everywhere (FIRST)
+
+**Goal:** Any meaningful failure produces a FailurePacket automatically and runs repair swarm (at least in plan-only mode), so we never spiral again.
+
+**Deliverables:**
+
+- [ ] Create `server/utils/failurePacket.ts` (or `scripts/utils/failurePacket.mjs`)
+  - Exports: `writeFailurePacket({ system, summary, command, errorMessage, logsPath?, runId?, sha?, extra? }) => filepath`
+  - Always writes into: `runs/failures/<failureId>/failurePacket.json`
+
+- [ ] Create `server/ai/orchestration/autoHeal.ts`
+  - `withAutoHeal(fn, context)` wrapper that:
+    - Catches errors
+    - Writes FailurePacket
+    - Calls `runRepairSwarm({ fromFailurePacketPath, mode: "plan-only" | "plan+patch" })`
+    - Writes RepairPacket + ScoreCard to `runs/repair/<repairId>/...`
+    - Rethrows (or returns structured failure) so caller still fails loudly
+
+**Wire into 3 places that caused the last spiral:**
+
+- [ ] **A) CI smoke test runner (FIRST - lowest blast radius)**
+  - File: `scripts/smoke/smokeIntakeFlow.mjs`
+  - Add `scripts/utils/failurePacket.mjs` helper
+  - Wrap `main()` in try/catch
+  - On error: write FailurePacket → run `pnpm swarm:fix --from <path> --mode plan-only` → exit 1
+  - **Acceptance:** Intentional break produces `runs/failures/.../failurePacket.json` + `runs/repair/.../repairPacket.json` + console prints both paths
+
+- [ ] B) Preflight runner
+  - File: whichever runs `smoke:preflight`
+  - Always FailurePacket on non-PASS
+
+- [ ] C) RunPlan / Swarm execution
+  - Files: `server/ai/orchestration/executeRunPlan.ts`, `server/jobs/runPlanQueue.ts`
+  - Failures in executeRunPlan / job queue always produce FailurePacket
+
+**Acceptance Gates (binary):**
+- If I break something intentionally (e.g., throw in intake submission), I see:
+  - `runs/failures/.../failurePacket.json`
+  - `runs/repair/.../repairPacket.json`
+  - `runs/repair/.../scorecard.json`
+- Console prints one line with both paths
+
+**No-permission dependency:** This does not require workflow edits. It's in repo code.
+
+---
+
+### Priority 2: Finish "Rest of getlaunchbase.com" (SECOND)
+
+**Goal:** Premium pages + Apply are done, but the site needs cohesion and "real product polish".
+
+**What we do next (in this order):**
+
+1. **Global shell pass (this is what makes it feel "finished")**
+   - [ ] Header/nav consistency across all pages
+   - [ ] Footer consistency across all pages
+   - [ ] Mobile spacing + typography normalization
+   - [ ] Button variants consistent everywhere
+   - [ ] SEO basics (title/description per page)
+   - **Deliverable:** `docs/premium_overhaul/ShellPatchList.md` (checklist Builder/Coder must follow)
+
+2. **Tier comparison table (Pricing)**
+   - [ ] Side-by-side Standard/Growth/Premium comparison
+   - [ ] Credits explanation ("What's a credit?" copy)
+   - [ ] "What changes cost" clarity (credits consumed by change requests)
+   - [ ] No dollar pricing unless you want it (stick to credits model)
+   - **Deliverable:** Update `client/src/pages/Pricing.tsx`
+
+3. **Examples page real assets pipeline**
+   - [ ] Replace placeholders with real screenshots
+   - [ ] Add a simple folder convention + import pattern
+   - **Deliverable:** `client/src/assets/examples/**` + tiny loader module
+
+**Acceptance Gates:**
+- [ ] On mobile: no horizontal scroll on any marketing page
+- [ ] One primary CTA visible at a time
+- [ ] Lighthouse (or simple perf check): no giant images uncompressed
+- [ ] Truth policy: no made-up claims anywhere
+
+---
+
+### Priority 1: Make "Builder Real" (THIRD)
+
+**Goal:** Stop pretending "Builder is a vibe." Make it an executor.
+
+**Minimal viable "Builder Executor":**
+
+- [ ] Command: `pnpm contract:execute --request apply-intakeflow-v1`
+
+**What it must do:**
+- [ ] Read a request JSON from: `docs/builder_contracts/requests/*.json`
+- [ ] Enforce `allowedPaths`/`forbiddenPaths`
+- [ ] Create a branch
+- [ ] Apply changes (either by invoking swarm coder or by deterministic transforms)
+- [ ] Run smoke tests
+- [ ] Open PR (or at least output a git-ready branch)
+
+**Deliverables:**
+- [ ] `scripts/contracts/executeBuilderRequest.ts`
+- [ ] `package.json` script: `"contract:execute": "tsx scripts/contracts/executeBuilderRequest.ts"`
+- [ ] Constitution file (already drafted): `docs/builder_contracts/BUILDER_CONSTITUTION.md`
+
+**Acceptance Gates:**
+- [ ] If request tries to edit `server/**`, executor refuses
+- [ ] If request edits allowed files only, it creates branch + commits
+- [ ] Smoke tests run automatically after patch
+
+---
+
+## 🚫 FREEZE RULES (48 HOURS)
+
+**No more CI/workflow edits unless something is literally broken.**
+- The smoke job is green; stop touching it.
+- Focus on product shipping, not infrastructure thrash.
+
+---
+
+## 📋 RELEASE CHECKLIST (TO BE CREATED)
+
+**Goal:** One page in the repo that says:
+- [ ] What "done" means
+- [ ] What gets checked
+- [ ] What triggers swarm automatically
+- [ ] Where artifacts live
+
+**Deliverable:** `docs/RELEASE_CHECKLIST.md`
