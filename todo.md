@@ -2621,11 +2621,12 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 **Approach:** Treat feature as "failure" → generate RepairPacket → apply patch
 
 **Steps:**
-- [ ] Create Feature-FailurePacket: `runs/failures/feature_pricing_compare_tiers/failurePacket.json`
-- [ ] Run swarm:fix with GPT-5.2 coder to generate RepairPacket
-- [ ] Apply patch from RepairPacket
-- [ ] Validate: lint, build, smoke test, visual check
-- [ ] Commit and mark complete
+- [x] Create Feature-FailurePacket: `runs/failures/feature_pricing_compare_tiers/failurePacket.json`
+- [x] Run swarm:fix with GPT-5.2 coder to generate RepairPacket (swarm misunderstood, went with direct implementation)
+- [x] Apply patch from RepairPacket (implemented directly instead)
+- [x] Validate: lint, build, smoke test, visual check
+- [x] Commit and mark complete
+- **Completed:** Commit 016664e - Compare Tiers section with mobile cards + desktop table
 
 **Requirements:**
 - Compare Standard/Growth/Premium tiers
