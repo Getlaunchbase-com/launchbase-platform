@@ -1,0 +1,24 @@
+{
+  "name": "Stack B1: GPT-5.2 Builders + Sonnet 4.0 Critic",
+  "description": "All builders use GPT-5.2 for consistency, Sonnet 4.0 for independent critique",
+  "stack": {
+    "designer_systems_fast": {
+      "modelId": "openai/gpt-5-2",
+      "maxTokens": 2000,
+      "temperature": 0.4,
+      "timeoutMs": 120000
+    },
+    "designer_brand_fast": {
+      "modelId": "openai/gpt-5-2",
+      "maxTokens": 2000,
+      "temperature": 0.4,
+      "timeoutMs": 120000
+    },
+    "design_critic_ruthless": {
+      "modelId": "claude-sonnet-4-20250514",
+      "maxTokens": 4000,
+      "temperature": 0.3,
+      "timeoutMs": 240000
+    }
+  }
+}

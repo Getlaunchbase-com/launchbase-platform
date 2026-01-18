@@ -15,7 +15,7 @@ import { safeError, toSafeClientMessage } from "../security/redaction";
 
 const AIML_API_KEY = process.env.AIML_API_KEY;
 const AIML_BASE_URL = process.env.AIML_BASE_URL || "https://api.aimlapi.com/v1";
-const REQUEST_TIMEOUT_MS = Number(process.env.AIML_REQUEST_TIMEOUT_MS ?? "90000"); // default 90s (configurable via env)
+const REQUEST_TIMEOUT_MS = 10000; // 10 seconds
 
 // ============================================
 // CLIENT INITIALIZATION

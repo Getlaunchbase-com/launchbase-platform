@@ -2158,3 +2158,216 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [ ] Document BuilderGate allowlist (exact surfaces + exact folders allowed)
 - [ ] Create TESTING_LADDER.md with all test cases and pass conditions
 - [ ] Create BUILDER_INTEGRATION.md with safe pages, permissions, and workflow
+
+
+---
+
+## 🧪 SMOKE TEST SYSTEM (Phase 2.5)
+
+**Goal:** Universal smoke harness for all LaunchBase systems with auto-diagnosis swarm
+
+### Credits System Hardening ✅ COMPLETE
+- [x] Create `getDefaultIntakeCredits()` helper function
+- [x] Add `validateIntakeCredits()` invariant guard
+- [x] Create CI check script `scripts/ci/check-intake-inserts.sh`
+- [x] Integrate invariant guard into portal mutations (requestChanges, approve)
+- [x] Formalize `pnpm smoke:intake` command
+- [x] Create credit consumption test (10-loop exhaustion + needsPurchase gate)
+- [x] Document Universal Smoke Harness structure
+
+### Next: Refactor & Expand
+- [ ] Refactor remaining 10 test files to use `getDefaultIntakeCredits()`
+- [ ] Add CI integration for `scripts/ci/check-intake-inserts.sh`
+- [ ] Run consumption test in CI: `pnpm tsx scripts/smoke/smokeCreditsConsumption.mjs`
+- [ ] Implement FailurePacketV1 auto-generation on test failure
+- [ ] Build diagnosis swarm automation (Field General + 3 coders + Arbiter)
+- [ ] Add smoke tests for:
+  - [ ] OAuth integrations (QB / Google / FB)
+  - [ ] Stripe payments & webhook flows
+  - [ ] Builder exec loops
+  - [ ] Preview/deploy gates
+  - [ ] Swarm contracts (8/8/10 output rules)
+- [ ] Create `pnpm smoke:all` command (runs all tests in parallel)
+- [ ] Create `pnpm smoke:triage` command (runs + auto-diagnosis on failure)
+- [ ] Create `pnpm smoke:verify <testRunId>` command (reruns using saved config)
+- [ ] Implement structured memory system:
+  - [ ] `runs/smoke/<testRunId>/failure.json`
+  - [ ] `runs/smoke/<testRunId>/diagnosis/<agent>.json`
+  - [ ] `runs/smoke/<testRunId>/fixattempt.json`
+  - [ ] `runs/smoke/<testRunId>/verification.json`
+  - [ ] `runs/smoke/<testRunId>/scorecard.json`
+- [ ] Build scorecard system (grade swarm accuracy + fix quality)
+
+**Definition of Done:**
+- All smoke tests pass in CI
+- FailurePacket → Diagnosis → Fix → Verification loop automated
+- Scorecard tracks swarm accuracy over time
+- Universal Smoke Harness applied to all LaunchBase systems
+
+
+
+---
+
+## 📦 TIER PACKAGING & ADD-ONS (Phase 3)
+
+**Goal:** Clean tier + add-on packaging with minimal intake questions
+
+### Tier Outcomes (Not Features)
+- [ ] **Standard (Polish Pass)**: 1 loop, credible site + clear CTA + basic trust
+- [ ] **Growth (Conversion Pass)**: 3 loops, proof blocks + funnel clarity + lead capture
+- [ ] **Premium (Automation Pass)**: 10 loops, Builder UI + integrations + workflows
+
+### Add-On Engines (Modular)
+- [ ] **Inbox Engine**: Email + SMS follow-up (auto-reply, reminders, nurture)
+- [ ] **Phone Engine**: Call forwarding + missed-call capture + tracking
+- [ ] **Social Engine**: Auto-post 2-5x/week (FB/IG/LinkedIn with approval gating)
+- [ ] **Ads Engine**: Google Ads setup + landing alignment + reporting + guardrails
+- [ ] **Books Engine**: QuickBooks invoices + client sync + job profitability
+
+### Add-On Packs (Bundled)
+- [ ] **Comms Pack**: Inbox Engine + Phone Engine
+- [ ] **Marketing Pack**: Social Engine + basic email campaigns
+- [ ] **Ads Pack**: Ads Engine
+- [ ] **Ops Pack**: Books Engine (QuickBooks)
+
+### Minimal Intake Questions (Tier-Aware)
+- [ ] **Universal (all tiers)**: Business name, location, services, ideal customer, primary goal, CTA, brand inputs, differentiators, must-keep items, compliance constraints
+- [ ] **Growth adds**: Lead handling (where leads go, reply method), reviews/testimonials, best converting offer, competitors
+- [ ] **Premium adds**: Current tools checklist, automation priorities, access method, approval style, spend approver, posting voice/forbidden topics
+
+### Enforcement (Not Unlimited)
+- [ ] Each "Request Changes" = 1 credit (one loop)
+- [ ] Add-ons have monthly run limits:
+  - [ ] Social Engine: 8 posts/month included
+  - [ ] Ads Engine: 1 campaign setup + weekly optimization
+  - [ ] Inbox Engine: 3 sequences + 1 monthly iteration
+
+---
+
+## 🔬 INTAKE PREFLIGHT SWARM (Phase 3.5)
+
+**Goal:** Validate intake completeness BEFORE burning credits or running expensive swarms
+
+### Ultimate Swarm Smoke Test Workflow
+- [ ] **Step 0**: Intake arrives → store as Inquiry/CustomerTruth object
+- [ ] **Step 1**: Intake Validator Swarm (pre-flight check)
+  - [ ] Validate completeness (tier-aware)
+  - [ ] Detect contradictions
+  - [ ] Normalize into Field General inputs
+- [ ] **Step 2**: Field General makes RunPlan (tier plan, swarms, add-ons, BuilderGate, deliverables)
+- [ ] **Step 3**: Add-On Orchestrator outputs AddonPlanV1 (engines enabled, connectors required, risk flags, setup steps)
+- [ ] **Step 4**: Smoke Test Swarm (fail fast)
+  - [ ] Tier budget check (Standard=1, Growth=3, Premium=10)
+  - [ ] Credit check (creditsRemaining initialized correctly)
+  - [ ] BuilderGate check (ONLY Premium, only allowed surfaces)
+  - [ ] Integration gating (block if missing budget/OAuth)
+  - [ ] Scope safety (Builder cannot touch server/auth/db)
+  - [ ] Approval policy (requiresApproval always true)
+
+### Contracts (Versioned)
+- [ ] `IntakeValidationV1`: Completeness + contradictions + normalized inputs
+- [ ] `AddonPlanV1`: Engines enabled + connectors required + risk flags + setup steps
+- [ ] `RepairPacketV1`: status (PASS/NEEDS_INFO/BLOCKED) + missingQuestions + whyItMatters + suggestedTierChange
+- [ ] `GoNoGoDecisionV1`: Final approval to proceed or block
+- [ ] `FailurePacketV1`: Crash/error reporting for diagnosis swarm
+
+### Preflight Runner
+- [ ] `runIntakePreflight(runId | intakeId)`:
+  - [ ] Reads Intake (truth)
+  - [ ] Outputs: Validation + AddonPlan + RepairPacket
+  - [ ] Writes to DB (or ShipPacket.data.preflight)
+
+### Gating Behavior
+- [ ] If `RepairPacket.status != PASS`:
+  - [ ] Do NOT enqueue expensive macro
+  - [ ] Send email/portal "missing info" questions
+  - [ ] Do NOT spend credits
+- [ ] If `PASS`:
+  - [ ] Generate RunPlan
+  - [ ] Enqueue executeRunPlan
+
+### Portal Endpoints
+- [ ] `portal.submitMissingInfo(runId, answers)` → reruns preflight
+- [ ] `portal.requestChanges(runId)` → consumes 1 credit, enqueues loop (existing)
+- [ ] `portal.approve(runId)` → no credits (existing)
+
+### Smoke Test Harness
+- [ ] `pnpm smoke:preflight` - Test preflight validation logic
+- [ ] `pnpm smoke:e2e:intake` - End-to-end intake → preflight → RunPlan flow
+- [ ] Fail fast with FailurePacket written to disk + DB
+
+### Swarm Roles (Preflight)
+- [ ] **Field General (GPT-5.2)**: Creates RunPlan + compliance rules
+- [ ] **Integration Architect (Claude Sonnet)**: Finds missing connector info + workflow realism
+- [ ] **Edge Case Hunter (Gemini/Grok)**: Finds contradictions, weird cases, abuse patterns
+- [ ] **Final Arbiter (GPT-5.2)**: Outputs RepairPacket + approves PASS/BLOCKED
+
+### Storage Decision
+- [ ] Choose storage approach:
+  - [ ] Option A: New tables `intake_validations`, `repair_packets`
+  - [ ] Option B: Store inside `ship_packets.data.preflight` (fastest)
+
+### Implementation (Two Commits)
+- [ ] **Commit 1**: Contracts + Preflight Runner + Storage
+  - [ ] Schemas (IntakeValidationV1, AddonPlanV1, RepairPacketV1, GoNoGoDecisionV1)
+  - [ ] Runner (`runIntakePreflight`)
+  - [ ] DB tables/columns (or shipPacket preflight blob)
+  - [ ] Smoke tests for preflight only
+- [ ] **Commit 2**: Portal + Email glue + E2E smoke
+  - [ ] Endpoints (`portal.submitMissingInfo`)
+  - [ ] Rerun preflight on missing info submission
+  - [ ] E2E test path
+
+### Grading Rubric (Hard Gates)
+- [ ] No expensive swarm run if preflight != PASS
+- [ ] Credits never decrement on intake submit
+- [ ] BuilderGate never allows server/db/auth folders
+- [ ] Repair questions are tier-aware and addon-aware
+- [ ] All outputs are schema-valid JSON
+
+### Grading Rubric (Soft Gates - Quality)
+- [ ] Questions are minimal (no 50-question forms)
+- [ ] Clear "why it matters" per question
+- [ ] Good default tier suggestions
+
+---
+
+## 🤖 BUILD SWARM AUTOMATION (Phase 4)
+
+**Goal:** GPT-5.2 Coder writes full implementation, Claude reviews/attacks, Arbiter merges
+
+### Swarm Roles (Build)
+- [ ] **GPT-5.2 Coder (primary implementer)**: Writes contracts, preflight runner, queue job, DB helpers, router endpoints, tests, logging. Outputs patch plan + file-by-file diffs.
+- [ ] **Claude (reviewer/red-team)**: Finds missing edge cases, security/abuse, incorrect assumptions, bad defaults, hidden race conditions, types/contract mismatch.
+- [ ] **GPT-5.2 Arbiter (merger)**: Takes Claude's feedback, produces final patch set, grades "fix applied" vs original issues.
+
+### Build Loop
+- [ ] Coder → Reviewer → Arbiter → Apply
+- [ ] Store "what each AI said" + grading:
+  - [ ] `diagnosisNotes[]`: { agent, summary, suggestedFixes[] }
+  - [ ] `grade`: pass/fail + which gates tripped
+  - [ ] `diffSummary`: what changed after fix
+
+### Coder Prompt Template
+- [ ] "Implement preflight + schemas + endpoints + tests"
+- [ ] "No new frameworks"
+- [ ] "Must write logs to file (proxy swallows stdout)"
+- [ ] "Must write FailurePacketV1 on any exception"
+- [ ] "Must be deterministic where possible"
+- [ ] Include: existing table shapes, queue runner pattern, tier/credit rules, BuilderGate allowlist, locations to plug into intakes.submit
+
+### Claude Review Prompt
+- [ ] Receives: spec + patch output
+- [ ] Instructions: "break it" (find edge cases, security issues, race conditions)
+
+### Arbiter Prompt
+- [ ] Merges Claude feedback into final patch
+- [ ] Grades fix quality against rubric
+
+**Definition of Done:**
+- All contracts versioned and schema-valid
+- Preflight runner tested with smoke tests
+- Portal endpoints integrated
+- E2E smoke test passes
+- Grading rubric enforced (hard + soft gates)
+

@@ -1,0 +1,214 @@
+      "expectedFailureModes": []
+    },
+    {
+      "id": "black-forest-labs/flux-1.1-pro",
+      "name": "Flux 1.1 Pro",
+      "use": "Branded Graphics & Illustrations",
+      "status": "pending_pilot",
+      "artifactKind": "json",
+      "roleEligibility": [
+        "designer_systems_fast",
+        "designer_brand_fast",
+        "design_critic_ruthless"
+      ],
+      "maxTokensRecommendation": {
+        "designer": null,
+        "critic": null
+      },
+      "expectedFailureModes": []
+    },
+    {
+      "id": "xai/grok-4-1-fast-reasoning",
+      "name": "xAI Grok 4.1 Fast (Reasoning)",
+      "use": "Multimodal Brainstorming & Layout Sketches",
+      "status": "pending_pilot",
+      "artifactKind": "json",
+      "roleEligibility": [
+        "designer_systems_fast",
+        "designer_brand_fast",
+        "design_critic_ruthless"
+      ],
+      "maxTokensRecommendation": {
+        "designer": null,
+        "critic": null
+      },
+      "expectedFailureModes": []
+    },
+    {
+      "id": "groq/llama-3.1-70b",
+      "name": "Groq LPU (LLAMA 3.1 70B)",
+      "use": "Low-Latency Code Synthesis",
+      "status": "pending_pilot",
+      "artifactKind": "json",
+      "roleEligibility": [
+        "designer_systems_fast",
+        "designer_brand_fast",
+        "design_critic_ruthless"
+      ],
+      "maxTokensRecommendation": {
+        "designer": null,
+        "critic": null
+      },
+      "expectedFailureModes": []
+    },
+    {
+      "id": "openai/gpt-5-2025-08-07",
+      "name": "GPT-5",
+      "use": "Strategic Copy & UX Writing",
+      "status": "pending_availability",
+      "artifactKind": "json",
+      "roleEligibility": [
+        "designer_systems_fast",
+        "designer_brand_fast",
+        "design_critic_ruthless"
+      ],
+      "maxTokensRecommendation": {
+        "designer": null,
+        "critic": null
+      },
+      "expectedFailureModes": []
+    },
+    {
+      "id": "openai/o3-pro",
+      "name": "O3-Pro",
+      "use": "Complex Reasoning & Architecture",
+      "status": "pending_availability",
+      "artifactKind": "json",
+      "roleEligibility": [
+        "designer_systems_fast",
+        "designer_brand_fast",
+        "design_critic_ruthless"
+      ],
+      "maxTokensRecommendation": {
+        "designer": null,
+        "critic": null
+      },
+      "expectedFailureModes": []
+    },
+    {
+      "id": "google/gemini-2.5-pro",
+      "name": "Gemini 2.5 Pro",
+      "use": "Multimodal Design & Code",
+      "status": "failed_pilot",
+      "reason": "100% truncation rate at maxTokens=3000, needs tuning",
+      "artifactKind": "json",
+      "roleEligibility": [
+        "designer_systems_fast",
+        "designer_brand_fast",
+        "design_critic_ruthless"
+      ],
+      "maxTokensRecommendation": {
+        "designer": null,
+        "critic": null
+      },
+      "expectedFailureModes": []
+    }
+  ],
+  "notes": {
+    "artworkLaneBehavior": "Artwork lane naturally has lower anchor counts on systems side (0.67 avg) due to strategic/visual nature of changes. Brand designer maintains specificity (5.0 avg anchors). TruthPenalty of 0.100 is consistent and expected.",
+    "zeroVarianceLanes": "App and Artwork lanes show zero score variance (\u03c3=0.0), indicating highly consistent Control stack performance. This is the gold standard for challenger comparison.",
+    "nextSteps": [
+      "Run 24-run Control soak test (6 reps \u00d7 4 lanes) to tighten variance bands",
+      "Build Model Weather Dashboard with pass rate, truthPenalty trends, token drift",
+      "Run preflight + pilot for approved challengers (Claude 3.5, Stitch, Grok, Groq)",
+      "Launch full Challenger Tournament once \u22652 challengers pass pilot validation"
+    ]
+  },
+  "schemaId": "launchbase.baseline_truth",
+  "schemaVersion": "1.2.0",
+  "compat": {
+    "minRunnerVersion": ">=0.9.0",
+    "minReaderVersion": "1.1.0"
+  },
+  "build": {
+    "gitCommit": null,
+    "branch": null,
+    "dirty": null
+  },
+  "inputs": {
+    "promptPackHash": null,
+    "validatorHash": null,
+    "truthPenaltyConfigHash": null,
+    "schemaHashes": {
+      "craftOutputSchemaFast": null,
+      "craftOutputSchema": null,
+      "criticOutputSchema": null,
+      "contentValidator": null,
+      "truthPenalty": null
+    }
+  },
+  "registrySnapshot": {
+    "generatedAt": "2026-01-15T15:17:35Z",
+    "source": "aiml_model_registry"
+  },
+  "updatedAt": "2026-01-15T15:19:09Z",
+  "provenance": {
+    "baselineGeneratedAt": "2026-01-15T14:50:00Z"
+  },
+  "evalConfig": {
+    "baselineMode": {
+      "enableLadder": false,
+      "allowModelFallback": false,
+      "concurrency": {
+        "openai": 3,
+        "anthropic": 3,
+        "google": 1
+      },
+      "runsPlanned": 14,
+      "lanes": [
+        "web",
+        "app",
+        "marketing",
+        "artwork"
+      ]
+    },
+    "roleConfigsAssumed": {
+      "designer_systems_fast": {
+        "maxTokens": 2000,
+        "timeoutMs": 90000
+      },
+      "designer_brand_fast": {
+        "maxTokens": 2000,
+        "timeoutMs": 90000
+      },
+      "design_critic_ruthless": {
+        "maxTokens": 4000,
+        "timeoutMs": 120000
+      }
+    },
+    "contentValidatorPolicy": {
+      "anchorTypes": [
+        "quantitative",
+        "ui_primitive",
+        "structural_move"
+      ],
+      "hardFailBelowAnchorsByLane": {
+        "web": 3,
+        "app": 3,
+        "marketing": 0,
+        "artwork": 0
+      },
+      "qualityPenaltyBand": {
+        "anchors_3_4": [
+          0.1,
+          0.2
+        ]
+      },
+      "notes": "Per-lane thresholds reflect strategic lanes (marketing/artwork) where anchor scarcity should not hard-fail; tune to code to avoid drift."
+    }
+  },
+  "artifacts": {
+    "baselineFilePath": "/home/ubuntu/launchbase/runs/baseline_truth_v1.2.json",
+    "expectedPerRunArtifacts": [
+      "systems.json",
+      "brand.json",
+      "critic.json",
+      "run_meta.json"
+    ],
+    "scorecardOutputs": [
+      "SOAK_SCORECARD.md",
+      "SOAK_RESULTS.json",
+      "SOAK_LIAR_LIST.json"
+    ]
+  }
+}

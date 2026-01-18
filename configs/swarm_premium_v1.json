@@ -1,0 +1,54 @@
+{
+  "policyId": "swarm_premium_v1",
+  "engineVersion": "v1",
+  "caps": {
+    "maxRounds": 3,
+    "costCapUsd": 4.0,
+    "maxTokensTotal": 16000
+  },
+  "routing": {
+    "requiredCaps": ["json_schema", "json_output"],
+    "preferredCaps": ["low_cost"]
+  },
+  "swarm": {
+    "enabled": true,
+    "specialists": ["craft", "critic"],
+    "maxSwirlRounds": 1,
+    "collapseStrategy": "field_general",
+    "failureMode": "continue_with_warnings",
+    "roles": {
+      "field_general": {
+        "transport": "memory"
+      },
+      "craft": {
+        "transport": "aiml",
+        "model": "gpt-4o-mini",
+        "capabilities": ["json_output"]
+      },
+      "critic": {
+        "transport": "aiml",
+        "model": "gpt-4o-mini",
+        "capabilities": ["json_output"]
+      }
+    },
+    "costCapsUsd": {
+      "perRole": {
+        "craft": 0.25,
+        "critic": 0.25
+      },
+      "total": 0.75
+    },
+    "timeoutsMs": {
+      "craft": 25000,
+      "critic": 25000
+    }
+  },
+  "presentationDefaults": {
+    "mode": "single_best",
+    "allowUserProviderPreference": false
+  },
+  "logging": {
+    "customerTrailEnabled": true,
+    "internalTrailEnabled": true
+  }
+}

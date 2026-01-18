@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SwarmTraceV1",
+  "description": "Append once per model to track claims and files touched",
+  "type": "object",
+  "required": ["version", "runId", "phase", "agent", "claims", "filesTouched", "timestampIso"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "swarm_trace.v1"
+    },
+    "runId": {
+      "type": "string",
+      "description": "Unique identifier for this smoke test run",
+      "example": "smoke_2026_01_17_001"
+    },
+    "phase": {
+      "type": "string",
+      "description": "Which phase of development this trace belongs to",
+      "example": "preflight_smoke"
+    },
+    "agent": {
+      "type": "object",
+      "required": ["name", "role"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["gpt-5.2-coder", "claude-reviewer", "gpt-5.2-arbiter"]
+        },
+        "role": {
+          "type": "string",
+          "enum": ["coder", "reviewer", "arbiter"]
+        }
+      }
+    },
+    "claims": {
+      "type": "array",
+      "description": "List of claims made by this agent",
+      "items": {
+        "type": "object",
+        "required": ["id", "claim", "type"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique claim identifier",
+            "example": "C1"
+          },
+          "claim": {
+            "type": "string",
+            "description": "The claim being made",
+            "example": "Preflight blocks enqueue on NEEDS_INFO"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["behavior", "invariant", "security", "performance"]
+          }
+        }
+      }
+    },
+    "filesTouched": {
+      "type": "array",
+      "description": "List of files modified by this agent",
+      "items": {
+        "type": "string"
+      }
+    },
+    "timestampIso": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp"
+    }
+  }
+}

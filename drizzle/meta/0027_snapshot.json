@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "3ada9f9c-4f44-46ab-a6e4-3227d21e4f47",
+  "id": "edfc7c09-e0c8-4680-9cff-d57a0854fa5e",
   "prevId": "fae7a75c-5ad7-489f-b205-370784c1d6c0",
   "tables": {
     "action_request_events": {
@@ -3832,30 +3832,16 @@
           "notNull": true,
           "autoincrement": false
         },
-        "tenant": {
-          "name": "tenant",
-          "type": "varchar(32)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "customerEmail": {
-          "name": "customerEmail",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "runId": {
           "name": "runId",
-          "type": "varchar(128)",
+          "type": "varchar(64)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "jobId": {
           "name": "jobId",
-          "type": "varchar(128)",
+          "type": "varchar(64)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -3867,20 +3853,13 @@
           "notNull": true,
           "autoincrement": false
         },
-        "runMode": {
-          "name": "runMode",
-          "type": "enum('tournament','production')",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "creativeModeEnabled": {
-          "name": "creativeModeEnabled",
-          "type": "int",
+        "status": {
+          "name": "status",
+          "type": "enum('PENDING','RUNNING','COMPLETED','FAILED')",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": 1
+          "default": "'PENDING'"
         },
         "data": {
           "name": "data",
@@ -3932,7 +3911,14 @@
           ]
         }
       },
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "run_plans_runId_unique": {
+          "name": "run_plans_runId_unique",
+          "columns": [
+            "runId"
+          ]
+        }
+      },
       "checkConstraint": {}
     },
     "ship_packets": {
@@ -3961,32 +3947,25 @@
         },
         "runId": {
           "name": "runId",
-          "type": "varchar(128)",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "tier": {
+          "name": "tier",
+          "type": "enum('standard','growth','premium')",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "status": {
           "name": "status",
-          "type": "enum('DRAFT','READY_FOR_REVIEW','APPROVED','REJECTED')",
+          "type": "enum('DRAFT','RUNNING','READY_FOR_REVIEW','APPROVED','REJECTED')",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": "'DRAFT'"
-        },
-        "previewUrl": {
-          "name": "previewUrl",
-          "type": "varchar(512)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "previewToken": {
-          "name": "previewToken",
-          "type": "varchar(128)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
         },
         "data": {
           "name": "data",
@@ -4028,10 +4007,10 @@
           ],
           "isUnique": false
         },
-        "ship_packets_runplan_idx": {
-          "name": "ship_packets_runplan_idx",
+        "ship_packets_status_idx": {
+          "name": "ship_packets_status_idx",
           "columns": [
-            "runPlanId"
+            "status"
           ],
           "isUnique": false
         }

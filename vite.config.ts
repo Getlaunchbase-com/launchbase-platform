@@ -27,15 +27,15 @@ export default defineConfig({
   },
   server: {
     host: true,
-    port: 5173,
-    strictPort: true,
-    allowedHosts: true,
-    hmr: {
-      protocol: "wss",
-      host: undefined, // ✅ Vite uses window.location.hostname
-      clientPort: 443,
-      port: 5173,
-    },
+    allowedHosts: [
+      ".manuspre.computer",
+      ".manus.computer",
+      ".manus-asia.computer",
+      ".manuscomputer.ai",
+      ".manusvm.computer",
+      "localhost",
+      "127.0.0.1",
+    ],
     fs: {
       strict: true,
       deny: ["**/.*"],

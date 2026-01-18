@@ -14,7 +14,7 @@
 
 import type { AiWorkOrderV1, AiWorkResultV1, ArtifactV1, StopReasonV1 } from "./types";
 import type { PolicyV1 } from "./policy/policyTypes";
-import { callSpecialistAIML, callSpecialistWithRetry } from "./specialists";
+import { callSpecialistAIML } from "./specialists";
 import { buildDeterministicCollapse } from "./swarm/collapseDeterministic";
 
 /**
@@ -30,7 +30,6 @@ export async function runSwarmV1(
   policy: PolicyV1,
   ctx: { traceId: string }
 ): Promise<AiWorkResultV1> {
-  console.log("[SWARM_DEBUG] runner=swarmRunner.ts", "fn=runSwarmV1", "build=", process.env.NODE_ENV);
   const artifacts: ArtifactV1[] = [];
   const costs: Array<{
     specialist: string;
@@ -84,9 +83,6 @@ export async function runSwarmV1(
   artifacts.push(planArtifact);
 
   // Step 2-3: Run specialists (craft, critic) - skip field_general
-  // Collect craft artifacts to pass to critic
-  const craftArtifacts: any[] = [];
-  
   for (const specialist of specialists) {
     const roleConfig = roles[specialist];
     if (!roleConfig) continue;
@@ -98,30 +94,16 @@ export async function runSwarmV1(
     }
 
     try {
-      // Build specialist input: critics receive prior craft artifacts
-      const specialistInput: any = {
-        plan: planArtifact.payload,
-        context: workOrder.inputs,
-      };
-      
-      // If this is a critic role, inject all prior craft artifacts
-      if (specialist.includes("critic")) {
-        specialistInput.craftArtifacts = craftArtifacts;
-        console.log("[SWARM_DEBUG] critic_input_stats", {
-          craftArtifactsCount: craftArtifacts.length,
-          craftArtifactsBytes: JSON.stringify(craftArtifacts).length,
-        });
-      }
-      
-      // Use retry wrapper with ladder disabled by default (enable via policy flag)
-      const enableLadder = policy.swarm?.enableRetryLadder ?? false;
-      const result = await callSpecialistWithRetry({
+      const result = await callSpecialistAIML({
         role: specialist as "craft" | "critic",
         trace: {
           jobId: ctx.traceId,
           step: `swarm.specialist.${specialist}`,
         },
-        input: specialistInput,
+        input: {
+          plan: planArtifact.payload,
+          context: workOrder.inputs,
+        },
         roleConfig,
       });
 
@@ -213,31 +195,6 @@ export async function runSwarmV1(
         stopReason: result.stopReason,
       };
       artifacts.push(artifact);
-      
-      // If this is a craft/designer role, collect for critic
-      // Collect if payload exists and has usable data (proposedChanges), even if timeout/provider_failed
-      // This allows critic to work with partial successes
-      if (!specialist.includes("critic") && artifact.payload) {
-        // Check if payload has proposedChanges (craft output)
-        const hasUsableOutput = artifact.payload.proposedChanges && Array.isArray(artifact.payload.proposedChanges) && artifact.payload.proposedChanges.length > 0;
-        if (hasUsableOutput) {
-          craftArtifacts.push({
-            role: specialist,
-            output: artifact.payload,
-          });
-          console.log("[SWARM_DEBUG] collected_craft_artifact", specialist, {
-            stopReason: result.stopReason,
-            changesCount: artifact.payload.proposedChanges.length,
-          });
-        }
-      }
-      
-      console.log("[SWARM_DEBUG] specialist_done", specialist, {
-        stopReason: result.stopReason,
-        hasPayload: !!artifact.payload,
-        payloadKeys: artifact.payload ? Object.keys(artifact.payload) : [],
-        collected: !specialist.includes("critic") && artifact.payload && result.stopReason === "ok",
-      });
 
       // Track cost
       costs.push({
