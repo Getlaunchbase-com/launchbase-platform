@@ -2371,3 +2371,51 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - E2E smoke test passes
 - Grading rubric enforced (hard + soft gates)
 
+
+
+---
+
+## 🎨 PHASE 3: PREMIUM TIER + AUTO-SWARM FIX ENGINE
+
+**Goal:** Build Premium pages (Pricing, How It Works, Examples, Portal) using PagePlan contracts, then implement Auto-Swarm Fix Engine for self-healing failures
+
+### Phase 3.1: Contracts & Infrastructure
+- [x] Create PagePlanV1 contract (server/contracts/pagePlan.ts)
+- [x] Create FailurePacketV1 contract (server/contracts/failurePacket.ts)
+- [x] Create RepairPacketV1 contract (server/contracts/repairPacket.ts)
+- [x] Create ScoreCardV1 contract (server/contracts/scoreCard.ts)
+- [x] Create failurePacket utility (server/utils/failurePacket.ts)
+
+### Phase 3.2: Premium PagePlans
+- [x] Create docs/premium_pageplans/ directory
+- [x] Write pricing.pageplan.json (tier comparison, credits, add-ons, FAQ)
+- [x] Write how-it-works.pageplan.json (intake → plan → preview → approve → deploy)
+- [x] Write examples.pageplan.json (before/after, tier examples)
+- [x] Write portal.pageplan.json (preview, approve, request changes, buy credits)
+
+### Phase 3.3: Premium Page Implementation
+- [ ] Implement Pricing page from PagePlan
+- [ ] Implement How It Works page from PagePlan
+- [ ] Implement Examples/Showroom page from PagePlan
+- [ ] Implement Portal pages from PagePlan
+
+### Phase 3.4: Critic Pressure-Test Loop
+- [ ] Create pressure-test runner (scripts/critic/runPressureTest.ts)
+- [ ] Integrate Sonnet 4.0 critic for page validation
+- [ ] Implement patch plan generation from critic issues
+- [ ] Add acceptance criteria gates (mustPass, shouldPass)
+
+### Phase 3.5: Auto-Swarm Fix Engine
+- [ ] Create runRepairSwarm orchestrator (server/ai/orchestration/runRepairSwarm.ts)
+- [ ] Create swarm fix CLI runner (scripts/swarm/runSwarmFix.mjs)
+- [ ] Add pnpm swarm:fix command to package.json
+- [ ] Integrate FailurePacket hooks into smoke tests
+- [ ] Integrate FailurePacket hooks into executeRunPlan
+- [ ] Integrate FailurePacket hooks into builder gate failures
+
+### Phase 3.6: Testing & Delivery
+- [ ] Test full Premium page flow
+- [ ] Test Critic pressure-test loop
+- [ ] Test Auto-Swarm Fix Engine with real failures
+- [ ] Save checkpoint with all Premium features
+- [ ] Push to GitHub

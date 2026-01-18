@@ -1,0 +1,104 @@
+{
+  "version": "pageplan.v1",
+  "page": {
+    "slug": "/portal",
+    "title": "Customer Portal",
+    "goal": "Let customers review their ShipPacket proposal, approve, or request changes (credits-gated).",
+    "primaryCTA": "Approve",
+    "secondaryCTA": "Request changes"
+  },
+  "sections": [
+    {
+      "id": "portal_header",
+      "type": "portal_header",
+      "headline": "Your preview is ready",
+      "subheadline": "Review the proposal. Approve to move forward, or request changes using credits.",
+      "notes": "This page must reflect actual ShipPacket status. No fake data."
+    },
+    {
+      "id": "proposal_summary",
+      "type": "proposal_summary",
+      "headline": "Summary",
+      "bullets": [
+        "Tier",
+        "Credits remaining",
+        "What changed (high level)",
+        "Notes from critic (if present)"
+      ],
+      "notes": "Render from ShipPacketV1. If critic failed, display as 'Needs revisions' not as an error."
+    },
+    {
+      "id": "preview_block",
+      "type": "preview_block",
+      "headline": "Preview",
+      "notes": "Standard/Growth: show showroom screenshots or snapshots. Premium: show Builder preview URL if available. Must support previewToken access."
+    },
+    {
+      "id": "actions",
+      "type": "action_bar",
+      "headline": "Next step",
+      "ctas": [
+        { "label": "Approve", "href": "#approve", "style": "primary" },
+        { "label": "Request changes", "href": "#request-changes", "style": "secondary" }
+      ],
+      "notes": "Wire buttons to portal.approve and portal.requestChanges mutations. Request changes must enforce creditsRemaining > 0 else show purchase flow."
+    },
+    {
+      "id": "credits_state",
+      "type": "credits_state",
+      "headline": "Credits",
+      "subheadline": "Credits limit how many revision loops you can run.",
+      "bullets": [
+        "Approve uses 0 credits",
+        "Request changes uses 1 credit",
+        "Buy more credits when you run out"
+      ],
+      "notes": "This should be consistent with Pricing copy."
+    },
+    {
+      "id": "buy_more_credits",
+      "type": "purchase_block",
+      "headline": "Need more revisions?",
+      "subheadline": "Buy more credits to keep iterating.",
+      "notes": "If needsPurchase=true from requestChanges, show credit pack options. Keep pricing dynamic/placeholder if Stripe products not final."
+    },
+    {
+      "id": "support_box",
+      "type": "support_box",
+      "headline": "Need help answering questions?",
+      "subheadline": "If something is missing, you can submit missing info instead of spending a credit.",
+      "notes": "If preflight result is NEEDS_INFO, surface required fields and a 'Submit missing info' form that triggers portal.submitMissingInfo (if implemented)."
+    }
+  ],
+  "constraints": {
+    "allowedFolders": [
+      "client/src/pages/**",
+      "client/src/components/marketing/**",
+      "client/src/styles/**"
+    ],
+    "forbiddenFolders": [
+      "server/**",
+      "drizzle/**",
+      "scripts/**",
+      "package.json",
+      ".env*"
+    ],
+    "mustUseExistingComponents": true,
+    "mobileRequirements": [
+      "Action buttons must be sticky or easily reachable",
+      "Preview must fit viewport width with no horizontal scroll",
+      "Credits state must be visible without hunting"
+    ]
+  },
+  "acceptance": {
+    "mustPass": [
+      "Approve triggers portal.approve and updates status",
+      "Request changes consumes 1 credit and enqueues run",
+      "If creditsRemaining=0, request changes returns needsPurchase UI"
+    ],
+    "shouldPass": [
+      "Clear status messaging for DRAFT vs READY_FOR_REVIEW",
+      "Preflight NEEDS_INFO shows a clean missing-fields UI"
+    ]
+  }
+}

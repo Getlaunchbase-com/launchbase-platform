@@ -1,0 +1,90 @@
+{
+  "version": "pageplan.v1",
+  "page": {
+    "slug": "/examples",
+    "title": "Examples",
+    "goal": "Show what Standard/Growth/Premium look like using the tier toggle showroom. Push users to Pricing → Intake.",
+    "primaryCTA": "Start your intake",
+    "secondaryCTA": "Pricing"
+  },
+  "sections": [
+    {
+      "id": "hero_examples",
+      "type": "hero",
+      "headline": "See the difference by tier",
+      "subheadline": "Toggle Standard → Growth → Premium to understand how far each tier goes.",
+      "ctas": [
+        { "label": "Start your intake", "href": "/intake", "style": "primary" },
+        { "label": "See pricing", "href": "/pricing", "style": "secondary" }
+      ],
+      "notes": "Hero should lead directly into the toggle."
+    },
+    {
+      "id": "tier_toggle_showroom",
+      "type": "tier_toggle",
+      "headline": "Tier toggle showroom",
+      "notes": "Embed/feature existing ExamplesViewer with before/after toggle. Ensure toggle labels map exactly to Standard/Growth/Premium. If multiple showrooms exist, use tabs."
+    },
+    {
+      "id": "what_to_look_for",
+      "type": "checklist",
+      "headline": "What to look for",
+      "bullets": [
+        "Clarity: headline + subheadline communicate in seconds",
+        "Hierarchy: one clear primary action",
+        "Proof: trust elements show up at the right time",
+        "Mobile: stacking and spacing stay readable",
+        "Flow: sections appear in an order that converts"
+      ],
+      "notes": "This primes the customer to evaluate correctly."
+    },
+    {
+      "id": "tier_breakdown_examples",
+      "type": "tier_outcomes",
+      "headline": "How tiers differ in practice",
+      "notes": "3 cards that match the language from Pricing and How it works. Keep consistent phrasing."
+    },
+    {
+      "id": "final_cta_examples",
+      "type": "final_cta",
+      "headline": "Want this for your site?",
+      "subheadline": "Start with the intake. We'll generate a plan and preview.",
+      "ctas": [
+        { "label": "Start your intake", "href": "/intake", "style": "primary" },
+        { "label": "Pricing", "href": "/pricing", "style": "secondary" }
+      ],
+      "notes": "Keep simple."
+    }
+  ],
+  "constraints": {
+    "allowedFolders": [
+      "client/src/pages/**",
+      "client/src/components/marketing/**",
+      "client/src/styles/**"
+    ],
+    "forbiddenFolders": [
+      "server/**",
+      "drizzle/**",
+      "scripts/**",
+      "package.json",
+      ".env*"
+    ],
+    "mustUseExistingComponents": true,
+    "mobileRequirements": [
+      "Tier toggle must be easy to use on mobile",
+      "Ensure embedded preview does not overflow width",
+      "CTA stays visible without scrolling too far"
+    ]
+  },
+  "acceptance": {
+    "mustPass": [
+      "Tier toggle is present and functional",
+      "Copy matches tier language used elsewhere",
+      "Mobile layout has no overflow"
+    ],
+    "shouldPass": [
+      "Examples page drives to Pricing and Intake clearly",
+      "Consistent spacing and typography with other pages"
+    ]
+  }
+}

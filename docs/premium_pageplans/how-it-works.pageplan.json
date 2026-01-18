@@ -1,0 +1,118 @@
+{
+  "version": "pageplan.v1",
+  "page": {
+    "slug": "/how-it-works",
+    "title": "How it works",
+    "goal": "Explain the workflow clearly and reduce anxiety: preview-first, approval step, credits, and what changes per tier.",
+    "primaryCTA": "Start your intake",
+    "secondaryCTA": "Pricing"
+  },
+  "sections": [
+    {
+      "id": "hero_hiw",
+      "type": "hero",
+      "headline": "A simple loop: intake → preview → approve → ship",
+      "subheadline": "You stay in control. Nothing goes live until you approve.",
+      "ctas": [
+        { "label": "Start your intake", "href": "/intake", "style": "primary" },
+        { "label": "See pricing", "href": "/pricing", "style": "secondary" }
+      ],
+      "notes": "Keep this page extremely clear. Avoid hype."
+    },
+    {
+      "id": "stepper",
+      "type": "stepper",
+      "headline": "The workflow",
+      "bullets": [
+        "1) Intake: tell us what you do and who you serve",
+        "2) Plan: we generate a structured improvement plan",
+        "3) Preview: you see before/after style examples or a staged preview (tier-dependent)",
+        "4) Iterate: request changes using credits",
+        "5) Approve: you approve when it's right",
+        "6) Deploy: publish changes (mechanism depends on setup)"
+      ],
+      "notes": "Use a numbered stepper. Each step should have 1–2 short lines."
+    },
+    {
+      "id": "tier_outcomes_hiw",
+      "type": "tier_outcomes",
+      "headline": "What changes by tier",
+      "subheadline": "Same workflow. Different depth.",
+      "notes": "Show 3 columns with outcome-focused descriptions. Include: credits included, deliverable type, and what the loop emphasizes (polish/conversion/transformation)."
+    },
+    {
+      "id": "credits_hiw",
+      "type": "credits_explainer",
+      "headline": "Revisions are credit-based (so it's not unlimited)",
+      "bullets": [
+        "Request changes consumes 1 credit",
+        "Approve consumes 0 credits",
+        "Buy more credits if you want additional loops"
+      ],
+      "notes": "Keep consistent with Pricing page wording."
+    },
+    {
+      "id": "builder_scope_hiw",
+      "type": "scope_box",
+      "headline": "Premium: Builder is UI execution only",
+      "bullets": [
+        "Allowed surfaces: homepage UI, landing UI, pricing UI",
+        "No server/auth/payment logic changes",
+        "No environment/config file edits"
+      ],
+      "notes": "This is a guardrail section. Keep it strict and explicit."
+    },
+    {
+      "id": "expectations",
+      "type": "expectations",
+      "headline": "What we need from you",
+      "bullets": [
+        "Accurate business info (services, location, CTA)",
+        "Any brand constraints (colors, tone)",
+        "Connections for add-ons (only if you choose them)"
+      ],
+      "notes": "Short. No new claims."
+    },
+    {
+      "id": "final_cta_hiw",
+      "type": "final_cta",
+      "headline": "Ready to see your plan and preview?",
+      "ctas": [
+        { "label": "Start your intake", "href": "/intake", "style": "primary" },
+        { "label": "Pricing", "href": "/pricing", "style": "secondary" }
+      ],
+      "notes": "Mobile CTA visible by ~20% scroll when sticky enabled."
+    }
+  ],
+  "constraints": {
+    "allowedFolders": [
+      "client/src/pages/**",
+      "client/src/components/marketing/**",
+      "client/src/styles/**"
+    ],
+    "forbiddenFolders": [
+      "server/**",
+      "drizzle/**",
+      "scripts/**",
+      "package.json",
+      ".env*"
+    ],
+    "mustUseExistingComponents": true,
+    "mobileRequirements": [
+      "Stepper must be readable and not cramped on mobile",
+      "No dual-primary CTAs in the same section",
+      "No dense paragraphs (>3 lines) on mobile"
+    ]
+  },
+  "acceptance": {
+    "mustPass": [
+      "Workflow is understandable in <30 seconds",
+      "Preview-first and approval-before-deploy is explicit",
+      "Premium Builder scope restrictions stated plainly"
+    ],
+    "shouldPass": [
+      "Consistent language across pages (pricing/how-it-works)",
+      "Tier differences are outcome-based, not feature soup"
+    ]
+  }
+}
