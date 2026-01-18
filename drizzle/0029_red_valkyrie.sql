@@ -1,0 +1,1 @@
+ALTER TABLE `intakes` MODIFY COLUMN `enginesSelected` json;

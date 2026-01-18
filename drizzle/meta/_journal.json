@@ -197,6 +197,20 @@
       "when": 1768714512172,
       "tag": "0027_cultured_wind_dancer",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "5",
+      "when": 1768743150691,
+      "tag": "0028_lonely_cable",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "5",
+      "when": 1768743180340,
+      "tag": "0029_red_valkyrie",
+      "breakpoints": true
     }
   ]
 }

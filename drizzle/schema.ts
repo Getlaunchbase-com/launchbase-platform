@@ -37,6 +37,10 @@ export const intakes = mysqlTable("intakes", {
   phone: varchar("phone", { length: 32 }),
   // AI-inferred vertical
   vertical: mysqlEnum("vertical", ["trades", "appointments", "professional"]).notNull(),
+  // Tier selection (Standard / Growth / Premium)
+  tier: mysqlEnum("tier", ["standard", "growth", "premium"]),
+  // Selected engines (optional add-ons)
+  enginesSelected: json("enginesSelected").$type<string[]>(),
   // Business details
   services: json("services").$type<string[]>(),
   serviceArea: json("serviceArea").$type<string[]>(),
