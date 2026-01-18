@@ -11,6 +11,7 @@
  *   pnpm smoke:intake
  */
 
+import { execSync } from 'node:child_process';
 import { getDb } from '../../server/db.ts';
 import { intakes } from '../../drizzle/schema.ts';
 import { desc, eq } from 'drizzle-orm';
@@ -19,6 +20,19 @@ const TEST_EMAIL = `smoke-test-${Date.now()}@example.com`;
 
 async function main() {
   console.log('🧪 Smoke Test: Apply Intake Flow\n');
+
+  // Apply schema migrations non-interactively (CI-safe)
+  console.log('Applying database migrations...');
+  try {
+    execSync('pnpm drizzle-kit migrate', {
+      stdio: 'inherit',
+      env: process.env,
+    });
+    console.log('✅ Migrations applied\n');
+  } catch (error) {
+    console.error('❌ Failed to apply migrations:', error.message);
+    throw error;
+  }
 
   // Schema guard: ensure tier and enginesSelected are present
   for (const col of ['tier', 'enginesSelected']) {
