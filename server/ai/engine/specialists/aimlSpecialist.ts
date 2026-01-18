@@ -54,6 +54,10 @@ export interface SpecialistInput {
   input: {
     plan: any;
     context?: any;
+
+    // Optional overrides for repair swarm
+    userPromptOverride?: string;
+    systemPromptOverride?: string;
   };
   roleConfig: SpecialistRoleConfig;
 }
@@ -140,13 +144,21 @@ export async function callSpecialistAIML(
 ): Promise<SpecialistOutput> {
   const { role, trace, input: specInput, roleConfig } = input;
 
-  // Load system prompt from promptPacks
-  const systemPrompt = loadPrompt(role);
+  // Load system prompt from promptPacks (allow override)
+  const systemPrompt =
+    specInput.systemPromptOverride ?? loadPrompt(role);
 
-  // Build user prompt
-  const userPrompt = `Plan: ${JSON.stringify(specInput.plan, null, 2)}${
-    specInput.context ? `\n\nContext: ${JSON.stringify(specInput.context, null, 2)}` : ""
-  }\n\nProvide your ${role} response in JSON format.`;
+  // Build user prompt (allow override)
+  const userPrompt =
+    specInput.userPromptOverride ??
+    `Plan: ${JSON.stringify(specInput.plan, null, 2)}${
+      specInput.context ? `\n\nContext: ${JSON.stringify(specInput.context, null, 2)}` : ""
+    }\n\nProvide your ${role} response in JSON format.`;
+
+  // Guard against missing prompt
+  if (!userPrompt || typeof userPrompt !== "string") {
+    throw new Error(`[AIML] Missing userPrompt (role=${role})`);
+  }
 
   try {
     // Call provider with timeout

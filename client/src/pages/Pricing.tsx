@@ -234,7 +234,7 @@ export default function Pricing() {
                   requires: ["Google Ads access", "Billing method", "Conversion goal definition"],
                   defaultAutomations: ["Lead follow-up sequence", "Keyword → CTA matching checklist", "Weekly pacing guardrails (if supported)"],
                   maintenance: ["Budget pacing", "Keyword hygiene", "Landing tweaks"],
-                  oftenUsedWith: ["Phone Engine", "Books Engine"]
+                  oftenUsedWith: ["Inbox Engine", "Phone Engine"]
                 }}
                 isSelected={selectedEngine === "engine-ads"}
                 onSelect={() => setSelectedEngine(selectedEngine === "engine-ads" ? null : "engine-ads")}

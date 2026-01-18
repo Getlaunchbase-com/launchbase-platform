@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env tsx
 /**
  * runSwarmFix - CLI runner for Auto-Swarm Fix Engine
  * 
@@ -16,11 +16,23 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { runRepairSwarm } from "../../server/ai/orchestration/runRepairSwarm.ts";
-import { createScoreCard } from "../../server/contracts/scoreCard.ts";
+import { createScoreCard } from "../../server/contracts/index.ts";
 
 function arg(name) {
   const i = process.argv.indexOf(name);
   return i >= 0 ? process.argv[i + 1] : null;
+}
+
+function fmtMoney(n) {
+  return typeof n === "number" && Number.isFinite(n) ? `$${n.toFixed(2)}` : "n/a";
+}
+
+function fmtSec(n) {
+  return typeof n === "number" && Number.isFinite(n) ? `${n.toFixed(1)}s` : "n/a";
+}
+
+function fmtScore(n) {
+  return typeof n === "number" && Number.isFinite(n) ? n.toFixed(2) : "n/a";
 }
 
 function flag(name) {
@@ -43,7 +55,7 @@ async function main() {
   const failurePacket = JSON.parse(readFileSync(from, "utf8"));
 
   // Hard stop for permission blockers
-  const msg = failurePacket.failure.error.toLowerCase();
+  const msg = failurePacket.failure.errorMessage?.toLowerCase() || "";
   if (msg.includes("workflows permission") || msg.includes("insufficient permissions")) {
     console.error("❌ BLOCKED: GitHub App permission. Do not swarm this.");
     console.error("Manual action required: Fix GitHub App permissions in repo settings.");
@@ -123,11 +135,11 @@ async function main() {
   writeFileSync(scoreCardPath, JSON.stringify(scoreCard, null, 2), "utf8");
   console.log(`\n📋 Wrote ScoreCard: ${scoreCardPath}`);
 
-  console.log(`\n🎯 Overall Score: ${scoreCard.overallScore.toFixed(2)}`);
-  console.log(`   Coder: ${scoreCard.agentScores.coder.toFixed(2)}`);
-  console.log(`   Reviewer: ${scoreCard.agentScores.reviewer.toFixed(2)}`);
-  console.log(`   Arbiter: ${scoreCard.agentScores.arbiter.toFixed(2)}`);
-  console.log(`   Trust Delta: ${scoreCard.trustDelta > 0 ? "+" : ""}${scoreCard.trustDelta.toFixed(3)}`);
+  console.log(`\n🎯 Overall Score: ${fmtScore(scoreCard.overallScore)}`);
+  console.log(`   Coder: ${fmtScore(scoreCard.agentScores?.coder)}`);
+  console.log(`   Reviewer: ${fmtScore(scoreCard.agentScores?.reviewer)}`);
+  console.log(`   Arbiter: ${fmtScore(scoreCard.agentScores?.arbiter)}`);
+  console.log(`   Trust Delta: ${scoreCard.trustDelta > 0 ? "+" : ""}${fmtScore(scoreCard.trustDelta)}`);
 
   if (result.stopReason === "ok") {
     console.log(`\n✅ Repair swarm completed successfully`);

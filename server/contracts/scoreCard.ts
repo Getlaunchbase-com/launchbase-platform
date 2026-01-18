@@ -231,3 +231,72 @@ export const EXAMPLE_SCORE_CARD: ScoreCardV1 = {
     },
   },
 };
+
+/**
+ * Create a new ScoreCard from repair results
+ */
+export function createScoreCard(opts: {
+  repairId: string;
+  failurePacket: any;
+  repairPacket: any;
+  testResults: {
+    passed: boolean;
+    regressions: string[];
+    newFailures: string[];
+  };
+  humanReview: {
+    coderAccuracy: number;
+    reviewerUseful: number;
+    arbiterCorrect: number;
+  };
+}): ScoreCardV1 {
+  const agentId = "coder_gpt5"; // Default for now
+  const agentRole = "coder";
+  const agentModel = "openai/gpt-5-2";
+
+  // Calculate overall score from human review
+  const overallScore = (
+    opts.humanReview.coderAccuracy * 0.4 +
+    opts.humanReview.reviewerUseful * 0.3 +
+    opts.humanReview.arbiterCorrect * 0.3
+  );
+
+  return {
+    version: "scorecard.v1",
+    agent: {
+      id: agentId,
+      role: agentRole,
+      model: agentModel,
+    },
+    metrics: {
+      totalRepairs: 1,
+      successfulRepairs: opts.testResults.passed ? 1 : 0,
+      failedRepairs: opts.testResults.passed ? 0 : 1,
+      successRate: opts.testResults.passed ? 1.0 : 0.0,
+      avgQualityScore: overallScore,
+      avgLatencyMs: 0, // Not tracked in manual repair
+      avgCostUsd: 0, // Not tracked in manual repair
+    },
+    recentHistory: [
+      {
+        repairId: opts.repairId,
+        timestamp: new Date().toISOString(),
+        success: opts.testResults.passed,
+        qualityScore: overallScore,
+        latencyMs: 0,
+        costUsd: 0,
+      },
+    ],
+    trustScore: {
+      current: overallScore,
+      trend: "stable",
+      lastUpdated: new Date().toISOString(),
+      decayFactor: 0.8,
+    },
+    specializations: {
+      failureTypes: {},
+      fileTypes: {},
+      complexity: {},
+    },
+  };
+}

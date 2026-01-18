@@ -17,7 +17,7 @@ import type { FailurePacketV1 } from "../../contracts/failurePacket";
 import type { RepairPacketV1 } from "../../contracts/repairPacket";
 import { createRepairPacket } from "../../contracts/repairPacket";
 import { callSpecialistAIML } from "../engine/specialists/aimlSpecialist";
-import { fileLog } from "../../utils/fileLog";
+// fileLog not needed - using console.log instead
 
 export type RepairSwarmOpts = {
   failurePacket: FailurePacketV1;
@@ -37,7 +37,7 @@ export type RepairSwarmResult = {
  * Check if failure is a permission/platform blocker
  */
 function isPermissionBlocker(pkt: FailurePacketV1): boolean {
-  const msg = pkt.failure.error.toLowerCase();
+  const msg = pkt.failure.errorMessage.toLowerCase();
   return (
     msg.includes("workflows permission") ||
     msg.includes("insufficient permissions") ||
@@ -62,7 +62,7 @@ async function runFieldGeneral(pkt: FailurePacketV1): Promise<{
 
 **Failure Context:**
 - Type: ${pkt.failure.type}
-- Error: ${pkt.failure.error}
+- Error: ${pkt.failure.errorMessage}
 - Stop Reason: ${pkt.failure.stopReason}
 - Component: ${pkt.context.component || "unknown"}
 - Command: ${pkt.context.command || "unknown"}
@@ -71,8 +71,7 @@ async function runFieldGeneral(pkt: FailurePacketV1): Promise<{
 ${pkt.failure.stack || "No stack trace available"}
 
 **Logs:**
-${pkt.context.logs?.stdoutTail || "No stdout"}
-${pkt.context.logs?.stderrTail || "No stderr"}
+${pkt.context.logs?.join('\n') || "No logs"}
 
 **Your task:**
 1. Identify the likely root cause
@@ -88,23 +87,28 @@ Return JSON:
 
   const result = await callSpecialistAIML({
     role: "field_general",
-    systemPrompt: "You are a Field General AI that diagnoses code failures.",
-    userPrompt: prompt,
-    responseSchema: {
-      type: "object",
-      properties: {
-        likelyCause: { type: "string" },
-        confidence: { type: "number" },
-        relatedIssues: { type: "array", items: { type: "string" } },
-      },
-      required: ["likelyCause", "confidence", "relatedIssues"],
+    trace: {
+      jobId: pkt.meta.jobId || "repair_job",
+      runId: pkt.meta.runId || "repair_run",
+    },
+    input: {
+      plan: { failurePacket: pkt, goal: "diagnose_and_fix" },
+      context: { repoSha: pkt.meta.sha, env: process.env.NODE_ENV },
+      systemPromptOverride: "You are a Field General AI that diagnoses code failures.",
+      userPromptOverride: prompt,
+    },
+    roleConfig: {
+      transport: "aiml" as const,
+      model: "openai/gpt-5-2",
+      capabilities: ["diagnosis"],
+      timeoutMs: 30000,
     },
   });
 
   const latencyMs = Date.now() - startMs;
   const costUsd = result.meta.costUsd || 0;
 
-  fileLog(`[FieldGeneral] Diagnosis: ${result.artifact.payload.likelyCause} (confidence: ${result.artifact.payload.confidence})`);
+  console.log(`[FieldGeneral] Diagnosis: ${result.artifact.payload.likelyCause} (confidence: ${result.artifact.payload.confidence})`);
 
   return {
     ...result.artifact.payload,
@@ -134,7 +138,7 @@ async function runCoder(pkt: FailurePacketV1, diagnosis: any): Promise<{
 
 **Failure Context:**
 - Type: ${pkt.failure.type}
-- Error: ${pkt.failure.error}
+- Error: ${pkt.failure.errorMessage}
 - Component: ${pkt.context.component || "unknown"}
 
 **Your task:**
@@ -159,36 +163,28 @@ Return JSON:
 
   const result = await callSpecialistAIML({
     role: "coder",
-    systemPrompt: "You are a Coder AI that proposes patches to fix code failures.",
-    userPrompt: prompt,
-    responseSchema: {
-      type: "object",
-      properties: {
-        changes: {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              file: { type: "string" },
-              operation: { type: "string", enum: ["edit", "create", "delete"] },
-              description: { type: "string" },
-              diff: { type: "string" },
-              rationale: { type: "string" },
-            },
-            required: ["file", "operation", "description", "rationale"],
-          },
-        },
-        testPlan: { type: "array", items: { type: "string" } },
-        rollbackPlan: { type: "string" },
-      },
-      required: ["changes", "testPlan", "rollbackPlan"],
+    trace: {
+      jobId: pkt.meta.jobId || "repair_job",
+      runId: pkt.meta.runId || "repair_run",
+    },
+    input: {
+      plan: { failurePacket: pkt, diagnosis, goal: "generate_patch" },
+      context: { repoSha: pkt.meta.sha, env: process.env.NODE_ENV },
+      systemPromptOverride: "You are a Coder AI that proposes patches to fix code failures.",
+      userPromptOverride: prompt,
+    },
+    roleConfig: {
+      transport: "aiml" as const,
+      model: "openai/gpt-5-2",
+      capabilities: ["coding"],
+      timeoutMs: 30000,
     },
   });
 
   const latencyMs = Date.now() - startMs;
   const costUsd = result.meta.costUsd || 0;
 
-  fileLog(`[Coder] Proposed ${result.artifact.payload.changes.length} changes`);
+  console.log(`[Coder] Proposed ${result.artifact.payload.changes.length} changes`);
 
   return {
     ...result.artifact.payload,
@@ -231,23 +227,28 @@ Return JSON:
 
   const result = await callSpecialistAIML({
     role: "reviewer",
-    systemPrompt: "You are a Reviewer AI that critiques code patches.",
-    userPrompt: prompt,
-    responseSchema: {
-      type: "object",
-      properties: {
-        approved: { type: "boolean" },
-        concerns: { type: "array", items: { type: "string" } },
-        suggestions: { type: "array", items: { type: "string" } },
-      },
-      required: ["approved", "concerns", "suggestions"],
+    trace: {
+      jobId: pkt.meta.jobId || "repair_job",
+      runId: pkt.meta.runId || "repair_run",
+    },
+    input: {
+      plan: { patch, goal: "review_patch" },
+      context: { repoSha: pkt.meta.sha, env: process.env.NODE_ENV },
+      systemPromptOverride: "You are a Reviewer AI that critiques code patches.",
+      userPromptOverride: prompt,
+    },
+    roleConfig: {
+      transport: "aiml" as const,
+      model: "anthropic/claude-sonnet-4-20250514",
+      capabilities: ["review"],
+      timeoutMs: 30000,
     },
   });
 
   const latencyMs = Date.now() - startMs;
   const costUsd = result.meta.costUsd || 0;
 
-  fileLog(`[Reviewer] ${result.artifact.payload.approved ? "APPROVED" : "REJECTED"} with ${result.artifact.payload.concerns.length} concerns`);
+  console.log(`[Reviewer] ${result.artifact.payload.approved ? "APPROVED" : "REJECTED"} with ${result.artifact.payload.concerns.length} concerns`);
 
   return {
     ...result.artifact.payload,
@@ -295,23 +296,28 @@ Return JSON:
 
   const result = await callSpecialistAIML({
     role: "arbiter",
-    systemPrompt: "You are an Arbiter AI that makes final decisions on code patches.",
-    userPrompt: prompt,
-    responseSchema: {
-      type: "object",
-      properties: {
-        decision: { type: "string", enum: ["apply", "reject", "revise"] },
-        rationale: { type: "string" },
-        finalPatch: { type: "object" },
-      },
-      required: ["decision", "rationale"],
+    trace: {
+      jobId: "repair_job",
+      runId: "repair_run",
+    },
+    input: {
+      plan: { diagnosis, patch, review, goal: "make_decision" },
+      context: { env: process.env.NODE_ENV },
+      systemPromptOverride: "You are an Arbiter AI that makes final decisions on code patches.",
+      userPromptOverride: prompt,
+    },
+    roleConfig: {
+      transport: "aiml" as const,
+      model: "openai/gpt-5-2",
+      capabilities: ["decision"],
+      timeoutMs: 30000,
     },
   });
 
   const latencyMs = Date.now() - startMs;
   const costUsd = result.meta.costUsd || 0;
 
-  fileLog(`[Arbiter] Decision: ${result.artifact.payload.decision}`);
+  console.log(`[Arbiter] Decision: ${result.artifact.payload.decision}`);
 
   return {
     ...result.artifact.payload,
@@ -332,7 +338,7 @@ export async function runRepairSwarm(opts: RepairSwarmOpts): Promise<RepairSwarm
   
   // Check for permission blockers
   if (isPermissionBlocker(failurePacket)) {
-    fileLog("[RepairSwarm] BLOCKED: Permission/platform blocker detected. Not swarming.");
+    console.log("[RepairSwarm] BLOCKED: Permission/platform blocker detected. Not swarming.");
     
     const repairPacket = createRepairPacket({
       failurePacket,
@@ -378,13 +384,13 @@ export async function runRepairSwarm(opts: RepairSwarmOpts): Promise<RepairSwarm
   }
   
   // Run Field General
-  fileLog("[RepairSwarm] Running Field General...");
+  console.log("[RepairSwarm] Running Field General...");
   const diagnosis = await runFieldGeneral(failurePacket);
   totalCostUsd += diagnosis.costUsd;
   totalLatencyMs += diagnosis.latencyMs;
   
   if (totalCostUsd > maxCostUsd) {
-    fileLog(`[RepairSwarm] Cost limit exceeded: $${totalCostUsd.toFixed(2)} > $${maxCostUsd.toFixed(2)}`);
+    console.log(`[RepairSwarm] Cost limit exceeded: $${totalCostUsd.toFixed(2)} > $${maxCostUsd.toFixed(2)}`);
     
     const repairPacket = createRepairPacket({
       failurePacket,
@@ -430,19 +436,19 @@ export async function runRepairSwarm(opts: RepairSwarmOpts): Promise<RepairSwarm
   }
   
   // Run Coder
-  fileLog("[RepairSwarm] Running Coder...");
+  console.log("[RepairSwarm] Running Coder...");
   const patch = await runCoder(failurePacket, diagnosis);
   totalCostUsd += patch.costUsd;
   totalLatencyMs += patch.latencyMs;
   
   // Run Reviewer
-  fileLog("[RepairSwarm] Running Reviewer...");
+  console.log("[RepairSwarm] Running Reviewer...");
   const review = await runReviewer(failurePacket, patch);
   totalCostUsd += review.costUsd;
   totalLatencyMs += review.latencyMs;
   
   // Run Arbiter
-  fileLog("[RepairSwarm] Running Arbiter...");
+  console.log("[RepairSwarm] Running Arbiter...");
   const arbiter = await runArbiter(diagnosis, patch, review);
   totalCostUsd += arbiter.costUsd;
   totalLatencyMs += arbiter.latencyMs;
@@ -492,7 +498,7 @@ export async function runRepairSwarm(opts: RepairSwarmOpts): Promise<RepairSwarm
     },
   });
   
-  fileLog(`[RepairSwarm] Complete: ${arbiter.decision} | Cost: $${totalCostUsd.toFixed(2)} | Latency: ${totalLatencyMs}ms`);
+  console.log(`[RepairSwarm] Complete: ${arbiter.decision} | Cost: $${totalCostUsd.toFixed(2)} | Latency: ${totalLatencyMs}ms`);
   
   return {
     repairPacket,

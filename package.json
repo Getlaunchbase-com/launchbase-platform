@@ -12,7 +12,8 @@
     "test": "vitest run",
     "smoke": "vitest run server/__tests__/smoke.*.test.ts",
     "db:push": "drizzle-kit generate && drizzle-kit migrate",
-    "swarm:fix": "node scripts/swarm/runSwarmFix.mjs"
+    "swarm:fix": "tsx scripts/swarm/runSwarmFix.mjs",
+    "smoke:swarm-fix": "tsx scripts/smoke/smokeSwarmFix.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.693.0",
