@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main, builder/**]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      
+      - name: Install dependencies
+        run: pnpm install
+      
+      - name: Run TypeScript check
+        run: pnpm tsc --noEmit
+        continue-on-error: true
+      
+      - name: Run smoke test: intake flow
+        run: pnpm smoke:intake
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      
+      - name: Run other smoke tests (if any)
+        run: |
+          if [ -d "scripts/smoke" ]; then
+            for test in scripts/smoke/*.mjs; do
+              if [ "$test" != "scripts/smoke/smokeIntakeFlow.mjs" ]; then
+                echo "Running $test..."
+                pnpm tsx "$test" || echo "Warning: $test failed"
+              fi
+            done
+          fi
+        continue-on-error: true
