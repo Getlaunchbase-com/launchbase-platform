@@ -340,7 +340,21 @@ export default function ApplyPage() {
   const preferredLang = getLangFromUrlOrStorage();
   const preferredAudience = getAudienceFromUrlOrStorage();
 
-  const [stepIndex, setStepIndex] = useState(0);
+  const [stepIndex, setStepIndex] = useState(() => {
+    // Dev-only: restore stepIndex from sessionStorage to survive remounts
+    if (import.meta.env.DEV && typeof window !== 'undefined') {
+      try {
+        const saved = sessionStorage.getItem('launchbase_apply_step_dev');
+        if (saved) {
+          const parsed = parseInt(saved, 10);
+          if (!isNaN(parsed) && parsed >= 0 && parsed < steps.length) {
+            return parsed;
+          }
+        }
+      } catch {}
+    }
+    return 0;
+  });
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const [form, setForm] = useState<ApplyForm>(() => {
@@ -417,6 +431,15 @@ export default function ApplyPage() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(form));
     } catch {}
   }, [form]);
+
+  // Dev-only: persist stepIndex to survive remounts (hot reload, fast refresh)
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      try {
+        sessionStorage.setItem('launchbase_apply_step_dev', String(stepIndex));
+      } catch {}
+    }
+  }, [stepIndex]);
 
   const submitMutation = trpc.suiteApply.submit.useMutation({
     onSuccess: () => {
@@ -676,13 +699,15 @@ export default function ApplyPage() {
                                   <input
                                     type="checkbox"
                                     checked={isSelected}
-                                    onChange={() => {
-                                      setForm(f => ({
-                                        ...f,
-                                        enginesSelected: isSelected
-                                          ? f.enginesSelected.filter(id => id !== engine.id)
-                                          : [...f.enginesSelected, engine.id]
-                                      }));
+                                    onChange={(e) => {
+                                      const checked = (e.target as HTMLInputElement).checked;
+                                      setForm((f) => {
+                                        const prev = f.enginesSelected ?? [];
+                                        const next = checked
+                                          ? Array.from(new Set([...prev, engine.id]))
+                                          : prev.filter((id) => id !== engine.id);
+                                        return { ...f, enginesSelected: next };
+                                      });
                                     }}
                                     className="w-4 h-4"
                                   />
@@ -1306,6 +1331,11 @@ function StepReview({
   const tierLabel = form.tier ? tierLabels[form.tier] : null;
 
   // Get selected engines
+  const missing = (form.enginesSelected ?? []).filter(
+    (id) => !ENGINES.some((e) => e.id === id)
+  );
+  if (missing.length) console.warn("Unknown engine ids:", missing);
+  
   const selectedEnginesList = form.enginesSelected.map(id => {
     const engine = ENGINES.find(e => e.id === id);
     return engine;

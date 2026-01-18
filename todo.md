@@ -2443,3 +2443,13 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - All pressure gates passed
 - Intake flow matches IntakeFlowPlanV1 contract
 - "LaunchBase on LaunchBase" test complete
+
+
+## 🐛 REVIEW STEP DEBUG (Apply.tsx)
+- [x] Add debug <pre> in engines_optional step showing form.enginesSelected
+- [x] Add debug <pre> in review step showing form.enginesSelected
+- [x] Fix checkbox handler: use event.checked instead of derived isSelected (eliminate batching race)
+- [x] Add unknown engine ID warning in Review step (console.warn for missing IDs)
+- [x] Add dev-only sessionStorage persistence for form + step (survive remounts during dev)
+- [x] Create E2E smoke test: tier=premium + engines=[inbox,ads] → verify DB + Review renders both
+- [x] Remove debug <pre> blocks after fixes validated
