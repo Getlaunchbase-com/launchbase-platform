@@ -460,6 +460,9 @@ function EngineCard({
   isSelected: boolean;
   onSelect: () => void;
 }) {
+  // Null-safe default for optional engine metadata
+  const oftenUsedWith = details.oftenUsedWith ?? [];
+
   return (
     <div 
       className={`rounded-2xl border p-6 cursor-pointer transition ${
@@ -529,7 +532,9 @@ function EngineCard({
           </div>
           <div>
             <p className="text-white/80 font-medium mb-2">Often used with:</p>
-            <p className="text-white/60">{details.oftenUsedWith.join(", ")}</p>
+            <p className="text-white/60">
+              {oftenUsedWith.length > 0 ? oftenUsedWith.join(", ") : "—"}
+            </p>
           </div>
         </div>
       )}
