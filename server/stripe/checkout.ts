@@ -2,10 +2,20 @@ import Stripe from "stripe";
 import { PRODUCTS, MODULE_PRODUCTS, ModuleKey } from "./products";
 import { computePricing, type PricingInput, type SocialTier } from "../../client/src/lib/computePricing";
 
-// Initialize Stripe with secret key
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2025-12-15.clover",
-});
+// Lazy-load Stripe to prevent crash when STRIPE_SECRET_KEY not set
+let _stripe: Stripe | null = null;
+function getStripe(): Stripe {
+  if (!_stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) {
+      throw new Error("STRIPE_SECRET_KEY not configured");
+    }
+    _stripe = new Stripe(key, {
+      apiVersion: "2025-12-15.clover",
+    });
+  }
+  return _stripe;
+}
 
 export interface CreateCheckoutParams {
   intakeId: number;
@@ -65,7 +75,7 @@ export async function createSetupCheckoutSession({
     }
   }
 
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripe().checkout.sessions.create({
     mode: "payment",
     customer_email: customerEmail,
     client_reference_id: intakeId.toString(),
@@ -96,7 +106,7 @@ export async function createSetupCheckoutSession({
  * Retrieve a checkout session by ID
  */
 export async function getCheckoutSession(sessionId: string) {
-  return stripe.checkout.sessions.retrieve(sessionId);
+  return getStripe().checkout.sessions.retrieve(sessionId);
 }
 
 /**
@@ -107,7 +117,7 @@ export function constructWebhookEvent(
   signature: string
 ): Stripe.Event {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
-  return stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+  return getStripe().webhooks.constructEvent(payload, signature, webhookSecret);
 }
 
 export interface CreateServiceCheckoutParams {
@@ -234,7 +244,7 @@ export async function createServiceCheckoutSession({
   }
 
   // Create Stripe session with audit-grade metadata
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripe().checkout.sessions.create({
     mode: "payment",
     customer_email: customerEmail,
     client_reference_id: intakeId.toString(),
@@ -284,4 +294,4 @@ export async function createServiceCheckoutSession({
   };
 }
 
-export { stripe };
+export { getStripe };

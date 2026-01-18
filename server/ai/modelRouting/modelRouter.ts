@@ -18,6 +18,7 @@ export type RouteOpts = {
   requestedModelId?: string;
   constraints?: Partial<ModelConstraints>;
   maxAttempts?: number; // default 3
+  allowFallback?: boolean; // default true; set false for tournaments to enforce model integrity
 };
 
 export type ProviderCall<T> = (modelId: string) => Promise<T>;
@@ -66,6 +67,10 @@ export class ModelRouter {
       if (opts.requestedModelId && modelId === opts.requestedModelId) {
         const exists = this.registry.get(modelId);
         if (!exists) {
+          // If fallback disabled (tournament mode), throw immediately
+          if (opts.allowFallback === false) {
+            throw new Error(`MODEL_NOT_IN_REGISTRY: ${modelId}`);
+          }
           // treat missing as immediate failover, no provider call
           this.telemetry?.modelFailover({
             from: modelId,

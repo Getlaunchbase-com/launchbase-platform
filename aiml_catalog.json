@@ -1,0 +1,4773 @@
+[
+  {
+    "id": "openai/gpt-4o",
+    "provider": "openai",
+    "family": "gpt-4",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-assistant\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\"]",
+    "score": 80
+  },
+  {
+    "id": "gpt-4o-2024-08-06",
+    "provider": "openai",
+    "family": "gpt-4",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-assistant\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\"]",
+    "score": 85
+  },
+  {
+    "id": "gpt-4o-2024-05-13",
+    "provider": "openai",
+    "family": "gpt-4",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-assistant\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\"]",
+    "score": 85
+  },
+  {
+    "id": "gpt-4o-mini",
+    "provider": "openai",
+    "family": "gpt-4",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-assistant\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\"]",
+    "score": 65
+  },
+  {
+    "id": "gpt-4o-mini-2024-07-18",
+    "provider": "openai",
+    "family": "gpt-4",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-assistant\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\"]",
+    "score": 70
+  },
+  {
+    "id": "chatgpt-4o-latest",
+    "provider": "unknown",
+    "family": "gpt-4",
+    "capabilities": [
+      "text",
+      "vision"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-completion.vision\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\"]",
+    "score": 80
+  },
+  {
+    "id": "gpt-4-turbo",
+    "provider": "openai",
+    "family": "gpt-4",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-assistant\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\"]",
+    "score": 80
+  },
+  {
+    "id": "gpt-4-turbo-2024-04-09",
+    "provider": "openai",
+    "family": "gpt-4",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-assistant\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\"]",
+    "score": 85
+  },
+  {
+    "id": "gpt-4",
+    "provider": "openai",
+    "family": "gpt-4",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-assistant\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\"]",
+    "score": 80
+  },
+  {
+    "id": "gpt-4-0125-preview",
+    "provider": "openai",
+    "family": "gpt-4",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-assistant\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.response-format\"]",
+    "score": 80
+  },
+  {
+    "id": "gpt-4-1106-preview",
+    "provider": "openai",
+    "family": "gpt-4",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-assistant\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.response-format\"]",
+    "score": 80
+  },
+  {
+    "id": "gpt-3.5-turbo",
+    "provider": "openai",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-assistant\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "gpt-3.5-turbo-0125",
+    "provider": "openai",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-assistant\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "gpt-3.5-turbo-1106",
+    "provider": "openai",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-assistant\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "o3-mini",
+    "provider": "unknown",
+    "family": "o3",
+    "capabilities": [
+      "text",
+      "reasoning"
+    ],
+    "tier": "premium",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-assistant\",\"openai/chat-completion.function\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.seed\",\"openai/chat-completion.reasoning\",\"openai/chat-completion.response-format\"]",
+    "score": 80
+  },
+  {
+    "id": "gpt-4o-audio-preview",
+    "provider": "openai",
+    "family": "gpt-4",
+    "capabilities": [
+      "text",
+      "vision",
+      "audio",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.audio\"]",
+    "score": 80
+  },
+  {
+    "id": "gpt-4o-mini-audio-preview",
+    "provider": "openai",
+    "family": "gpt-4",
+    "capabilities": [
+      "text",
+      "vision",
+      "audio",
+      "structured"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.audio\"]",
+    "score": 65
+  },
+  {
+    "id": "openai/gpt-audio",
+    "provider": "openai",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "audio",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.audio\"]",
+    "score": 50
+  },
+  {
+    "id": "openai/gpt-audio-mini",
+    "provider": "openai",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "audio",
+      "structured"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.audio\"]",
+    "score": 35
+  },
+  {
+    "id": "gpt-4o-search-preview",
+    "provider": "openai",
+    "family": "gpt-4",
+    "capabilities": [
+      "text",
+      "vision"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.search\"]",
+    "score": 80
+  },
+  {
+    "id": "gpt-4o-mini-search-preview",
+    "provider": "openai",
+    "family": "gpt-4",
+    "capabilities": [
+      "text",
+      "vision"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.search\"]",
+    "score": 65
+  },
+  {
+    "id": "openai/gpt-4.1-2025-04-14",
+    "provider": "openai",
+    "family": "gpt-4",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-assistant\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\"]",
+    "score": 90
+  },
+  {
+    "id": "openai/gpt-4.1-mini-2025-04-14",
+    "provider": "openai",
+    "family": "gpt-4",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-assistant\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\"]",
+    "score": 75
+  },
+  {
+    "id": "openai/gpt-4.1-nano-2025-04-14",
+    "provider": "openai",
+    "family": "gpt-4",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-assistant\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\"]",
+    "score": 65
+  },
+  {
+    "id": "openai/o4-mini-2025-04-16",
+    "provider": "openai",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.seed\",\"openai/chat-completion.reasoning\",\"openai/chat-completion.response-format\"]",
+    "score": 45
+  },
+  {
+    "id": "openai/o3-2025-04-16",
+    "provider": "openai",
+    "family": "o3",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision"
+    ],
+    "tier": "premium",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-completion.function\",\"openai/chat-completion.vision\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.seed\",\"openai/chat-completion.reasoning\",\"openai/chat-completion.response-format\"]",
+    "score": 100
+  },
+  {
+    "id": "o1",
+    "provider": "unknown",
+    "family": "o1",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-assistant\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.seed\",\"openai/chat-completion.reasoning\",\"openai/chat-completion.response-format\"]",
+    "score": 85
+  },
+  {
+    "id": "openai/gpt-5-2025-08-07",
+    "provider": "openai",
+    "family": "gpt-5",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision",
+      "structured"
+    ],
+    "tier": "premium",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.stream\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.seed\",\"openai/chat-completion.reasoning\",\"openai/chat-completion.response-format\"]",
+    "score": 100
+  },
+  {
+    "id": "openai/gpt-5-mini-2025-08-07",
+    "provider": "openai",
+    "family": "gpt-5",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision",
+      "structured"
+    ],
+    "tier": "premium",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.stream\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.seed\",\"openai/chat-completion.reasoning\",\"openai/chat-completion.response-format\"]",
+    "score": 95
+  },
+  {
+    "id": "openai/gpt-5-nano-2025-08-07",
+    "provider": "openai",
+    "family": "gpt-5",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision",
+      "structured"
+    ],
+    "tier": "premium",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.seed\",\"openai/chat-completion.reasoning\",\"openai/chat-completion.response-format\"]",
+    "score": 85
+  },
+  {
+    "id": "openai/gpt-5-chat-latest",
+    "provider": "openai",
+    "family": "gpt-5",
+    "capabilities": [
+      "text",
+      "vision"
+    ],
+    "tier": "premium",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-completion.vision\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\"]",
+    "score": 100
+  },
+  {
+    "id": "openai/gpt-5-1",
+    "provider": "openai",
+    "family": "gpt-5",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision",
+      "structured"
+    ],
+    "tier": "premium",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.seed\",\"openai/chat-completion.reasoning\",\"openai/chat-completion.response-format\"]",
+    "score": 100
+  },
+  {
+    "id": "openai/gpt-5-1-chat-latest",
+    "provider": "openai",
+    "family": "gpt-5",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "premium",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\"]",
+    "score": 100
+  },
+  {
+    "id": "openai/gpt-5-2",
+    "provider": "openai",
+    "family": "gpt-5",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision",
+      "structured"
+    ],
+    "tier": "premium",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.seed\",\"openai/chat-completion.reasoning\",\"openai/chat-completion.response-format\"]",
+    "score": 100
+  },
+  {
+    "id": "openai/gpt-5-2-chat-latest",
+    "provider": "openai",
+    "family": "gpt-5",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "premium",
+    "features": "[\"openai/chat-completion\",\"openai/response-api\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\"]",
+    "score": 100
+  },
+  {
+    "id": "openai/o3-pro",
+    "provider": "openai",
+    "family": "o3",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision",
+      "structured"
+    ],
+    "tier": "premium",
+    "features": "[\"openai/response-api\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.seed\",\"openai/chat-completion.reasoning\",\"openai/chat-completion.response-format\"]",
+    "score": 100
+  },
+  {
+    "id": "openai/gpt-5-pro",
+    "provider": "openai",
+    "family": "gpt-5",
+    "capabilities": [],
+    "tier": "premium",
+    "features": "[\"openai/response-api\"]",
+    "score": 100
+  },
+  {
+    "id": "openai/gpt-5-1-codex",
+    "provider": "openai",
+    "family": "gpt-5",
+    "capabilities": [
+      "code"
+    ],
+    "tier": "premium",
+    "features": "[\"openai/response-api\"]",
+    "score": 100
+  },
+  {
+    "id": "openai/gpt-5-1-codex-mini",
+    "provider": "openai",
+    "family": "gpt-5",
+    "capabilities": [
+      "code"
+    ],
+    "tier": "premium",
+    "features": "[\"openai/response-api\"]",
+    "score": 85
+  },
+  {
+    "id": "openai/gpt-5-2-pro",
+    "provider": "openai",
+    "family": "gpt-5",
+    "capabilities": [],
+    "tier": "premium",
+    "features": "[\"openai/response-api\"]",
+    "score": 100
+  },
+  {
+    "id": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+    "provider": "mistralai",
+    "family": "other",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\"]",
+    "score": 50
+  },
+  {
+    "id": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+    "provider": "meta-llama",
+    "family": "llama-3",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.developer\",\"together/chat-completion.echo\",\"openai/chat-completion\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\"]",
+    "score": 50
+  },
+  {
+    "id": "meta-llama/Llama-3.2-3B-Instruct-Turbo",
+    "provider": "meta-llama",
+    "family": "llama-3",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.developer\",\"openai/chat-completion\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\"]",
+    "score": 50
+  },
+  {
+    "id": "meta-llama/Llama-Guard-3-11B-Vision-Turbo",
+    "provider": "meta-llama",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "vision"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion.vision\",\"openai/chat-completion.message.developer\",\"openai/chat-completion\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\"]",
+    "score": 50
+  },
+  {
+    "id": "Qwen/Qwen2.5-7B-Instruct-Turbo",
+    "provider": "Qwen",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.response-format\",\"together/chat-completion.echo\",\"openai/chat-completion\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\"]",
+    "score": 50
+  },
+  {
+    "id": "meta-llama/Meta-Llama-3-8B-Instruct-Lite",
+    "provider": "meta-llama",
+    "family": "llama-3",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/chat-completion.message.developer\",\"together/chat-completion.echo\",\"openai/chat-completion\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\"]",
+    "score": 50
+  },
+  {
+    "id": "meta-llama/Llama-3-70b-chat-hf",
+    "provider": "meta-llama",
+    "family": "llama-3",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion.message.developer\",\"together/chat-completion.echo\",\"openai/chat-completion\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\"]",
+    "score": 50
+  },
+  {
+    "id": "Qwen/Qwen2.5-72B-Instruct-Turbo",
+    "provider": "Qwen",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.response-format\",\"together/chat-completion.echo\",\"openai/chat-completion\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\"]",
+    "score": 50
+  },
+  {
+    "id": "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo",
+    "provider": "meta-llama",
+    "family": "llama-3",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.developer\",\"together/chat-completion.echo\",\"openai/chat-completion\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\"]",
+    "score": 50
+  },
+  {
+    "id": "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
+    "provider": "meta-llama",
+    "family": "llama-3",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.developer\",\"together/chat-completion.echo\",\"openai/chat-completion\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\"]",
+    "score": 50
+  },
+  {
+    "id": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+    "provider": "meta-llama",
+    "family": "llama-3",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.developer\",\"together/chat-completion.echo\",\"openai/chat-completion\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\"]",
+    "score": 50
+  },
+  {
+    "id": "mistralai/Mistral-7B-Instruct-v0.2",
+    "provider": "mistralai",
+    "family": "other",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion.message.developer\",\"together/chat-completion.echo\",\"openai/chat-completion\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\"]",
+    "score": 50
+  },
+  {
+    "id": "meta-llama/LlamaGuard-2-8b",
+    "provider": "meta-llama",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.developer\",\"together/chat-completion.echo\",\"openai/chat-completion\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\"]",
+    "score": 50
+  },
+  {
+    "id": "mistralai/Mistral-7B-Instruct-v0.3",
+    "provider": "mistralai",
+    "family": "other",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion.message.developer\",\"together/chat-completion.echo\",\"openai/chat-completion\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\"]",
+    "score": 50
+  },
+  {
+    "id": "meta-llama/Meta-Llama-Guard-3-8B",
+    "provider": "meta-llama",
+    "family": "other",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion.message.developer\",\"together/chat-completion.echo\",\"openai/chat-completion\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\"]",
+    "score": 50
+  },
+  {
+    "id": "meta-llama/llama-4-scout",
+    "provider": "meta-llama",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.response-format\",\"openai/chat-completion\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\"]",
+    "score": 50
+  },
+  {
+    "id": "meta-llama/llama-4-maverick",
+    "provider": "meta-llama",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.response-format\",\"openai/chat-completion\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\"]",
+    "score": 50
+  },
+  {
+    "id": "Qwen/Qwen3-235B-A22B-fp8-tput",
+    "provider": "Qwen",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.response-format\",\"openai/chat-completion\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\"]",
+    "score": 50
+  },
+  {
+    "id": "claude-3-opus-20240229",
+    "provider": "anthropic",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "vision"
+    ],
+    "tier": "standard",
+    "features": "[\"anthropic/message-completion\",\"anthropic/message-completion.vision\",\"anthropic/message-completion.function\"]",
+    "score": 55
+  },
+  {
+    "id": "claude-3-haiku-20240307",
+    "provider": "anthropic",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "vision"
+    ],
+    "tier": "standard",
+    "features": "[\"anthropic/message-completion\",\"anthropic/message-completion.vision\",\"anthropic/message-completion.function\"]",
+    "score": 55
+  },
+  {
+    "id": "claude-3-5-haiku-20241022",
+    "provider": "anthropic",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "vision"
+    ],
+    "tier": "standard",
+    "features": "[\"anthropic/message-completion\",\"anthropic/message-completion.vision\",\"anthropic/message-completion.function\"]",
+    "score": 55
+  },
+  {
+    "id": "claude-3-7-sonnet-20250219",
+    "provider": "anthropic",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision"
+    ],
+    "tier": "standard",
+    "features": "[\"anthropic/message-completion\",\"anthropic/message-completion.vision\",\"anthropic/message-completion.function\",\"anthropic/message-completion.reasoning\"]",
+    "score": 60
+  },
+  {
+    "id": "claude-sonnet-4-20250514",
+    "provider": "anthropic",
+    "family": "claude-sonnet",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision"
+    ],
+    "tier": "standard",
+    "features": "[\"anthropic/message-completion\",\"anthropic/message-completion.vision\",\"anthropic/message-completion.function\",\"anthropic/message-completion.reasoning\"]",
+    "score": 60
+  },
+  {
+    "id": "claude-opus-4-20250514",
+    "provider": "anthropic",
+    "family": "claude-opus-4",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision"
+    ],
+    "tier": "premium",
+    "features": "[\"anthropic/message-completion\",\"anthropic/message-completion.vision\",\"anthropic/message-completion.function\",\"anthropic/message-completion.reasoning\"]",
+    "score": 100
+  },
+  {
+    "id": "claude-opus-4-1-20250805",
+    "provider": "anthropic",
+    "family": "claude-opus-4",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision"
+    ],
+    "tier": "premium",
+    "features": "[\"anthropic/message-completion\",\"anthropic/message-completion.vision\",\"anthropic/message-completion.function\",\"anthropic/message-completion.reasoning\"]",
+    "score": 100
+  },
+  {
+    "id": "claude-sonnet-4-5-20250929",
+    "provider": "anthropic",
+    "family": "claude-sonnet",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision"
+    ],
+    "tier": "standard",
+    "features": "[\"anthropic/message-completion\",\"anthropic/message-completion.vision\",\"anthropic/message-completion.function\",\"anthropic/message-completion.reasoning\"]",
+    "score": 60
+  },
+  {
+    "id": "claude-haiku-4-5-20251001",
+    "provider": "anthropic",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision"
+    ],
+    "tier": "standard",
+    "features": "[\"anthropic/message-completion\",\"anthropic/message-completion.vision\",\"anthropic/message-completion.function\",\"anthropic/message-completion.reasoning\"]",
+    "score": 60
+  },
+  {
+    "id": "claude-opus-4-5-20251101",
+    "provider": "anthropic",
+    "family": "claude-opus-4",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision"
+    ],
+    "tier": "premium",
+    "features": "[\"anthropic/message-completion\",\"anthropic/message-completion.vision\",\"anthropic/message-completion.function\",\"anthropic/message-completion.reasoning\"]",
+    "score": 100
+  },
+  {
+    "id": "google/gemini-2.0-flash-exp",
+    "provider": "google",
+    "family": "gemini-2",
+    "capabilities": [
+      "text",
+      "vision"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.vision\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.stream\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\"]",
+    "score": 73
+  },
+  {
+    "id": "google/gemini-2.0-flash",
+    "provider": "google",
+    "family": "gemini-2",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.vision\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.stream\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\"]",
+    "score": 73
+  },
+  {
+    "id": "google/gemini-2.5-pro",
+    "provider": "google",
+    "family": "gemini-2",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "premium",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.vision\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.stream\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\"]",
+    "score": 85
+  },
+  {
+    "id": "google/gemini-2.5-flash",
+    "provider": "google",
+    "family": "gemini-2",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.vision\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.stream\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\"]",
+    "score": 77
+  },
+  {
+    "id": "deepseek-chat",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.echo\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.logit-bias\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "deepseek-reasoner",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.echo\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.number-of-messages\"]",
+    "score": 50
+  },
+  {
+    "id": "deepseek/deepseek-chat-v3.1",
+    "provider": "deepseek",
+    "family": "other",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.echo\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.logit-bias\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.response-format\",\"openai/chat-completion.function\"]",
+    "score": 50
+  },
+  {
+    "id": "deepseek/deepseek-reasoner-v3.1",
+    "provider": "deepseek",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.echo\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.response-format\",\"openai/chat-completion.function\"]",
+    "score": 50
+  },
+  {
+    "id": "deepseek/deepseek-non-reasoner-v3.1-terminus",
+    "provider": "deepseek",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.echo\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.logit-bias\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.response-format\",\"openai/chat-completion.function\"]",
+    "score": 50
+  },
+  {
+    "id": "deepseek/deepseek-reasoner-v3.1-terminus",
+    "provider": "deepseek",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.echo\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.response-format\",\"openai/chat-completion.function\"]",
+    "score": 50
+  },
+  {
+    "id": "deepseek/deepseek-non-thinking-v3.2-exp",
+    "provider": "deepseek",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.echo\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.logit-bias\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.response-format\",\"openai/chat-completion.function\"]",
+    "score": 50
+  },
+  {
+    "id": "deepseek/deepseek-thinking-v3.2-exp",
+    "provider": "deepseek",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"together/chat-completion.echo\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.response-format\",\"openai/chat-completion.function\"]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/qwen-max",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.logprobs\"]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/qwen-plus",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.logprobs\"]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/qwen-turbo",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.logprobs\"]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/qwen-max-2025-01-25",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.logprobs\"]",
+    "score": 60
+  },
+  {
+    "id": "alibaba/qwen3-coder-480b-a35b-instruct",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "code",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/qwen3-32b",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.max-completion-tokens\",\"together/chat-completion.repetition-penalty\",\"alibaba/chat-completion.reasoning\",\"openai/chat-completion.logprobs\"]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/qwen3-max-preview",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.max-completion-tokens\",\"together/chat-completion.repetition-penalty\",\"openai/chat-completion.logprobs\"]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/qwen3-235b-a22b-thinking-2507",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.max-completion-tokens\",\"together/chat-completion.repetition-penalty\",\"alibaba/chat-completion.reasoning\"]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/qwen3-next-80b-a3b-thinking",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.max-completion-tokens\",\"together/chat-completion.repetition-penalty\",\"alibaba/chat-completion.reasoning\"]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/qwen3-next-80b-a3b-instruct",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.max-completion-tokens\",\"together/chat-completion.repetition-penalty\",\"openai/chat-completion.logprobs\"]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/qwen3-max-instruct",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.max-completion-tokens\",\"together/chat-completion.repetition-penalty\",\"openai/chat-completion.logprobs\"]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/qwen3-omni-30b-a3b-captioner",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "audio"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.stream\",\"alibaba/chat-completion.audio\"]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/qwen3-vl-plus",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.vision\",\"openai/chat-completion.max-completion-tokens\",\"together/chat-completion.repetition-penalty\",\"alibaba/chat-completion.reasoning\"]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/qwen3-vl-flash",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.vision\",\"openai/chat-completion.max-completion-tokens\",\"together/chat-completion.repetition-penalty\",\"alibaba/chat-completion.reasoning\"]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/qwen3-vl-32b-thinking",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.max-completion-tokens\",\"together/chat-completion.repetition-penalty\",\"openai/chat-completion.vision\"]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/qwen3-vl-32b-instruct",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.max-completion-tokens\",\"together/chat-completion.repetition-penalty\",\"openai/chat-completion.vision\"]",
+    "score": 50
+  },
+  {
+    "id": "mistralai/mistral-tiny",
+    "provider": "mistralai",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.message.system\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.stop\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "mistralai/mistral-nemo",
+    "provider": "mistralai",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.message.system\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.stop\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "anthracite-org/magnum-v4-72b",
+    "provider": "anthracite-org",
+    "family": "other",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.stop\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "gryphe/mythomax-l2-13b",
+    "provider": "gryphe",
+    "family": "other",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.message.system\",\"openai/chat-completion.stop\"]",
+    "score": 50
+  },
+  {
+    "id": "nvidia/llama-3.1-nemotron-70b-instruct",
+    "provider": "nvidia",
+    "family": "llama-3",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.message.system\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "google/gemma-3-4b-it",
+    "provider": "google",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "vision"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.vision\",\"openai/chat-completion.stop\"]",
+    "score": 50
+  },
+  {
+    "id": "google/gemma-3-12b-it",
+    "provider": "google",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "vision"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.vision\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "google/gemma-3-27b-it",
+    "provider": "google",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "vision"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.message.system\",\"openai/chat-completion.vision\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.stop\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "google/gemini-2.5-flash-lite-preview",
+    "provider": "google",
+    "family": "gemini-2",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision",
+      "structured"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.reasoning\"]",
+    "score": 77
+  },
+  {
+    "id": "deepseek/deepseek-prover-v2",
+    "provider": "deepseek",
+    "family": "other",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.message.system\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "deepseek/deepseek-v3.2-speciale",
+    "provider": "deepseek",
+    "family": "other",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.message.system\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.number-of-messages\"]",
+    "score": 50
+  },
+  {
+    "id": "google/gemma-3n-e4b-it",
+    "provider": "google",
+    "family": "other",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.stop\",\"openai/chat-completion.logit-bias\"]",
+    "score": 50
+  },
+  {
+    "id": "cohere/command-a",
+    "provider": "cohere",
+    "family": "other",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.stop\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "openai/gpt-oss-120b",
+    "provider": "openai",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.response-format\",\"openai/chat-completion.reasoning\",\"together/chat-completion.echo\"]",
+    "score": 50
+  },
+  {
+    "id": "openai/gpt-oss-20b",
+    "provider": "openai",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.response-format\",\"openai/chat-completion.reasoning\",\"together/chat-completion.echo\"]",
+    "score": 50
+  },
+  {
+    "id": "nousresearch/hermes-4-405b",
+    "provider": "nousresearch",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.message.system\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "nvidia/nemotron-nano-9b-v2",
+    "provider": "nvidia",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "structured"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.seed\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.response-format\",\"openrouter/chat-completion.reasoning\",\"together/chat-completion.echo\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"openrouter/chat-completion.top-a\",\"together/chat-completion.repetition-penalty\"]",
+    "score": 25
+  },
+  {
+    "id": "nvidia/nemotron-nano-12b-v2-vl",
+    "provider": "nvidia",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.seed\",\"openai/chat-completion.presence-penalty\",\"openrouter/chat-completion.reasoning\",\"together/chat-completion.echo\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"openrouter/chat-completion.top-a\",\"together/chat-completion.repetition-penalty\"]",
+    "score": 25
+  },
+  {
+    "id": "qwen/qwen-2.5-vl-7b-instruct",
+    "provider": "qwen",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "vision"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.message.system\",\"openai/chat-completion.vision\",\"openai/chat-completion.stop\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "google/gemini-3-pro-preview",
+    "provider": "google",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision",
+      "structured"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.seed\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.reasoning\",\"openai/chat-completion.response-format\"]",
+    "score": 35
+  },
+  {
+    "id": "google/gemini-3-flash-preview",
+    "provider": "google",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.seed\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.response-format\"]",
+    "score": 35
+  },
+  {
+    "id": "xiaomi/mimo-v2-flash",
+    "provider": "xiaomi",
+    "family": "other",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stop\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "baidu/ernie-4.5-21b-a3b-thinking",
+    "provider": "baidu",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.message.system\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.stop\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "baidu/ernie-4.5-21b-a3b",
+    "provider": "baidu",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.message.system\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.stop\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "baidu/ernie-4.5-vl-28b-a3b",
+    "provider": "baidu",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.vision\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.message.system\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.stop\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "baidu/ernie-4.5-vl-424b-a47b",
+    "provider": "baidu",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.vision\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.message.system\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.stop\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "baidu/ernie-4.5-300b-a47b",
+    "provider": "baidu",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.min-p\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.message.system\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.stop\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "MiniMax-Text-01",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature?min=0&max=1\",\"openai/chat-completion.top-p\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.vision\",\"minimax/chat-completion.mask-sensitive-info\"]",
+    "score": 35
+  },
+  {
+    "id": "minimax/m1",
+    "provider": "minimax",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "budget",
+    "features": "[\"minimax/chat-completion.mask-sensitive-info\",\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature?min=0&max=1\",\"openai/chat-completion.top-p\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\"]",
+    "score": 35
+  },
+  {
+    "id": "minimax/m2",
+    "provider": "minimax",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature?min=0&max=1\",\"openai/chat-completion.top-p\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\"]",
+    "score": 35
+  },
+  {
+    "id": "minimax/m2-1",
+    "provider": "minimax",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.seed\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.response-format\"]",
+    "score": 35
+  },
+  {
+    "id": "bagoodex/bagoodex-search-v1",
+    "provider": "bagoodex",
+    "family": "other",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.response-format\",\"openai/chat-completion.seed\",\"openai/chat-completion.stop\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"together/chat-completion.echo\",\"together/chat-completion.repetition-penalty\",\"together/chat-completion.top-k\",\"together/chat-completion.min-p\",\"bagoodex/chat-completion.search\"]",
+    "score": 50
+  },
+  {
+    "id": "moonshot/kimi-k2-preview",
+    "provider": "moonshot",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.stream\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.response-format\",\"moonshot/chat-completion.search\"]",
+    "score": 50
+  },
+  {
+    "id": "moonshot/kimi-k2-0905-preview",
+    "provider": "moonshot",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.stream\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.response-format\",\"moonshot/chat-completion.search\"]",
+    "score": 50
+  },
+  {
+    "id": "moonshot/kimi-k2-turbo-preview",
+    "provider": "moonshot",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.stream\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.response-format\",\"moonshot/chat-completion.search\"]",
+    "score": 50
+  },
+  {
+    "id": "x-ai/grok-4-07-09",
+    "provider": "x-ai",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.prediction\",\"openai/chat-completion.message.system\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.logprobs\",\"openrouter/chat-completion.reasoning\"]",
+    "score": 50
+  },
+  {
+    "id": "x-ai/grok-3-beta",
+    "provider": "x-ai",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.message.system\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.stop\",\"openai/chat-completion.logprobs\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "x-ai/grok-3-mini-beta",
+    "provider": "x-ai",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "structured"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.prediction\",\"openai/chat-completion.message.system\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.logprobs\",\"openrouter/chat-completion.reasoning\",\"openai/chat-completion.response-format\"]",
+    "score": 35
+  },
+  {
+    "id": "x-ai/grok-code-fast-1",
+    "provider": "x-ai",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "code",
+      "reasoning",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.prediction\",\"openai/chat-completion.message.system\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.logprobs\",\"openrouter/chat-completion.reasoning\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "x-ai/grok-4-fast-reasoning",
+    "provider": "x-ai",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.prediction\",\"openai/chat-completion.message.system\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.logprobs\",\"openrouter/chat-completion.reasoning\"]",
+    "score": 50
+  },
+  {
+    "id": "x-ai/grok-4-fast-non-reasoning",
+    "provider": "x-ai",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.prediction\",\"openai/chat-completion.message.system\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.logprobs\"]",
+    "score": 50
+  },
+  {
+    "id": "x-ai/grok-4-1-fast-reasoning",
+    "provider": "x-ai",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.prediction\",\"openai/chat-completion.message.system\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.logprobs\",\"openrouter/chat-completion.reasoning\"]",
+    "score": 50
+  },
+  {
+    "id": "x-ai/grok-4-1-fast-non-reasoning",
+    "provider": "x-ai",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "vision",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"together/chat-completion.top-k\",\"together/chat-completion.repetition-penalty\",\"openrouter/chat-completion.top-a\",\"openai/chat-completion.prediction\",\"openai/chat-completion.message.system\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.developer\",\"openai/chat-completion.logprobs\"]",
+    "score": 50
+  },
+  {
+    "id": "perplexity/sonar",
+    "provider": "perplexity",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "vision"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.vision\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.search\",\"together/chat-completion.top-k\",\"perplexity/chat-completion.search\"]",
+    "score": 50
+  },
+  {
+    "id": "perplexity/sonar-pro",
+    "provider": "perplexity",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "vision"
+    ],
+    "tier": "premium",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.vision\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.logit-bias\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.seed\",\"openai/chat-completion.response-format\",\"openai/chat-completion.search\",\"together/chat-completion.top-k\",\"perplexity/chat-completion.search\"]",
+    "score": 58
+  },
+  {
+    "id": "zhipu/glm-4.5",
+    "provider": "zhipu",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.stream\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.top-p\",\"zhipu/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.response-format\",\"zhipu/chat-completion.thinking\",\"zhipu/chat-completion.web-search\"]",
+    "score": 50
+  },
+  {
+    "id": "zhipu/glm-4.5-air",
+    "provider": "zhipu",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.stream\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.top-p\",\"zhipu/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.response-format\",\"zhipu/chat-completion.thinking\",\"zhipu/chat-completion.web-search\"]",
+    "score": 50
+  },
+  {
+    "id": "zhipu/glm-4.6",
+    "provider": "zhipu",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.stream\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.top-p\",\"zhipu/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.response-format\",\"zhipu/chat-completion.thinking\",\"zhipu/chat-completion.web-search\"]",
+    "score": 50
+  },
+  {
+    "id": "zhipu/glm-4.7",
+    "provider": "zhipu",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "reasoning",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.stream\",\"openai/chat-completion.number-of-messages\",\"openai/chat-completion.top-p\",\"zhipu/chat-completion.stop\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.response-format\",\"zhipu/chat-completion.thinking\",\"zhipu/chat-completion.web-search\"]",
+    "score": 50
+  },
+  {
+    "id": "meta-llama/llama-3.3-70b-versatile",
+    "provider": "meta-llama",
+    "family": "llama-3",
+    "capabilities": [
+      "text",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.message.file\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.message.system\",\"openai/chat-completion.stream\",\"openai/chat-completion.max-completion-tokens\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.seed\",\"openai/chat-completion.function\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.stop\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "bytedance/seed-1-8",
+    "provider": "bytedance",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "vision",
+      "structured"
+    ],
+    "tier": "standard",
+    "features": "[\"openai/chat-completion\",\"openai/chat-completion.vision\",\"openai/chat-completion.function\",\"openai/chat-completion.message.refusal\",\"openai/chat-completion.parallel-tool-calls\",\"openai/chat-completion.message.system\",\"openai/chat-completion.message.assistant\",\"openai/chat-completion.stream\",\"openai/chat-completion.temperature\",\"openai/chat-completion.top-p\",\"openai/chat-completion.frequency-penalty\",\"openai/chat-completion.prediction\",\"openai/chat-completion.seed\",\"openai/chat-completion.presence-penalty\",\"openai/chat-completion.response-format\"]",
+    "score": 50
+  },
+  {
+    "id": "google/gc-document-ai",
+    "provider": "google",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "mistral/mistral-ocr-latest",
+    "provider": "mistral",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "dall-e-3",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "dall-e-2",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "openai/gpt-image-1",
+    "provider": "openai",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "openai/gpt-image-1-mini",
+    "provider": "openai",
+    "family": "other",
+    "capabilities": [],
+    "tier": "budget",
+    "features": "[]",
+    "score": 35
+  },
+  {
+    "id": "openai/gpt-image-1-5",
+    "provider": "openai",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "imagen-3.0-generate-002",
+    "provider": "unknown",
+    "family": "imagen",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "imagen-4.0-ultra-generate-preview-06-06",
+    "provider": "unknown",
+    "family": "imagen",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "premium",
+    "features": "[]",
+    "score": 58
+  },
+  {
+    "id": "google/imagen-4.0-generate-001",
+    "provider": "google",
+    "family": "imagen",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "google/imagen-4.0-fast-generate-001",
+    "provider": "google",
+    "family": "imagen",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "google/imagen-4.0-ultra-generate-001",
+    "provider": "google",
+    "family": "imagen",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "premium",
+    "features": "[]",
+    "score": 58
+  },
+  {
+    "id": "google/imagen4/preview",
+    "provider": "google",
+    "family": "imagen",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "flux/schnell",
+    "provider": "flux",
+    "family": "flux",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "flux-pro",
+    "provider": "unknown",
+    "family": "flux",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "premium",
+    "features": "[]",
+    "score": 58
+  },
+  {
+    "id": "flux-pro/v1.1",
+    "provider": "flux-pro",
+    "family": "flux",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "flux-pro/v1.1-ultra",
+    "provider": "flux-pro",
+    "family": "flux",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "premium",
+    "features": "[]",
+    "score": 58
+  },
+  {
+    "id": "flux/dev",
+    "provider": "flux",
+    "family": "flux",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "flux/dev/image-to-image",
+    "provider": "flux",
+    "family": "flux",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "flux/srpo",
+    "provider": "flux",
+    "family": "flux",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "flux/srpo/image-to-image",
+    "provider": "flux",
+    "family": "flux",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "bytedance/uso",
+    "provider": "bytedance",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "bytedance/seedream-v4-edit",
+    "provider": "bytedance",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "bytedance/seedream-v4-text-to-image",
+    "provider": "bytedance",
+    "family": "other",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "stable-diffusion-v3-medium",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "stable-diffusion-v35-large",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "flux-realism",
+    "provider": "unknown",
+    "family": "flux",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "recraft-v3",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "triposr",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "flux/kontext-max/text-to-image",
+    "provider": "flux",
+    "family": "flux",
+    "capabilities": [
+      "text",
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "flux/kontext-pro/text-to-image",
+    "provider": "flux",
+    "family": "flux",
+    "capabilities": [
+      "text",
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "flux/kontext-pro/image-to-image",
+    "provider": "flux",
+    "family": "flux",
+    "capabilities": [
+      "text",
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "flux/kontext-max/image-to-image",
+    "provider": "flux",
+    "family": "flux",
+    "capabilities": [
+      "text",
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/qwen-image",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "google/gemini-2.5-flash-image",
+    "provider": "google",
+    "family": "gemini-2",
+    "capabilities": [
+      "vision"
+    ],
+    "tier": "budget",
+    "features": "[]",
+    "score": 77
+  },
+  {
+    "id": "google/gemini-2.5-flash-image-edit",
+    "provider": "google",
+    "family": "gemini-2",
+    "capabilities": [
+      "vision"
+    ],
+    "tier": "budget",
+    "features": "[]",
+    "score": 77
+  },
+  {
+    "id": "google/gemini-3-pro-image-preview",
+    "provider": "google",
+    "family": "other",
+    "capabilities": [
+      "vision"
+    ],
+    "tier": "budget",
+    "features": "[]",
+    "score": 35
+  },
+  {
+    "id": "google/nano-banana-pro",
+    "provider": "google",
+    "family": "other",
+    "capabilities": [],
+    "tier": "premium",
+    "features": "[]",
+    "score": 33
+  },
+  {
+    "id": "google/gemini-3-pro-image-preview-edit",
+    "provider": "google",
+    "family": "other",
+    "capabilities": [
+      "vision"
+    ],
+    "tier": "budget",
+    "features": "[]",
+    "score": 35
+  },
+  {
+    "id": "google/nano-banana-pro-edit",
+    "provider": "google",
+    "family": "other",
+    "capabilities": [],
+    "tier": "budget",
+    "features": "[]",
+    "score": 25
+  },
+  {
+    "id": "hunyuan/hunyuan-image-v3-text-to-image",
+    "provider": "hunyuan",
+    "family": "other",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "tencent/hunyuan-part",
+    "provider": "tencent",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "blackforestlabs/flux-2",
+    "provider": "blackforestlabs",
+    "family": "flux",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "blackforestlabs/flux-2-edit",
+    "provider": "blackforestlabs",
+    "family": "flux",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "blackforestlabs/flux-2-lora",
+    "provider": "blackforestlabs",
+    "family": "flux",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "blackforestlabs/flux-2-lora-edit",
+    "provider": "blackforestlabs",
+    "family": "flux",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "blackforestlabs/flux-2-pro",
+    "provider": "blackforestlabs",
+    "family": "flux",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "premium",
+    "features": "[]",
+    "score": 58
+  },
+  {
+    "id": "blackforestlabs/flux-2-pro-edit",
+    "provider": "blackforestlabs",
+    "family": "flux",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "blackforestlabs/flux-2-max",
+    "provider": "blackforestlabs",
+    "family": "flux",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "blackforestlabs/flux-2-max-edit",
+    "provider": "blackforestlabs",
+    "family": "flux",
+    "capabilities": [
+      "image-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/z-image-turbo",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/z-image-turbo-lora",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "klingai/image-o1",
+    "provider": "klingai",
+    "family": "o1",
+    "capabilities": [
+      "reasoning"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 85
+  },
+  {
+    "id": "bytedance/seedream-4-5",
+    "provider": "bytedance",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/qwen-image-edit",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/wan2.5-t2i-preview",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/wan2.2-t2i-plus",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/wan2.2-t2i-flash",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/wan-2-6-image",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "bytedance/seedream-3.0",
+    "provider": "bytedance",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "bytedance/seededit-3.0-i2i",
+    "provider": "bytedance",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "reve/create-image",
+    "provider": "reve",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "reve/edit-image",
+    "provider": "reve",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "reve/remix-edit-image",
+    "provider": "reve",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "topaz-labs/sharpen",
+    "provider": "topaz-labs",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "topaz-labs/sharpen-gen",
+    "provider": "topaz-labs",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "x-ai/grok-2-image",
+    "provider": "x-ai",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "magic/image-to-3d",
+    "provider": "magic",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "text-embedding-3-small",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "text-embedding-3-large",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "text-embedding-ada-002",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "togethercomputer/m2-bert-80M-32k-retrieval",
+    "provider": "togethercomputer",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "BAAI/bge-base-en-v1.5",
+    "provider": "BAAI",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "BAAI/bge-large-en-v1.5",
+    "provider": "BAAI",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "voyage-large-2-instruct",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "voyage-finance-2",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "voyage-multilingual-2",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "voyage-law-2",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "voyage-code-2",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [
+      "code"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "voyage-large-2",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "voyage-2",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "text-embedding-004",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "text-multilingual-embedding-002",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/qwen-text-embedding-v4",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/qwen-text-embedding-v3",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_nova-2-general",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_nova-2-meeting",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_nova-2-phonecall",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_nova-2-voicemail",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_nova-2-finance",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_nova-2-conversationalai",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_nova-2-video",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_nova-2-medical",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_nova-2-drivethru",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_nova-2-automotive",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_whisper-large",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [
+      "audio"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_whisper-medium",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [
+      "audio"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_whisper-small",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [
+      "audio"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_whisper-tiny",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [
+      "audio"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_whisper-base",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [
+      "audio"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-asteria-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-hera-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-luna-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-stella-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-athena-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-zeus-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-orion-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-arcas-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-perseus-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-angus-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-orpheus-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-helios-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-amalthea-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-andromeda-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-apollo-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-arcas-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-aries-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-asteria-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-athena-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-atlas-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-aurora-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-callista-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-cora-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-cordelia-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-delia-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-draco-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-electra-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-harmonia-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-helena-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-hera-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-hermes-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-hyperion-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-iris-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-janus-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-juno-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-jupiter-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-luna-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-mars-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-minerva-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-neptune-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-odysseus-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-ophelia-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-orion-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-orpheus-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-pandora-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-phoebe-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-pluto-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-saturn-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-selene-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-thalia-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-theia-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-vesta-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-zeus-en",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-celeste-es",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-estrella-es",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "#g1_aura-2-nestor-es",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "aai/slam-1",
+    "provider": "aai",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "aai/universal",
+    "provider": "aai",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "openai/gpt-4o-transcribe",
+    "provider": "openai",
+    "family": "gpt-4",
+    "capabilities": [
+      "vision"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 80
+  },
+  {
+    "id": "openai/gpt-4o-mini-transcribe",
+    "provider": "openai",
+    "family": "gpt-4",
+    "capabilities": [
+      "vision"
+    ],
+    "tier": "budget",
+    "features": "[]",
+    "score": 65
+  },
+  {
+    "id": "openai/gpt-4o-mini-tts",
+    "provider": "openai",
+    "family": "gpt-4",
+    "capabilities": [
+      "vision"
+    ],
+    "tier": "budget",
+    "features": "[]",
+    "score": 65
+  },
+  {
+    "id": "openai/tts-1",
+    "provider": "openai",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "openai/tts-1-hd",
+    "provider": "openai",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "elevenlabs/eleven_multilingual_v2",
+    "provider": "elevenlabs",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "elevenlabs/eleven_turbo_v2_5",
+    "provider": "elevenlabs",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "elevenlabs/v3_alpha",
+    "provider": "elevenlabs",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "minimax/speech-2.5-turbo-preview",
+    "provider": "minimax",
+    "family": "other",
+    "capabilities": [
+      "audio"
+    ],
+    "tier": "budget",
+    "features": "[]",
+    "score": 35
+  },
+  {
+    "id": "minimax/speech-2.5-hd-preview",
+    "provider": "minimax",
+    "family": "other",
+    "capabilities": [
+      "audio"
+    ],
+    "tier": "budget",
+    "features": "[]",
+    "score": 35
+  },
+  {
+    "id": "minimax/speech-2.6-hd",
+    "provider": "minimax",
+    "family": "other",
+    "capabilities": [
+      "audio"
+    ],
+    "tier": "budget",
+    "features": "[]",
+    "score": 35
+  },
+  {
+    "id": "minimax/speech-2.6-turbo",
+    "provider": "minimax",
+    "family": "other",
+    "capabilities": [
+      "audio"
+    ],
+    "tier": "budget",
+    "features": "[]",
+    "score": 35
+  },
+  {
+    "id": "microsoft/vibevoice-7b",
+    "provider": "microsoft",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "microsoft/vibevoice-1.5b",
+    "provider": "microsoft",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/qwen3-tts-flash",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "hume/octave-2",
+    "provider": "hume",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "inworld/tts-1",
+    "provider": "inworld",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "inworld/tts-1-max",
+    "provider": "inworld",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "gpt-3.5-turbo-instruct",
+    "provider": "openai",
+    "family": "other",
+    "capabilities": [
+      "text"
+    ],
+    "tier": "budget",
+    "features": "[\"openai/completion\"]",
+    "score": 50
+  },
+  {
+    "id": "openai/sora-2-t2v",
+    "provider": "openai",
+    "family": "sora",
+    "capabilities": [
+      "video",
+      "video-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "openai/sora-2-i2v",
+    "provider": "openai",
+    "family": "sora",
+    "capabilities": [
+      "video",
+      "video-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "openai/sora-2-pro-i2v",
+    "provider": "openai",
+    "family": "sora",
+    "capabilities": [
+      "video",
+      "video-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "openai/sora-2-pro-t2v",
+    "provider": "openai",
+    "family": "sora",
+    "capabilities": [
+      "video",
+      "video-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "video-01",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "video-01-live2d",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "minimax/hailuo-02",
+    "provider": "minimax",
+    "family": "other",
+    "capabilities": [],
+    "tier": "budget",
+    "features": "[]",
+    "score": 35
+  },
+  {
+    "id": "minimax/hailuo-2.3",
+    "provider": "minimax",
+    "family": "other",
+    "capabilities": [],
+    "tier": "budget",
+    "features": "[]",
+    "score": 35
+  },
+  {
+    "id": "minimax/hailuo-2.3-fast",
+    "provider": "minimax",
+    "family": "other",
+    "capabilities": [],
+    "tier": "budget",
+    "features": "[]",
+    "score": 35
+  },
+  {
+    "id": "kling-video/v1.6/standard/text-to-video",
+    "provider": "kling-video",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "kling-video/v1.6/standard/image-to-video",
+    "provider": "kling-video",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "pixverse/v5/transition",
+    "provider": "pixverse",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "pixverse/v5/image-to-video",
+    "provider": "pixverse",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "pixverse/v5/text-to-video",
+    "provider": "pixverse",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "pixverse/lip-sync",
+    "provider": "pixverse",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "pixverse/v5-5-text-to-video",
+    "provider": "pixverse",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "pixverse/v5-5-image-to-video",
+    "provider": "pixverse",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "google/veo-3.1-t2v",
+    "provider": "google",
+    "family": "other",
+    "capabilities": [
+      "video",
+      "video-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "google/veo-3.1-i2v",
+    "provider": "google",
+    "family": "other",
+    "capabilities": [
+      "video",
+      "video-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "google/veo-3.1-first-last-image-to-video",
+    "provider": "google",
+    "family": "other",
+    "capabilities": [
+      "video",
+      "video-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "google/veo-3.1-reference-to-video",
+    "provider": "google",
+    "family": "other",
+    "capabilities": [
+      "video",
+      "video-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "google/veo-3.1-t2v-fast",
+    "provider": "google",
+    "family": "other",
+    "capabilities": [
+      "video",
+      "video-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "google/veo-3.1-i2v-fast",
+    "provider": "google",
+    "family": "other",
+    "capabilities": [
+      "video",
+      "video-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "google/veo-3.1-first-last-image-to-video-fast",
+    "provider": "google",
+    "family": "other",
+    "capabilities": [
+      "video",
+      "video-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "google/veo3-1-extend-video",
+    "provider": "google",
+    "family": "o3",
+    "capabilities": [
+      "reasoning",
+      "video",
+      "video-gen"
+    ],
+    "tier": "premium",
+    "features": "[]",
+    "score": 95
+  },
+  {
+    "id": "google/veo3-1-fast-extend-video",
+    "provider": "google",
+    "family": "o3",
+    "capabilities": [
+      "reasoning",
+      "video",
+      "video-gen"
+    ],
+    "tier": "premium",
+    "features": "[]",
+    "score": 95
+  },
+  {
+    "id": "klingai/v2.5-turbo/pro/image-to-video",
+    "provider": "klingai",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "klingai/v2.5-turbo/pro/text-to-video",
+    "provider": "klingai",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "bytedance/omnihuman",
+    "provider": "bytedance",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "bytedance/omnihuman/v1.5",
+    "provider": "bytedance",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "veed/fabric-1.0",
+    "provider": "veed",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "veed/fabric-1.0-fast",
+    "provider": "veed",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "tencent/hunyuan-video-foley",
+    "provider": "tencent",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/wan2.2-vace-fun-a14b-depth",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/wan2.2-vace-fun-a14b-pose",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/wan2.2-vace-fun-a14b-inpainting",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/wan2.2-vace-fun-a14b-outpainting",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/wan2.2-vace-fun-a14b-reframe",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/wan2.2-14b-animate-move",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/wan2.2-14b-animate-replace",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "sber-ai/kandinsky5-t2v",
+    "provider": "sber-ai",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "sber-ai/kandinsky5-distill-t2v",
+    "provider": "sber-ai",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "krea/krea-wan-14b/text-to-video",
+    "provider": "krea",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "krea/krea-wan-14b/video-to-video",
+    "provider": "krea",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "ltxv/ltxv-2",
+    "provider": "ltxv",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "ltxv/ltxv-2-fast",
+    "provider": "ltxv",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "klingai/avatar-standard",
+    "provider": "klingai",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "klingai/avatar-pro",
+    "provider": "klingai",
+    "family": "other",
+    "capabilities": [],
+    "tier": "premium",
+    "features": "[]",
+    "score": 58
+  },
+  {
+    "id": "longcat/distilled/480p",
+    "provider": "longcat",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "longcat/distilled/720p",
+    "provider": "longcat",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "klingai/video-o1-image-to-video",
+    "provider": "klingai",
+    "family": "o1",
+    "capabilities": [
+      "reasoning",
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 85
+  },
+  {
+    "id": "klingai/video-o1-reference-to-video",
+    "provider": "klingai",
+    "family": "o1",
+    "capabilities": [
+      "reasoning",
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 85
+  },
+  {
+    "id": "klingai/video-o1-video-to-video-edit",
+    "provider": "klingai",
+    "family": "o1",
+    "capabilities": [
+      "reasoning",
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 85
+  },
+  {
+    "id": "klingai/video-o1-video-to-video-reference",
+    "provider": "klingai",
+    "family": "o1",
+    "capabilities": [
+      "reasoning",
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 85
+  },
+  {
+    "id": "klingai/video-v2-6-pro-image-to-video",
+    "provider": "klingai",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "klingai/video-v2-6-pro-text-to-video",
+    "provider": "klingai",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "gen3a_turbo",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "runway/gen4_turbo",
+    "provider": "runway",
+    "family": "runway",
+    "capabilities": [
+      "video",
+      "video-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "runway/act_two",
+    "provider": "runway",
+    "family": "runway",
+    "capabilities": [
+      "video",
+      "video-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "runway/gen4_aleph",
+    "provider": "runway",
+    "family": "runway",
+    "capabilities": [
+      "video",
+      "video-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "bytedance/seedance-1-0-lite-t2v",
+    "provider": "bytedance",
+    "family": "other",
+    "capabilities": [],
+    "tier": "budget",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "bytedance/seedance-1-0-lite-i2v",
+    "provider": "bytedance",
+    "family": "other",
+    "capabilities": [],
+    "tier": "budget",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "bytedance/seedance-1-0-pro-t2v",
+    "provider": "bytedance",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "bytedance/seedance-1-0-pro-i2v",
+    "provider": "bytedance",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "bytedance/seedance-1-0-pro-fast",
+    "provider": "bytedance",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/wan2.2-i2v-plus",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/wan2.2-t2v-plus",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/wan2.1-t2v-turbo",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/wan2.1-t2v-plus",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/wan2.5-t2v-preview",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/wan2.5-i2v-preview",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/wan-2-6-t2v",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/wan-2-6-i2v",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "alibaba/wan-2-6-r2v",
+    "provider": "alibaba",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "veo2/image-to-video",
+    "provider": "veo2",
+    "family": "other",
+    "capabilities": [
+      "video",
+      "video-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "veo2",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [
+      "video",
+      "video-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "google/veo3",
+    "provider": "google",
+    "family": "o3",
+    "capabilities": [
+      "reasoning",
+      "video",
+      "video-gen"
+    ],
+    "tier": "premium",
+    "features": "[]",
+    "score": 95
+  },
+  {
+    "id": "google/veo-3.0-i2v",
+    "provider": "google",
+    "family": "other",
+    "capabilities": [
+      "video",
+      "video-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "google/veo-3.0-fast",
+    "provider": "google",
+    "family": "other",
+    "capabilities": [
+      "video",
+      "video-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "google/veo-3.0-i2v-fast",
+    "provider": "google",
+    "family": "other",
+    "capabilities": [
+      "video",
+      "video-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "kling-video/v1/standard/image-to-video",
+    "provider": "kling-video",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "kling-video/v1/standard/text-to-video",
+    "provider": "kling-video",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "kling-video/v1/pro/image-to-video",
+    "provider": "kling-video",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "kling-video/v1/pro/text-to-video",
+    "provider": "kling-video",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "kling-video/v1.5/standard/image-to-video",
+    "provider": "kling-video",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "kling-video/v1.5/pro/image-to-video",
+    "provider": "kling-video",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "kling-video/v1.5/pro/text-to-video",
+    "provider": "kling-video",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "kling-video/v1.6/pro/image-to-video",
+    "provider": "kling-video",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "kling-video/v1.6/pro/text-to-video",
+    "provider": "kling-video",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "kling-video/v1.6/standard/multi-image-to-video",
+    "provider": "kling-video",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "klingai/kling-video-v1.6-pro-effects",
+    "provider": "klingai",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "klingai/kling-video-v1.6-standard-effects",
+    "provider": "klingai",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "klingai/v2-master-text-to-video",
+    "provider": "klingai",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "klingai/v2-master-image-to-video",
+    "provider": "klingai",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "klingai/v2.1-master-text-to-video",
+    "provider": "klingai",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "klingai/v2.1-master-image-to-video",
+    "provider": "klingai",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "kling-video/v2.1/standard/image-to-video",
+    "provider": "kling-video",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "kling-video/v2.1/pro/image-to-video",
+    "provider": "kling-video",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "klingai/video-v2-6-pro-motion-control",
+    "provider": "klingai",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "luma/ray-1-6",
+    "provider": "luma",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "luma/ray-2",
+    "provider": "luma",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "luma/ray-flash-2",
+    "provider": "luma",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "fallback-openai/sora-2-t2v",
+    "provider": "fallback-openai",
+    "family": "sora",
+    "capabilities": [
+      "video",
+      "video-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "fallback-openai/sora-2-i2v",
+    "provider": "fallback-openai",
+    "family": "sora",
+    "capabilities": [
+      "video",
+      "video-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "fallback-openai/sora-2-pro-i2v",
+    "provider": "fallback-openai",
+    "family": "sora",
+    "capabilities": [
+      "video",
+      "video-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "fallback-openai/sora-2-pro-t2v",
+    "provider": "fallback-openai",
+    "family": "sora",
+    "capabilities": [
+      "video",
+      "video-gen"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "magic/image-to-video",
+    "provider": "magic",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "magic/text-to-video",
+    "provider": "magic",
+    "family": "other",
+    "capabilities": [
+      "text",
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "magic/video-to-video",
+    "provider": "magic",
+    "family": "other",
+    "capabilities": [
+      "video"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "stable-audio",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [
+      "audio"
+    ],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "minimax-music",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "budget",
+    "features": "[]",
+    "score": 35
+  },
+  {
+    "id": "google/lyria2",
+    "provider": "google",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "music-01",
+    "provider": "unknown",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  },
+  {
+    "id": "minimax/music-1.5",
+    "provider": "minimax",
+    "family": "other",
+    "capabilities": [],
+    "tier": "budget",
+    "features": "[]",
+    "score": 35
+  },
+  {
+    "id": "minimax/music-2.0",
+    "provider": "minimax",
+    "family": "other",
+    "capabilities": [],
+    "tier": "budget",
+    "features": "[]",
+    "score": 35
+  },
+  {
+    "id": "elevenlabs/eleven_music",
+    "provider": "elevenlabs",
+    "family": "other",
+    "capabilities": [],
+    "tier": "standard",
+    "features": "[]",
+    "score": 50
+  }
+]

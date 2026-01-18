@@ -11,6 +11,12 @@ import { createServer } from "http";
 import net from "net";
 import { createApp } from "./app";
 import { setupVite, serveStatic } from "./vite";
+import fs from "node:fs";
+
+fs.appendFileSync(
+  "/tmp/launchbase_boot.log",
+  `[BOOT] index.ts loaded ${new Date().toISOString()}\n`
+);
 
 /**
  * Check if a port is available

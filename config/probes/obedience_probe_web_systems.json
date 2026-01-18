@@ -1,0 +1,45 @@
+{
+  "probeId": "obedience_web_systems_v1",
+  "mode": "tournament",
+  "lane": "web",
+  "role": "designer_systems_fast",
+  "repsPerModel": 3,
+  "models": [
+    {
+      "modelId": "gpt-4o-mini",
+      "provider": "openai",
+      "timeoutMs": 120000,
+      "maxTokens": 2000
+    },
+    {
+      "modelId": "gpt-4o-2024-08-06",
+      "provider": "openai",
+      "timeoutMs": 120000,
+      "maxTokens": 2000
+    },
+    {
+      "modelId": "claude-3-5-sonnet-20240620",
+      "provider": "anthropic",
+      "timeoutMs": 180000,
+      "maxTokens": 2000
+    }
+  ],
+  "workOrder": {
+    "id": "WO-PROBE-001",
+    "lane": "web",
+    "inputs": {
+      "pageType": "homepage",
+      "targetAudience": "small business owners/operators",
+      "primaryCTA": "Request setup",
+      "secondaryCTA": "See workflows",
+      "currentAssetsProvided": {
+        "existingCopy": false,
+        "existingDesign": false,
+        "existingSiteHTML": false,
+        "screenshots": false
+      }
+    }
+  },
+  "maxAttempts": 3,
+  "outputDir": "runs/probes"
+}

@@ -1,9 +1,19 @@
 import Stripe from "stripe";
 
-// Initialize Stripe with secret key
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2025-12-15.clover",
-});
+// Lazy-load Stripe to prevent crash when STRIPE_SECRET_KEY not set
+let _stripe: Stripe | null = null;
+function getStripe(): Stripe {
+  if (!_stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) {
+      throw new Error("STRIPE_SECRET_KEY not configured");
+    }
+    _stripe = new Stripe(key, {
+      apiVersion: "2025-12-15.clover",
+    });
+  }
+  return _stripe;
+}
 
 // Types
 export type Cadence = "low" | "medium" | "high";
@@ -181,7 +191,7 @@ export async function createIntelligenceCheckoutSession({
       : undefined;
 
   // Create checkout session
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripe().checkout.sessions.create({
     mode: "subscription",
     customer_email: customerEmail,
     line_items: lineItems,
@@ -228,7 +238,7 @@ export async function createIntelligenceCheckoutSession({
  * Get checkout session status
  */
 export async function getCheckoutSessionStatus(sessionId: string) {
-  const session = await stripe.checkout.sessions.retrieve(sessionId, {
+  const session = await getStripe().checkout.sessions.retrieve(sessionId, {
     expand: ["subscription"],
   });
 
@@ -250,7 +260,7 @@ export async function createCustomerPortalSession(
   customerId: string,
   returnUrl: string
 ): Promise<{ url: string }> {
-  const session = await stripe.billingPortal.sessions.create({
+  const session = await getStripe().billingPortal.sessions.create({
     customer: customerId,
     return_url: returnUrl,
   });
@@ -262,7 +272,7 @@ export async function createCustomerPortalSession(
  * Get customer's active Social Media Intelligence subscription
  */
 export async function getIntelligenceSubscription(customerId: string) {
-  const subscriptions = await stripe.subscriptions.list({
+  const subscriptions = await getStripe().subscriptions.list({
     customer: customerId,
     status: "active",
     limit: 10,
@@ -300,7 +310,7 @@ export async function getIntelligenceSubscription(customerId: string) {
  * Cancel subscription at period end
  */
 export async function cancelIntelligenceSubscription(subscriptionId: string) {
-  await stripe.subscriptions.update(subscriptionId, {
+  await getStripe().subscriptions.update(subscriptionId, {
     cancel_at_period_end: true,
   });
   return { success: true };
@@ -310,13 +320,13 @@ export async function cancelIntelligenceSubscription(subscriptionId: string) {
  * Reactivate a canceled subscription
  */
 export async function reactivateIntelligenceSubscription(subscriptionId: string) {
-  await stripe.subscriptions.update(subscriptionId, {
+  await getStripe().subscriptions.update(subscriptionId, {
     cancel_at_period_end: false,
   });
   return { success: true };
 }
 
-export { stripe };
+export { getStripe };
 
 
 /**
@@ -380,7 +390,7 @@ export async function getSMISubscriptionStatus(userId: string) {
 
   // Get subscription details from Stripe
   try {
-    const subscription = await stripe.subscriptions.retrieve(record.stripeSubscriptionId);
+    const subscription = await getStripe().subscriptions.retrieve(record.stripeSubscriptionId);
     
     return {
       hasSubscription: true,
