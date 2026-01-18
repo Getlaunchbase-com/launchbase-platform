@@ -1,330 +1,304 @@
+import { Check, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
-import { ArrowRight, Eye, Brain, Shield, Zap, Check } from "lucide-react";
 
 export default function HowItWorks() {
   return (
-    <div className="min-h-screen bg-[#0B0B0C] text-white">
-      {/* Header */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0B0B0C]/95 backdrop-blur-sm border-b border-white/10">
-        <div className="container max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/">
-            <img src="/logo-cropped.png" alt="LaunchBase" className="h-8 w-auto" />
-          </Link>
-          <Link 
-            href="/apply"
-            className="rounded-xl bg-[#FF6A00] px-4 py-2 text-sm font-medium text-black hover:brightness-110 transition"
-          >
-            Apply now
-          </Link>
-        </div>
-      </nav>
-
-      <div className="pt-28 pb-20">
-        <div className="mx-auto max-w-4xl px-4">
-          {/* Hero */}
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80 mb-4">
-              <span className="h-2 w-2 rounded-full bg-[#1ED760]" />
-              Automation without abdication
-            </div>
-            <h1 className="text-4xl font-semibold tracking-tight">
-              How LaunchBase works
+    <div className="min-h-screen bg-gradient-to-b from-black via-[#0A0A0A] to-black text-white">
+      {/* Hero Section */}
+      <section className="py-16 md:py-24 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="max-w-3xl">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+              How LaunchBase Works
             </h1>
-            <p className="mt-4 text-lg text-white/70 max-w-2xl mx-auto">
-              LaunchBase observes what's happening around your business and acts only when it matters — with your approval.
-            </p>
-            <p className="mt-3 text-sm text-white/50">
-              You can always see what LaunchBase is doing — and change it anytime.
-            </p>
-          </div>
-
-          {/* The Loop */}
-          <div className="mb-20">
-            <h2 className="text-2xl font-semibold mb-8 text-center">The Intelligence Loop</h2>
-            
-            <div className="grid md:grid-cols-4 gap-6">
-              <LoopStep
-                icon={<Eye className="h-6 w-6" />}
-                title="Observe"
-                description="LaunchBase monitors weather, events, and local context around your business 24/7."
-                color="#FF6A00"
-              />
-              <LoopStep
-                icon={<Brain className="h-6 w-6" />}
-                title="Decide"
-                description="Our system determines if there's a relevant, safe moment to engage your audience."
-                color="#1ED760"
-              />
-              <LoopStep
-                icon={<Shield className="h-6 w-6" />}
-                title="Approve"
-                description="You review and approve posts before they go live. Nothing happens without your say."
-                color="#3B82F6"
-              />
-              <LoopStep
-                icon={<Zap className="h-6 w-6" />}
-                title="Act"
-                description="Approved content posts automatically at the optimal time for maximum impact."
-                color="#A855F7"
-              />
-            </div>
-          </div>
-
-          {/* What makes it different */}
-          <div className="mb-20">
-            <h2 className="text-2xl font-semibold mb-8 text-center">What makes it different</h2>
-            
-            <div className="grid md:grid-cols-2 gap-6">
-              <DifferenceCard
-                title="Silence is valid output"
-                description="Most automation tools spam your audience. LaunchBase knows when NOT to post. If there's nothing relevant to say, we say nothing."
-              />
-              <DifferenceCard
-                title="Weather-aware and safety-gated"
-                description="Every post passes through weather and safety checks. We'll never post about a fun event during a local emergency."
-              />
-              <DifferenceCard
-                title="Local context, not generic content"
-                description="We reference what's actually happening in your area — game days, school schedules, community events — not generic marketing copy."
-              />
-              <DifferenceCard
-                title="You're always in control"
-                description="Choose Auto, Guided, or Custom mode. Every decision is visible in your dashboard. Nothing is permanent — change your mind anytime."
-              />
-            </div>
-          </div>
-
-          {/* Control Modes */}
-          <div className="mb-20">
-            <h2 className="text-2xl font-semibold mb-8 text-center">Choose your control level</h2>
-            
-            <div className="grid md:grid-cols-3 gap-6">
-              <ModeCard
-                title="Auto"
-                description="LaunchBase decides for you. You can review everything."
-                features={[
-                  "Hands-off operation",
-                  "Every decision logged",
-                  "Override anytime",
-                ]}
-              />
-              <ModeCard
-                title="Guided"
-                description="LaunchBase recommends. You approve."
-                features={[
-                  "Preview every post",
-                  "Edit before publishing",
-                  "Suggested alternatives",
-                ]}
-                recommended
-              />
-              <ModeCard
-                title="Custom"
-                description="You fine-tune relevance. Safety is still enforced."
-                features={[
-                  "Set custom rules",
-                  "Adjust cadence",
-                  "Fine-tune triggers",
-                ]}
-              />
-            </div>
-
-            {/* Trust Guardrail */}
-            <div className="mt-8 text-center">
-              <p className="text-sm text-white/60">
-                <span className="text-white/80">Controls change relevance — not safety.</span>
-                <br />
-                Weather, safety, and brand protection are always enforced.
-              </p>
-            </div>
-          </div>
-
-          {/* Pricing Preview */}
-          <div className="mb-20 rounded-2xl border border-white/10 bg-white/5 p-8">
-            <h2 className="text-2xl font-semibold mb-2 text-center">Simple, transparent pricing</h2>
-            <p className="text-white/60 text-center mb-8">
-              Choose your cadence. Add context layers. That's it.
+            <p className="text-xl md:text-2xl text-white/80 mb-8">
+              You answer a short intake. We generate a build plan, produce a preview, and iterate with guarded revisions—then ship.
             </p>
             
-            <div className="grid md:grid-cols-3 gap-6 mb-8">
-              <PricingTier
-                name="Low"
-                price={79}
-                frequency="1–2 posts/week"
-                description="Stay present without noise"
-              />
-              <PricingTier
-                name="Medium"
-                price={129}
-                frequency="2–3 posts/week"
-                description="Balanced, timely presence"
-                recommended
-              />
-              <PricingTier
-                name="High"
-                price={199}
-                frequency="4–6 posts/week"
-                description="Maximum visibility"
-              />
+            <div className="flex flex-col sm:flex-row gap-4 mb-12">
+              <Link 
+                href="/intake"
+                className="inline-flex items-center justify-center gap-2 bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white px-8 py-4 rounded-lg font-semibold transition"
+              >
+                Start the intake
+                <ArrowRight className="h-5 w-5" />
+              </Link>
+              <Link 
+                href="/pricing"
+                className="inline-flex items-center justify-center gap-2 border border-white/20 hover:border-white/40 text-white px-8 py-4 rounded-lg font-semibold transition"
+              >
+                See pricing
+              </Link>
             </div>
 
-            <div className="text-center text-sm text-white/60">
-              <p>Add local context layers: Sports (+$29/mo) • Community (+$39/mo) • Trends (+$49/mo)</p>
-              <p className="mt-1">One-time setup: $249 base + $99 per layer</p>
+            <div className="flex flex-col gap-3">
+              {[
+                "Preflight checks for missing info",
+                "Swarm produces a proposal packet",
+                "Critic validates clarity + mobile"
+              ].map((badge, i) => (
+                <div key={i} className="flex items-center gap-2 text-white/70">
+                  <Check className="h-5 w-5 text-[#1ED760]" />
+                  <span>{badge}</span>
+                </div>
+              ))}
             </div>
-
-            <p className="text-center text-xs text-white/40 italic mt-6">
-              You're not buying software. You're deciding how much responsibility to hand off.
-            </p>
           </div>
+        </div>
+      </section>
 
-          {/* CTA */}
-          <div className="text-center">
-            <h2 className="text-2xl font-semibold mb-4">Ready to get started?</h2>
-            <p className="text-white/60 mb-6">
-              Apply in 3–5 minutes. Preview before anything goes live.
-            </p>
+      {/* Timeline Section */}
+      <section className="py-16 md:py-20 px-4 bg-white/5">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">The 6-step flow</h2>
+          
+          <div className="space-y-6">
+            {[
+              {
+                title: "1) Intake",
+                body: "Tell us what you do, who you serve, and what you want the site to accomplish."
+              },
+              {
+                title: "2) Preflight",
+                body: "We validate the inputs, flag missing details, and prevent made-up claims before anything is generated."
+              },
+              {
+                title: "3) Field General plan",
+                body: "A deterministic plan sets tier budgets, allowed surfaces, and the work order for specialists."
+              },
+              {
+                title: "4) Swarm run",
+                body: "Specialists propose changes and a selector composes a coherent set of improvements."
+              },
+              {
+                title: "5) Preview packet",
+                body: "You receive a ShipPacket proposal that's ready to review, with clear deltas and rationale."
+              },
+              {
+                title: "6) Approve or request changes",
+                body: "You can approve, or request another iteration using your included credits."
+              }
+            ].map((step, i) => (
+              <div 
+                key={i}
+                className="bg-white/5 border border-white/10 rounded-xl p-6 hover:border-white/20 transition"
+              >
+                <h3 className="text-xl font-semibold mb-2 text-[#FF6A00]">{step.title}</h3>
+                <p className="text-white/70">{step.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* What You Receive Section */}
+      <section className="py-16 md:py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">What you receive</h2>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                title: "Build plan",
+                body: "A structured plan that defines page goals, sections, CTAs, and constraints."
+              },
+              {
+                title: "Proposal packet (ShipPacket)",
+                body: "A reviewable proposal with recommended changes, reasoning, and what will be built next."
+              },
+              {
+                title: "Quality gates",
+                body: "A critic review focused on clarity, hierarchy, and mobile usability—so problems are caught early."
+              }
+            ].map((card, i) => (
+              <div 
+                key={i}
+                className="bg-white/5 border border-white/10 rounded-xl p-6 hover:border-white/20 transition"
+              >
+                <h3 className="text-xl font-semibold mb-3">{card.title}</h3>
+                <p className="text-white/70">{card.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Tiers Section */}
+      <section className="py-16 md:py-20 px-4 bg-white/5">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center">How tiers differ</h2>
+          <p className="text-center text-white/70 mb-12 max-w-2xl mx-auto">
+            Choose the level of iteration and tooling you need. All tiers keep changes guarded and reviewable.
+          </p>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                name: "Standard",
+                badge: "Polish pass",
+                bullets: [
+                  "1 included change request credit",
+                  "Showroom-style preview flow",
+                  "Best for: tighten messaging + spacing + CTA hierarchy"
+                ]
+              },
+              {
+                name: "Growth",
+                badge: "Conversion pass",
+                bullets: [
+                  "3 included change request credits",
+                  "Showroom-style preview flow",
+                  "Best for: add proof elements + conversion structure"
+                ]
+              },
+              {
+                name: "Premium",
+                badge: "Full transformation",
+                bullets: [
+                  "10 included change request credits",
+                  "Builder-enabled on approved marketing surfaces",
+                  "Best for: positioning + design system + strongest hierarchy"
+                ],
+                footnote: "Premium Builder access is limited to approved UI surfaces only."
+              }
+            ].map((tier, i) => (
+              <div 
+                key={i}
+                className={`rounded-xl p-6 border ${
+                  tier.name === "Premium" 
+                    ? "border-[#FF6A00] bg-[#FF6A00]/10" 
+                    : "border-white/10 bg-white/5"
+                }`}
+              >
+                <div className="mb-4">
+                  <span className="text-xs uppercase tracking-wider text-white/60">{tier.badge}</span>
+                  <h3 className="text-2xl font-bold mt-1">{tier.name}</h3>
+                </div>
+                
+                <ul className="space-y-3 mb-4">
+                  {tier.bullets.map((bullet, j) => (
+                    <li key={j} className="flex items-start gap-2 text-sm text-white/80">
+                      <Check className="h-4 w-4 text-[#1ED760] mt-0.5 flex-shrink-0" />
+                      <span>{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
+                
+                {tier.footnote && (
+                  <p className="text-xs text-white/60 mt-4 pt-4 border-t border-white/10">
+                    {tier.footnote}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Critic Checks Section */}
+      <section className="py-16 md:py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">What the critic checks</h2>
+          
+          <div className="grid md:grid-cols-2 gap-8">
+            <div>
+              <h3 className="text-xl font-semibold mb-4 text-[#FF6A00]">Must-pass signals</h3>
+              <ul className="space-y-3">
+                {[
+                  "Clear single primary CTA",
+                  "Readable mobile hierarchy",
+                  "No cluttered or conflicting offers",
+                  "Trust and proof placed where it matters"
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-2 text-white/80">
+                    <Check className="h-5 w-5 text-[#1ED760] mt-0.5 flex-shrink-0" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="text-xl font-semibold mb-4 text-[#FF6A00]">Common fixes</h3>
+              <ul className="space-y-3">
+                {[
+                  "CTA hierarchy and wording cleanup",
+                  "Section order for comprehension",
+                  "Pricing card stacking on mobile",
+                  "Spacing rhythm and headings"
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-2 text-white/80">
+                    <Check className="h-5 w-5 text-[#1ED760] mt-0.5 flex-shrink-0" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          
+          <p className="text-center text-sm text-white/60 mt-8">
+            Critic review is a quality gate, not a promise of outcomes.
+          </p>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-16 md:py-20 px-4 bg-white/5">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">FAQ</h2>
+          
+          <div className="space-y-6">
+            {[
+              {
+                q: "What counts as a change request?",
+                a: "A change request is one additional improvement loop. Approving your proposal does not consume credits."
+              },
+              {
+                q: "Can I buy more revisions?",
+                a: "Yes—when you run out of included credits, you can purchase additional change requests."
+              },
+              {
+                q: "What does Premium Builder access mean?",
+                a: "Premium allows Builder-powered UI execution on approved marketing surfaces only. Core backend and sensitive areas are out of scope."
+              }
+            ].map((item, i) => (
+              <div 
+                key={i}
+                className="bg-white/5 border border-white/10 rounded-xl p-6"
+              >
+                <h3 className="text-lg font-semibold mb-2">{item.q}</h3>
+                <p className="text-white/70">{item.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA Section */}
+      <section className="py-16 md:py-24 px-4">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl md:text-5xl font-bold mb-4">Ready to see your plan?</h2>
+          <p className="text-xl text-white/70 mb-8">
+            Start with the intake. If anything is missing, we'll ask before generating work.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
-              href="/apply"
-              className="inline-flex items-center gap-2 rounded-xl bg-[#FF6A00] px-6 py-3 text-base font-medium text-black hover:brightness-110 transition"
+              href="/intake"
+              className="inline-flex items-center justify-center gap-2 bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white px-8 py-4 rounded-lg font-semibold transition"
             >
-              Apply for LaunchBase
+              Start the intake
               <ArrowRight className="h-5 w-5" />
             </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <footer className="py-12 px-4 border-t border-white/10">
-        <div className="container max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <Link href="/">
-              <img src="/logo-cropped.png" alt="LaunchBase" className="h-6 w-auto opacity-60 hover:opacity-100 transition cursor-pointer" />
+            <Link 
+              href="/pricing"
+              className="inline-flex items-center justify-center gap-2 border border-white/20 hover:border-white/40 text-white px-8 py-4 rounded-lg font-semibold transition"
+            >
+              See pricing
             </Link>
-            <div className="flex items-center gap-6 text-sm text-gray-500">
-              <Link href="/expand" className="hover:text-white transition">Suite</Link>
-              <a href="/#pricing" className="hover:text-white transition">Pricing</a>
-              <Link href="/trust" className="hover:text-white transition">Trust & Commitments</Link>
-            </div>
-            <p className="text-gray-600 text-sm">
-              © {new Date().getFullYear()} LaunchBase
-            </p>
           </div>
         </div>
-      </footer>
-    </div>
-  );
-}
-
-function LoopStep({
-  icon,
-  title,
-  description,
-  color,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  color: string;
-}) {
-  return (
-    <div className="text-center">
-      <div 
-        className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl"
-        style={{ backgroundColor: `${color}20`, color }}
-      >
-        {icon}
-      </div>
-      <h3 className="font-medium mb-2">{title}</h3>
-      <p className="text-sm text-white/60">{description}</p>
-    </div>
-  );
-}
-
-function DifferenceCard({
-  title,
-  description,
-}: {
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-      <h3 className="font-medium mb-2">{title}</h3>
-      <p className="text-sm text-white/60">{description}</p>
-    </div>
-  );
-}
-
-function ModeCard({
-  title,
-  description,
-  features,
-  recommended,
-}: {
-  title: string;
-  description: string;
-  features: string[];
-  recommended?: boolean;
-}) {
-  return (
-    <div className={`rounded-2xl border p-6 ${
-      recommended 
-        ? "border-[#FF6A00] bg-[#FF6A00]/10" 
-        : "border-white/10 bg-white/5"
-    }`}>
-      <div className="flex items-center gap-2 mb-2">
-        <h3 className="font-medium">{title}</h3>
-        {recommended && (
-          <span className="rounded-full bg-[#FF6A00]/20 text-[#FF6A00] px-2 py-0.5 text-xs">
-            Most popular
-          </span>
-        )}
-      </div>
-      <p className="text-sm text-white/60 mb-4">{description}</p>
-      <ul className="space-y-2">
-        {features.map((feature, i) => (
-          <li key={i} className="flex items-center gap-2 text-sm text-white/80">
-            <Check className="h-4 w-4 text-[#1ED760]" />
-            {feature}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function PricingTier({
-  name,
-  price,
-  frequency,
-  description,
-  recommended,
-}: {
-  name: string;
-  price: number;
-  frequency: string;
-  description: string;
-  recommended?: boolean;
-}) {
-  return (
-    <div className={`rounded-2xl border p-6 text-center ${
-      recommended 
-        ? "border-[#FF6A00] bg-[#FF6A00]/10" 
-        : "border-white/10 bg-white/5"
-    }`}>
-      <div className="flex items-center justify-center gap-2 mb-2">
-        <h3 className="font-medium">{name}</h3>
-        {recommended && (
-          <span className="rounded-full bg-[#FF6A00]/20 text-[#FF6A00] px-2 py-0.5 text-xs">
-            Recommended
-          </span>
-        )}
-      </div>
-      <div className="text-3xl font-semibold mb-1">${price}<span className="text-lg text-white/60">/mo</span></div>
-      <div className="text-sm text-white/60 mb-2">{frequency}</div>
-      <p className="text-xs text-white/50">{description}</p>
+      </section>
     </div>
   );
 }
