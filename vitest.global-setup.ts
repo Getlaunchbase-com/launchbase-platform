@@ -52,26 +52,13 @@ export default async function globalSetup() {
     throw err;
   }
   
-  // Now ensure schema is applied (TiDB-safe, idempotent)
-  console.log("[Vitest Setup] Enforcing database schema...");
+  // Now apply schema using drizzle-kit push (TiDB-safe, creates tables from schema)
+  console.log("[Vitest Setup] Applying schema with drizzle-kit push...");
   try {
-    const schemaConn = await mysql.createConnection(databaseUrl);
-    
-    // Add tier and enginesSelected columns if they don't exist (TiDB-safe)
-    await schemaConn.execute(`
-      ALTER TABLE intakes
-      ADD COLUMN IF NOT EXISTS tier ENUM('standard','growth','premium') NULL
-    `);
-    
-    await schemaConn.execute(`
-      ALTER TABLE intakes
-      ADD COLUMN IF NOT EXISTS enginesSelected JSON NULL
-    `);
-    
-    await schemaConn.end();
-    console.log("[Vitest Setup] Schema enforcement complete ✓");
+    execSync("pnpm -s drizzle-kit push --force", { stdio: "inherit" });
+    console.log("[Vitest Setup] Schema applied successfully ✓");
   } catch (err) {
-    console.error("[Vitest Setup] Failed to enforce schema:", err);
+    console.error("[Vitest Setup] Failed to apply schema:", err);
     throw err;
   }
   
