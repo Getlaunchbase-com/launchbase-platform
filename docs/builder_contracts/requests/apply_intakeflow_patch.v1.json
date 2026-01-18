@@ -1,0 +1,118 @@
+{
+  "version": "builderPatchRequest.v1",
+  "id": "apply-intakeflow-v1",
+  "target": {
+    "repo": "Getlaunchbase-com/launchbase-platform",
+    "branch": "builder/apply-intakeflow-v1",
+    "file": "client/src/pages/Apply.tsx",
+    "route": "/apply"
+  },
+  "intent": "Rewrite Apply.tsx to match IntakeFlowPlanV1 with tier selection + progressive disclosure for Engines",
+  "constraints": {
+    "createFilesAllowed": false,
+    "allowedPaths": [
+      "client/src/pages/Apply.tsx",
+      "client/src/components/marketing/**",
+      "client/src/styles/**"
+    ],
+    "forbiddenPaths": [
+      "server/**",
+      "drizzle/**",
+      "package.json",
+      "client/src/pages/Portal.tsx",
+      "client/src/components/auth/**"
+    ],
+    "noNewDeps": true
+  },
+  "requirements": {
+    "stepOrder": [
+      "language",
+      "tier_selection",
+      "business_basics",
+      "goals",
+      "engines_optional",
+      "review_submit"
+    ],
+    "tierSelection": {
+      "tiers": ["standard", "growth", "premium"],
+      "copy": {
+        "standard": "Polish pass. One focused improvement loop.",
+        "growth": "Conversion pass. Proof, structure, trust, and CTA hierarchy.",
+        "premium": "Full transformation. Design system + strongest hierarchy."
+      }
+    },
+    "engines": [
+      {
+        "id": "inbox",
+        "name": "Inbox Engine",
+        "doesForYou": "Business email, routing, auto-replies, lead follow-up.",
+        "setupFeeUsd": 99,
+        "careFeeMonthlyUsd": 29,
+        "oftenUsedWith": ["Phone Engine", "Ads Engine"],
+        "requires": ["domain access", "DNS update"]
+      },
+      {
+        "id": "phone",
+        "name": "Phone Engine",
+        "doesForYou": "Call forwarding, missed-call capture, SMS follow-up.",
+        "setupFeeUsd": 149,
+        "careFeeMonthlyUsd": 39,
+        "oftenUsedWith": ["Inbox Engine"],
+        "requires": ["call forwarding number"]
+      },
+      {
+        "id": "social",
+        "name": "Social Engine",
+        "doesForYou": "Auto-posting, content loop, weekly schedule.",
+        "setupFeeUsd": 99,
+        "careFeeMonthlyUsd": 49,
+        "oftenUsedWith": ["Inbox Engine"],
+        "requires": ["IG/FB access"]
+      },
+      {
+        "id": "ads",
+        "name": "Ads Engine",
+        "doesForYou": "Google Ads starter, tracking, landing alignment.",
+        "setupFeeUsd": 299,
+        "careFeeMonthlyUsd": 199,
+        "oftenUsedWith": ["Inbox Engine", "Phone Engine"],
+        "requires": ["Google Ads account", "billing access"]
+      },
+      {
+        "id": "books",
+        "name": "Books Engine",
+        "doesForYou": "QuickBooks sync, invoicing triggers, client follow-ups.",
+        "setupFeeUsd": 199,
+        "careFeeMonthlyUsd": 79,
+        "oftenUsedWith": ["Inbox Engine"],
+        "requires": ["QuickBooks OAuth"]
+      }
+    ],
+    "uiRules": {
+      "mobileFirst": true,
+      "progressIndicator": true,
+      "hoverOrTapHelp": true,
+      "onePrimaryCTA": true,
+      "ctaTarget": "/apply"
+    },
+    "truthPolicy": {
+      "noInventedClaims": true,
+      "noFakeTestimonials": true
+    }
+  },
+  "acceptanceGates": {
+    "mustPass": [
+      "Tier selection is step 1 after language",
+      "Engines are optional and shown via progressive disclosure",
+      "Engine cards show Setup + Monthly Care pricing",
+      "Tooltips work on mobile (tap) and desktop (hover)",
+      "No forbidden files changed",
+      "No new dependencies"
+    ]
+  },
+  "deliverables": {
+    "prRequired": true,
+    "prTitle": "Apply intake flow: tier selection + engines (contract-driven)",
+    "prBody": "Implements IntakeFlowPlanV1 in Apply.tsx with tier gating and progressive add-on engines."
+  }
+}
