@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
+import { ENGINES, type EngineId } from "../data/engines";
 import { getLangFromUrlOrStorage, getAudienceFromUrlOrStorage, setLang, setAudience, type Audience } from "@/lib/prefs";
 import { ArrowLeft, Check, Loader2, Globe, Wrench, Heart, Scissors, UtensilsCrossed, Leaf, Briefcase, Dumbbell, Car } from "lucide-react";
 import { Link } from "wouter";
@@ -32,6 +33,7 @@ type BurdenCategory =
 type ApplyForm = {
   audience: "biz" | "org";
   language: Language;
+  tier: "standard" | "growth" | "premium" | null;
   websiteStatus: "none" | "existing" | "systems_only";
   vertical: VerticalCategory | null;
   industry: string;
@@ -43,6 +45,7 @@ type ApplyForm = {
   contactName: string;
   contactEmail: string;
   contactPhone: string;
+  enginesSelected: EngineId[];
   termsAccepted: boolean;
 };
 
@@ -319,12 +322,14 @@ function clamp(n: number, min: number, max: number) {
 
 const steps = [
   { id: "language", label: "language" },
+  { id: "tier_selection", label: "tier" },
   { id: "business", label: "business" },
   { id: "location", label: "location" },
   { id: "burden", label: "burden" },
   { id: "involvement", label: "involvement" },
   { id: "timing", label: "start" },
   { id: "contact", label: "contact" },
+  { id: "engines_optional", label: "engines" },
   { id: "review", label: "review" },
 ] as const;
 
@@ -335,13 +340,28 @@ export default function ApplyPage() {
   const preferredLang = getLangFromUrlOrStorage();
   const preferredAudience = getAudienceFromUrlOrStorage();
 
-  const [stepIndex, setStepIndex] = useState(0);
+  const [stepIndex, setStepIndex] = useState(() => {
+    // Dev-only: restore stepIndex from sessionStorage to survive remounts
+    if (import.meta.env.DEV && typeof window !== 'undefined') {
+      try {
+        const saved = sessionStorage.getItem('launchbase_apply_step_dev');
+        if (saved) {
+          const parsed = parseInt(saved, 10);
+          if (!isNaN(parsed) && parsed >= 0 && parsed < steps.length) {
+            return parsed;
+          }
+        }
+      } catch {}
+    }
+    return 0;
+  });
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const [form, setForm] = useState<ApplyForm>(() => {
     const base: ApplyForm = {
       audience: "biz",
       language: "en",
+      tier: null,
       websiteStatus: "none",
       vertical: null,
       industry: "",
@@ -353,6 +373,7 @@ export default function ApplyPage() {
       contactName: "",
       contactEmail: "",
       contactPhone: "",
+      enginesSelected: [],
       termsAccepted: false,
     };
 
@@ -411,6 +432,15 @@ export default function ApplyPage() {
     } catch {}
   }, [form]);
 
+  // Dev-only: persist stepIndex to survive remounts (hot reload, fast refresh)
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      try {
+        sessionStorage.setItem('launchbase_apply_step_dev', String(stepIndex));
+      } catch {}
+    }
+  }, [stepIndex]);
+
   const submitMutation = trpc.suiteApply.submit.useMutation({
     onSuccess: () => {
       localStorage.removeItem(STORAGE_KEY);
@@ -436,6 +466,8 @@ export default function ApplyPage() {
     switch (currentStep) {
       case "language":
         return !!form.language;
+      case "tier_selection":
+        return !!form.tier;
       case "business":
         return !!form.vertical;
       case "location":
@@ -452,6 +484,8 @@ export default function ApplyPage() {
           form.contactEmail.includes("@") &&
           form.contactPhone.trim().length >= 7
         );
+      case "engines_optional":
+        return true;
       case "review":
         return form.termsAccepted;
       default:
@@ -496,6 +530,8 @@ export default function ApplyPage() {
       // Additional burden data for internal use
       burdens: form.burdens,
       involvement: form.involvement,
+      tier: form.tier,
+      enginesSelected: form.enginesSelected,
     });
   }
 
@@ -567,6 +603,76 @@ export default function ApplyPage() {
                   />
                 )}
 
+                {currentStep === "tier_selection" && (
+                  <div>
+                    <h2 className="text-2xl font-semibold mb-2">Choose your tier</h2>
+                    <p className="text-white/70 mb-6">Select the level of transformation that fits your needs.</p>
+                    <div className="grid gap-4">
+                      {/* Standard Tier */}
+                      <button
+                        onClick={() => setForm(f => ({...f, tier: "standard"}))}
+                        className={`p-5 rounded-lg border text-left transition ${
+                          form.tier === "standard"
+                            ? "border-[#FF6A00] bg-[#FF6A00]/10"
+                            : "border-white/20 hover:border-white/40"
+                        }`}
+                      >
+                        <div className="font-semibold text-xl mb-1">Standard</div>
+                        <div className="text-sm text-white/60 mb-3">Credits included: 1 credit</div>
+                        <div className="text-sm text-white/80 mb-3">Best for: One focused improvement pass.</div>
+                        <div className="text-sm text-white/70 space-y-1">
+                          <div>• Clearer hero + single primary CTA</div>
+                          <div>• Stronger section order + messaging hierarchy</div>
+                          <div>• Mobile cleanup + quick conversion polish</div>
+                        </div>
+                      </button>
+
+                      {/* Growth Tier */}
+                      <button
+                        onClick={() => setForm(f => ({...f, tier: "growth"}))}
+                        className={`p-5 rounded-lg border text-left transition ${
+                          form.tier === "growth"
+                            ? "border-[#FF6A00] bg-[#FF6A00]/10"
+                            : "border-white/20 hover:border-white/40"
+                        }`}
+                      >
+                        <div className="font-semibold text-xl mb-1">Growth</div>
+                        <div className="text-sm text-white/60 mb-3">Credits included: 3 credits</div>
+                        <div className="text-sm text-white/80 mb-3">Best for: Conversion-focused iteration and refinement.</div>
+                        <div className="text-sm text-white/70 space-y-1">
+                          <div>• Proof + trust layer upgrades (reviews, guarantees, clarity)</div>
+                          <div>• CTA placement + funnel tightening</div>
+                          <div>• 3 improvement loops to refine outcomes</div>
+                        </div>
+                      </button>
+
+                      {/* Premium Tier */}
+                      <button
+                        onClick={() => setForm(f => ({...f, tier: "premium"}))}
+                        className={`p-5 rounded-lg border text-left transition ${
+                          form.tier === "premium"
+                            ? "border-[#FF6A00] bg-[#FF6A00]/10"
+                            : "border-white/20 hover:border-white/40"
+                        }`}
+                      >
+                        <div className="font-semibold text-xl mb-1">Premium</div>
+                        <div className="text-sm text-white/60 mb-3">Credits included: 10 credits</div>
+                        <div className="text-sm text-white/80 mb-3">Best for: Full transformation + deeper iteration.</div>
+                        <div className="text-sm text-white/70 space-y-1">
+                          <div>• Strongest design system + page-wide consistency</div>
+                          <div>• Full funnel rebuild + structure improvements</div>
+                          <div>• 10 loops for aggressive refinement</div>
+                        </div>
+                      </button>
+                    </div>
+                    <div className="mt-4 p-3 rounded-lg bg-white/5 border border-white/10">
+                      <div className="text-xs text-white/60">
+                        <strong className="text-white/80">What's a credit?</strong> Each time you hit "Request changes" on your preview, it uses 1 credit.
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {currentStep === "business" && (
                   <StepBusiness
                     websiteStatus={form.websiteStatus}
@@ -622,6 +728,63 @@ export default function ApplyPage() {
                     onChange={(patch) => setForm((f) => ({ ...f, ...patch }))}
                     t={t}
                   />
+                )}
+
+                {currentStep === "engines_optional" && (
+                  <div>
+                    <h2 className="text-2xl font-semibold mb-2">Add engines (optional)</h2>
+                    <p className="text-white/70 mb-6">You can add these now or later.</p>
+                    <div className="space-y-4">
+                      {ENGINES.map(engine => {
+                        const isSelected = form.enginesSelected.includes(engine.id);
+                        const oftenWith = engine.oftenUsedWith?.length ? engine.oftenUsedWith.join(", ") : "—";
+                        return (
+                          <details key={engine.id} className="border border-white/20 rounded-lg p-4">
+                            <summary className="cursor-pointer flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-3">
+                                  <input
+                                    type="checkbox"
+                                    checked={isSelected}
+                                    onChange={(e) => {
+                                      const checked = (e.target as HTMLInputElement).checked;
+                                      setForm((f) => {
+                                        const prev = f.enginesSelected ?? [];
+                                        const next = checked
+                                          ? Array.from(new Set([...prev, engine.id]))
+                                          : prev.filter((id) => id !== engine.id);
+                                        return { ...f, enginesSelected: next };
+                                      });
+                                    }}
+                                    className="w-4 h-4"
+                                  />
+                                  <div>
+                                    <div className="font-semibold">{engine.name}</div>
+                                    <div className="text-sm text-white/60 mt-1">{engine.doesForYou}</div>
+                                  </div>
+                                </div>
+                                <div className="mt-2 text-sm">
+                                  <span className="text-white/80">Setup: ${engine.setupFeeUsd}</span>
+                                  <span className="mx-2 text-white/40">•</span>
+                                  <span className="text-white/80">Monthly Care: ${engine.careFeeMonthlyUsd}/mo</span>
+                                </div>
+                              </div>
+                            </summary>
+                            <div className="mt-4 pt-4 border-t border-white/10 text-sm space-y-2">
+                              <div>
+                                <span className="text-white/60">Requires:</span>
+                                <span className="ml-2">{engine.requires.join(", ")}</span>
+                              </div>
+                              <div>
+                                <span className="text-white/60">Often used with:</span>
+                                <span className="ml-2">{oftenWith}</span>
+                              </div>
+                            </div>
+                          </details>
+                        );
+                      })}
+                    </div>
+                  </div>
                 )}
 
                 {currentStep === "review" && (
@@ -1206,6 +1369,25 @@ function StepReview({
   // Get involvement label
   const involvementLabel = INVOLVEMENT_OPTIONS.find(o => o.id === form.involvement)?.name[language];
 
+  // Get tier label
+  const tierLabels = {
+    standard: "Standard",
+    growth: "Growth",
+    premium: "Premium"
+  };
+  const tierLabel = form.tier ? tierLabels[form.tier] : null;
+
+  // Get selected engines
+  const missing = (form.enginesSelected ?? []).filter(
+    (id) => !ENGINES.some((e) => e.id === id)
+  );
+  if (missing.length) console.warn("Unknown engine ids:", missing);
+  
+  const selectedEnginesList = form.enginesSelected.map(id => {
+    const engine = ENGINES.find(e => e.id === id);
+    return engine;
+  }).filter(Boolean);
+
   return (
     <div>
       <h2 className="text-xl font-semibold">{t.reviewStep.title}</h2>
@@ -1253,23 +1435,38 @@ function StepReview({
           <div className="text-sm text-white/60">{form.contactPhone}</div>
         </div>
 
-        {/* Pricing */}
-        <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-          <div className="text-sm text-white/50 mb-2">
-            {language === "es" ? "Precio de fundador" : language === "pl" ? "Cena założycielska" : "Founder pricing"}
+        {/* Tier */}
+        {tierLabel && (
+          <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+            <div className="text-sm text-white/50 mb-2">
+              {language === "es" ? "Nivel" : language === "pl" ? "Poziom" : "Tier"}
+            </div>
+            <div className="font-medium">{tierLabel}</div>
           </div>
-          <div className="flex justify-between">
-            <span>{t.pricing.monthly}</span>
-            <span className="font-medium text-[#FF6A00]">${FOUNDER_MONTHLY}/mo</span>
+        )}
+
+        {/* Engines */}
+        {selectedEnginesList.length > 0 && (
+          <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+            <div className="text-sm text-white/50 mb-2">
+              {language === "es" ? "Motores" : language === "pl" ? "Silniki" : "Engines"}
+            </div>
+            <div className="space-y-2">
+              {selectedEnginesList.map(engine => (
+                <div key={engine!.id} className="flex justify-between items-start">
+                  <div>
+                    <div className="font-medium">{engine!.name}</div>
+                    <div className="text-xs text-white/50">{engine!.doesForYou}</div>
+                  </div>
+                  <div className="text-right text-sm">
+                    <div className="text-white/60">Setup: ${engine!.setupFeeUsd}</div>
+                    <div className="text-white/60">Care: ${engine!.careFeeMonthlyUsd}/mo</div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="flex justify-between text-sm text-white/60">
-            <span>{t.pricing.setup}</span>
-            <span>${FOUNDER_SETUP}</span>
-          </div>
-          <div className="mt-2 pt-2 border-t border-white/10 text-xs text-white/50">
-            {t.pricing.founderLocked}
-          </div>
-        </div>
+        )}
 
         {/* Terms */}
         <label className="flex items-start gap-3 cursor-pointer">

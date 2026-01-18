@@ -1,22 +1,8 @@
 # LaunchBase TODO
 
-**Status:** ✅ Phase 1 BASELINE TAGGED — Phase 2.4 Complete — Preflight System Complete — Documentation Recovered  
-**Version:** PENDING (Full Checkmark Update)  
-**Last Updated:** January 17, 2026
-
-### 🏆 COMPLETION SUMMARY
-| Phase | Status | Tests |
-|-------|--------|-------|
-| Phase 1: Constitutional Layer | ✅ FROZEN | 26/26 |
-| Phase 1.1: Weekly Report Contract | ✅ COMPLETE | - |
-| Phase 2.2: Policy Registry | ✅ COMPLETE | 11/11 |
-| Phase 2.3: Minimal Swarm Loop | ✅ COMPLETE | 51/51 |
-| Phase 2.4: Deterministic Collapse | ✅ COMPLETE | 59/59 |
-| Preflight System | ✅ CONTRACTS COMPLETE | 33/33 |
-| Credits System | ✅ COMPLETE | 5/5 |
-| Tournament Infrastructure | ✅ v1.2 COMPLETE | - |
-| Homepage Copy | ✅ COMPLETE | - |
-| Documentation Recovery | ✅ COMPLETE | 87 files |
+**Status:** ✅ Phase 1 BASELINE TAGGED — Phase 2 Authorized  
+**Version:** a6a0462d (Stable Baseline v1.0)  
+**Last Updated:** January 13, 2026
 
 > **📖 See WHERE_WE_ARE.md for complete status report and vision**
 
@@ -230,62 +216,74 @@
 **Goal:** Multi-AI collaboration for showroom websites (design + code across AIs)  
 **Mode:** Field General orchestrates specialists. All decisions audited.
 
-### PR 5: Showrooms Repo Structure ✅ COMPLETE
+### PR 5: Showrooms Repo Structure
 
 **Goal:** Source of truth for all 4 showroom websites
 
-**Completed:** January 13, 2026  
-**Repository:** https://github.com/Getlaunchbase-com/launchbase-showrooms
-
 **Tasks:**
-- [x] Create GitHub repo: `launchbase-showrooms`
-- [x] Structure: 4 showrooms (launchbase, site_gpt, site_manus, site_4) with protocols and tools
-- [x] Each showroom includes:
-  - SHOWROOM_BRIEF.md (goals, constraints, tier, success criteria)
-  - SUCCESS_CRITERIA.md (testable quality criteria)
-  - BASELINE_COST.md (token/cost baseline)
-  - CHANGELOG.md (append-only log)
-- [x] Protocols documented:
-  - SWARM_PROTOCOL_V1.md (how Field General + specialists collaborate)
-  - REVIEW_CHECKLIST.md (quality gates before ship)
-- [x] Tools documented:
-  - measure_cost.md (cost measurement methodology)
+- [ ] Create GitHub repo: `launchbase-showrooms`
+- [ ] Structure:
+  ```
+  showrooms/
+    site-1-basic/
+      README.md (goals, constraints, tier, success criteria)
+      launchbase.yaml (scope + guardrails + budgets)
+      src/ (HTML/CSS/JS)
+    site-2-standard/
+      README.md
+      launchbase.yaml
+      src/
+    site-3-premium/
+      README.md
+      launchbase.yaml
+      src/
+    site-4-enterprise/
+      README.md
+      launchbase.yaml
+      src/
+  ```
+- [ ] Each `README.md` includes:
+  - Business goals (conversion, trust, speed)
+  - Design constraints (colors, fonts, layout)
+  - Tier features (Basic: 3 pages, Standard: 5 pages, Premium: 10 pages, Enterprise: unlimited)
+  - "What success looks like" (metrics, user feedback)
+- [ ] Each `launchbase.yaml` includes:
+  - Scope (pages, components, integrations)
+  - Guardrails (no external dependencies, accessibility standards)
+  - Budgets (max file size, max load time)
 
 **Definition of Done:**
-- ✅ Repo created and structured
-- ✅ All 4 sites have brief + success criteria
-- ✅ Protocols documented
-- ✅ Cost measurement methodology defined
+- Repo created and structured
+- All 4 sites have README + launchbase.yaml
+- First site committed (Basic tier)
 
 ---
 
-### PR 6: Swarm Protocol (Field General + Specialists) ✅ COMPLETE
+### PR 6: Swarm Protocol (Field General + Specialists)
 
 **Goal:** Deterministic multi-AI collaboration with audit trail
 
-**Completed:** January 13, 2026
-
 **Tasks:**
-- [x] Create `docs/protocols/SWARM_PROTOCOL_V1.md` with:
+- [ ] Create `docs/SWARM_PROTOCOL.md` with:
   - Roles:
     - **Field General (FG)**: GPT-5.2 — writes task + constraints + acceptance tests
-    - **Specialist A (Craft)**: Proposes solution
-    - **Specialist B (Critic)**: Critiques proposal
+    - **Specialist A**: Proposes solution
+    - **Specialist B**: Critiques proposal
     - **FG**: Collapses to decision + next action
   - Decision trail storage:
     - Use existing `ActionRequest` + `events` pattern
     - New `rawInbound.source = "swarm"`
     - Store: task, proposal, critique, decision, rationale
   - Escalation rules: When FG needs human input
-- [x] Implement swarm orchestration in `server/ai/engine/swarm/`
-- [x] Add swarm tests (59/59 passing across Gates 0-5)
-- [x] Run first swarm workflow with coffee shop benchmark
+- [ ] Implement swarm router in `server/routers/swarm.ts`
+- [ ] Add swarm tests in `server/swarm.test.ts`
+- [ ] Run first swarm workflow: "Design Basic tier homepage"
 
 **Definition of Done:**
-- ✅ Swarm protocol doc committed
-- ✅ Swarm orchestration implemented and tested
-- ✅ First swarm decision trail stored
-- ✅ Coffee shop benchmarks executed ($0.0198, 14.4s)
+- Swarm protocol doc committed
+- Swarm router implemented and tested
+- First swarm decision trail stored in DB
+- First showroom site generated via swarm
 
 ---
 
@@ -512,7 +510,7 @@ We proceed one clean PR at a time.
   - Cost caps & retry rules
   - Swarm depth (# of specialists)
   - Approval rules & escalation thresholds
-- [x] Update runEngine() to load and apply policy
+- [ ] Update runEngine() to load and apply policy
 - [x] Create checkpoint: Phase 2.2 complete
 
 **Definition of Done:**
@@ -534,10 +532,10 @@ We proceed one clean PR at a time.
 - ✅ policyId impacts routing decisions but does not change core idempotency key
 
 **Definition of Done:**
-- [x] Policy registry exists with 3 working policies (launchbase_portal_v1, swarm_premium_v1, ai_butler_consumer_v1)
-- [x] runEngine() applies policy constraints
-- [x] No hard-coded tier logic (all config-driven)
-- [x] Checkpoint saved
+- [ ] Policy registry exists with 2 working policies
+- [ ] runEngine() applies policy constraints
+- [ ] No hard-coded tier logic (all config-driven)
+- [ ] Checkpoint saved
 
 
 ---
@@ -612,37 +610,35 @@ We proceed one clean PR at a time.
 - ✅ policyId impacts routing decisions but does not change core idempotency key
 
 **Definition of Done:**
-- [x] Policies load by policyId from JSON files (via policyBundle.ts)
-- [x] Router driven by required/preferred capabilities from policy
-- [x] Failures are stopReason'd, not thrown
-- [x] 11/11 policy tripwire tests pass
-- [x] Swarm logic implemented (Phase 2.3)
-- [x] Checkpoint saved
+- [ ] Policies load by policyId from JSON files
+- [ ] Router driven by required/preferred capabilities from policy
+- [ ] Failures are stopReason'd, not thrown
+- [ ] 4 policy tripwire tests pass
+- [ ] No swarm logic yet (Phase 2.3)
+- [ ] Checkpoint saved
 
 ---
 
-### Phase 2.3: Minimal Swarm Loop ✅ COMPLETE
+### Phase 2.3: Minimal Swarm Loop (NEXT)
 
 **Goal:** Field General + 2 specialists (1 loop), deterministic collapse, full audit trail
 
-**Completed:** January 13, 2026
-
 **Tasks:**
-- [x] Implement minimal swarm loop (1 round):
+- [ ] Implement minimal swarm loop (1 round):
   - Field General produces plan
   - Specialist A: "find flaws + missing constraints"
   - Specialist B: "cost/UX risk + simplifications"
   - Field General collapses into final decision artifact
-- [x] Store swarm trail in extensions.swarm.internal (internal-only)
-- [x] Store customer-safe artifact in artifacts[] only
-- [x] All non-CORE variability lives in extensions
-- [x] Create checkpoint: Phase 2.3 complete
+- [ ] Store swarm trail in extensions.swarm.internal (internal-only)
+- [ ] Store customer-safe artifact in artifacts[] only
+- [ ] All non-CORE variability lives in extensions
+- [ ] Create checkpoint: Phase 2.3 complete
 
 **Definition of Done:**
-- [x] Swarm loop executes (Field General + 2 specialists)
-- [x] Audit trail split (customer vs internal)
-- [x] Output only via artifacts[] + stopReason
-- [x] Checkpoint saved
+- [ ] Swarm loop executes (Field General + 2 specialists)
+- [ ] Audit trail split (customer vs internal)
+- [ ] Output only via artifacts[] + stopReason
+- [ ] Checkpoint saved
 
 
 ---
@@ -725,79 +721,75 @@ We proceed one clean PR at a time.
 
 ---
 
-### Gate 2: Swarm Tripwire Tests ✅ COMPLETE
+### Gate 2: Swarm Tripwire Tests
 
 **Goal:** Lock in behavior like Phase 1 did
 
 **Required Tests:**
-- [x] Test 1: Artifact order + kinds frozen
+- [ ] Test 1: Artifact order + kinds frozen
   - Swarm policy produces exactly 4 artifacts in order
   - Kinds: swarm.plan, swarm.specialist.craft, swarm.specialist.critic, swarm.collapse
-- [x] Test 2: Idempotency stability
+- [ ] Test 2: Idempotency stability
   - Same CORE → same keyHash
   - Different CORE → different keyHash
-- [x] Test 3: Policy toggles behavior
+- [ ] Test 3: Policy toggles behavior
   - Non-swarm policy never emits swarm artifacts
   - Swarm policy always emits swarm artifacts
-- [x] Test 4: Cost cap enforcement
+- [ ] Test 4: Cost cap enforcement
   - If estimated cost exceeds cap → stopReason: policy_rejected
-- [x] Test 5: No leakage
+- [ ] Test 5: No leakage
   - Artifacts marked customerSafe=true never contain forbidden keys/strings
   - No prompts, no provider payloads, no PII
 
 **Definition of Done:**
-- ✅ 8/8 tripwire tests passing (Gate 2)
-- ✅ Tests use memory/log transport (no AIML spend)
-- ✅ Contracts locked (artifact structure frozen)
+- [ ] 5/5 tripwire tests passing
+- [ ] Tests use memory/log transport (no AIML spend)
+- [ ] Contracts locked (artifact structure frozen)
 
 ---
 
-### Gate 3: Provider Wiring ✅ COMPLETE
+### Gate 3: Provider Wiring
 
 **Goal:** Wire real providers only after contracts frozen
 
-**Completed:** January 13, 2026
-
 **Tasks:**
-- [x] Field General model routing:
+- [ ] Field General model routing:
   - Use model router to select structured output model
   - Apply policy caps (costCapUsd, maxRounds)
-- [x] Specialist model routing:
-  - Use cheaper models for specialists (gpt-4o-mini)
+- [ ] Specialist model routing:
+  - Use cheaper models for specialists
   - Keep provider preferences in policy config only
-- [x] Cost accounting:
+- [ ] Cost accounting:
   - Track inputTokens, outputTokens, estimatedUsd per specialist
   - Aggregate costs across swarm loop
   - Verify cost cap enforcement
-- [x] Real swarm run:
-  - Execute real swarm workflow
+- [ ] Real swarm run:
+  - Execute at least one real swarm workflow
   - Verify swarm.collapse success
   - Verify safe artifacts + cost accounting
 
 **Definition of Done:**
-- ✅ Real swarm runs produce swarm.collapse success
-- ✅ Safe artifacts (no leakage)
-- ✅ Cost accounting accurate (44/44 tests passing)
-- ✅ All tripwire tests passing with real providers
+- [ ] At least one real swarm run produces swarm.collapse success
+- [ ] Safe artifacts (no leakage)
+- [ ] Cost accounting accurate
+- [ ] All tripwire tests still passing with real providers
 
 ---
 
-### Phase 2.3 Checkpoint ✅ COMPLETE
-
-**Completed:** January 13, 2026
+### Phase 2.3 Checkpoint
 
 **Tasks:**
-- [x] Mark all Gate 0-4 tasks complete
-- [x] Run all tests (contract + policy + swarm)
-- [x] Create checkpoint: Phase 2.3 complete
+- [ ] Mark all Gate 0-3 tasks complete
+- [ ] Run all tests (contract + policy + swarm)
+- [ ] Create checkpoint: Phase 2.3 complete
 
 **Definition of Done:**
-- ✅ Server bootstraps policies at startup
-- ✅ Swarm orchestration works (memory + real providers)
-- ✅ 51/51 swarm tripwire tests passing
-- ✅ Cost accounting accurate
-- ✅ No leakage (customerSafe enforced)
-- ✅ Checkpoint saved (version: f71eb964)
+- [ ] Server bootstraps policies at startup
+- [ ] Swarm orchestration works (memory + real providers)
+- [ ] 5/5 swarm tripwire tests passing
+- [ ] Cost accounting accurate
+- [ ] No leakage (customerSafe enforced)
+- [ ] Checkpoint saved
 
 ---
 
@@ -838,31 +830,29 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 
 ---
 
-### Gate 2: Specialist Intelligence ✅ COMPLETE
+### Gate 2: Specialist Intelligence (IN PROGRESS)
 
 **Goal:** Replace memory transport with real provider calls for specialists
 
-**Completed:** January 13, 2026
-
 **Tasks:**
-- [x] Update swarmRunner.ts to call real providers:
+- [ ] Update swarmRunner.ts to call real providers:
   - Craft specialist: real AIML provider call (cheaper model)
   - Critic specialist: real AIML provider call (cheaper model with strict schema)
   - Field General: deterministic orchestration (no provider call yet)
-- [x] Implement cost accounting:
+- [ ] Implement cost accounting:
   - Track tokens and USD per specialist
   - Sum costs across all specialists
   - Enforce policy cost cap (stop if exceeded)
-- [x] Implement failure isolation:
+- [ ] Implement failure isolation:
   - Specialist failure → controlled collapse (no throw)
   - Return stopReason: "provider_failed" with partial artifacts
   - Log failure details in internal metadata
-- [x] Add Gate 2 tripwire tests:
-  - [x] Craft specialist fails → controlled collapse
-  - [x] Critic specialist fails → controlled collapse
-  - [x] Cost cap hit → policy_rejected or cost_cap_exceeded
-  - [x] Schema validation failure → controlled collapse
-  - [x] Successful run → cost accounting accurate
+- [ ] Add Gate 2 tripwire tests:
+  - [ ] Craft specialist fails → controlled collapse
+  - [ ] Critic specialist fails → controlled collapse
+  - [ ] Cost cap hit → policy_rejected or cost_cap_exceeded
+  - [ ] Schema validation failure → controlled collapse
+  - [ ] Successful run → cost accounting accurate
 
 **Hard Invariants:**
 - Artifact order frozen (plan → craft → critic → collapse)
@@ -871,11 +861,11 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - stopReason always present
 
 **Definition of Done:**
-- ✅ 2 specialists call real provider (AIML)
-- ✅ Cost accounting sums across specialist calls
-- ✅ Cost cap stops further calls and collapses safely
-- ✅ Specialist failure → controlled collapse (no throw, no leaked error)
-- ✅ 8/8 tripwire tests passing (Gate 2)
+- [ ] 2 specialists call real provider (AIML)
+- [ ] Cost accounting sums across specialist calls
+- [ ] Cost cap stops further calls and collapses safely
+- [ ] Specialist failure → controlled collapse (no throw, no leaked error)
+- [ ] New tripwire tests passing (5 tests)
 
 
 ---
@@ -1558,62 +1548,62 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [ ] Generate PILOT_SCORECARD.md with decision recommendation
 
 
-## 🔬 BASELINE SOAK TEST (24 runs, Control stack) ✅ INFRASTRUCTURE COMPLETE
+## 🔬 BASELINE SOAK TEST (24 runs, Control stack)
 - [x] Implement TruthPenalty scoring system (v1.0 weights)
 - [x] Build truthPenalty calculator with breakdown tracking
 - [x] Create liar detection triggers (unverifiable/invented/vague/strain)
-- [x] Build Baseline Soak Test runner (4 lanes × 6 reps = 24 runs) - scripts/swarm/runControlSoakTest.ts
-- [x] Generate SOAK_RESULTS.json with truthPenalty per run
-- [x] Generate SOAK_SCORECARD.md with per-lane baselines (docs/reports/)
-- [ ] Generate SOAK_LIAR_LIST.json with penalty triggers (pending execution)
-- [ ] Execute 24-run soak test (pending AIML credits)
+- [ ] Build Baseline Soak Test runner (4 lanes × 6 reps = 24 runs)
+- [ ] Generate SOAK_RESULTS.json with truthPenalty per run
+- [ ] Generate SOAK_SCORECARD.md with per-lane baselines
+- [ ] Generate SOAK_LIAR_LIST.json with penalty triggers
+- [ ] Execute 24-run soak test
 - [ ] Analyze variance and establish truth baseline
 - [ ] Lock Model Weather Control Chart thresholds
-- [x] Save checkpoint with complete tournament infrastructure
+- [ ] Save checkpoint with complete tournament infrastructure
 
 
 ---
 
-## 🏆 TOURNAMENT INFRASTRUCTURE V1.2 ✅ COMPLETE
+## 🏆 TOURNAMENT INFRASTRUCTURE V1.2 (IN PROGRESS)
 
 **Baseline Truth v1.2 Complete - Now implementing audit-proof infrastructure**
 
-### Phase 1: Schema Hash Validation & Integrity Enforcement ✅ COMPLETE
+### Phase 1: Schema Hash Validation & Integrity Enforcement
 - [x] Add `integrity.requireSchemaHashMatch: true` flag to baseline_truth_v1.2.json
 - [x] Build runtime schema hash validator (computes current hashes, compares to baseline)
 - [x] Add drift detection guard: if hash mismatch → mark run as INVALID and stop
-- [x] Test schema hash validation with intentional drift scenario
+- [ ] Test schema hash validation with intentional drift scenario
 
-### Phase 2: Control Soak Test (24 runs) ✅ INFRASTRUCTURE COMPLETE
+### Phase 2: Control Soak Test (24 runs)
 - [x] Create `runControlSoakTest.ts` script (4 lanes × 6 reps = 24 runs)
 - [x] Enforce strict mode: enableLadder=false, allowModelFallback=false
 - [x] Generate outputs: SOAK_RESULTS.json, SOAK_SCORECARD.md
-- [ ] Run Control soak test to collect actual data (pending AIML credits)
+- [ ] Run Control soak test to collect actual data
 - [ ] Update baseline_truth_v1.2.json with tightened variance bands
 - [ ] Add explicit controlBands (lower/upper bounds) for challenger comparisons
 
-### Phase 3: Preflight Check System ✅ COMPLETE
+### Phase 3: Preflight Check System
 - [x] Build preflight validator using registrySnapshot + preflightRecords
 - [x] Block stacks with missingModels.length > 0
 - [x] Auto-apply maxTokensRecommendation for models with known truncation risk
 - [x] Add preflight check to all tournament runners (pilot, soak, full tournament)
 
-### Phase 4: Lane-by-Lane Pilot System ✅ COMPLETE
+### Phase 4: Lane-by-Lane Pilot System
 - [x] Create `runLaneByLanePilot.ts` script
 - [x] Implement 2-lane validation (Web + Marketing × 2 reps = 4 runs)
 - [x] Enforce pilot acceptance criteria: ≥95% pass (4/4), 0 truncations, 0 drift, beat Control by ≥3 OR match with lower truthPenalty
 - [x] Only expand to all 4 lanes after 2-lane pilot passes
 
-### Phase 5: Asset Model Lane Rules ✅ COMPLETE
+### Phase 5: Asset Model Lane Rules
 - [x] Add lane rule in challengerCatalog: asset models (Flux/SD3/Stitch) use separate scoring rubric
 - [x] Create asset model evaluation schema (image quality, artifact validity, not LLM truthPenalty)
 - [x] Prevent asset models from being judged by LLM designer schema (avoid false "liar" labels)
-- [x] Document asset model lane rules in ASSET_MODEL_LANE_RULES.md (docs/specs/)
+- [x] Document asset model lane rules in ASSET_MODEL_LANE_RULES.md
 
-### Phase 6: Documentation & Checkpoint ✅ COMPLETE
-- [x] Document audit-proof tournament infrastructure in TOURNAMENT_INFRASTRUCTURE.md (docs/reports/)
+### Phase 6: Documentation & Checkpoint
+- [x] Document audit-proof tournament infrastructure in TOURNAMENT_INFRASTRUCTURE.md
 - [x] Save checkpoint with all improvements
-- [x] Generate tournament readiness report (docs/reports/TOURNAMENT_READINESS_REPORT.md)
+- [x] Generate tournament readiness report
 
 ---
 
@@ -1631,7 +1621,7 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 
 ---
 
-## 🔬 SCIENTIFIC ENFORCEMENT SYSTEM (7-STEP IMPLEMENTATION) ✅ COMPLETE
+## 🔬 SCIENTIFIC ENFORCEMENT SYSTEM (7-STEP IMPLEMENTATION)
 
 **Making tournaments audit-proof with deterministic invalidation rules**
 
@@ -1665,12 +1655,12 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [x] Enforce: if any missing → invalid
 - [x] Critical: prevents "partial runs" from creating fake averages
 
-### Step 5: 24-Run Control Soak (Real Variance Bands) ✅ INFRASTRUCTURE COMPLETE
+### Step 5: 24-Run Control Soak (Real Variance Bands)
 - [x] Config: 4 lanes × 6 reps = 24 runs, Control only, ladder OFF, allowFallback false, strict artifact enforcement ON
 - [x] Outputs: SOAK_RESULTS.json, SOAK_SCORECARD.md, baseline_truth_v1.3.json (same schema, updated stats)
 - [x] Upgrade per lane: mean score, stddev, percentile bands (P10/P50/P90), truthPenalty distribution, anchorCount stats, failure mode rates
 - [x] Enhanced with VALID/INVALID status tracking and registry snapshot artifacts
-- [ ] Run actual Control soak test to collect real data (pending AIML credits)
+- [ ] Run actual Control soak test to collect real data
 
 ### Step 6: Weather Dashboard MVP
 - [x] Compute 6 KPIs per lane + per stack:
@@ -2172,25 +2162,6 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 
 ---
 
-## 📂 DOCUMENTATION RECOVERY (January 17, 2026) ✅ COMPLETE
-
-**Goal:** Recover and sync all documentation from previous chat session
-
-**Source:** BuildingaWebsiteCreationPlatformforBusinesses(1).zip + https://manus.im/share/m6BgsPsbfKcb8gu2PYogaT
-
-### Files Recovered and Synced to GitHub:
-- [x] 31 swarm/stack configuration JSON files → `configs/`
-- [x] 27 AI prompt templates → `docs/prompts/`
-- [x] 3 protocol documents → `docs/protocols/`
-- [x] 11 report/scorecard documents → `docs/reports/`
-- [x] 7 specification documents → `docs/specs/`
-- [x] 3 showroom documents → `docs/showrooms/`
-- [x] 5 additional documentation files → `docs/`
-
-**Commit:** 8019a52 - "Recover and sync documentation, configs, and prompts from previous session"
-
----
-
 ## 🧪 SMOKE TEST SYSTEM (Phase 2.5)
 
 **Goal:** Universal smoke harness for all LaunchBase systems with auto-diagnosis swarm
@@ -2273,38 +2244,38 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 
 ---
 
-## 🔬 INTAKE PREFLIGHT SWARM (Phase 3.5) ✅ CONTRACTS COMPLETE
+## 🔬 INTAKE PREFLIGHT SWARM (Phase 3.5)
 
 **Goal:** Validate intake completeness BEFORE burning credits or running expensive swarms
 
 ### Ultimate Swarm Smoke Test Workflow
-- [x] **Step 0**: Intake arrives → store as Inquiry/CustomerTruth object
-- [x] **Step 1**: Intake Validator Swarm (pre-flight check)
-  - [x] Validate completeness (tier-aware)
-  - [x] Detect contradictions
-  - [x] Normalize into Field General inputs
-- [x] **Step 2**: Field General makes RunPlan (tier plan, swarms, add-ons, BuilderGate, deliverables)
-- [x] **Step 3**: Add-On Orchestrator outputs AddonPlanV1 (engines enabled, connectors required, risk flags, setup steps)
-- [x] **Step 4**: Smoke Test Swarm (fail fast)
-  - [x] Tier budget check (Standard=1, Growth=3, Premium=10)
-  - [x] Credit check (creditsRemaining initialized correctly)
-  - [x] BuilderGate check (ONLY Premium, only allowed surfaces)
-  - [x] Integration gating (block if missing budget/OAuth)
-  - [x] Scope safety (Builder cannot touch server/auth/db)
-  - [x] Approval policy (requiresApproval always true)
+- [ ] **Step 0**: Intake arrives → store as Inquiry/CustomerTruth object
+- [ ] **Step 1**: Intake Validator Swarm (pre-flight check)
+  - [ ] Validate completeness (tier-aware)
+  - [ ] Detect contradictions
+  - [ ] Normalize into Field General inputs
+- [ ] **Step 2**: Field General makes RunPlan (tier plan, swarms, add-ons, BuilderGate, deliverables)
+- [ ] **Step 3**: Add-On Orchestrator outputs AddonPlanV1 (engines enabled, connectors required, risk flags, setup steps)
+- [ ] **Step 4**: Smoke Test Swarm (fail fast)
+  - [ ] Tier budget check (Standard=1, Growth=3, Premium=10)
+  - [ ] Credit check (creditsRemaining initialized correctly)
+  - [ ] BuilderGate check (ONLY Premium, only allowed surfaces)
+  - [ ] Integration gating (block if missing budget/OAuth)
+  - [ ] Scope safety (Builder cannot touch server/auth/db)
+  - [ ] Approval policy (requiresApproval always true)
 
-### Contracts (Versioned) ✅ COMPLETE
-- [x] `IntakeValidationV1`: Completeness + contradictions + normalized inputs (server/contracts/preflight.ts)
-- [x] `AddonPlanV1`: Engines enabled + connectors required + risk flags + setup steps (server/contracts/preflight.ts)
-- [x] `RepairPacketV1`: status (PASS/NEEDS_INFO/BLOCKED) + missingQuestions + whyItMatters + suggestedTierChange (server/contracts/preflight.ts)
-- [x] `GoNoGoDecisionV1`: Final approval to proceed or block (server/contracts/preflight.ts)
-- [x] `FailurePacketV1`: Crash/error reporting for diagnosis swarm (server/contracts/preflight.ts)
+### Contracts (Versioned)
+- [ ] `IntakeValidationV1`: Completeness + contradictions + normalized inputs
+- [ ] `AddonPlanV1`: Engines enabled + connectors required + risk flags + setup steps
+- [ ] `RepairPacketV1`: status (PASS/NEEDS_INFO/BLOCKED) + missingQuestions + whyItMatters + suggestedTierChange
+- [ ] `GoNoGoDecisionV1`: Final approval to proceed or block
+- [ ] `FailurePacketV1`: Crash/error reporting for diagnosis swarm
 
-### Preflight Runner ✅ COMPLETE
-- [x] `runIntakePreflight(runId | intakeId)` (server/ai/orchestration/runPreflight.ts):
-  - [x] Reads Intake (truth)
-  - [x] Outputs: Validation + AddonPlan + RepairPacket
-  - [x] Writes to DB (or ShipPacket.data.preflight)
+### Preflight Runner
+- [ ] `runIntakePreflight(runId | intakeId)`:
+  - [ ] Reads Intake (truth)
+  - [ ] Outputs: Validation + AddonPlan + RepairPacket
+  - [ ] Writes to DB (or ShipPacket.data.preflight)
 
 ### Gating Behavior
 - [ ] If `RepairPacket.status != PASS`:
@@ -2320,10 +2291,10 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [ ] `portal.requestChanges(runId)` → consumes 1 credit, enqueues loop (existing)
 - [ ] `portal.approve(runId)` → no credits (existing)
 
-### Smoke Test Harness ✅ COMPLETE
-- [x] `pnpm smoke:preflight` - Test preflight validation logic (scripts/smoke/runSmokePreflight.mjs)
-- [x] `pnpm smoke:e2e:intake` - End-to-end intake → preflight → RunPlan flow (scripts/smoke/runSmokeIntakeE2E.mjs)
-- [x] Fail fast with FailurePacket written to disk + DB
+### Smoke Test Harness
+- [ ] `pnpm smoke:preflight` - Test preflight validation logic
+- [ ] `pnpm smoke:e2e:intake` - End-to-end intake → preflight → RunPlan flow
+- [ ] Fail fast with FailurePacket written to disk + DB
 
 ### Swarm Roles (Preflight)
 - [ ] **Field General (GPT-5.2)**: Creates RunPlan + compliance rules
@@ -2400,3 +2371,107 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - E2E smoke test passes
 - Grading rubric enforced (hard + soft gates)
 
+
+
+---
+
+## 🎨 PHASE 3: PREMIUM TIER + AUTO-SWARM FIX ENGINE
+
+**Goal:** Build Premium pages (Pricing, How It Works, Examples, Portal) using PagePlan contracts, then implement Auto-Swarm Fix Engine for self-healing failures
+
+### Phase 3.1: Contracts & Infrastructure
+- [x] Create PagePlanV1 contract (server/contracts/pagePlan.ts)
+- [x] Create FailurePacketV1 contract (server/contracts/failurePacket.ts)
+- [x] Create RepairPacketV1 contract (server/contracts/repairPacket.ts)
+- [x] Create ScoreCardV1 contract (server/contracts/scoreCard.ts)
+- [x] Create failurePacket utility (server/utils/failurePacket.ts)
+
+### Phase 3.2: Premium PagePlans
+- [x] Create docs/premium_pageplans/ directory
+- [x] Write pricing.pageplan.json (tier comparison, credits, add-ons, FAQ)
+- [x] Write how-it-works.pageplan.json (intake → plan → preview → approve → deploy)
+- [x] Write examples.pageplan.json (before/after, tier examples)
+- [x] Write portal.pageplan.json (preview, approve, request changes, buy credits)
+
+### Phase 3.3: Premium Page Implementation
+- [ ] Implement Pricing page from PagePlan
+- [ ] Implement How It Works page from PagePlan
+- [ ] Implement Examples/Showroom page from PagePlan
+- [ ] Implement Portal pages from PagePlan
+
+### Phase 3.4: Critic Pressure-Test Loop
+- [ ] Create pressure-test runner (scripts/critic/runPressureTest.ts)
+- [ ] Integrate Sonnet 4.0 critic for page validation
+- [ ] Implement patch plan generation from critic issues
+- [ ] Add acceptance criteria gates (mustPass, shouldPass)
+
+### Phase 3.5: Auto-Swarm Fix Engine
+- [x] Create runRepairSwarm orchestrator (server/ai/orchestration/runRepairSwarm.ts)
+- [x] Create swarm fix CLI runner (scripts/swarm/runSwarmFix.mjs)
+- [x] Add pnpm swarm:fix command to package.json
+- [x] Integrate FailurePacket hooks into smoke tests
+- [ ] Integrate FailurePacket hooks into executeRunPlan
+- [ ] Integrate FailurePacket hooks into builder gate failures
+
+### Phase 3.6: Testing & Delivery
+- [ ] Test full Premium page flow
+- [ ] Test Critic pressure-test loop
+- [ ] Test Auto-Swarm Fix Engine with real failures
+- [ ] Save checkpoint with all Premium features
+- [ ] Push to GitHub
+
+
+## 🎯 PREMIUM INTAKE FLOW (ACTIVE)
+
+**Goal:** Execute IntakeFlowPlanV1 using Builder to generate tier selection + add-ons in Apply.tsx
+
+**Contract:** `docs/contracts/IntakeFlowPlanV1.json`
+
+**Tasks:**
+- [ ] Execute IntakeFlowPlanV1 with Builder to generate Apply.tsx
+- [ ] Pressure-test intake flow with acceptance gates:
+  - Tier selection visible and functional
+  - Add-on Engines progressive disclosure
+  - Mobile-first (no horizontal scroll, 44px+ touch targets)
+  - Setup/Care pricing disclosure
+  - "Often used with" tap-to-expand
+- [ ] Apply swarm-fix if gates fail
+- [ ] Save checkpoint when gates pass
+
+**Definition of Done:**
+- Apply.tsx rebuilt with tier selection
+- All pressure gates passed
+- Intake flow matches IntakeFlowPlanV1 contract
+- "LaunchBase on LaunchBase" test complete
+
+
+## 🐛 REVIEW STEP DEBUG (Apply.tsx)
+- [x] Add debug <pre> in engines_optional step showing form.enginesSelected
+- [x] Add debug <pre> in review step showing form.enginesSelected
+- [x] Fix checkbox handler: use event.checked instead of derived isSelected (eliminate batching race)
+- [x] Add unknown engine ID warning in Review step (console.warn for missing IDs)
+- [x] Add dev-only sessionStorage persistence for form + step (survive remounts during dev)
+- [x] Create E2E smoke test: tier=premium + engines=[inbox,ads] → verify DB + Review renders both
+- [x] Remove debug <pre> blocks after fixes validated
+
+## 💰 TIER PRICING DISPLAY (Apply.tsx)
+- [x] Add tier pricing to tier selection cards (monthly/per-build + credits + best for + what you get)
+- [x] Ensure mobile visibility (pricing + credits visible without expanding)
+- [x] Single primary CTA ("Continue")
+- [x] Truth-safe copy only (no invented claims)
+- [x] Mirror tier definitions from Pricing page for consistency
+
+## 🔄 GITHUB SYNC
+- [x] Sync Apply.tsx changes to launchbase-platform (committed locally, will sync via Management UI GitHub export)
+- [x] Sync client/src/data/engines.ts (already in checkpoint 03708365)
+- [x] Sync drizzle schema + migrations (already in checkpoint 03708365)
+- [x] Sync smoke test + package.json script (already in checkpoint 03708365)
+- [x] Add/update docs/contracts/IntakeFlowPlanV1.md with smoke:intake requirement
+
+## 📄 HOW IT WORKS PAGE UPDATE
+- [ ] Add "Choose a tier + optional engines" section
+- [ ] Visual flow: tiers → engines → what happens next
+- [ ] Keep it literal and visual (no hype)
+
+## 🧪 CI INTEGRATION
+- [ ] Add smoke:intake to CI pipeline alongside other smoke tests
