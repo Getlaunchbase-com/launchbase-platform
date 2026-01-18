@@ -37,7 +37,7 @@ export type RepairSwarmResult = {
  * Check if failure is a permission/platform blocker
  */
 function isPermissionBlocker(pkt: FailurePacketV1): boolean {
-  const msg = pkt.failure.errorMessage.toLowerCase();
+  const msg = pkt.error?.message?.toLowerCase() || "";
   return (
     msg.includes("workflows permission") ||
     msg.includes("insufficient permissions") ||
