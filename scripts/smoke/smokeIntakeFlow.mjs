@@ -12,7 +12,7 @@
  */
 
 import { getDb } from '../../server/db.ts';
-import { intakes } from '../../drizzle/schema';
+import { intakes } from '../../drizzle/schema.ts';
 import { desc, eq } from 'drizzle-orm';
 
 const TEST_EMAIL = `smoke-test-${Date.now()}@example.com`;
@@ -33,17 +33,47 @@ async function main() {
   try {
     // Step 1: Insert test intake
     console.log('Step 1: Inserting test intake...');
-    await db.insert(intakes).values({
-      businessName: 'Smoke Test Business',
-      contactName: 'Smoke Test User',
-      email: TEST_EMAIL,
-      phone: '555-0123',
-      audience: 'biz',
-      websiteStatus: 'none',
-      vertical: 'trades',
-      tier: 'premium',
-      enginesSelected: ['inbox', 'ads'],
-    });
+    
+    try {
+      await db.insert(intakes).values({
+        businessName: 'Smoke Test Business',
+        contactName: 'Smoke Test User',
+        email: TEST_EMAIL,
+        phone: '555-0123',
+        audience: 'biz',
+        websiteStatus: 'none',
+        vertical: 'trades',
+        tier: 'premium',
+        enginesSelected: ['inbox', 'ads'],
+        
+        // 🔧 Explicit values to avoid DB default issues in CI
+        language: 'en',
+        tenant: 'launchbase',
+        services: [],
+        serviceArea: '',
+        primaryCTA: '',
+        bookingLink: '',
+        tagline: '',
+        brandColors: [],
+        rawPayload: {},
+        status: 'new',
+      });
+    } catch (insertError) {
+      console.error('\n=== INSERT FAILED: RAW ERROR ===');
+      console.error(insertError);
+      console.error('\n=== INSERT FAILED: e.message ===');
+      console.error(insertError?.message);
+      console.error('\n=== INSERT FAILED: mysql fields ===');
+      console.error({
+        code: insertError?.code,
+        errno: insertError?.errno,
+        sqlState: insertError?.sqlState,
+        sqlMessage: insertError?.sqlMessage,
+        causeMessage: insertError?.cause?.message,
+        causeSqlMessage: insertError?.cause?.sqlMessage,
+      });
+      throw insertError;
+    }
 
     console.log(`✅ Inserted test intake for ${TEST_EMAIL}`);
 
