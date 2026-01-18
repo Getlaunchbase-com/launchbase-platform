@@ -29,7 +29,8 @@ jobs:
           cache: "pnpm"
 
       - name: Install deps
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install
+
 
       - name: Smoke preflight
         run: pnpm smoke:preflight
