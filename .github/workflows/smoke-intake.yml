@@ -15,6 +15,9 @@ concurrency:
 
 jobs:
   smoke-intake:
+    # Fork PRs can't access secrets like DATABASE_URL
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -35,6 +38,11 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
+
+      - name: Apply DB schema
+        run: pnpm db:push
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Run intake smoke test
         run: pnpm smoke:intake
