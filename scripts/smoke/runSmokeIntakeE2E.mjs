@@ -17,6 +17,12 @@ const TIERS = [
 async function testE2EIntake() {
   console.log('=== SMOKE TEST: E2E Intake Flow ===\n');
   
+  if (!process.env.DATABASE_URL) {
+    console.log('⚠️  DATABASE_URL not set - skipping E2E intake test');
+    console.log('✅ SMOKE TEST SKIPPED (no database configured)');
+    return;
+  }
+  
   const db = await getDb();
   if (!db) throw new Error('Database not available');
   
