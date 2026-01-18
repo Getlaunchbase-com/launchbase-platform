@@ -2,20 +2,25 @@
  * AIML Specialist Adapter
  * 
  * Single-responsibility module for calling AIML provider for specialist roles.
+ * Loads prompts from promptPacks directory based on role name.
  * 
  * Hard rules:
  * - Never store prompts in artifacts
  * - On error: artifact payload is only { ok: false, stopReason, fingerprint }
- * - Minimal JSON schemas (draft/notes for craft, issues/verdict for critic)
  */
 
 import { completeJson } from "../../providers/providerFactory";
 import type { ArtifactV1 } from "../types";
+import * as fs from "fs";
+import * as path from "path";
+import { fileURLToPath } from "url";
+
+// ES module __dirname equivalent
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * Specialist stopReasons (frozen list)
- * 
- * These are internal-only. Swarm runner may convert to customer-safe stopReasons.
  */
 export type SpecialistStopReason =
   | "ok"
@@ -41,7 +46,7 @@ export interface SpecialistRoleConfig {
  * Specialist call input
  */
 export interface SpecialistInput {
-  role: "craft" | "critic";
+  role: string; // Now accepts any role name
   trace: {
     jobId: string;
     runId: string;
@@ -69,32 +74,60 @@ export interface SpecialistOutput {
   stopReason: SpecialistStopReason;
 }
 
-/**
- * Craft specialist JSON schema (minimal)
- */
-const CRAFT_SCHEMA = {
-  type: "object",
-  properties: {
-    draft: { type: "string" },
-    notes: { type: "array", items: { type: "string" } },
-  },
-  required: ["draft", "notes"],
-  additionalProperties: false,
-};
+// Cache for loaded prompts
+const promptCache = new Map<string, string>();
 
 /**
- * Critic specialist JSON schema (minimal)
+ * Load prompt from promptPacks directory
+ * Tries multiple naming conventions: role.md, role_fast.md, etc.
  */
-const CRITIC_SCHEMA = {
-  type: "object",
-  properties: {
-    issues: { type: "array", items: { type: "string" } },
-    verdict: { type: "string", enum: ["pass", "revise"] },
-    suggestions: { type: "array", items: { type: "string" } },
-  },
-  required: ["issues", "verdict", "suggestions"],
-  additionalProperties: false,
-};
+function loadPrompt(role: string): string {
+  // Check cache first
+  if (promptCache.has(role)) {
+    return promptCache.get(role)!;
+  }
+
+  const promptDir = path.join(__dirname, "promptPacks");
+  
+  // Try different file naming patterns
+  const patterns = [
+    `${role}.md`,
+    `${role}_fast.md`,
+    role.replace(/_fast$/, ".md"),
+    role.replace(/_ruthless$/, ".md"),
+  ];
+
+  for (const pattern of patterns) {
+    const filePath = path.join(promptDir, pattern);
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, "utf-8");
+      promptCache.set(role, content);
+      return content;
+    }
+  }
+
+  // Fallback prompts for known roles
+  const fallbacks: Record<string, string> = {
+    craft: "You are a craft specialist. Generate high-quality proposals based on the task and inputs. Return JSON with 'draft' (string) and 'notes' (array of strings).",
+    critic: "You are a critic specialist. Find flaws, edge cases, and regressions in proposals. Return JSON with 'issues' (array of strings), 'verdict' ('pass' or 'revise'), and 'suggestions' (array of strings).",
+    change_selector_fast: `You are a change selector. Given a list of proposed changes, select the best 8 that maximize impact.
+Return JSON: { "selectedChanges": [...8 items from input...], "rationale": "why these 8" }
+Rules:
+- Select EXACTLY 8 changes
+- Prioritize by impact on conversion and clarity
+- Return raw JSON only, no markdown`,
+  };
+
+  if (fallbacks[role]) {
+    promptCache.set(role, fallbacks[role]);
+    return fallbacks[role];
+  }
+
+  // Generic fallback
+  const generic = `You are a ${role} specialist. Analyze the input and provide your expert response in JSON format.`;
+  promptCache.set(role, generic);
+  return generic;
+}
 
 /**
  * Call AIML provider for specialist role
@@ -107,19 +140,13 @@ export async function callSpecialistAIML(
 ): Promise<SpecialistOutput> {
   const { role, trace, input: specInput, roleConfig } = input;
 
-  // Build system prompt based on role
-  const systemPrompt =
-    role === "craft"
-      ? "You are a craft specialist. Generate high-quality proposals based on the task and inputs. Return JSON with 'draft' (string) and 'notes' (array of strings)."
-      : "You are a critic specialist. Find flaws, edge cases, and regressions in proposals. Return JSON with 'issues' (array of strings), 'verdict' ('pass' or 'revise'), and 'suggestions' (array of strings).";
+  // Load system prompt from promptPacks
+  const systemPrompt = loadPrompt(role);
 
   // Build user prompt
   const userPrompt = `Plan: ${JSON.stringify(specInput.plan, null, 2)}${
     specInput.context ? `\n\nContext: ${JSON.stringify(specInput.context, null, 2)}` : ""
   }\n\nProvide your ${role} response in JSON format.`;
-
-  // Determine expected schema
-  const expectedSchema = role === "craft" ? CRAFT_SCHEMA : CRITIC_SCHEMA;
 
   try {
     // Call provider with timeout
@@ -148,78 +175,51 @@ export async function callSpecialistAIML(
       ),
     ]);
 
-    // Check cost cap
-    if (roleConfig.costCapUsd && result.cost.estimatedUsd > roleConfig.costCapUsd) {
+    // Handle null result
+    if (!result) {
       return {
         artifact: {
           kind: `swarm.specialist.${role}`,
           payload: {
             ok: false,
-            stopReason: "cost_cap_exceeded",
-            fingerprint: `${trace.jobId}:${role}:cost_cap`,
+            stopReason: "provider_failed",
+            fingerprint: `${trace.jobId}:${role}:null_result`,
           },
           customerSafe: false,
         },
         meta: {
-          model: result.meta.model,
-          requestId: result.meta.requestId,
-          latencyMs: result.latencyMs,
-          inputTokens: result.usage.inputTokens,
-          outputTokens: result.usage.outputTokens,
-          costUsd: result.cost.estimatedUsd,
+          model: roleConfig.model,
+          requestId: "none",
+          latencyMs: 0,
+          inputTokens: 0,
+          outputTokens: 0,
+          costUsd: 0,
         },
-        stopReason: "cost_cap_exceeded",
+        stopReason: "provider_failed",
       };
     }
 
-    // Validate JSON against schema (simple check, not full Ajv)
-    if (!result.json || typeof result.json !== "object") {
+    // Handle JSON parse failure
+    if (!result.json) {
       return {
         artifact: {
           kind: `swarm.specialist.${role}`,
           payload: {
             ok: false,
             stopReason: "json_parse_failed",
-            fingerprint: `${trace.jobId}:${role}:json_parse`,
+            fingerprint: `${trace.jobId}:${role}:json_parse_failed`,
           },
           customerSafe: false,
         },
         meta: {
-          model: result.meta.model,
-          requestId: result.meta.requestId,
-          latencyMs: result.latencyMs,
-          inputTokens: result.usage.inputTokens,
-          outputTokens: result.usage.outputTokens,
-          costUsd: result.cost.estimatedUsd,
+          model: result.meta?.model || roleConfig.model,
+          requestId: result.meta?.requestId || "unknown",
+          latencyMs: result.latencyMs || 0,
+          inputTokens: result.usage?.inputTokens || 0,
+          outputTokens: result.usage?.outputTokens || 0,
+          costUsd: result.cost?.estimatedUsd || 0,
         },
         stopReason: "json_parse_failed",
-      };
-    }
-
-    // Basic schema validation
-    const requiredFields = role === "craft" ? ["draft", "notes"] : ["issues", "verdict", "suggestions"];
-    const missingFields = requiredFields.filter((field) => !(field in result.json));
-    if (missingFields.length > 0) {
-      return {
-        artifact: {
-          kind: `swarm.specialist.${role}`,
-          payload: {
-            ok: false,
-            stopReason: "ajv_failed",
-            fingerprint: `${trace.jobId}:${role}:ajv`,
-            missingFields,
-          },
-          customerSafe: false,
-        },
-        meta: {
-          model: result.meta.model,
-          requestId: result.meta.requestId,
-          latencyMs: result.latencyMs,
-          inputTokens: result.usage.inputTokens,
-          outputTokens: result.usage.outputTokens,
-          costUsd: result.cost.estimatedUsd,
-        },
-        stopReason: "ajv_failed",
       };
     }
 
@@ -228,7 +228,7 @@ export async function callSpecialistAIML(
       artifact: {
         kind: `swarm.specialist.${role}`,
         payload: result.json,
-        customerSafe: false, // Always false for specialists
+        customerSafe: false,
       },
       meta: {
         model: result.meta.model,
@@ -275,7 +275,6 @@ export async function callSpecialistAIML(
   }
 }
 
-
 /**
  * Call specialist with automatic retry on transient failures
  * 
@@ -283,14 +282,15 @@ export async function callSpecialistAIML(
  * Does NOT retry on: ok, json_parse_failed, ajv_failed, cost_cap_exceeded
  * 
  * @param input - Specialist input
- * @param maxAttempts - Maximum retry attempts (default: 3)
+ * @param enableLadder - Whether to enable retry ladder (default: true). If false, only 1 attempt.
  * @returns SpecialistOutput from last attempt
  */
 export async function callSpecialistWithRetry(
   input: SpecialistInput,
-  maxAttempts: number = 3
+  enableLadder: boolean = true
 ): Promise<SpecialistOutput> {
   const retryableReasons: SpecialistStopReason[] = ["timeout", "router_failed", "provider_failed"];
+  const maxAttempts = enableLadder ? 3 : 1;
   
   let lastOutput: SpecialistOutput | null = null;
   

@@ -493,8 +493,15 @@ function buildCompleteJsonResult(
 ): CompleteJsonResult {
   let json: any | null = null;
 
+  // Strip markdown code blocks if present (common with Llama models)
+  let textToParse = response.rawText;
+  const mdJsonMatch = textToParse.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (mdJsonMatch) {
+    textToParse = mdJsonMatch[1].trim();
+  }
+
   try {
-    json = JSON.parse(response.rawText);
+    json = JSON.parse(textToParse);
   } catch (err) {
     // NEVER log rawText preview. Log only a hash + length.
     console.warn("[AI] Failed to parse JSON response", {
