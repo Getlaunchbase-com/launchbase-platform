@@ -1,0 +1,801 @@
+{
+  "version": "intakeFlowPlan.v1",
+  "id": "apply_intakeflow_getlaunchbase_com_1737167263000",
+  "createdAtIso": "2026-01-18T01:55:00.000Z",
+  "target": {
+    "route": "/apply",
+    "file": "client/src/pages/Apply.tsx",
+    "tiered": true
+  },
+  "builderGate": {
+    "enabled": true,
+    "allowedPaths": [
+      "client/src/pages/Apply.tsx",
+      "client/src/components/marketing/**",
+      "client/src/styles/**"
+    ],
+    "forbiddenPaths": [
+      "server/**",
+      "drizzle/**",
+      "package.json",
+      "client/src/pages/Portal.tsx",
+      "client/src/components/auth/**"
+    ],
+    "createFilesAllowed": [
+      "client/src/components/marketing/intake/**"
+    ],
+    "allowedComponents": [
+      "Button",
+      "Card",
+      "Section",
+      "Container",
+      "Heading",
+      "Text",
+      "Badge",
+      "Divider",
+      "Input",
+      "Textarea",
+      "Select",
+      "Checkbox",
+      "RadioGroup",
+      "Progress"
+    ]
+  },
+  "designSystem": {
+    "contractPath": "docs/premium_design_system_patchlist.md",
+    "rules": {
+      "singleH1": true,
+      "buttonMinHeightPx": 44,
+      "cardRadiusPx": 16,
+      "sectionPadding": "py-16 desktop / py-12 mobile",
+      "cardPadding": "p-6 desktop / p-4 mobile"
+    }
+  },
+  "truthPolicy": {
+    "noInventedClaims": true,
+    "pricingMustMatchTierDefinitions": true,
+    "addonsMustBeDescribedAsSetupAndCare": true,
+    "noOAuthClaimsWithoutConnectionStep": true,
+    "noGuaranteesLanguage": true
+  },
+  "uxPrinciples": {
+    "mobileFirst": true,
+    "progressAlwaysVisible": true,
+    "inlineValidation": true,
+    "saveAndResume": {
+      "enabled": true,
+      "storage": "localStorage",
+      "key": "launchbase.apply.v1.draft",
+      "resumeBanner": true
+    },
+    "onePrimaryCTA": true,
+    "secondaryCTAAllowed": [
+      "Back",
+      "Save and exit",
+      "Skip (only on optional steps)"
+    ],
+    "interaction": {
+      "hoverMustHaveTapEquivalent": true,
+      "disclosurePattern": "tap-to-expand"
+    }
+  },
+  "dataModel": {
+    "intakeVersion": "intake.v1",
+    "fields": {
+      "language": "string",
+      "tier": "standard|growth|premium",
+      "businessName": "string",
+      "industry": "string",
+      "serviceArea": "string",
+      "websiteUrl": "string|null",
+      "primaryGoal": "string",
+      "services": "string[]",
+      "brand": {
+        "nameToUse": "string|null",
+        "colors": "string[]|null",
+        "styleWords": "string[]|null",
+        "logoUrl": "string|null"
+      },
+      "contact": {
+        "fullName": "string",
+        "email": "string",
+        "phone": "string|null"
+      },
+      "addons": {
+        "enginesSelected": "string[]",
+        "engines": {
+          "inbox": {
+            "selected": "boolean",
+            "requirements": {
+              "hasDomain": "boolean|null",
+              "domainName": "string|null",
+              "preferredInboxProvider": "google|microsoft|other|null"
+            },
+            "setupAndCare": {
+              "setupFeeUsd": "number|null",
+              "careMonthlyUsd": "number|null"
+            }
+          },
+          "phone": {
+            "selected": "boolean",
+            "requirements": {
+              "currentPhoneProvider": "string|null",
+              "needsNewNumber": "boolean|null",
+              "callForwardingDesired": "boolean|null"
+            },
+            "setupAndCare": {
+              "setupFeeUsd": "number|null",
+              "careMonthlyUsd": "number|null"
+            }
+          },
+          "social": {
+            "selected": "boolean",
+            "requirements": {
+              "platforms": "string[]|null",
+              "hasAssets": "boolean|null",
+              "postingFrequency": "weekly|3x_weekly|daily|null"
+            },
+            "setupAndCare": {
+              "setupFeeUsd": "number|null",
+              "careMonthlyUsd": "number|null"
+            }
+          },
+          "ads": {
+            "selected": "boolean",
+            "requirements": {
+              "hasGoogleAdsAccount": "boolean|null",
+              "monthlyAdSpendUsd": "number|null",
+              "targetServiceOrOffer": "string|null"
+            },
+            "setupAndCare": {
+              "setupFeeUsd": "number|null",
+              "careMonthlyUsd": "number|null"
+            }
+          },
+          "books": {
+            "selected": "boolean",
+            "requirements": {
+              "usesQuickbooks": "boolean|null",
+              "quickbooksType": "online|desktop|none|null",
+              "needsInvoicingAutomation": "boolean|null"
+            },
+            "setupAndCare": {
+              "setupFeeUsd": "number|null",
+              "careMonthlyUsd": "number|null"
+            }
+          }
+        }
+      },
+      "connections": {
+        "domainAccess": "none|have_domain|need_domain",
+        "builderAccess": "none|github_connected",
+        "oauth": {
+          "googleAds": "not_now|connect_now",
+          "quickbooks": "not_now|connect_now"
+        }
+      }
+    }
+  },
+  "steps": [
+    {
+      "id": "language",
+      "title": "Language",
+      "subtitle": "Choose your preferred language.",
+      "required": true,
+      "fields": [
+        {
+          "key": "language",
+          "type": "radio",
+          "label": "Select language",
+          "options": [
+            { "value": "en", "label": "English" },
+            { "value": "es", "label": "Español" }
+          ],
+          "defaultValue": "en",
+          "validation": { "required": true }
+        }
+      ],
+      "primaryCTA": { "label": "Continue", "action": "next" },
+      "secondaryCTA": [{ "label": "Save and exit", "action": "save_exit" }]
+    },
+    {
+      "id": "tier",
+      "title": "Choose your tier",
+      "subtitle": "Pick the outcome you want. You can upgrade later.",
+      "required": true,
+      "ui": { "layout": "tierCards", "mobileStack": true },
+      "fields": [
+        {
+          "key": "tier",
+          "type": "radioCards",
+          "label": "Tier",
+          "options": [
+            {
+              "value": "standard",
+              "label": "Standard",
+              "tag": "Fast launch",
+              "bullets": [
+                "Marketing site build",
+                "Core pages + conversion basics",
+                "1 revision credit included"
+              ],
+              "truthNotes": ["No integrations included by default."]
+            },
+            {
+              "value": "growth",
+              "label": "Growth",
+              "tag": "Optimize conversion",
+              "bullets": [
+                "Everything in Standard",
+                "Conversion-focused structure + copy",
+                "3 revision credits included"
+              ],
+              "truthNotes": ["Add-ons recommended for automation."]
+            },
+            {
+              "value": "premium",
+              "label": "Premium",
+              "tag": "Full system",
+              "bullets": [
+                "Everything in Growth",
+                "Builder-enabled UI upgrades (safe surfaces only)",
+                "10 revision credits included"
+              ],
+              "truthNotes": ["Integrations can be planned now; connecting may require follow-up."]
+            }
+          ],
+          "validation": { "required": true }
+        }
+      ],
+      "primaryCTA": { "label": "Continue", "action": "next" },
+      "secondaryCTA": [{ "label": "Back", "action": "back" }]
+    },
+    {
+      "id": "basics",
+      "title": "Business basics",
+      "subtitle": "Tell us what you do and where you serve customers.",
+      "required": true,
+      "fields": [
+        {
+          "key": "businessName",
+          "type": "text",
+          "label": "Business name",
+          "placeholder": "e.g., Acme Plumbing",
+          "validation": { "required": true, "minLength": 2, "maxLength": 80 }
+        },
+        {
+          "key": "industry",
+          "type": "select",
+          "label": "Industry",
+          "options": [
+            { "value": "plumbing", "label": "Plumbing" },
+            { "value": "hvac", "label": "HVAC" },
+            { "value": "roofing", "label": "Roofing" },
+            { "value": "legal", "label": "Legal" },
+            { "value": "saas", "label": "SaaS" },
+            { "value": "other", "label": "Other" }
+          ],
+          "validation": { "required": true }
+        },
+        {
+          "key": "serviceArea",
+          "type": "text",
+          "label": "Primary service area",
+          "placeholder": "City / region",
+          "validation": { "required": true, "minLength": 2, "maxLength": 120 }
+        },
+        {
+          "key": "services",
+          "type": "multiSelect",
+          "label": "Top services",
+          "helpText": "Pick 2–6. This guides your page structure and calls-to-action.",
+          "options": [
+            { "value": "web_design", "label": "Web design" },
+            { "value": "seo", "label": "SEO" },
+            { "value": "lead_gen", "label": "Lead generation" },
+            { "value": "branding", "label": "Branding" },
+            { "value": "other", "label": "Other" }
+          ],
+          "validation": { "required": true, "minItems": 1, "maxItems": 8 }
+        },
+        {
+          "key": "websiteUrl",
+          "type": "text",
+          "label": "Current website (optional)",
+          "placeholder": "https://",
+          "validation": { "required": false, "pattern": "^(https?:\\/\\/)?[^\\s]+\\.[^\\s]+$" }
+        },
+        {
+          "key": "primaryGoal",
+          "type": "textarea",
+          "label": "Primary goal",
+          "placeholder": "What should this site achieve in the first 30 days?",
+          "validation": { "required": true, "minLength": 10, "maxLength": 400 }
+        }
+      ],
+      "primaryCTA": { "label": "Continue", "action": "next" },
+      "secondaryCTA": [
+        { "label": "Back", "action": "back" },
+        { "label": "Save and exit", "action": "save_exit" }
+      ]
+    },
+    {
+      "id": "brand",
+      "title": "Brand inputs",
+      "subtitle": "Optional—but helpful for matching your style.",
+      "required": false,
+      "fields": [
+        {
+          "key": "brand.nameToUse",
+          "type": "text",
+          "label": "Brand name to display (optional)",
+          "placeholder": "Leave blank to use business name",
+          "validation": { "required": false, "maxLength": 80 }
+        },
+        {
+          "key": "brand.styleWords",
+          "type": "tagInput",
+          "label": "Style words (optional)",
+          "helpText": "Examples: modern, trustworthy, bold, minimalist",
+          "validation": { "required": false, "maxItems": 6 }
+        },
+        {
+          "key": "brand.colors",
+          "type": "colorList",
+          "label": "Brand colors (optional)",
+          "helpText": "Add up to 5 hex colors.",
+          "validation": { "required": false, "maxItems": 5, "hexOnly": true }
+        },
+        {
+          "key": "brand.logoUrl",
+          "type": "text",
+          "label": "Logo URL (optional)",
+          "placeholder": "https://",
+          "validation": { "required": false, "pattern": "^(https?:\\/\\/)?[^\\s]+\\.[^\\s]+$" }
+        }
+      ],
+      "primaryCTA": { "label": "Continue", "action": "next" },
+      "secondaryCTA": [
+        { "label": "Back", "action": "back" },
+        { "label": "Skip", "action": "skip" }
+      ]
+    },
+    {
+      "id": "addons",
+      "title": "Add-on Engines",
+      "subtitle": "Optional engines you can add now or later. Tap to expand details.",
+      "required": false,
+      "visibility": {
+        "mode": "progressive",
+        "rules": [
+          {
+            "when": { "field": "tier", "equals": "standard" },
+            "showEngines": ["inbox", "phone", "social", "ads", "books"],
+            "defaultCollapsed": true,
+            "hint": "Standard is a fast launch. Engines can be added anytime."
+          },
+          {
+            "when": { "field": "tier", "equals": "growth" },
+            "showEngines": ["inbox", "phone", "social", "ads", "books"],
+            "defaultCollapsed": false,
+            "hint": "Growth works best with at least one Engine."
+          },
+          {
+            "when": { "field": "tier", "equals": "premium" },
+            "showEngines": ["inbox", "phone", "social", "ads", "books"],
+            "defaultCollapsed": false,
+            "hint": "Premium can plan connections now. Some connections may require follow-up."
+          }
+        ]
+      },
+      "ui": {
+        "layout": "engineCards",
+        "mobileBehavior": "accordion",
+        "includeHover": false,
+        "includeTapDetails": true
+      },
+      "enginesCatalog": [
+        {
+          "key": "inbox",
+          "label": "Inbox Engine",
+          "oneLiner": "Business email + routing + autoresponder basics.",
+          "whatItDoes": [
+            "Sets up or connects business email",
+            "Routes inquiries to the right place",
+            "Optional autoresponder for missed inquiries"
+          ],
+          "oftenUsedWith": ["phone", "social"],
+          "requirements": ["Domain access (recommended)", "Preferred inbox provider"],
+          "setupAndCareCopy": {
+            "setup": "One-time setup to connect inbox, routing, and templates.",
+            "care": "Ongoing maintenance for deliverability, routing, and updates."
+          }
+        },
+        {
+          "key": "phone",
+          "label": "Phone Engine",
+          "oneLiner": "Call forwarding + missed-call capture + follow-ups.",
+          "whatItDoes": [
+            "Configures call forwarding rules",
+            "Captures missed calls and prompts follow-up",
+            "Optional SMS/email notifications"
+          ],
+          "oftenUsedWith": ["inbox", "ads"],
+          "requirements": ["Current phone provider (if any)", "Forwarding preferences"],
+          "setupAndCareCopy": {
+            "setup": "One-time setup of forwarding and capture flows.",
+            "care": "Ongoing maintenance for routing and provider changes."
+          }
+        },
+        {
+          "key": "social",
+          "label": "Social Engine",
+          "oneLiner": "Auto-posting loop with brand-safe templates.",
+          "whatItDoes": [
+            "Connects social channels",
+            "Sets up posting cadence",
+            "Creates reusable post templates"
+          ],
+          "oftenUsedWith": ["inbox", "ads"],
+          "requirements": ["Platforms", "Asset availability", "Posting frequency"],
+          "setupAndCareCopy": {
+            "setup": "One-time setup of channels, cadence, and templates.",
+            "care": "Ongoing content maintenance and schedule tuning."
+          }
+        },
+        {
+          "key": "ads",
+          "label": "Ads Engine",
+          "oneLiner": "Google Ads starter + landing alignment.",
+          "whatItDoes": [
+            "Plans campaign structure",
+            "Aligns landing page and offer",
+            "Optional connection via Google Ads OAuth"
+          ],
+          "oftenUsedWith": ["phone", "social"],
+          "requirements": ["Ad spend range", "Offer/service focus", "Google Ads account status"],
+          "setupAndCareCopy": {
+            "setup": "One-time setup of campaigns and tracking plan.",
+            "care": "Ongoing monitoring, adjustments, and reporting."
+          }
+        },
+        {
+          "key": "books",
+          "label": "Books Engine",
+          "oneLiner": "QuickBooks connection planning + invoicing automation.",
+          "whatItDoes": [
+            "Plans QuickBooks integration",
+            "Defines invoice triggers and workflows",
+            "Optional connection via QuickBooks OAuth"
+          ],
+          "oftenUsedWith": ["inbox", "phone"],
+          "requirements": ["QuickBooks usage", "Invoicing automation needs"],
+          "setupAndCareCopy": {
+            "setup": "One-time setup of categories, triggers, and connection plan.",
+            "care": "Ongoing maintenance for sync, mappings, and edge cases."
+          }
+        }
+      ],
+      "fields": [
+        {
+          "key": "addons.enginesSelected",
+          "type": "engineMultiSelect",
+          "label": "Select Engines (optional)",
+          "validation": { "required": false, "maxItems": 5 }
+        },
+        {
+          "key": "addons.engines.inbox.requirements.hasDomain",
+          "type": "radio",
+          "label": "Do you have a domain for business email?",
+          "options": [
+            { "value": true, "label": "Yes" },
+            { "value": false, "label": "No" }
+          ],
+          "visibility": { "whenEngineSelected": "inbox" }
+        },
+        {
+          "key": "addons.engines.inbox.requirements.domainName",
+          "type": "text",
+          "label": "Domain name (if yes)",
+          "placeholder": "e.g., yourbusiness.com",
+          "visibility": { "when": { "field": "addons.engines.inbox.requirements.hasDomain", "equals": true } }
+        },
+        {
+          "key": "addons.engines.inbox.requirements.preferredInboxProvider",
+          "type": "select",
+          "label": "Preferred inbox provider",
+          "options": [
+            { "value": "google", "label": "Google Workspace" },
+            { "value": "microsoft", "label": "Microsoft 365" },
+            { "value": "other", "label": "Other" }
+          ],
+          "visibility": { "whenEngineSelected": "inbox" }
+        },
+        {
+          "key": "addons.engines.phone.requirements.currentPhoneProvider",
+          "type": "text",
+          "label": "Current phone provider (optional)",
+          "placeholder": "e.g., Verizon, RingCentral",
+          "visibility": { "whenEngineSelected": "phone" }
+        },
+        {
+          "key": "addons.engines.phone.requirements.callForwardingDesired",
+          "type": "radio",
+          "label": "Do you want call forwarding?",
+          "options": [
+            { "value": true, "label": "Yes" },
+            { "value": false, "label": "No" }
+          ],
+          "visibility": { "whenEngineSelected": "phone" }
+        },
+        {
+          "key": "addons.engines.social.requirements.platforms",
+          "type": "multiSelect",
+          "label": "Platforms",
+          "options": [
+            { "value": "instagram", "label": "Instagram" },
+            { "value": "facebook", "label": "Facebook" },
+            { "value": "linkedin", "label": "LinkedIn" },
+            { "value": "tiktok", "label": "TikTok" }
+          ],
+          "visibility": { "whenEngineSelected": "social" }
+        },
+        {
+          "key": "addons.engines.social.requirements.postingFrequency",
+          "type": "select",
+          "label": "Posting frequency",
+          "options": [
+            { "value": "weekly", "label": "Weekly" },
+            { "value": "3x_weekly", "label": "3x / week" },
+            { "value": "daily", "label": "Daily" }
+          ],
+          "visibility": { "whenEngineSelected": "social" }
+        },
+        {
+          "key": "addons.engines.ads.requirements.hasGoogleAdsAccount",
+          "type": "radio",
+          "label": "Do you already have a Google Ads account?",
+          "options": [
+            { "value": true, "label": "Yes" },
+            { "value": false, "label": "No" }
+          ],
+          "visibility": { "whenEngineSelected": "ads" }
+        },
+        {
+          "key": "addons.engines.ads.requirements.monthlyAdSpendUsd",
+          "type": "number",
+          "label": "Estimated monthly ad spend (USD)",
+          "placeholder": "e.g., 1000",
+          "visibility": { "whenEngineSelected": "ads" },
+          "validation": { "required": false, "min": 0, "max": 100000 }
+        },
+        {
+          "key": "addons.engines.ads.requirements.targetServiceOrOffer",
+          "type": "text",
+          "label": "What service/offer should ads promote?",
+          "placeholder": "e.g., Emergency plumbing",
+          "visibility": { "whenEngineSelected": "ads" },
+          "validation": { "required": false, "maxLength": 140 }
+        },
+        {
+          "key": "addons.engines.books.requirements.usesQuickbooks",
+          "type": "radio",
+          "label": "Do you use QuickBooks today?",
+          "options": [
+            { "value": true, "label": "Yes" },
+            { "value": false, "label": "No" }
+          ],
+          "visibility": { "whenEngineSelected": "books" }
+        },
+        {
+          "key": "addons.engines.books.requirements.quickbooksType",
+          "type": "select",
+          "label": "QuickBooks type",
+          "options": [
+            { "value": "online", "label": "QuickBooks Online" },
+            { "value": "desktop", "label": "QuickBooks Desktop" },
+            { "value": "none", "label": "Not sure / none" }
+          ],
+          "visibility": { "whenEngineSelected": "books" }
+        },
+        {
+          "key": "addons.engines.books.requirements.needsInvoicingAutomation",
+          "type": "radio",
+          "label": "Interested in invoicing automation?",
+          "options": [
+            { "value": true, "label": "Yes" },
+            { "value": false, "label": "No" }
+          ],
+          "visibility": { "whenEngineSelected": "books" }
+        }
+      ],
+      "primaryCTA": { "label": "Continue", "action": "next" },
+      "secondaryCTA": [
+        { "label": "Back", "action": "back" },
+        { "label": "Skip", "action": "skip" }
+      ]
+    },
+    {
+      "id": "connections",
+      "title": "Connections (optional)",
+      "subtitle": "If you want us to connect tools now, tell us what access you have.",
+      "required": false,
+      "fields": [
+        {
+          "key": "connections.domainAccess",
+          "type": "radioCards",
+          "label": "Domain access",
+          "options": [
+            { "value": "have_domain", "label": "I have domain access", "helpText": "Best for Inbox Engine + deliverability." },
+            { "value": "need_domain", "label": "I need a domain", "helpText": "We can plan it now; setup may follow." },
+            { "value": "none", "label": "Not now", "helpText": "Skip for now." }
+          ]
+        },
+        {
+          "key": "connections.builderAccess",
+          "type": "radioCards",
+          "label": "Repo access",
+          "options": [
+            { "value": "github_connected", "label": "GitHub repo connected", "helpText": "Enables Premium UI work in safe surfaces." },
+            { "value": "none", "label": "Not connected", "helpText": "You can connect later." }
+          ],
+          "visibility": { "when": { "field": "tier", "equals": "premium" } }
+        },
+        {
+          "key": "connections.oauth.googleAds",
+          "type": "radio",
+          "label": "Google Ads connection",
+          "options": [
+            { "value": "connect_now", "label": "Connect now (OAuth)" },
+            { "value": "not_now", "label": "Not now" }
+          ],
+          "visibility": { "whenEngineSelected": "ads" }
+        },
+        {
+          "key": "connections.oauth.quickbooks",
+          "type": "radio",
+          "label": "QuickBooks connection",
+          "options": [
+            { "value": "connect_now", "label": "Connect now (OAuth)" },
+            { "value": "not_now", "label": "Not now" }
+          ],
+          "visibility": { "whenEngineSelected": "books" }
+        }
+      ],
+      "primaryCTA": { "label": "Continue", "action": "next" },
+      "secondaryCTA": [
+        { "label": "Back", "action": "back" },
+        { "label": "Skip", "action": "skip" }
+      ]
+    },
+    {
+      "id": "contact",
+      "title": "Contact",
+      "subtitle": "Where should we send your preview?",
+      "required": true,
+      "fields": [
+        {
+          "key": "contact.fullName",
+          "type": "text",
+          "label": "Full name",
+          "validation": { "required": true, "minLength": 2, "maxLength": 80 }
+        },
+        {
+          "key": "contact.email",
+          "type": "email",
+          "label": "Email",
+          "validation": { "required": true, "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$" }
+        },
+        {
+          "key": "contact.phone",
+          "type": "tel",
+          "label": "Phone (optional)",
+          "validation": { "required": false, "maxLength": 30 }
+        }
+      ],
+      "primaryCTA": { "label": "Continue", "action": "next" },
+      "secondaryCTA": [{ "label": "Back", "action": "back" }]
+    },
+    {
+      "id": "review",
+      "title": "Review & submit",
+      "subtitle": "Confirm details before we generate your plan.",
+      "required": true,
+      "ui": { "layout": "summaryCards", "editable": true },
+      "summarySections": [
+        {
+          "title": "Tier",
+          "fields": ["tier"]
+        },
+        {
+          "title": "Business",
+          "fields": ["businessName", "industry", "serviceArea", "services", "websiteUrl", "primaryGoal"]
+        },
+        {
+          "title": "Engines",
+          "fields": ["addons.enginesSelected"]
+        },
+        {
+          "title": "Connections",
+          "fields": ["connections.domainAccess", "connections.oauth.googleAds", "connections.oauth.quickbooks"]
+        },
+        {
+          "title": "Contact",
+          "fields": ["contact.fullName", "contact.email", "contact.phone"]
+        }
+      ],
+      "primaryCTA": { "label": "Submit", "action": "submit" },
+      "secondaryCTA": [{ "label": "Back", "action": "back" }],
+      "submitBehavior": {
+        "endpoint": "trpc.intake.submit",
+        "successRoute": "/preview",
+        "writeDraftBeforeSubmit": true,
+        "disableOnSubmit": true
+      }
+    }
+  ],
+  "acceptanceGates": {
+    "mobileMustPass": [
+      "Progress indicator visible on all steps",
+      "Single primary CTA per step",
+      "Touch targets >= 44px for all interactive elements",
+      "No horizontal scroll on 390x844 viewport",
+      "Engine details accessible via tap (no hover-only content)",
+      "Inline validation errors are readable and non-blocking"
+    ],
+    "designSystemMustPass": [
+      "Exactly one H1 on the page",
+      "Heading hierarchy does not skip levels",
+      "Section/card spacing consistent with design system",
+      "Primary/secondary button variants consistent across steps"
+    ],
+    "truthMustPass": [
+      "No invented performance claims",
+      "Tier descriptions match actual tier definitions",
+      "Add-on engines described as setup+care (no promises of instant results)",
+      "OAuth connection described as optional and may require follow-up"
+    ],
+    "flowMustPass": [
+      "Tier selection is the first real step after language",
+      "Add-on engine fields appear only when engine selected",
+      "Review step shows tier, engines, and contact clearly",
+      "Submit triggers intake.submit without client-side crashes"
+    ]
+  },
+  "pressureTests": {
+    "scenarios": [
+      {
+        "id": "standard_minimal",
+        "description": "Standard, minimal required fields, no engines",
+        "expected": "Can submit successfully, progress works, review renders"
+      },
+      {
+        "id": "growth_with_engines",
+        "description": "Growth with Inbox + Phone selected",
+        "expected": "Progressive disclosure fields appear; review includes selected engines"
+      },
+      {
+        "id": "premium_with_ads_books_connect",
+        "description": "Premium with Ads + Books selected, connect_now for OAuth toggles",
+        "expected": "Connection step appears; no claims beyond planning; review reflects choices"
+      }
+    ]
+  },
+  "audit": {
+    "fieldGeneralPlan": "Upgrade /apply into a tier-first, mobile-first, multi-step intake flow with progressive disclosure for Add-on Engines and optional Connections. Preserve existing submission endpoint wiring and patterns. No server changes.",
+    "criticConcerns": [
+      "Risk: hover-only UI for engine details on desktop breaks mobile",
+      "Risk: too many fields overwhelm Standard users",
+      "Risk: CTA hierarchy drift across steps",
+      "Risk: claims about OAuth/automation exceed truth policy"
+    ],
+    "coderFeasibility": "Feasible by refactoring Apply.tsx into a stepper with reusable StepShell + Field components under marketing/intake. No new dependencies required.",
+    "models": {
+      "planner": "openai/gpt-5-2",
+      "coder": "openai/gpt-5-2",
+      "critic": "claude-sonnet-4-20250514",
+      "arbiter": "openai/gpt-5-2"
+    }
+  }
+}
+```0

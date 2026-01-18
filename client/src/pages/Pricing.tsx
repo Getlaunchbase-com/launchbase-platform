@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { ArrowRight, Check, Info } from "lucide-react";
 import { useState } from "react";
+import { ENGINES } from "../data/engines";
 
 export default function Pricing() {
   const [selectedEngine, setSelectedEngine] = useState<string | null>(null);

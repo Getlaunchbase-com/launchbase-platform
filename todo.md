@@ -2419,3 +2419,27 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [ ] Test Auto-Swarm Fix Engine with real failures
 - [ ] Save checkpoint with all Premium features
 - [ ] Push to GitHub
+
+
+## 🎯 PREMIUM INTAKE FLOW (ACTIVE)
+
+**Goal:** Execute IntakeFlowPlanV1 using Builder to generate tier selection + add-ons in Apply.tsx
+
+**Contract:** `docs/contracts/IntakeFlowPlanV1.json`
+
+**Tasks:**
+- [ ] Execute IntakeFlowPlanV1 with Builder to generate Apply.tsx
+- [ ] Pressure-test intake flow with acceptance gates:
+  - Tier selection visible and functional
+  - Add-on Engines progressive disclosure
+  - Mobile-first (no horizontal scroll, 44px+ touch targets)
+  - Setup/Care pricing disclosure
+  - "Often used with" tap-to-expand
+- [ ] Apply swarm-fix if gates fail
+- [ ] Save checkpoint when gates pass
+
+**Definition of Done:**
+- Apply.tsx rebuilt with tier selection
+- All pressure gates passed
+- Intake flow matches IntakeFlowPlanV1 contract
+- "LaunchBase on LaunchBase" test complete
