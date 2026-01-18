@@ -6,38 +6,41 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    # Run nightly at 2 AM UTC
-    - cron: '0 2 * * *'
+    - cron: "0 2 * * *"
   workflow_dispatch:
 
 jobs:
   smoke:
     runs-on: ubuntu-latest
-    
+
     steps:
-      - uses: actions/checkout@v4
-      
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
         with:
-          node-version: '22'
-          cache: 'pnpm'
-      
-      - name: Install pnpm
-        run: npm install -g pnpm
-      
-      - name: Install dependencies
+          version: 9
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Install deps
         run: pnpm install --frozen-lockfile
-      
-      - name: Run preflight smoke tests
+
+      - name: Smoke preflight
         run: pnpm smoke:preflight
-        
-      - name: Run E2E intake smoke tests
+
+      - name: Smoke E2E intake
         run: pnpm smoke:e2e:intake
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      
+
       - name: Upload failure artifacts
-        if: failure()
+        if: failure( )
         uses: actions/upload-artifact@v4
         with:
           name: smoke-test-failures
