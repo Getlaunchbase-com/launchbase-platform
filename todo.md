@@ -2406,10 +2406,10 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [ ] Add acceptance criteria gates (mustPass, shouldPass)
 
 ### Phase 3.5: Auto-Swarm Fix Engine
-- [ ] Create runRepairSwarm orchestrator (server/ai/orchestration/runRepairSwarm.ts)
-- [ ] Create swarm fix CLI runner (scripts/swarm/runSwarmFix.mjs)
-- [ ] Add pnpm swarm:fix command to package.json
-- [ ] Integrate FailurePacket hooks into smoke tests
+- [x] Create runRepairSwarm orchestrator (server/ai/orchestration/runRepairSwarm.ts)
+- [x] Create swarm fix CLI runner (scripts/swarm/runSwarmFix.mjs)
+- [x] Add pnpm swarm:fix command to package.json
+- [x] Integrate FailurePacket hooks into smoke tests
 - [ ] Integrate FailurePacket hooks into executeRunPlan
 - [ ] Integrate FailurePacket hooks into builder gate failures
 
