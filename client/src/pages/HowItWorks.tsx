@@ -17,10 +17,10 @@ export default function HowItWorks() {
             
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
               <Link 
-                href="/intake"
+                href="/apply"
                 className="inline-flex items-center justify-center gap-2 bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white px-8 py-4 rounded-lg font-semibold transition"
               >
-                Start the intake
+                Get started
                 <ArrowRight className="h-5 w-5" />
               </Link>
               <Link 
@@ -284,10 +284,10 @@ export default function HowItWorks() {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
-              href="/intake"
+              href="/apply"
               className="inline-flex items-center justify-center gap-2 bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white px-8 py-4 rounded-lg font-semibold transition"
             >
-              Start the intake
+              Get started
               <ArrowRight className="h-5 w-5" />
             </Link>
             <Link 

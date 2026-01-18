@@ -31,6 +31,7 @@ import Apply from "./pages/Apply";
 import ApplySuccess from "./pages/ApplySuccess";
 import HowItWorks from "./pages/HowItWorks";
 import Pricing from "./pages/Pricing";
+import Examples from "./pages/Examples";
 import Why from "./pages/Why";
 import Trust from "./pages/Trust";
 import AdminSuiteApplications from "./pages/AdminSuiteApplications";
@@ -61,6 +62,7 @@ function Router() {
       <Route path="/apply/success" component={ApplySuccess} />
       <Route path="/how-it-works" component={HowItWorks} />
       <Route path="/pricing" component={Pricing} />
+      <Route path="/examples" component={Examples} />
       <Route path="/why" component={Why} />
       <Route path="/trust" component={Trust} />
       
