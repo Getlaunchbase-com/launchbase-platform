@@ -2611,3 +2611,26 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [ ] Where artifacts live
 
 **Deliverable:** `docs/RELEASE_CHECKLIST.md`
+
+---
+
+## 🎯 ACTIVE: Tier Comparison Table (Swarm-Driven Feature)
+
+**Goal:** Add Compare Tiers section to Pricing page using swarm:fix workflow
+
+**Approach:** Treat feature as "failure" → generate RepairPacket → apply patch
+
+**Steps:**
+- [ ] Create Feature-FailurePacket: `runs/failures/feature_pricing_compare_tiers/failurePacket.json`
+- [ ] Run swarm:fix with GPT-5.2 coder to generate RepairPacket
+- [ ] Apply patch from RepairPacket
+- [ ] Validate: lint, build, smoke test, visual check
+- [ ] Commit and mark complete
+
+**Requirements:**
+- Compare Standard/Growth/Premium tiers
+- Credits: Standard=1, Growth=3, Premium=10
+- Mobile-first (no horizontal scroll)
+- Truth policy: no invented metrics
+- CTA → /apply
+- "What's a credit?" explainer
