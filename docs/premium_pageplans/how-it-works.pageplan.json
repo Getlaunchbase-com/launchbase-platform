@@ -1,118 +1,275 @@
 {
   "version": "pageplan.v1",
-  "page": {
-    "slug": "/how-it-works",
-    "title": "How it works",
-    "goal": "Explain the workflow clearly and reduce anxiety: preview-first, approval step, credits, and what changes per tier.",
-    "primaryCTA": "Start your intake",
-    "secondaryCTA": "Pricing"
+  "id": "how-it-works.pageplan.v1",
+  "page": "how_it_works",
+  "route": "/how-it-works",
+  "title": "How It Works",
+  "meta": {
+    "description": "See how LaunchBase goes from intake to preview to approval to deployment—tier-aware with credits and add-ons.",
+    "ogTitle": "How LaunchBase Works",
+    "ogDescription": "Intake → Plan → Preview → Approve → Deploy"
   },
-  "sections": [
-    {
-      "id": "hero_hiw",
-      "type": "hero",
-      "headline": "A simple loop: intake → preview → approve → ship",
-      "subheadline": "You stay in control. Nothing goes live until you approve.",
-      "ctas": [
-        { "label": "Start your intake", "href": "/intake", "style": "primary" },
-        { "label": "See pricing", "href": "/pricing", "style": "secondary" }
-      ],
-      "notes": "Keep this page extremely clear. Avoid hype."
-    },
-    {
-      "id": "stepper",
-      "type": "stepper",
-      "headline": "The workflow",
-      "bullets": [
-        "1) Intake: tell us what you do and who you serve",
-        "2) Plan: we generate a structured improvement plan",
-        "3) Preview: you see before/after style examples or a staged preview (tier-dependent)",
-        "4) Iterate: request changes using credits",
-        "5) Approve: you approve when it's right",
-        "6) Deploy: publish changes (mechanism depends on setup)"
-      ],
-      "notes": "Use a numbered stepper. Each step should have 1–2 short lines."
-    },
-    {
-      "id": "tier_outcomes_hiw",
-      "type": "tier_outcomes",
-      "headline": "What changes by tier",
-      "subheadline": "Same workflow. Different depth.",
-      "notes": "Show 3 columns with outcome-focused descriptions. Include: credits included, deliverable type, and what the loop emphasizes (polish/conversion/transformation)."
-    },
-    {
-      "id": "credits_hiw",
-      "type": "credits_explainer",
-      "headline": "Revisions are credit-based (so it's not unlimited)",
-      "bullets": [
-        "Request changes consumes 1 credit",
-        "Approve consumes 0 credits",
-        "Buy more credits if you want additional loops"
-      ],
-      "notes": "Keep consistent with Pricing page wording."
-    },
-    {
-      "id": "builder_scope_hiw",
-      "type": "scope_box",
-      "headline": "Premium: Builder is UI execution only",
-      "bullets": [
-        "Allowed surfaces: homepage UI, landing UI, pricing UI",
-        "No server/auth/payment logic changes",
-        "No environment/config file edits"
-      ],
-      "notes": "This is a guardrail section. Keep it strict and explicit."
-    },
-    {
-      "id": "expectations",
-      "type": "expectations",
-      "headline": "What we need from you",
-      "bullets": [
-        "Accurate business info (services, location, CTA)",
-        "Any brand constraints (colors, tone)",
-        "Connections for add-ons (only if you choose them)"
-      ],
-      "notes": "Short. No new claims."
-    },
-    {
-      "id": "final_cta_hiw",
-      "type": "final_cta",
-      "headline": "Ready to see your plan and preview?",
-      "ctas": [
-        { "label": "Start your intake", "href": "/intake", "style": "primary" },
-        { "label": "Pricing", "href": "/pricing", "style": "secondary" }
-      ],
-      "notes": "Mobile CTA visible by ~20% scroll when sticky enabled."
-    }
-  ],
   "constraints": {
-    "allowedFolders": [
-      "client/src/pages/**",
+    "builderSurface": "how_it_works_ui",
+    "allowedPaths": [
+      "client/src/pages/HowItWorks.tsx",
       "client/src/components/marketing/**",
       "client/src/styles/**"
     ],
-    "forbiddenFolders": [
+    "forbiddenPaths": [
       "server/**",
       "drizzle/**",
-      "scripts/**",
       "package.json",
-      ".env*"
+      "client/src/pages/Portal.tsx",
+      "client/src/components/auth/**"
     ],
-    "mustUseExistingComponents": true,
-    "mobileRequirements": [
-      "Stepper must be readable and not cramped on mobile",
-      "No dual-primary CTAs in the same section",
-      "No dense paragraphs (>3 lines) on mobile"
-    ]
+    "allowedComponents": [
+      "Section",
+      "Container",
+      "Heading",
+      "Text",
+      "Badge",
+      "Divider",
+      "Card",
+      "Button",
+      "Link"
+    ],
+    "designSystemContractPath": "docs/premium_design_system_patchlist.md",
+    "ctaRules": {
+      "singlePrimaryCtaPerViewportRegion": true,
+      "noDualPrimaryCtas": true
+    }
   },
-  "acceptance": {
-    "mustPass": [
-      "Workflow is understandable in <30 seconds",
-      "Preview-first and approval-before-deploy is explicit",
-      "Premium Builder scope restrictions stated plainly"
-    ],
-    "shouldPass": [
-      "Consistent language across pages (pricing/how-it-works)",
-      "Tier differences are outcome-based, not feature soup"
-    ]
-  }
+  "truthRules": {
+    "noInventedClaims": true,
+    "describeProcessAccurately": true,
+    "noPlatformPromisesBeyondScope": true
+  },
+  "acceptanceGates": {
+    "mobile": {
+      "viewport": "390x844",
+      "mustPass": [
+        "Only 1 primary CTA visible in hero region",
+        "Primary CTA visible by 20% scroll",
+        "No text overlaps or clipped buttons",
+        "Touch targets minimum 44x44px"
+      ]
+    },
+    "designSystem": {
+      "mustPass": [
+        "H1 appears exactly once on page",
+        "Heading hierarchy never skips levels (H1→H2→H3)",
+        "Section padding consistent (no random spacing)"
+      ]
+    },
+    "truth": {
+      "mustPass": [
+        "No invented performance claims",
+        "Credits described accurately (Request changes = 1 credit, Approve = 0)",
+        "Premium Builder described as UI-only on allowed surfaces"
+      ]
+    }
+  },
+  "sections": [
+    {
+      "id": "how-hero",
+      "type": "hero",
+      "components": ["Badge", "Heading", "Text", "Button", "Link"],
+      "content": {
+        "badge": "How it works",
+        "h1": "Intake → Preview → Approve → Deploy",
+        "subheadline": "A tier-aware workflow that keeps iterations focused and ships faster.",
+        "primaryCta": { "text": "Start intake", "href": "/intake" },
+        "secondaryCta": { "text": "See pricing", "href": "/pricing" }
+      },
+      "layout": {
+        "notes": ["Primary CTA must be visible above the fold on mobile."]
+      }
+    },
+    {
+      "id": "steps",
+      "type": "steps",
+      "components": ["Section", "Container", "Heading", "Text", "Card", "Divider", "Badge", "Link"],
+      "content": {
+        "h2": "The workflow",
+        "steps": [
+          {
+            "step": 1,
+            "title": "Submit intake",
+            "body": "Tell us what you do, who you serve, and what you want your site to do.",
+            "details": [
+              "We use your answers as the source of truth.",
+              "If key info is missing, we’ll ask for it before building."
+            ]
+          },
+          {
+            "step": 2,
+            "title": "Generate a plan + preview",
+            "body": "We generate a proposal based on your tier and constraints.",
+            "details": [
+              "Standard/Growth: showroom previews.",
+              "Premium: Builder execution on approved marketing UI surfaces."
+            ]
+          },
+          {
+            "step": 3,
+            "title": "Review and request changes",
+            "body": "You approve or request changes from the portal.",
+            "details": [
+              "Approve costs 0 credits.",
+              "Request changes costs 1 credit per loop."
+            ]
+          },
+          {
+            "step": 4,
+            "title": "Deploy",
+            "body": "After approval, we deploy changes within the allowed scope.",
+            "details": [
+              "Some add-ons require connecting accounts before they can run.",
+              "We never touch forbidden areas like auth, billing, or server logic during UI-only work."
+            ]
+          }
+        ],
+        "notes": [
+          "Avoid promising timelines unless you already publish them elsewhere.",
+          "Keep language factual, not hypey."
+        ]
+      },
+      "layout": {
+        "notes": [
+          "Show steps as vertical stack on mobile.",
+          "Make each step scannable (title + 1–2 short lines + bullets)."
+        ]
+      }
+    },
+    {
+      "id": "tiers-explained",
+      "type": "tier_explainer",
+      "components": ["Section", "Container", "Heading", "Text", "Card", "Divider", "Badge", "Link"],
+      "content": {
+        "h2": "What changes by tier",
+        "cards": [
+          {
+            "tier": "Standard",
+            "badge": "Polish pass",
+            "bullets": [
+              "Tighten copy and hierarchy",
+              "Clearer CTA structure",
+              "Single improvement loop included"
+            ]
+          },
+          {
+            "tier": "Growth",
+            "badge": "Conversion pass",
+            "bullets": [
+              "Adds trust and proof elements",
+              "More iteration loops included",
+              "Still showroom previews (no Builder execution)"
+            ]
+          },
+          {
+            "tier": "Premium",
+            "badge": "Full transformation",
+            "bullets": [
+              "Design system consistency",
+              "Premium positioning and layout",
+              "Builder executes UI on allowed marketing surfaces"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "credits",
+      "type": "credits_explainer",
+      "components": ["Section", "Container", "Heading", "Text", "Card", "Divider"],
+      "content": {
+        "h2": "Credits keep iteration focused",
+        "bullets": [
+          "Request changes = 1 credit",
+          "Approve = 0 credits",
+          "Buy more credits when you want additional loops"
+        ],
+        "callout": "This prevents unlimited back-and-forth and keeps the process fast."
+      }
+    },
+    {
+      "id": "addons-explained",
+      "type": "addons_explainer",
+      "components": ["Section", "Container", "Heading", "Text", "Card", "Badge", "Divider", "Link"],
+      "content": {
+        "h2": "Add-ons: connect your tools",
+        "intro": "Add-ons are optional. They require you to connect accounts (OAuth or credentials) before they can run.",
+        "addons": [
+          {
+            "name": "Email / Inbox",
+            "badge": "Inbox Engine",
+            "requires": ["Email provider access"],
+            "exampleAutomations": ["Auto-reply", "Lead routing", "Follow-up sequence"]
+          },
+          {
+            "name": "Calls",
+            "badge": "Phone Engine",
+            "requires": ["Forwarding setup details"],
+            "exampleAutomations": ["Missed-call follow-up", "Call capture", "Routing"]
+          },
+          {
+            "name": "Social",
+            "badge": "Social Engine",
+            "requires": ["Social account access"],
+            "exampleAutomations": ["Auto-post schedule", "Content prompts", "Review-to-post loop (if provided)"]
+          },
+          {
+            "name": "Google Ads",
+            "badge": "Ads Engine",
+            "requires": ["Google Ads access"],
+            "exampleAutomations": ["Campaign starter setup", "Landing alignment", "Basic reporting"]
+          },
+          {
+            "name": "QuickBooks",
+            "badge": "Books Engine",
+            "requires": ["QuickBooks OAuth approval"],
+            "exampleAutomations": ["Invoice trigger", "Customer sync", "Payment reminders (if enabled)"]
+          }
+        ],
+        "notes": [
+          "Don’t claim these are enabled by default.",
+          "Always state: requires explicit connection + approval."
+        ]
+      }
+    },
+    {
+      "id": "security-scope",
+      "type": "scope_security",
+      "components": ["Section", "Container", "Heading", "Text", "Card", "Divider"],
+      "content": {
+        "h2": "Scope & safety",
+        "bullets": [
+          "Premium Builder execution is UI-only on approved marketing surfaces.",
+          "Forbidden areas (auth, billing, server logic) are never edited during UI work.",
+          "Every run is pressure-tested against mobile, design system, and truth gates."
+        ]
+      }
+    },
+    {
+      "id": "closing-cta",
+      "type": "cta",
+      "components": ["Section", "Container", "Heading", "Text", "Button", "Link"],
+      "content": {
+        "h2": "Ready to see a preview?",
+        "text": "Submit your intake and we’ll generate a plan and proposal you can approve or iterate on.",
+        "primaryCta": { "text": "Start intake", "href": "/intake" },
+        "secondaryCta": { "text": "Choose a tier", "href": "/pricing" }
+      }
+    }
+  ]
 }
+
+If you want, I can also generate the two files exactly as they should live in repo:
+
+docs/premium_pageplans/pricing.pageplan.json
+
+docs/premium_pageplans/how-it-works.pageplan.json
+
+
+(with the same content, just with stable IDs + no timestamps).

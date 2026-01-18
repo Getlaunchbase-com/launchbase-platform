@@ -1,124 +1,275 @@
 {
   "version": "pageplan.v1",
-  "page": {
-    "slug": "/pricing",
-    "title": "Pricing",
-    "goal": "Convert qualified buyers into starting an intake with a clear tier choice and clear understanding of credits and add-ons.",
-    "primaryCTA": "Start your intake",
-    "secondaryCTA": "See examples"
+  "id": "pricing.pageplan.v1",
+  "page": "pricing",
+  "route": "/pricing",
+  "title": "Pricing",
+  "meta": {
+    "description": "Choose a LaunchBase tier. See what’s included, what add-ons are available, and how revisions/credits work.",
+    "ogTitle": "LaunchBase Pricing",
+    "ogDescription": "Standard, Growth, Premium — pick the tier that fits your business."
+  },
+  "constraints": {
+    "builderSurface": "pricing_ui",
+    "allowedPaths": [
+      "client/src/pages/Pricing.tsx",
+      "client/src/components/marketing/**",
+      "client/src/styles/**"
+    ],
+    "forbiddenPaths": [
+      "server/**",
+      "drizzle/**",
+      "package.json",
+      "client/src/pages/Portal.tsx",
+      "client/src/components/auth/**"
+    ],
+    "allowedComponents": [
+      "Section",
+      "Container",
+      "Heading",
+      "Text",
+      "Badge",
+      "Divider",
+      "Card",
+      "Button",
+      "Link"
+    ],
+    "designSystemContractPath": "docs/premium_design_system_patchlist.md",
+    "ctaRules": {
+      "singlePrimaryCtaPerViewportRegion": true,
+      "primaryCtaTextMustMatchOneOf": ["Start", "Get started", "Choose plan", "Continue"],
+      "secondaryCtaAllowed": true,
+      "noDualPrimaryCtas": true
+    }
+  },
+  "truthRules": {
+    "noInventedClaims": true,
+    "noTestimonialsUnlessProvided": true,
+    "pricingMustMatchTierDefinitions": true,
+    "featuresMustBeTierAccurate": true
+  },
+  "acceptanceGates": {
+    "mobile": {
+      "viewport": "390x844",
+      "mustPass": [
+        "Only 1 primary CTA visible in hero region",
+        "Primary CTA visible by 20% scroll",
+        "Pricing cards stack vertically (no horizontal scroll)",
+        "No text overlaps or clipped buttons",
+        "Touch targets minimum 44x44px"
+      ]
+    },
+    "designSystem": {
+      "mustPass": [
+        "H1 appears exactly once on page",
+        "Heading hierarchy never skips levels (H1→H2→H3)",
+        "Section padding consistent (no random spacing)",
+        "Button variants consistent across sections"
+      ]
+    },
+    "truth": {
+      "mustPass": [
+        "No invented performance claims",
+        "Credits/revisions described accurately per tier",
+        "Add-ons described as optional and require connections"
+      ]
+    }
   },
   "sections": [
     {
-      "id": "hero_pricing",
+      "id": "pricing-hero",
       "type": "hero",
-      "headline": "Pick a tier. Get a better website, fast.",
-      "subheadline": "Answer a few questions. We generate a plan and a preview. You approve before anything ships.",
-      "bullets": [
-        "Preview-first workflow (approve before deploy)",
-        "Tiered outcomes (polish → conversion → full transformation)",
-        "Revision credits included (buy more any time)"
-      ],
-      "ctas": [
-        { "label": "Start your intake", "href": "/intake", "style": "primary" },
-        { "label": "See examples", "href": "/examples", "style": "secondary" }
-      ],
-      "notes": "Keep hero short. 1 primary CTA. Make tier clarity visible without scrolling on desktop. On mobile, hero must fit within ~1.25 screens."
+      "components": ["Badge", "Heading", "Text", "Button", "Link"],
+      "content": {
+        "badge": "Pricing",
+        "h1": "Pick a tier. Get a site that’s ready to ship.",
+        "subheadline": "Standard is a polish pass. Growth adds conversion improvements. Premium is a full UI transformation with Builder execution.",
+        "primaryCta": { "text": "Choose plan", "href": "#plans" },
+        "secondaryCta": { "text": "How it works", "href": "/how-it-works" }
+      },
+      "layout": {
+        "sectionPadding": "py-16 desktop / py-12 mobile",
+        "maxWidth": "container",
+        "heroAlignment": "left",
+        "notes": [
+          "Primary CTA must be visible above the fold on mobile.",
+          "Avoid multiple competing CTAs in hero."
+        ]
+      }
     },
     {
-      "id": "tier_cards",
+      "id": "tier-plans",
       "type": "pricing_cards",
-      "headline": "Three tiers, three outcomes",
-      "subheadline": "Choose based on how much change you want and how many revision loops you need.",
-      "bullets": [
-        "Standard: polish pass (messaging + spacing + CTA hierarchy)",
-        "Growth: conversion pass (proof + outcomes + trust elements)",
-        "Premium: full transformation (positioning + design system + strongest hierarchy)"
-      ],
-      "notes": "Use 3 cards with consistent layout. Each card must include: price placeholder, credits included, who it's for, deliverable type (showroom vs builder), and a single CTA."
+      "anchor": "plans",
+      "components": ["Section", "Container", "Card", "Heading", "Text", "Button", "Divider", "Badge"],
+      "content": {
+        "h2": "Plans",
+        "intro": "Choose the tier that matches how much change you want.",
+        "cards": [
+          {
+            "tier": "standard",
+            "label": "Standard",
+            "badge": "Polish pass",
+            "summary": "Tighten messaging, improve hierarchy, clearer CTA.",
+            "includedCredits": 1,
+            "loops": "1 initial loop",
+            "builder": "No (showroom preview only)",
+            "highlights": [
+              "Messaging cleanup",
+              "Spacing + hierarchy improvements",
+              "CTA clarity"
+            ],
+            "primaryCta": { "text": "Choose Standard", "href": "/intake?tier=standard" }
+          },
+          {
+            "tier": "growth",
+            "label": "Growth",
+            "badge": "Conversion pass",
+            "summary": "Everything in Standard plus trust + proof improvements.",
+            "includedCredits": 3,
+            "loops": "2–3 initial loops",
+            "builder": "No (showroom preview only)",
+            "highlights": [
+              "Trust strip + proof elements",
+              "Outcome bullets + clarity improvements",
+              "More iteration loops"
+            ],
+            "primaryCta": { "text": "Choose Growth", "href": "/intake?tier=growth" }
+          },
+          {
+            "tier": "premium",
+            "label": "Premium",
+            "badge": "Full transformation",
+            "summary": "Premium positioning + design system + strongest hierarchy.",
+            "includedCredits": 10,
+            "loops": "5–10 initial loops",
+            "builder": "Yes (UI execution allowed on marketing surfaces)",
+            "highlights": [
+              "Design system consistency",
+              "Premium layout + positioning",
+              "Builder execution + pressure testing"
+            ],
+            "primaryCta": { "text": "Choose Premium", "href": "/intake?tier=premium" }
+          }
+        ],
+        "notes": [
+          "Do NOT invent dollar prices unless provided elsewhere.",
+          "If you do have pricing numbers in repo, wire them in from constants—don’t hardcode."
+        ]
+      },
+      "layout": {
+        "cardsLayout": "3-up desktop, 1-up mobile",
+        "cardPadding": "p-6 desktop / p-4 mobile",
+        "cardRadius": "16px",
+        "notes": [
+          "Cards must stack vertically on mobile with no horizontal scroll.",
+          "Each card has exactly one primary CTA button."
+        ]
+      }
     },
     {
-      "id": "tier_compare_table",
-      "type": "comparison_table",
-      "headline": "Compare tiers",
-      "subheadline": "A simple grid that explains what changes as you move up.",
-      "notes": "Rows should include: credits included, initial loops, deliverable (showroom / builder-executed UI), pressure-test loop, support level, typical use case. Use checkmarks, avoid dense text."
+      "id": "credits-explainer",
+      "type": "explainers",
+      "components": ["Section", "Container", "Heading", "Text", "Card", "Divider"],
+      "content": {
+        "h2": "Revisions & credits",
+        "bullets": [
+          "Each “Request changes” consumes 1 credit.",
+          "“Approve” consumes 0 credits.",
+          "When credits run out, you can buy more."
+        ],
+        "finePrint": "Credits limit iteration so the process stays fast and focused.",
+        "guardrails": [
+          "No unlimited back-and-forth.",
+          "Every loop is pressure-tested before it’s shown as ready."
+        ]
+      }
     },
     {
-      "id": "credits_explainer",
-      "type": "credits_explainer",
-      "headline": "How revision credits work",
-      "subheadline": "Requesting changes consumes 1 credit. Approving is free.",
-      "bullets": [
-        "1 request changes = 1 credit = 1 additional improvement loop",
-        "Approve = 0 credits consumed",
-        "When credits run out, you can buy more"
-      ],
-      "notes": "This section must be crystal clear. Add a small example: 'Premium includes 10 credits → up to 10 request-changes loops.' No pricing numbers unless provided elsewhere."
-    },
-    {
-      "id": "addons_overview",
-      "type": "addons_overview",
-      "headline": "Add-ons (optional)",
-      "subheadline": "Connect the tools you already use. We'll help configure workflows where supported.",
-      "bullets": [
-        "Inbox Engine (email routing + autoresponder basics)",
-        "Phone Engine (call forwarding + missed call capture)",
-        "Social Engine (auto-post workflow)",
-        "Ads Engine (Google Ads starter alignment)",
-        "Books Engine (QuickBooks connection where supported)"
-      ],
-      "notes": "Do NOT promise specific integrations unless they exist in product. Each add-on should have a 'Learn more' expand/collapse with requirements and what the customer must connect."
+      "id": "add-ons",
+      "type": "addons",
+      "components": ["Section", "Container", "Heading", "Text", "Card", "Badge", "Divider", "Link"],
+      "content": {
+        "h2": "Optional add-ons",
+        "intro": "Add-ons connect your tools and automate workflows. They require account access and can be enabled after your site is in a good place.",
+        "addons": [
+          {
+            "name": "Inbox Engine",
+            "badge": "Email",
+            "description": "Routing, auto-replies, follow-ups.",
+            "requires": ["Email provider access (e.g., Google Workspace/Microsoft)"]
+          },
+          {
+            "name": "Phone Engine",
+            "badge": "Calls",
+            "description": "Call forwarding, missed-call capture, follow-up texts/emails.",
+            "requires": ["Call routing destination(s)", "Forwarding provider configuration"]
+          },
+          {
+            "name": "Social Engine",
+            "badge": "Social",
+            "description": "Auto-posting and content loop.",
+            "requires": ["Social account access"]
+          },
+          {
+            "name": "Ads Engine",
+            "badge": "Ads",
+            "description": "Google Ads setup + landing alignment.",
+            "requires": ["Google Ads account access"]
+          },
+          {
+            "name": "Books Engine",
+            "badge": "Accounting",
+            "description": "QuickBooks connection + invoicing triggers.",
+            "requires": ["QuickBooks OAuth approval"]
+          }
+        ],
+        "notes": [
+          "Do not claim integrations are enabled by default.",
+          "State clearly: add-ons require explicit connections and approvals."
+        ]
+      }
     },
     {
       "id": "faq",
       "type": "faq",
-      "headline": "FAQ",
-      "notes": "Include FAQ items: what is included, what is a credit, what happens after intake, can I buy more credits, do you deploy automatically, what pages are included, what is Premium builder scope. Keep answers short and truth-pack safe."
+      "components": ["Section", "Container", "Heading", "Text", "Card", "Divider", "Link"],
+      "content": {
+        "h2": "FAQ",
+        "items": [
+          {
+            "q": "What happens after I submit the intake?",
+            "a": "We generate a plan and a preview. You review it, then approve or request changes."
+          },
+          {
+            "q": "Do you deploy changes automatically?",
+            "a": "We deploy after approval. Some changes may require access or confirmations depending on your setup."
+          },
+          {
+            "q": "Can I buy more revisions?",
+            "a": "Yes. When credits are exhausted, you can purchase more credits."
+          },
+          {
+            "q": "Does Premium include Builder execution?",
+            "a": "Yes—Premium allows Builder execution for approved marketing UI surfaces only."
+          }
+        ]
+      }
     },
     {
-      "id": "final_cta",
-      "type": "final_cta",
-      "headline": "Ready to see your improved site?",
-      "subheadline": "Start with the intake. Get a plan and preview. Approve when it's right.",
-      "ctas": [
-        { "label": "Start your intake", "href": "/intake", "style": "primary" },
-        { "label": "See examples", "href": "/examples", "style": "secondary" }
-      ],
-      "notes": "Sticky CTA on mobile should appear by ~20% scroll, not later."
+      "id": "closing-cta",
+      "type": "cta",
+      "components": ["Section", "Container", "Heading", "Text", "Button", "Link"],
+      "content": {
+        "h2": "Ready to start?",
+        "text": "Pick a tier and submit your intake. We’ll generate a preview you can approve or iterate on.",
+        "primaryCta": { "text": "Choose plan", "href": "#plans" },
+        "secondaryCta": { "text": "See examples", "href": "/examples" }
+      },
+      "layout": {
+        "notes": ["One primary CTA only. Secondary CTA is a link-style button."]
+      }
     }
-  ],
-  "constraints": {
-    "allowedFolders": [
-      "client/src/pages/**",
-      "client/src/components/marketing/**",
-      "client/src/styles/**"
-    ],
-    "forbiddenFolders": [
-      "server/**",
-      "drizzle/**",
-      "scripts/**",
-      "package.json",
-      ".env*"
-    ],
-    "mustUseExistingComponents": true,
-    "mobileRequirements": [
-      "Single primary CTA per screen",
-      "All tier cards must stack cleanly (no 3-across on mobile)",
-      "Pricing CTA visible by 1.5 screens",
-      "No horizontal scroll at any breakpoint"
-    ]
-  },
-  "acceptance": {
-    "mustPass": [
-      "One clear primary CTA in hero",
-      "Tier cards readable on mobile and stack vertically",
-      "Credits explanation is explicit and unambiguous",
-      "No new claims about integrations or guarantees"
-    ],
-    "shouldPass": [
-      "Comparison table is scannable in <10 seconds",
-      "FAQ answers <3 sentences each",
-      "Consistent spacing rhythm across sections"
-    ]
-  }
+  ]
 }
+
