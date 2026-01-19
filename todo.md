@@ -2653,17 +2653,18 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
   - A2: EmailSendResult type already had resendMessageId field
   - A3: sendActionRequestEmail return type updated to include resendMessageId + correct provider types
 
-### Active Bucket
+### Completed Buckets (continued)
 - [x] Bucket B: Portal credits (2 errors) - COMPLETE: 17→15 errors
   - B1: decrementIntakeCredit no-op export added to server/db.ts
   - B2: creditsRemaining computed at portal boundary based on tier
+- [x] Copy Refine: Type union alignment (4 errors) - COMPLETE: 15→11 errors
+  - Fixed z.record() to include key type z.string()
+  - Added actionRequestIds, needsHuman, error to AiCopyRefineResult success/failure branches
 
-### Remaining Errors (15 total)
+### Remaining Errors (11 total)
 - AI Tennis/AIML: 6 errors (PromptPackRole/Task, callAimlJson, traceId type)
 - Contracts: 3 errors (duplicate exports, duplicate properties)
-- Copy Refine: 3 errors (actionRequestIds, needsHuman, error property)
-- Preflight: 2 errors (Expected 2-3 arguments)
-- Portal: 2 errors (decrementIntakeCredit, creditsRemaining)
+- Preflight/ActionRequests: 2 errors (Expected 2-3 arguments for z.record)
 - Provider Factory: 1 error (MapIterator downlevelIteration)
 
-**Target:** <20 errors for production readiness (currently at 17)
+**Target:** <20 errors for production readiness ✅ ACHIEVED (currently at 11)

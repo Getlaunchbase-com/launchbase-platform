@@ -21,7 +21,7 @@ export const aiCopyRefineRouter = router({
         intakeId: z.number(),
         userText: z.string().min(1).max(1000),
         targetSection: z.string().optional(),
-        currentCopy: z.record(z.any()).optional(),
+        currentCopy: z.record(z.string(), z.any()).optional(),
         constraints: z
           .object({
             maxRounds: z.number().min(1).max(6).optional(),

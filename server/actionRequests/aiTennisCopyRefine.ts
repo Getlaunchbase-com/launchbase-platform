@@ -43,8 +43,11 @@ export type AiCopyRefineResult =
   | {
       success: true;
       actionRequestId: number;
+      actionRequestIds?: string[];  // Router expects array
       traceId: string;
       stopReason: "ok";
+      needsHuman?: boolean;  // Router expects this
+      error?: string;  // Router expects this
       meta: {
         rounds: number;
         estimatedUsd: number;
@@ -57,6 +60,8 @@ export type AiCopyRefineResult =
       stopReason: ServiceFailReason;
       traceId: string;
       needsHuman?: boolean;
+      error?: string;  // Router expects this
+      actionRequestIds?: string[];  // Router expects array
       meta: {
         rounds: number;
         estimatedUsd: number;
