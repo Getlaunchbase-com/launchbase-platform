@@ -161,13 +161,13 @@ async function main() {
   console.log(`   Total Latency: ${result.totalLatencyMs}ms`);
   console.log(`   Diagnosis: ${result.repairPacket.diagnosis.likelyCause}`);
   console.log(`   Confidence: ${result.repairPacket.diagnosis.confidence}`);
-  console.log(`   Changes Proposed: ${result.repairPacket.patchPlan.changes.length}`);
+  console.log(`   Changes Proposed: ${(result.repairPacket.patchPlan?.changes ?? []).length}`);
 
   // Apply patch if requested
   if (shouldApply && result.repairPacket.execution.applied) {
     console.log(`\n🔧 Applying patch...`);
     
-    for (const change of result.repairPacket.patchPlan.changes) {
+    for (const change of (result.repairPacket.patchPlan?.changes ?? [])) {
       console.log(`   ${change.operation.toUpperCase()}: ${change.file}`);
       console.log(`      ${change.description}`);
       

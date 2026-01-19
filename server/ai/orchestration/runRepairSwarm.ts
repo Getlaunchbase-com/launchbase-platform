@@ -212,7 +212,7 @@ async function runReviewer(pkt: FailurePacketV1, patch: any): Promise<{
 ${JSON.stringify(patch.changes, null, 2)}
 
 **Test Plan:**
-${patch.testPlan.join("\n")}
+${(patch.testPlan ?? []).join("\n")}
 
 **Your task:**
 1. Identify any concerns or risks with the patch
@@ -478,7 +478,7 @@ export async function runRepairSwarm(opts: RepairSwarmOpts): Promise<RepairSwarm
       stopReason: arbiter.decision === "apply" ? "ok" : "human_review_required",
       logs: [
         `Field General: ${diagnosis.likelyCause}`,
-        `Coder: ${patch.changes.length} changes proposed`,
+        `Coder: ${(patch.changes ?? []).length} changes proposed`,
         `Reviewer: ${review.approved ? "APPROVED" : "REJECTED"}`,
         `Arbiter: ${arbiter.decision.toUpperCase()}`,
       ],
@@ -487,7 +487,7 @@ export async function runRepairSwarm(opts: RepairSwarmOpts): Promise<RepairSwarm
     },
     scorecard: {
       coderScore: review.approved ? 0.9 : 0.5,
-      reviewerScore: review.concerns.length === 0 ? 0.9 : 0.7,
+      reviewerScore: (review.concerns ?? []).length === 0 ? 0.9 : 0.7,
       arbiterScore: arbiter.decision === "apply" ? 0.9 : 0.5,
       overallScore: arbiter.decision === "apply" ? 0.85 : 0.5,
       trustDelta: arbiter.decision === "apply" ? +0.05 : -0.02,
