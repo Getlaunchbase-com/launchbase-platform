@@ -58,7 +58,7 @@ export class ModelRegistry {
   }
 
   list(): NormalizedModel[] {
-    return [...this.state.models.values()];
+    return Array.from(this.state.models.values());
   }
 
   /**

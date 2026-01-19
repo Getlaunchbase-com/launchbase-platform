@@ -27,14 +27,14 @@ export function normalizeCraftFastPayload(payload: any): NormalizeResult {
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
     return {
       payload,
-      event: { truncated: false, from: 0, to: 0 },
+      event: { kind: "truncate", applied: false, truncated: false, from: 0, to: 0 },
     };
   }
   
   if (!Array.isArray(payload.proposedChanges)) {
     return {
       payload,
-      event: { truncated: false, from: 0, to: 0 },
+      event: { kind: "truncate", applied: false, truncated: false, from: 0, to: 0 },
     };
   }
   
@@ -47,14 +47,14 @@ export function normalizeCraftFastPayload(payload: any): NormalizeResult {
         ...payload,
         proposedChanges: payload.proposedChanges.slice(0, 8),
       },
-      event: { truncated: true, from: n, to: 8 },
+      event: { kind: "truncate", applied: true, truncated: true, from: n, to: 8 },
     };
   }
   
   // Leave as-is if <=8
   return {
     payload,
-    event: { truncated: false, from: n, to: n },
+    event: { kind: "truncate", applied: false, truncated: false, from: n, to: n },
   };
 }
 

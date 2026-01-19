@@ -52,7 +52,7 @@ export class ModelRouter {
     candidateIds.push(resolution.primary.id, ...resolution.fallbacks.map((m) => m.id));
 
     // de-dupe while preserving order
-    const uniq = [...new Set(candidateIds)];
+    const uniq = Array.from(new Set(candidateIds));
 
     const maxAttempts = opts.maxAttempts ?? 3;
     const attemptList = uniq.slice(0, maxAttempts);

@@ -500,9 +500,9 @@ export async function runPilotMacro(params: {
         systemsPayload = result.payload;
         normalizationTracking.events.systems = {
           kind: 'truncate',
-          applied: result.event.truncated,
-          from: result.event.from,
-          to: result.event.to,
+          applied: !!result.event.truncated,
+          from: result.event.from ?? 0,
+          to: result.event.to ?? 0,
         };
         if (result.event.truncated) {
           normalizationTracking.applied = true;
@@ -669,9 +669,9 @@ export async function runPilotMacro(params: {
         brandPayload = result.payload;
         normalizationTracking.events.brand = {
           kind: 'truncate',
-          applied: result.event.truncated,
-          from: result.event.from,
-          to: result.event.to,
+          applied: !!result.event.truncated,
+          from: result.event.from ?? 0,
+          to: result.event.to ?? 0,
         };
         if (result.event.truncated) {
           normalizationTracking.applied = true;
