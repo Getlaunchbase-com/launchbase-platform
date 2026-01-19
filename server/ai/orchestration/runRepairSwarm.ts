@@ -184,7 +184,8 @@ Return JSON:
   const latencyMs = Date.now() - startMs;
   const costUsd = result.meta.costUsd || 0;
 
-  console.log(`[Coder] Proposed ${result.artifact.payload.changes.length} changes`);
+  const changes = result.artifact?.payload?.changes ?? [];
+  console.log(`[Coder] Proposed ${changes.length} changes`);
 
   return {
     ...result.artifact.payload,

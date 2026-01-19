@@ -48,7 +48,10 @@ const featureList = [
   "Preview before publish",
   "Request changes (1 credit per request)",
   "Optional add-on engines (Inbox/Phone/Social/Ads/Books)",
-];
+] as const;
+
+type FeatureKey = (typeof featureList)[number];
+type TierFeatures = Record<FeatureKey, boolean>;
 
 export default function CompareTiers() {
   return (

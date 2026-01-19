@@ -233,12 +233,22 @@ async function insertCandidates(
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
+  const EMPTY_SCORE_BREAKDOWN = {
+    readability: 0,
+    hierarchy: 0,
+    mobileClarity: 0,
+    conversionClarity: 0,
+    brandNeutrality: 0,
+    signals: {},
+    violations: [],
+  };
+
   const rows: InsertDesignCandidate[] = candidates.map((c) => ({
     designJobId,
     variantKey: c.variantKey,
     designJson: c.design as any,
     scoreTotal: 0, // Will be updated after scoring
-    scoreBreakdown: {},
+    scoreBreakdown: EMPTY_SCORE_BREAKDOWN,
     rank: 0, // Will be updated after ranking
   }));
 
