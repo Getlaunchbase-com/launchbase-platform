@@ -34,6 +34,7 @@ interface OnboardingData {
   enrichmentLayer: boolean;
   googleBusiness: boolean;
   quickBooksSync: boolean;
+  phoneService?: boolean;
   promoCode?: string;
 }
 
@@ -979,7 +980,7 @@ export default function Onboarding() {
               serviceSelections={{
                 website: data.website,
                 emailService: data.emailService,
-                socialMediaTier: data.socialMediaTier,
+                socialMediaTier: data.socialMediaTier === "LOW" ? "SMALL" : data.socialMediaTier === "HIGH" ? "LARGE" : data.socialMediaTier,
                 googleBusiness: data.googleBusiness,
                 quickBooksSync: data.quickBooksSync,
                 phoneService: data.phoneService

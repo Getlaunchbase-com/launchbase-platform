@@ -27,6 +27,7 @@ export interface ValidationPolicy {
 export type TruncateEvent = {
   kind: "truncate";
   applied: boolean;
+  truncated?: boolean;
   from: number;
   to: number;
 };
@@ -37,6 +38,9 @@ export type CoerceRisksEvent = {
   coercedCount: number;
   fromType: "object";
   toType: "string";
+  truncated?: boolean;
+  from?: number;
+  to?: number;
 };
 
 // Union (still useful for generic handling / logging)

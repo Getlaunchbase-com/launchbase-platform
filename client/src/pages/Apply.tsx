@@ -530,7 +530,7 @@ export default function ApplyPage() {
       // Additional burden data for internal use
       burdens: form.burdens,
       involvement: form.involvement,
-      tier: form.tier,
+      tier: form.tier ?? undefined,
       enginesSelected: form.enginesSelected,
     });
   }
