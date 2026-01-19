@@ -148,7 +148,7 @@ const memoryProvider: AiProvider = {
       // Wildcard matching ONLY in tests (for unpredictable Date.now() jobIds)
       // Production code should use deterministic jobIds or mock Date.now()
       if (!rawText && schema && jobId && typeof process !== 'undefined' && (process.env.VITEST === 'true' || process.env.VITEST === '1')) {
-        for (const [key, value] of memoryStore.entries()) {
+        for (const [key, value] of Array.from(memoryStore.entries())) {
           if (key.startsWith(`${schema}:${model}:`) && key.endsWith(`:${round}`)) {
             rawText = value;
             break;

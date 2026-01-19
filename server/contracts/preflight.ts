@@ -74,7 +74,8 @@ export const RepairPacketV1Schema = z.object({
   })),
 });
 
-export type RepairPacketV1 = z.infer<typeof RepairPacketV1Schema>;
+// Note: RepairPacketV1 type is exported from ./repairPacket.ts
+// This schema is for preflight validation only
 
 // FailurePacketV1
 export const FailurePacketV1Schema = z.object({
@@ -86,10 +87,12 @@ export const FailurePacketV1Schema = z.object({
   errorMessage: z.string(),
   stack: z.string().optional(),
   timestampIso: z.string(),
-  context: z.record(z.unknown()).optional(),
+  context: z.record(z.string(), z.unknown()).optional(),
 });
 
-export type FailurePacketV1 = z.infer<typeof FailurePacketV1Schema>;
+// Preflight-specific type (for validation)
+type FailurePacketV1Preflight = z.infer<typeof FailurePacketV1Schema>;
+export type { FailurePacketV1Preflight as FailurePacketV1 };
 
 // PreflightResultV1 (combined output)
 export const PreflightResultV1Schema = z.object({

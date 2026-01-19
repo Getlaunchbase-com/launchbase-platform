@@ -2660,11 +2660,19 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [x] Copy Refine: Type union alignment (4 errors) - COMPLETE: 15→11 errors
   - Fixed z.record() to include key type z.string()
   - Added actionRequestIds, needsHuman, error to AiCopyRefineResult success/failure branches
+- [x] Micro-bucket 1: Preflight/ActionRequests z.record (2 errors) - COMPLETE: 11→9 errors
+  - Fixed z.record(z.unknown()) → z.record(z.string(), z.unknown()) in preflight.ts
+  - Fixed z.record(z.any()) → z.record(z.string(), z.any()) in actionRequestsRouter.ts
+- [x] Micro-bucket 2: Provider Factory MapIterator (1 error) - COMPLETE: 9→8 errors
+  - Wrapped memoryStore.entries() with Array.from() to avoid downlevelIteration flag
+- [x] Micro-bucket 3: Contracts duplicate exports (3 errors) - COMPLETE: 8→7 errors
+  - Replaced wildcard exports with explicit named exports in contracts/index.ts
+  - Separated preflight schemas from full contract types
+  - Fixed runPreflight.ts to import RepairPacketV1 from repairPacket.ts directly
 
-### Remaining Errors (11 total)
+### Remaining Errors (7 total)
 - AI Tennis/AIML: 6 errors (PromptPackRole/Task, callAimlJson, traceId type)
-- Contracts: 3 errors (duplicate exports, duplicate properties)
-- Preflight/ActionRequests: 2 errors (Expected 2-3 arguments for z.record)
-- Provider Factory: 1 error (MapIterator downlevelIteration)
+- Contracts: 1 error (duplicate property in failurePacket.ts)
 
-**Target:** <20 errors for production readiness ✅ ACHIEVED (currently at 11)
+**Target:** <20 errors for production readiness ✅ ACHIEVED (currently at 7)
+**Progress:** 75 → 7 errors (-68 errors, 91% reduction)

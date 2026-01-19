@@ -188,7 +188,7 @@ export const actionRequestsRouter = router({
       id: z.number(),
       userText: z.string().min(1),
       targetSection: z.string().optional(),
-      currentCopy: z.record(z.any()).optional(),
+      currentCopy: z.record(z.string(), z.any()).optional(),
       constraints: z.object({
         maxRounds: z.number().int().min(1).max(6).optional(),
         costCapUsd: z.number().min(0).max(10).optional(),
