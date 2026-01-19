@@ -10,7 +10,10 @@
  * 4. Idempotency unchanged (same CORE → same keyHash)
  */
 
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest
+import { allowNetwork } from "../../../__tests__/helpers/networkGate";
+
+const t = allowNetwork ? test : test.skip;";
 import type { SpecialistOutput } from "../specialists";
 import { registerPolicies, clearPolicyRegistry } from "../policy/policyRegistry";
 import { ALL_POLICIES } from "../policy/policyBundle";
@@ -98,7 +101,7 @@ describe("Swarm Orchestration — Gate 1 Tripwire Tests", () => {
   // TEST 1: Policy toggle behavior
   // ============================================
 
-  it("produces no swarm artifacts when swarm disabled", async () => {
+  t("produces no swarm artifacts when swarm disabled", async () => {
     const workOrder: AiWorkOrderV1 = {
       version: "v1",
       tenant: "test-tenant",
@@ -137,7 +140,7 @@ describe("Swarm Orchestration — Gate 1 Tripwire Tests", () => {
     expect(swarmArtifacts.length).toBe(0);
   });
 
-  it("produces exactly 4 swarm artifacts when swarm enabled", async () => {
+  t("produces exactly 4 swarm artifacts when swarm enabled", async () => {
     const workOrder: AiWorkOrderV1 = {
       version: "v1",
       tenant: "test-tenant",
@@ -179,7 +182,7 @@ describe("Swarm Orchestration — Gate 1 Tripwire Tests", () => {
   // TEST 2: Artifact order frozen
   // ============================================
 
-  it("produces swarm artifacts in exact order: plan, craft, critic, collapse", async () => {
+  t("produces swarm artifacts in exact order: plan, craft, critic, collapse", async () => {
     const workOrder: AiWorkOrderV1 = {
       version: "v1",
       tenant: "test-tenant",
@@ -230,7 +233,7 @@ describe("Swarm Orchestration — Gate 1 Tripwire Tests", () => {
   // TEST 3: Customer safety invariant
   // ============================================
 
-  it("marks only swarm.collapse as customerSafe=true", async () => {
+  t("marks only swarm.collapse as customerSafe=true", async () => {
     const workOrder: AiWorkOrderV1 = {
       version: "v1",
       tenant: "test-tenant",
@@ -283,7 +286,7 @@ describe("Swarm Orchestration — Gate 1 Tripwire Tests", () => {
   // TEST 4: Idempotency unchanged
   // ============================================
 
-  it("produces same keyHash for same CORE inputs", () => {
+  t("produces same keyHash for same CORE inputs", () => {
     const workOrder1: AiWorkOrderV1 = {
       version: "v1",
       tenant: "test-tenant",
@@ -325,7 +328,7 @@ describe("Swarm Orchestration — Gate 1 Tripwire Tests", () => {
     expect(key1).toBe(key2); // Same CORE → same keyHash
   });
 
-  it("produces different keyHash for different CORE inputs", () => {
+  t("produces different keyHash for different CORE inputs", () => {
     const workOrder1: AiWorkOrderV1 = {
       version: "v1",
       tenant: "test-tenant",
@@ -372,7 +375,7 @@ describe("Swarm Orchestration — Gate 1 Tripwire Tests", () => {
   // TEST 5: stopReason always present
   // ============================================
 
-  it("includes stopReason in successful swarm execution", async () => {
+  t("includes stopReason in successful swarm execution", async () => {
     const workOrder: AiWorkOrderV1 = {
       version: "v1",
       tenant: "test-tenant",

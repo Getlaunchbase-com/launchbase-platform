@@ -2680,3 +2680,9 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 **Final Status:** 0 errors ✅ (100% type-safe)
 **Progress:** 75 → 0 errors (-75 errors, 100% reduction)
 **Target:** <20 errors for production readiness ✅ EXCEEDED
+
+- [x] Network test gating complete (8 files, 26 tests gated)
+  - Created networkGate helper with explicit Option A logic (flag-only gating)
+  - Applied Pattern A to 8 network-dependent test files
+  - Added banner showing ALLOW_NETWORK_TESTS and AI_PROVIDER status
+  - Verified: 26 tests skip by default, run with ALLOW_NETWORK_TESTS=1

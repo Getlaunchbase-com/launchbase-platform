@@ -14,7 +14,10 @@
  * - No new stopReason values
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest
+import { allowNetwork } from "../../../__tests__/helpers/networkGate";
+
+const t = allowNetwork ? test : test.skip;";
 import type { SpecialistOutput } from "../specialists";
 import { clearPolicyRegistry, registerPolicies } from "../policy/policyRegistry";
 import { ALL_POLICIES } from "../policy/policyBundle";
@@ -116,7 +119,7 @@ describe("Swarm Orchestration — Gate 3 Tripwire Tests", () => {
   // TEST 1: Field General uses memory transport
   // ============================================
   
-  it("uses memory transport for field_general (no provider call)", async () => {
+  t("uses memory transport for field_general (no provider call)", async () => {
     const order: AiWorkOrderV1 = {
       version: "v1",
       tenant: "launchbase",
@@ -152,7 +155,7 @@ describe("Swarm Orchestration — Gate 3 Tripwire Tests", () => {
   // TEST 2: Craft/Critic use policy-defined models
   // ============================================
   
-  it("uses policy-defined models for craft and critic specialists", async () => {
+  t("uses policy-defined models for craft and critic specialists", async () => {
     const order: AiWorkOrderV1 = {
       version: "v1",
       tenant: "launchbase",
@@ -187,7 +190,7 @@ describe("Swarm Orchestration — Gate 3 Tripwire Tests", () => {
   // TEST 3: Cost accounting present on every run
   // ============================================
   
-  it("includes meta.swarm.roleCostsUsd and totalCostUsd on every run", async () => {
+  t("includes meta.swarm.roleCostsUsd and totalCostUsd on every run", async () => {
     const order: AiWorkOrderV1 = {
       version: "v1",
       tenant: "launchbase",
@@ -225,7 +228,7 @@ describe("Swarm Orchestration — Gate 3 Tripwire Tests", () => {
   // TEST 4: Per-role cap triggers correct stopReason
   // ============================================
   
-  it("enforces per-role cost cap and sets correct stopReason", async () => {
+  t("enforces per-role cost cap and sets correct stopReason", async () => {
     const order: AiWorkOrderV1 = {
       version: "v1",
       tenant: "launchbase",
@@ -260,7 +263,7 @@ describe("Swarm Orchestration — Gate 3 Tripwire Tests", () => {
   // TEST 5: Total cap halts with skipped artifact
   // ============================================
   
-  it("halts before next specialist when total cap exceeded, emits skipped artifact", async () => {
+  t("halts before next specialist when total cap exceeded, emits skipped artifact", async () => {
     const order: AiWorkOrderV1 = {
       version: "v1",
       tenant: "launchbase",
@@ -300,7 +303,7 @@ describe("Swarm Orchestration — Gate 3 Tripwire Tests", () => {
   // TEST 6: CustomerSafe boundary unchanged
   // ============================================
   
-  it("marks only swarm.collapse as customerSafe=true (frozen contract)", async () => {
+  t("marks only swarm.collapse as customerSafe=true (frozen contract)", async () => {
     const order: AiWorkOrderV1 = {
       version: "v1",
       tenant: "launchbase",

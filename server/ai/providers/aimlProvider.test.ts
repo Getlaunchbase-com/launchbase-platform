@@ -4,15 +4,19 @@
  * Validates that the AIML API key works with a lightweight API call.
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, test } from "vitest";
+import { allowNetwork } from "../../__tests__/helpers/networkGate";
 import { aimlProvider, isAimlConfigured } from "./aimlProvider";
 
-describe("aimlProvider", () => {
-  it("should have AIML_API_KEY configured", () => {
+const t = allowNetwork ? test : test.skip;
+const describeN = allowNetwork ? describe : describe.skip;
+
+describeN("aimlProvider", () => {
+  t("should have AIML_API_KEY configured", () => {
     expect(isAimlConfigured()).toBe(true);
   });
 
-  it("should make a successful API call to AIML", async () => {
+  t("should make a successful API call to AIML", async () => {
     // Skip if no API key (shouldn't happen in this test, but safety check)
     if (!isAimlConfigured()) {
       console.warn("AIML_API_KEY not configured, skipping API test");

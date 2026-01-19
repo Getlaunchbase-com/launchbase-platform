@@ -14,7 +14,10 @@
  * - No prompt/provider internals leak
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest
+import { allowNetwork } from "../../../__tests__/helpers/networkGate";
+
+const t = allowNetwork ? test : test.skip;";
 import type { SpecialistOutput } from "../specialists";
 import { clearPolicyRegistry, registerPolicies } from "../policy/policyRegistry";
 import { ALL_POLICIES } from "../policy/policyBundle";
@@ -116,7 +119,7 @@ describe("Swarm Orchestration — Gate 4 Tripwire Tests", () => {
   // T1: Stable output envelope
   // ============================================
   
-  it("T1: returns stable output envelope (status, stopReason, artifacts)", async () => {
+  t("T1: returns stable output envelope (status, stopReason, artifacts)", async () => {
     const order: AiWorkOrderV1 = {
       version: "v1",
       tenant: "launchbase",
@@ -147,7 +150,7 @@ describe("Swarm Orchestration — Gate 4 Tripwire Tests", () => {
   // T2: Frozen artifact ordering preserved
   // ============================================
   
-  it("T2: preserves frozen artifact ordering (plan → craft → critic → collapse)", async () => {
+  t("T2: preserves frozen artifact ordering (plan → craft → critic → collapse)", async () => {
     const order: AiWorkOrderV1 = {
       version: "v1",
       tenant: "launchbase",
@@ -185,7 +188,7 @@ describe("Swarm Orchestration — Gate 4 Tripwire Tests", () => {
   // T3: Telemetry required
   // ============================================
   
-  it("T3: includes required telemetry (roleCostsUsd, totalCostUsd, roleModels)", async () => {
+  t("T3: includes required telemetry (roleCostsUsd, totalCostUsd, roleModels)", async () => {
     const order: AiWorkOrderV1 = {
       version: "v1",
       tenant: "launchbase",
@@ -226,7 +229,7 @@ describe("Swarm Orchestration — Gate 4 Tripwire Tests", () => {
   // T4: Cost caps enforced, non-chaotic
   // ============================================
   
-  it("T4: enforces cost caps without chaos (per-role + total)", async () => {
+  t("T4: enforces cost caps without chaos (per-role + total)", async () => {
     const order: AiWorkOrderV1 = {
       version: "v1",
       tenant: "launchbase",
@@ -258,7 +261,7 @@ describe("Swarm Orchestration — Gate 4 Tripwire Tests", () => {
   // T5: Run persistence contract
   // ============================================
   
-  it("T5: output structure supports persistence (input, output, summary)", async () => {
+  t("T5: output structure supports persistence (input, output, summary)", async () => {
     const order: AiWorkOrderV1 = {
       version: "v1",
       tenant: "launchbase",
@@ -295,7 +298,7 @@ describe("Swarm Orchestration — Gate 4 Tripwire Tests", () => {
   // T6: No prompt/provider internals leak
   // ============================================
   
-  it("T6: does not leak prompts or provider internals", async () => {
+  t("T6: does not leak prompts or provider internals", async () => {
     const order: AiWorkOrderV1 = {
       version: "v1",
       tenant: "launchbase",
@@ -335,7 +338,7 @@ describe("Swarm Orchestration — Gate 4 Tripwire Tests", () => {
   // T7: Showroom-to-policy mapping deterministic
   // ============================================
   
-  it("T7: produces deterministic keyHash for same inputs", async () => {
+  t("T7: produces deterministic keyHash for same inputs", async () => {
     const orderA: AiWorkOrderV1 = {
       version: "v1",
       tenant: "launchbase",

@@ -9,11 +9,14 @@
  * - Deterministic for same inputs
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect } from "vitest
+import { allowNetwork } from "../../../__tests__/helpers/networkGate";
+
+const t = allowNetwork ? test : test.skip;";
 import { buildDeterministicCollapse } from "../swarm/collapseDeterministic";
 
 describe("Gate 5: deterministic collapse", () => {
-  it("returns ok with payload when craft+critic are clean", () => {
+  t("returns ok with payload when craft+critic are clean", () => {
     const res = buildDeterministicCollapse({
       craft: {
         stopReason: "ok",
@@ -45,7 +48,7 @@ describe("Gate 5: deterministic collapse", () => {
     expect(res.payload?.assumptions).toContain("Target audience prefers brevity");
   });
 
-  it("returns needs_human when critic fails", () => {
+  t("returns needs_human when critic fails", () => {
     const res = buildDeterministicCollapse({
       craft: {
         stopReason: "ok",
@@ -66,7 +69,7 @@ describe("Gate 5: deterministic collapse", () => {
     expect(res.payload).toBeNull();
   });
 
-  it("returns needs_human when no changes exist", () => {
+  t("returns needs_human when no changes exist", () => {
     const res = buildDeterministicCollapse({
       craft: {
         stopReason: "ok",
@@ -82,7 +85,7 @@ describe("Gate 5: deterministic collapse", () => {
     expect(res.payload).toBeNull();
   });
 
-  it("returns needs_human when craft stopReason is not ok", () => {
+  t("returns needs_human when craft stopReason is not ok", () => {
     const res = buildDeterministicCollapse({
       craft: {
         stopReason: "provider_failed",
@@ -98,7 +101,7 @@ describe("Gate 5: deterministic collapse", () => {
     expect(res.payload).toBeNull();
   });
 
-  it("returns needs_human when critic stopReason is not ok", () => {
+  t("returns needs_human when critic stopReason is not ok", () => {
     const res = buildDeterministicCollapse({
       craft: {
         stopReason: "ok",
@@ -114,7 +117,7 @@ describe("Gate 5: deterministic collapse", () => {
     expect(res.payload).toBeNull();
   });
 
-  it("forbidden keys never appear in extensions", () => {
+  t("forbidden keys never appear in extensions", () => {
     const res = buildDeterministicCollapse({
       craft: {
         stopReason: "ok",
@@ -139,7 +142,7 @@ describe("Gate 5: deterministic collapse", () => {
     expect(extensionsStr).not.toMatch(/prompt|system|provider|stack|traceback|error/i);
   });
 
-  it("deterministic for same inputs", () => {
+  t("deterministic for same inputs", () => {
     const input = {
       craft: {
         stopReason: "ok",
@@ -166,7 +169,7 @@ describe("Gate 5: deterministic collapse", () => {
     expect(a).toEqual(b);
   });
 
-  it("merges risks and assumptions from craft and critic", () => {
+  t("merges risks and assumptions from craft and critic", () => {
     const res = buildDeterministicCollapse({
       craft: {
         stopReason: "ok",

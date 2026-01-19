@@ -9,6 +9,9 @@
 
 // No global mocks here - tests opt-in via helpers when needed
 
+// Network test banner
+console.log(`[tests] ALLOW_NETWORK_TESTS=${process.env.ALLOW_NETWORK_TESTS ?? "0"} AI_PROVIDER=${process.env.AI_PROVIDER ?? "(unset)"}`);
+
 function pickTestDbUrl(): string {
   // Manus platform may provide different env vars for test vs prod
   // Priority: TEST_DATABASE_URL > DATABASE_URL_TEST > DATABASE_URL

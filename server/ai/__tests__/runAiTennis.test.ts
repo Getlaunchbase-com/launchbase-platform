@@ -9,8 +9,11 @@
  * - No prompt leakage in logs/errors
  */
 
-import { describe, it, expect, vi, beforeAll, afterAll } from "vitest";
+import { describe, it, expect, vi, beforeAll, afterAll, test } from "vitest";
+import { allowNetwork } from "../../__tests__/helpers/networkGate";
 import { runAiTennis } from "../runAiTennis";
+
+const t = allowNetwork ? test : test.skip;
 
 describe("runAiTennis", () => {
   beforeAll(() => {
@@ -21,7 +24,7 @@ describe("runAiTennis", () => {
     delete process.env.AI_PROVIDER;
   });
 
-  it("completes generate → critique → collapse flow", async () => {
+  t("completes generate → critique → collapse flow", async () => {
     const result = await runAiTennis(
       { userText: "Rewrite homepage copy" },
       {
@@ -40,7 +43,7 @@ describe("runAiTennis", () => {
     expect(result.meta.models.length).toBeGreaterThan(0);
   });
 
-  it("stops early when needsHuman: true in draft", async () => {
+  t("stops early when needsHuman: true in draft", async () => {
     // Mock memory provider to return needsHuman: true
     const result = await runAiTennis(
       { userText: "Complex request requiring human review" },
@@ -57,7 +60,7 @@ describe("runAiTennis", () => {
     expect(result.needsHuman).toBeDefined();
   });
 
-  it("respects maxTokensTotal budget", async () => {
+  t("respects maxTokensTotal budget", async () => {
     try {
       await runAiTennis(
         { userText: "Test budget enforcement" },
@@ -75,7 +78,7 @@ describe("runAiTennis", () => {
     }
   });
 
-  it("respects costCapUsd budget", async () => {
+  t("respects costCapUsd budget", async () => {
     try {
       await runAiTennis(
         { userText: "Test cost cap enforcement" },
@@ -93,7 +96,7 @@ describe("runAiTennis", () => {
     }
   });
 
-  it("stops when critique score meets threshold", async () => {
+  t("stops when critique score meets threshold", async () => {
     const result = await runAiTennis(
       { userText: "Test early stop on score" },
       {
@@ -110,7 +113,7 @@ describe("runAiTennis", () => {
     expect(result.roundsRun).toBeLessThanOrEqual(1);
   });
 
-  it("does not leak prompt text in logs on provider failure", async () => {
+  t("does not leak prompt text in logs on provider failure", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const error = vi.spyOn(console, "error").mockImplementation(() => {});
 
@@ -138,13 +141,13 @@ describe("runAiTennis", () => {
     error.mockRestore();
   });
 
-  it("validates schema and throws on invalid output", async () => {
+  t("validates schema and throws on invalid output", async () => {
     // This test would require mocking provider to return invalid JSON
     // For now, we test that validation is called
     expect(true).toBe(true); // Placeholder
   });
 
-  it("uses strict router mode (no silent fallback)", async () => {
+  t("uses strict router mode (no silent fallback)", async () => {
     // Strict mode is enforced in runAiTennis by passing { strict: true }
     // If ModelRouter fails, it should throw immediately
     expect(true).toBe(true); // Placeholder - would need to mock ModelRouter failure

@@ -7,7 +7,11 @@
  * - Adjusts recommended thresholds
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, test } from "vitest";
+import { allowNetwork } from "./helpers/networkGate";
+
+const t = allowNetwork ? test : test.skip;
+const describeN = allowNetwork ? describe : describe.skip;
 import { getDb } from "../db";
 import { confidenceLearning } from "../../drizzle/schema";
 import { eq, and } from "drizzle-orm";
@@ -17,7 +21,7 @@ import {
   getConfidenceStats,
 } from "../confidence-learning";
 
-describe("Confidence Learning", () => {
+describeN("Confidence Learning", () => {
   const testKey = "test.confidence.key";
   const tenant = "launchbase";
 
@@ -36,7 +40,7 @@ describe("Confidence Learning", () => {
       );
   });
 
-  it("should create new record on first outcome", async () => {
+  t("should create new record on first outcome", async () => {
     await recordConfidenceOutcome({
       checklistKey: testKey,
       tenant,
@@ -50,7 +54,7 @@ describe("Confidence Learning", () => {
     expect(stats!.recommendedThreshold).toBe(0.9);
   });
 
-  it("should update counters on subsequent outcomes", async () => {
+  t("should update counters on subsequent outcomes", async () => {
     // Record 3 approvals
     await recordConfidenceOutcome({ checklistKey: testKey, tenant, outcome: "approved" });
     await recordConfidenceOutcome({ checklistKey: testKey, tenant, outcome: "approved" });
@@ -61,7 +65,7 @@ describe("Confidence Learning", () => {
     expect(stats!.approvalRate).toBe(1.0); // 3/3 = 100%
   });
 
-  it("should calculate approval rate correctly", async () => {
+  t("should calculate approval rate correctly", async () => {
     // Record 7 approvals, 3 rejections
     for (let i = 0; i < 7; i++) {
       await recordConfidenceOutcome({ checklistKey: testKey, tenant, outcome: "approved" });
@@ -75,7 +79,7 @@ describe("Confidence Learning", () => {
     expect(stats!.approvalRate).toBeCloseTo(0.7, 2); // 7/10 = 70%
   });
 
-  it("should calculate edit rate correctly", async () => {
+  t("should calculate edit rate correctly", async () => {
     // Record 6 approvals, 2 edits, 2 rejections
     for (let i = 0; i < 6; i++) {
       await recordConfidenceOutcome({ checklistKey: testKey, tenant, outcome: "approved" });
@@ -92,7 +96,7 @@ describe("Confidence Learning", () => {
     expect(stats!.editRate).toBeCloseTo(0.2, 2); // 2/10 = 20%
   });
 
-  it("should lower threshold when approval rate > 90%", async () => {
+  t("should lower threshold when approval rate > 90%", async () => {
     // Record 10 approvals (100% approval rate)
     for (let i = 0; i < 10; i++) {
       await recordConfidenceOutcome({ checklistKey: testKey, tenant, outcome: "approved" });
@@ -102,7 +106,7 @@ describe("Confidence Learning", () => {
     expect(threshold).toBe(0.85); // Should be lowered from 0.9
   });
 
-  it("should raise threshold when approval rate < 70%", async () => {
+  t("should raise threshold when approval rate < 70%", async () => {
     // Record 6 approvals, 4 rejections (60% approval rate)
     for (let i = 0; i < 6; i++) {
       await recordConfidenceOutcome({ checklistKey: testKey, tenant, outcome: "approved" });
@@ -115,7 +119,7 @@ describe("Confidence Learning", () => {
     expect(threshold).toBe(0.95); // Should be raised from 0.9
   });
 
-  it("should keep threshold at 0.9 for moderate approval rate", async () => {
+  t("should keep threshold at 0.9 for moderate approval rate", async () => {
     // Record 8 approvals, 2 rejections (80% approval rate)
     for (let i = 0; i < 8; i++) {
       await recordConfidenceOutcome({ checklistKey: testKey, tenant, outcome: "approved" });
@@ -128,12 +132,12 @@ describe("Confidence Learning", () => {
     expect(threshold).toBe(0.9); // Should stay at default
   });
 
-  it("should return default threshold for unknown key", async () => {
+  t("should return default threshold for unknown key", async () => {
     const threshold = await getRecommendedThreshold("unknown.key", tenant);
     expect(threshold).toBe(0.9); // Default
   });
 
-  it("should handle unclear outcomes", async () => {
+  t("should handle unclear outcomes", async () => {
     await recordConfidenceOutcome({ checklistKey: testKey, tenant, outcome: "unclear" });
 
     const stats = await getConfidenceStats(testKey, tenant);

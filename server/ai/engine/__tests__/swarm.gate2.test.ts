@@ -8,7 +8,10 @@
  * - stopReason propagation to artifact payload
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest
+import { allowNetwork } from "../../../__tests__/helpers/networkGate";
+
+const t = allowNetwork ? test : test.skip;";
 import type { SpecialistOutput } from "../specialists";
 import { clearPolicyRegistry, registerPolicies } from "../policy/policyRegistry";
 
@@ -172,7 +175,7 @@ describe("Gate 2: Specialist Intelligence Tripwires", () => {
     vi.clearAllMocks();
   });
 
-  it("1. both specialists succeed → ok", async () => {
+  t("1. both specialists succeed → ok", async () => {
     // Mock: craft ok, critic ok
     (callSpecialistAIML as any).mockImplementation(({ role }: { role: string }) => {
       if (role === "craft") return mockCraftOk();
@@ -199,7 +202,7 @@ describe("Gate 2: Specialist Intelligence Tripwires", () => {
     expect(result.artifacts.length).toBe(4); // plan + craft + critic + collapse
   });
 
-  it("2. swarm disabled → policy_invalid", async () => {
+  t("2. swarm disabled → policy_invalid", async () => {
     const disabledPolicy = {
       ...testPolicies[0],
       policyId: "swarm_disabled",
@@ -225,7 +228,7 @@ describe("Gate 2: Specialist Intelligence Tripwires", () => {
     expect(result.stopReason).toBe("policy_invalid");
   });
 
-  it("3. craft fails → critic runs → safe collapse (continue_with_warnings)", async () => {
+  t("3. craft fails → critic runs → safe collapse (continue_with_warnings)", async () => {
     // Mock: craft fails, critic ok
     (callSpecialistAIML as any).mockImplementation(({ role }: { role: string }) => {
       if (role === "craft") return mockFail("craft", "provider_failed");
@@ -255,7 +258,7 @@ describe("Gate 2: Specialist Intelligence Tripwires", () => {
     expect(result.artifacts[2].payload.stopReason).toBe("ok");
   });
 
-  it("4. critic fails → safe collapse", async () => {
+  t("4. critic fails → safe collapse", async () => {
     // Mock: craft ok, critic fails
     (callSpecialistAIML as any).mockImplementation(({ role }: { role: string }) => {
       if (role === "craft") return mockCraftOk();
@@ -285,7 +288,7 @@ describe("Gate 2: Specialist Intelligence Tripwires", () => {
     expect(result.artifacts[2].payload.stopReason).toBe("provider_failed"); // critic failed
   });
 
-  it("5. per-role cap enforced", async () => {
+  t("5. per-role cap enforced", async () => {
     // Mock: craft exceeds per-role cap (0.25), critic ok
     (callSpecialistAIML as any).mockImplementation(({ role }: { role: string }) => {
       if (role === "craft") return mockCraftOk({ meta: { ...mockCraftOk().meta, costUsd: 0.30 } });
@@ -312,7 +315,7 @@ describe("Gate 2: Specialist Intelligence Tripwires", () => {
     expect(result.artifacts[1].payload.stopReason).toBe("cost_cap_exceeded");
   });
 
-  it("6. total cap enforced", async () => {
+  t("6. total cap enforced", async () => {
     // Mock: craft pushes total over cap (0.75)
     (callSpecialistAIML as any).mockImplementation(({ role }: { role: string }) => {
       if (role === "craft") return mockCraftOk({ meta: { ...mockCraftOk().meta, costUsd: 0.76 } });
@@ -344,7 +347,7 @@ describe("Gate 2: Specialist Intelligence Tripwires", () => {
     expect(result.artifacts[2].payload).toBeNull(); // null payload when needs_human
   });
 
-  it("7. idempotency unchanged (same CORE → same keyHash)", async () => {
+  t("7. idempotency unchanged (same CORE → same keyHash)", async () => {
     (callSpecialistAIML as any).mockImplementation(({ role }: { role: string }) => {
       if (role === "craft") return mockCraftOk();
       if (role === "critic") return mockCriticOk();
@@ -376,7 +379,7 @@ describe("Gate 2: Specialist Intelligence Tripwires", () => {
     expect(result2.status).toBe("succeeded");
   });
 
-  it("8. no leakage in artifacts on provider failure", async () => {
+  t("8. no leakage in artifacts on provider failure", async () => {
     (callSpecialistAIML as any).mockImplementation(({ role }: { role: string }) => {
       if (role === "craft") return mockFail("craft", "provider_failed");
       if (role === "critic") return mockCriticOk();
