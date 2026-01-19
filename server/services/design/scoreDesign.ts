@@ -321,7 +321,7 @@ function calculateBrandNeutrality(candidate: DesignOutput): {
   }
 
   // Bonus for minimal design
-  if (candidate.typography.maxFonts === 1 && candidate.colors.maxAccentColors === 1) {
+  if ((candidate.typography as any).maxFonts === 1 && (candidate.colors as any).maxAccentColors === 1) {
     restraint = 100; // Perfect restraint
   }
 

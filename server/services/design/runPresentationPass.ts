@@ -8,6 +8,45 @@ import { createHash } from "crypto";
 import { eq, and } from "drizzle-orm";
 
 /**
+ * Normalize designJson from DB to DesignOutput (handles legacy + new formats)
+ */
+function toDesignOutput(input: unknown): DesignOutput {
+  if (input && typeof input === "object") {
+    const o = input as any;
+
+    // New format (already DesignOutput)
+    if (o.version && o.tokens && o.layout) return o as DesignOutput;
+
+    // Legacy format -> adapt with safe defaults
+    if (o.hero || o.sections || o.colors || o.typography) {
+      return {
+        version: "v1",
+        variantKey: o?.meta?.variantKey ?? "legacy",
+        tokens: {
+          maxWidth: "lg",
+          radius: "lg",
+          sectionGap: "normal",
+          headingScale: "default",
+          ctaStyle: "solid",
+          trustPlacement: "hero",
+          imageStyle: "stock",
+        },
+        layout: {
+          hero: "left",
+          trust: "inline",
+          services: "cards",
+          testimonials: "single",
+          cta: "heroAndBottom",
+        },
+      };
+    }
+  }
+
+  // Hard fail: unknown shape
+  throw new Error("designJson is neither DesignOutput nor legacy design shape");
+}
+
+/**
  * Run presentation pass (Tier 1 Enhanced)
  * 
  * Orchestrates:
@@ -181,7 +220,7 @@ async function findCompletedJob(params: {
   const candidates = await db
     .select()
     .from(designCandidates)
-    .where(eq(designCandidates.id, job.winnerCandidateId))
+    .where(eq(designCandidates.id, job.winnerCandidateId!))
     .limit(1);
 
   if (candidates.length === 0 || !candidates[0].designJson) {
@@ -190,7 +229,7 @@ async function findCompletedJob(params: {
 
   return {
     jobId: job.id,
-    winner: candidates[0].designJson as DesignOutput,
+    winner: toDesignOutput(candidates[0].designJson),
     variantKey: candidates[0].variantKey,
     score: candidates[0].scoreTotal,
   };
