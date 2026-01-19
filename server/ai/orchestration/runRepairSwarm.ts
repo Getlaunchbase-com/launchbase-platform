@@ -394,9 +394,18 @@ export async function runRepairSwarm(opts: RepairSwarmOpts): Promise<RepairSwarm
   
   // Run Field General
   console.log("[RepairSwarm] Running Field General...");
-  const diagnosis = await runFieldGeneral(failurePacket);
-  totalCostUsd += diagnosis.costUsd;
-  totalLatencyMs += diagnosis.latencyMs;
+  const fieldGeneralResult = await runFieldGeneral(failurePacket);
+  totalCostUsd += fieldGeneralResult.costUsd;
+  totalLatencyMs += fieldGeneralResult.latencyMs;
+  
+  // Guard against undefined/partial model outputs
+  const diagnosis = {
+    likelyCause: typeof fieldGeneralResult.likelyCause === "string" ? fieldGeneralResult.likelyCause : "(Field General returned undefined diagnosis)",
+    confidence: typeof fieldGeneralResult.confidence === "number" ? fieldGeneralResult.confidence : 0,
+    relatedIssues: Array.isArray(fieldGeneralResult.relatedIssues) ? fieldGeneralResult.relatedIssues : [],
+    costUsd: fieldGeneralResult.costUsd,
+    latencyMs: fieldGeneralResult.latencyMs,
+  };
   
   if (totalCostUsd > maxCostUsd) {
     console.log(`[RepairSwarm] Cost limit exceeded: $${totalCostUsd.toFixed(2)} > $${maxCostUsd.toFixed(2)}`);
