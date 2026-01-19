@@ -190,7 +190,7 @@ export function validateChallengerStacks(
 
   const allPassed = results.every(r => r.passed);
   const blockedStacks = results.flatMap(r => r.blockedStacks);
-  const missingModels = [...new Set(results.flatMap(r => r.missingModels))];
+  const missingModels = Array.from(new Set(results.flatMap(r => r.missingModels)));
   const truncationRisks = results.flatMap(r => r.truncationRisks);
   const warnings = results.flatMap(r => r.warnings);
 

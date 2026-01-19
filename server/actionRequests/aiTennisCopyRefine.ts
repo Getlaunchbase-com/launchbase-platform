@@ -56,6 +56,7 @@ export type AiCopyRefineResult =
       success: false;
       stopReason: ServiceFailReason;
       traceId: string;
+      needsHuman?: boolean;
       meta: {
         rounds: number;
         estimatedUsd: number;

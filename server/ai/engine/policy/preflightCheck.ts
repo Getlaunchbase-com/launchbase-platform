@@ -91,7 +91,7 @@ export function printPreflightReport(results: Map<string, PreflightResult>): voi
   console.log("PREFLIGHT POLICY CHECK REPORT");
   console.log("=".repeat(60));
   
-  for (const [policyName, result] of results.entries()) {
+  for (const [policyName, result] of Array.from(results.entries())) {
     console.log(`\n📦 Policy: ${policyName}`);
     console.log(`  Total roles: ${result.totalRoles}`);
     console.log(`  Validated: ${result.validatedRoles.length}`);

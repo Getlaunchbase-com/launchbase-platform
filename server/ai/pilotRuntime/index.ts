@@ -24,4 +24,4 @@ export { scoreDesign } from '../../services/design/scoreDesign';
 export { scoreDesignRun } from '../../services/design/scoreTournament';
 
 // Types
-export type { ArtifactV1 } from '../engine/types';
+export type { AiArtifactV1 } from '../engine/types';

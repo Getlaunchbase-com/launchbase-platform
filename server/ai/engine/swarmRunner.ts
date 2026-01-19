@@ -12,9 +12,9 @@
  * Gate 3: Model router integration
  */
 
-import type { AiWorkOrderV1, AiWorkResultV1, ArtifactV1, StopReasonV1 } from "./types";
+import type { AiWorkOrderV1, AiWorkResultV1, AiArtifactV1, StopReasonV1 } from "./types";
 import type { PolicyV1 } from "./policy/policyTypes";
-import { callSpecialistAIML } from "./specialists";
+import { callSpecialistAIML, type SpecialistRoleConfig } from "./specialists/aimlSpecialist";
 import { buildDeterministicCollapse } from "./swarm/collapseDeterministic";
 
 /**
@@ -28,9 +28,9 @@ import { buildDeterministicCollapse } from "./swarm/collapseDeterministic";
 export async function runSwarmV1(
   workOrder: AiWorkOrderV1,
   policy: PolicyV1,
-  ctx: { traceId: string }
+  ctx: { traceId: string; tenant?: string; scope?: string }
 ): Promise<AiWorkResultV1> {
-  const artifacts: ArtifactV1[] = [];
+  const artifacts: AiArtifactV1[] = [];
   const costs: Array<{
     specialist: string;
     inputTokens: number;
@@ -69,8 +69,12 @@ export async function runSwarmV1(
 
   const { roles, costCapsUsd, failureMode, specialists } = swarmConfig;
 
+  // Guard against undefined
+  const rolesSafe = roles ?? {};
+  const costCapsSafe = costCapsUsd ?? {};
+
   // Step 1: Field General "plan"
-  const planArtifact: ArtifactV1 = {
+  const planArtifact: AiArtifactV1 = {
     kind: "swarm.plan",
     payload: {
       scope: workOrder.scope,
@@ -84,10 +88,19 @@ export async function runSwarmV1(
 
   // Step 2-3: Run specialists (craft, critic) - skip field_general
   for (const specialist of specialists) {
-    const roleConfig = roles[specialist];
-    if (!roleConfig) continue;
+    const rawConfig = rolesSafe[specialist];
+    if (!rawConfig) continue;
+    
+    // Ensure roleConfig satisfies SpecialistRoleConfig
+    const roleConfig: SpecialistRoleConfig = {
+      transport: (rawConfig.transport as "aiml" | "memory") ?? "aiml",
+      model: rawConfig.model ?? "gpt-5.2",
+      capabilities: rawConfig.capabilities ?? [],
+      costCapUsd: (rawConfig as any).costCapUsd,
+      timeoutMs: (rawConfig as any).timeoutMs,
+    };
     // Check total cap BEFORE calling next specialist
-    if (typeof costCapsUsd.total === "number" && totalCostUsd > costCapsUsd.total) {
+    if (typeof costCapsSafe.total === "number" && totalCostUsd > costCapsSafe.total) {
       recordWarning(undefined, "cost_cap_exceeded");
       // Stop making calls, proceed to collapse
       break;
@@ -115,7 +128,7 @@ export async function runSwarmV1(
       };
 
       // Check per-role cap AFTER specialist call
-      const perRoleCap = costCapsUsd.perRole?.[specialist];
+      const perRoleCap = costCapsSafe.perRole?.[specialist];
       const roleCapExceeded = typeof perRoleCap === "number" && result.meta.costUsd > perRoleCap;
 
       if (roleCapExceeded) {
@@ -124,7 +137,7 @@ export async function runSwarmV1(
           kind: `swarm.specialist.${specialist}`,
           customerSafe: false,
           payload: {
-            ...result.artifact.payload,
+            ...(typeof result.artifact.payload === "object" && result.artifact.payload !== null ? result.artifact.payload : {}),
             role: specialist,
             stopReason: "cost_cap_exceeded",
             meta: result.meta,
@@ -213,7 +226,7 @@ export async function runSwarmV1(
       roleModels[specialist] = result.meta.model;
 
       // Check total cap AFTER adding specialist cost
-      if (typeof costCapsUsd.total === "number" && totalCostUsd > costCapsUsd.total) {
+      if (typeof costCapsSafe.total === "number" && totalCostUsd > costCapsSafe.total) {
         recordWarning(undefined, "cost_cap_exceeded");
 
         // fail_fast: stop immediately
@@ -305,7 +318,7 @@ export async function runSwarmV1(
         inputTokens: 0,
         outputTokens: 0,
         costUsd: 0,
-        model: roleConfig.model,
+        model: roleConfig.model ?? "unknown",
         latencyMs: 0,
         stopReason: "provider_failed",
       });

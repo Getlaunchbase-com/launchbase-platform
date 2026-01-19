@@ -10,7 +10,7 @@
  */
 
 import { completeJson } from "../../providers/providerFactory";
-import type { ArtifactV1 } from "../types";
+import type { AiArtifactV1 } from "../types";
 import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
@@ -51,7 +51,8 @@ export interface SpecialistInput {
   role: string; // Now accepts any role name
   trace: {
     jobId: string;
-    runId: string;
+    runId?: string;
+    step?: string;
   };
   input: {
     plan: any;
@@ -68,7 +69,7 @@ export interface SpecialistInput {
  * Specialist call output
  */
 export interface SpecialistOutput {
-  artifact: ArtifactV1;
+  artifact: AiArtifactV1;
   meta: {
     model: string;
     requestId: string;

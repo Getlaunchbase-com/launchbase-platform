@@ -86,7 +86,7 @@ function sanitizeUnknown(input: unknown, depth = 0): unknown {
   if (input === null) return null;
 
   const t = typeof input;
-  if (t === "string") return clampStr(input);
+  if (t === "string") return clampStr(input as string);
   if (t === "number" || t === "boolean") return input;
 
   if (Array.isArray(input)) {
