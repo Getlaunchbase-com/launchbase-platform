@@ -1,4 +1,5 @@
 /**
+import http from "node:http";
  * FOREVER CONTRACT: This test must remain boundary-real (signed webhook).
  * No mocks. Asserts only durable side effects.
  * 
@@ -93,7 +94,7 @@ describe.sequential("smoke: Stripe checkout.session.completed webhook (signed bo
 
 
     // 2) Act #1 - First delivery
-    const r1 = await request(app)
+    const r1 = await request(server)
       .post("/api/stripe/webhook")
       .set("Stripe-Signature", sig)
       .set("Content-Type", "application/json")
@@ -146,7 +147,7 @@ describe.sequential("smoke: Stripe checkout.session.completed webhook (signed bo
     expect(wh1?.ok).toBe(true);
 
     // 4) Act #2 - Replay (exact same event)
-    const r2 = await request(app)
+    const r2 = await request(server)
       .post("/api/stripe/webhook")
       .set("Stripe-Signature", sig)
       .set("Content-Type", "application/json")

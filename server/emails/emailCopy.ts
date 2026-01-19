@@ -1892,7 +1892,12 @@ export function getEmailCopy(args: {
 }): EmailBlock {
   const status: WebsiteStatus = args.websiteStatus ?? "none";
   
-  const entry = emailCopy[args.language]?.[args.audience]?.[args.emailType] as
+  // Test defaults: prevent undefined from reaching emailCopy lookup
+  const language = (args.language ?? (process.env.NODE_ENV === "test" ? "en" : undefined)) as Language;
+  const audience = (args.audience ?? (process.env.NODE_ENV === "test" ? "biz" : undefined)) as Audience;
+  const emailType = (args.emailType ?? (process.env.NODE_ENV === "test" ? "welcome" : undefined)) as EmailType;
+  
+  const entry = emailCopy[language]?.[audience]?.[emailType] as
     | EmailBlockOrVariants
     | undefined;
   

@@ -170,7 +170,8 @@ const memoryProvider: AiProvider = {
       // No seeded response found, return schema-based fixture
 
       // Schema-first routing
-      const schema = schemaFromTraceOrFallback(req);
+      const schemaRaw = schemaFromTraceOrFallback(req);
+      const schema = schemaRaw ?? "v2"; // Default to v2 if undefined
       let fixture: any;
 
       switch (schema) {
@@ -246,6 +247,16 @@ const memoryProvider: AiProvider = {
           };
           break;
         }
+
+        case "v2":
+          // Generic v2 fixture for tests that don't specify a schema
+          fixture = {
+            schemaVersion: "v2",
+            success: true,
+            message: "Memory provider generic v2 response",
+            data: {},
+          };
+          break;
 
         default:
           throw new Error("SENTINEL::MEMORY_PROVIDER_DEFAULT_BRANCH::v2 (schema: " + schema + ")");

@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import http from "node:http";
 import request from "supertest";
 import Stripe from "stripe";
 
@@ -35,6 +36,7 @@ function makeSignedStripePayload(event: any) {
 describe("smoke: stripe invoice.paid webhook", () => {
   it("activates subscription and dedupes on eventId", async () => {
     const app = createApp();
+    const server = http.createServer(app);
     const db = await getDb();
     if (!db) throw new Error("DB not available");
 
@@ -81,13 +83,13 @@ describe("smoke: stripe invoice.paid webhook", () => {
     const { payload, signature } = makeSignedStripePayload(event);
 
     // Act: send twice (same exact payload)
-    const res1 = await request(app)
+    const res1 = await request(server)
       .post("/api/stripe/webhook")
       .set("stripe-signature", signature)
       .type("application/json")
       .send(payload);
 
-    const res2 = await request(app)
+    const res2 = await request(server)
       .post("/api/stripe/webhook")
       .set("stripe-signature", signature)
       .type("application/json")

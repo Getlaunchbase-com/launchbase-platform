@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import request from "supertest";
 import Stripe from "stripe";
+import http from "node:http";
 
 import { createApp } from "../_core/app";
 import { getDb } from "../db";
@@ -42,8 +43,9 @@ function makeSignedStripePayload(event: any) {
 describe("smoke: stripe webhook boundary", () => {
   it("rejects missing signature", async () => {
     const app = createApp();
+    const server = http.createServer(app);
 
-    const res = await request(app)
+    const res = await request(server)
       .post("/api/stripe/webhook")
       .set("content-type", "application/json")
       .send(JSON.stringify({ hello: "world" }));
@@ -55,6 +57,7 @@ describe("smoke: stripe webhook boundary", () => {
 
   it("is idempotent for duplicate checkout.session.completed", async () => {
     const app = createApp();
+    const server = http.createServer(app);
     const db = await getDb();
     if (!db) throw new Error("DB not available");
 
@@ -104,7 +107,7 @@ describe("smoke: stripe webhook boundary", () => {
 
     // Act: send twice (same exact payload + signature)
     // IMPORTANT: Use .type() to set Content-Type without triggering JSON encoding
-    const res1 = await request(app)
+    const res1 = await request(server)
       .post("/api/stripe/webhook")
       .set("stripe-signature", signature)
       .type("application/json")
@@ -115,7 +118,7 @@ describe("smoke: stripe webhook boundary", () => {
       console.log("webhook res1 failed:", res1.status, res1.text);
     }
 
-    const res2 = await request(app)
+    const res2 = await request(server)
       .post("/api/stripe/webhook")
       .set("stripe-signature", signature)
       .type("application/json")

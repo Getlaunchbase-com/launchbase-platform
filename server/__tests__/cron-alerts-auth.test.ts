@@ -1,4 +1,5 @@
 /**
+import http from "node:http";
  * Boundary Tests: /api/cron/alerts Authentication & Rate Limiting
  * 
  * Forever contracts:
@@ -14,11 +15,12 @@ import request from "supertest";
 import { createApp } from "../_core/app";
 
 const app = createApp();
+    const server = http.createServer(app);
 const WORKER_TOKEN = process.env.WORKER_TOKEN;
 
 describe("POST /api/cron/alerts - Authentication", () => {
   it("should reject requests without token", async () => {
-    const res = await request(app)
+    const res = await request(server)
       .post("/api/cron/alerts")
       .send({});
     
@@ -30,7 +32,7 @@ describe("POST /api/cron/alerts - Authentication", () => {
   });
 
   it("should reject requests with invalid token", async () => {
-    const res = await request(app)
+    const res = await request(server)
       .post("/api/cron/alerts")
       .set("Authorization", "Bearer invalid_token_12345")
       .send({});
@@ -43,7 +45,7 @@ describe("POST /api/cron/alerts - Authentication", () => {
   });
 
   it("should accept requests with valid token (x-worker-token header)", async () => {
-    const res = await request(app)
+    const res = await request(server)
       .post("/api/cron/alerts")
       .set("x-worker-token", WORKER_TOKEN!)
       .send({});
@@ -54,7 +56,7 @@ describe("POST /api/cron/alerts - Authentication", () => {
   });
 
   it("should accept requests with valid token (Authorization Bearer header)", async () => {
-    const res = await request(app)
+    const res = await request(server)
       .post("/api/cron/alerts")
       .set("Authorization", `Bearer ${WORKER_TOKEN}`)
       .send({});
@@ -68,7 +70,7 @@ describe("POST /api/cron/alerts - Authentication", () => {
 describe("POST /api/cron/alerts - Rate Limiting", () => {
   it("should rate limit rapid successive calls", async () => {
     // First call - should succeed
-    const res1 = await request(app)
+    const res1 = await request(server)
       .post("/api/cron/alerts")
       .set("x-worker-token", WORKER_TOKEN!)
       .send({});
@@ -77,7 +79,7 @@ describe("POST /api/cron/alerts - Rate Limiting", () => {
     expect(res1.body.success).toBe(true);
     
     // Immediate second call - should be rate limited
-    const res2 = await request(app)
+    const res2 = await request(server)
       .post("/api/cron/alerts")
       .set("x-worker-token", WORKER_TOKEN!)
       .send({});
@@ -92,7 +94,7 @@ describe("POST /api/cron/alerts - Rate Limiting", () => {
   it("should allow calls after rate limit window expires", async () => {
     // This test would require waiting 60s or mocking Date.now()
     // For now, we verify the response shape includes the necessary fields
-    const res = await request(app)
+    const res = await request(server)
       .post("/api/cron/alerts")
       .set("x-worker-token", WORKER_TOKEN!)
       .send({});
