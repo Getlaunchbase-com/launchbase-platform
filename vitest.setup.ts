@@ -7,6 +7,8 @@
  * connection pool will be created with the wrong URL and frozen.
  */
 
+// No global mocks here - tests opt-in via helpers when needed
+
 function pickTestDbUrl(): string {
   // Manus platform may provide different env vars for test vs prod
   // Priority: TEST_DATABASE_URL > DATABASE_URL_TEST > DATABASE_URL
