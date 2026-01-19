@@ -129,7 +129,6 @@ export function createFailurePacket(opts: {
       stack: redact(error.stack),
     },
     context: {
-      logs: [],
       ...opts.context,
       inputs: redact(opts.context?.inputs),
       outputs: redact(opts.context?.outputs),

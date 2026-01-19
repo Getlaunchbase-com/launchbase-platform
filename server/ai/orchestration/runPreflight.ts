@@ -8,7 +8,9 @@ import {
   type AddonPlanV1,
   type PreflightResultV1,
 } from '../../contracts/preflight.js';
-import type { RepairPacketV1 } from '../../contracts/repairPacket.js';
+import type { z } from 'zod';
+
+type RepairPacketV1 = z.infer<typeof RepairPacketV1Schema>;
 import { writeFailurePacket, createFailurePacket } from '../../utils/fileLog.js';
 
 const LOG_FILE = '/tmp/launchbase_preflight.log';

@@ -10,7 +10,7 @@
  */
 
 import { completeJson, type CompleteJsonOptions } from "./providers/providerFactory";
-import { getPromptPack, type PromptPackRole, type PromptPackTask } from "./promptPacks/registry";
+import { getPromptPack, type TaskType, type SystemRole } from "./promptPacks/registry";
 import { validateAiOutput } from "./validateAiOutput";
 import { enforceSectionCaps } from "./enforceSectionCaps";
 
@@ -47,9 +47,9 @@ export type RunAiTennisOptions = {
 
   // Prompt roles (defaults are sane)
   roles?: {
-    generator?: PromptPackRole; // "implementer" typically
-    critic?: PromptPackRole;    // "critic"
-    collapse?: PromptPackRole;  // "field_general" or "implementer"
+    generator?: SystemRole; // "implementer" typically
+    critic?: SystemRole;    // "critic"
+    collapse?: SystemRole;  // "field_general" or "implementer"
   };
 };
 
@@ -142,7 +142,7 @@ export async function runAiTennis<TFinal = any>(
   }
 
   // Helper to call completeJson safely
-  const callJson = async (phase: TennisPhase, packTask: PromptPackTask, role: PromptPackRole, payload: any, round: number) => {
+  const callJson = async (phase: TennisPhase, packTask: TaskType, role: SystemRole, payload: any, round: number) => {
     if (budgetTokensRemaining <= 0) throw new Error("AI Tennis token budget exceeded");
     if (budgetCostRemaining <= 0) throw new Error("AI Tennis cost budget exceeded");
 
@@ -162,16 +162,11 @@ export async function runAiTennis<TFinal = any>(
         messages,
         temperature: opts.temperature,
         maxTokens: maxTokensThisCall,
-        trace: JSON.stringify({
+        trace: {
           jobId: opts.trace.jobId,
           step: phase,
-          schema: pack.outputSchemaName,
           round,
-          caps: {
-            roundLimit: clampInt(maxRounds - 1, 0, 2),
-            costCapUsd: clampNumber(costCapUsd, 0, 10),
-          },
-        }),
+        },
       },
       opts.transport,
       { task: routerTask, useRouter: true, strict: true } // STRICT: no silent fallback
@@ -230,7 +225,7 @@ export async function runAiTennis<TFinal = any>(
 
   // ---- ROUNDS: critique -> collapse ----
   for (let round = 1; round <= maxRounds; round++) {
-    const crit = await callAimlJson("critique", "critique", roles.critic, { ...input, draft: current }, round);
+    const crit = await callJson("critique", "critique", roles.critic, { ...input, draft: current }, round);
     const critVResult = validateAiOutputTyped("critique", crit);
     if (!critVResult.ok) {
       throw new Error(`AI output failed schema validation (critique): ${critVResult.errors.join("; ")}`);

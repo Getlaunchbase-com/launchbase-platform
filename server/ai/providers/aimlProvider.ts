@@ -124,7 +124,7 @@ export const aimlProvider: AiProvider = {
       });
 
       // Throw sanitized error upward (prevents leaking AIML echo content)
-      throw new Error(toSafeClientMessage({ trace }));
+      throw new Error(toSafeClientMessage({ trace: trace.jobId }));
     }
   },
 };
