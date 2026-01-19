@@ -120,7 +120,7 @@ Return JSON:
 /**
  * Run Coder to propose a patch
  */
-async function runCoder(pkt: FailurePacketV1, diagnosis: any): Promise<{
+async function runCoder(pkt: FailurePacketV1, diagnosis: any, reviseNotes: string = ""): Promise<{
   changes: RepairPacketV1["patchPlan"]["changes"];
   testPlan: string[];
   rollbackPlan: string;
@@ -128,6 +128,14 @@ async function runCoder(pkt: FailurePacketV1, diagnosis: any): Promise<{
   latencyMs: number;
 }> {
   const startMs = Date.now();
+  
+  const reviseSectionPrompt = reviseNotes ? `
+
+**REVISIONS REQUESTED:**
+${reviseNotes}
+
+You MUST address the concerns and rationale above in your revised patch.
+` : "";
   
   const prompt = `You are the Coder. Based on this diagnosis, propose a patch to fix the failure.
 
@@ -139,7 +147,7 @@ async function runCoder(pkt: FailurePacketV1, diagnosis: any): Promise<{
 **Failure Context:**
 - Type: ${pkt.failure.type}
 - Error: ${pkt.failure.errorMessage}
-- Component: ${pkt.context.component || "unknown"}
+- Component: ${pkt.context.component || "unknown"}${reviseSectionPrompt}
 
 **Your task:**
 1. Propose specific file changes to fix the issue
@@ -436,23 +444,81 @@ export async function runRepairSwarm(opts: RepairSwarmOpts): Promise<RepairSwarm
     };
   }
   
-  // Run Coder
-  console.log("[RepairSwarm] Running Coder...");
-  const patch = await runCoder(failurePacket, diagnosis);
-  totalCostUsd += patch.costUsd;
-  totalLatencyMs += patch.latencyMs;
+  // Iteration loop: Coder → Reviewer → Arbiter
+  let reviseNotes = "";
+  let finalPatch: any = null;
+  let finalReview: any = null;
+  let finalArbiter: any = null;
+  let stopReason: "ok" | "patch_failed" | "max_iters" = "patch_failed";
   
-  // Run Reviewer
-  console.log("[RepairSwarm] Running Reviewer...");
-  const review = await runReviewer(failurePacket, patch);
-  totalCostUsd += review.costUsd;
-  totalLatencyMs += review.latencyMs;
+  for (let iter = 0; iter < maxIterations; iter++) {
+    console.log(`[RepairSwarm] Iteration ${iter + 1}/${maxIterations}`);
+    
+    // Run Coder
+    console.log("[RepairSwarm] Running Coder...");
+    const patch = await runCoder(failurePacket, diagnosis, reviseNotes);
+    totalCostUsd += patch.costUsd;
+    totalLatencyMs += patch.latencyMs;
+    
+    if (totalCostUsd > maxCostUsd) {
+      console.log(`[RepairSwarm] Cost limit exceeded: $${totalCostUsd.toFixed(2)} > $${maxCostUsd.toFixed(2)}`);
+      stopReason = "patch_failed";
+      break;
+    }
+    
+    // Run Reviewer
+    console.log("[RepairSwarm] Running Reviewer...");
+    const review = await runReviewer(failurePacket, patch);
+    totalCostUsd += review.costUsd;
+    totalLatencyMs += review.latencyMs;
+    
+    // Run Arbiter
+    console.log("[RepairSwarm] Running Arbiter...");
+    const arbiter = await runArbiter(diagnosis, patch, review);
+    totalCostUsd += arbiter.costUsd;
+    totalLatencyMs += arbiter.latencyMs;
+    
+    finalPatch = patch;
+    finalReview = review;
+    finalArbiter = arbiter;
+    
+    // Termination rules
+    if (arbiter.decision === "apply") {
+      console.log("[RepairSwarm] Arbiter approved patch - stopping");
+      stopReason = "ok";
+      break;
+    }
+    
+    if (arbiter.decision === "reject") {
+      console.log("[RepairSwarm] Arbiter rejected patch - stopping");
+      stopReason = "patch_failed";
+      break;
+    }
+    
+    if (arbiter.decision === "revise" && iter < maxIterations - 1) {
+      console.log("[RepairSwarm] Arbiter requested revisions - continuing to next iteration");
+      
+      // Build revise notes for next iteration
+      reviseNotes = [
+        reviseNotes && `Previous notes:\n${reviseNotes}`,
+        (review?.concerns ?? []).length ? `Reviewer concerns:\n- ${(review.concerns ?? []).join("\n- ")}` : "",
+        arbiter?.rationale ? `Arbiter rationale:\n${arbiter.rationale}` : "",
+      ]
+        .filter(Boolean)
+        .join("\n\n");
+      
+      continue;
+    }
+    
+    // revise but out of iterations, or unknown decision
+    console.log(`[RepairSwarm] Max iterations reached or unknown decision - stopping`);
+    stopReason = "max_iters";
+    break;
+  }
   
-  // Run Arbiter
-  console.log("[RepairSwarm] Running Arbiter...");
-  const arbiter = await runArbiter(diagnosis, patch, review);
-  totalCostUsd += arbiter.costUsd;
-  totalLatencyMs += arbiter.latencyMs;
+  const patch = finalPatch;
+  const review = finalReview;
+  const arbiter = finalArbiter;
   
   // Create RepairPacket
   const repairPacket = createRepairPacket({
@@ -499,11 +565,11 @@ export async function runRepairSwarm(opts: RepairSwarmOpts): Promise<RepairSwarm
     },
   });
   
-  console.log(`[RepairSwarm] Complete: ${arbiter.decision} | Cost: $${totalCostUsd.toFixed(2)} | Latency: ${totalLatencyMs}ms`);
+  console.log(`[RepairSwarm] Complete: ${stopReason} | Cost: $${totalCostUsd.toFixed(2)} | Latency: ${totalLatencyMs}ms`);
   
   return {
     repairPacket,
-    stopReason: arbiter.decision === "apply" ? "ok" : "patch_failed",
+    stopReason: stopReason === "ok" ? "ok" : "patch_failed",
     totalCostUsd,
     totalLatencyMs: Date.now() - startMs,
   };

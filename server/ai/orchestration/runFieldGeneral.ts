@@ -1,5 +1,5 @@
 // server/ai/orchestration/runFieldGeneral.ts
-import type { Intake } from "../../drizzle/schema";
+import type { Intake } from "../../../drizzle/schema";
 import type { RunPlanV1, Tier, BuilderGate, RunMode } from "./types";
 import { buildSystemsPack, buildBrandPack, buildCriticPack } from "./promptPackBuilders";
 

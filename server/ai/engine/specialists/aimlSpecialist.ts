@@ -29,7 +29,9 @@ export type SpecialistStopReason =
   | "json_parse_failed"
   | "ajv_failed"
   | "timeout"
-  | "cost_cap_exceeded";
+  | "cost_cap_exceeded"
+  | "schema_failed"
+  | "content_noncompliance";
 
 /**
  * Specialist role config (from policy)

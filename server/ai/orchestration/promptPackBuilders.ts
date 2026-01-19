@@ -1,5 +1,5 @@
 // server/ai/orchestration/promptPackBuilders.ts
-import type { Intake } from "../../drizzle/schema";
+import type { Intake } from "../../../drizzle/schema";
 
 type PackOut = { packId: string; params: Record<string, unknown> };
 

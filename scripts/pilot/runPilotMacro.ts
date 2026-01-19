@@ -68,7 +68,7 @@ type RetryableStopReason = 'timeout' | 'provider_failed' | 'json_parse_failed' |
 
 function isRetryable(stopReason: SpecialistStopReason): boolean {
   // Always retryable
-  if (stopReason === 'timeout' || stopReason === 'provider_failed' || stopReason === 'invalid_json') {
+  if (stopReason === 'timeout' || stopReason === 'provider_failed' || stopReason === 'json_parse_failed') {
     return true;
   }
   

@@ -1963,6 +1963,8 @@ export const appRouter = router({
         // New burden-focused fields (optional for backwards compatibility)
         burdens: z.array(z.enum(["website", "social_media", "visibility", "all_of_it", "not_sure"])).optional(),
         involvement: z.enum(["HANDLE_IT", "KEEP_ME_POSTED"]).optional(),
+        tier: z.enum(["standard", "growth", "premium"]).optional(),
+        enginesSelected: z.array(z.string()).optional(),
       }))
       .mutation(async ({ input }) => {
         const db = await getDb();

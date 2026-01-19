@@ -34,8 +34,8 @@ router.get("/api/diagnostic/intakes", async (req, res) => {
         status: intakes.status,
         tenant: intakes.tenant,
         createdAt: intakes.createdAt,
-        approvedAt: intakes.approvedAt,
-        designJobId: designJobs.designJobId,
+        // approvedAt: removed from schema
+        // designJobId: removed from schema
         tier: designJobs.tier,
         designStatus: designJobs.status,
       })
