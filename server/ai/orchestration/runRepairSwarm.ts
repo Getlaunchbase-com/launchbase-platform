@@ -19,6 +19,14 @@ import { createRepairPacket } from "../../contracts/repairPacket";
 import { callSpecialistAIML } from "../engine/specialists/aimlSpecialist";
 // fileLog not needed - using console.log instead
 
+/**
+ * Helper: safely normalize unknown payload to Record
+ */
+function payloadAsRecord(x: unknown): Record<string, unknown> {
+  if (!x || typeof x !== "object" || Array.isArray(x)) return {};
+  return x as Record<string, unknown>;
+}
+
 export type RepairSwarmOpts = {
   failurePacket: FailurePacketV1;
   maxIterations?: number; // Default: 2
@@ -37,7 +45,7 @@ export type RepairSwarmResult = {
  * Check if failure is a permission/platform blocker
  */
 function isPermissionBlocker(pkt: FailurePacketV1): boolean {
-  const msg = pkt.error?.message?.toLowerCase() || "";
+  const msg = (pkt.failure?.errorMessage ?? "").toLowerCase();
   return (
     msg.includes("workflows permission") ||
     msg.includes("insufficient permissions") ||
@@ -58,13 +66,20 @@ async function runFieldGeneral(pkt: FailurePacketV1): Promise<{
 }> {
   const startMs = Date.now();
   
+  // Extract component from FailurePacket
+  const component =
+    (pkt as any)?.context?.component ??
+    (pkt as any)?.component ??
+    (pkt as any)?.failure?.component ??
+    "unknown";
+  
   const prompt = `You are the Field General. Diagnose this failure and identify the likely root cause.
 
 **Failure Context:**
 - Type: ${pkt.failure.type}
 - Error: ${pkt.failure.errorMessage}
 - Stop Reason: ${pkt.failure.stopReason}
-- Component: ${pkt.context.component || "unknown"}
+- Component: ${component || "unknown"}
 - Command: ${pkt.context.command || "unknown"}
 
 **Stack Trace:**
@@ -108,10 +123,13 @@ Return JSON:
   const latencyMs = Date.now() - startMs;
   const costUsd = result.meta.costUsd || 0;
 
-  console.log(`[FieldGeneral] Diagnosis: ${result.artifact.payload.likelyCause} (confidence: ${result.artifact.payload.confidence})`);
+  const payload = payloadAsRecord(result.artifact.payload);
+  console.log(`[FieldGeneral] Diagnosis: ${payload.likelyCause} (confidence: ${payload.confidence})`);
 
   return {
-    ...result.artifact.payload,
+    likelyCause: typeof payload.likelyCause === "string" ? payload.likelyCause : "(unknown)",
+    confidence: typeof payload.confidence === "number" ? payload.confidence : 0,
+    relatedIssues: Array.isArray(payload.relatedIssues) ? payload.relatedIssues : [],
     costUsd,
     latencyMs,
   };
@@ -128,6 +146,13 @@ async function runCoder(pkt: FailurePacketV1, diagnosis: any, reviseNotes: strin
   latencyMs: number;
 }> {
   const startMs = Date.now();
+  
+  // Extract component from FailurePacket
+  const component =
+    (pkt as any)?.context?.component ??
+    (pkt as any)?.component ??
+    (pkt as any)?.failure?.component ??
+    "unknown";
   
   const reviseSectionPrompt = reviseNotes ? `
 
@@ -147,7 +172,7 @@ You MUST address the concerns and rationale above in your revised patch.
 **Failure Context:**
 - Type: ${pkt.failure.type}
 - Error: ${pkt.failure.errorMessage}
-- Component: ${pkt.context.component || "unknown"}${reviseSectionPrompt}
+- Component: ${component || "unknown"}${reviseSectionPrompt}
 
 **Your task:**
 1. Propose specific file changes to fix the issue
@@ -192,11 +217,14 @@ Return JSON:
   const latencyMs = Date.now() - startMs;
   const costUsd = result.meta.costUsd || 0;
 
-  const changes = result.artifact?.payload?.changes ?? [];
+  const payload = payloadAsRecord(result.artifact.payload);
+  const changes = Array.isArray(payload.changes) ? payload.changes : [];
   console.log(`[Coder] Proposed ${changes.length} changes`);
 
   return {
-    ...result.artifact.payload,
+    changes,
+    testPlan: Array.isArray(payload.testPlan) ? payload.testPlan : [],
+    rollbackPlan: typeof payload.rollbackPlan === "string" ? payload.rollbackPlan : "",
     costUsd,
     latencyMs,
   };
@@ -257,10 +285,15 @@ Return JSON:
   const latencyMs = Date.now() - startMs;
   const costUsd = result.meta.costUsd || 0;
 
-  console.log(`[Reviewer] ${result.artifact.payload.approved ? "APPROVED" : "REJECTED"} with ${result.artifact.payload.concerns.length} concerns`);
+  const payload = payloadAsRecord(result.artifact.payload);
+  const approved = !!payload.approved;
+  const concerns = Array.isArray(payload.concerns) ? payload.concerns : [];
+  console.log(`[Reviewer] ${approved ? "APPROVED" : "REJECTED"} with ${concerns.length} concerns`);
 
   return {
-    ...result.artifact.payload,
+    approved,
+    concerns,
+    suggestions: Array.isArray(payload.suggestions) ? payload.suggestions : [],
     costUsd,
     latencyMs,
   };
@@ -326,10 +359,14 @@ Return JSON:
   const latencyMs = Date.now() - startMs;
   const costUsd = result.meta.costUsd || 0;
 
-  console.log(`[Arbiter] Decision: ${result.artifact.payload.decision}`);
+  const payload = payloadAsRecord(result.artifact.payload);
+  const decision = typeof payload.decision === "string" ? payload.decision as ("apply" | "reject" | "revise") : "reject";
+  console.log(`[Arbiter] Decision: ${decision}`);
 
   return {
-    ...result.artifact.payload,
+    decision,
+    rationale: typeof payload.rationale === "string" ? payload.rationale : "",
+    finalPatch: payload.finalPatch ?? null,
     costUsd,
     latencyMs,
   };
