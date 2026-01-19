@@ -11,6 +11,23 @@
  */
 
 import { Resend } from "resend";
+
+/**
+ * Extract message ID from provider response (handles different provider shapes)
+ */
+function extractMessageId(resp: unknown): string | undefined {
+  if (!resp || typeof resp !== "object") return undefined;
+
+  const r = resp as any;
+
+  // common provider shapes
+  if (typeof r.id === "string") return r.id;
+  if (typeof r.messageId === "string") return r.messageId;
+  if (r.data && typeof r.data.id === "string") return r.data.id;
+  if (r.data && typeof r.data.messageId === "string") return r.data.messageId;
+
+  return undefined;
+}
 import { ENV } from "./_core/env";
 
 /**
@@ -104,12 +121,13 @@ async function sendViaResend(payload: EmailPayload): Promise<EmailSendResult> {
       text: payload.text,
     });
     
-    console.log("[EmailTransport:resend] ✅ Sent successfully:", result.id);
+    const messageId = extractMessageId(result);
+    console.log("[EmailTransport:resend] ✅ Sent successfully:", messageId);
     
     return {
       success: true,
       provider: "resend",
-      resendMessageId: result.id,
+      resendMessageId: messageId,
     };
   } catch (err: any) {
     const errorMessage = err?.message || err?.error?.message || "Unknown error";

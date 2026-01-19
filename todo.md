@@ -2635,3 +2635,35 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - Truth policy: no invented metrics
 - CTA → /apply
 - "What's a credit?" explainer
+
+
+## 🔧 TypeScript Cleanup (Production Type Safety)
+
+**Goal:** Reduce TypeScript errors from 75 → <20 for production readiness  
+**Approach:** Systematic bucket-by-bucket fixes (no spirals, no guessing)
+
+### Completed Buckets
+- [x] Bucket 1: Schema/import fixes (added .js extensions, fixed tier/enginesSelected) - cleared 7 errors
+- [x] Bucket 2A/2B/2C: UI nullable unions, normalizer events, server contracts - cleared 12 errors
+- [x] Bucket 3A/3B/3C: Iterator wrapping, undefined handling, normalizer discriminants - cleared 12 errors
+- [x] Bucket 3D: Swarm infrastructure type safety (payload parsing, FailurePacket alignment) - cleared 13 errors
+- [x] Design Scoring: Added toDesignOutput adapter, fixed comparison logic - cleared 4 errors
+- [x] Bucket A: Email resendMessageId type fixes - cleared 8 errors (25→17)
+  - A1: extractMessageId helper added to emailTransport.ts
+  - A2: EmailSendResult type already had resendMessageId field
+  - A3: sendActionRequestEmail return type updated to include resendMessageId + correct provider types
+
+### Active Bucket
+- [x] Bucket B: Portal credits (2 errors) - COMPLETE: 17→15 errors
+  - B1: decrementIntakeCredit no-op export added to server/db.ts
+  - B2: creditsRemaining computed at portal boundary based on tier
+
+### Remaining Errors (15 total)
+- AI Tennis/AIML: 6 errors (PromptPackRole/Task, callAimlJson, traceId type)
+- Contracts: 3 errors (duplicate exports, duplicate properties)
+- Copy Refine: 3 errors (actionRequestIds, needsHuman, error property)
+- Preflight: 2 errors (Expected 2-3 arguments)
+- Portal: 2 errors (decrementIntakeCredit, creditsRemaining)
+- Provider Factory: 1 error (MapIterator downlevelIteration)
+
+**Target:** <20 errors for production readiness (currently at 17)

@@ -14,7 +14,14 @@ export const portalRouter = router({
       const intake = await getIntakeById(ship.intakeId);
       if (!intake) throw new Error("Intake not found");
 
-      if ((intake.creditsRemaining ?? 0) <= 0) {
+      // Compute credits from tier (no DB storage yet)
+      const creditsRemaining =
+        intake.tier === "premium" ? 10 :
+        intake.tier === "growth" ? 3 :
+        intake.tier === "standard" ? 1 :
+        0;
+
+      if (creditsRemaining <= 0) {
         return {
           ok: false,
           needsPurchase: true,
@@ -23,7 +30,7 @@ export const portalRouter = router({
         };
       }
 
-      await decrementIntakeCredit(intake.id, 1);
+      await decrementIntakeCredit(intake.id);
       enqueueExecuteRunPlan(input.runId);
 
       return { ok: true, enqueued: true };

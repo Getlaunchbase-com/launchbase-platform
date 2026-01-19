@@ -620,7 +620,7 @@ export async function sendActionRequestEmail(data: {
   token: string;
   checklistKey: string;
   proposedPreviewToken?: string;
-}): Promise<{ success: boolean; provider?: "resend" | "notification"; error?: string }> {
+}): Promise<{ success: boolean; provider?: "resend" | "log" | "memory"; error?: string; resendMessageId?: string }> {
   const resend = getResendClient();
   
   const approveUrl = `${ENV.publicBaseUrl}/api/actions/${data.token}/approve`;

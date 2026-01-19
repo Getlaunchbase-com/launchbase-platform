@@ -753,3 +753,13 @@ export async function updateShipPacketData(id: number, data: ShipPacket["data"])
   
   await db.update(shipPackets).set({ data }).where(eq(shipPackets.id, id));
 }
+
+
+/**
+ * Decrement intake credit (no-op shim for portal API stability)
+ * Credits enforcement not implemented yet - keeps type boundary clean
+ */
+export async function decrementIntakeCredit(_intakeId: number): Promise<void> {
+  // Credits enforcement not implemented yet. Keep API stable for portal.
+  return;
+}
