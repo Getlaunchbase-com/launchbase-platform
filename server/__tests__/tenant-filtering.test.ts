@@ -30,12 +30,12 @@ describe("Tenant Filtering", () => {
     await db.delete(intakes).where(eq(intakes.id, 99999));
     await db.delete(intakes).where(eq(intakes.id, 99998));
 
-    // Ensure buildPlan fixtures exist
+    // Ensure buildPlan fixtures exist (use unique IDs to avoid collision with other tests)
     const { buildPlans } = await import("../../drizzle/schema");
-    const existingPlan1 = await db.select().from(buildPlans).where(eq(buildPlans.id, 1));
+    const existingPlan1 = await db.select().from(buildPlans).where(eq(buildPlans.id, 101));
     if (existingPlan1.length === 0) {
       await db.insert(buildPlans).values({
-        id: 1,
+        id: 101,
         intakeId: 1,
         templateId: "default",
         plan: {
@@ -47,10 +47,10 @@ describe("Tenant Filtering", () => {
         status: "ready",
       });
     }
-    const existingPlan2 = await db.select().from(buildPlans).where(eq(buildPlans.id, 2));
+    const existingPlan2 = await db.select().from(buildPlans).where(eq(buildPlans.id, 102));
     if (existingPlan2.length === 0) {
       await db.insert(buildPlans).values({
-        id: 2,
+        id: 102,
         intakeId: 2,
         templateId: "default",
         plan: {
@@ -89,13 +89,13 @@ describe("Tenant Filtering", () => {
 
     // Create test deployments
     const launchbaseDeploy = await createDeployment({
-      buildPlanId: 1,
+      buildPlanId: 101,
       intakeId: launchbaseIntakeId,
       status: "success",
     });
 
     const vincesDeploy = await createDeployment({
-      buildPlanId: 2,
+      buildPlanId: 102,
       intakeId: vincesIntakeId,
       status: "success",
     });

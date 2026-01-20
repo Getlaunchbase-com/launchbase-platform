@@ -2972,11 +2972,12 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
 - [x] Root cause: Safety gate was returning early before policy check was reached
 
 **Current Status:**
-- **Pass rate: 99.8%** (572/573 tests passing)
-- **Fixes applied:** ModelPolicy type, buildPlan fixtures, Facebook DRAFT/QUEUE tests
-- **Remaining:** aiTennisCopyRefine memory fixture (skipped with TODO)
+- **Pass rate: 100%** (573/573 tests passing, 59 intentionally skipped)
+- **Fixes applied:** ModelPolicy type, buildPlan fixtures, Facebook DRAFT/QUEUE tests, tenant-filtering ID collision
+- **Remaining:** aiTennisCopyRefine memory fixture (skipped with TODO for future investigation)
 
 **Next Steps:**
 1. ✅ Facebook tests complete (both DRAFT and QUEUE passing)
-2. Investigate aiTennisCopyRefine memory fixture routing (complex, deferred)
-3. Save checkpoint at 99.8% pass rate (572/573)
+2. ✅ Tenant-filtering pollution fixed (changed buildPlan IDs from 1/2 to 101/102)
+3. ✅ Save final checkpoint at 100% pass rate (573/573)
+4. Investigate aiTennisCopyRefine memory fixture routing (deferred for future work)
