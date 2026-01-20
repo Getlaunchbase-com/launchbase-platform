@@ -387,6 +387,19 @@ We proceed one clean PR at a time.
 - [ ] Verify second call returns cached result
 - [ ] Verify weekly report shows cache hit numerator/denominator > 0
 
+## Test Suite Stabilization (Ongoing)
+
+### Boolean Assertion Failures Bucket ✅ +14 TESTS FIXED
+- [x] enforceSectionCaps: Changed return type to CapViolationResult (6 tests)
+- [x] promptPack fixtures: Fixed intent_parse schema + step→schema mapping (8 tests)
+- [ ] Remaining 4 promptPack tests deferred (schema validation issues)
+
+### Swarm Confidence Layer (Next Priority)
+- [ ] Capture 3 golden transcripts (APPLY, REJECT, REVISE paths)
+- [ ] Build replay provider for deterministic swarm runs
+- [ ] Write 5 behavioral invariant tests
+- [ ] Verify swarm tests pass in CI without network
+
 ## PR 3: Production Hardening (Phase 1 Finish Line)
 
 **Goal:** Lock down production readiness with cleanup + resilience (no new behavior)
@@ -2723,3 +2736,9 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
   - Fixed 2 fallback tests: changed to assert throws (fail-loud is correct)
   - Fixed 2 Spanish variant tests: updated expectations to match actual copy
   - All email localization tests now green
+
+- [ ] Boolean assertion failures bucket (12 tests)
+  - Capture exact failures with test file, assertion line, actual vs expected, fixture names
+  - Micro-bucket by shared fixture/helper (3-4 tests per micro-bucket)
+  - Apply single-point fixes per micro-bucket
+  - Verify all 12 tests pass

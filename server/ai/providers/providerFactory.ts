@@ -112,15 +112,31 @@ function parseTrace(trace: unknown): TraceParsed {
 }
 
 function schemaFromTraceOrFallback(request: { trace?: any; model?: string }): string | undefined {
-  const t = parseTrace(request.trace);
-  if (t?.schema && typeof t.schema === "string") return t.schema;
+  // 1) Structured object: { schema, step, ... }
+  if (request.trace && typeof request.trace === "object") {
+    const t = request.trace as Record<string, unknown>;
+    const schema = typeof t.schema === "string" ? t.schema : undefined;
+    if (schema) return schema;
 
+    // ✅ Key fix: step becomes schema for memory fixtures
+    const step = typeof t.step === "string" ? t.step : undefined;
+    if (step) {
+      // Step → fixture schema mapping (workflow step names → output schema names)
+      if (step === "generate_candidates") return "copy_proposal";
+      return step;
+    }
+  }
+
+  // 2) String trace fallback
   const traceStr =
     typeof request.trace === "string" ? request.trace : JSON.stringify(request.trace ?? "");
 
-  if (traceStr.includes('"schema":"copy_proposal"') || traceStr.includes("copy_proposal")) return "copy_proposal";
-  if (traceStr.includes('"schema":"critique"') || traceStr.includes("critique")) return "critique";
-  if (traceStr.includes('"schema":"decision_collapse"') || traceStr.includes("decision_collapse")) return "decision_collapse";
+  // Include ALL task types we support
+  if (traceStr.includes("intent_parse")) return "intent_parse";
+  if (traceStr.includes("generate_candidates")) return "copy_proposal";
+  if (traceStr.includes("copy_proposal")) return "copy_proposal";
+  if (traceStr.includes("critique")) return "critique";
+  if (traceStr.includes("decision_collapse")) return "decision_collapse";
 
   return undefined;
 }
@@ -177,11 +193,14 @@ const memoryProvider: AiProvider = {
       switch (schema) {
         case "intent_parse":
           fixture = {
+            schemaVersion: "v1",
+            intentType: "COPY_CHANGE",
+            targetKeys: ["hero.headline"],
             userText: "I want to rewrite my homepage copy",
-            intent: "copy_rewrite",
-            confidence: 0.95,
-            issues: [],
+            proposedDirection: "Rewrite homepage copy to be more engaging",
             needsHuman: false,
+            confidence: 0.95,
+            requiresApproval: true,
           };
           break;
 

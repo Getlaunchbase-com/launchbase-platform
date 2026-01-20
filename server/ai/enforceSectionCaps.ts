@@ -204,12 +204,14 @@ function enforceVariantCaps(variant: CopyVariant, index: number): string[] {
  * const capped = enforceSectionCaps(schemaResult.data);
  * // Safe to use capped proposal
  */
-export function enforceSectionCaps(proposal: CopyProposal): CopyProposal {
+export function enforceSectionCaps(proposal: CopyProposal): CapViolationResult {
   // Defensive guards
-  if (!proposal || typeof proposal !== "object") return proposal;
+  if (!proposal || typeof proposal !== "object") {
+    return { ok: false, code: "cap_violation", errors: ["Invalid proposal object"] };
+  }
   
   if (!("variants" in proposal) || !Array.isArray(proposal.variants)) {
-    return proposal; // schema validation handles missing variants
+    return { ok: false, code: "cap_violation", errors: ["Missing or invalid variants array"] };
   }
 
   const errors: string[] = [];
@@ -220,10 +222,10 @@ export function enforceSectionCaps(proposal: CopyProposal): CopyProposal {
   });
 
   if (errors.length > 0) {
-    throw new Error(`Cap violations: ${errors.join("; ")}`);
+    return { ok: false, code: "cap_violation", errors };
   }
 
-  return proposal;
+  return { ok: true };
 }
 
 /**
