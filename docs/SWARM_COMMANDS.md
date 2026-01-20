@@ -1,0 +1,337 @@
+# Swarm Recording & Replay - Canonical Commands
+
+**Status:** ✅ Production-Ready  
+**Version:** 1.0  
+**Last Updated:** January 19, 2026
+
+## Environment Variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `AI_PROVIDER` | Yes | - | Must be `replay` for both record and replay modes |
+| `SWARM_RECORD` | For recording | `0` | Set to `1` to enable recording mode (proxy to AIML) |
+| `SWARM_REPLAY_RUN_ID` | Yes | `apply_ok` | Fixture folder name (scenario identifier) |
+| `SWARM_RECORD_ALLOW_OVERWRITE` | Optional | `0` | Set to `1` to allow overwriting existing fixtures |
+
+**Backward Compatibility:** `REPLAY_ID` is supported as fallback for `SWARM_REPLAY_RUN_ID`.
+
+---
+
+## Canonical Commands
+
+### 1. Capture Golden Transcript (Record Mode)
+
+**Capture to staging folder:**
+```bash
+AI_PROVIDER=replay \
+SWARM_RECORD=1 \
+SWARM_REPLAY_RUN_ID=golden_ts_bucket__staging__$(date +%s) \
+pnpm tsx scripts/swarm/captureGolden.ts
+```
+
+**Expected output:**
+```
+🎬 Capturing Golden Transcript
+   SWARM_REPLAY_RUN_ID: golden_ts_bucket__staging__1737334800
+   AI_PROVIDER: replay
+   SWARM_RECORD: 1
+
+[replay:record] id=golden_ts_bucket__staging__1737334800 run=capture-golden_ts_bucket__staging__1737334800 role=craft idx=0
+[replay:record] Wrote fixture: server/ai/engine/__tests__/fixtures/swarm/replays/golden_ts_bucket__staging__1737334800/craft.json (entry 0)
+[replay:record] id=golden_ts_bucket__staging__1737334800 run=capture-golden_ts_bucket__staging__1737334800 role=critic idx=0
+[replay:record] Wrote fixture: server/ai/engine/__tests__/fixtures/swarm/replays/golden_ts_bucket__staging__1737334800/critic.json (entry 0)
+
+✅ Swarm completed successfully
+   Status: succeeded
+   StopReason: ok
+   NeedsHuman: false
+   Artifacts: 4
+
+📁 Fixtures saved to:
+   server/ai/engine/__tests__/fixtures/swarm/replays/golden_ts_bucket__staging__1737334800/
+
+🧪 To replay this scenario:
+   AI_PROVIDER=replay SWARM_REPLAY_RUN_ID=golden_ts_bucket__staging__1737334800 pnpm vitest server/ai/engine/__tests__/swarm.replay.invariants.test.ts
+```
+
+---
+
+### 2. Replay Golden Transcript (Replay Mode)
+
+**Replay from staging:**
+```bash
+AI_PROVIDER=replay \
+SWARM_REPLAY_RUN_ID=golden_ts_bucket__staging__1737334800 \
+pnpm vitest server/ai/engine/__tests__/swarm.replay.invariants.test.ts
+```
+
+**Expected output:**
+```
+[replay] id=golden_ts_bucket__staging__1737334800 run=test-apply-ok role=craft idx=0
+[replay] id=golden_ts_bucket__staging__1737334800 run=test-apply-ok role=critic idx=0
+
+✓ server/ai/engine/__tests__/swarm.replay.invariants.test.ts (3 tests) 10ms
+  ✓ apply_ok: produces APPLY decision
+  ✓ reject_ok: produces REJECT decision
+  ✓ revise_then_apply: triggers iteration loop
+```
+
+---
+
+### 3. Promote Golden Transcript (Staging → Canonical)
+
+**Step 1: Diff + Redact Audit**
+```bash
+# Inspect fixtures for secrets/PII
+cat server/ai/engine/__tests__/fixtures/swarm/replays/golden_ts_bucket__staging__1737334800/craft.json
+cat server/ai/engine/__tests__/fixtures/swarm/replays/golden_ts_bucket__staging__1737334800/critic.json
+
+# Ensure no secrets, PII, or non-deterministic data
+grep -r "sk-" server/ai/engine/__tests__/fixtures/swarm/replays/golden_ts_bucket__staging__1737334800/
+grep -r "@" server/ai/engine/__tests__/fixtures/swarm/replays/golden_ts_bucket__staging__1737334800/
+```
+
+**Step 2: Promote by Rename**
+```bash
+# Move staging → canonical
+mv server/ai/engine/__tests__/fixtures/swarm/replays/golden_ts_bucket__staging__1737334800 \
+   server/ai/engine/__tests__/fixtures/swarm/replays/golden_ts_bucket
+```
+
+**Step 3: Lock (Prevent Accidental Overwrite)**
+```bash
+# Replay tests should pass with canonical name
+AI_PROVIDER=replay \
+SWARM_REPLAY_RUN_ID=golden_ts_bucket \
+pnpm vitest server/ai/engine/__tests__/swarm.replay.invariants.test.ts
+
+# Attempting to record again should fail (unless ALLOW_OVERWRITE=1)
+AI_PROVIDER=replay \
+SWARM_RECORD=1 \
+SWARM_REPLAY_RUN_ID=golden_ts_bucket \
+pnpm tsx scripts/swarm/captureGolden.ts
+# ❌ Error: Fixture already exists: .../golden_ts_bucket/craft.json
+#    Set SWARM_RECORD_ALLOW_OVERWRITE=1 to overwrite, or use a different SWARM_REPLAY_RUN_ID
+```
+
+---
+
+### 4. CI Invocation (Safe Defaults)
+
+**Run all replay tests in CI:**
+```bash
+# Use default fixtures (synthetic contract tests)
+AI_PROVIDER=replay pnpm vitest server/ai/engine/__tests__/swarm.replay.invariants.test.ts
+
+# Or specify golden transcript
+AI_PROVIDER=replay SWARM_REPLAY_RUN_ID=golden_ts_bucket pnpm vitest server/ai/engine/__tests__/swarm.replay.invariants.test.ts
+```
+
+**CI Environment:**
+- ✅ No `SWARM_RECORD=1` (read-only mode)
+- ✅ No `SWARM_RECORD_ALLOW_OVERWRITE=1` (safety)
+- ✅ Deterministic (no network calls, no cost)
+- ✅ Fast (fixtures load from disk)
+
+---
+
+## Promotion Workflow (Repeatable)
+
+```mermaid
+graph LR
+    A[Capture to Staging] --> B[Replay Locally]
+    B --> C[Diff + Redact Audit]
+    C --> D[Promote by Rename]
+    D --> E[Lock with Safety Flag]
+    E --> F[CI Validation]
+```
+
+### Step-by-Step
+
+1. **Capture to staging folder**
+   ```bash
+   SWARM_REPLAY_RUN_ID=golden_ts_bucket__staging__$(date +%s)
+   ```
+
+2. **Replay in CI locally**
+   ```bash
+   AI_PROVIDER=replay SWARM_REPLAY_RUN_ID=<staging_id> pnpm test swarm.replay
+   ```
+
+3. **Diff + redact audit**
+   - Ensure no secrets/PII
+   - Ensure fixture determinism
+   - Validate patch quality (see Patch Quality Invariants below)
+
+4. **Promote by rename**
+   ```bash
+   mv .../golden_ts_bucket__staging__<timestamp> .../golden_ts_bucket
+   ```
+
+5. **Lock**
+   - Disallow overwrite unless `SWARM_RECORD_ALLOW_OVERWRITE=1`
+   - Prevents "fixture drift" becoming silent tech debt
+
+---
+
+## Patch Quality Invariants
+
+**Every golden transcript must enforce these guardrails:**
+
+### ❌ Forbidden Changes (Auto-Reject)
+
+1. **No skipLibCheck**
+   - `tsconfig.json` must not add `"skipLibCheck": true`
+   - Swarm cannot "win" by lowering type safety standards
+
+2. **No global tsconfig relax**
+   - No `"strict": false`
+   - No `"noImplicitAny": false`
+   - No `"strictNullChecks": false`
+
+3. **No test disabling**
+   - No `test.skip()` or `describe.skip()`
+   - No commenting out tests
+   - No `expect.any()` to bypass assertions
+
+4. **No changes outside declared file allowlist**
+   - Unless explicitly permitted in FailurePacket constraints
+   - Prevents scope creep and unintended side effects
+
+### ✅ Required Properties (Auto-Validate)
+
+1. **Patch must be minimal**
+   - Changes should be localized to the failure site
+   - No refactors, no "while we're here" improvements
+
+2. **Patch must be bounded**
+   - Max file count: specified in FailurePacket
+   - Max line changes: specified in FailurePacket
+
+3. **Patch must preserve behavior**
+   - No logic changes unless required to fix the failure
+   - No new features, no optimizations
+
+4. **Patch must include iteration**
+   - At least one REVISE → APPLY iteration (proves swarm earns its keep)
+   - Demonstrates critic feedback loop works
+
+---
+
+## The 3 Golden Transcripts (Target Coverage)
+
+### 1. TS Bucket: Bounded Typecheck Failure (6-20 errors)
+
+**Goal:** Proves "static compiler repair" works
+
+**Example FailurePacket:**
+```json
+{
+  "component": "tsc",
+  "context": {
+    "command": "pnpm tsc --noEmit",
+    "logs": [
+      "server/ai/engine/swarmRunner.ts(131,13): error TS2698: Spread types may only be created from object types.",
+      "server/ai/engine/swarmRunner.ts(312,9): error TS2322: Type 'string | undefined' is not assignable to type 'string'."
+    ],
+    "errorCount": 2
+  },
+  "constraints": "No behavior changes. Fix type errors only. Max 2 files."
+}
+```
+
+**Fixture name:** `golden_ts_bucket`
+
+---
+
+### 2. Test Bucket: Deterministic Unit/Integration Failure
+
+**Goal:** Proves "test harness repair" and "mock boundaries" work
+
+**Example FailurePacket:**
+```json
+{
+  "component": "vitest",
+  "context": {
+    "command": "pnpm vitest server/__tests__/smoke.email.test.ts",
+    "logs": [
+      "AssertionError: expected 'en' to be 'es'",
+      "at server/__tests__/smoke.email.test.ts:42:27"
+    ],
+    "testFile": "server/__tests__/smoke.email.test.ts"
+  },
+  "constraints": "Tests-only fix. No behavior changes. Max 1 file."
+}
+```
+
+**Fixture name:** `golden_test_bucket`
+
+---
+
+### 3. Migration Bucket: DB Schema/Migration Incompat
+
+**Goal:** Proves "sql/migration repair" works and doesn't regress smoke
+
+**Example FailurePacket:**
+```json
+{
+  "component": "drizzle",
+  "context": {
+    "command": "pnpm db:push",
+    "logs": [
+      "Error: TiDB does not support JSON default values",
+      "at drizzle/schema.ts:42:15"
+    ],
+    "dialect": "tidb"
+  },
+  "constraints": "Schema-only fix. No data loss. Max 1 file."
+}
+```
+
+**Fixture name:** `golden_migration_bucket`
+
+---
+
+## Troubleshooting
+
+### Error: "Fixture already exists"
+
+**Cause:** Attempting to record to an existing fixture folder without `SWARM_RECORD_ALLOW_OVERWRITE=1`.
+
+**Fix:**
+```bash
+# Option 1: Use a different run ID
+SWARM_REPLAY_RUN_ID=golden_ts_bucket__v2
+
+# Option 2: Allow overwrite (use with caution)
+SWARM_RECORD_ALLOW_OVERWRITE=1
+```
+
+### Error: "missing trace.role"
+
+**Cause:** The replay provider requires `trace.role` to determine which fixture to load.
+
+**Fix:** Ensure `aimlSpecialist.ts` passes `role` in the trace object (already implemented).
+
+### Fixtures are non-deterministic
+
+**Cause:** AI responses include timestamps, request IDs, or other non-deterministic data.
+
+**Fix:** Redact non-deterministic fields before promoting to canonical:
+```bash
+# Remove timestamps, request IDs, etc.
+jq 'del(.meta.timestamp, .meta.requestId)' craft.json > craft_clean.json
+mv craft_clean.json craft.json
+```
+
+---
+
+## Related Documents
+
+- [SWARM_RECORDING.md](./SWARM_RECORDING.md) - Complete recording mode documentation
+- [SWARM_PROTOCOL.md](./SWARM_PROTOCOL.md) - Swarm orchestration design
+- [FOREVER_CONTRACTS.md](./FOREVER_CONTRACTS.md) - AI constitutional guarantees
+
+---
+
+**Key Achievement:** Standardized environment variables, safety flags, and canonical commands. The promotion workflow prevents fixture drift and ensures golden transcripts remain trustworthy.

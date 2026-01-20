@@ -2759,3 +2759,13 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [ ] Capture 1 real golden transcript (requires AIML API access)
 - [ ] Validate recorded transcript with replay tests
 - [ ] Future: Capture 3 golden transcripts (TS, test, migration buckets)
+
+### Swarm Recording Standardization & Promotion Workflow ✅ COMPLETE
+- [x] Standardize env variable: REPLAY_ID → SWARM_REPLAY_RUN_ID (with backward compat)
+- [x] Add SWARM_RECORD_ALLOW_OVERWRITE=1 safety flag
+- [x] Update providerFactory.ts to use SWARM_REPLAY_RUN_ID
+- [x] Update captureGolden.ts to use SWARM_REPLAY_RUN_ID
+- [x] Create docs/SWARM_COMMANDS.md with canonical commands
+- [x] Add promotion workflow documentation (staging → canonical)
+- [x] Add patch quality invariants (no skipLibCheck, no test disabling, bounded changes)
+- [ ] Add deprecation warning for REPLAY_ID (future cleanup)

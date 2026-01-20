@@ -320,9 +320,10 @@ import path from "node:path";
 import fs from "node:fs";
 
 function createReplayProvider(): AiProvider {
-  const replayId = process.env.REPLAY_ID ?? "apply_ok";
+  const replayId = process.env.SWARM_REPLAY_RUN_ID ?? process.env.REPLAY_ID ?? "apply_ok"; // fallback for backward compat
   const baseDir = path.resolve(process.cwd(), "server/ai/engine/__tests__/fixtures/swarm/replays");
   const recordMode = process.env.SWARM_RECORD === "1";
+  const allowOverwrite = process.env.SWARM_RECORD_ALLOW_OVERWRITE === "1";
   
   // Per-instance counters (fresh per test)
   const counters: Record<string, number> = {};
@@ -369,6 +370,14 @@ function createReplayProvider(): AiProvider {
     // Read existing fixtures (if any)
     let existingData: any[] = [];
     if (fs.existsSync(filePath)) {
+      // Safety: refuse to overwrite unless explicitly allowed
+      if (!allowOverwrite && idx === 0) {
+        throw new Error(
+          `[replay:record] Fixture already exists: ${filePath}\n` +
+          `Set SWARM_RECORD_ALLOW_OVERWRITE=1 to overwrite, or use a different SWARM_REPLAY_RUN_ID`
+        );
+      }
+      
       const raw = fs.readFileSync(filePath, "utf-8");
       const data = JSON.parse(raw);
       existingData = Array.isArray(data) ? data : [data];

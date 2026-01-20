@@ -22,7 +22,7 @@ import type { PolicyV1 } from "../../server/ai/engine/policy/policyTypes";
 // CONFIGURATION
 // ============================================
 
-const REPLAY_ID = process.env.REPLAY_ID ?? "golden_1";
+const SWARM_REPLAY_RUN_ID = process.env.SWARM_REPLAY_RUN_ID ?? "golden_1";
 const AI_PROVIDER = process.env.AI_PROVIDER ?? "replay";
 const SWARM_RECORD = process.env.SWARM_RECORD ?? "0";
 
@@ -94,14 +94,14 @@ const workOrder: AiWorkOrderV1 = {
 
 async function main() {
   console.log("🎬 Capturing Golden Transcript");
-  console.log(`   REPLAY_ID: ${REPLAY_ID}`);
+  console.log(`   SWARM_REPLAY_RUN_ID: ${SWARM_REPLAY_RUN_ID}`);
   console.log(`   AI_PROVIDER: ${AI_PROVIDER}`);
   console.log(`   SWARM_RECORD: ${SWARM_RECORD}`);
   console.log("");
 
   try {
     const result = await runSwarmV1(workOrder, policy, {
-      traceId: `capture-${REPLAY_ID}`,
+      traceId: `capture-${SWARM_REPLAY_RUN_ID}`,
     });
 
     console.log("");
@@ -112,10 +112,10 @@ async function main() {
     console.log(`   Artifacts: ${result.artifacts.length}`);
     console.log("");
     console.log("📁 Fixtures saved to:");
-    console.log(`   server/ai/engine/__tests__/fixtures/swarm/replays/${REPLAY_ID}/`);
+    console.log(`   server/ai/engine/__tests__/fixtures/swarm/replays/${SWARM_REPLAY_RUN_ID}/`);
     console.log("");
     console.log("🧪 To replay this scenario:");
-    console.log(`   AI_PROVIDER=replay REPLAY_ID=${REPLAY_ID} pnpm vitest server/ai/engine/__tests__/swarm.replay.invariants.test.ts`);
+    console.log(`   AI_PROVIDER=replay SWARM_REPLAY_RUN_ID=${SWARM_REPLAY_RUN_ID} pnpm vitest server/ai/engine/__tests__/swarm.replay.invariants.test.ts`);
   } catch (error) {
     console.error("");
     console.error("❌ Swarm failed");
