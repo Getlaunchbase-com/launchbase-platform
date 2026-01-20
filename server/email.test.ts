@@ -20,6 +20,17 @@ vi.mock("./_core/notification", () => ({
   notifyOwner: vi.fn(() => Promise.resolve(true)),
 }));
 
+// Mock Resend to always succeed
+vi.mock("resend", () => {
+  return {
+    Resend: vi.fn().mockImplementation(() => ({
+      emails: {
+        send: vi.fn(async () => ({ id: "test-email-id" })),
+      },
+    })),
+  };
+});
+
 import { getEmailTemplate, sendEmail } from "./email";
 
 describe("Email Service", () => {
