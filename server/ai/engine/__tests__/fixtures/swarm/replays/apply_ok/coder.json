@@ -1,0 +1,13 @@
+{
+  "ok": true,
+  "changes": [
+    {
+      "filePath": "client/src/pages/Apply.tsx",
+      "patch": "*** Begin Patch\n*** Update File: client/src/pages/Apply.tsx\n@@\n-  tier: form.tier,\n+  tier: form.tier ?? undefined,\n*** End Patch"
+    }
+  ],
+  "testPlan": [
+    "pnpm typecheck",
+    "pnpm smoke:intake"
+  ]
+}

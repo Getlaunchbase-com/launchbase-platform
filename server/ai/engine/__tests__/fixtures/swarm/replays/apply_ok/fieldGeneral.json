@@ -1,0 +1,8 @@
+{
+  "ok": true,
+  "summary": "Type mismatch: convert null to undefined at callsite.",
+  "rootCause": "Mutation input expects undefined not null.",
+  "recommendedFix": "Use `tier: form.tier ?? undefined`.",
+  "confidence": 0.9,
+  "relatedIssues": []
+}

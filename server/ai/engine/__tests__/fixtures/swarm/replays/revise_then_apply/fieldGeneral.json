@@ -1,0 +1,8 @@
+{
+  "ok": true,
+  "summary": "NormalizationEvent union missing discriminator usage or fields.",
+  "rootCause": "Returning events without kind or missing optional fields in union.",
+  "recommendedFix": "Ensure truncate events include kind: 'truncate' and union includes needed fields.",
+  "confidence": 0.82,
+  "relatedIssues": []
+}

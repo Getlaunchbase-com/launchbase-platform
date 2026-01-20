@@ -1,0 +1,6 @@
+{
+  "ok": true,
+  "approved": false,
+  "concerns": ["No changes proposed; cannot resolve missing module under constraints."],
+  "suggestions": ["Confirm intended module or allow dependency addition."]
+}

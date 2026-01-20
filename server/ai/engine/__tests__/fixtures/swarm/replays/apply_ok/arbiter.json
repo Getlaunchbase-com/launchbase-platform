@@ -1,0 +1,6 @@
+{
+  "ok": true,
+  "decision": "APPLY",
+  "reason": "Patch is minimal and aligns null/undefined contract without behavior change.",
+  "confidence": 0.85
+}

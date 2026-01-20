@@ -1,0 +1,8 @@
+{
+  "ok": true,
+  "summary": "Missing module; cannot add dependency due to constraints.",
+  "rootCause": "Import points to a non-existent module.",
+  "recommendedFix": "Remove or replace import with an existing module. Needs product/architecture decision.",
+  "confidence": 0.7,
+  "relatedIssues": []
+}

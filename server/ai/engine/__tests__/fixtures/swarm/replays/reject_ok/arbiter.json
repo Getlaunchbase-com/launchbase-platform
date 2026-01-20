@@ -1,0 +1,6 @@
+{
+  "ok": true,
+  "decision": "REJECT",
+  "reason": "No actionable patch within constraints; requires human decision.",
+  "confidence": 0.8
+}

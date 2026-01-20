@@ -1,0 +1,22 @@
+{
+  "version": "failurePacket.v1",
+  "id": "replay-revise-then-apply",
+  "createdAtIso": "2026-01-19T00:00:00.000Z",
+  "system": "vitest",
+  "failure": {
+    "stopReason": "compilation_failed",
+    "errorMessage": "TS2353: Object literal may only specify known properties"
+  },
+  "context": {
+    "component": "typescript-compiler",
+    "command": "pnpm typecheck",
+    "logs": [
+      "scripts/pilot/normalizer.ts(30,16): error TS2353: Object literal may only specify known properties, and 'truncated' does not exist in type 'NormalizationEvent'."
+    ],
+    "constraints": {
+      "noNewDeps": true,
+      "noTsconfigChanges": true,
+      "maxFiles": 2
+    }
+  }
+}

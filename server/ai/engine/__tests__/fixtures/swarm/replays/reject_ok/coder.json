@@ -1,0 +1,5 @@
+{
+  "ok": true,
+  "changes": [],
+  "testPlan": ["pnpm typecheck"]
+}

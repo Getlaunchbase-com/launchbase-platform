@@ -1,0 +1,22 @@
+{
+  "version": "failurePacket.v1",
+  "id": "replay-reject-ok",
+  "createdAtIso": "2026-01-19T00:00:00.000Z",
+  "system": "vitest",
+  "failure": {
+    "stopReason": "compilation_failed",
+    "errorMessage": "TS2307: Cannot find module 'does-not-exist'"
+  },
+  "context": {
+    "component": "typescript-compiler",
+    "command": "pnpm typecheck",
+    "logs": [
+      "server/x.ts(1,1): error TS2307: Cannot find module 'does-not-exist' or its corresponding type declarations."
+    ],
+    "constraints": {
+      "noNewDeps": true,
+      "noTsconfigChanges": true,
+      "maxFiles": 2
+    }
+  }
+}
