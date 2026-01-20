@@ -2705,3 +2705,9 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
   - Removed unnecessary afterAll cleanup (SuperTest handles teardown)
   - Wrapped notifyOwner in try-catch to prevent webhook hangs
   - All payment reliability tests now green
+
+- [x] app.address bucket fixed (5 tests passing)
+  - Applied proven await createApp() pattern from Stripe webhook fixes
+  - Moved app initialization to beforeAll() block
+  - All 5 API routing guardrail tests now green
+  - Same mechanical fix pattern validated across 2 buckets (Stripe + API routing)

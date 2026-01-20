@@ -13,12 +13,16 @@
  * HTML 200 responses instead of JSON, causing silent failures for weeks.
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import supertest from "supertest";
 import { createApp } from "./_core/app";
 
 describe("API guardrails (never repeat cron + SPA issues)", () => {
-  const app = createApp();
+  let app: Awaited<ReturnType<typeof createApp>>;
+
+  beforeAll(async () => {
+    app = await createApp();
+  });
 
   it("never serves SPA HTML under /api (404 returns JSON)", async () => {
     const res = await supertest(app).get("/api/__does_not_exist__");
