@@ -72,41 +72,34 @@ async function main() {
   console.log("   Expected: { workOrder, policy, ctx }");
   console.log("");
 
-  // IMPORTANT: import lazily so mocks/env are in place
-  const { runSwarmV1 } = await import("../../server/ai/engine/swarmRunner");
-  
-  const res = await runSwarmV1(workOrder as any, policy as any, ctx as any);
+  try {
+    // IMPORTANT: import lazily so mocks/env are in place
+    const { runSwarmV1 } = await import("../../server/ai/engine/swarmRunner");
+    
+    const res = await runSwarmV1(workOrder as any, policy as any, ctx as any);
 
-  // For now, just create the output directory structure
-  const outDir = path.resolve(".swarm_runs");
-  fs.mkdirSync(outDir, { recursive: true });
+    // For now, just create the output directory structure
+    const outDir = path.resolve(".swarm_runs");
+    fs.mkdirSync(outDir, { recursive: true });
 
-  const artifacts = res?.artifacts ?? [];
-  const craft = artifacts.filter((a: any) => a?.type?.includes("specialist.craft"));
-  const critic = artifacts.filter((a: any) => a?.type?.includes("specialist.critic"));
-  const collapse = artifacts.find((a: any) => a?.type?.includes("swarm.collapse"));
-  
-  const result = {
-    status: res?.status,
-    stopReason: res?.stopReason,
-    craftRounds: craft.map((c: any) => c?.payload ?? c),
-    criticRounds: critic.map((c: any) => c?.payload ?? c),
-    collapse: collapse?.payload ?? collapse,
-  };
+    const artifacts = res?.artifacts ?? [];
+    const craft = artifacts.filter((a: any) => a?.type?.includes("specialist.craft"));
+    const critic = artifacts.filter((a: any) => a?.type?.includes("specialist.critic"));
+    const collapse = artifacts.find((a: any) => a?.type?.includes("swarm.collapse"));
+    
+    const result = {
+      status: res?.status,
+      stopReason: res?.stopReason,
+      craftRounds: craft.map((c: any) => c?.payload ?? c),
+      criticRounds: critic.map((c: any) => c?.payload ?? c),
+      collapse: collapse?.payload ?? collapse,
+    };
 
-  fs.writeFileSync(path.join(outDir, "last_result.json"), JSON.stringify(result, null, 2), "utf8");
-
-  console.log("✅ Swarm run complete (skeleton mode)");
-  console.log(`   status=${result.status} stopReason=${result.stopReason}`);
-  console.log(`   artifacts=${result.artifacts?.length ?? 0}`);
-  console.log("");
-  console.log("📁 Output written to: .swarm_runs/last_result.json");
-  console.log("");
-  console.log("🔜 Next steps:");
-  console.log("   1. Implement scripts/swarm/utils/packetToWorkOrder.ts");
-  console.log("   2. Wire up runSwarmV1 invocation");
-  console.log("   3. Extract proposedChanges from craft artifact");
-  console.log("   4. Generate git diff from proposedChanges");
+    console.log(JSON.stringify(result, null, 2));
+  } catch (err: any) {
+    console.log(JSON.stringify({ status: "error", error: String(err?.message ?? err) }, null, 2));
+    process.exit(1);
+  }
 }
 
 main().catch((e) => {

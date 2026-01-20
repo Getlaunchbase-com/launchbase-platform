@@ -10,13 +10,20 @@ pnpm vitest run --reporter=default 2>&1 | tee "$OUT_FILE"
 VITEST_EXIT=${PIPESTATUS[0]}
 set -e
 
+# Guardrail: fail fast if output is empty
+if [ ! -s "$OUT_FILE" ]; then
+  echo "ERROR: vitest output file is empty: $OUT_FILE"
+  exit 2
+fi
+
+echo "Vitest output saved to: $(pwd)/$OUT_FILE"
 echo ""
 echo "==> Triaging failures into Tier0/Tier1/Tier2..."
 cat "$OUT_FILE" | pnpm tsx scripts/test/triageFailures.ts
 
 echo ""
 echo "==> Next steps (manual or swarm-assisted)"
-echo "  1) Open scripts/test/triageFailures.json"
+echo "  1) Open $(pwd)/scripts/test/out/triage.json"
 echo "  2) Clear Tier0 first"
 echo "  3) Then Tier1"
 echo "  4) Treat Tier2 as integration decisions"
