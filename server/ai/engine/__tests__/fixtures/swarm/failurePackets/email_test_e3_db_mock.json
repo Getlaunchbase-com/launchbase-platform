@@ -1,0 +1,45 @@
+{
+  "version": "v1",
+  "failure": {
+    "stopReason": "test_failed",
+    "errorMessage": "No \"getIntakeById\" export is defined on the \"./db\" mock"
+  },
+  "context": {
+    "component": "vitest",
+    "command": "pnpm vitest server/email.test.ts -t \"sendEmail\" --run",
+    "logs": [
+      "FAIL  server/email.test.ts > Email Service > sendEmail > should send email and return true on success",
+      "Error: [vitest] No \"getIntakeById\" export is defined on the \"./db\" mock. Did you forget to return it from \"vi.mock\"?",
+      "",
+      "FAIL  server/email.test.ts > Email Service > sendEmail > should log email to database",
+      "Error: [vitest] No \"getIntakeById\" export is defined on the \"./db\" mock. Did you forget to return it from \"vi.mock\"?",
+      "",
+      "Test file: server/email.test.ts",
+      "Import path used: import { getIntakeById } from './db'",
+      "Mock location: vi.mock('./db', () => ({ ... }))"
+    ],
+    "constraints": [
+      "Test-only change",
+      "No production behavior changes",
+      "No new deps",
+      "Max 3 files",
+      "Prefer updating existing vi.mock() for ./db rather than refactoring production imports",
+      "Do not change email copy content"
+    ],
+    "expectedFixes": [
+      "Update the ./db test mock in server/email.test.ts to export getIntakeById with the minimal shape needed by sendEmail tests",
+      "If other db exports are referenced by this test file, ensure the mock provides them too",
+      "Mock should return a valid intake object with at least { id, email, language, audience } fields"
+    ]
+  },
+  "metadata": {
+    "capturedAt": "2026-01-19T22:10:00Z",
+    "bucket": "email_test_e3_db_mock",
+    "bucketType": "mechanical_test_harness",
+    "priority": "high",
+    "estimatedComplexity": "low",
+    "failureCount": 2,
+    "singleFile": true,
+    "rootCause": "Missing getIntakeById export in vi.mock('./db') definition"
+  }
+}

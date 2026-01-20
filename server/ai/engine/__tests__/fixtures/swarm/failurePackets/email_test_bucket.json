@@ -1,0 +1,46 @@
+{
+  "version": "v1",
+  "component": "vitest",
+  "severity": "medium",
+  "context": {
+    "command": "pnpm vitest server/email.test.ts --run",
+    "testFile": "server/email.test.ts",
+    "errorCount": 4,
+    "logs": [
+      "FAIL  server/email.test.ts > Email Service > getEmailTemplate > should generate intake confirmation email",
+      "AssertionError: expected 'We\\'re building your site from scratc…' to be '✅ We\\'re building your website'",
+      "",
+      "FAIL  server/email.test.ts > Email Service > getEmailTemplate > should return default template for unknown type",
+      "Error: [emailCopy] Missing copy for language=en audience=biz emailType=unknown_type",
+      "",
+      "FAIL  server/email.test.ts > Email Service > sendEmail > should send email and return true on success",
+      "Error: [vitest] No \"getIntakeById\" export is defined on the \"./db\" mock. Did you forget to return it from \"vi.mock\"?",
+      "",
+      "FAIL  server/email.test.ts > Email Service > sendEmail > should log email to database",
+      "Error: [vitest] No \"getIntakeById\" export is defined on the \"./db\" mock. Did you forget to return it from \"vi.mock\"?"
+    ],
+    "failureSignature": "email_copy_and_mock_mismatch",
+    "rootCause": "Test harness issues: (1) Email copy expectations don't match actual copy, (2) Missing mock exports for db.getIntakeById"
+  },
+  "constraints": [
+    "Test-only fixes",
+    "No product logic changes",
+    "Max 2 files (server/email.test.ts + server/emails/emailCopy.ts if needed)",
+    "No dependency changes",
+    "Must preserve existing email functionality",
+    "Fix must be minimal and bounded"
+  ],
+  "expectedOutcome": {
+    "status": "succeeded",
+    "testsFixed": 4,
+    "filesModified": ["server/email.test.ts"],
+    "patchType": "test_harness_fix"
+  },
+  "metadata": {
+    "capturedAt": "2026-01-19T22:05:00Z",
+    "bucket": "email_test_bucket",
+    "bucketType": "mechanical_test_harness",
+    "priority": "high",
+    "estimatedComplexity": "low"
+  }
+}

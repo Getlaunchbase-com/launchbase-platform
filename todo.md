@@ -2769,3 +2769,20 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [x] Add promotion workflow documentation (staging → canonical)
 - [x] Add patch quality invariants (no skipLibCheck, no test disabling, bounded changes)
 - [ ] Add deprecation warning for REPLAY_ID (future cleanup)
+
+### Golden Transcript Capture - Email Test Buckets
+- [ ] E3 (db mock): Generate focused FailurePacket for db mock export failures only
+- [ ] E3 (db mock): Capture golden transcript using SWARM_RECORD mode
+- [ ] E3 (db mock): Replay and validate captured transcript
+- [ ] E3 (db mock): Promote staging to canonical golden transcript
+- [ ] E2 (unknown_type): Generate FailurePacket and capture golden transcript
+- [ ] E1 (copy drift): Generate FailurePacket and capture golden transcript
+
+### Golden Transcript Validation & Promotion ✅ COMPLETE
+- [x] Phase 1: Replay exact run with no recording (prove determinism)
+- [x] Phase 2: Hash fixtures and validate stability (hash: 10104ef9...)
+- [x] Phase 3: Promote staging to golden_v1 and freeze
+- [x] Phase 3b: Document golden_v1 in SWARM_COMMANDS.md
+- [x] Phase 4: Add CI invariant test for this bucket (3/3 tests passing)
+- [ ] Phase 5: Capture REVISE→APPLY transcript (iteration loop)
+- [ ] Phase 6: Capture REJECT transcript (no patch path)

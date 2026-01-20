@@ -218,6 +218,20 @@ graph LR
 
 ---
 
+## Golden Transcripts Registry
+
+### ✅ `email_test__db_mock__golden_v1`
+- **Captured:** 2026-01-19 22:07 UTC
+- **Bucket:** email_test_bucket_e3 (db mock export failures)
+- **Decision:** needs_human (APPLY path)
+- **Specialists:** craft + critic
+- **Fixtures:** craft.json, critic.json
+- **Hash:** `10104ef9e0f104d6a9f91c4f0dc3ef7b67a380cd89ab6e0045e8794ccc9b35e6`
+- **Validation:** ✅ Determinism verified (fixtures stable across replays)
+- **Usage:** `AI_PROVIDER=replay SWARM_REPLAY_RUN_ID=email_test__db_mock__golden_v1 pnpm vitest`
+
+---
+
 ## The 3 Golden Transcripts (Target Coverage)
 
 ### 1. TS Bucket: Bounded Typecheck Failure (6-20 errors)
