@@ -2992,3 +2992,23 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
   - Swarm repair infrastructure integration
   - Real-world success story (96.7% → 100% pass rate)
   - Execution checklist for burning down failing suites
+
+## Test Automation Scripts
+
+- [x] Created `docs/TEST_FIX_PATTERNS.md` - Copy/paste cookbook with 12 patterns
+  - Quick reference table for symptom → fix mapping
+  - Before/after code examples for each pattern
+  - Tier classification (0/1/2) for each pattern
+  
+- [x] Created `scripts/test/triageFailures.ts` - Auto-bucket failures into Tier 0/1/2
+  - Reads Vitest output (file or stdin)
+  - Classifies failures using lightweight heuristics
+  - Outputs JSON summary with top reasons
+  - Usage: `pnpm tsx scripts/test/triageFailures.ts --from vitest.out`
+  
+- [x] Created `scripts/test/repairLoop.sh` - One-button pipeline for test repair
+  - Runs test suite and captures output
+  - Auto-triages failures
+  - Provides next steps guidance
+  - Includes swarm hook placeholder for future automation
+  - Usage: `./scripts/test/repairLoop.sh`
