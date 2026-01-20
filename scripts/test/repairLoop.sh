@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-OUT_DIR=".test_runs"
-mkdir -p "$OUT_DIR"
-
-STAMP="$(date +%Y%m%d_%H%M%S)"
-VITEST_OUT="$OUT_DIR/vitest_${STAMP}.out"
+OUT_FILE="scripts/test/out/vitest.out.txt"
+mkdir -p "scripts/test/out"
 
 echo "==> Running test suite (capturing output)..."
-pnpm test 2>&1 | tee "$VITEST_OUT" || true
+set +e
+pnpm vitest run --reporter=default 2>&1 | tee "$OUT_FILE"
+VITEST_EXIT=${PIPESTATUS[0]}
+set -e
 
 echo ""
 echo "==> Triaging failures into Tier0/Tier1/Tier2..."
-pnpm tsx scripts/test/triageFailures.ts --from "$VITEST_OUT"
+cat "$OUT_FILE" | pnpm tsx scripts/test/triageFailures.ts
 
 echo ""
 echo "==> Next steps (manual or swarm-assisted)"
@@ -26,4 +26,5 @@ echo "==> Optional (swarm hook placeholder)"
 echo "  If you have a FailurePacket ready:"
 echo "    AI_PROVIDER=replay SWARM_REPLAY_RUN_ID=<id> pnpm tsx scripts/swarm/runRepair.ts --from <failurepacket.json>"
 echo ""
-echo "Done."
+echo "Vitest exit code: $VITEST_EXIT"
+exit "$VITEST_EXIT"
