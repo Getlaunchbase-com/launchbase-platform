@@ -3094,3 +3094,20 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
 - [x] Save PR1.5 checkpoint
 
 **Result:** ✅ Metrics endpoint (PR2) will have real data immediately
+
+
+## PR 2: Admin Email Metrics Endpoint
+
+**Goal:** Add admin-only tRPC endpoint for operational email metrics
+
+**Tasks:**
+- [x] Create server/trpc/routers/adminEmailMetricsRouter.ts with getSummary endpoint
+- [x] Implement 3 SQL queries: totals+success, top failure codes, provider events
+- [x] Add input validation: days clamp [1, 90], optional tenant filter
+- [x] Register router under admin root (admin.emailMetrics)
+- [x] Add 3 tests: days clamp, no data window, tenant filter
+- [x] Verify percent fields rounded to 2 decimals, no NaN
+- [x] Run full test suite (583/583 passing - 3 new PR2 tests)
+- [x] Save PR2 checkpoint
+
+**Result:** Admin dashboard can query real operational metrics (delivery success, fallback rate, idempotency hits, top failure codes)

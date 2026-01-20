@@ -3,6 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { adminStripeWebhooksRouter } from "./routers/admin/stripeWebhooks";
 import { adminEmailSmokeRouter } from "./routers/admin/emailSmoke";
+import { adminEmailMetricsRouter } from "./routers/admin/emailMetrics";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -897,6 +898,9 @@ export const appRouter = router({
     
     // Email delivery smoke test (admin-only)
     emailSmoke: adminEmailSmokeRouter,
+    
+    // Email delivery metrics (admin-only)
+    emailMetrics: adminEmailMetricsRouter,
     
     // Test checkout for Stripe integration verification
     createTestCheckout: protectedProcedure

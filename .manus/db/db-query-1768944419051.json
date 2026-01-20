@@ -1,0 +1,33 @@
+{
+  "query": "SELECT * FROM email_logs LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT * FROM email_logs LIMIT 1;",
+  "rows": [
+    {
+      "id": "1",
+      "intakeId": "1",
+      "tenant": "launchbase",
+      "emailType": "intake_confirmation",
+      "recipientEmail": "user@launchbase.com",
+      "subject": "Test Launchbase",
+      "status": "sent",
+      "deliveryProvider": "resend",
+      "errorMessage": "NULL",
+      "idempotencyKey": "NULL",
+      "idempotencyHitCount": "0",
+      "idempotencyHitAt": "NULL",
+      "providerMessageId": "NULL",
+      "source": "NULL",
+      "templateVersion": "NULL",
+      "variant": "NULL",
+      "durationMs": "NULL",
+      "errorCode": "NULL",
+      "sentAt": "2026-01-17 21:26:48",
+      "openedAt": "NULL",
+      "clickedAt": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tintakeId\ttenant\temailType\trecipientEmail\tsubject\tstatus\tdeliveryProvider\terrorMessage\tidempotencyKey\tidempotencyHitCount\tidempotencyHitAt\tproviderMessageId\tsource\ttemplateVersion\tvariant\tdurationMs\terrorCode\tsentAt\topenedAt\tclickedAt\n1\t1\tlaunchbase\tintake_confirmation\tuser@launchbase.com\tTest Launchbase\tsent\tresend\tNULL\tNULL\t0\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\t2026-01-17 21:26:48\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}
