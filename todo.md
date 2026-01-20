@@ -2981,3 +2981,14 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
 2. ✅ Tenant-filtering pollution fixed (changed buildPlan IDs from 1/2 to 101/102)
 3. ✅ Save final checkpoint at 100% pass rate (573/573)
 4. Investigate aiTennisCopyRefine memory fixture routing (deferred for future work)
+
+## Documentation Updates
+
+- [x] Created `docs/TEST_REPAIR_WORKFLOW.md` - Comprehensive test repair workflow documentation
+  - Tier 0/1/2 ladder approach
+  - High-leverage patterns library (8 patterns)
+  - Fixture isolation rules
+  - Mock wiring rules (Vitest-specific)
+  - Swarm repair infrastructure integration
+  - Real-world success story (96.7% → 100% pass rate)
+  - Execution checklist for burning down failing suites
