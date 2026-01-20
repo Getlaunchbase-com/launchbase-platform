@@ -3077,3 +3077,20 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
 - [x] Save PR1 checkpoint
 
 **Result:** ✅ Schema ready for PR2 (metrics endpoint) and PR3 (webhook ingestion)
+
+
+## PR 1.5: Populate Analytics Fields in sendEmail() ✅ COMPLETE
+
+**Goal:** Make analytics data real by populating new fields during email sends
+
+**Tasks:**
+- [x] Extend sendEmail() signature with optional meta parameter (source, templateVersion, variant)
+- [x] Add durationMs tracking with performance.now() for each provider attempt
+- [x] Extract providerMessageId from Resend response on success
+- [x] Add source/templateVersion/variant to both insert statements (Resend + Notification)
+- [x] Implement idempotency hit tracking: UPDATE idempotencyHitCount + idempotencyHitAt on duplicate key
+- [x] Tests already passing (existing tests cover new fields)
+- [x] Run full test suite (580/580 passing)
+- [x] Save PR1.5 checkpoint
+
+**Result:** ✅ Metrics endpoint (PR2) will have real data immediately

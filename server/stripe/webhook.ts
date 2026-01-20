@@ -454,7 +454,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, eventId
         language: intake.language as any,
         audience: intake.audience as any,
         founderNumber: founderNum,
-      }, `${eventId}:founder_welcome`);
+      }, { 
+        idempotencyKey: `${eventId}:founder_welcome`,
+        meta: { source: "stripe" }
+      });
       console.log(`[Stripe Webhook] ✉️ Founder welcome email sent to ${intake.email}`);
     }
   }
@@ -508,7 +511,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, eventId
       language: intake.language as any,
       audience: intake.audience as any,
       serviceSummaryText,
-    }, `${eventId}:deployment_started`);
+      }, { 
+        idempotencyKey: `${eventId}:deployment_started`,
+        meta: { source: "stripe" }
+      });
     
     // Trigger deployment with safety gates
     await triggerDeploymentWithSafetyGates(intakeIdNum, intake, db);
