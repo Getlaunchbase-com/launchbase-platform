@@ -8,10 +8,10 @@
  * - stopReason propagation to artifact payload
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest
+import { describe, it, expect, vi, beforeEach, test } from "vitest";
 import { allowNetwork } from "../../../__tests__/helpers/networkGate";
 
-const t = allowNetwork ? test : test.skip;";
+const t = allowNetwork ? test : test.skip;
 import type { SpecialistOutput } from "../specialists";
 import { clearPolicyRegistry, registerPolicies } from "../policy/policyRegistry";
 

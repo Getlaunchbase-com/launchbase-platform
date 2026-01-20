@@ -2871,3 +2871,43 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 4. APPLY (ambiguous): email_test__db_mock - needs_human edge case
 
 Swarm is now **measurable infrastructure** with regression protection for all canonical behaviors.
+
+### Swarm Ladder Execution: 19 Failures → 98%+ Pass Rate 🚧 IN PROGRESS
+
+**Step 0: Manual Syntax Fixes (5 tests)** ✅ COMPLETE
+- [x] Fix unterminated string literal in swarm.gate2.test.ts
+- [x] Fix unterminated string literal in swarm.gate3.test.ts
+- [x] Fix unterminated string literal in swarm.gate4.test.ts
+- [x] Fix unterminated string literal in swarm.gate5.collapse.test.ts
+- [x] Fix unterminated string literal in swarm.test.ts
+- [x] Rerun test suite to confirm 5 syntax errors resolved
+
+**Step 1: Tier 0 Swarm Batch - Guaranteed Wins (8 tests)** 🚧 IN PROGRESS (3/8 done)
+- [x] Email subject line mismatch (email.test.ts - intake confirmation) - swarm suggested, human applied
+- [x] Missing getIntakeById mock export (email.test.ts - 2 tests) - manual fix
+- [x] sendEmail return value contract drift (email.test.ts - 2 tests) - manual fix
+- [ ] Spanish email copy variant (emailCopy.test.ts)
+- [ ] Founder pricing notes assertion (computePricing.test.ts)
+- [ ] Email unknown_type fallback (email.test.ts)
+- [ ] ModelRegistry mock getModels method (modelRegistry.mock.test.ts)
+- [ ] Missing http import (cron-alerts-auth.test.ts)
+- [x] Create FailurePackets with Tier 0 constraints (created tier0_email_subject_mismatch.json)
+- [x] Run swarm on Tier 0 batch (1 run completed, critic rejected due to prompt ambiguity)
+- [x] Validate fixes and measure ROI (3 tests fixed, ROI tracked)
+
+**Step 2: Tier 1 Swarm Batch - Slightly Coupled (6 tests)**
+- [ ] PromptPack validation fixtures (4 tests) - schema/fixture drift
+- [ ] Service count calculation (computePricing.test.ts - 2 tests)
+- [ ] Email template fallback behavior (email.test.ts - unknown_type)
+- [ ] Create FailurePackets with Tier 1 constraints (2 files, ≤60 lines, 2 iterations)
+- [ ] Run swarm on Tier 1 batch
+- [ ] Validate fixes and measure ROI
+
+**Step 3: Tier 2 - Stop and Escalate (5 tests)**
+- [ ] Facebook policy integration (2 tests) - manual review required
+- [ ] Template versioning DB fixtures (2 tests) - buildPlan missing
+- [ ] Tenant filtering DB fixture (1 test)
+- [ ] ActionRequest creation (aiTennisCopyRefine.test.ts)
+- [ ] ModelPolicy feature filtering (modelPolicy.test.ts)
+
+**Goal:** Push test pass rate from 96.7% (551/570) to 98%+ using mechanical-first swarm ladder

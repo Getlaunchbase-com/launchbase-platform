@@ -1,0 +1,38 @@
+{
+  "component": "vitest",
+  "intent": "Tier 0: Fix email subject line assertion mismatch (copy drift)",
+  "context": {
+    "component": "vitest",
+    "command": "pnpm vitest run server/email.test.ts",
+    "logs": "AssertionError: expected 'We\\'re building your site from scratch…' to be '✅ We\\'re building your website'\nExpected: \"✅ We're building your website\"\nReceived: \"We're building your site from scratch — here's the plan\"\n ❯ server/email.test.ts:34:32\n     32|       const template = getEmailTemplate(\"intake_confirmation\", baseDat…\n     33|       \n     34|       expect(template.subject).toBe(\"✅ We're building your website\");\n       |                                ^\n     35|       expect(template.previewText).toContain(\"LaunchBase\");",
+    "files": [
+      "server/email.test.ts"
+    ],
+    "failureCount": 1,
+    "promptOverrides": {
+      "craft": {
+        "systemPromptOverride": "You are a software repair agent. Your job is to propose a minimal patch that makes the provided failing tests pass.\n\nYou MUST output ONLY a JSON object with this exact structure:\n{\n  \"proposedChanges\": [\n    {\n      \"filePath\": \"relative/path/to/file.ts\",\n      \"rationale\": \"Brief explanation of why this change fixes the test\",\n      \"diff\": \"unified diff format showing the change\"\n    }\n  ]\n}\n\n**Critical Constraints:**\n- You can ONLY modify test files, mock files, or fixture files\n- You MUST NOT change production code\n- You can change at most 1 file\n- You can change at most 20 lines\n- This is a mechanical copy drift fix - just update the test assertion to match current copy",
+        "userPromptOverride": "Fix this test failure:\n\nTest: server/email.test.ts > Email Service > getEmailTemplate > should generate intake confirmation email\n\nError: AssertionError: expected 'We\\'re building your site from scratch…' to be '✅ We\\'re building your website'\n\nExpected: \"✅ We're building your website\"\nReceived: \"We're building your site from scratch — here's the plan\"\n\n**This is a copy drift issue** - the email subject line changed but the test wasn't updated. Update the test assertion on line 34 to match the current subject line.\n\n**Constraints:**\n- Only modify server/email.test.ts\n- Change line 34: expect(template.subject).toBe(\"✅ We're building your website\");\n- To: expect(template.subject).toBe(\"We're building your site from scratch — here's the plan\");\n- Max 1 file, max 20 lines changed"
+      },
+      "critic": {
+        "systemPromptOverride": "You are the Critic in a 2-role swarm (craft + critic). You MUST review Craft's proposedChanges.\n\nYou MUST output ONLY a JSON object with this exact structure:\n{\n  \"pass\": boolean,\n  \"issues\": [\n    {\n      \"severity\": \"high\" | \"medium\" | \"low\",\n      \"message\": \"Description of the issue\"\n    }\n  ],\n  \"previewRecommended\": boolean,\n  \"risks\": [\"risk 1\", \"risk 2\"],\n  \"assumptions\": [\"assumption 1\", \"assumption 2\"]\n}\n\n**Critical Rules for Tier 0:**\n1. Craft MUST only touch test/mock/fixture files (no production code)\n2. Craft MUST change at most 1 file\n3. Craft MUST change at most 20 lines\n4. For copy drift fixes, verify the new assertion matches the actual output\n5. Set pass=true if all constraints met and fix is correct\n6. Set pass=false with high severity if any constraint violated",
+        "userPromptOverride": "Review this patch for the email subject line test failure:\n\nOriginal error: expected 'We\\'re building your site from scratch…' to be '✅ We\\'re building your website'\n\nCraft's proposed changes: {craftOutput}\n\nValidation checklist:\n1. Does craft only modify server/email.test.ts? (no production code)\n2. Does craft change at most 1 file?\n3. Does craft change at most 20 lines?\n4. Does the new assertion match the actual subject line: \"We're building your site from scratch — here's the plan\"?\n5. Is this a safe mechanical fix (just updating test to match current copy)?\n\nSet pass=true if all checks pass, pass=false with high severity if any constraint violated."
+      }
+    }
+  },
+  "constraints": [
+    "mustNotChangeProductionCode: true",
+    "allowedPaths: [\"server/**/__tests__/**\", \"**/*.test.ts\", \"**/*.spec.ts\", \"**/__mocks__/**\"]",
+    "maxFilesChanged: 1",
+    "maxLinesChanged: 20",
+    "maxIterations: 1"
+  ],
+  "expectedOutcome": "APPLY: craft updates test assertion to match current email subject line, critic approves",
+  "metadata": {
+    "tier": "tier0",
+    "bucket": "email_copy_drift",
+    "severity": "low",
+    "fixComplexity": "trivial",
+    "createdAt": "2026-01-20T08:00:00Z"
+  }
+}

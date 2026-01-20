@@ -14,10 +14,10 @@
  * - No prompt/provider internals leak
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest
+import { describe, it, expect, beforeEach, vi, test } from "vitest";
 import { allowNetwork } from "../../../__tests__/helpers/networkGate";
 
-const t = allowNetwork ? test : test.skip;";
+const t = allowNetwork ? test : test.skip;
 import type { SpecialistOutput } from "../specialists";
 import { clearPolicyRegistry, registerPolicies } from "../policy/policyRegistry";
 import { ALL_POLICIES } from "../policy/policyBundle";

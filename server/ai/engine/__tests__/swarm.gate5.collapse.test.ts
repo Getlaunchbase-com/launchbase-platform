@@ -9,10 +9,10 @@
  * - Deterministic for same inputs
  */
 
-import { describe, it, expect } from "vitest
+import { describe, it, expect, test } from "vitest";
 import { allowNetwork } from "../../../__tests__/helpers/networkGate";
 
-const t = allowNetwork ? test : test.skip;";
+const t = allowNetwork ? test : test.skip;
 import { buildDeterministicCollapse } from "../swarm/collapseDeterministic";
 
 describe("Gate 5: deterministic collapse", () => {

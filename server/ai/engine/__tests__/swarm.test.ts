@@ -10,10 +10,10 @@
  * 4. Idempotency unchanged (same CORE → same keyHash)
  */
 
-import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest
+import { describe, it, expect, beforeAll, beforeEach, vi, test } from "vitest";
 import { allowNetwork } from "../../../__tests__/helpers/networkGate";
 
-const t = allowNetwork ? test : test.skip;";
+const t = allowNetwork ? test : test.skip;
 import type { SpecialistOutput } from "../specialists";
 import { registerPolicies, clearPolicyRegistry } from "../policy/policyRegistry";
 import { ALL_POLICIES } from "../policy/policyBundle";

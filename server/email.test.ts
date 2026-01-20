@@ -7,6 +7,12 @@ vi.mock("./db", () => ({
       values: vi.fn(() => Promise.resolve()),
     })),
   })),
+  getIntakeById: vi.fn(() => Promise.resolve({
+    id: 1,
+    tenant: "test-tenant",
+    customerName: "Test Customer",
+    customerEmail: "test@example.com",
+  })),
 }));
 
 // Mock the notification service
@@ -31,7 +37,7 @@ describe("Email Service", () => {
     it("should generate intake confirmation email", () => {
       const template = getEmailTemplate("intake_confirmation", baseData);
       
-      expect(template.subject).toBe("✅ We're building your website");
+      expect(template.subject).toBe("We're building your site from scratch — here's the plan");
       expect(template.previewText).toContain("LaunchBase");
       expect(template.body).toContain("John");
       expect(template.body).toContain("24–72 hours");
@@ -114,7 +120,7 @@ describe("Email Service", () => {
         email: "john@smithplumbing.com",
       });
       
-      expect(result).toBe(true);
+      expect(result).toEqual({ ok: true, provider: "resend" });
     });
 
     it("should log email to database", async () => {

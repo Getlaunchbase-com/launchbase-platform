@@ -1,0 +1,20 @@
+[
+  {
+    "proposedChanges": [
+      {
+        "filePath": "server/email.test.ts",
+        "rationale": "Updating the test assertion to match the current subject line ensures that the test reflects the latest changes in the email template.",
+        "diff": "--- server/email.test.ts\n+++ server/email.test.ts\n@@ -31,7 +31,7 @@\n     expect(template.body).toContain('Thank you for your submission');\n   });\n \n   it('should generate intake confirmation email', () => {\n-    expect(template.subject).toBe(\"✅ We're building your website\");\n+    expect(template.subject).toBe(\"We're building your site from scratch — here's the plan\");\n     expect(template.body).toContain('Your intake confirmation details');\n   });\n \n });"
+      }
+    ]
+  },
+  {
+    "proposedChanges": [
+      {
+        "filePath": "server/email.test.ts",
+        "rationale": "The test assertion was updated to match the current email subject line, fixing the copy drift issue.",
+        "diff": "diff --git a/server/email.test.ts b/server/email.test.ts\nindex abcdef1..abcdef2 100644\n--- a/server/email.test.ts\n+++ b/server/email.test.ts\n@@ -31,7 +31,7 @@ describe('Email Service', () => {\n     const template = getEmailTemplate();\n     \n     // Other assertions...\n-    expect(template.subject).toBe(\"✅ We're building your website\");\n+    expect(template.subject).toBe(\"We're building your site from scratch — here's the plan\");\n   });\n });"
+      }
+    ]
+  }
+]

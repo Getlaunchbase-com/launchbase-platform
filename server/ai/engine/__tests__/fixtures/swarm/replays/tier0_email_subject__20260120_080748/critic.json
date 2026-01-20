@@ -1,0 +1,38 @@
+[
+  {
+    "pass": false,
+    "issues": [
+      {
+        "severity": "high",
+        "message": "The updated assertion does not match the actual subject line; it should be '✅ We\\'re building your site from scratch…' instead of the proposed 'We're building your site from scratch — here's the plan'."
+      }
+    ],
+    "previewRecommended": false,
+    "risks": [
+      "The test may still fail after this change if the subject line is incorrect.",
+      "Potential confusion for developers if the assertion is not aligned with actual output."
+    ],
+    "assumptions": [
+      "The email subject line has been updated in the template.",
+      "The changes are meant to reflect the most current email subject line."
+    ]
+  },
+  {
+    "pass": false,
+    "issues": [
+      {
+        "severity": "high",
+        "message": "The new assertion does not match the expected subject line; it should be '✅ We\\'re building your website', not 'We\\'re building your site from scratch — here\\'s the plan'."
+      }
+    ],
+    "previewRecommended": false,
+    "risks": [
+      "The test may fail again if the subject line does not match the new assertion",
+      "Potential confusion for developers reviewing the test if the assertion is incorrect"
+    ],
+    "assumptions": [
+      "The subject line in the email template has not been recently changed",
+      "The test is meant to assert the current expected output of the email subject line"
+    ]
+  }
+]
