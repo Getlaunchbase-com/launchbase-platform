@@ -2849,3 +2849,25 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 3. APPLY (ambiguous): email_test__db_mock - needs_human with DB issues
 
 **Next:** Capture REJECT golden (unfixable/constraint violation) to complete the canonical behavior triangle
+
+### Fourth Golden Transcript: REJECT (no changes allowed) ✅ COMPLETE
+- [x] Identify simple failing test for REJECT scenario (ModelRegistry mock)
+- [x] Create FailurePacket with allowedPaths: [] (no files can be changed)
+- [x] Add craft prompt override: "If no changes are allowed, return empty proposedChanges"
+- [x] Add critic prompt override: "If proposedChanges is empty due to constraints, set pass=false with high severity"
+- [x] Capture golden transcript with SWARM_RECORD=1 (reject_no_edits__golden_v1)
+- [x] Validate REJECT behavior: craft.proposedChanges=[], critic.pass=false, high severity issue
+- [x] Validate replay determinism (no network calls, same outcome)
+- [x] Promote staging to reject_no_edits__golden_v1
+- [x] Add 3 CI invariant tests (determinism, REJECT path, constraint enforcement)
+- [x] Register in SWARM_COMMANDS.md with invariants
+- [x] Update key achievement: complete canonical triangle (APPLY/REVISE/REJECT)
+- [x] All 12 golden tests passing (4 scenarios × 3 tests)
+
+**Achievement:** Canonical behavior triangle complete! The system contract is now CI-locked:
+1. APPLY (clean): email_spanish_copy - pass=true, single iteration
+2. REVISE→REVISE→NEEDS_HUMAN: facebook - 2 iterations, exhausted maxIterations
+3. REJECT→REJECT→NEEDS_HUMAN: reject_no_edits - 2 iterations, constraint violation
+4. APPLY (ambiguous): email_test__db_mock - needs_human edge case
+
+Swarm is now **measurable infrastructure** with regression protection for all canonical behaviors.

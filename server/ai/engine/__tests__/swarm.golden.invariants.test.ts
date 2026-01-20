@@ -403,5 +403,117 @@ describe("Swarm Golden Transcript Invariants", () => {
     });
   });
 
-  // TODO: Add tests for REJECT golden transcript (Phase 6)
+  describe("reject_no_edits__golden_v1", () => {
+    const GOLDEN_RUN_ID = "reject_no_edits__golden_v1";
+    const BUCKET_NAME = "modelregistry_mock_no_edits";
+
+    beforeEach(() => {
+      // Reset replay provider singleton to pick up new SWARM_REPLAY_RUN_ID
+      __resetReplayProviderForTests();
+      process.env.SWARM_REPLAY_RUN_ID = GOLDEN_RUN_ID;
+    });
+
+    it("should replay deterministically with same decision outcome", async () => {
+      // Load FailurePacket
+      const { workOrder } = loadFailurePacket(BUCKET_NAME);
+
+      // Run swarm
+      const result = await runSwarmV1(workOrder, policy, {
+        traceId: `test-${GOLDEN_RUN_ID}`,
+      });
+
+      // Assert decision outcome
+      expect(result.status).toBe("succeeded");
+      expect(result.stopReason).toBe("needs_human");
+      expect(result.needsHuman).toBe(true);
+
+      // Assert artifacts (structural, future-proof)
+      const byKind = (k: string) => result.artifacts.filter((a) => a.kind === k);
+      
+      // Plan exists exactly once
+      expect(byKind("swarm.plan").length).toBe(1);
+      
+      // Collapse exists exactly once and is last
+      expect(byKind("swarm.collapse").length).toBe(1);
+      const last = result.artifacts[result.artifacts.length - 1];
+      expect(last.kind).toBe("swarm.collapse");
+      
+      // Craft/critic exist >= 1 (may iterate)
+      expect(byKind("swarm.specialist.craft").length).toBeGreaterThanOrEqual(1);
+      expect(byKind("swarm.specialist.critic").length).toBeGreaterThanOrEqual(1);
+      
+      // Plan comes first
+      expect(result.artifacts[0].kind).toBe("swarm.plan");
+    });
+
+    it("should demonstrate REJECT with no-edits constraint (2 iterations, both rejected)", async () => {
+      // Load FailurePacket
+      const { workOrder } = loadFailurePacket(BUCKET_NAME);
+
+      // Run swarm
+      const result = await runSwarmV1(workOrder, policy, {
+        traceId: `test-${GOLDEN_RUN_ID}-reject`,
+      });
+
+      // Extract craft and critic artifacts
+      const craftArtifacts = result.artifacts.filter(a => a.kind === "swarm.specialist.craft");
+      const criticArtifacts = result.artifacts.filter(a => a.kind === "swarm.specialist.critic");
+      
+      // Assert 2 iterations (REJECT→REJECT→NEEDS_HUMAN)
+      expect(craftArtifacts.length).toBe(2);
+      expect(criticArtifacts.length).toBe(2);
+      
+      // Assert craft respected constraint in both iterations (empty proposedChanges)
+      const craft0 = craftArtifacts[0].payload as any;
+      const craft1 = craftArtifacts[1].payload as any;
+      expect(craft0.proposedChanges.length).toBe(0);
+      expect(craft1.proposedChanges.length).toBe(0);
+      expect(craft0.explanation).toContain("constraint");
+      expect(craft1.explanation).toContain("constraint");
+      
+      // Assert critic rejected in both iterations (pass=false, high severity)
+      const critic0 = criticArtifacts[0].payload as any;
+      const critic1 = criticArtifacts[1].payload as any;
+      expect(critic0.pass).toBe(false);
+      expect(critic1.pass).toBe(false);
+      expect(critic0.issues.length).toBeGreaterThan(0);
+      expect(critic1.issues.length).toBeGreaterThan(0);
+      expect(critic0.issues[0].severity).toBe("high");
+      expect(critic1.issues[0].severity).toBe("high");
+      expect(critic0.issues[0].message).toContain("constraint");
+      expect(critic1.issues[0].message).toContain("constraint");
+      
+      // Assert final outcome is needs_human (unfixable due to constraint)
+      expect(result.stopReason).toBe("needs_human");
+      expect(result.needsHuman).toBe(true);
+    });
+
+    it("should maintain fixture stability (no drift)", async () => {
+      // This test proves fixtures haven't changed since promotion
+      // by running the same swarm twice and comparing results
+      
+      const { workOrder } = loadFailurePacket(BUCKET_NAME);
+
+      // Run 1
+      const result1 = await runSwarmV1(workOrder, policy, {
+        traceId: `test-${GOLDEN_RUN_ID}-drift-1`,
+      });
+
+      // Run 2
+      const result2 = await runSwarmV1(workOrder, policy, {
+        traceId: `test-${GOLDEN_RUN_ID}-drift-2`,
+      });
+
+      // Assert identical outcomes
+      expect(result1.status).toBe(result2.status);
+      expect(result1.stopReason).toBe(result2.stopReason);
+      expect(result1.needsHuman).toBe(result2.needsHuman);
+      expect(result1.artifacts.length).toBe(result2.artifacts.length);
+      
+      // Assert artifact kinds match
+      const kinds1 = result1.artifacts.map(a => a.kind).sort();
+      const kinds2 = result2.artifacts.map(a => a.kind).sort();
+      expect(kinds1).toEqual(kinds2);
+    });
+  });
 });

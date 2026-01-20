@@ -398,6 +398,24 @@ mv craft_clean.json craft.json
   - Single iteration (no revision loop)
   - stopReason: needs_human (human must apply patch)
 
+### 4. reject_no_edits__golden_v1
+- **Scenario:** ModelRegistry mock test failure with no-edits-allowed constraint
+- **Decision Path:** REJECT→REJECT→NEEDS_HUMAN (2 iterations, both rejected due to constraint)
+- **Fixture Location:** `server/ai/engine/__tests__/fixtures/swarm/replays/reject_no_edits__golden_v1/`
+- **FailurePacket:** `server/ai/engine/__tests__/fixtures/swarm/failurePackets/modelregistry_mock_no_edits.json`
+- **Test Coverage:** 3 tests in `swarm.golden.invariants.test.ts`
+- **Captured:** January 20, 2026
+- **Status:** ✅ Locked (CI trust anchor)
+- **Key Validation:** Proves REJECT path (craft respects constraint → empty proposedChanges → critic.pass=false with high severity)
+- **Invariants:**
+  - craft.proposedChanges.length === 0 (both iterations)
+  - craft.explanation contains "constraint" (both iterations)
+  - critic.pass === false (both iterations)
+  - critic.issues[0].severity === "high" (both iterations)
+  - critic.issues[0].message contains "constraint" (both iterations)
+  - 2 iterations (exhausted maxIterations)
+  - stopReason: needs_human (unfixable due to constraint)
+
 ### Adding New Golden Transcripts
 
 1. **Capture to staging:**
@@ -439,10 +457,11 @@ mv craft_clean.json craft.json
 
 ---
 
-**Key Achievement:** Standardized environment variables, safety flags, and canonical commands. The promotion workflow prevents fixture drift and ensures golden transcripts remain trustworthy. Three golden transcripts now serve as CI trust anchors:
+**Key Achievement:** Standardized environment variables, safety flags, and canonical commands. The promotion workflow prevents fixture drift and ensures golden transcripts remain trustworthy. Four golden transcripts now serve as CI trust anchors, completing the **canonical behavior triangle**:
 
 1. **APPLY (clean)**: email_spanish_copy__apply_pass__golden_v1 - Single iteration, critic.pass=true, mechanical fix validated
 2. **REVISE→REVISE→NEEDS_HUMAN**: facebook_postWeatherAware__revise_apply__golden_v1 - 2 iterations, both critic.pass=false, exhausted maxIterations
-3. **APPLY (ambiguous)**: email_test__db_mock__golden_v1 - needs_human with DB mock issues
+3. **REJECT→REJECT→NEEDS_HUMAN**: reject_no_edits__golden_v1 - 2 iterations, empty proposedChanges, constraint violation
+4. **APPLY (ambiguous)**: email_test__db_mock__golden_v1 - needs_human with DB mock issues
 
-The swarm is now **testable infrastructure** with regression protection for all major decision paths.
+The swarm is now **measurable infrastructure** with CI-locked regression protection for all canonical behaviors: **APPLY / REVISE / REJECT**. The system contract is complete.

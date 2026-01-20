@@ -1,0 +1,26 @@
+[
+  {
+    "pass": false,
+    "issues": [
+      {
+        "severity": "high",
+        "message": "No fix possible due to constraint: no files may be changed"
+      }
+    ],
+    "previewRecommended": false,
+    "risks": [],
+    "assumptions": []
+  },
+  {
+    "pass": false,
+    "issues": [
+      {
+        "severity": "high",
+        "message": "No fix possible due to constraint: no files may be changed"
+      }
+    ],
+    "previewRecommended": false,
+    "risks": [],
+    "assumptions": []
+  }
+]

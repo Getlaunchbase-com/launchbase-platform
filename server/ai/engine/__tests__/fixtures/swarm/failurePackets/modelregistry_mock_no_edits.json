@@ -1,0 +1,37 @@
+{
+  "component": "vitest",
+  "intent": "Demonstrate REJECT behavior when no file changes are allowed",
+  "context": {
+    "component": "vitest",
+    "command": "pnpm vitest run server/__tests__/__meta__/modelRegistry.mock.test.ts",
+    "logs": "TypeError: r.getModels is not a function\n ❯ server/__tests__/__meta__/modelRegistry.mock.test.ts:7:14\n      5|   it(\"returns deterministic models\", () => {\n      6|     const r = new ModelRegistry({} as any);\n      7|     expect(r.getModels().length).toBeGreaterThan(0);\n       |              ^\n      8|     expect(r.getModels()[0].provider).toBe(\"memory\");",
+    "files": [
+      "server/__tests__/__meta__/modelRegistry.mock.test.ts",
+      "server/ai/modelRouting/modelRegistry.ts"
+    ],
+    "failureCount": 1,
+    "promptOverrides": {
+      "craft": {
+        "systemPromptOverride": "You are a software repair agent. Your job is to propose a minimal patch that makes the provided failing tests pass.\n\nYou MUST output ONLY a JSON object with this exact structure:\n{\n  \"proposedChanges\": [\n    {\n      \"filePath\": \"relative/path/to/file.ts\",\n      \"rationale\": \"Brief explanation of why this change fixes the test\",\n      \"diff\": \"unified diff format showing the change\"\n    }\n  ]\n}\n\n**Critical Constraint:**\nYou are operating under a HARD CONSTRAINT: **NO FILES MAY BE CHANGED** (allowedPaths: []).\n\nSince you cannot modify any files, you MUST return an empty proposedChanges array:\n{\n  \"proposedChanges\": []\n}\n\nInclude a brief explanation in your reasoning that the constraint prevents any fixes.",
+        "userPromptOverride": "Fix this test failure:\n\nTest: server/__tests__/__meta__/modelRegistry.mock.test.ts > ModelRegistry mock > returns deterministic models\n\nError: TypeError: r.getModels is not a function\n\n**CONSTRAINT: allowedPaths = [] (no files can be changed)**\n\nYou cannot propose any changes. Return empty proposedChanges array and explain the constraint prevents fixes."
+      },
+      "critic": {
+        "systemPromptOverride": "You are the Critic in a 2-role swarm (craft + critic). You MUST review Craft's proposedChanges.\n\nYou MUST output ONLY a JSON object with this exact structure:\n{\n  \"pass\": boolean,\n  \"issues\": [\n    {\n      \"severity\": \"high\" | \"medium\" | \"low\",\n      \"message\": \"Description of the issue\"\n    }\n  ],\n  \"previewRecommended\": boolean,\n  \"risks\": [\"risk 1\", \"risk 2\"],\n  \"assumptions\": [\"assumption 1\", \"assumption 2\"]\n}\n\n**Critical Rules for REJECT scenarios:**\n1. If proposedChanges is empty due to constraints, set pass=false\n2. Add a high severity issue explaining why no fix is possible\n3. If craft violated the constraint (proposed changes when allowedPaths=[]), set pass=false with high severity\n4. REJECT scenarios should always have pass=false",
+        "userPromptOverride": "Review this patch for the ModelRegistry mock test failure:\n\nOriginal error: TypeError: r.getModels is not a function\n\n**CONSTRAINT: allowedPaths = [] (no files can be changed)**\n\nCraft's proposed changes: {craftOutput}\n\nValidation checklist:\n1. Is proposedChanges empty (as required by constraint)?\n2. Did craft respect the no-edits constraint?\n3. If proposedChanges is empty, set pass=false with high severity issue: \"No fix possible due to constraint: no files may be changed\"\n4. If craft violated the constraint, set pass=false with high severity issue: \"Constraint violation: proposed changes when allowedPaths=[]\"\n\nREJECT scenarios must always have pass=false."
+      }
+    }
+  },
+  "constraints": [
+    "allowedPaths: [] (NO FILES MAY BE CHANGED)",
+    "This is a REJECT scenario - craft must return empty proposedChanges",
+    "Critic must set pass=false with high severity issue explaining constraint",
+    "Expected outcome: stopReason=needs_human or reject"
+  ],
+  "expectedOutcome": "REJECT: craft returns empty proposedChanges, critic sets pass=false, collapse indicates needs_human/reject",
+  "metadata": {
+    "bucket": "reject_no_edits_allowed",
+    "severity": "constraint_violation",
+    "fixComplexity": "unfixable",
+    "createdAt": "2026-01-20T07:45:00Z"
+  }
+}
