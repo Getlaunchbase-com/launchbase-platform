@@ -8,7 +8,8 @@
  *
  * Output:
  *   - Console summary
- *   - Writes JSON to scripts/test/triageFailures.json
+ *   - Writes JSON to scripts/test/out/triage.json
+ *   - Writes Markdown to scripts/test/out/triage.md
  */
 
 import fs from "node:fs";
@@ -146,9 +147,24 @@ function main() {
   const failures = extractFailures(output);
   const { byTier, summary } = summarize(failures);
 
-  const outPath = path.resolve("scripts/test/triageFailures.json");
-  fs.mkdirSync(path.dirname(outPath), { recursive: true });
-  fs.writeFileSync(outPath, JSON.stringify({ summary, failures: byTier }, null, 2), "utf8");
+  const OUT_DIR = path.resolve(process.cwd(), "scripts/test/out");
+  fs.mkdirSync(OUT_DIR, { recursive: true });
+  
+  const OUT_JSON = path.join(OUT_DIR, "triage.json");
+  const OUT_MD = path.join(OUT_DIR, "triage.md");
+  
+  fs.writeFileSync(OUT_JSON, JSON.stringify({ summary, failures: byTier }, null, 2), "utf8");
+  
+  // Write markdown summary
+  let md = `# Test Failure Triage\nGenerated: ${new Date().toISOString()}\n\n`;
+  md += `## Summary\n- Tier 0: ${summary.tier0}\n- Tier 1: ${summary.tier1}\n- Tier 2: ${summary.tier2}\n\n`;
+  md += `## Tier 0 (Mechanical)\n`;
+  for (const f of byTier.tier0) md += `- ${f.raw}\n`;
+  md += `\n## Tier 1 (Coupled / fixtures / schema)\n`;
+  for (const f of byTier.tier1) md += `- ${f.raw}\n`;
+  md += `\n## Tier 2 (Integration / pollution / policy)\n`;
+  for (const f of byTier.tier2) md += `- ${f.raw}\n`;
+  fs.writeFileSync(OUT_MD, md, "utf8");
 
   console.log("✅ triageFailures complete");
   console.log(`Total signals: ${summary.total}`);
@@ -157,7 +173,8 @@ function main() {
   for (const [reason, count] of summary.topReasons) {
     console.log(`  - ${count}× ${reason}`);
   }
-  console.log(`\nWrote: ${outPath}`);
+  console.log(`Wrote: ${OUT_JSON}`);
+  console.log(`Wrote: ${OUT_MD}`);
 }
 
 main();
