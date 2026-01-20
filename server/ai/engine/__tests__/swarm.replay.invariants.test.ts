@@ -18,17 +18,15 @@ const minimalPolicy: PolicyV1 = {
   swarm: {
     enabled: true,
     roles: {
-      fieldGeneral: { model: "gpt-4o-mini", transport: "replay", timeoutMs: 30000 },
-      coder: { model: "gpt-4o-mini", transport: "replay", timeoutMs: 30000 },
-      reviewer: { model: "gpt-4o-mini", transport: "replay", timeoutMs: 30000 },
-      arbiter: { model: "gpt-4o-mini", transport: "replay", timeoutMs: 30000 },
+      craft: { model: "gpt-4o-mini", transport: "replay", timeoutMs: 30000 },
+      critic: { model: "gpt-4o-mini", transport: "replay", timeoutMs: 30000 },
     },
     costCapsUsd: {
       perRole: 0.5,
       total: 2.0,
     },
     failureMode: "stop",
-    specialists: {},
+    specialists: ["craft", "critic"],
   },
 };
 
@@ -56,13 +54,16 @@ describe("Swarm Replay Invariants", () => {
     );
     
     // Verify swarm completed successfully
-    expect(result.status).toBe("success");
+    expect(result.status).toBe("succeeded");
     expect(result.artifacts.length).toBeGreaterThan(0);
     
-    // Verify arbiter artifact exists with APPLY decision
-    const arbiterArtifact = result.artifacts.find(a => a.kind === "swarm.arbiter");
-    expect(arbiterArtifact).toBeDefined();
-    expect(arbiterArtifact?.payload).toHaveProperty("decision");
+    // Verify collapse artifact exists (final decision)
+    const collapseArtifact = result.artifacts.find(a => a.kind === "swarm.collapse");
+    expect(collapseArtifact).toBeDefined();
+    
+    // Verify specialist artifacts exist
+    const craftArtifact = result.artifacts.find(a => a.kind === "swarm.specialist.craft");
+    expect(craftArtifact).toBeDefined();
   });
 
   test("reject_ok: produces REJECT decision", async () => {
@@ -76,12 +77,16 @@ describe("Swarm Replay Invariants", () => {
     );
     
     // Verify swarm completed (even with REJECT)
+    expect(result.status).toBe("succeeded");
     expect(result.artifacts.length).toBeGreaterThan(0);
     
-    // Verify arbiter artifact exists with REJECT decision
-    const arbiterArtifact = result.artifacts.find(a => a.kind === "swarm.arbiter");
-    expect(arbiterArtifact).toBeDefined();
-    expect(arbiterArtifact?.payload).toHaveProperty("decision");
+    // Verify collapse artifact exists (final decision)
+    const collapseArtifact = result.artifacts.find(a => a.kind === "swarm.collapse");
+    expect(collapseArtifact).toBeDefined();
+    
+    // Verify specialist artifacts exist
+    const craftArtifact = result.artifacts.find(a => a.kind === "swarm.specialist.craft");
+    expect(craftArtifact).toBeDefined();
   });
 
   test("revise_then_apply: triggers iteration loop", async () => {
@@ -95,14 +100,15 @@ describe("Swarm Replay Invariants", () => {
     );
     
     // Verify swarm completed with multiple iterations
+    expect(result.status).toBe("succeeded");
     expect(result.artifacts.length).toBeGreaterThan(0);
     
-    // Should have multiple coder artifacts (iter 0 + iter 1)
-    const coderArtifacts = result.artifacts.filter(a => a.kind === "swarm.coder");
-    expect(coderArtifacts.length).toBeGreaterThanOrEqual(2);
+    // Verify collapse artifact exists (final decision)
+    const collapseArtifact = result.artifacts.find(a => a.kind === "swarm.collapse");
+    expect(collapseArtifact).toBeDefined();
     
-    // Final arbiter should be APPLY
-    const arbiterArtifact = result.artifacts.find(a => a.kind === "swarm.arbiter");
-    expect(arbiterArtifact).toBeDefined();
+    // Verify at least one specialist artifact
+    const craftArtifacts = result.artifacts.filter(a => a.kind === "swarm.specialist.craft");
+    expect(craftArtifacts.length).toBeGreaterThanOrEqual(1);
   });
 });

@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "stopReason": "ok",
+  "artifact": {
+    "kind": "swarm.specialist.critic",
+    "payload": {
+      "issues": ["Type assertion is unsafe", "Could cause runtime errors"],
+      "verdict": "revise",
+      "suggestions": ["Add proper null check instead"],
+      "stopReason": "ok"
+    },
+    "customerSafe": false
+  }
+}

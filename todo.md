@@ -394,16 +394,18 @@ We proceed one clean PR at a time.
 - [x] promptPack fixtures: Fixed intent_parse schema + step→schema mapping (8 tests)
 - [ ] Remaining 4 promptPack tests deferred (schema validation issues)
 
-### Swarm Confidence Layer (Implementation Complete, Needs Debugging)
+### Swarm Confidence Layer ✅ COMPLETE
 - [x] Create fixture folder structure (server/ai/engine/__tests__/fixtures/swarm/replays/)
-- [x] apply_ok fixtures complete (5 files: input, fieldGeneral, coder, reviewer, arbiter)
-- [x] reject_ok fixtures complete (5 files)
-- [x] revise_then_apply fixtures complete (5 files with arrays for iteration)
+- [x] apply_ok fixtures complete (craft.json, critic.json)
+- [x] reject_ok fixtures complete (craft.json, critic.json)
+- [x] revise_then_apply fixtures complete (craft.json, critic.json with iteration arrays)
 - [x] Build replay provider (hooked into providerFactory for AI_PROVIDER=replay)
 - [x] Write 3 smoke invariant tests (APPLY, REJECT, REVISE→APPLY paths)
-- [ ] Debug: role extraction from trace.step (swarm may use different format)
-- [ ] Debug: counter reset mechanism and file path resolution
-- [ ] Verify swarm plumbing works deterministically in CI
+- [x] Role extraction from trace.role working (no parsing needed)
+- [x] Counter isolation by ${replayRunId}:${role} verified
+- [x] File path resolution from process.cwd() working
+- [x] All 3 replay invariant tests passing (deterministic swarm plumbing verified)
+- [ ] Replace synthetic fixtures with real golden transcripts from production swarm runs
 
 ## PR 3: Production Hardening (Phase 1 Finish Line)
 

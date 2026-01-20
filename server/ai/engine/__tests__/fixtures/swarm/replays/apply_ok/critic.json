@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "stopReason": "ok",
+  "artifact": {
+    "kind": "swarm.specialist.critic",
+    "payload": {
+      "issues": [],
+      "verdict": "pass",
+      "suggestions": ["Looks good"],
+      "stopReason": "ok"
+    },
+    "customerSafe": false
+  }
+}

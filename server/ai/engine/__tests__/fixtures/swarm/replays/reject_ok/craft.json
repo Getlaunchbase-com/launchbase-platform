@@ -1,0 +1,13 @@
+{
+  "ok": true,
+  "stopReason": "ok",
+  "artifact": {
+    "kind": "swarm.specialist.craft",
+    "payload": {
+      "draft": "Attempted fix with type assertion",
+      "notes": ["Used 'as string' to bypass error"],
+      "stopReason": "ok"
+    },
+    "customerSafe": false
+  }
+}

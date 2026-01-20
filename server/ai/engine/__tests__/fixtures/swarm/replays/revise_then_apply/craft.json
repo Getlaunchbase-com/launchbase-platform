@@ -1,0 +1,28 @@
+[
+  {
+    "ok": true,
+    "stopReason": "ok",
+    "artifact": {
+      "kind": "swarm.specialist.craft",
+      "payload": {
+        "draft": "First attempt with type assertion",
+        "notes": ["Quick fix"],
+        "stopReason": "ok"
+      },
+      "customerSafe": false
+    }
+  },
+  {
+    "ok": true,
+    "stopReason": "ok",
+    "artifact": {
+      "kind": "swarm.specialist.craft",
+      "payload": {
+        "draft": "Second attempt with proper null check",
+        "notes": ["Added if statement", "Safer approach"],
+        "stopReason": "ok"
+      },
+      "customerSafe": false
+    }
+  }
+]

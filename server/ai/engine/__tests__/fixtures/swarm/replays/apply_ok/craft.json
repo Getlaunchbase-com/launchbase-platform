@@ -1,0 +1,13 @@
+{
+  "ok": true,
+  "stopReason": "ok",
+  "artifact": {
+    "kind": "swarm.specialist.craft",
+    "payload": {
+      "draft": "Fixed TypeScript error by adding null check",
+      "notes": ["Added optional chaining", "Preserved existing logic"],
+      "stopReason": "ok"
+    },
+    "customerSafe": false
+  }
+}
