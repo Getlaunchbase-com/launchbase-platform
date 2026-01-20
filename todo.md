@@ -3111,3 +3111,31 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
 - [x] Save PR2 checkpoint
 
 **Result:** Admin dashboard can query real operational metrics (delivery success, fallback rate, idempotency hits, top failure codes)
+
+
+## Auto-Repair System: Implement --apply and --test
+
+**Status:** Current system only proposes patches (RepairPacket + ScoreCard). Need to implement actual patch application and test execution.
+
+**Tasks:**
+- [x] Implement --apply flag in runSwarmFix.ts
+  - [x] Validate all patchPlan.changes[] have valid unified diffs
+  - [x] Create temp patch file from diffs
+  - [x] Run `git apply <patchfile>`
+  - [x] Log `git diff --stat` for audit trail
+  - [x] Set stopReason="human_review_required" if any diff missing
+- [x] Implement --test flag in runSwarmFix.ts
+  - [x] Execute patchPlan.testPlan[] commands sequentially
+  - [x] Fail fast on non-zero exit code
+  - [x] Set stopReason="tests_failed" if any test fails
+- [x] Update RepairPacket.execution fields
+  - [x] Set `applied` = true/false
+  - [x] Set `testsPassed` = true/false
+  - [x] Set `stopReason` = ok | patch_failed | tests_failed | human_review_required
+  - [x] Append full logs to `execution.logs[]`
+  - [x] Persist updated RepairPacket.json
+- [ ] Add --commit option (production-safe)
+  - [ ] After apply+tests pass, commit with message "auto-repair: <repairId>"
+  - [ ] Create branch (not main) for safety
+- [ ] Test with existing repair artifacts (repair_1768946826657)
+- [ ] Update smoke test to verify --apply and --test work

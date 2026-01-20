@@ -150,10 +150,7 @@ async function main() {
     outputDir: outDir,
   });
 
-  // Write RepairPacket
-  const repairPacketPath = `${outDir}/repairPacket.json`;
-  writeFileSync(repairPacketPath, JSON.stringify(result.repairPacket, null, 2), "utf8");
-  console.log(`✅ Wrote RepairPacket: ${repairPacketPath}`);
+
 
   console.log(`\n📊 Swarm Result:`);
   console.log(`   Stop Reason: ${result.stopReason}`);
@@ -164,31 +161,131 @@ async function main() {
   console.log(`   Changes Proposed: ${(result.repairPacket.patchPlan?.changes ?? []).length}`);
 
   // Apply patch if requested
-  if (shouldApply && result.repairPacket.execution.applied) {
+  let patchApplied = false;
+  const applyLogs = [];
+  
+  if (shouldApply) {
     console.log(`\n🔧 Applying patch...`);
     
-    for (const change of (result.repairPacket.patchPlan?.changes ?? [])) {
-      console.log(`   ${change.operation.toUpperCase()}: ${change.file}`);
-      console.log(`      ${change.description}`);
-      
-      // TODO: Actually apply the changes (edit/create/delete files)
-      // For now, just log what would be done
-    }
+    const changes = result.repairPacket.patchPlan?.changes ?? [];
     
-    console.log(`⚠️  Patch application not yet implemented. Manual review required.`);
+    // Validate all changes have diffs
+    const missingDiffs = changes.filter(c => !c.diff);
+    if (missingDiffs.length > 0) {
+      console.error(`❌ Cannot apply: ${missingDiffs.length} changes missing diffs`);
+      for (const change of missingDiffs) {
+        console.error(`   - ${change.file}: ${change.description}`);
+        applyLogs.push(`Missing diff for ${change.file}`);
+      }
+      result.repairPacket.execution.stopReason = "human_review_required";
+      result.repairPacket.execution.applied = false;
+    } else {
+      // Create temp patch file
+      const patchContent = changes.map(c => c.diff).join("\n");
+      const patchFile = `${outDir}/patch.diff`;
+      writeFileSync(patchFile, patchContent, "utf8");
+      applyLogs.push(`Created patch file: ${patchFile}`);
+      
+      // Apply patch using git apply
+      try {
+        const { execSync } = require("child_process");
+        execSync(`git apply ${patchFile}`, { cwd: process.cwd(), stdio: "pipe" });
+        
+        // Log diff stats
+        const diffStat = execSync(`git diff --stat`, { cwd: process.cwd(), encoding: "utf8" });
+        console.log(`✅ Patch applied successfully`);
+        console.log(diffStat);
+        applyLogs.push(`git apply succeeded`);
+        applyLogs.push(`Diff stats:\n${diffStat}`);
+        
+        patchApplied = true;
+        result.repairPacket.execution.applied = true;
+      } catch (err) {
+        console.error(`❌ git apply failed: ${err.message}`);
+        applyLogs.push(`git apply failed: ${err.message}`);
+        result.repairPacket.execution.stopReason = "patch_failed";
+        result.repairPacket.execution.applied = false;
+      }
+    }
   }
 
   // Run tests if requested
   let testsPassed = false;
+  const testLogs = [];
+  
   if (shouldTest) {
     console.log(`\n🧪 Running tests...`);
     
-    // TODO: Run the test plan from repairPacket.patchPlan.testPlan
-    // For now, assume tests pass
-    testsPassed = true;
-    console.log(`✅ Tests passed`);
+    const testPlan = result.repairPacket.patchPlan?.testPlan ?? [];
+    
+    if (testPlan.length === 0) {
+      console.log(`⚠️  No test plan provided`);
+      testLogs.push("No test plan in RepairPacket");
+    } else {
+      const { execSync } = require("child_process");
+      let allTestsPassed = true;
+      
+      for (let i = 0; i < testPlan.length; i++) {
+        const testCmd = testPlan[i];
+        console.log(`   [${i + 1}/${testPlan.length}] Running: ${testCmd}`);
+        testLogs.push(`Test ${i + 1}: ${testCmd}`);
+        
+        try {
+          const output = execSync(testCmd, { 
+            cwd: process.cwd(), 
+            encoding: "utf8",
+            stdio: "pipe"
+          });
+          console.log(`   ✅ Passed`);
+          testLogs.push(`Test ${i + 1} passed`);
+          if (output.trim()) {
+            testLogs.push(`Output: ${output.trim()}`);
+          }
+        } catch (err) {
+          console.error(`   ❌ Failed: ${err.message}`);
+          testLogs.push(`Test ${i + 1} failed: ${err.message}`);
+          if (err.stdout) testLogs.push(`stdout: ${err.stdout}`);
+          if (err.stderr) testLogs.push(`stderr: ${err.stderr}`);
+          
+          allTestsPassed = false;
+          result.repairPacket.execution.stopReason = "tests_failed";
+          break; // Fail fast
+        }
+      }
+      
+      testsPassed = allTestsPassed;
+      result.repairPacket.execution.testsPassed = testsPassed;
+      
+      if (testsPassed) {
+        console.log(`✅ All tests passed`);
+      } else {
+        console.error(`❌ Tests failed`);
+      }
+    }
   }
 
+  // Update execution logs
+  result.repairPacket.execution.logs = [
+    ...applyLogs,
+    ...testLogs,
+  ];
+  
+  // Set final stopReason if not already set
+  if (!result.repairPacket.execution.stopReason || result.repairPacket.execution.stopReason === "ok") {
+    if (patchApplied && testsPassed) {
+      result.repairPacket.execution.stopReason = "ok";
+    } else if (!patchApplied && shouldApply) {
+      // stopReason already set in apply logic
+    } else if (!testsPassed && shouldTest) {
+      // stopReason already set in test logic
+    }
+  }
+  
+  // Write RepairPacket
+  const repairPacketPath = `${outDir}/repairPacket.json`;
+  writeFileSync(repairPacketPath, JSON.stringify(result.repairPacket, null, 2), "utf8");
+  console.log(`\n✅ Wrote RepairPacket: ${repairPacketPath}`);
+  
   // Create ScoreCard
   const scoreCard = createScoreCard({
     repairId,
