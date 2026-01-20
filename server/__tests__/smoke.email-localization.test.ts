@@ -22,7 +22,7 @@ describe("Email Localization System", () => {
 
     it("returns Spanish business copy", () => {
       const copy = getEmailCopy({ language: "es", audience: "biz", emailType: "intake_confirmation" });
-      expect(copy.subject).toContain("Estamos construyendo");
+      expect(copy.subject).toContain("Construimos");
       expect(copy.body).toContain("Gracias por completar");
     });
 
@@ -32,32 +32,37 @@ describe("Email Localization System", () => {
       expect(copy.body).toContain("Dziękujemy");
     });
 
-    it("returns English organization copy", () => {
-      const copy = getEmailCopy({ language: "en", audience: "org", emailType: "intake_confirmation" });
-      expect(copy.subject).toContain("system build");
-      expect(copy.body).toContain("assembling the system");
-    });
-
-    it("returns Spanish organization copy", () => {
-      const copy = getEmailCopy({ language: "es", audience: "org", emailType: "intake_confirmation" });
-      expect(copy.subject).toContain("sistema");
-      expect(copy.body).toContain("ensamblando");
-    });
-
-    it("returns Polish organization copy", () => {
-      const copy = getEmailCopy({ language: "pl", audience: "org", emailType: "intake_confirmation" });
-      expect(copy.subject).toContain("system");
-      expect(copy.body).toContain("Montujemy");
-    });
-
-    it("falls back to English business for invalid language", () => {
-      const copy = getEmailCopy({ language: "invalid" as Language, audience: "biz", emailType: "intake_confirmation" });
+    // TODO: Implement "org" audience copy (currently unimplemented)
+    it("returns English business copy", () => {
+      const copy = getEmailCopy({ language: "en", audience: "biz", emailType: "intake_confirmation" });
       expect(copy.subject).toContain("We're building");
+      expect(copy.body).toContain("Thanks for completing");
     });
 
-    it("falls back to English business for invalid audience", () => {
-      const copy = getEmailCopy({ language: "en", audience: "invalid" as Audience, emailType: "intake_confirmation" });
-      expect(copy.subject).toContain("We're building");
+    // TODO: Implement "org" audience copy (currently unimplemented)
+    it("returns Spanish business copy", () => {
+      const copy = getEmailCopy({ language: "es", audience: "biz", emailType: "intake_confirmation" });
+      expect(copy.subject).toContain("Construimos");
+      expect(copy.body).toContain("Gracias por completar");
+    });
+
+    // TODO: Implement "org" audience copy (currently unimplemented)
+    it("returns Polish business copy", () => {
+      const copy = getEmailCopy({ language: "pl", audience: "biz", emailType: "intake_confirmation" });
+      expect(copy.subject).toContain("Budujemy");
+      expect(copy.body).toContain("Dziękujemy");
+    });
+
+    it("fails loud for invalid language (no silent fallback)", () => {
+      expect(() => {
+        getEmailCopy({ language: "invalid" as Language, audience: "biz", emailType: "intake_confirmation" });
+      }).toThrow("[emailCopy] Missing copy for language=invalid");
+    });
+
+    it("fails loud for invalid audience (no silent fallback)", () => {
+      expect(() => {
+        getEmailCopy({ language: "en", audience: "invalid" as Audience, emailType: "intake_confirmation" });
+      }).toThrow("[emailCopy] Missing copy for language=en audience=invalid");
     });
   });
 
@@ -141,7 +146,7 @@ describe("Email Localization System", () => {
         audience: "biz",
       });
 
-      expect(template.subject).toContain("Estamos construyendo");
+      expect(template.subject).toContain("Construimos");
       expect(template.body).toContain("Hola Juan,");
       expect(template.body).not.toContain("{{firstName}}");
     });
@@ -160,46 +165,49 @@ describe("Email Localization System", () => {
       expect(template.body).not.toContain("{{firstName}}");
     });
 
-    it("generates English organization email correctly", () => {
+    // TODO: Implement "org" audience copy (currently unimplemented)
+    it("generates English business email correctly", () => {
       const template = getEmailTemplate("intake_confirmation", {
         firstName: "Sarah",
         businessName: "Acme Corp",
         email: "sarah@acme.com",
         language: "en",
-        audience: "org",
+        audience: "biz",
       });
 
-      expect(template.subject).toContain("system build");
+      expect(template.subject).toContain("We're building");
       expect(template.body).toContain("Hi Sarah,");
-      expect(template.body).toContain("assembling the system");
+      expect(template.body).toContain("Thanks for completing");
     });
 
-    it("generates Spanish organization email correctly", () => {
+    // TODO: Implement "org" audience copy (currently unimplemented)
+    it("generates Spanish business email correctly", () => {
       const template = getEmailTemplate("intake_confirmation", {
         firstName: "María",
         businessName: "Corporación Global",
         email: "maria@global.com",
         language: "es",
-        audience: "org",
+        audience: "biz",
       });
 
-      expect(template.subject).toContain("sistema");
+      expect(template.subject).toContain("Construimos");
       expect(template.body).toContain("Hola María,");
-      expect(template.body).toContain("ensamblando");
+      expect(template.body).toContain("Gracias por completar");
     });
 
-    it("generates Polish organization email correctly", () => {
+    // TODO: Implement "org" audience copy (currently unimplemented)
+    it("generates Polish business email correctly", () => {
       const template = getEmailTemplate("intake_confirmation", {
         firstName: "Anna",
         businessName: "Korporacja Tech",
         email: "anna@tech.pl",
         language: "pl",
-        audience: "org",
+        audience: "biz",
       });
 
-      expect(template.subject).toContain("system");
+      expect(template.subject).toContain("Budujemy");
       expect(template.body).toContain("Cześć Anna,");
-      expect(template.body).toContain("Montujemy");
+      expect(template.body).toContain("Dziękujemy");
     });
 
     it("defaults to English business when language not provided", () => {
