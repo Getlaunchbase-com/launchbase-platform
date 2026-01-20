@@ -1,0 +1,11 @@
+[
+  {
+    "proposedChanges": [
+      {
+        "filePath": "server/emails/emailCopy.test.ts",
+        "rationale": "The test expected the outdated subject 'Renovamos', which has been updated to 'Actualizamos'. Changing the assertion to expect 'Actualizamos' aligns with the current email copy.",
+        "diff": "--- server/emails/emailCopy.test.ts\n+++ server/emails/emailCopy.test.ts\n@@ -73,7 +73,7 @@\n     expect(emailCopy.subject).to.contain('existing');\n     // Check Spanish subject\n-    expect(emailCopy.subject).to.contain('Renovamos');\n+    expect(emailCopy.subject).to.contain('Actualizamos');\n   });\n"
+      }
+    ]
+  }
+]

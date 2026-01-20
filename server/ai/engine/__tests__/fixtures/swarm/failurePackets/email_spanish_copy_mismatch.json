@@ -1,0 +1,36 @@
+{
+  "component": "vitest",
+  "intent": "Fix Spanish email copy test assertion to match current translation",
+  "context": {
+    "component": "vitest",
+    "command": "pnpm vitest run server/emails/emailCopy.test.ts",
+    "logs": "AssertionError: expected 'Actualizamos tu sitio — próximos paso…' to contain 'Renovamos'\nExpected: \"Renovamos\"\nReceived: \"Actualizamos tu sitio — próximos pasos aquí\"\n ❯ server/emails/emailCopy.test.ts:76:28\n     74|       });\n     75|       \n     76|       expect(copy.subject).toContain(\"Renovamos\");\n       |                            ^\n     77|       expect(copy.body).toContain(\"Ya tienes un sitio web\");",
+    "files": [
+      "server/emails/emailCopy.test.ts"
+    ],
+    "failureCount": 1,
+    "promptOverrides": {
+      "craft": {
+        "systemPromptOverride": "You are a software repair agent. Your job is to propose a minimal patch that makes the provided failing tests pass.\n\nYou MUST output ONLY a JSON object with this exact structure:\n{\n  \"proposedChanges\": [\n    {\n      \"filePath\": \"relative/path/to/file.ts\",\n      \"rationale\": \"Brief explanation of why this change fixes the test\",\n      \"diff\": \"unified diff format showing the change\"\n    }\n  ]\n}\n\n**Critical Rules:**\n1. DO NOT change email copy files - only update test assertions\n2. The Spanish translation changed from 'Renovamos' to 'Actualizamos'\n3. Update the test expectation to match the current copy\n4. Keep changes minimal - only fix the failing assertion\n5. Preserve all other test logic unchanged",
+        "userPromptOverride": "Fix this test failure:\n\nTest: server/emails/emailCopy.test.ts > Email Copy Variant Selection (FOREVER TEST) > Multilingual variant support > should return Spanish 'existing' variant\n\nError: AssertionError: expected 'Actualizamos tu sitio — próximos paso…' to contain 'Renovamos'\n\nThe Spanish email subject changed from 'Renovamos' to 'Actualizamos'. Update line 76 in server/emails/emailCopy.test.ts to expect 'Actualizamos' instead of 'Renovamos'.\n\nConstraints:\n- Only modify server/emails/emailCopy.test.ts\n- Do not change any email copy files\n- Keep the test structure identical\n- Only update the failing assertion on line 76"
+      },
+      "critic": {
+        "systemPromptOverride": "You are the Critic in a 2-role swarm (craft + critic). You MUST review Craft's proposedChanges.\n\nYou MUST output ONLY a JSON object with this exact structure:\n{\n  \"pass\": boolean,\n  \"issues\": [\n    {\n      \"severity\": \"high\" | \"medium\" | \"low\",\n      \"message\": \"Description of the issue\"\n    }\n  ],\n  \"previewRecommended\": boolean,\n  \"risks\": [\"risk 1\", \"risk 2\"],\n  \"assumptions\": [\"assumption 1\", \"assumption 2\"]\n}\n\n**Critical Rules:**\n1. pass=true ONLY if proposedChanges fixes the test without side effects\n2. pass=false if proposedChanges is empty or changes wrong files\n3. Check that ONLY test assertions are changed, not email copy\n4. Verify the change matches the error message (Renovamos → Actualizamos)\n5. Flag high severity if email copy files are modified",
+        "userPromptOverride": "Review this patch for the Spanish email copy test failure:\n\nOriginal error: expected 'Actualizamos tu sitio — próximos paso…' to contain 'Renovamos'\n\nCraft's proposed changes: {craftOutput}\n\nValidation checklist:\n1. Does it only modify server/emails/emailCopy.test.ts?\n2. Does it change 'Renovamos' to 'Actualizamos' on line 76?\n3. Does it preserve all other test logic?\n4. Does it avoid modifying any email copy files?\n\nIf all checks pass, set pass=true. Otherwise, set pass=false with high severity issues."
+      }
+    }
+  },
+  "constraints": [
+    "Only modify test files, never email copy files",
+    "Update assertion to match current Spanish translation",
+    "Keep changes minimal and localized to failing line",
+    "Preserve test structure and all other assertions"
+  ],
+  "expectedOutcome": "Test passes with updated assertion expecting 'Actualizamos' instead of 'Renovamos'",
+  "metadata": {
+    "bucket": "email_copy_mismatch",
+    "severity": "low",
+    "fixComplexity": "trivial",
+    "createdAt": "2026-01-20T07:30:00Z"
+  }
+}

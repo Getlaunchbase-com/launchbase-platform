@@ -2831,3 +2831,21 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [x] Recapture facebook golden with corrected critic schema (critic.json has {pass, issues, ...})
 - [x] Validate REVISE→REVISE→NEEDS_HUMAN iteration loop (craft[0] → critic[0]:pass=false → craft[1] → critic[1]:pass=false → needs_human)
 - [x] Promote to facebook_postWeatherAware__revise_apply__golden_v1 and save checkpoint
+
+### Third Golden Transcript: APPLY with pass=true ✅ COMPLETE
+- [x] Identify mechanical test failure (Spanish email copy mismatch)
+- [x] Create FailurePacket with role-specific prompt overrides
+- [x] Capture golden transcript with SWARM_RECORD=1 (email_spanish_copy__apply_pass__golden_v1)
+- [x] Validate single iteration: craft.proposedChanges → critic.pass=true → no revision
+- [x] Validate replay determinism (no network calls, same outcome)
+- [x] Promote staging to golden_v1
+- [x] Add 3 CI invariant tests (determinism, APPLY path, fixture stability)
+- [x] Register in SWARM_COMMANDS.md with invariants
+- [x] All 9 golden tests passing (3 scenarios × 3 tests)
+
+**Achievement:** Swarm is now testable infrastructure with CI trust anchors for:
+1. APPLY (clean): email_spanish_copy - pass=true, single iteration
+2. REVISE→REVISE→NEEDS_HUMAN: facebook - 2 iterations, exhausted maxIterations
+3. APPLY (ambiguous): email_test__db_mock - needs_human with DB issues
+
+**Next:** Capture REJECT golden (unfixable/constraint violation) to complete the canonical behavior triangle

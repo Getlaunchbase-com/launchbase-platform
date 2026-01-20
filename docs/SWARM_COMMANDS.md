@@ -380,6 +380,24 @@ mv craft_clean.json craft.json
 - **Status:** ✅ Locked (CI trust anchor)
 - **Key Validation:** Proves iteration loop works (craft[0] → critic[0].pass=false → craft[1] → critic[1].pass=false → needs_human)
 
+### 3. email_spanish_copy__apply_pass__golden_v1
+- **Scenario:** Spanish email copy test assertion mismatch (mechanical fix)
+- **Decision Path:** APPLY with pass=true (single iteration, clean first-pass success)
+- **Fixture Location:** `server/ai/engine/__tests__/fixtures/swarm/replays/email_spanish_copy__apply_pass__golden_v1/`
+- **FailurePacket:** `server/ai/engine/__tests__/fixtures/swarm/failurePackets/email_spanish_copy_mismatch.json`
+- **Test Coverage:** 3 tests in `swarm.golden.invariants.test.ts`
+- **Captured:** January 20, 2026
+- **Status:** ✅ Locked (CI trust anchor)
+- **Key Validation:** Proves clean APPLY path (craft proposes valid fix → critic.pass=true → no iteration needed)
+- **Invariants:**
+  - critic.pass === true
+  - critic.issues.length === 0
+  - craft.proposedChanges.length === 1
+  - craft only touches test file (server/emails/emailCopy.test.ts)
+  - diff changes 'Renovamos' → 'Actualizamos'
+  - Single iteration (no revision loop)
+  - stopReason: needs_human (human must apply patch)
+
 ### Adding New Golden Transcripts
 
 1. **Capture to staging:**
@@ -421,4 +439,10 @@ mv craft_clean.json craft.json
 
 ---
 
-**Key Achievement:** Standardized environment variables, safety flags, and canonical commands. The promotion workflow prevents fixture drift and ensures golden transcripts remain trustworthy. Two golden transcripts now serve as CI trust anchors for APPLY and REVISE→REVISE→NEEDS_HUMAN decision paths.
+**Key Achievement:** Standardized environment variables, safety flags, and canonical commands. The promotion workflow prevents fixture drift and ensures golden transcripts remain trustworthy. Three golden transcripts now serve as CI trust anchors:
+
+1. **APPLY (clean)**: email_spanish_copy__apply_pass__golden_v1 - Single iteration, critic.pass=true, mechanical fix validated
+2. **REVISE→REVISE→NEEDS_HUMAN**: facebook_postWeatherAware__revise_apply__golden_v1 - 2 iterations, both critic.pass=false, exhausted maxIterations
+3. **APPLY (ambiguous)**: email_test__db_mock__golden_v1 - needs_human with DB mock issues
+
+The swarm is now **testable infrastructure** with regression protection for all major decision paths.
