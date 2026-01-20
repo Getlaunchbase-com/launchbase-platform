@@ -1,0 +1,31 @@
+{
+  "query": "SHOW CREATE TABLE email_logs;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SHOW CREATE TABLE email_logs;",
+  "rows": [
+    {
+      "Table": "email_logs",
+      "Create Table": "CREATE TABLE `email_logs` ("
+    }
+  ],
+  "messages": [
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `intakeId` int(11) NOT NULL,",
+    "  `tenant` enum('launchbase','vinces') NOT NULL DEFAULT 'launchbase',",
+    "  `emailType` enum('intake_confirmation','in_progress','ready_for_review','review_nudge','launch_confirmation','deployment_started','site_live','preview_followup','testimonial_request','founding_client_lockin','founder_welcome','day7_checkin','day30_value','contact_form_confirmation','ops_alert') NOT NULL,",
+    "  `recipientEmail` varchar(320) NOT NULL,",
+    "  `subject` varchar(255) NOT NULL,",
+    "  `status` enum('sent','failed','opened','clicked') NOT NULL DEFAULT 'sent',",
+    "  `deliveryProvider` enum('resend','notification') DEFAULT NULL,",
+    "  `errorMessage` text DEFAULT NULL,",
+    "  `idempotencyKey` varchar(255) DEFAULT NULL,",
+    "  `sentAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `openedAt` timestamp NULL DEFAULT NULL,",
+    "  `clickedAt` timestamp NULL DEFAULT NULL,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,",
+    "  UNIQUE KEY `email_logs_idempotency_key_uq` (`idempotencyKey`)",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin AUTO_INCREMENT=30001"
+  ],
+  "stdout": "Table\tCreate Table\nemail_logs\tCREATE TABLE `email_logs` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `intakeId` int(11) NOT NULL,\n  `tenant` enum('launchbase','vinces') NOT NULL DEFAULT 'launchbase',\n  `emailType` enum('intake_confirmation','in_progress','ready_for_review','review_nudge','launch_confirmation','deployment_started','site_live','preview_followup','testimonial_request','founding_client_lockin','founder_welcome','day7_checkin','day30_value','contact_form_confirmation','ops_alert') NOT NULL,\n  `recipientEmail` varchar(320) NOT NULL,\n  `subject` varchar(255) NOT NULL,\n  `status` enum('sent','failed','opened','clicked') NOT NULL DEFAULT 'sent',\n  `deliveryProvider` enum('resend','notification') DEFAULT NULL,\n  `errorMessage` text DEFAULT NULL,\n  `idempotencyKey` varchar(255) DEFAULT NULL,\n  `sentAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `openedAt` timestamp NULL DEFAULT NULL,\n  `clickedAt` timestamp NULL DEFAULT NULL,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,\n  UNIQUE KEY `email_logs_idempotency_key_uq` (`idempotencyKey`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin AUTO_INCREMENT=30001\n",
+  "stderr": "",
+  "execution_time_ms": 209
+}

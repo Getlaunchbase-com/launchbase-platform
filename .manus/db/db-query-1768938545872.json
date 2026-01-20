@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE `email_logs` \n  ADD `idempotencyHitCount` int DEFAULT 0 NOT NULL,\n  ADD `idempotencyHitAt` timestamp,\n  ADD `providerMessageId` varchar(191),\n  ADD `source` varchar(32),\n  ADD `templateVersion` varchar(64),\n  ADD `variant` varchar(32),\n  ADD `durationMs` int,\n  ADD `errorCode` varchar(64);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute ALTER TABLE `email_logs` \n  ADD `idempotencyHitCount` int DEFAULT 0 NOT NULL,\n  ADD `idempotencyHitAt` timestamp,\n  ADD `providerMessageId` varchar(191),\n  ADD `source` varchar(32),\n  ADD `templateVersion` varchar(64),\n  ADD `variant` varchar(32),\n  ADD `durationMs` int,\n  ADD `errorCode` varchar(64);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2342
+}

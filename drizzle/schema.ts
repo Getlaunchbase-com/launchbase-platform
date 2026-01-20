@@ -349,18 +349,87 @@ export const emailLogs = mysqlTable(
     errorMessage: text("errorMessage"),
     // Idempotency (Stripe event-based deduplication)
     idempotencyKey: varchar("idempotencyKey", { length: 255 }),
+    idempotencyHitCount: int("idempotencyHitCount").notNull().default(0),
+    idempotencyHitAt: timestamp("idempotencyHitAt"),
+    // Provider tracking (for analytics)
+    providerMessageId: varchar("providerMessageId", { length: 191 }),
+    // Attribution and versioning
+    source: varchar("source", { length: 32 }),
+    templateVersion: varchar("templateVersion", { length: 64 }),
+    variant: varchar("variant", { length: 32 }),
+    // Performance and error tracking
+    durationMs: int("durationMs"),
+    errorCode: varchar("errorCode", { length: 64 }),
     // Timestamps
     sentAt: timestamp("sentAt").defaultNow().notNull(),
     openedAt: timestamp("openedAt"),
     clickedAt: timestamp("clickedAt"),
   },
   (t) => ({
+    // Idempotency
     idempotencyKeyUq: uniqueIndex("email_logs_idempotency_key_uq").on(t.idempotencyKey),
+    // Time-window analytics indexes
+    sentAtTypeIdx: index("idx_email_logs_sent_at_type").on(t.sentAt, t.emailType),
+    sentAtProviderIdx: index("idx_email_logs_sent_at_provider").on(t.sentAt, t.deliveryProvider),
+    tenantSentAtIdx: index("idx_email_logs_tenant_sent_at").on(t.tenant, t.sentAt),
+    sentAtErrorCodeIdx: index("idx_email_logs_sent_at_error_code").on(t.sentAt, t.errorCode),
   })
 );
 
 export type EmailLog = typeof emailLogs.$inferSelect;
 export type InsertEmailLog = typeof emailLogs.$inferInsert;
+
+/**
+ * PUBLIC CONTRACT: email_provider_events stores webhook callbacks from email providers.
+ *
+ * Why this exists:
+ * - Durable audit trail of provider-reported events (delivered, bounced, complained, opened, clicked).
+ * - Enables bounce/complaint rate analytics and deliverability monitoring.
+ * - Idempotent webhook ingestion via unique (provider, providerEventId).
+ *
+ * Linking strategy:
+ * - Primary join: via `emailLogId` (stable FK to email_logs.id).
+ * - Secondary lookup: via `providerMessageId` (provider's message identifier).
+ * - Webhooks often provide `providerMessageId` first; we backfill `emailLogId` during ingestion.
+ *
+ * Idempotency rules:
+ * - `(provider, providerEventId)` must be unique to prevent duplicate event processing.
+ * - Webhook handlers MUST check for duplicate events before processing.
+ *
+ * DO NOT weaken this contract:
+ * - Do NOT remove the unique index on (provider, providerEventId).
+ * - Do NOT process webhooks without signature verification.
+ */
+export const emailProviderEvents = mysqlTable(
+  "email_provider_events",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    // Provider identification
+    provider: varchar("provider", { length: 32 }).notNull(),
+    providerEventId: varchar("providerEventId", { length: 191 }).notNull(),
+    providerMessageId: varchar("providerMessageId", { length: 191 }),
+    // Link to email_logs (optional FK, can be backfilled)
+    emailLogId: int("emailLogId"),
+    // Event details
+    eventType: varchar("eventType", { length: 32 }).notNull(),
+    occurredAt: timestamp("occurredAt").notNull(),
+    receivedAt: timestamp("receivedAt").defaultNow().notNull(),
+    // Raw payload for debugging
+    payloadJson: json("payloadJson").notNull(),
+  },
+  (t) => ({
+    // Idempotency: prevent duplicate webhook processing
+    uniqProviderEvent: uniqueIndex("uq_provider_event").on(t.provider, t.providerEventId),
+    // Join key: link events to email_logs
+    providerMsgIdx: index("idx_provider_message").on(t.provider, t.providerMessageId),
+    emailLogIdx: index("idx_email_log_id").on(t.emailLogId),
+    // Analytics: event type over time
+    occurredAtTypeIdx: index("idx_occurred_at_type").on(t.occurredAt, t.eventType),
+  })
+);
+
+export type EmailProviderEvent = typeof emailProviderEvents.$inferSelect;
+export type InsertEmailProviderEvent = typeof emailProviderEvents.$inferInsert;
 
 /**
  * Internal notes for admin operators

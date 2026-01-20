@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE `email_provider_events` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`provider` varchar(32) NOT NULL,\n\t`providerEventId` varchar(191) NOT NULL,\n\t`providerMessageId` varchar(191),\n\t`emailLogId` int,\n\t`eventType` varchar(32) NOT NULL,\n\t`occurredAt` timestamp NOT NULL,\n\t`receivedAt` timestamp NOT NULL DEFAULT (now()),\n\t`payloadJson` json NOT NULL,\n\tCONSTRAINT `email_provider_events_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `uq_provider_event` UNIQUE(`provider`,`providerEventId`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute CREATE TABLE `email_provider_events` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`provider` varchar(32) NOT NULL,\n\t`providerEventId` varchar(191) NOT NULL,\n\t`providerMessageId` varchar(191),\n\t`emailLogId` int,\n\t`eventType` varchar(32) NOT NULL,\n\t`occurredAt` timestamp NOT NULL,\n\t`receivedAt` timestamp NOT NULL DEFAULT (now()),\n\t`payloadJson` json NOT NULL,\n\tCONSTRAINT `email_provider_events_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `uq_provider_event` UNIQUE(`provider`,`providerEventId`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 199
+}

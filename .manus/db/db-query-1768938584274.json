@@ -1,0 +1,82 @@
+{
+  "query": "DESCRIBE email_provider_events;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute DESCRIBE email_provider_events;",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "provider",
+      "Type": "varchar(32)",
+      "Null": "NO",
+      "Key": "MUL",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "providerEventId",
+      "Type": "varchar(191)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "providerMessageId",
+      "Type": "varchar(191)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "emailLogId",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "MUL",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "eventType",
+      "Type": "varchar(32)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "occurredAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "MUL",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "receivedAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "payloadJson",
+      "Type": "json",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint(11)\tNO\tPRI\tNULL\tauto_increment\nprovider\tvarchar(32)\tNO\tMUL\tNULL\t\nproviderEventId\tvarchar(191)\tNO\t\tNULL\t\nproviderMessageId\tvarchar(191)\tYES\t\tNULL\t\nemailLogId\tint(11)\tYES\tMUL\tNULL\t\neventType\tvarchar(32)\tNO\t\tNULL\t\noccurredAt\ttimestamp\tNO\tMUL\tNULL\t\nreceivedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\npayloadJson\tjson\tNO\t\tNULL\t\n",
+  "stderr": "",
+  "execution_time_ms": 49
+}

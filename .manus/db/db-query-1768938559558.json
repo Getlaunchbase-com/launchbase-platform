@@ -1,0 +1,9 @@
+{
+  "query": "CREATE INDEX `idx_email_logs_sent_at_type` ON `email_logs` (`sentAt`,`emailType`);\nCREATE INDEX `idx_email_logs_sent_at_provider` ON `email_logs` (`sentAt`,`deliveryProvider`);\nCREATE INDEX `idx_email_logs_tenant_sent_at` ON `email_logs` (`tenant`,`sentAt`);\nCREATE INDEX `idx_email_logs_sent_at_error_code` ON `email_logs` (`sentAt`,`errorCode`);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute CREATE INDEX `idx_email_logs_sent_at_type` ON `email_logs` (`sentAt`,`emailType`);\nCREATE INDEX `idx_email_logs_sent_at_provider` ON `email_logs` (`sentAt`,`deliveryProvider`);\nCREATE INDEX `idx_email_logs_tenant_sent_at` ON `email_logs` (`tenant`,`sentAt`);\nCREATE INDEX `idx_email_logs_sent_at_error_code` ON `email_logs` (`sentAt`,`errorCode`);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1950
+}

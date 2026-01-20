@@ -225,6 +225,13 @@
       "when": 1768936283175,
       "tag": "0031_stale_frightful_four",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "5",
+      "when": 1768938514860,
+      "tag": "0032_lowly_metal_master",
+      "breakpoints": true
     }
   ]
 }

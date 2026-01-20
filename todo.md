@@ -3061,3 +3061,19 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
 - [x] Add result semantics comment to sendEmail() return type
 - [x] Add idempotency comment to Stripe webhook callsite
 - [x] Sync code to GitHub: Getlaunchbase-com/launchbase-platform (commit 4e4935a pushed)
+
+
+## PR 1: Email Analytics Schema ✅ COMPLETE
+
+**Goal:** Add operational metrics columns + indexes for email analytics dashboard
+
+**Tasks:**
+- [x] Add 8 new columns to email_logs (providerMessageId, source, templateVersion, variant, durationMs, errorCode, idempotencyHitCount, idempotencyHitAt)
+- [x] Add 4 indexes to email_logs (sent_at+type, sent_at+provider, tenant+sent_at, sent_at+error_code)
+- [x] Create email_provider_events table with 4 indexes
+- [x] Run migration via manual SQL (Drizzle migration had conflicts)
+- [x] Verify schema with DESCRIBE and SHOW INDEX
+- [x] Run full test suite (580/580 passing)
+- [x] Save PR1 checkpoint
+
+**Result:** ✅ Schema ready for PR2 (metrics endpoint) and PR3 (webhook ingestion)

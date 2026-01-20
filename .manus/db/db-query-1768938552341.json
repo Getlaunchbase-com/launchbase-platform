@@ -1,0 +1,9 @@
+{
+  "query": "CREATE INDEX `idx_provider_message` ON `email_provider_events` (`provider`,`providerMessageId`);\nCREATE INDEX `idx_email_log_id` ON `email_provider_events` (`emailLogId`);\nCREATE INDEX `idx_occurred_at_type` ON `email_provider_events` (`occurredAt`,`eventType`);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute CREATE INDEX `idx_provider_message` ON `email_provider_events` (`provider`,`providerMessageId`);\nCREATE INDEX `idx_email_log_id` ON `email_provider_events` (`emailLogId`);\nCREATE INDEX `idx_occurred_at_type` ON `email_provider_events` (`occurredAt`,`eventType`);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1348
+}
