@@ -2749,3 +2749,13 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
   - Micro-bucket by shared fixture/helper (3-4 tests per micro-bucket)
   - Apply single-point fixes per micro-bucket
   - Verify all 12 tests pass
+
+### Swarm Recording Mode (Continuous Learning Loop) ✅ INFRASTRUCTURE COMPLETE
+- [x] Add SWARM_RECORD=1 environment variable support
+- [x] Implement fixture recorder in providerFactory (write mode)
+- [x] Create scripts/swarm/captureGolden.ts wrapper script
+- [x] Validate recording logic with tests (3/3 passing)
+- [x] Document recording workflow in docs/SWARM_RECORDING.md
+- [ ] Capture 1 real golden transcript (requires AIML API access)
+- [ ] Validate recorded transcript with replay tests
+- [ ] Future: Capture 3 golden transcripts (TS, test, migration buckets)

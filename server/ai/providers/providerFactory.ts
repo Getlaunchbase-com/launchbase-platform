@@ -322,6 +322,7 @@ import fs from "node:fs";
 function createReplayProvider(): AiProvider {
   const replayId = process.env.REPLAY_ID ?? "apply_ok";
   const baseDir = path.resolve(process.cwd(), "server/ai/engine/__tests__/fixtures/swarm/replays");
+  const recordMode = process.env.SWARM_RECORD === "1";
   
   // Per-instance counters (fresh per test)
   const counters: Record<string, number> = {};
@@ -356,6 +357,39 @@ function createReplayProvider(): AiProvider {
     return data;
   }
   
+  async function recordFixture(role: string, idx: number, response: AiChatResponse): Promise<void> {
+    const filePath = path.join(baseDir, replayId, `${role}.json`);
+    const dir = path.dirname(filePath);
+    
+    // Ensure directory exists
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    
+    // Read existing fixtures (if any)
+    let existingData: any[] = [];
+    if (fs.existsSync(filePath)) {
+      const raw = fs.readFileSync(filePath, "utf-8");
+      const data = JSON.parse(raw);
+      existingData = Array.isArray(data) ? data : [data];
+    }
+    
+    // Parse response to get artifact structure
+    let artifact: any;
+    try {
+      artifact = JSON.parse(response.rawText);
+    } catch {
+      artifact = { rawText: response.rawText };
+    }
+    
+    // Append new response
+    existingData.push(artifact);
+    
+    // Write back to disk
+    fs.writeFileSync(filePath, JSON.stringify(existingData, null, 2), "utf-8");
+    console.log(`[replay:record] Wrote fixture: ${filePath} (entry ${idx})`);
+  }
+  
   return {
     async chat(options: AiChatRequest): Promise<AiChatResponse> {
       // Extract role from trace (explicit or fallback)
@@ -370,6 +404,20 @@ function createReplayProvider(): AiProvider {
       const runId = options.trace?.replayRunId ?? options.trace?.jobId ?? "default";
       const idx = nextIndex(runId, role);
       
+      // RECORD MODE: Call upstream AIML provider and save response
+      if (recordMode) {
+        console.log(`[replay:record] id=${replayId} run=${runId} role=${role} idx=${idx}`);
+        
+        // Call real AIML provider
+        const response = await aimlProvider.chat(options);
+        
+        // Save to fixture folder
+        await recordFixture(role, idx, response);
+        
+        return response;
+      }
+      
+      // REPLAY MODE: Load fixture from disk
       console.log(`[replay] id=${replayId} run=${runId} role=${role} idx=${idx}`);
       
       const fixture = loadFixture(role, idx);
