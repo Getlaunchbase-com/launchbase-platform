@@ -123,6 +123,7 @@ function schemaFromTraceOrFallback(request: { trace?: any; model?: string }): st
     if (step) {
       // Step → fixture schema mapping (workflow step names → output schema names)
       if (step === "generate_candidates") return "copy_proposal";
+      if (step === "test") return "decision_collapse"; // Test fixture mapping
       return step;
     }
   }
@@ -132,6 +133,7 @@ function schemaFromTraceOrFallback(request: { trace?: any; model?: string }): st
     typeof request.trace === "string" ? request.trace : JSON.stringify(request.trace ?? "");
 
   // Include ALL task types we support
+  if (traceStr.includes("test:test:1")) return "decision_collapse"; // Test fixture mapping
   if (traceStr.includes("intent_parse")) return "intent_parse";
   if (traceStr.includes("generate_candidates")) return "copy_proposal";
   if (traceStr.includes("copy_proposal")) return "copy_proposal";
@@ -249,11 +251,9 @@ const memoryProvider: AiProvider = {
           fixture = {
             schemaVersion: "v1",
             selectedProposal: {
+              type: "copy",
               targetKey: "hero.headline",
               value: "Transform Your Business",
-              rationale: "Clear, benefit-led headline for above-the-fold.",
-              confidence: 0.9,
-              risks: [],
             },
             reason: "Best balance of clarity and impact.",
             approvalText: "Approve updated hero headline.",

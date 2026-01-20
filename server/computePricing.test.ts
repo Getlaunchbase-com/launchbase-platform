@@ -185,8 +185,8 @@ describe("computePricing", () => {
         quickBooksSync: false,
       });
 
-      // Website counts, email doesn't count separately when required with website
-      expect(result.selectedServiceCount).toBe(1);
+      // Website (1) + Email (1) = 2 (email counts separately when included)
+      expect(result.selectedServiceCount).toBe(2);
     });
 
     it("should count all selected services correctly", () => {
@@ -199,9 +199,9 @@ describe("computePricing", () => {
         quickBooksSync: true,
       });
 
-      // Website (1) + Social (1) + Enrichment (1) + GMB (1) + QB (1) = 5
-      // Email doesn't count separately when required with website
-      expect(result.selectedServiceCount).toBe(5);
+      // Website (1) + Email (1) + Social (1) + Enrichment (1) + GMB (1) + QB (1) = 6
+      // Email counts separately when included
+      expect(result.selectedServiceCount).toBe(6);
     });
   });
 

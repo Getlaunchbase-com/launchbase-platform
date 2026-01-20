@@ -251,10 +251,10 @@ describe("PromptPack: decision_collapse", () => {
 
     // Verify schema validation passes
     const validation = validateAiOutput("decision_collapse", json);
-    expect(validation.ok).toBe(true);
     if (!validation.ok) {
-      console.error("Validation errors:", validation.errors);
+      console.error("[TEST DEBUG] Validation errors:", JSON.stringify(validation.errors, null, 2));
     }
+    expect(validation.ok).toBe(true);
 
     // Verify required fields
     expect(json).toHaveProperty("schemaVersion");

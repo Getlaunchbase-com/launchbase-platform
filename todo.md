@@ -2895,9 +2895,9 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
 - [x] Run swarm on Tier 0 batch (1 run completed, critic rejected due to prompt ambiguity)
 - [x] Validate fixes and measure ROI (7 tests fixed, 1 skipped, pass rate 97.9%)
 
-**Step 2: Tier 1 Swarm Batch - Slightly Coupled (6 tests)**
-- [ ] PromptPack validation fixtures (4 tests) - schema/fixture drift
-- [ ] Service count calculation (computePricing.test.ts - 2 tests)
+**Step 2: Tier 1 Swarm Batch - Slightly Coupled (6 tests)** ✅ COMPLETE (6/6 done)
+- [x] PromptPack validation fixtures (4 tests) - fixed decision_collapse selectedProposal schema + Memory Transport trace mapping
+- [x] Service count calculation (computePricing.test.ts - 2 tests) - updated expectations (email counts separately)
 - [ ] Email template fallback behavior (email.test.ts - unknown_type)
 - [ ] Create FailurePackets with Tier 1 constraints (2 files, ≤60 lines, 2 iterations)
 - [ ] Run swarm on Tier 1 batch
