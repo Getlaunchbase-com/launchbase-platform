@@ -1,13 +1,13 @@
 {
   "summary": {
-    "total": 1,
+    "total": 4,
     "tier0": 0,
     "tier1": 0,
-    "tier2": 1,
+    "tier2": 4,
     "topReasons": [
       [
         "uncategorized; likely integration or deeper coupling",
-        1
+        4
       ]
     ]
   },
@@ -16,7 +16,22 @@
     "tier1": [],
     "tier2": [
       {
-        "raw": "FAIL test.ts\\nError: example",
+        "raw": "[Analytics] Failed to track event: TypeError: db.insert is not a function",
+        "tier": "tier2",
+        "reason": "uncategorized; likely integration or deeper coupling"
+      },
+      {
+        "raw": "     → expected 'notification' to be 'resend' // Object.is equality",
+        "tier": "tier2",
+        "reason": "uncategorized; likely integration or deeper coupling"
+      },
+      {
+        "raw": " FAIL  server/__tests__/smoke.email-delivery.test.ts > smoke.email-delivery > enforces Resend routing when RESEND_API_KEY is present",
+        "tier": "tier2",
+        "reason": "uncategorized; likely integration or deeper coupling"
+      },
+      {
+        "raw": "AssertionError: expected 'notification' to be 'resend' // Object.is equality",
         "tier": "tier2",
         "reason": "uncategorized; likely integration or deeper coupling"
       }
