@@ -3050,3 +3050,14 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
 - [x] Save checkpoint and sync to GitHub
 
 **Result:** ✅ 580/580 tests passing with production-ready Stripe event ID-based idempotency
+
+## Public Contract Documentation ✅ COMPLETE
+
+**Goal:** Document idempotency guarantees to prevent future regressions
+
+**Tasks:**
+- [x] Add public contract comment to email_logs schema
+- [x] Add public contract comment to sendEmail() function
+- [x] Add result semantics comment to sendEmail() return type
+- [x] Add idempotency comment to Stripe webhook callsite
+- [x] Sync code to GitHub: Getlaunchbase-com/launchbase-platform (commit 4e4935a pushed)

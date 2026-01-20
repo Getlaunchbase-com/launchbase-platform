@@ -402,8 +402,46 @@ LaunchBase`
   }
 }
 
-// Send email and log it
-// Send email with explicit provider logging (FOREVER FIX)
+/**
+ * PUBLIC CONTRACT: sendEmail()
+ *
+ * Purpose:
+ * - Sends an email (via provider) and records the attempt in `email_logs`.
+ * - Provides deterministic, race-safe idempotency when `idempotencyKey` is supplied.
+ *
+ * Idempotency:
+ * - If `idempotencyKey` is provided, sendEmail MUST be exactly-once for that key.
+ * - Exactly-once is guaranteed via DB uniqueness + insert-first semantics.
+ * - A duplicate idempotency key MUST NOT throw. It MUST return a successful "already sent" result.
+ *
+ * Required behavior for event-driven callers (Stripe/webhooks):
+ * - Always pass an idempotencyKey derived from the upstream event (e.g. `${event.id}:${emailType}`).
+ * - This prevents duplicate emails during webhook retries, queue replays, or concurrent execution.
+ *
+ * Design constraints:
+ * - Do NOT implement idempotency as "check then send" (race condition).
+ * - The correct approach is:
+ *   1) Attempt insert of a log row with idempotencyKey
+ *   2) If duplicate -> no-op success
+ *   3) Otherwise proceed to send and finalize log status/provider details
+ *
+ * Return contract:
+ * - Return value is structured, not boolean. Do not revert to `true/false`.
+ * - Caller can depend on:
+ *   - ok/success signal
+ *   - provider selected
+ *   - whether this call actually sent vs skipped due to idempotency
+ *
+ * Result semantics:
+ * - { ok: true, skipped: true }  => idempotency hit (already recorded/sent earlier)
+ * - { ok: true, skipped: false } => newly sent (this invocation performed delivery)
+ * - { ok: false }                => delivery failed and no fallback succeeded
+ *
+ * Testing requirements:
+ * - Must be fully deterministic under test with provider mocked.
+ * - Webhook idempotency tests must validate:
+ *   repeated event => only one effective send + stable log behavior.
+ */
 export async function sendEmail(
   intakeId: number,
   type: EmailType,

@@ -446,6 +446,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, eventId
     const [intake] = await db.select().from(intakes).where(eq(intakes.id, intakeIdNum));
     if (intake) {
       const firstName = intake.contactName?.split(' ')[0] || 'there';
+      // Idempotency: Stripe retries the same `event.id`, so this MUST be keyed by event.id to prevent duplicates.
       await sendEmail(intakeIdNum, 'founder_welcome', {
         firstName,
         businessName: intake.businessName,
@@ -499,6 +500,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session, eventId
     }
     
     // Send "deployment started" email
+    // Idempotency: Stripe retries the same `event.id`, so this MUST be keyed by event.id to prevent duplicates.
     await sendEmail(intakeIdNum, "deployment_started", {
       firstName,
       businessName: intake.businessName,

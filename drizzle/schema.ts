@@ -291,7 +291,29 @@ export type AnalyticsEvent = typeof analyticsEvents.$inferSelect;
 export type InsertAnalyticsEvent = typeof analyticsEvents.$inferInsert;
 
 /**
- * Email logs for tracking sent emails
+ * PUBLIC CONTRACT: email_logs is the system-of-record for outbound email delivery attempts.
+ *
+ * Why this exists:
+ * - Prevents duplicate emails under webhook retry storms / concurrent workers.
+ * - Provides auditability: what we tried, what provider we used, what happened.
+ *
+ * Idempotency rules:
+ * - `idempotencyKey` is OPTIONAL for general email sends, but REQUIRED for event-driven sends
+ *   (e.g., Stripe webhooks) to guarantee exactly-once delivery behavior.
+ * - The database enforces uniqueness on `idempotencyKey` (unique index).
+ * - MySQL allows multiple NULLs, so "non-idempotent" sends (no key) are permitted.
+ *
+ * Canonical key format (recommendation):
+ * - `${sourceEventId}:${emailType}`
+ *   Example: `evt_123:intake_confirmation`
+ *
+ * Concurrency guarantee:
+ * - If two processes attempt the same `idempotencyKey`, at most ONE row is inserted.
+ * - Callers must treat duplicate-key insert errors as a successful no-op ("already sent").
+ *
+ * DO NOT weaken this contract:
+ * - Do NOT remove the unique index on idempotencyKey.
+ * - Do NOT "pre-check then insert" for idempotency (race-prone). Use insert-first.
  */
 export const emailLogs = mysqlTable(
   "email_logs",
