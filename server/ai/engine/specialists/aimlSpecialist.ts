@@ -180,6 +180,8 @@ export async function callSpecialistAIML(
             jobId: trace.jobId,
             step: `swarm.specialist.${role}`,
             round: 0,
+            role, // explicit role for replay provider
+            replayRunId: trace.jobId, // stable per job
           },
         },
         roleConfig.transport,

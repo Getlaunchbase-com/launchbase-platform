@@ -35,6 +35,8 @@ export interface AiChatRequest {
     jobId: string;
     step: string;
     round: number;
+    role?: string; // explicit role for replay provider
+    replayRunId?: string; // stable per job for counter isolation
   };
 }
 

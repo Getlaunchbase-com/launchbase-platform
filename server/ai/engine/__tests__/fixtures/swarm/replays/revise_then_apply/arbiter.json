@@ -1,0 +1,24 @@
+[
+  {
+    "ok": true,
+    "stopReason": "ok",
+    "artifact": {
+      "kind": "arbiterDecision.v1",
+      "payload": {
+        "decision": "revise",
+        "rationale": "Reviewer raised valid concerns; request revision."
+      }
+    }
+  },
+  {
+    "ok": true,
+    "stopReason": "ok",
+    "artifact": {
+      "kind": "arbiterDecision.v1",
+      "payload": {
+        "decision": "apply",
+        "rationale": "Patch is acceptable; proceed."
+      }
+    }
+  }
+]

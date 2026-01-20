@@ -13,7 +13,7 @@ import { safeError, safePreview, toSafeClientMessage } from "../security/redacti
 // TRANSPORT TYPES
 // ============================================
 
-export type AiTransport = "aiml" | "memory" | "log";
+export type AiTransport = "aiml" | "memory" | "log" | "replay";
 
 // ============================================
 // MEMORY TRANSPORT (for tests)
@@ -313,6 +313,84 @@ const memoryProvider: AiProvider = {
 };
 
 // ============================================
+// REPLAY TRANSPORT (for swarm deterministic testing)
+// ============================================
+
+import path from "node:path";
+import fs from "node:fs";
+
+function createReplayProvider(): AiProvider {
+  const replayId = process.env.REPLAY_ID ?? "apply_ok";
+  const baseDir = path.resolve(process.cwd(), "server/ai/engine/__tests__/fixtures/swarm/replays");
+  
+  // Per-instance counters (fresh per test)
+  const counters: Record<string, number> = {};
+  
+  function nextIndex(runId: string, role: string): number {
+    const key = `${runId}:${role}`;
+    const idx = counters[key] ?? 0;
+    counters[key] = idx + 1;
+    return idx;
+  }
+  
+  function loadFixture(role: string, idx: number): any {
+    const filePath = path.join(baseDir, replayId, `${role}.json`);
+    
+    if (!fs.existsSync(filePath)) {
+      throw new Error(`[replay] missing fixture: ${filePath}`);
+    }
+    
+    const raw = fs.readFileSync(filePath, "utf-8");
+    const data = JSON.parse(raw);
+    
+    // Support single object or array
+    if (Array.isArray(data)) {
+      if (data.length === 0) throw new Error(`[replay] empty fixture array: ${filePath}`);
+      const picked = data[Math.min(idx, data.length - 1)];
+      if (idx >= data.length) {
+        console.warn(`[replay] ${role} exhausted; clamping to last entry`);
+      }
+      return picked;
+    }
+    
+    return data;
+  }
+  
+  return {
+    async chat(options: AiChatRequest): Promise<AiChatResponse> {
+      // Extract role from trace (explicit or fallback)
+      const role =
+        options.trace?.role ??
+        options.trace?.step?.split(".").pop();
+      
+      if (!role) {
+        throw new Error("[replay] missing trace.role and cannot infer from trace.step");
+      }
+      
+      const runId = options.trace?.replayRunId ?? options.trace?.jobId ?? "default";
+      const idx = nextIndex(runId, role);
+      
+      console.log(`[replay] id=${replayId} run=${runId} role=${role} idx=${idx}`);
+      
+      const fixture = loadFixture(role, idx);
+      
+      return {
+        rawText: JSON.stringify(fixture),
+        usage: {
+          inputTokens: 0,
+          outputTokens: 0,
+        },
+        providerMeta: {
+          requestId: `replay-${Date.now()}`,
+          model: `replay:${role}`,
+          finishReason: "stop",
+        },
+      };
+    },
+  };
+}
+
+// ============================================
 // LOG TRANSPORT (for debugging)
 // ============================================
 
@@ -374,6 +452,9 @@ export function getAiProvider(transport?: AiTransport): AiProvider {
     case "log":
       return logProvider;
 
+    case "replay":
+      return createReplayProvider();
+
     default:
       console.warn(`[AI] Unknown transport: ${selectedTransport}, falling back to aiml`);
       return aimlProvider;
@@ -403,6 +484,8 @@ export interface CompleteJsonOptions {
     jobId: string;
     step: string;
     round: number;
+    role?: string; // explicit role for replay provider
+    replayRunId?: string; // stable per job for counter isolation
   };
 }
 

@@ -1,0 +1,32 @@
+[
+  {
+    "ok": true,
+    "stopReason": "ok",
+    "artifact": {
+      "kind": "review.v1",
+      "payload": {
+        "verdict": "revise",
+        "concerns": [
+          "Patch summary is too vague.",
+          "Test plan is incomplete."
+        ],
+        "suggestedEdits": [
+          "Add a clearer summary.",
+          "Include pnpm test."
+        ]
+      }
+    }
+  },
+  {
+    "ok": true,
+    "stopReason": "ok",
+    "artifact": {
+      "kind": "review.v1",
+      "payload": {
+        "verdict": "approve",
+        "concerns": [],
+        "suggestedEdits": []
+      }
+    }
+  }
+]

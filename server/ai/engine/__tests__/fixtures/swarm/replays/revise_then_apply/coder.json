@@ -1,0 +1,36 @@
+[
+  {
+    "ok": true,
+    "stopReason": "ok",
+    "artifact": {
+      "kind": "patchPlan.v1",
+      "payload": {
+        "summary": "First attempt: propose minimal patch (intentionally imperfect).",
+        "changes": [
+          {
+            "path": "README.md",
+            "diff": "--- a/README.md\n+++ b/README.md\n@@\n-foo\n+bar\n"
+          }
+        ],
+        "testPlan": ["pnpm typecheck"]
+      }
+    }
+  },
+  {
+    "ok": true,
+    "stopReason": "ok",
+    "artifact": {
+      "kind": "patchPlan.v1",
+      "payload": {
+        "summary": "Second attempt: refine patch based on reviewer feedback.",
+        "changes": [
+          {
+            "path": "README.md",
+            "diff": "--- a/README.md\n+++ b/README.md\n@@\n-foo\n+bar\n"
+          }
+        ],
+        "testPlan": ["pnpm typecheck", "pnpm test -r"]
+      }
+    }
+  }
+]
