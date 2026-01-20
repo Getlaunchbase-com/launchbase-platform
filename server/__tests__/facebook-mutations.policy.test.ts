@@ -6,10 +6,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { checkFacebookPostingPolicy } from "../services/facebook-policy";
-import * as facebookPoster from "../services/facebook-poster";
 
-// Mock the policy module
+// Mock the policy module BEFORE any imports that use it
 vi.mock("../services/facebook-policy", () => ({
   checkFacebookPostingPolicy: vi.fn(),
 }));
@@ -25,14 +23,22 @@ vi.mock("../db", () => ({
   getDb: vi.fn(),
 }));
 
+// Mock weather intelligence
+vi.mock("../services/weather-intelligence", () => ({
+  getWeatherIntelligence: vi.fn(),
+  formatFacebookPost: vi.fn(),
+}));
+
 describe("Facebook Mutations - Policy Integration", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.resetModules(); // Ensure fresh module imports for each test
   });
 
   describe("facebook.post mutation", () => {
     it("should return BLOCK response and NOT call Facebook when daily cap is reached", async () => {
       // Mock policy to return BLOCK
+      const { checkFacebookPostingPolicy } = await import("../services/facebook-policy");
       vi.mocked(checkFacebookPostingPolicy).mockResolvedValue({
         allowed: false,
         action: "BLOCK",
@@ -73,11 +79,13 @@ describe("Facebook Mutations - Policy Integration", () => {
       expect(result.error?.toLowerCase()).toMatch(/limit|cap/);
 
       // Assert Facebook poster was NOT called
+      const facebookPoster = await import("../services/facebook-poster");
       expect(facebookPoster.postToFacebook).not.toHaveBeenCalled();
     });
 
     it("should call Facebook when policy allows PUBLISH", async () => {
       // Mock policy to return PUBLISH
+      const { checkFacebookPostingPolicy } = await import("../services/facebook-policy");
       vi.mocked(checkFacebookPostingPolicy).mockResolvedValue({
         allowed: true,
         action: "PUBLISH",
@@ -100,6 +108,7 @@ describe("Facebook Mutations - Policy Integration", () => {
       } as any);
 
       // Mock Facebook poster to return success
+      const facebookPoster = await import("../services/facebook-poster");
       vi.mocked(facebookPoster.postToFacebook).mockResolvedValue({
         success: true,
         postId: "fb123",
@@ -130,7 +139,28 @@ describe("Facebook Mutations - Policy Integration", () => {
 
   describe("facebook.postWeatherAware mutation", () => {
     it("should return DRAFT response and NOT call Facebook when approval is required", async () => {
+      // Mock weather intelligence to return non-severe conditions (bypass safety gate)
+      const weatherIntel = await import("../services/weather-intelligence");
+      vi.mocked(weatherIntel.getWeatherIntelligence).mockResolvedValue({
+        postType: "ALL_CLEAR",
+        urgency: "low",
+        summary: "Nice weather today",
+        bullets: ["Clear skies"],
+        suggestedCTA: "Enjoy the day!",
+        safetyGate: false, // Critical: bypass safety gate to reach policy check
+        rawConditions: {
+          temperature: 70,
+          temperatureUnit: "F",
+          shortForecast: "Sunny",
+          windSpeed: "5 mph",
+          windDirection: "N",
+        },
+        alerts: [],
+      });
+      vi.mocked(weatherIntel.formatFacebookPost).mockReturnValue("Nice weather today");
+      
       // Mock policy to return DRAFT
+      const { checkFacebookPostingPolicy } = await import("../services/facebook-policy");
       vi.mocked(checkFacebookPostingPolicy).mockResolvedValue({
         allowed: false,
         action: "DRAFT",
@@ -175,14 +205,40 @@ describe("Facebook Mutations - Policy Integration", () => {
       expect(result.posted).toBe(false);
       expect(result.action).toBe("DRAFT");
       // Assert semantic meaning (allows copy to evolve)
-      expect(result.error?.toLowerCase()).toMatch(/approval|review/);
+      expect(result.error?.toLowerCase()).toMatch(/needs approval/);
 
       // Assert Facebook poster was NOT called
+      const facebookPoster = await import("../services/facebook-poster");
       expect(facebookPoster.postToFacebook).not.toHaveBeenCalled();
     });
 
     it("should return QUEUE response with retryAt when outside business hours", async () => {
+      // Mock weather intelligence to return non-severe conditions (bypass safety gate)
+      const weatherIntel = await import("../services/weather-intelligence");
+      vi.mocked(weatherIntel.getWeatherIntelligence).mockResolvedValue({
+        postType: "ALL_CLEAR",
+        urgency: "low",
+        summary: "Nice weather today",
+        bullets: ["Clear skies"],
+        suggestedCTA: "Enjoy the day!",
+        safetyGate: false, // Critical: bypass safety gate to reach policy check
+        rawConditions: {
+          temperature: 70,
+          temperatureUnit: "F",
+          shortForecast: "Sunny",
+          windSpeed: "5 mph",
+          windDirection: "N",
+        },
+        alerts: [],
+      });
+      vi.mocked(weatherIntel.formatFacebookPost).mockReturnValue("Nice weather today");
+      
       // Mock policy to return QUEUE
+      const { checkFacebookPostingPolicy } = await import("../services/facebook-policy");
+      
+      // Sanity check: verify mock is actually applied
+      expect(vi.isMockFunction(checkFacebookPostingPolicy)).toBe(true);
+      
       vi.mocked(checkFacebookPostingPolicy).mockResolvedValue({
         allowed: false,
         action: "QUEUE",
@@ -230,6 +286,7 @@ describe("Facebook Mutations - Policy Integration", () => {
       expect(result.retryAt).toBe("2026-01-16T12:00:00Z");
 
       // Assert Facebook poster was NOT called
+      const facebookPoster = await import("../services/facebook-poster");
       expect(facebookPoster.postToFacebook).not.toHaveBeenCalled();
     });
   });
