@@ -1,5 +1,4 @@
 /**
-import http from "node:http";
  * FOREVER CONTRACT: This test must remain boundary-real (signed webhook).
  * No mocks. Asserts only durable side effects.
  * 
@@ -9,6 +8,7 @@ import http from "node:http";
  * - Idempotent email delivery (no duplicates on webhook replay)
  * - Webhook retry tracking (retryCount, idempotencyHit, ok status)
  */
+import http from "node:http";
 import { describe, it, expect, beforeAll } from "vitest";
 import request from "supertest";
 import crypto from "crypto";
@@ -25,11 +25,13 @@ function signStripePayload(rawBody: string, secret: string, ts: number) {
 
 describe.sequential("smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent)", () => {
   let app: any;
+  let server: http.Server;
   let db: any;
   let webhookSecret: string;
 
   beforeAll(async () => {
-    app = createApp();
+    app = await createApp();
+    server = http.createServer(app);
     db = await getDb();
     if (!db) throw new Error("db unavailable");
 

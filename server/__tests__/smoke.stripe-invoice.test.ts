@@ -35,7 +35,7 @@ function makeSignedStripePayload(event: any) {
 
 describe("smoke: stripe invoice.paid webhook", () => {
   it("activates subscription and dedupes on eventId", async () => {
-    const app = createApp();
+    const app = await createApp();
     const server = http.createServer(app);
     const db = await getDb();
     if (!db) throw new Error("DB not available");

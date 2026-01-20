@@ -589,11 +589,16 @@ async function triggerDeploymentWithSafetyGates(
       })
       .where(eq(intakes.id, intakeId));
     
-    // Notify admin
-    await notifyOwner({
-      title: `Deployment blocked for ${intake.businessName}`,
-      content: `Safety gates failed:\n${failedChecks.map(c => `- ${c.check}: ${c.reason}`).join("\n")}`,
-    });
+    // Notify admin (best-effort, never blocks webhook response)
+    try {
+      await notifyOwner({
+        title: `Deployment blocked for ${intake.businessName}`,
+        content: `Safety gates failed:\n${failedChecks.map(c => `- ${c.check}: ${c.reason}`).join("\n")}`,
+      });
+    } catch (err) {
+      console.error("[Stripe Webhook] Failed to send notification:", err);
+      // Continue - notification failure should not block webhook processing
+    }
     
     return;
   }

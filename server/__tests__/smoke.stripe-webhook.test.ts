@@ -42,7 +42,7 @@ function makeSignedStripePayload(event: any) {
 
 describe("smoke: stripe webhook boundary", () => {
   it("rejects missing signature", async () => {
-    const app = createApp();
+    const app = await createApp();
     const server = http.createServer(app);
 
     const res = await request(server)
@@ -56,7 +56,7 @@ describe("smoke: stripe webhook boundary", () => {
   });
 
   it("is idempotent for duplicate checkout.session.completed", async () => {
-    const app = createApp();
+    const app = await createApp();
     const server = http.createServer(app);
     const db = await getDb();
     if (!db) throw new Error("DB not available");

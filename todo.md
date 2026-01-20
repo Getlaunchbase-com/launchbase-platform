@@ -2686,3 +2686,22 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
   - Applied Pattern A to 8 network-dependent test files
   - Added banner showing ALLOW_NETWORK_TESTS and AI_PROVIDER status
   - Verified: 26 tests skip by default, run with ALLOW_NETWORK_TESTS=1
+
+## Stripe Webhook Test Fixes (Payment Reliability)
+- [ ] Triage Stripe webhook test failures
+  - Run smoke.stripe-webhook.test.ts
+  - Run smoke.stripe-checkout-webhook.test.ts
+  - Run smoke.stripe-invoice.test.ts
+- [ ] Fix Stripe webhook tests
+  - Verify raw body handling (express.raw vs express.json)
+  - Generate proper stripe-signature headers in tests
+  - Verify STRIPE_WEBHOOK_SECRET in test env
+- [ ] Verify all payment reliability tests pass
+- [ ] Commit and checkpoint Stripe webhook fixes
+
+- [x] Stripe webhook test fixes complete (4/4 tests passing)
+  - Fixed createApp() async issue (all tests now await createApp())
+  - Fixed stripe-checkout-webhook test (broken import, missing server declaration)
+  - Removed unnecessary afterAll cleanup (SuperTest handles teardown)
+  - Wrapped notifyOwner in try-catch to prevent webhook hangs
+  - All payment reliability tests now green

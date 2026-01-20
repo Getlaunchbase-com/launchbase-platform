@@ -14,8 +14,13 @@ import { describe, it, expect, beforeAll, vi } from "vitest";
 import request from "supertest";
 import { createApp } from "../_core/app";
 
-const app = createApp();
-    const server = http.createServer(app);
+let app: Awaited<ReturnType<typeof createApp>>;
+let server: http.Server;
+
+beforeAll(async () => {
+  app = await createApp();
+  server = http.createServer(app);
+});
 const WORKER_TOKEN = process.env.WORKER_TOKEN;
 
 describe("POST /api/cron/alerts - Authentication", () => {
