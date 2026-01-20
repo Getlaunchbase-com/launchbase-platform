@@ -1,0 +1,25 @@
+{
+  "summary": {
+    "total": 1,
+    "tier0": 0,
+    "tier1": 0,
+    "tier2": 1,
+    "topReasons": [
+      [
+        "uncategorized; likely integration or deeper coupling",
+        1
+      ]
+    ]
+  },
+  "failures": {
+    "tier0": [],
+    "tier1": [],
+    "tier2": [
+      {
+        "raw": "FAIL test.ts\\nError: example",
+        "tier": "tier2",
+        "reason": "uncategorized; likely integration or deeper coupling"
+      }
+    ]
+  }
+}
