@@ -104,11 +104,8 @@ describe("Email Service", () => {
       expect(template.body).toContain("support");
     });
 
-    it("should return default template for unknown type", () => {
-      const template = getEmailTemplate("unknown_type" as any, baseData);
-      
-      expect(template.subject).toBe("Update from LaunchBase");
-      expect(template.body).toContain("John");
+    it("should throw for unknown email type", () => {
+      expect(() => getEmailTemplate("unknown_type" as any, baseData)).toThrow(/Missing copy/i);
     });
   });
 

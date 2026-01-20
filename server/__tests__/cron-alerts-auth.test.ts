@@ -1,5 +1,4 @@
 /**
-import http from "node:http";
  * Boundary Tests: /api/cron/alerts Authentication & Rate Limiting
  * 
  * Forever contracts:
@@ -12,6 +11,7 @@ import http from "node:http";
 
 import { describe, it, expect, beforeAll, vi } from "vitest";
 import request from "supertest";
+import * as http from "node:http";
 import { createApp } from "../_core/app";
 
 let app: Awaited<ReturnType<typeof createApp>>;

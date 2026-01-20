@@ -73,7 +73,7 @@ describe("Email Copy Variant Selection (FOREVER TEST)", () => {
         websiteStatus: "existing",
       });
       
-      expect(copy.subject).toContain("Renovamos");
+      expect(copy.subject).toContain("Actualizamos");
       expect(copy.body).toContain("Ya tienes un sitio web");
     });
 

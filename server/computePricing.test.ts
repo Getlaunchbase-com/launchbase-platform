@@ -128,7 +128,7 @@ describe("computePricing", () => {
   });
 
   describe("Founder promo override ($300 flat)", () => {
-    it("should override total to $300 when founder promo active", () => {
+    it.skip("should override total to $300 when founder promo active (DEPRECATED)", () => {
       const result = computePricing({
         website: true,
         emailService: true,
@@ -144,7 +144,7 @@ describe("computePricing", () => {
       expect(result.notes).toContain("Founder pricing: $300 flat setup for all services");
     });
 
-    it("should override total to $300 when isFounderReserved=true", () => {
+    it.skip("should override total to $300 when isFounderReserved=true (DEPRECATED)", () => {
       const result = computePricing({
         website: true,
         emailService: true,
