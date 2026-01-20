@@ -1,0 +1,40 @@
+{
+  "id": "facebook_postWeatherAware_revise_apply",
+  "timestamp": "2026-01-19T22:35:00Z",
+  "component": "tests",
+  "stopReason": "assertion_failed",
+  "context": {
+    "promptOverrides": {
+      "craft": {
+        "systemPromptOverride": "You are a software repair agent. Your job is to propose a minimal patch that makes the provided failing tests pass.\n\nYou MUST propose at least one change (non-empty proposedChanges). If truly blocked, return proposedChanges with a single change that adds targeted diagnostics (e.g., extra assertion output), and clearly state blockers.\n\nConstraints are strict: follow the packet constraints (max files, no new deps, no disabling tests, no tsconfig hacks unless explicitly allowed).\n\nYou must base your patch on the failure logs/snippets. Do not guess APIs—if a symbol is missing, search in the repo structure described in the packet logs/snippets and propose the most likely minimal change.\n\nOutput MUST be valid JSON matching the expected schema. No prose outside JSON.",
+        "userPromptOverride": "You are fixing failing tests. Use the FailurePacket context (command, logs, file/line snippets, constraints).\nGoal: make the tests pass with the smallest safe change set.\nRules:\n1. proposedChanges MUST be non-empty.\n2. Each change MUST include: filePath, rationale, and a small diff-like description (what to change).\n3. Prefer test-only fixes when failures are test harness/mocks/fixtures.\n4. Do not change product behavior unless the failure proves a real bug.\nReturn JSON only."
+      },
+      "critic": {
+        "systemPromptOverride": "You are a strict code reviewer for test-repair patches.\n\nYou MUST reject or request revision if proposedChanges is empty, missing, or does not directly address the failures.\n\nYou MUST check constraints: no disabling tests, no skipLibCheck, no 'make it pass by weakening assertions' unless the test is objectively wrong and you justify it.\n\nPassing requires: (a) at least one concrete change, (b) a clear link from each change to a specific failure line, (c) no scope creep.\n\nOutput MUST be valid JSON matching the expected schema. No prose outside JSON.",
+        "userPromptOverride": "Review the proposed patch against the FailurePacket failures.\n\nIf proposedChanges is empty → verdict must be 'revise' (or 'reject') with concern: 'No patch proposed.'\n\nOtherwise:\n- List concerns keyed to specific failures.\n- If patch is minimal, safe, and likely fixes the failing tests → verdict 'pass'. Return JSON only."
+      }
+    },
+    "command": "pnpm vitest server/__tests__/facebook-mutations.policy.test.ts --run",
+    "logs": "FAIL  server/__tests__/facebook-mutations.policy.test.ts > Facebook Mutations - Policy Integration > facebook.postWeatherAware mutation > should return DRAFT response and NOT call Facebook when approval is required\nAssertionError: expected undefined to be 'DRAFT' // Object.is equality\n- Expected: \"DRAFT\"\n+ Received: undefined\n ❯ server/__tests__/facebook-mutations.policy.test.ts:175:29\n    173|       // Assert response structure\n    174|       expect(result.posted).toBe(false);\n    175|       expect(result.action).toBe(\"DRAFT\");\n       |                             ^\n    176|       // Assert semantic meaning (allows copy to evolve)\n    177|       expect(result.error?.toLowerCase()).toMatch(/approval|review/);\n\nFAIL  server/__tests__/facebook-mutations.policy.test.ts > Facebook Mutations - Policy Integration > facebook.postWeatherAware mutation > should return QUEUE response with retryAt when outside business hours\nAssertionError: expected undefined to be 'QUEUE' // Object.is equality\n- Expected: \"QUEUE\"\n+ Received: undefined\n ❯ server/__tests__/facebook-mutations.policy.test.ts:226:29\n    224|       // Assert response structure\n    225|       expect(result.posted).toBe(false);\n    226|       expect(result.action).toBe(\"QUEUE\");\n       |                             ^\n    227|       // Assert semantic meaning (allows copy to evolve)\n    228|       expect(result.error?.toLowerCase()).toMatch(/queue|scheduled/);\n\nTest context:\n- Test 1: Mock policy returns DRAFT, expects result.action='DRAFT'\n- Test 2: Mock policy returns QUEUE with retryAt, expects result.action='QUEUE'\n- Both tests expect result.posted=false\n- Both tests mock checkFacebookPostingPolicy to return specific policy responses",
+    "files": [
+      "server/__tests__/facebook-mutations.policy.test.ts",
+      "server/routers.ts (facebook.postWeatherAware mutation implementation)"
+    ],
+    "failureCount": 2
+  },
+  "intent": "Fix facebook.postWeatherAware mutation to properly handle DRAFT and QUEUE policy responses. The mutation must set result.action based on policy check result. Both DRAFT (approval required) and QUEUE (outside business hours) responses must be handled correctly. If only one of the 2 tests is addressed, revise and produce a follow-up patch that clears both.",
+  "constraints": {
+    "maxFiles": 3,
+    "noDependencies": true,
+    "noProductBehaviorChanges": true,
+    "preserveIntent": "Preserve approval gate and business hours policy intent",
+    "testOnly": true,
+    "minimal": true,
+    "bounded": true
+  },
+  "expectedOutcome": {
+    "testsPass": true,
+    "filesModified": ["server/routers.ts"],
+    "description": "facebook.postWeatherAware mutation correctly sets result.action='DRAFT' when policy requires approval and result.action='QUEUE' when outside business hours"
+  }
+}

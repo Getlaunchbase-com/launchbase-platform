@@ -69,7 +69,15 @@ const policy: PolicyV1 = {
 // LOAD FAILURE PACKET
 // ============================================
 
-const failurePacketPath = process.argv[2];
+// Parse --from flag
+let failurePacketPath: string | undefined;
+for (let i = 2; i < process.argv.length; i++) {
+  if (process.argv[i] === '--from' && i + 1 < process.argv.length) {
+    failurePacketPath = process.argv[i + 1];
+    break;
+  }
+}
+
 let workOrder: AiWorkOrderV1;
 
 if (failurePacketPath) {
@@ -79,16 +87,24 @@ if (failurePacketPath) {
   const packet = JSON.parse(packetContent);
   
   // Convert FailurePacket to AiWorkOrderV1
+  // Note: Using simplified structure for testing (not full AiWorkOrderV1)
   workOrder = {
     version: "v1",
-    scope: packet.context.component === "vitest" ? "fix_test_failure" : "fix_error",
-    task: packet.failure?.errorMessage || "Fix test failures",
-    context: {
-      component: packet.context.component,
+    scope: packet.component === "tests" ? "fix_test_failure" : "fix_error",
+    task: packet.intent || "Fix test failures",
+    inputs: {
+      component: packet.component,
       command: packet.context.command,
       logs: packet.context.logs,
-      constraints: packet.context.constraints,
-      expectedFixes: packet.context.expectedFixes,
+      files: packet.context.files,
+      failureCount: packet.context.failureCount,
+      constraints: packet.constraints,
+      expectedOutcome: packet.expectedOutcome,
+      // Pass through prompt overrides if present
+      ...(packet.context.promptOverrides ? {
+        systemPromptOverride: packet.context.promptOverrides.craft?.systemPromptOverride,
+        userPromptOverride: packet.context.promptOverrides.craft?.userPromptOverride,
+      } : {}),
     },
   };
   console.log(`✅ Loaded FailurePacket: ${packet.metadata?.bucket || 'unknown'}`);

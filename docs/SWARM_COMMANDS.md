@@ -228,7 +228,25 @@ graph LR
 - **Fixtures:** craft.json, critic.json
 - **Hash:** `10104ef9e0f104d6a9f91c4f0dc3ef7b67a380cd89ab6e0045e8794ccc9b35e6`
 - **Validation:** ✅ Determinism verified (fixtures stable across replays)
-- **Usage:** `AI_PROVIDER=replay SWARM_REPLAY_RUN_ID=email_test__db_mock__golden_v1 pnpm vitest`
+
+**Invariant Contract:**
+```typescript
+status: "succeeded"
+stopReason: "needs_human"
+needsHuman: true
+collapse.payload: null  // null when needs_human=true (by design)
+artifacts.length: 4     // plan + craft + critic + collapse
+```
+
+**Verify Replay:**
+```bash
+AI_PROVIDER=replay \
+SWARM_REPLAY_RUN_ID=email_test__db_mock__golden_v1 \
+pnpm tsx scripts/swarm/replayValidate.ts \
+  server/ai/engine/__tests__/fixtures/swarm/failurePackets/email_test_e3_db_mock.json
+```
+
+**Expected:** `status=succeeded, stopReason=needs_human, collapse.payload=null`
 
 ---
 

@@ -107,6 +107,11 @@ export async function runSwarmV1(
     }
 
     try {
+      // Extract prompt overrides for this role (if present)
+      const inputs = workOrder.inputs as any;
+      const systemPromptOverride = inputs?.systemPromptOverride;
+      const userPromptOverride = inputs?.userPromptOverride;
+
       const result = await callSpecialistAIML({
         role: specialist as "craft" | "critic",
         trace: {
@@ -116,6 +121,9 @@ export async function runSwarmV1(
         input: {
           plan: planArtifact.payload,
           context: workOrder.inputs,
+          // Pass prompt overrides at top level (aimlSpecialist expects them here)
+          ...(systemPromptOverride ? { systemPromptOverride } : {}),
+          ...(userPromptOverride ? { userPromptOverride } : {}),
         },
         roleConfig,
       });
@@ -401,6 +409,51 @@ export async function runSwarmV1(
           roleModels,
           warnings,
           reason: "Missing craft or critic artifact for collapse",
+        },
+      },
+    };
+  }
+
+  // ARBITER GATE: Reject empty proposedChanges (belt + suspenders)
+  // Even if critic passed, collapse will catch this, but we enforce it here too
+  const craftPayload = craftArtifact.payload;
+  const hasProposedChanges = 
+    craftPayload && 
+    typeof craftPayload === 'object' && 
+    'proposedChanges' in craftPayload &&
+    Array.isArray(craftPayload.proposedChanges) && 
+    craftPayload.proposedChanges.length > 0;
+
+  if (!hasProposedChanges) {
+    artifacts.push({
+      kind: "swarm.collapse",
+      customerSafe: true,
+      payload: null,
+    });
+
+    return {
+      version: "v1",
+      status: "succeeded",
+      stopReason: "needs_human",
+      needsHuman: true,
+      traceId: ctx.traceId,
+      artifacts,
+      customerSafe: true,
+      extensions: {
+        swarm: {
+          costs,
+          totalCostUsd,
+          roleCostsUsd,
+          roleModels,
+          warnings: [
+            ...warnings,
+            {
+              kind: "swarm.empty_patch",
+              message: "Craft proposed no changes (proposedChanges empty or missing)",
+              detail: { craftPayload: typeof craftPayload },
+            },
+          ],
+          reason: "Empty patch rejected by arbiter gate",
         },
       },
     };

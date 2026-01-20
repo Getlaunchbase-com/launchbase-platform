@@ -2786,3 +2786,35 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
 - [x] Phase 4: Add CI invariant test for this bucket (3/3 tests passing)
 - [ ] Phase 5: Capture REVISE→APPLY transcript (iteration loop)
 - [ ] Phase 6: Capture REJECT transcript (no patch path)
+
+### Golden Transcript Documentation Upgrade ✅ COMPLETE
+- [x] Add canonical run command to golden_v1 registry entry
+- [x] Add invariant outcome contract (stopReason, payload expectations)
+- [ ] Document acceptance criteria for REVISE→APPLY golden (after capture)
+
+### REVISE→APPLY Golden Transcript Capture
+- [x] Identify FailurePacket that triggers REVISE→APPLY path (facebook.postWeatherAware)
+- [x] Create bounded FailurePacket with coupled constraints (DRAFT + QUEUE handling)
+- [ ] Capture REVISE→APPLY golden transcript with staging workflow
+- [ ] Validate iteration loop (craft[0] → critic[0] → craft[1] → critic[1])
+- [ ] Verify first critic verdict = revise, final verdict = pass/apply
+- [ ] Promote to golden_v2 and add CI invariant test
+- [ ] Document in SWARM_COMMANDS.md with iteration count assertions
+
+### Fix "Empty Patch Can Pass" Bug (Critical Swarm Hardening)
+- [ ] Step 1: Add hard invariant gate in critic/arbiter (reject proposedChanges.length === 0)
+- [ ] Step 1a: Enforce in critic stage output handling (post-parse, before arbiter)
+- [ ] Step 1b: Enforce in arbiter pre-check (belt + suspenders)
+- [ ] Step 2: Tighten Critic prompt ("If proposedChanges is empty, MUST return verdict=revise or reject")
+- [ ] Step 3: Nudge Craft prompt ("Must propose at least one change unless impossible")
+- [ ] Step 4: Recapture facebook golden with fixed gates
+- [ ] Step 5: Validate iteration loop (craft[0] → critic[0:revise] → craft[1] → critic[1:pass])
+- [ ] Step 6: Promote to golden_v2 and add CI invariant test
+
+### Repair Prompt Overrides (Unblock REVISE→APPLY Golden)
+- [x] Add prompt overrides to facebook FailurePacket (craft_repair + critic_repair system/user prompts)
+- [x] Add arbiter gate in swarmRunner: reject if proposedChanges.length === 0
+- [ ] Recapture facebook golden with repair prompts
+- [ ] Validate REVISE→APPLY iteration loop (craft[0] → critic[0]:revise → craft[1] → critic[1]:pass)
+- [ ] Create permanent repair prompt pack (craft_repair.md, critic_repair.md)
+- [ ] Update prompt loading logic to select repair prompts for test/code failures

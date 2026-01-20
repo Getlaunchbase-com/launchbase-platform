@@ -163,6 +163,11 @@ export async function callSpecialistAIML(
     throw new Error(`[AIML] Missing userPrompt (role=${role})`);
   }
 
+  // Debug: Log override status in record mode
+  if (process.env.SWARM_RECORD === "1") {
+    console.log(`[swarm] role=${role} overrides? system=${!!specInput.systemPromptOverride} user=${!!specInput.userPromptOverride}`);
+  }
+
   try {
     // Call provider with timeout
     const timeoutMs = roleConfig.timeoutMs || 25000;
