@@ -15,48 +15,48 @@ import { getEmailTemplate } from "../email";
 describe("Email Localization System", () => {
   describe("getEmailCopy", () => {
     it("returns English business copy by default", () => {
-      const copy = getEmailCopy("en", "biz", "intake_confirmation");
+      const copy = getEmailCopy({ language: "en", audience: "biz", emailType: "intake_confirmation" });
       expect(copy.subject).toContain("We're building");
       expect(copy.body).toContain("Thanks for completing");
     });
 
     it("returns Spanish business copy", () => {
-      const copy = getEmailCopy("es", "biz", "intake_confirmation");
+      const copy = getEmailCopy({ language: "es", audience: "biz", emailType: "intake_confirmation" });
       expect(copy.subject).toContain("Estamos construyendo");
       expect(copy.body).toContain("Gracias por completar");
     });
 
     it("returns Polish business copy", () => {
-      const copy = getEmailCopy("pl", "biz", "intake_confirmation");
+      const copy = getEmailCopy({ language: "pl", audience: "biz", emailType: "intake_confirmation" });
       expect(copy.subject).toContain("Budujemy");
       expect(copy.body).toContain("Dziękujemy");
     });
 
     it("returns English organization copy", () => {
-      const copy = getEmailCopy("en", "org", "intake_confirmation");
+      const copy = getEmailCopy({ language: "en", audience: "org", emailType: "intake_confirmation" });
       expect(copy.subject).toContain("system build");
       expect(copy.body).toContain("assembling the system");
     });
 
     it("returns Spanish organization copy", () => {
-      const copy = getEmailCopy("es", "org", "intake_confirmation");
+      const copy = getEmailCopy({ language: "es", audience: "org", emailType: "intake_confirmation" });
       expect(copy.subject).toContain("sistema");
       expect(copy.body).toContain("ensamblando");
     });
 
     it("returns Polish organization copy", () => {
-      const copy = getEmailCopy("pl", "org", "intake_confirmation");
+      const copy = getEmailCopy({ language: "pl", audience: "org", emailType: "intake_confirmation" });
       expect(copy.subject).toContain("system");
       expect(copy.body).toContain("Montujemy");
     });
 
     it("falls back to English business for invalid language", () => {
-      const copy = getEmailCopy("invalid" as Language, "biz", "intake_confirmation");
+      const copy = getEmailCopy({ language: "invalid" as Language, audience: "biz", emailType: "intake_confirmation" });
       expect(copy.subject).toContain("We're building");
     });
 
     it("falls back to English business for invalid audience", () => {
-      const copy = getEmailCopy("en", "invalid" as Audience, "intake_confirmation");
+      const copy = getEmailCopy({ language: "en", audience: "invalid" as Audience, emailType: "intake_confirmation" });
       expect(copy.subject).toContain("We're building");
     });
   });
@@ -259,7 +259,7 @@ describe("Email Localization System", () => {
       languages.forEach((language) => {
         audiences.forEach((audience) => {
           it(`${emailType} works for ${language} ${audience}`, () => {
-            const copy = getEmailCopy(language, audience, emailType);
+            const copy = getEmailCopy({ language, audience, emailType });
             
             // All emails must have these fields
             expect(copy.subject).toBeTruthy();

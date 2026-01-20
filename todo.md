@@ -2711,3 +2711,9 @@ Engine output becomes "artifacts + final result" regardless of UI skin:
   - Moved app initialization to beforeAll() block
   - All 5 API routing guardrail tests now green
   - Same mechanical fix pattern validated across 2 buckets (Stripe + API routing)
+
+- [x] Email copy function signature mismatch fixed (+43 tests)
+  - Changed getEmailCopy calls from positional args to object syntax
+  - Fixed: getEmailCopy("en", "biz", "type") → getEmailCopy({ language, audience, emailType })
+  - 49/59 tests passing (was 6/59)
+  - Remaining 10 failures are content/expectation issues (separate bucket)
