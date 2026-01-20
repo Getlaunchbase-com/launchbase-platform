@@ -171,6 +171,7 @@ describe("Facebook Mutations - Policy Integration", () => {
       });
 
       // Assert response structure
+      console.log("[TEST] Facebook DRAFT result:", JSON.stringify(result, null, 2));
       expect(result.posted).toBe(false);
       expect(result.action).toBe("DRAFT");
       // Assert semantic meaning (allows copy to evolve)

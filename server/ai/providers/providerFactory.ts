@@ -163,11 +163,26 @@ const memoryProvider: AiProvider = {
       // Try exact match first
       rawText = memoryStore.get(traceKey);
       
+      // DEBUG: Log lookup details
+      const vitestWildcard = typeof process !== 'undefined' && (process.env.VITEST === 'true' || process.env.VITEST === '1');
+      console.log("[memory] lookup", {
+        schema,
+        model,
+        jobId,
+        round,
+        key: traceKey,
+        vitestWildcard,
+        seedCount: memoryStore.size,
+        sampleKeys: Array.from(memoryStore.keys()).slice(0, 10),
+        exactMatch: Boolean(rawText),
+      });
+      
       // Wildcard matching ONLY in tests (for unpredictable Date.now() jobIds)
       // Production code should use deterministic jobIds or mock Date.now()
-      if (!rawText && schema && jobId && typeof process !== 'undefined' && (process.env.VITEST === 'true' || process.env.VITEST === '1')) {
+      if (!rawText && schema && jobId && vitestWildcard) {
         for (const [key, value] of Array.from(memoryStore.entries())) {
           if (key.startsWith(`${schema}:${model}:`) && key.endsWith(`:${round}`)) {
+            console.log("[memory] wildcard matched:", key);
             rawText = value;
             break;
           }
@@ -641,6 +656,12 @@ export async function completeJson(
 
   // Call provider directly (no router)
   try {
+    console.log("[completeJson] calling provider.chat", {
+      transport: selectedTransport,
+      provider: provider?.constructor?.name || "unknown",
+      trace,
+      model: finalModel,
+    });
     const response = await provider.chat({
       ...options,
       jsonOnly: true,

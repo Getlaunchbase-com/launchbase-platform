@@ -30,6 +30,39 @@ describe("Tenant Filtering", () => {
     await db.delete(intakes).where(eq(intakes.id, 99999));
     await db.delete(intakes).where(eq(intakes.id, 99998));
 
+    // Ensure buildPlan fixtures exist
+    const { buildPlans } = await import("../../drizzle/schema");
+    const existingPlan1 = await db.select().from(buildPlans).where(eq(buildPlans.id, 1));
+    if (existingPlan1.length === 0) {
+      await db.insert(buildPlans).values({
+        id: 1,
+        intakeId: 1,
+        templateId: "default",
+        plan: {
+          pages: [],
+          brand: { primaryColor: "#000", secondaryColor: "#fff", fontFamily: "Inter" },
+          copy: { heroHeadline: "Test", heroSubheadline: "Test", ctaText: "Test" },
+          features: [],
+        },
+        status: "ready",
+      });
+    }
+    const existingPlan2 = await db.select().from(buildPlans).where(eq(buildPlans.id, 2));
+    if (existingPlan2.length === 0) {
+      await db.insert(buildPlans).values({
+        id: 2,
+        intakeId: 2,
+        templateId: "default",
+        plan: {
+          pages: [],
+          brand: { primaryColor: "#000", secondaryColor: "#fff", fontFamily: "Inter" },
+          copy: { heroHeadline: "Test", heroSubheadline: "Test", ctaText: "Test" },
+          features: [],
+        },
+        status: "ready",
+      });
+    }
+
     // Create test intakes
     const launchbaseIntake = await createIntake({
       businessName: "LaunchBase Test Co",

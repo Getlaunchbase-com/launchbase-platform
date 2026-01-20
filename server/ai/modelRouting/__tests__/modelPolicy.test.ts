@@ -60,13 +60,13 @@ describe("ModelPolicy", () => {
           data: [
             {
               id: "gpt-4o",
-              type: "text",
+              type: "chat-completion",
               info: { contextLength: 128000 },
               features: { json_schema: true, structured_outputs: true },
             },
             {
               id: "gpt-3.5-turbo",
-              type: "text",
+              type: "chat-completion",
               info: { contextLength: 16000 },
               features: {},
             },

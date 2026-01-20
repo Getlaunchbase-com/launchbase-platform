@@ -2508,6 +2508,7 @@ export const appRouter = router({
           return {
             posted: false,
             error: "Database unavailable",
+            action: "DRAFT",
             intelligence: null,
             formattedPost: "",
           };
@@ -2525,6 +2526,7 @@ export const appRouter = router({
           return {
             posted: false,
             error: "Facebook not connected",
+            action: "DRAFT",
             intelligence: null,
             formattedPost: "",
           };
@@ -2543,6 +2545,7 @@ export const appRouter = router({
           return {
             posted: false,
             error: "Safety gate active - severe weather conditions",
+            action: "DRAFT", // Safety gate requires approval
             intelligence,
             formattedPost: "",
           };
@@ -2609,6 +2612,7 @@ export const appRouter = router({
           postId: result.postId,
           postUrl: result.postUrl,
           error: result.error,
+          action: result.success ? "PUBLISH" : "DRAFT",
           intelligence,
           formattedPost: message,
         };

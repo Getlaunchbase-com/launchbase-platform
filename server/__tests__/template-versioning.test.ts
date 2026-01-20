@@ -9,12 +9,40 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { getDb, createDeployment, getDeploymentById } from "../db";
 import { TEMPLATE_VERSION_CURRENT, TEMPLATE_VERSION_BASELINE } from "../../shared/templateVersion";
+import { buildPlans, intakes } from "../../drizzle/schema";
+import { eq } from "drizzle-orm";
 
 describe("Template Versioning", () => {
   beforeAll(async () => {
     const db = await getDb();
     if (!db) {
       throw new Error("Database not available for testing");
+    }
+
+    // Ensure buildPlan fixture exists
+    const existing = await db.select().from(buildPlans).where(eq(buildPlans.id, 1));
+    if (existing.length === 0) {
+      // Create test intake first
+      const [testIntake] = await db.insert(intakes).values({
+        businessName: "Test Business",
+        contactName: "Test User",
+        email: "test@example.com",
+        vertical: "professional",
+        tenant: "launchbase",
+      });
+      
+      await db.insert(buildPlans).values({
+        id: 1,
+        intakeId: Number(testIntake.insertId),
+        templateId: "default",
+        plan: {
+          pages: [],
+          brand: { primaryColor: "#000", secondaryColor: "#fff", fontFamily: "Inter" },
+          copy: { heroHeadline: "Test", heroSubheadline: "Test", ctaText: "Test" },
+          features: [],
+        },
+        status: "ready",
+      });
     }
   });
 
