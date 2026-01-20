@@ -230,6 +230,107 @@ features: ["json_schema"]
 
 ---
 
+## Pattern Q — Resend deterministic tests (package-level mock)
+
+### When to use
+- Tests that assert `provider: "resend"` (happy path) or exercise email delivery routing
+- You hit import-order / module-cache issues where `vi.spyOn()` or boundary mocks don't intercept
+- You need deterministic behavior without depending on `RESEND_API_KEY` or network
+
+### Why this works
+`email.ts` (or downstream code) may instantiate `new Resend()` or import resend early. Mocking the package ensures all call sites see the stub, regardless of internal adapter boundaries.
+
+### Template: happy-path Resend succeeds
+
+```ts
+import { describe, it, expect, vi } from "vitest";
+
+describe("email delivery via Resend (deterministic)", () => {
+  it("sends via resend and returns provider=resend", async () => {
+    // 1) Reset module cache so mocks apply to fresh imports
+    await vi.resetModules();
+
+    // 2) Register package mock BEFORE importing module under test
+    vi.doMock("resend", () => {
+      class Resend {
+        emails = {
+          send: vi.fn(async () => ({
+            data: { id: "email_mock_123" },
+            error: null,
+          })),
+        };
+      }
+      return { Resend };
+    });
+
+    // 3) Import AFTER mocks are in place
+    const { sendEmail } = await import("../email"); // adjust path
+
+    // 4) Run
+    const res = await sendEmail({
+      to: "test@example.com",
+      type: "intake_confirmation",
+      // ...whatever your call requires
+    });
+
+    expect(res.ok).toBe(true);
+    expect(res.provider).toBe("resend");
+  });
+});
+```
+
+### Template: force Resend failure (tests fallback behavior)
+
+Use this when you want to assert fallback to "notification" (or whatever your fallback provider is).
+
+```ts
+import { describe, it, expect, vi } from "vitest";
+
+describe("email fallback when Resend fails", () => {
+  it("falls back to notification provider", async () => {
+    await vi.resetModules();
+
+    vi.doMock("resend", () => {
+      class Resend {
+        emails = {
+          send: vi.fn(async () => ({
+            data: null,
+            error: { message: "daily_quota_exceeded", name: "rate_limit" },
+          })),
+        };
+      }
+      return { Resend };
+    });
+
+    const { sendEmail } = await import("../email"); // adjust path
+
+    const res = await sendEmail({
+      to: "test-fallback@example.com",
+      type: "intake_confirmation",
+      // ...
+    });
+
+    expect(res.ok).toBe(true);
+    expect(res.provider).toBe("notification");
+  });
+});
+```
+
+### Rules / gotchas (read this if you've been burned)
+
+1. **Never** `import { sendEmail } ...` at the top of the file if you're mocking resend. You must dynamic import after `vi.doMock`.
+2. Prefer `vi.doMock` over `vi.mock` when you need per-test control.
+3. Use `await vi.resetModules()` at the start of each test that sets different mock behavior.
+4. If multiple tests in the same file need the same mock behavior, you can put `resetModules + doMock` in `beforeEach`, but only if every test in the file expects the mock.
+5. Keep the mock surface minimal: only `new Resend().emails.send()` needs to exist for most flows.
+
+### What this pattern proves
+- Happy path is deterministic and does not depend on secrets or the network
+- Fallback path is deterministic and can be asserted explicitly
+- No global mock bleed if you follow: `resetModules → doMock → dynamic import`
+
+---
+
 ## Quick Reference Table
 
 | Pattern | Symptom Keyword | Tier | Fix Type |
@@ -246,6 +347,7 @@ features: ["json_schema"]
 | J | buildPlan not found | 2 | seed required JSON |
 | K | validation.ok=false | 1 | update fixture schema |
 | L | no eligible models | 1 | fix model type/features |
+| Q | Resend mock bleed / import order | 0 | vi.doMock("resend") + dynamic import |
 
 ---
 
