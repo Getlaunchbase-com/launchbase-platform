@@ -9,7 +9,18 @@
  * This runs in CI via `pnpm smoke` with no human login required.
  */
 
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect, beforeAll, vi } from "vitest";
+
+// Mock Resend to always succeed (deterministic happy path)
+vi.mock("resend", () => {
+  return {
+    Resend: vi.fn().mockImplementation(() => ({
+      emails: {
+        send: vi.fn(async () => ({ id: "test-email-id-" + Date.now() })),
+      },
+    })),
+  };
+});
 import { getDb } from "../db";
 import { intakes, emailLogs } from "../../drizzle/schema";
 import { sendEmail } from "../email";
