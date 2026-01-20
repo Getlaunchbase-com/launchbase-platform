@@ -1,0 +1,2051 @@
+
+ RUN  v2.1.9 /home/ubuntu/launchbase
+
+[Vitest Setup] Rebuilding test database from scratch...
+[Vitest Setup] Target database: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] Dropping database H86jcAdP392wwbWXRcEDMs...
+[Vitest Setup] Creating database H86jcAdP392wwbWXRcEDMs...
+[Vitest Setup] Database rebuilt successfully
+[Vitest Setup] Applying schema with drizzle-kit push...
+No config path provided, using default 'drizzle.config.ts'
+Reading config file '/home/ubuntu/launchbase/drizzle.config.ts'
+[⣷] Pulling schema from database...
+[2K[1G[✓] Pulling schema from database...
+Reading schema files:
+/home/ubuntu/launchbase/drizzle/schema.ts
+
+[✓] Changes applied
+[Vitest Setup] Schema applied successfully ✓
+[Vitest Setup] Test database ready ✓
+stdout | server/intelligence-layers.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/utils/__tests__/idempotency.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/ai/validateAiOutput.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/ai/engine/__tests__/swarm.golden.invariants.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/ai/engine/__tests__/swarm.gate2.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/intelligence-layers.test.ts (36 tests) 15ms
+stdout | server/ai/engine/__tests__/swarm.golden.invariants.test.ts > Swarm Golden Transcript Invariants
+[golden-invariants] Forcing AI_PROVIDER=replay for golden transcript tests
+
+stdout | server/ai/engine/__tests__/swarm.golden.invariants.test.ts > Swarm Golden Transcript Invariants > email_test__db_mock__golden_v1 > should replay deterministically with same decision outcome
+[swarm] role=craft override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-email_test__db_mock__golden_v1:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=email_test__db_mock__golden_v1 run=test-email_test__db_mock__golden_v1 role=craft idx=0
+[swarm] role=critic override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-email_test__db_mock__golden_v1:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=email_test__db_mock__golden_v1 run=test-email_test__db_mock__golden_v1 role=critic idx=0
+[swarm] role=craft override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-email_test__db_mock__golden_v1:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=email_test__db_mock__golden_v1 run=test-email_test__db_mock__golden_v1 role=craft idx=1
+[swarm] role=critic override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-email_test__db_mock__golden_v1:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=email_test__db_mock__golden_v1 run=test-email_test__db_mock__golden_v1 role=critic idx=1
+
+stderr | server/ai/engine/__tests__/swarm.golden.invariants.test.ts > Swarm Golden Transcript Invariants > email_test__db_mock__golden_v1 > should replay deterministically with same decision outcome
+[replay] craft exhausted; clamping to last entry
+[replay] critic exhausted; clamping to last entry
+
+stdout | server/ai/engine/__tests__/swarm.golden.invariants.test.ts > Swarm Golden Transcript Invariants > email_test__db_mock__golden_v1 > should produce needs_human stopReason (APPLY path)
+[swarm] role=craft override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-email_test__db_mock__golden_v1-collapse:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=email_test__db_mock__golden_v1 run=test-email_test__db_mock__golden_v1-collapse role=craft idx=0
+[swarm] role=critic override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-email_test__db_mock__golden_v1-collapse:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=email_test__db_mock__golden_v1 run=test-email_test__db_mock__golden_v1-collapse role=critic idx=0
+[swarm] role=craft override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-email_test__db_mock__golden_v1-collapse:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=email_test__db_mock__golden_v1 run=test-email_test__db_mock__golden_v1-collapse role=craft idx=1
+[swarm] role=critic override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-email_test__db_mock__golden_v1-collapse:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=email_test__db_mock__golden_v1 run=test-email_test__db_mock__golden_v1-collapse role=critic idx=1
+
+stderr | server/ai/engine/__tests__/swarm.golden.invariants.test.ts > Swarm Golden Transcript Invariants > email_test__db_mock__golden_v1 > should produce needs_human stopReason (APPLY path)
+[replay] craft exhausted; clamping to last entry
+[replay] critic exhausted; clamping to last entry
+
+stdout | server/ai/engine/__tests__/swarm.golden.invariants.test.ts > Swarm Golden Transcript Invariants > email_test__db_mock__golden_v1 > should maintain fixture stability (no drift)
+[swarm] role=craft override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-email_test__db_mock__golden_v1-drift-1:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=email_test__db_mock__golden_v1 run=test-email_test__db_mock__golden_v1-drift-1 role=craft idx=0
+[swarm] role=critic override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-email_test__db_mock__golden_v1-drift-1:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=email_test__db_mock__golden_v1 run=test-email_test__db_mock__golden_v1-drift-1 role=critic idx=0
+[swarm] role=craft override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-email_test__db_mock__golden_v1-drift-1:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=email_test__db_mock__golden_v1 run=test-email_test__db_mock__golden_v1-drift-1 role=craft idx=1
+[swarm] role=critic override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-email_test__db_mock__golden_v1-drift-1:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=email_test__db_mock__golden_v1 run=test-email_test__db_mock__golden_v1-drift-1 role=critic idx=1
+[swarm] role=craft override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-email_test__db_mock__golden_v1-drift-2:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=email_test__db_mock__golden_v1 run=test-email_test__db_mock__golden_v1-drift-2 role=craft idx=0
+[swarm] role=critic override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-email_test__db_mock__golden_v1-drift-2:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=email_test__db_mock__golden_v1 run=test-email_test__db_mock__golden_v1-drift-2 role=critic idx=0
+[swarm] role=craft override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-email_test__db_mock__golden_v1-drift-2:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=email_test__db_mock__golden_v1 run=test-email_test__db_mock__golden_v1-drift-2 role=craft idx=1
+[swarm] role=critic override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-email_test__db_mock__golden_v1-drift-2:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=email_test__db_mock__golden_v1 run=test-email_test__db_mock__golden_v1-drift-2 role=critic idx=1
+
+stderr | server/ai/engine/__tests__/swarm.golden.invariants.test.ts > Swarm Golden Transcript Invariants > email_test__db_mock__golden_v1 > should maintain fixture stability (no drift)
+[replay] craft exhausted; clamping to last entry
+[replay] critic exhausted; clamping to last entry
+[replay] craft exhausted; clamping to last entry
+[replay] critic exhausted; clamping to last entry
+
+stdout | server/ai/engine/__tests__/swarm.golden.invariants.test.ts > Swarm Golden Transcript Invariants > facebook_postWeatherAware__revise_apply__golden_v1 > should replay deterministically with same decision outcome
+[swarm] role=craft override.system=true override.user=true
+[swarm] craft systemPrompt preview: You are a software repair agent. Your job is to propose a minimal patch that makes the provided failing tests pass.
+
+You...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-facebook_postWeatherAware__revise_apply__golden_v1:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=facebook_postWeatherAware__revise_apply__golden_v1 run=test-facebook_postWeatherAware__revise_apply__golden_v1 role=craft idx=0
+[swarm] role=critic override.system=true override.user=true
+[swarm] critic systemPrompt preview: You are the Critic in a 2-role swarm (craft + critic). You MUST review Craft's proposedChanges.
+
+You MUST output ONLY a ...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-facebook_postWeatherAware__revise_apply__golden_v1:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=facebook_postWeatherAware__revise_apply__golden_v1 run=test-facebook_postWeatherAware__revise_apply__golden_v1 role=critic idx=0
+[swarm] role=craft override.system=true override.user=true
+[swarm] craft systemPrompt preview: You are a software repair agent. Your job is to propose a minimal patch that makes the provided failing tests pass.
+
+You...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-facebook_postWeatherAware__revise_apply__golden_v1:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=facebook_postWeatherAware__revise_apply__golden_v1 run=test-facebook_postWeatherAware__revise_apply__golden_v1 role=craft idx=1
+[swarm] role=critic override.system=true override.user=true
+[swarm] critic systemPrompt preview: You are the Critic in a 2-role swarm (craft + critic). You MUST review Craft's proposedChanges.
+
+You MUST output ONLY a ...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-facebook_postWeatherAware__revise_apply__golden_v1:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=facebook_postWeatherAware__revise_apply__golden_v1 run=test-facebook_postWeatherAware__revise_apply__golden_v1 role=critic idx=1
+
+stdout | server/ai/engine/__tests__/swarm.golden.invariants.test.ts > Swarm Golden Transcript Invariants > facebook_postWeatherAware__revise_apply__golden_v1 > should demonstrate REVISE→REVISE→NEEDS_HUMAN iteration loop
+[swarm] role=craft override.system=true override.user=true
+[swarm] craft systemPrompt preview: You are a software repair agent. Your job is to propose a minimal patch that makes the provided failing tests pass.
+
+You...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-facebook_postWeatherAware__revise_apply__golden_v1-iteration:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=facebook_postWeatherAware__revise_apply__golden_v1 run=test-facebook_postWeatherAware__revise_apply__golden_v1-iteration role=craft idx=0
+[swarm] role=critic override.system=true override.user=true
+[swarm] critic systemPrompt preview: You are the Critic in a 2-role swarm (craft + critic). You MUST review Craft's proposedChanges.
+
+You MUST output ONLY a ...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-facebook_postWeatherAware__revise_apply__golden_v1-iteration:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=facebook_postWeatherAware__revise_apply__golden_v1 run=test-facebook_postWeatherAware__revise_apply__golden_v1-iteration role=critic idx=0
+[swarm] role=craft override.system=true override.user=true
+[swarm] craft systemPrompt preview: You are a software repair agent. Your job is to propose a minimal patch that makes the provided failing tests pass.
+
+You...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-facebook_postWeatherAware__revise_apply__golden_v1-iteration:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=facebook_postWeatherAware__revise_apply__golden_v1 run=test-facebook_postWeatherAware__revise_apply__golden_v1-iteration role=craft idx=1
+[swarm] role=critic override.system=true override.user=true
+[swarm] critic systemPrompt preview: You are the Critic in a 2-role swarm (craft + critic). You MUST review Craft's proposedChanges.
+
+You MUST output ONLY a ...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-facebook_postWeatherAware__revise_apply__golden_v1-iteration:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=facebook_postWeatherAware__revise_apply__golden_v1 run=test-facebook_postWeatherAware__revise_apply__golden_v1-iteration role=critic idx=1
+
+stdout | server/ai/engine/__tests__/swarm.golden.invariants.test.ts > Swarm Golden Transcript Invariants > facebook_postWeatherAware__revise_apply__golden_v1 > should maintain fixture stability (no drift)
+[swarm] role=craft override.system=true override.user=true
+[swarm] craft systemPrompt preview: You are a software repair agent. Your job is to propose a minimal patch that makes the provided failing tests pass.
+
+You...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-facebook_postWeatherAware__revise_apply__golden_v1-drift-1:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=facebook_postWeatherAware__revise_apply__golden_v1 run=test-facebook_postWeatherAware__revise_apply__golden_v1-drift-1 role=craft idx=0
+[swarm] role=critic override.system=true override.user=true
+[swarm] critic systemPrompt preview: You are the Critic in a 2-role swarm (craft + critic). You MUST review Craft's proposedChanges.
+
+You MUST output ONLY a ...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-facebook_postWeatherAware__revise_apply__golden_v1-drift-1:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=facebook_postWeatherAware__revise_apply__golden_v1 run=test-facebook_postWeatherAware__revise_apply__golden_v1-drift-1 role=critic idx=0
+[swarm] role=craft override.system=true override.user=true
+[swarm] craft systemPrompt preview: You are a software repair agent. Your job is to propose a minimal patch that makes the provided failing tests pass.
+
+You...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-facebook_postWeatherAware__revise_apply__golden_v1-drift-1:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=facebook_postWeatherAware__revise_apply__golden_v1 run=test-facebook_postWeatherAware__revise_apply__golden_v1-drift-1 role=craft idx=1
+[swarm] role=critic override.system=true override.user=true
+[swarm] critic systemPrompt preview: You are the Critic in a 2-role swarm (craft + critic). You MUST review Craft's proposedChanges.
+
+You MUST output ONLY a ...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-facebook_postWeatherAware__revise_apply__golden_v1-drift-1:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=facebook_postWeatherAware__revise_apply__golden_v1 run=test-facebook_postWeatherAware__revise_apply__golden_v1-drift-1 role=critic idx=1
+[swarm] role=craft override.system=true override.user=true
+[swarm] craft systemPrompt preview: You are a software repair agent. Your job is to propose a minimal patch that makes the provided failing tests pass.
+
+You...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-facebook_postWeatherAware__revise_apply__golden_v1-drift-2:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=facebook_postWeatherAware__revise_apply__golden_v1 run=test-facebook_postWeatherAware__revise_apply__golden_v1-drift-2 role=craft idx=0
+[swarm] role=critic override.system=true override.user=true
+[swarm] critic systemPrompt preview: You are the Critic in a 2-role swarm (craft + critic). You MUST review Craft's proposedChanges.
+
+You MUST output ONLY a ...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-facebook_postWeatherAware__revise_apply__golden_v1-drift-2:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=facebook_postWeatherAware__revise_apply__golden_v1 run=test-facebook_postWeatherAware__revise_apply__golden_v1-drift-2 role=critic idx=0
+[swarm] role=craft override.system=true override.user=true
+[swarm] craft systemPrompt preview: You are a software repair agent. Your job is to propose a minimal patch that makes the provided failing tests pass.
+
+You...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-facebook_postWeatherAware__revise_apply__golden_v1-drift-2:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=facebook_postWeatherAware__revise_apply__golden_v1 run=test-facebook_postWeatherAware__revise_apply__golden_v1-drift-2 role=craft idx=1
+[swarm] role=critic override.system=true override.user=true
+[swarm] critic systemPrompt preview: You are the Critic in a 2-role swarm (craft + critic). You MUST review Craft's proposedChanges.
+
+You MUST output ONLY a ...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-facebook_postWeatherAware__revise_apply__golden_v1-drift-2:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=facebook_postWeatherAware__revise_apply__golden_v1 run=test-facebook_postWeatherAware__revise_apply__golden_v1-drift-2 role=critic idx=1
+
+stdout | server/ai/engine/__tests__/swarm.golden.invariants.test.ts > Swarm Golden Transcript Invariants > email_spanish_copy__apply_pass__golden_v1 > should replay deterministically with same decision outcome
+[swarm] role=craft override.system=true override.user=true
+[swarm] craft systemPrompt preview: You are a software repair agent. Your job is to propose a minimal patch that makes the provided failing tests pass.
+
+You...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-email_spanish_copy__apply_pass__golden_v1:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=email_spanish_copy__apply_pass__golden_v1 run=test-email_spanish_copy__apply_pass__golden_v1 role=craft idx=0
+[swarm] role=critic override.system=true override.user=true
+[swarm] critic systemPrompt preview: You are the Critic in a 2-role swarm (craft + critic). You MUST review Craft's proposedChanges.
+
+You MUST output ONLY a ...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-email_spanish_copy__apply_pass__golden_v1:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=email_spanish_copy__apply_pass__golden_v1 run=test-email_spanish_copy__apply_pass__golden_v1 role=critic idx=0
+
+stdout | server/ai/engine/__tests__/swarm.golden.invariants.test.ts > Swarm Golden Transcript Invariants > email_spanish_copy__apply_pass__golden_v1 > should demonstrate APPLY with pass=true (clean first-pass success)
+[swarm] role=craft override.system=true override.user=true
+[swarm] craft systemPrompt preview: You are a software repair agent. Your job is to propose a minimal patch that makes the provided failing tests pass.
+
+You...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-email_spanish_copy__apply_pass__golden_v1-apply:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=email_spanish_copy__apply_pass__golden_v1 run=test-email_spanish_copy__apply_pass__golden_v1-apply role=craft idx=0
+[swarm] role=critic override.system=true override.user=true
+[swarm] critic systemPrompt preview: You are the Critic in a 2-role swarm (craft + critic). You MUST review Craft's proposedChanges.
+
+You MUST output ONLY a ...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-email_spanish_copy__apply_pass__golden_v1-apply:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=email_spanish_copy__apply_pass__golden_v1 run=test-email_spanish_copy__apply_pass__golden_v1-apply role=critic idx=0
+
+stdout | server/ai/engine/__tests__/swarm.golden.invariants.test.ts > Swarm Golden Transcript Invariants > email_spanish_copy__apply_pass__golden_v1 > should maintain fixture stability (no drift)
+[swarm] role=craft override.system=true override.user=true
+[swarm] craft systemPrompt preview: You are a software repair agent. Your job is to propose a minimal patch that makes the provided failing tests pass.
+
+You...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-email_spanish_copy__apply_pass__golden_v1-drift-1:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=email_spanish_copy__apply_pass__golden_v1 run=test-email_spanish_copy__apply_pass__golden_v1-drift-1 role=craft idx=0
+[swarm] role=critic override.system=true override.user=true
+[swarm] critic systemPrompt preview: You are the Critic in a 2-role swarm (craft + critic). You MUST review Craft's proposedChanges.
+
+You MUST output ONLY a ...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-email_spanish_copy__apply_pass__golden_v1-drift-1:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=email_spanish_copy__apply_pass__golden_v1 run=test-email_spanish_copy__apply_pass__golden_v1-drift-1 role=critic idx=0
+[swarm] role=craft override.system=true override.user=true
+[swarm] craft systemPrompt preview: You are a software repair agent. Your job is to propose a minimal patch that makes the provided failing tests pass.
+
+You...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-email_spanish_copy__apply_pass__golden_v1-drift-2:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=email_spanish_copy__apply_pass__golden_v1 run=test-email_spanish_copy__apply_pass__golden_v1-drift-2 role=craft idx=0
+[swarm] role=critic override.system=true override.user=true
+[swarm] critic systemPrompt preview: You are the Critic in a 2-role swarm (craft + critic). You MUST review Craft's proposedChanges.
+
+You MUST output ONLY a ...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-email_spanish_copy__apply_pass__golden_v1-drift-2:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=email_spanish_copy__apply_pass__golden_v1 run=test-email_spanish_copy__apply_pass__golden_v1-drift-2 role=critic idx=0
+
+stdout | server/ai/engine/__tests__/swarm.golden.invariants.test.ts > Swarm Golden Transcript Invariants > reject_no_edits__golden_v1 > should replay deterministically with same decision outcome
+[swarm] role=craft override.system=true override.user=true
+[swarm] craft systemPrompt preview: You are a software repair agent. Your job is to propose a minimal patch that makes the provided failing tests pass.
+
+You...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-reject_no_edits__golden_v1:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=reject_no_edits__golden_v1 run=test-reject_no_edits__golden_v1 role=craft idx=0
+[swarm] role=critic override.system=true override.user=true
+[swarm] critic systemPrompt preview: You are the Critic in a 2-role swarm (craft + critic). You MUST review Craft's proposedChanges.
+
+You MUST output ONLY a ...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-reject_no_edits__golden_v1:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=reject_no_edits__golden_v1 run=test-reject_no_edits__golden_v1 role=critic idx=0
+[swarm] role=craft override.system=true override.user=true
+[swarm] craft systemPrompt preview: You are a software repair agent. Your job is to propose a minimal patch that makes the provided failing tests pass.
+
+You...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-reject_no_edits__golden_v1:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=reject_no_edits__golden_v1 run=test-reject_no_edits__golden_v1 role=craft idx=1
+[swarm] role=critic override.system=true override.user=true
+[swarm] critic systemPrompt preview: You are the Critic in a 2-role swarm (craft + critic). You MUST review Craft's proposedChanges.
+
+You MUST output ONLY a ...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-reject_no_edits__golden_v1:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=reject_no_edits__golden_v1 run=test-reject_no_edits__golden_v1 role=critic idx=1
+
+stdout | server/ai/engine/__tests__/swarm.golden.invariants.test.ts > Swarm Golden Transcript Invariants > reject_no_edits__golden_v1 > should demonstrate REJECT with no-edits constraint (2 iterations, both rejected)
+[swarm] role=craft override.system=true override.user=true
+[swarm] craft systemPrompt preview: You are a software repair agent. Your job is to propose a minimal patch that makes the provided failing tests pass.
+
+You...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-reject_no_edits__golden_v1-reject:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=reject_no_edits__golden_v1 run=test-reject_no_edits__golden_v1-reject role=craft idx=0
+[swarm] role=critic override.system=true override.user=true
+[swarm] critic systemPrompt preview: You are the Critic in a 2-role swarm (craft + critic). You MUST review Craft's proposedChanges.
+
+You MUST output ONLY a ...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-reject_no_edits__golden_v1-reject:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=reject_no_edits__golden_v1 run=test-reject_no_edits__golden_v1-reject role=critic idx=0
+[swarm] role=craft override.system=true override.user=true
+[swarm] craft systemPrompt preview: You are a software repair agent. Your job is to propose a minimal patch that makes the provided failing tests pass.
+
+You...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-reject_no_edits__golden_v1-reject:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=reject_no_edits__golden_v1 run=test-reject_no_edits__golden_v1-reject role=craft idx=1
+[swarm] role=critic override.system=true override.user=true
+[swarm] critic systemPrompt preview: You are the Critic in a 2-role swarm (craft + critic). You MUST review Craft's proposedChanges.
+
+You MUST output ONLY a ...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-reject_no_edits__golden_v1-reject:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=reject_no_edits__golden_v1 run=test-reject_no_edits__golden_v1-reject role=critic idx=1
+
+stdout | server/ai/engine/__tests__/swarm.golden.invariants.test.ts > Swarm Golden Transcript Invariants > reject_no_edits__golden_v1 > should maintain fixture stability (no drift)
+[swarm] role=craft override.system=true override.user=true
+[swarm] craft systemPrompt preview: You are a software repair agent. Your job is to propose a minimal patch that makes the provided failing tests pass.
+
+You...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-reject_no_edits__golden_v1-drift-1:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=reject_no_edits__golden_v1 run=test-reject_no_edits__golden_v1-drift-1 role=craft idx=0
+[swarm] role=critic override.system=true override.user=true
+[swarm] critic systemPrompt preview: You are the Critic in a 2-role swarm (craft + critic). You MUST review Craft's proposedChanges.
+
+You MUST output ONLY a ...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-reject_no_edits__golden_v1-drift-1:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=reject_no_edits__golden_v1 run=test-reject_no_edits__golden_v1-drift-1 role=critic idx=0
+[swarm] role=craft override.system=true override.user=true
+[swarm] craft systemPrompt preview: You are a software repair agent. Your job is to propose a minimal patch that makes the provided failing tests pass.
+
+You...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-reject_no_edits__golden_v1-drift-1:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=reject_no_edits__golden_v1 run=test-reject_no_edits__golden_v1-drift-1 role=craft idx=1
+[swarm] role=critic override.system=true override.user=true
+[swarm] critic systemPrompt preview: You are the Critic in a 2-role swarm (craft + critic). You MUST review Craft's proposedChanges.
+
+You MUST output ONLY a ...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-reject_no_edits__golden_v1-drift-1:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=reject_no_edits__golden_v1 run=test-reject_no_edits__golden_v1-drift-1 role=critic idx=1
+[swarm] role=craft override.system=true override.user=true
+[swarm] craft systemPrompt preview: You are a software repair agent. Your job is to propose a minimal patch that makes the provided failing tests pass.
+
+You...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-reject_no_edits__golden_v1-drift-2:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=reject_no_edits__golden_v1 run=test-reject_no_edits__golden_v1-drift-2 role=craft idx=0
+[swarm] role=critic override.system=true override.user=true
+[swarm] critic systemPrompt preview: You are the Critic in a 2-role swarm (craft + critic). You MUST review Craft's proposedChanges.
+
+You MUST output ONLY a ...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-reject_no_edits__golden_v1-drift-2:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=reject_no_edits__golden_v1 run=test-reject_no_edits__golden_v1-drift-2 role=critic idx=0
+[swarm] role=craft override.system=true override.user=true
+[swarm] craft systemPrompt preview: You are a software repair agent. Your job is to propose a minimal patch that makes the provided failing tests pass.
+
+You...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-reject_no_edits__golden_v1-drift-2:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=reject_no_edits__golden_v1 run=test-reject_no_edits__golden_v1-drift-2 role=craft idx=1
+[swarm] role=critic override.system=true override.user=true
+[swarm] critic systemPrompt preview: You are the Critic in a 2-role swarm (craft + critic). You MUST review Craft's proposedChanges.
+
+You MUST output ONLY a ...
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-reject_no_edits__golden_v1-drift-2:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=reject_no_edits__golden_v1 run=test-reject_no_edits__golden_v1-drift-2 role=critic idx=1
+
+ ✓ server/ai/engine/__tests__/swarm.golden.invariants.test.ts (12 tests) 51ms
+ ✓ server/ai/validateAiOutput.test.ts (24 tests) 36ms
+stdout | server/__tests__/alerts-forever.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ↓ server/ai/engine/__tests__/swarm.gate2.test.ts (8 tests | 8 skipped)
+stdout | server/utils/__tests__/idempotency.test.ts > withIdempotency > executes operation on first call
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+stdout | server/ai/engine/__tests__/swarm.gate4.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/routers/actionRequestsRouter.aiProposeCopy.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/ai/enforceSectionCaps.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/ai/enforceSectionCaps.test.ts (15 tests) 10ms
+ ↓ server/ai/engine/__tests__/swarm.gate4.test.ts (7 tests | 7 skipped)
+stdout | server/ai/__tests__/promptPack.validation.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/ai/engine/__tests__/swarm.gate3.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Cooldown & Dedupe > should send email only once for same fingerprint
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+ ↓ server/ai/engine/__tests__/swarm.gate3.test.ts (6 tests | 6 skipped)
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Cooldown & Dedupe > should send email only once for same fingerprint
+[Alerts] Sent new alert: health:email_failures (launchbase|health:email_failures|3plus) to vince@vincessnowplow.com
+
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Cooldown & Dedupe > should send email only once for same fingerprint
+[Alerts] Updated existing alert: health:email_failures (launchbase|health:email_failures|3plus)
+
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Cooldown & Dedupe > should send new email when fingerprint changes (bucket escalation)
+[Alerts] Sent new alert: health:email_failures (launchbase|health:email_failures|3plus) to vince@vincessnowplow.com
+
+stdout | server/ai/__tests__/promptPack.validation.test.ts > PromptPack: intent_parse > should produce valid intent_parse JSON
+[completeJson] calling provider.chat {
+  transport: 'memory',
+  provider: 'Object',
+  trace: 'test-intent_parse:intent_parse:1',
+  model: 'gpt-4o-mini'
+}
+
+stdout | server/ai/__tests__/promptPack.validation.test.ts > PromptPack: intent_parse > should have required fields
+[completeJson] calling provider.chat {
+  transport: 'memory',
+  provider: 'Object',
+  trace: 'test-intent_parse:intent_parse:1',
+  model: 'gpt-4o-mini'
+}
+
+stdout | server/ai/__tests__/promptPack.validation.test.ts > PromptPack: generate_candidates > should produce valid copy_proposal JSON
+[completeJson] calling provider.chat {
+  transport: 'memory',
+  provider: 'Object',
+  trace: 'test-generate_candidates:generate_candidates:1',
+  model: 'gpt-4o-mini'
+}
+
+stdout | server/ai/__tests__/promptPack.validation.test.ts > PromptPack: generate_candidates > should enforce section caps
+[completeJson] calling provider.chat {
+  transport: 'memory',
+  provider: 'Object',
+  trace: 'test-generate_candidates:generate_candidates:1',
+  model: 'gpt-4o-mini'
+}
+
+stdout | server/ai/__tests__/promptPack.validation.test.ts > PromptPack: critique > should produce valid critique JSON
+[completeJson] calling provider.chat {
+  transport: 'memory',
+  provider: 'Object',
+  trace: 'test-critique:critique:1',
+  model: 'gpt-4o-mini'
+}
+
+stdout | server/ai/__tests__/promptPack.validation.test.ts > PromptPack: decision_collapse > should produce valid decision_collapse JSON
+[completeJson] calling provider.chat {
+  transport: 'memory',
+  provider: 'Object',
+  trace: 'test-decision_collapse:decision_collapse:1',
+  model: 'gpt-4o-mini'
+}
+
+stdout | server/ai/__tests__/promptPack.validation.test.ts > PromptPack: decision_collapse > should enforce needsHuman escalation path
+[completeJson] calling provider.chat {
+  transport: 'memory',
+  provider: 'Object',
+  trace: 'test-decision_collapse:decision_collapse:1',
+  model: 'gpt-4o-mini'
+}
+
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Cooldown & Dedupe > should send new email when fingerprint changes (bucket escalation)
+[Alerts] Sent new alert: health:email_failures (launchbase|health:email_failures|10plus) to vince@vincessnowplow.com
+
+stdout | server/ai/__tests__/promptPack.validation.test.ts > Memory Transport > should return deterministic JSON
+[completeJson] calling provider.chat {
+  transport: 'memory',
+  provider: 'Object',
+  trace: 'test:test:1',
+  model: 'test-model'
+}
+[completeJson] calling provider.chat {
+  transport: 'memory',
+  provider: 'Object',
+  trace: 'test:test:1',
+  model: 'test-model'
+}
+
+stdout | server/ai/__tests__/promptPack.validation.test.ts > Memory Transport > should never make real API calls
+[completeJson] calling provider.chat {
+  transport: 'memory',
+  provider: 'Object',
+  trace: 'test:test:1',
+  model: 'gpt-4o-mini'
+}
+
+ ✓ server/ai/__tests__/promptPack.validation.test.ts (12 tests) 19ms
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Cooldown & Dedupe > should send new email when fingerprint changes (bucket escalation)
+[Alerts] Resolved alert: health:email_failures (launchbase|health:email_failures|3plus)
+
+stdout | server/ai/engine/__tests__/policy.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Tenant Isolation > should isolate vinces alerts from launchbase queries
+[Alerts] Sent new alert: health:email_failures (vinces|health:email_failures|3plus) to vince@vincessnowplow.com
+
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Tenant Isolation > should isolate vinces alerts from launchbase queries
+[Alerts] Sent new alert: health:email_failures (launchbase|health:email_failures|3plus) to vince@vincessnowplow.com
+
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Tenant Isolation > should not resolve vinces alerts when launchbase condition clears
+[Alerts] Sent new alert: health:email_failures (vinces|health:email_failures|3plus) to vince@vincessnowplow.com
+
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Tenant Isolation > should not resolve vinces alerts when launchbase condition clears
+[Alerts] Sent new alert: health:email_failures (launchbase|health:email_failures|3plus) to vince@vincessnowplow.com
+
+stdout | server/ai/engine/__tests__/swarm.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Tenant Isolation > should not resolve vinces alerts when launchbase condition clears
+[Alerts] Resolved alert: health:email_failures (launchbase|health:email_failures|3plus)
+
+ ✓ server/ai/engine/__tests__/policy.test.ts (11 tests) 41ms
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Auto-Resolve > should resolve alert when condition clears
+[Alerts] Sent new alert: health:email_failures (launchbase|health:email_failures|3plus) to vince@vincessnowplow.com
+
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Auto-Resolve > should resolve alert when condition clears
+[Alerts] Resolved alert: health:email_failures (launchbase|health:email_failures|3plus)
+
+ ↓ server/ai/engine/__tests__/swarm.test.ts (7 tests | 7 skipped)
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Auto-Resolve > should not send email when resolving alert
+[Alerts] Sent new alert: health:email_failures (launchbase|health:email_failures|3plus) to vince@vincessnowplow.com
+
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Auto-Resolve > should not send email when resolving alert
+[Alerts] Resolved alert: health:email_failures (launchbase|health:email_failures|3plus)
+
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Auto-Resolve > should handle multiple alerts resolving simultaneously
+[Alerts] Sent new alert: health:email_failures (launchbase|health:email_failures|3plus) to vince@vincessnowplow.com
+
+stdout | server/__tests__/rollback.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Auto-Resolve > should handle multiple alerts resolving simultaneously
+[Alerts] Sent new alert: health:webhooks_stale (launchbase|health:webhooks_stale|2h) to vince@vincessnowplow.com
+
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Auto-Resolve > should handle multiple alerts resolving simultaneously
+[Alerts] Sent new alert: health:deploy_failures (launchbase|health:deploy_failures|2plus) to vince@vincessnowplow.com
+
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Auto-Resolve > should handle multiple alerts resolving simultaneously
+[Alerts] Resolved alert: health:email_failures (launchbase|health:email_failures|3plus)
+
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Auto-Resolve > should handle multiple alerts resolving simultaneously
+[Alerts] Resolved alert: health:webhooks_stale (launchbase|health:webhooks_stale|2h)
+
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Auto-Resolve > should handle multiple alerts resolving simultaneously
+[Alerts] Resolved alert: health:deploy_failures (launchbase|health:deploy_failures|2plus)
+
+stdout | server/__tests__/facebook-mutations.policy.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Time Determinism > should use frozen time for all timestamps
+[Alerts] Sent new alert: health:email_failures (launchbase|health:email_failures|3plus) to vince@vincessnowplow.com
+
+stdout | server/routers/actionRequestsRouter.aiProposeCopy.test.ts > actionRequests.aiProposeCopy > should successfully generate copy proposal
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Time Determinism > should update lastSeenAt on dedupe with frozen time
+[Alerts] Sent new alert: health:email_failures (launchbase|health:email_failures|3plus) to vince@vincessnowplow.com
+
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Time Determinism > should update lastSeenAt on dedupe with frozen time
+[Alerts] Updated existing alert: health:email_failures (launchbase|health:email_failures|3plus)
+
+ ✓ server/__tests__/alerts-forever.test.ts (9 tests) 936ms
+ ✓ server/utils/__tests__/idempotency.test.ts (15 tests) 1420ms
+   ✓ withIdempotency > OWNERSHIP GUARD: prevents lost updates during stale takeover 781ms
+stdout | server/__tests__/rollback.test.ts > Rollback Safety Rails
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+stdout | server/__tests__/smoke.email-localization.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/action-requests-ops.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/rollback.test.ts > Rollback Safety Rails > should clone templateVersion and buildPlanSnapshot exactly
+[Rollback] Created deployment 2 from source 1 for intake 4 (reason: Test exact clone)
+
+stdout | server/__tests__/rollback.test.ts > Rollback Safety Rails > should set trigger=rollback and rolledBackFromDeploymentId
+[Rollback] Created deployment 3 from source 1 for intake 4 (reason: Test trigger fields)
+
+stdout | server/__tests__/action-requests-ops.test.ts > FOREVER: Action Request Ops Controls > FOREVER: resend rate limit blocks <10m, no sendCount increment, no RESENT event
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+ ✓ server/__tests__/smoke.email-localization.test.ts (59 tests) 22ms
+stdout | server/__tests__/rollback.test.ts > Rollback Safety Rails > should return correct deployment IDs
+[Rollback] Created deployment 6 from source 1 for intake 4 (reason: Test return values)
+
+stdout | server/__tests__/rollback.test.ts > Rollback Safety Rails > should allow multiple rollbacks in sequence
+[Rollback] Created deployment 7 from source 1 for intake 4 (reason: First rollback)
+
+ ✓ server/routers/actionRequestsRouter.aiProposeCopy.test.ts (9 tests) 882ms
+stdout | server/__tests__/rollback.test.ts > Rollback Safety Rails > should allow multiple rollbacks in sequence
+[Rollback] Created deployment 8 from source 1 for intake 4 (reason: Second rollback)
+
+stdout | server/setupPacket.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/__tests__/rollback.test.ts (7 tests) 804ms
+stdout | server/services/__tests__/facebook-policy.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/e2e-action-request-loop.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stderr | server/__tests__/facebook-mutations.policy.test.ts > Facebook Mutations - Policy Integration > facebook.post mutation > should call Facebook when policy allows PUBLISH
+[Analytics] Failed to track event: TypeError: db.insert is not a function
+    at Module.trackEvent (/home/ubuntu/launchbase/server/analytics.ts:81:14)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at /home/ubuntu/launchbase/server/routers.ts:2481:11
+    at resolveMiddleware (file:///home/ubuntu/launchbase/node_modules/.pnpm/@trpc+server@11.6.0_typescript@5.9.3/node_modules/@trpc/server/src/unstable-core-do-not-import/procedureBuilder.ts:571:22)
+    at callRecursive (file:///home/ubuntu/launchbase/node_modules/.pnpm/@trpc+server@11.6.0_typescript@5.9.3/node_modules/@trpc/server/src/unstable-core-do-not-import/procedureBuilder.ts:633:20)
+    at callRecursive (file:///home/ubuntu/launchbase/node_modules/.pnpm/@trpc+server@11.6.0_typescript@5.9.3/node_modules/@trpc/server/src/unstable-core-do-not-import/procedureBuilder.ts:633:20)
+    at callRecursive (file:///home/ubuntu/launchbase/node_modules/.pnpm/@trpc+server@11.6.0_typescript@5.9.3/node_modules/@trpc/server/src/unstable-core-do-not-import/procedureBuilder.ts:633:20)
+    at procedure (file:///home/ubuntu/launchbase/node_modules/.pnpm/@trpc+server@11.6.0_typescript@5.9.3/node_modules/@trpc/server/src/unstable-core-do-not-import/procedureBuilder.ts:673:20)
+    at file:///home/ubuntu/launchbase/node_modules/.pnpm/@trpc+server@11.6.0_typescript@5.9.3/node_modules/@trpc/server/src/unstable-core-do-not-import/router.ts:474:20
+    at /home/ubuntu/launchbase/server/__tests__/facebook-mutations.policy.test.ts:125:22
+
+stderr | server/setupPacket.test.ts > Setup Packet Generator > generateSetupPacket > should return null for non-existent intake
+[SetupPacket] Intake 999 not found
+
+ ✓ server/setupPacket.test.ts (9 tests) 322ms
+   ✓ Setup Packet Generator > generateSetupPacket > should generate a Google Business packet with correct structure 311ms
+stdout | server/__tests__/facebook-mutations.policy.test.ts > Facebook Mutations - Policy Integration > facebook.postWeatherAware mutation > should return DRAFT response and NOT call Facebook when approval is required
+[TEST] Facebook DRAFT result: {
+  "posted": false,
+  "error": "Needs approval",
+  "action": "DRAFT",
+  "reasons": [
+    "Approval required: LaunchBase is in launch mode (first 7 days after connection)."
+  ],
+  "intelligence": {
+    "postType": "ALL_CLEAR",
+    "urgency": "low",
+    "summary": "Nice weather today",
+    "bullets": [
+      "Clear skies"
+    ],
+    "suggestedCTA": "Enjoy the day!",
+    "safetyGate": false,
+    "rawConditions": {
+      "temperature": 70,
+      "temperatureUnit": "F",
+      "shortForecast": "Sunny",
+      "windSpeed": "5 mph",
+      "windDirection": "N"
+    },
+    "alerts": []
+  },
+  "formattedPost": "Nice weather today"
+}
+
+ ✓ server/services/__tests__/facebook-policy.test.ts (8 tests) 37ms
+stdout | server/action-requests.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/__tests__/facebook-mutations.policy.test.ts (4 tests) 1562ms
+   ✓ Facebook Mutations - Policy Integration > facebook.post mutation > should return BLOCK response and NOT call Facebook when daily cap is reached 977ms
+stderr | server/__tests__/action-requests-ops.test.ts > FOREVER: Action Request Ops Controls > FOREVER: adminApply requires reason, writes ADMIN_APPLY + APPLIED + LOCKED events, final status locked
+[ActionRequests] Unknown checklistKey: headline
+
+ ✓ server/__tests__/action-requests-ops.test.ts (4 tests) 954ms
+   ✓ FOREVER: Action Request Ops Controls > FOREVER: resend rate limit blocks <10m, no sendCount increment, no RESENT event 652ms
+stdout | server/weather-facebook.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/weather-facebook.test.ts (22 tests) 12ms
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Complete loop from Ask to Confirm
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+stdout | server/__tests__/proposed-preview.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Complete loop from Ask to Confirm
+[Email] sendActionRequestEmail called
+[Email] - To: e2e-test-1768929323138@test.com
+[Email] - Resend client exists: true
+[Email] - ENV.resendApiKey exists: true
+[Email] - ENV.resendApiKey length: 36
+[EmailTransport] Using transport: memory
+[EmailTransport] To: e2e-test-1768929323138@test.com
+[EmailTransport] Subject: [LB:action_1768929323264_d895612da691f6ed] Approve your homepage headline
+[EmailTransport:memory] 💾 Email stored in memory
+  To: e2e-test-1768929323138@test.com
+  Subject: [LB:action_1768929323264_d895612da691f6ed] Approve your homepage headline
+[Email] ✅ Sent via memory: memory_1768929323306_imhf124
+
+stdout | server/intelligence.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Complete loop from Ask to Confirm
+[Webhook] Inbound email: {
+  to: 'approvals+action_1768929323264_d895612da691f6ed@getlaunchbase.com',
+  from: 'e2e-test-1768929323138@test.com',
+  subject: 'Re: Approve your homepage headline'
+}
+
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Complete loop from Ask to Confirm
+[Webhook] Classification: { intent: 'APPROVE', confidence: 0.95 }
+
+stdout | server/ai/engine/__tests__/contract.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/action-requests.test.ts > Action Request System - FOREVER Tests > FOREVER: Approve link flow completes successfully
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Complete loop from Ask to Confirm
+[ConfidenceLearning] Created homepage.headline: approved
+
+ ✓ server/ai/engine/__tests__/contract.test.ts (8 tests) 12ms
+stdout | server/__tests__/proposed-preview.test.ts > FOREVER: Proposed Preview Feature
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+stdout | server/actionRequests/aiTennisCopyRefine.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/intelligence.test.ts > Intelligence Service > Silence Audit Trail > should handle logDecision without throwing
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+stdout | server/__tests__/proposed-preview.test.ts > FOREVER: Proposed Preview Feature > FOREVER: Proposed preview renders with 200 and contains proposed text
+✅ FOREVER Test: Proposed preview renders correctly
+
+stdout | server/__tests__/proposed-preview.test.ts > FOREVER: Proposed Preview Feature > FOREVER: Expired token returns 410 with friendly message
+✅ FOREVER Test: Expired token returns 410
+
+stdout | server/__tests__/proposed-preview.test.ts > FOREVER: Proposed Preview Feature > FOREVER: No DB write - intake fields unchanged after preview hit
+✅ FOREVER Test: No DB write - intake unchanged
+
+stdout | server/__tests__/proposed-preview.test.ts > FOREVER: Proposed Preview Feature > FOREVER: PREVIEW_VIEWED event logged when preview is accessed
+✅ FOREVER Test: PREVIEW_VIEWED event logged
+
+stdout | server/__tests__/proposed-preview.test.ts > FOREVER: Proposed Preview Feature > FOREVER: Unknown checklistKey shows fallback UI with approve/edit buttons
+✅ FOREVER Test: Unknown checklistKey shows fallback UI
+
+ ✓ server/__tests__/proposed-preview.test.ts (5 tests) 334ms
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Complete loop from Ask to Confirm
+✅ E2E Test Complete - Ask → Understand → Apply → Confirm loop verified
+
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Edit reply flow
+[Webhook] Inbound email: {
+  to: 'approvals+action_1768929323941_8ff096234d11455f@getlaunchbase.com',
+  from: 'e2e-test-1768929323922@test.com',
+  subject: 'Re: Approve your homepage headline'
+}
+
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Edit reply flow
+[Webhook] Classification: { intent: 'EDIT_EXACT', confidence: 0.75 }
+
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Edit reply flow
+[ConfidenceLearning] Updated homepage.headline: edited (approval rate: 50.0%, threshold: 0.95)
+
+stdout | server/computePricing.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/computePricing.test.ts (16 tests | 2 skipped) 10ms
+stdout | server/actionRequests/aiTennisCopyRefine.test.ts > aiTennisCopyRefine > handles needsHuman path with structured failure
+[completeJson] calling provider.chat {
+  transport: 'memory',
+  provider: 'Object',
+  trace: 'copy-refine-1768929324199:generate_candidates:0',
+  model: 'router'
+}
+
+ ✓ server/actionRequests/aiTennisCopyRefine.test.ts (4 tests | 1 skipped) 11ms
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Edit reply flow
+✅ E2E Edit Test Complete - Customer edit reply processed
+
+ ✓ server/intelligence.test.ts (18 tests) 540ms
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Unclear reply escalation
+[Webhook] Inbound email: {
+  to: 'approvals+action_1768929324252_3c4327254e027aed@getlaunchbase.com',
+  from: 'e2e-test-1768929324234@test.com',
+  subject: 'Re: Approve your homepage headline'
+}
+
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Unclear reply escalation
+[Webhook] Classification: { intent: 'EDIT_AMBIGUOUS', confidence: 0.6 }
+
+ ✓ server/action-requests.test.ts (8 tests) 900ms
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Unclear reply escalation
+[ConfidenceLearning] Updated homepage.headline: unclear (approval rate: 33.3%, threshold: 0.95)
+
+stdout | server/serviceSummary.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/tenant-filtering.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/module-setup.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/db.rawPayload.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/module-setup.test.ts (23 tests) 14ms
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Unclear reply escalation
+✅ E2E Escalation Test Complete - Unclear reply escalated to human
+
+ ✓ server/__tests__/e2e-action-request-loop.test.ts (3 tests) 1442ms
+   ✓ E2E: Ask → Understand → Apply → Confirm Loop > E2E: Complete loop from Ask to Confirm 791ms
+   ✓ E2E: Ask → Understand → Apply → Confirm Loop > E2E: Edit reply flow 312ms
+   ✓ E2E: Ask → Understand → Apply → Confirm Loop > E2E: Unclear reply escalation 338ms
+stdout | server/intake.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/serviceSummary.test.ts > Service Summary Parity (FOREVER)
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+stdout | server/email.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/tenant-filtering.test.ts > Tenant Filtering
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+stdout | server/db.rawPayload.test.ts > createIntake rawPayload builder > preserves caller-provided rawPayload values when optional fields are undefined
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+ ✓ server/serviceSummary.test.ts (5 tests) 166ms
+ ✓ server/db.rawPayload.test.ts (4 tests) 225ms
+stdout | server/__tests__/smoke.stripe-checkout-webhook.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/actionRequests/extractSelectedProposal.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/tenant-filtering.test.ts > Tenant Filtering
+[Email] ✅ Sent via Resend: intake_confirmation to test@launchbase.com
+
+stdout | server/email.test.ts > Email Service > sendEmail > should send email and return true on success
+[Email] ✅ Sent via Resend: intake_confirmation to john@smithplumbing.com
+
+ ✓ server/intake.test.ts (9 tests) 17ms
+stdout | server/email.test.ts > Email Service > sendEmail > should log email to database
+[Email] ✅ Sent via notification (fallback): ready_for_review to john@smithplumbing.com
+
+stderr | server/email.test.ts > Email Service > sendEmail > should log email to database
+[Email] ❌ Resend failed: {
+  message: 'Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.',
+  name: 'rate_limit_exceeded',
+  status: 429,
+  code: undefined,
+  details: {
+    statusCode: 429,
+    name: 'rate_limit_exceeded',
+    message: 'Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.'
+  }
+}
+
+ ✓ server/email.test.ts (14 tests) 474ms
+   ✓ Email Service > sendEmail > should send email and return true on success 345ms
+stderr | server/__tests__/tenant-filtering.test.ts > Tenant Filtering
+[Email] ❌ Resend failed: {
+  message: 'Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.',
+  name: 'rate_limit_exceeded',
+  status: 429,
+  code: undefined,
+  details: {
+    statusCode: 429,
+    name: 'rate_limit_exceeded',
+    message: 'Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.'
+  }
+}
+
+stdout | server/__tests__/smoke.stripe-checkout-webhook.test.ts
+[OAuth] Initialized with baseURL: https://api.manus.im
+
+stdout | server/__tests__/batch-approve.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/actionRequests/extractSelectedProposal.test.ts (19 tests) 9ms
+stdout | server/__tests__/admin.stripeWebhooks.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/tenant-filtering.test.ts > Tenant Filtering
+[Email] ✅ Sent via notification (fallback): intake_confirmation to test@vincessnowplow.com
+
+stdout | server/ai/engine/__tests__/swarm.gate5.collapse.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ↓ server/ai/engine/__tests__/swarm.gate5.collapse.test.ts (8 tests | 8 skipped)
+stdout | server/__tests__/batch-approve.test.ts > Batch Approval > should approve all 3 requests in batch
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+ ✓ server/__tests__/tenant-filtering.test.ts (7 tests) 1392ms
+stdout | server/__tests__/smoke.stripe-webhook.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/resendPreviewEmail.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/resendPreviewEmail.test.ts (13 tests) 9ms
+stdout | server/__tests__/smoke.prefs-language.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/smoke.stripe-checkout-webhook.test.ts > smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent)
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+ ✓ server/__tests__/smoke.prefs-language.test.ts (7 tests) 22ms
+stderr | server/__tests__/batch-approve.test.ts > Batch Approval > should approve all 3 requests in batch
+[ActionRequests] Unknown checklistKey: test.key.0
+
+stderr | server/__tests__/batch-approve.test.ts > Batch Approval > should approve all 3 requests in batch
+[ActionRequests] Unknown checklistKey: test.key.1
+
+stdout | server/__tests__/smoke.stripe-checkout-webhook.test.ts > smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent) > processes once; replay increments retryCount but no duplicate side-effects
+[Webhook body debug] isBuffer= true typeof= object content-type= application/json first20= {"id":"evt_2e3c05788
+[Stripe Webhook] Received event: checkout.session.completed (evt_2e3c05788f814ae4be59da7369c53b1b)
+
+stdout | server/__tests__/smoke.stripe-checkout-webhook.test.ts > smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent) > processes once; replay increments retryCount but no duplicate side-effects
+[Stripe Webhook] ✅ Successfully claimed session cs_test_8ae13664bb5c48b0a076b7413559764c for intake 37
+
+stderr | server/__tests__/batch-approve.test.ts > Batch Approval > should approve all 3 requests in batch
+[ActionRequests] Unknown checklistKey: test.key.2
+
+stdout | server/__tests__/smoke.stripe-checkout-webhook.test.ts > smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent) > processes once; replay increments retryCount but no duplicate side-effects
+[Stripe Webhook] Intake 37 marked as paid
+
+stdout | server/__tests__/admin.stripeWebhooks.test.ts > admin.stripeWebhooks security boundary > Test B — allows when admin > list returns array with correct shape when user is admin
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+stdout | server/__tests__/confidence-learning.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/__tests__/admin.stripeWebhooks.test.ts (6 tests) 142ms
+stderr | server/__tests__/batch-approve.test.ts > Batch Approval > should skip already-locked requests
+[ActionRequests] Unknown checklistKey: test.key.1
+
+stdout | server/__tests__/smoke.stripe-webhook.test.ts
+[OAuth] Initialized with baseURL: https://api.manus.im
+
+stderr | server/__tests__/batch-approve.test.ts > Batch Approval > should skip already-locked requests
+[ActionRequests] Unknown checklistKey: test.key.2
+
+stdout | server/__tests__/smoke.stripe-checkout-webhook.test.ts > smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent) > processes once; replay increments retryCount but no duplicate side-effects
+[Email] ✅ Sent via Resend: deployment_started to smoke+stripe-9cd1e63a-691b-4c02-8381-028b672eb838@launchbase-test.com
+
+stderr | server/__tests__/smoke.stripe-checkout-webhook.test.ts > smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent) > processes once; replay increments retryCount but no duplicate side-effects
+[Stripe Webhook] Deployment safety gates failed for intake 37: [
+  {
+    check: 'build_plan_exists',
+    passed: false,
+    reason: 'No build plan found for this intake'
+  },
+  {
+    check: 'preview_token_exists',
+    passed: false,
+    reason: 'No preview token found'
+  },
+  {
+    check: 'approval_exists',
+    passed: false,
+    reason: 'Customer has not approved the build plan'
+  }
+]
+
+stderr | server/__tests__/batch-approve.test.ts > Batch Approval > should handle partial failures gracefully
+[ActionRequests] Unknown checklistKey: test.key.0
+
+stdout | server/setIntakeStatus.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ↓ server/__tests__/confidence-learning.test.ts (9 tests | 9 skipped)
+stderr | server/__tests__/batch-approve.test.ts > Batch Approval > should handle partial failures gracefully
+[ActionRequests] Unknown checklistKey: test.key.1
+
+ ✓ server/__tests__/batch-approve.test.ts (3 tests) 1283ms
+   ✓ Batch Approval > should approve all 3 requests in batch 868ms
+stdout | server/__tests__/smoke.stripe-checkout-webhook.test.ts > smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent) > processes once; replay increments retryCount but no duplicate side-effects
+[Webhook body debug] isBuffer= true typeof= object content-type= application/json first20= {"id":"evt_2e3c05788
+[Stripe Webhook] Received event: checkout.session.completed (evt_2e3c05788f814ae4be59da7369c53b1b)
+
+stdout | server/__tests__/smoke.stripe-checkout-webhook.test.ts > smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent) > processes once; replay increments retryCount but no duplicate side-effects
+[Stripe Webhook] ✅ Duplicate checkout completion ignored (session cs_test_8ae13664bb5c48b0a076b7413559764c, intake 37)
+
+ ✓ server/__tests__/smoke.stripe-checkout-webhook.test.ts (1 test) 947ms
+   ✓ smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent) > processes once; replay increments retryCount but no duplicate side-effects 818ms
+stdout | server/statusTransitions.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/statusTransitions.test.ts (19 tests) 13ms
+stdout | server/__tests__/smoke.email-delivery.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/setIntakeStatus.test.ts > setIntakeStatus
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+stderr | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > rejects missing signature
+[Stripe Webhook] Missing stripe-signature header
+
+stdout | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+stdout | server/ai/modelRouting/featureAliases.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/ai/modelRouting/featureAliases.test.ts (13 tests) 8ms
+stderr | server/setIntakeStatus.test.ts > setIntakeStatus > rejects invalid transition without override (new → approved)
+[Database] Transition not allowed: new → approved. Allowed: review, needs_info, paid
+
+stdout | server/analytics.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed
+[Webhook body debug] isBuffer= true typeof= object content-type= application/json first20= {"id":"evt_176892932
+[Stripe Webhook] Received event: checkout.session.completed (evt_1768929327941)
+
+stdout | server/setIntakeStatus.test.ts > setIntakeStatus > allows override with overrideReason and creates event
+[Database] Status change: intake 40: new → approved (actor: admin #admin123, reason: manual admin fix for testing, overridden: true)
+
+stdout | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed
+[Stripe Webhook] ✅ Successfully claimed session cs_test_1768929327941 for intake 41
+
+stdout | server/setIntakeStatus.test.ts > setIntakeStatus > creates event for valid transition
+[Database] Status change: intake 40: approved → new (actor: system, reason: reset for test, overridden: true)
+
+stdout | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed
+[Stripe Webhook] Intake 41 marked as paid
+
+stdout | server/setIntakeStatus.test.ts > setIntakeStatus > creates event for valid transition
+[Database] Status change: intake 40: new → review (actor: system, reason: automated transition, overridden: false)
+
+ ✓ server/setIntakeStatus.test.ts (4 tests) 239ms
+stdout | server/ai/__tests__/runAiTennis.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/analytics.test.ts > Analytics Service > trackEvent > should track a page view event
+[Analytics] Tracked: page_view_home { eventName: 'page_view_home', sessionId: 'test_session_123' }
+
+stdout | server/analytics.test.ts > Analytics Service > trackEvent > should track an onboarding step event with step number
+[Analytics] Tracked: onboarding_step_completed {
+  eventName: 'onboarding_step_completed',
+  sessionId: 'test_session_123',
+  stepNumber: 3,
+  vertical: 'trades'
+}
+
+stdout | server/analytics.test.ts > Analytics Service > trackEvent > should track an onboarding completion event with intake ID
+[Analytics] Tracked: onboarding_completed {
+  eventName: 'onboarding_completed',
+  sessionId: 'test_session_123',
+  intakeId: 42,
+  vertical: 'appointments'
+}
+
+stdout | server/analytics.test.ts > Analytics Service > trackEvent > should track event with metadata
+[Analytics] Tracked: cta_click_start_intake {
+  eventName: 'cta_click_start_intake',
+  sessionId: 'test_session_123',
+  metadata: { source: 'hero_button', variant: 'A' }
+}
+
+stdout | server/analytics.test.ts > Analytics Event Types > should accept valid landing page events
+[Analytics] Tracked: page_view_home { eventName: 'page_view_home' }
+[Analytics] Tracked: cta_click_start_intake { eventName: 'cta_click_start_intake' }
+
+stdout | server/analytics.test.ts > Analytics Event Types > should accept valid onboarding events
+[Analytics] Tracked: onboarding_started { eventName: 'onboarding_started' }
+[Analytics] Tracked: onboarding_step_viewed { eventName: 'onboarding_step_viewed' }
+[Analytics] Tracked: onboarding_step_completed { eventName: 'onboarding_step_completed' }
+[Analytics] Tracked: onboarding_completed { eventName: 'onboarding_completed' }
+[Analytics] Tracked: onboarding_abandoned { eventName: 'onboarding_abandoned' }
+
+ ✓ server/analytics.test.ts (11 tests) 19ms
+stdout | server/analytics.test.ts > Analytics Event Types > should accept valid build quality events
+[Analytics] Tracked: build_plan_generated { eventName: 'build_plan_generated' }
+[Analytics] Tracked: clarification_requested { eventName: 'clarification_requested' }
+[Analytics] Tracked: build_approved_first_pass { eventName: 'build_approved_first_pass' }
+[Analytics] Tracked: build_revision_requested { eventName: 'build_revision_requested' }
+
+stdout | server/worker.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/smoke.email-delivery.test.ts > smoke.email-delivery
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+ ✓ server/worker.test.ts (10 tests) 8ms
+ ↓ server/ai/__tests__/runAiTennis.test.ts (8 tests | 8 skipped)
+stdout | server/ai/modelRouting/modelNormalize.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/smoke.facebook-mutations.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/ai/modelRouting/modelNormalize.test.ts (17 tests) 10ms
+stdout | server/api-routing-guardrails.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed
+[Email] ✅ Sent via Resend: deployment_started to idem-1768929327823@launchbase-test.com
+
+stderr | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed
+[Stripe Webhook] Deployment safety gates failed for intake 41: [
+  {
+    check: 'build_plan_exists',
+    passed: false,
+    reason: 'No build plan found for this intake'
+  },
+  {
+    check: 'preview_token_exists',
+    passed: false,
+    reason: 'No preview token found'
+  },
+  {
+    check: 'approval_exists',
+    passed: false,
+    reason: 'Customer has not approved the build plan'
+  }
+]
+
+stdout | server/ai/modelRouting/__tests__/modelRouter.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/ai/modelRouting/__tests__/modelRouter.test.ts (4 tests) 7ms
+stdout | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed
+[Webhook body debug] isBuffer= true typeof= object content-type= application/json first20= {"id":"evt_176892932
+[Stripe Webhook] Received event: checkout.session.completed (evt_1768929327941)
+
+stdout | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed
+[Stripe Webhook] ✅ Duplicate checkout completion ignored (session cs_test_1768929327941, intake 41)
+
+ ✓ server/__tests__/smoke.stripe-webhook.test.ts (2 tests) 1121ms
+   ✓ smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed 1051ms
+stdout | server/suiteApply.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/suiteApply.test.ts (6 tests) 5ms
+stdout | server/__tests__/smoke.stripe-invoice.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/api-routing-guardrails.test.ts
+[OAuth] Initialized with baseURL: https://api.manus.im
+
+stdout | server/ai/modelRouting/__tests__/modelPolicy.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/ai/modelRouting/__tests__/modelPolicy.test.ts (5 tests) 7ms
+stdout | server/__tests__/smoke.email-delivery.test.ts > smoke.email-delivery > sendEmail() succeeds and logs to email_logs
+[Email] ✅ Sent via Resend: intake_confirmation to vince@vincessnowplow.com
+
+stdout | server/__tests__/cron-alerts-auth.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/smoke.facebook-mutations.test.ts > SMOKE: Facebook Mutations (End-to-End) > blocks posting when daily cap is reached (2 posts)
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+stdout | server/__tests__/smoke.facebook-mutations.test.ts > SMOKE: Facebook Mutations (End-to-End) > blocks posting when daily cap is reached (2 posts)
+✅ Cap block validated (end-to-end)
+
+ ✓ server/__tests__/smoke.facebook-mutations.test.ts (1 test) 207ms
+stdout | server/__tests__/smoke.stripe-invoice.test.ts
+[OAuth] Initialized with baseURL: https://api.manus.im
+
+stdout | server/ai/engine/__tests__/swarm.replay.invariants.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/api-routing-guardrails.test.ts > API guardrails (never repeat cron + SPA issues) > cron health returns JSON and includes db status
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+stdout | server/__tests__/cron-alerts-auth.test.ts
+[OAuth] Initialized with baseURL: https://api.manus.im
+
+stdout | server/ai/engine/__tests__/swarm.replay.invariants.test.ts > Swarm Replay Invariants > apply_ok: produces APPLY decision
+[swarm] role=craft override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-apply-ok:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=apply_ok run=test-apply-ok role=craft idx=0
+[swarm] role=critic override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-apply-ok:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=apply_ok run=test-apply-ok role=critic idx=0
+[swarm] role=craft override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-apply-ok:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=apply_ok run=test-apply-ok role=craft idx=1
+[swarm] role=critic override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-apply-ok:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=apply_ok run=test-apply-ok role=critic idx=1
+
+stderr | server/ai/engine/__tests__/swarm.replay.invariants.test.ts > Swarm Replay Invariants > apply_ok: produces APPLY decision
+[swarm] Critic output missing required field 'pass', applying schema gate
+[swarm] Critic output missing required field 'pass', applying schema gate
+
+stdout | server/ai/engine/__tests__/swarm.replay.invariants.test.ts > Swarm Replay Invariants > reject_ok: produces REJECT decision
+[swarm] role=craft override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-reject-ok:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=apply_ok run=test-reject-ok role=craft idx=0
+[swarm] role=critic override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-reject-ok:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=apply_ok run=test-reject-ok role=critic idx=0
+[swarm] role=craft override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-reject-ok:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=apply_ok run=test-reject-ok role=craft idx=1
+[swarm] role=critic override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-reject-ok:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=apply_ok run=test-reject-ok role=critic idx=1
+
+stderr | server/ai/engine/__tests__/swarm.replay.invariants.test.ts > Swarm Replay Invariants > reject_ok: produces REJECT decision
+[swarm] Critic output missing required field 'pass', applying schema gate
+[swarm] Critic output missing required field 'pass', applying schema gate
+
+stdout | server/ai/engine/__tests__/swarm.replay.invariants.test.ts > Swarm Replay Invariants > revise_then_apply: triggers iteration loop
+[swarm] role=craft override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-revise-apply:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=apply_ok run=test-revise-apply role=craft idx=0
+[swarm] role=critic override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-revise-apply:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=apply_ok run=test-revise-apply role=critic idx=0
+[swarm] role=craft override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-revise-apply:swarm.specialist.craft:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=apply_ok run=test-revise-apply role=craft idx=1
+[swarm] role=critic override.system=false override.user=false
+[completeJson] calling provider.chat {
+  transport: 'replay',
+  provider: 'Object',
+  trace: 'test-revise-apply:swarm.specialist.critic:0',
+  model: 'gpt-4o-mini'
+}
+[replay] id=apply_ok run=test-revise-apply role=critic idx=1
+
+stderr | server/ai/engine/__tests__/swarm.replay.invariants.test.ts > Swarm Replay Invariants > revise_then_apply: triggers iteration loop
+[swarm] Critic output missing required field 'pass', applying schema gate
+[swarm] Critic output missing required field 'pass', applying schema gate
+
+ ✓ server/ai/engine/__tests__/swarm.replay.invariants.test.ts (3 tests) 14ms
+stdout | server/__tests__/smoke.email-delivery.test.ts > smoke.email-delivery > enforces Resend routing when RESEND_API_KEY is present
+[Email] ✅ Sent via Resend: intake_confirmation to vince@vincessnowplow.com
+
+ ✓ server/api-routing-guardrails.test.ts (5 tests) 216ms
+stdout | server/__tests__/smoke.email-delivery.test.ts > smoke.email-delivery > enforces Resend routing when RESEND_API_KEY is present
+[Smoke Test] ✅ Resend routing enforced (no fallback)
+
+ ✓ server/__tests__/smoke.email-delivery.test.ts (2 tests) 2059ms
+   ✓ smoke.email-delivery > sendEmail() succeeds and logs to email_logs 1304ms
+   ✓ smoke.email-delivery > enforces Resend routing when RESEND_API_KEY is present 625ms
+stdout | server/__tests__/smoke.facebook-policy.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/emails/emailCopy.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/emails/emailCopy.test.ts (9 tests) 9ms
+stdout | server/__tests__/smoke.stripe-invoice.test.ts > smoke: stripe invoice.paid webhook > activates subscription and dedupes on eventId
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+stdout | server/__tests__/smoke.stripe-invoice.test.ts > smoke: stripe invoice.paid webhook > activates subscription and dedupes on eventId
+[Webhook body debug] isBuffer= true typeof= object content-type= application/json first20= {"id":"evt_176892933
+[Stripe Webhook] Received event: invoice.paid (evt_1768929330382)
+
+stdout | server/ai/modelRouting/__tests__/modelRegistry.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/ai/modelRouting/__tests__/modelRegistry.test.ts (4 tests) 8ms
+stdout | server/__tests__/smoke.stripe-invoice.test.ts > smoke: stripe invoice.paid webhook > activates subscription and dedupes on eventId
+[Stripe Webhook] SMI module activated for user 1
+
+stdout | server/__tests__/smoke.stripe-invoice.test.ts > smoke: stripe invoice.paid webhook > activates subscription and dedupes on eventId
+[Webhook body debug] isBuffer= true typeof= object content-type= application/json first20= {"id":"evt_176892933
+[Stripe Webhook] Received event: invoice.paid (evt_1768929330382)
+
+stdout | server/__tests__/facebook-webhook.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/smoke.stripe-invoice.test.ts > smoke: stripe invoice.paid webhook > activates subscription and dedupes on eventId
+[Stripe Webhook] SMI module activated for user 1
+
+ ✓ server/__tests__/smoke.stripe-invoice.test.ts (1 test) 309ms
+   ✓ smoke: stripe invoice.paid webhook > activates subscription and dedupes on eventId 308ms
+stdout | server/__tests__/smoke.facebook-policy.test.ts > SMOKE: Facebook Policy > checkFacebookPostingPolicy returns valid PolicyCheckResult
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+stdout | server/__tests__/template-versioning.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stderr | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Authentication > should reject requests without token
+[Alerts] Unauthorized request - invalid token
+
+stderr | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Authentication > should reject requests with invalid token
+[Alerts] Unauthorized request - invalid token
+
+stdout | server/__tests__/smoke.facebook-policy.test.ts > SMOKE: Facebook Policy > checkFacebookPostingPolicy returns valid PolicyCheckResult
+✅ Policy contract validated: BLOCK
+
+stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Authentication > should accept requests with valid token (x-worker-token header)
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+stdout | server/__tests__/smoke.facebook-policy.test.ts > SMOKE: Facebook Policy > returns BLOCK action when connection is missing
+✅ Connection missing validated
+
+ ✓ server/__tests__/smoke.facebook-policy.test.ts (2 tests) 140ms
+stdout | server/__tests__/health-dashboard.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Authentication > should accept requests with valid token (x-worker-token header)
+[Cron] Started worker run: 146f9b04-f42e-4a2e-929a-84cf696fccd4
+
+stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Authentication > should accept requests with valid token (x-worker-token header)
+[Alerts] Resolved alert: health:email_failures (launchbase|health:email_failures|3plus)
+[Alerts] Processed alerts for tenant: launchbase
+
+stdout | server/__tests__/facebook-webhook.test.ts > Facebook Webhook > handleWebhookVerification > should verify webhook with correct token
+[Facebook Webhook] Verification successful
+
+stderr | server/__tests__/facebook-webhook.test.ts > Facebook Webhook > handleWebhookVerification > should reject webhook with incorrect token
+[Facebook Webhook] Verification failed { mode: 'subscribe', token: 'wrong_token' }
+
+stderr | server/__tests__/facebook-webhook.test.ts > Facebook Webhook > handleWebhookVerification > should reject webhook with incorrect mode
+[Facebook Webhook] Verification failed { mode: 'unsubscribe', token: 'launchbase_fb_webhook_2026' }
+
+ ✓ server/__tests__/facebook-webhook.test.ts (7 tests) 10ms
+stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Authentication > should accept requests with valid token (x-worker-token header)
+[Alerts] Processed alerts for tenant: vinces
+
+stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Authentication > should accept requests with valid token (Authorization Bearer header)
+[Alerts] Rate limited - last run was 0s ago
+
+stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Rate Limiting > should rate limit rapid successive calls
+[Alerts] Rate limited - last run was 0s ago
+
+stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Rate Limiting > should rate limit rapid successive calls
+[Alerts] Rate limited - last run was 0s ago
+[Cron] Finished worker run: 146f9b04-f42e-4a2e-929a-84cf696fccd4
+
+stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Rate Limiting > should allow calls after rate limit window expires
+[Alerts] Rate limited - last run was 0s ago
+
+ ✓ server/__tests__/cron-alerts-auth.test.ts (6 tests) 268ms
+stdout | server/ai/engine/__tests__/bootstrap.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/template-versioning.test.ts > Template Versioning
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+stdout | server/ai/engine/__tests__/swarm.record.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/ai/engine/__tests__/bootstrap.test.ts (4 tests) 10ms
+ ✓ server/ai/engine/__tests__/swarm.record.test.ts (3 tests) 6ms
+stdout | server/ai/providers/aimlProvider.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/health-dashboard.test.ts > Health Dashboard > should return health metrics with correct structure
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+ ✓ server/__tests__/template-versioning.test.ts (4 tests) 196ms
+ ↓ server/ai/providers/aimlProvider.test.ts (2 tests | 2 skipped)
+stdout | server/__tests__/smoke.emailCopy-websiteStatus.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/__tests__/health-dashboard.test.ts (4 tests) 197ms
+stdout | server/auth.logout.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/__tests__/smoke.emailCopy-websiteStatus.test.ts (3 tests) 4ms
+stdout | server/utils/__tests__/idempotency.rowsAffected.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/__meta__/modelRegistry.mock.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ↓ server/__tests__/__meta__/modelRegistry.mock.test.ts (1 test | 1 skipped)
+ ✓ server/utils/__tests__/idempotency.rowsAffected.test.ts (3 tests) 3ms
+ ✓ server/auth.logout.test.ts (1 test) 5ms
+
+ Test Files  62 passed | 9 skipped (71)
+      Tests  579 passed | 59 skipped (638)
+   Start at  12:14:59
+   Duration  32.91s (transform 2.31s, setup 247ms, collect 25.76s, tests 20.17s, environment 17ms, prepare 6.25s)
+
