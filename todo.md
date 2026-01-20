@@ -3012,3 +3012,20 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
   - Provides next steps guidance
   - Includes swarm hook placeholder for future automation
   - Usage: `./scripts/test/repairLoop.sh`
+
+
+## Resend Mock Refactoring (Pattern 3 - Boundary Mocking)
+
+- [ ] Identify the boundary module for Resend adapter (e.g., server/emails/providers/resend.ts)
+- [ ] Remove global Resend mocks from email.test.ts (lines 23-32)
+- [ ] Remove global Resend mocks from smoke.email-delivery.test.ts
+- [ ] Add boundary mock to smoke.email-delivery.test.ts using vi.doMock()
+  - Use vi.resetModules() in beforeEach
+  - Mock the internal provider adapter, not the SDK
+  - Import sendEmail after mocking
+- [ ] Add fallback test to email.test.ts
+  - Force Resend failure by mocking adapter to throw
+  - Assert provider === "notification"
+  - Assert no timeout/hang
+- [ ] Verify all tests pass with `pnpm vitest run`
+- [ ] Save checkpoint with clean boundary-mocked tests

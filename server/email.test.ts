@@ -6,6 +6,13 @@ vi.mock("./db", () => ({
     insert: vi.fn(() => ({
       values: vi.fn(() => Promise.resolve()),
     })),
+    select: vi.fn(() => ({
+      from: vi.fn(() => ({
+        where: vi.fn(() => ({
+          limit: vi.fn(() => Promise.resolve([])), // Return empty array for idempotency check
+        })),
+      })),
+    })),
   })),
   getIntakeById: vi.fn(() => Promise.resolve({
     id: 1,
@@ -19,17 +26,6 @@ vi.mock("./db", () => ({
 vi.mock("./_core/notification", () => ({
   notifyOwner: vi.fn(() => Promise.resolve(true)),
 }));
-
-// Mock Resend to always succeed
-vi.mock("resend", () => {
-  return {
-    Resend: vi.fn().mockImplementation(() => ({
-      emails: {
-        send: vi.fn(async () => ({ id: "test-email-id" })),
-      },
-    })),
-  };
-});
 
 import { getEmailTemplate, sendEmail } from "./email";
 
@@ -121,8 +117,23 @@ describe("Email Service", () => {
   });
 
   describe("sendEmail", () => {
+    beforeEach(() => {
+      vi.resetModules();
+    });
+
     it("should send email and return true on success", async () => {
-      const result = await sendEmail(1, "intake_confirmation", {
+      // Mock "resend" package directly to intercept new Resend()
+      vi.doMock("resend", () => {
+        class Resend {
+          emails = {
+            send: vi.fn(async () => ({ id: "test-msg" })),
+          };
+        }
+        return { Resend };
+      });
+
+      const emailMod = await import("./email");
+      const result = await emailMod.sendEmail(1, "intake_confirmation", {
         firstName: "John",
         businessName: "Smith Plumbing",
         email: "john@smithplumbing.com",
@@ -132,9 +143,20 @@ describe("Email Service", () => {
     });
 
     it("should log email to database", async () => {
+      // Mock "resend" package directly to intercept new Resend()
+      vi.doMock("resend", () => {
+        class Resend {
+          emails = {
+            send: vi.fn(async () => ({ id: "test-msg" })),
+          };
+        }
+        return { Resend };
+      });
+
       const { getDb } = await import("./db");
+      const emailMod = await import("./email");
       
-      await sendEmail(1, "ready_for_review", {
+      await emailMod.sendEmail(1, "ready_for_review", {
         firstName: "John",
         businessName: "Smith Plumbing",
         email: "john@smithplumbing.com",
@@ -142,6 +164,30 @@ describe("Email Service", () => {
       });
       
       expect(getDb).toHaveBeenCalled();
+    });
+
+    it("should fallback to notification when Resend fails", async () => {
+      // Mock "resend" package to throw error (simulating Resend failure)
+      vi.doMock("resend", () => {
+        class Resend {
+          emails = {
+            send: vi.fn(async () => {
+              throw new Error("Resend API error");
+            }),
+          };
+        }
+        return { Resend };
+      });
+
+      const emailMod = await import("./email");
+      const result = await emailMod.sendEmail(1, "intake_confirmation", {
+        firstName: "John",
+        businessName: "Smith Plumbing",
+        email: "john@smithplumbing.com",
+      });
+      
+      expect(result.ok).toBe(true);
+      expect(result.provider).toBe("notification");
     });
   });
 

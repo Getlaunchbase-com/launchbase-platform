@@ -1,13 +1,13 @@
 {
   "summary": {
-    "total": 4,
+    "total": 11,
     "tier0": 0,
     "tier1": 0,
-    "tier2": 4,
+    "tier2": 11,
     "topReasons": [
       [
         "uncategorized; likely integration or deeper coupling",
-        4
+        11
       ]
     ]
   },
@@ -21,7 +21,37 @@
         "reason": "uncategorized; likely integration or deeper coupling"
       },
       {
+        "raw": "     → expected { ok: true, …(2) } to deeply equal { ok: true, provider: 'resend' }",
+        "tier": "tier2",
+        "reason": "uncategorized; likely integration or deeper coupling"
+      },
+      {
         "raw": "     → expected 'notification' to be 'resend' // Object.is equality",
+        "tier": "tier2",
+        "reason": "uncategorized; likely integration or deeper coupling"
+      },
+      {
+        "raw": "     → expected 2 to be 1 // Object.is equality",
+        "tier": "tier2",
+        "reason": "uncategorized; likely integration or deeper coupling"
+      },
+      {
+        "raw": " FAIL  server/email.test.ts > Email Service > sendEmail > should send email and return true on success",
+        "tier": "tier2",
+        "reason": "uncategorized; likely integration or deeper coupling"
+      },
+      {
+        "raw": "AssertionError: expected { ok: true, …(2) } to deeply equal { ok: true, provider: 'resend' }",
+        "tier": "tier2",
+        "reason": "uncategorized; likely integration or deeper coupling"
+      },
+      {
+        "raw": " FAIL  server/__tests__/smoke.email-delivery.test.ts > smoke.email-delivery > sendEmail() succeeds and logs to email_logs",
+        "tier": "tier2",
+        "reason": "uncategorized; likely integration or deeper coupling"
+      },
+      {
+        "raw": "AssertionError: expected 'notification' to be 'resend' // Object.is equality",
         "tier": "tier2",
         "reason": "uncategorized; likely integration or deeper coupling"
       },
@@ -31,7 +61,12 @@
         "reason": "uncategorized; likely integration or deeper coupling"
       },
       {
-        "raw": "AssertionError: expected 'notification' to be 'resend' // Object.is equality",
+        "raw": " FAIL  server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed",
+        "tier": "tier2",
+        "reason": "uncategorized; likely integration or deeper coupling"
+      },
+      {
+        "raw": "AssertionError: expected 2 to be 1 // Object.is equality",
         "tier": "tier2",
         "reason": "uncategorized; likely integration or deeper coupling"
       }

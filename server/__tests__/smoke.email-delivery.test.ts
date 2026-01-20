@@ -9,21 +9,9 @@
  * This runs in CI via `pnpm smoke` with no human login required.
  */
 
-import { describe, it, expect, beforeAll, vi } from "vitest";
-
-// Mock Resend to always succeed (deterministic happy path)
-vi.mock("resend", () => {
-  return {
-    Resend: vi.fn().mockImplementation(() => ({
-      emails: {
-        send: vi.fn(async () => ({ id: "test-email-id-" + Date.now() })),
-      },
-    })),
-  };
-});
+import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
 import { getDb } from "../db";
 import { intakes, emailLogs } from "../../drizzle/schema";
-import { sendEmail } from "../email";
 import { eq, desc } from "drizzle-orm";
 import { ENV } from "../_core/env";
 
@@ -31,6 +19,10 @@ describe.sequential("smoke.email-delivery", () => {
   let testIntakeId: number;
   // Use allowed test email (Resend test mode restriction)
   const testEmail = "vince@vincessnowplow.com";
+
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
 
   beforeAll(async () => {
     const db = await getDb();
@@ -56,8 +48,24 @@ describe.sequential("smoke.email-delivery", () => {
   });
 
   it("sendEmail() succeeds and logs to email_logs", async () => {
+    // Reset modules before mocking to ensure clean state
+    vi.resetModules();
+
+    // Mock "resend" package directly to intercept new Resend()
+    vi.doMock("resend", () => {
+      class Resend {
+        emails = {
+          send: vi.fn(async () => ({ id: "test-msg-1" })),
+        };
+      }
+      return { Resend };
+    });
+
     const db = await getDb();
     if (!db) throw new Error("Database not available");
+
+    // Import sendEmail AFTER mock
+    const { sendEmail } = await import("../email");
 
     // Call sendEmail directly
     const success = await sendEmail(testIntakeId, "intake_confirmation", {
@@ -87,6 +95,19 @@ describe.sequential("smoke.email-delivery", () => {
   });
 
   it("enforces Resend routing when RESEND_API_KEY is present", async () => {
+    // Reset modules before mocking to ensure clean state
+    vi.resetModules();
+
+    // Mock "resend" package directly to intercept new Resend()
+    vi.doMock("resend", () => {
+      class Resend {
+        emails = {
+          send: vi.fn(async () => ({ id: "test-msg-2" })),
+        };
+      }
+      return { Resend };
+    });
+
     // This test proves routing observability
     // If RESEND_API_KEY is set, we MUST use Resend (not notification fallback)
     
@@ -99,7 +120,8 @@ describe.sequential("smoke.email-delivery", () => {
     if (!db) throw new Error("Database not available");
 
     // Pattern A: Insert + select by unique email
-    const routingEmail = "vince@vincessnowplow.com";
+    // Use different email from first test to avoid ID collision
+    const routingEmail = "routing-test@vincessnowplow.com";
     await db.insert(intakes).values({
       email: routingEmail,
       businessName: "Routing Test Co",
@@ -126,6 +148,9 @@ describe.sequential("smoke.email-delivery", () => {
         consoleLogs.push(args.join(" "));
         originalLog(...args);
       };
+
+      // Import sendEmail AFTER mock
+      const { sendEmail } = await import("../email");
 
       const success = await sendEmail(routingIntakeId, "intake_confirmation", {
         firstName: "Routing User",

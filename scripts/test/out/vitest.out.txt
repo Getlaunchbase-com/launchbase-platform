@@ -17,14 +17,6 @@ Reading schema files:
 [✓] Changes applied
 [Vitest Setup] Schema applied successfully ✓
 [Vitest Setup] Test database ready ✓
-stdout | server/ai/engine/__tests__/swarm.golden.invariants.test.ts
-[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
-[Vitest Setup] Canonical DATABASE_URL set
-[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
-[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
-[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
-[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
-
 stdout | server/ai/validateAiOutput.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -34,6 +26,14 @@ stdout | server/ai/validateAiOutput.test.ts
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
 stdout | server/utils/__tests__/idempotency.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/ai/engine/__tests__/swarm.golden.invariants.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
 [Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
@@ -57,8 +57,8 @@ stdout | server/ai/engine/__tests__/swarm.gate2.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
- ✓ server/intelligence-layers.test.ts (36 tests) 19ms
- ✓ server/ai/validateAiOutput.test.ts (24 tests) 27ms
+ ✓ server/intelligence-layers.test.ts (36 tests) 14ms
+ ✓ server/ai/validateAiOutput.test.ts (24 tests) 24ms
 stdout | server/__tests__/alerts-forever.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -676,20 +676,9 @@ You MUST output ONLY a ...
 }
 [replay] id=reject_no_edits__golden_v1 run=test-reject_no_edits__golden_v1-drift-2 role=critic idx=1
 
- ✓ server/ai/engine/__tests__/swarm.golden.invariants.test.ts (12 tests) 41ms
+ ✓ server/ai/engine/__tests__/swarm.golden.invariants.test.ts (12 tests) 37ms
  ↓ server/ai/engine/__tests__/swarm.gate2.test.ts (8 tests | 8 skipped)
-stdout | server/utils/__tests__/idempotency.test.ts > withIdempotency > executes operation on first call
-[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
-
 stdout | server/ai/engine/__tests__/swarm.gate4.test.ts
-[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
-[Vitest Setup] Canonical DATABASE_URL set
-[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
-[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
-[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
-[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
-
-stdout | server/ai/enforceSectionCaps.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
 [Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
@@ -705,7 +694,18 @@ stdout | server/routers/actionRequestsRouter.aiProposeCopy.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
- ✓ server/ai/enforceSectionCaps.test.ts (15 tests) 10ms
+stdout | server/ai/enforceSectionCaps.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/utils/__tests__/idempotency.test.ts > withIdempotency > executes operation on first call
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+ ✓ server/ai/enforceSectionCaps.test.ts (15 tests) 17ms
  ↓ server/ai/engine/__tests__/swarm.gate4.test.ts (7 tests | 7 skipped)
 stdout | server/__tests__/alerts-forever.test.ts > Alert System - Cooldown & Dedupe > should send email only once for same fingerprint
 [DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
@@ -732,10 +732,10 @@ stdout | server/__tests__/alerts-forever.test.ts > Alert System - Cooldown & Ded
 stdout | server/__tests__/alerts-forever.test.ts > Alert System - Cooldown & Dedupe > should send email only once for same fingerprint
 [Alerts] Updated existing alert: health:email_failures (launchbase|health:email_failures|3plus)
 
- ↓ server/ai/engine/__tests__/swarm.gate3.test.ts (6 tests | 6 skipped)
 stdout | server/__tests__/alerts-forever.test.ts > Alert System - Cooldown & Dedupe > should send new email when fingerprint changes (bucket escalation)
 [Alerts] Sent new alert: health:email_failures (launchbase|health:email_failures|3plus) to vince@vincessnowplow.com
 
+ ↓ server/ai/engine/__tests__/swarm.gate3.test.ts (6 tests | 6 skipped)
 stdout | server/__tests__/alerts-forever.test.ts > Alert System - Cooldown & Dedupe > should send new email when fingerprint changes (bucket escalation)
 [Alerts] Sent new alert: health:email_failures (launchbase|health:email_failures|10plus) to vince@vincessnowplow.com
 
@@ -812,6 +812,9 @@ stdout | server/ai/__tests__/promptPack.validation.test.ts > Memory Transport > 
   model: 'test-model'
 }
 
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Tenant Isolation > should isolate vinces alerts from launchbase queries
+[Alerts] Sent new alert: health:email_failures (vinces|health:email_failures|3plus) to vince@vincessnowplow.com
+
 stdout | server/ai/__tests__/promptPack.validation.test.ts > Memory Transport > should never make real API calls
 [completeJson] calling provider.chat {
   transport: 'memory',
@@ -820,11 +823,14 @@ stdout | server/ai/__tests__/promptPack.validation.test.ts > Memory Transport > 
   model: 'gpt-4o-mini'
 }
 
- ✓ server/ai/__tests__/promptPack.validation.test.ts (12 tests) 19ms
+ ✓ server/ai/__tests__/promptPack.validation.test.ts (12 tests) 20ms
 stdout | server/__tests__/alerts-forever.test.ts > Alert System - Tenant Isolation > should isolate vinces alerts from launchbase queries
+[Alerts] Sent new alert: health:email_failures (launchbase|health:email_failures|3plus) to vince@vincessnowplow.com
+
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Tenant Isolation > should not resolve vinces alerts when launchbase condition clears
 [Alerts] Sent new alert: health:email_failures (vinces|health:email_failures|3plus) to vince@vincessnowplow.com
 
-stdout | server/__tests__/alerts-forever.test.ts > Alert System - Tenant Isolation > should isolate vinces alerts from launchbase queries
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Tenant Isolation > should not resolve vinces alerts when launchbase condition clears
 [Alerts] Sent new alert: health:email_failures (launchbase|health:email_failures|3plus) to vince@vincessnowplow.com
 
 stdout | server/ai/engine/__tests__/policy.test.ts
@@ -836,12 +842,12 @@ stdout | server/ai/engine/__tests__/policy.test.ts
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
 stdout | server/__tests__/alerts-forever.test.ts > Alert System - Tenant Isolation > should not resolve vinces alerts when launchbase condition clears
-[Alerts] Sent new alert: health:email_failures (vinces|health:email_failures|3plus) to vince@vincessnowplow.com
+[Alerts] Resolved alert: health:email_failures (launchbase|health:email_failures|3plus)
 
-stdout | server/__tests__/alerts-forever.test.ts > Alert System - Tenant Isolation > should not resolve vinces alerts when launchbase condition clears
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Auto-Resolve > should resolve alert when condition clears
 [Alerts] Sent new alert: health:email_failures (launchbase|health:email_failures|3plus) to vince@vincessnowplow.com
 
-stdout | server/__tests__/alerts-forever.test.ts > Alert System - Tenant Isolation > should not resolve vinces alerts when launchbase condition clears
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Auto-Resolve > should resolve alert when condition clears
 [Alerts] Resolved alert: health:email_failures (launchbase|health:email_failures|3plus)
 
 stdout | server/ai/engine/__tests__/swarm.test.ts
@@ -852,20 +858,13 @@ stdout | server/ai/engine/__tests__/swarm.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
-stdout | server/__tests__/alerts-forever.test.ts > Alert System - Auto-Resolve > should resolve alert when condition clears
-[Alerts] Sent new alert: health:email_failures (launchbase|health:email_failures|3plus) to vince@vincessnowplow.com
-
-stdout | server/__tests__/alerts-forever.test.ts > Alert System - Auto-Resolve > should resolve alert when condition clears
-[Alerts] Resolved alert: health:email_failures (launchbase|health:email_failures|3plus)
-
- ✓ server/ai/engine/__tests__/policy.test.ts (11 tests) 33ms
 stdout | server/__tests__/alerts-forever.test.ts > Alert System - Auto-Resolve > should not send email when resolving alert
 [Alerts] Sent new alert: health:email_failures (launchbase|health:email_failures|3plus) to vince@vincessnowplow.com
 
 stdout | server/__tests__/alerts-forever.test.ts > Alert System - Auto-Resolve > should not send email when resolving alert
 [Alerts] Resolved alert: health:email_failures (launchbase|health:email_failures|3plus)
 
- ↓ server/ai/engine/__tests__/swarm.test.ts (7 tests | 7 skipped)
+ ✓ server/ai/engine/__tests__/policy.test.ts (11 tests) 39ms
 stdout | server/__tests__/alerts-forever.test.ts > Alert System - Auto-Resolve > should handle multiple alerts resolving simultaneously
 [Alerts] Sent new alert: health:email_failures (launchbase|health:email_failures|3plus) to vince@vincessnowplow.com
 
@@ -875,6 +874,7 @@ stdout | server/__tests__/alerts-forever.test.ts > Alert System - Auto-Resolve >
 stdout | server/__tests__/alerts-forever.test.ts > Alert System - Auto-Resolve > should handle multiple alerts resolving simultaneously
 [Alerts] Sent new alert: health:deploy_failures (launchbase|health:deploy_failures|2plus) to vince@vincessnowplow.com
 
+ ↓ server/ai/engine/__tests__/swarm.test.ts (7 tests | 7 skipped)
 stdout | server/__tests__/alerts-forever.test.ts > Alert System - Auto-Resolve > should handle multiple alerts resolving simultaneously
 [Alerts] Resolved alert: health:email_failures (launchbase|health:email_failures|3plus)
 
@@ -884,6 +884,12 @@ stdout | server/__tests__/alerts-forever.test.ts > Alert System - Auto-Resolve >
 stdout | server/__tests__/alerts-forever.test.ts > Alert System - Auto-Resolve > should handle multiple alerts resolving simultaneously
 [Alerts] Resolved alert: health:deploy_failures (launchbase|health:deploy_failures|2plus)
 
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Time Determinism > should use frozen time for all timestamps
+[Alerts] Sent new alert: health:email_failures (launchbase|health:email_failures|3plus) to vince@vincessnowplow.com
+
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Time Determinism > should update lastSeenAt on dedupe with frozen time
+[Alerts] Sent new alert: health:email_failures (launchbase|health:email_failures|3plus) to vince@vincessnowplow.com
+
 stdout | server/__tests__/rollback.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -892,9 +898,10 @@ stdout | server/__tests__/rollback.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
-stdout | server/__tests__/alerts-forever.test.ts > Alert System - Time Determinism > should use frozen time for all timestamps
-[Alerts] Sent new alert: health:email_failures (launchbase|health:email_failures|3plus) to vince@vincessnowplow.com
+stdout | server/__tests__/alerts-forever.test.ts > Alert System - Time Determinism > should update lastSeenAt on dedupe with frozen time
+[Alerts] Updated existing alert: health:email_failures (launchbase|health:email_failures|3plus)
 
+ ✓ server/__tests__/alerts-forever.test.ts (9 tests) 912ms
 stdout | server/__tests__/facebook-mutations.policy.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -903,21 +910,11 @@ stdout | server/__tests__/facebook-mutations.policy.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
-stdout | server/__tests__/alerts-forever.test.ts > Alert System - Time Determinism > should update lastSeenAt on dedupe with frozen time
-[Alerts] Sent new alert: health:email_failures (launchbase|health:email_failures|3plus) to vince@vincessnowplow.com
-
-stdout | server/__tests__/alerts-forever.test.ts > Alert System - Time Determinism > should update lastSeenAt on dedupe with frozen time
-[Alerts] Updated existing alert: health:email_failures (launchbase|health:email_failures|3plus)
-
- ✓ server/__tests__/alerts-forever.test.ts (9 tests) 877ms
 stdout | server/routers/actionRequestsRouter.aiProposeCopy.test.ts > actionRequests.aiProposeCopy > should successfully generate copy proposal
 [DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
 
- ✓ server/utils/__tests__/idempotency.test.ts (15 tests) 1433ms
-   ✓ withIdempotency > OWNERSHIP GUARD: prevents lost updates during stale takeover 774ms
-stdout | server/__tests__/rollback.test.ts > Rollback Safety Rails
-[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
-
+ ✓ server/utils/__tests__/idempotency.test.ts (15 tests) 1455ms
+   ✓ withIdempotency > OWNERSHIP GUARD: prevents lost updates during stale takeover 776ms
 stdout | server/__tests__/smoke.email-localization.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -925,6 +922,9 @@ stdout | server/__tests__/smoke.email-localization.test.ts
 [Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/rollback.test.ts > Rollback Safety Rails
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
 
 stdout | server/__tests__/action-requests-ops.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
@@ -940,19 +940,12 @@ stdout | server/__tests__/rollback.test.ts > Rollback Safety Rails > should clon
 stdout | server/__tests__/rollback.test.ts > Rollback Safety Rails > should set trigger=rollback and rolledBackFromDeploymentId
 [Rollback] Created deployment 3 from source 1 for intake 4 (reason: Test trigger fields)
 
- ✓ server/__tests__/smoke.email-localization.test.ts (59 tests) 28ms
+ ✓ server/__tests__/smoke.email-localization.test.ts (59 tests) 25ms
 stdout | server/__tests__/action-requests-ops.test.ts > FOREVER: Action Request Ops Controls > FOREVER: resend rate limit blocks <10m, no sendCount increment, no RESENT event
 [DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
 
 stdout | server/__tests__/rollback.test.ts > Rollback Safety Rails > should return correct deployment IDs
 [Rollback] Created deployment 6 from source 1 for intake 4 (reason: Test return values)
-
- ✓ server/routers/actionRequestsRouter.aiProposeCopy.test.ts (9 tests) 779ms
-stdout | server/__tests__/rollback.test.ts > Rollback Safety Rails > should allow multiple rollbacks in sequence
-[Rollback] Created deployment 7 from source 1 for intake 4 (reason: First rollback)
-
-stdout | server/__tests__/rollback.test.ts > Rollback Safety Rails > should allow multiple rollbacks in sequence
-[Rollback] Created deployment 8 from source 7 for intake 4 (reason: Second rollback)
 
 stdout | server/setupPacket.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
@@ -962,7 +955,14 @@ stdout | server/setupPacket.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
- ✓ server/__tests__/rollback.test.ts (7 tests) 718ms
+stdout | server/__tests__/rollback.test.ts > Rollback Safety Rails > should allow multiple rollbacks in sequence
+[Rollback] Created deployment 7 from source 1 for intake 4 (reason: First rollback)
+
+ ✓ server/routers/actionRequestsRouter.aiProposeCopy.test.ts (9 tests) 872ms
+stdout | server/__tests__/rollback.test.ts > Rollback Safety Rails > should allow multiple rollbacks in sequence
+[Rollback] Created deployment 8 from source 1 for intake 4 (reason: Second rollback)
+
+ ✓ server/__tests__/rollback.test.ts (7 tests) 795ms
 stdout | server/services/__tests__/facebook-policy.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -971,6 +971,11 @@ stdout | server/services/__tests__/facebook-policy.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
+stderr | server/setupPacket.test.ts > Setup Packet Generator > generateSetupPacket > should return null for non-existent intake
+[SetupPacket] Intake 999 not found
+
+ ✓ server/setupPacket.test.ts (9 tests) 393ms
+   ✓ Setup Packet Generator > generateSetupPacket > should generate a Google Business packet with correct structure 382ms
 stdout | server/__tests__/e2e-action-request-loop.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -992,11 +997,6 @@ stderr | server/__tests__/facebook-mutations.policy.test.ts > Facebook Mutations
     at file:///home/ubuntu/launchbase/node_modules/.pnpm/@trpc+server@11.6.0_typescript@5.9.3/node_modules/@trpc/server/src/unstable-core-do-not-import/router.ts:474:20
     at /home/ubuntu/launchbase/server/__tests__/facebook-mutations.policy.test.ts:125:22
 
-stderr | server/setupPacket.test.ts > Setup Packet Generator > generateSetupPacket > should return null for non-existent intake
-[SetupPacket] Intake 999 not found
-
- ✓ server/setupPacket.test.ts (9 tests) 338ms
-   ✓ Setup Packet Generator > generateSetupPacket > should generate a Google Business packet with correct structure 321ms
 stdout | server/__tests__/facebook-mutations.policy.test.ts > Facebook Mutations - Policy Integration > facebook.postWeatherAware mutation > should return DRAFT response and NOT call Facebook when approval is required
 [TEST] Facebook DRAFT result: {
   "posted": false,
@@ -1026,7 +1026,7 @@ stdout | server/__tests__/facebook-mutations.policy.test.ts > Facebook Mutations
   "formattedPost": "Nice weather today"
 }
 
- ✓ server/services/__tests__/facebook-policy.test.ts (8 tests) 37ms
+ ✓ server/services/__tests__/facebook-policy.test.ts (8 tests) 39ms
 stdout | server/action-requests.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -1035,11 +1035,14 @@ stdout | server/action-requests.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
+ ✓ server/__tests__/facebook-mutations.policy.test.ts (4 tests) 1823ms
+   ✓ Facebook Mutations - Policy Integration > facebook.post mutation > should return BLOCK response and NOT call Facebook when daily cap is reached 1076ms
+   ✓ Facebook Mutations - Policy Integration > facebook.post mutation > should call Facebook when policy allows PUBLISH 322ms
 stderr | server/__tests__/action-requests-ops.test.ts > FOREVER: Action Request Ops Controls > FOREVER: adminApply requires reason, writes ADMIN_APPLY + APPLIED + LOCKED events, final status locked
 [ActionRequests] Unknown checklistKey: headline
 
- ✓ server/__tests__/facebook-mutations.policy.test.ts (4 tests) 1677ms
-   ✓ Facebook Mutations - Policy Integration > facebook.post mutation > should return BLOCK response and NOT call Facebook when daily cap is reached 1002ms
+ ✓ server/__tests__/action-requests-ops.test.ts (4 tests) 1141ms
+   ✓ FOREVER: Action Request Ops Controls > FOREVER: resend rate limit blocks <10m, no sendCount increment, no RESENT event 785ms
 stdout | server/weather-facebook.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -1048,25 +1051,12 @@ stdout | server/weather-facebook.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
- ✓ server/__tests__/action-requests-ops.test.ts (4 tests) 976ms
-   ✓ FOREVER: Action Request Ops Controls > FOREVER: resend rate limit blocks <10m, no sendCount increment, no RESENT event 666ms
 stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Complete loop from Ask to Confirm
 [DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
 
- ✓ server/weather-facebook.test.ts (22 tests) 11ms
-stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Complete loop from Ask to Confirm
-[Email] sendActionRequestEmail called
-[Email] - To: e2e-test-1768929726540@test.com
-[Email] - Resend client exists: true
-[Email] - ENV.resendApiKey exists: true
-[Email] - ENV.resendApiKey length: 36
-[EmailTransport] Using transport: memory
-[EmailTransport] To: e2e-test-1768929726540@test.com
-[EmailTransport] Subject: [LB:action_1768929726670_31ed2c823b354b83] Approve your homepage headline
-[EmailTransport:memory] 💾 Email stored in memory
-  To: e2e-test-1768929726540@test.com
-  Subject: [LB:action_1768929726670_31ed2c823b354b83] Approve your homepage headline
-[Email] ✅ Sent via memory: memory_1768929726713_3ipn3oj
+ ✓ server/weather-facebook.test.ts (22 tests) 12ms
+stdout | server/action-requests.test.ts > Action Request System - FOREVER Tests > FOREVER: Approve link flow completes successfully
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
 
 stdout | server/__tests__/proposed-preview.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
@@ -1075,16 +1065,6 @@ stdout | server/__tests__/proposed-preview.test.ts
 [Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
-
-stdout | server/action-requests.test.ts > Action Request System - FOREVER Tests > FOREVER: Approve link flow completes successfully
-[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
-
-stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Complete loop from Ask to Confirm
-[Webhook] Inbound email: {
-  to: 'approvals+action_1768929726670_31ed2c823b354b83@getlaunchbase.com',
-  from: 'e2e-test-1768929726540@test.com',
-  subject: 'Re: Approve your homepage headline'
-}
 
 stdout | server/intelligence.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
@@ -1095,7 +1075,18 @@ stdout | server/intelligence.test.ts
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
 stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Complete loop from Ask to Confirm
-[Webhook] Classification: { intent: 'APPROVE', confidence: 0.95 }
+[Email] sendActionRequestEmail called
+[Email] - To: e2e-test-1768933716075@test.com
+[Email] - Resend client exists: true
+[Email] - ENV.resendApiKey exists: true
+[Email] - ENV.resendApiKey length: 36
+[EmailTransport] Using transport: memory
+[EmailTransport] To: e2e-test-1768933716075@test.com
+[EmailTransport] Subject: [LB:action_1768933716248_04864e2d43cfda44] Approve your homepage headline
+[EmailTransport:memory] 💾 Email stored in memory
+  To: e2e-test-1768933716075@test.com
+  Subject: [LB:action_1768933716248_04864e2d43cfda44] Approve your homepage headline
+[Email] ✅ Sent via memory: memory_1768933716319_p6v6nbv
 
 stdout | server/ai/engine/__tests__/contract.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
@@ -1106,10 +1097,23 @@ stdout | server/ai/engine/__tests__/contract.test.ts
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
 stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Complete loop from Ask to Confirm
+[Webhook] Inbound email: {
+  to: 'approvals+action_1768933716248_04864e2d43cfda44@getlaunchbase.com',
+  from: 'e2e-test-1768933716075@test.com',
+  subject: 'Re: Approve your homepage headline'
+}
+
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Complete loop from Ask to Confirm
+[Webhook] Classification: { intent: 'APPROVE', confidence: 0.95 }
+
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Complete loop from Ask to Confirm
 [ConfidenceLearning] Created homepage.headline: approved
 
- ✓ server/ai/engine/__tests__/contract.test.ts (8 tests) 10ms
+ ✓ server/ai/engine/__tests__/contract.test.ts (8 tests) 12ms
 stdout | server/__tests__/proposed-preview.test.ts > FOREVER: Proposed Preview Feature
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+stdout | server/intelligence.test.ts > Intelligence Service > Silence Audit Trail > should handle logDecision without throwing
 [DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
 
 stdout | server/actionRequests/aiTennisCopyRefine.test.ts
@@ -1119,9 +1123,6 @@ stdout | server/actionRequests/aiTennisCopyRefine.test.ts
 [Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
-
-stdout | server/intelligence.test.ts > Intelligence Service > Silence Audit Trail > should handle logDecision without throwing
-[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
 
 stdout | server/__tests__/proposed-preview.test.ts > FOREVER: Proposed Preview Feature > FOREVER: Proposed preview renders with 200 and contains proposed text
 ✅ FOREVER Test: Proposed preview renders correctly
@@ -1138,10 +1139,10 @@ stdout | server/__tests__/proposed-preview.test.ts > FOREVER: Proposed Preview F
 stdout | server/__tests__/proposed-preview.test.ts > FOREVER: Proposed Preview Feature > FOREVER: Unknown checklistKey shows fallback UI with approve/edit buttons
 ✅ FOREVER Test: Unknown checklistKey shows fallback UI
 
- ✓ server/__tests__/proposed-preview.test.ts (5 tests) 327ms
- ✓ server/intelligence.test.ts (18 tests) 445ms
- ✓ server/action-requests.test.ts (8 tests) 878ms
-   ✓ Action Request System - FOREVER Tests > FOREVER: Approve link flow completes successfully 367ms
+ ✓ server/__tests__/proposed-preview.test.ts (5 tests) 350ms
+ ✓ server/action-requests.test.ts (8 tests) 986ms
+   ✓ Action Request System - FOREVER Tests > FOREVER: Approve link flow completes successfully 324ms
+ ✓ server/intelligence.test.ts (18 tests) 528ms
 stdout | server/computePricing.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -1150,17 +1151,25 @@ stdout | server/computePricing.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
+ ✓ server/computePricing.test.ts (16 tests | 2 skipped) 10ms
 stdout | server/actionRequests/aiTennisCopyRefine.test.ts > aiTennisCopyRefine > handles needsHuman path with structured failure
 [completeJson] calling provider.chat {
   transport: 'memory',
   provider: 'Object',
-  trace: 'copy-refine-1768929727636:generate_candidates:0',
+  trace: 'copy-refine-1768933717254:generate_candidates:0',
   model: 'router'
 }
 
  ✓ server/actionRequests/aiTennisCopyRefine.test.ts (4 tests | 1 skipped) 10ms
- ✓ server/computePricing.test.ts (16 tests | 2 skipped) 10ms
 stdout | server/serviceSummary.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/email.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
 [Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
@@ -1184,16 +1193,24 @@ stdout | server/module-setup.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
-stdout | server/db.rawPayload.test.ts
-[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
-[Vitest Setup] Canonical DATABASE_URL set
-[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
-[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
-[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
-[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
-
  ✓ server/module-setup.test.ts (23 tests) 13ms
-stdout | server/intake.test.ts
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Complete loop from Ask to Confirm
+✅ E2E Test Complete - Ask → Understand → Apply → Confirm loop verified
+
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Edit reply flow
+[Webhook] Inbound email: {
+  to: 'approvals+action_1768933717585_f01e2159c254890b@getlaunchbase.com',
+  from: 'e2e-test-1768933717568@test.com',
+  subject: 'Re: Approve your homepage headline'
+}
+
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Edit reply flow
+[Webhook] Classification: { intent: 'EDIT_EXACT', confidence: 0.75 }
+
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Edit reply flow
+[ConfidenceLearning] Updated homepage.headline: edited (approval rate: 50.0%, threshold: 0.95)
+
+stdout | server/db.rawPayload.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
 [Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
@@ -1204,15 +1221,30 @@ stdout | server/intake.test.ts
 stdout | server/serviceSummary.test.ts > Service Summary Parity (FOREVER)
 [DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
 
-stdout | server/db.rawPayload.test.ts > createIntake rawPayload builder > preserves caller-provided rawPayload values when optional fields are undefined
-[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Edit reply flow
+✅ E2E Edit Test Complete - Customer edit reply processed
+
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Unclear reply escalation
+[Webhook] Inbound email: {
+  to: 'approvals+action_1768933717957_006564f9d65fe69e@getlaunchbase.com',
+  from: 'e2e-test-1768933717899@test.com',
+  subject: 'Re: Approve your homepage headline'
+}
+
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Unclear reply escalation
+[Webhook] Classification: { intent: 'EDIT_AMBIGUOUS', confidence: 0.6 }
 
 stdout | server/__tests__/tenant-filtering.test.ts > Tenant Filtering
 [DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
 
- ✓ server/serviceSummary.test.ts (5 tests) 174ms
- ✓ server/db.rawPayload.test.ts (4 tests) 233ms
-stdout | server/email.test.ts
+ ✓ server/serviceSummary.test.ts (5 tests) 192ms
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Unclear reply escalation
+[ConfidenceLearning] Updated homepage.headline: unclear (approval rate: 33.3%, threshold: 0.95)
+
+stdout | server/db.rawPayload.test.ts > createIntake rawPayload builder > preserves caller-provided rawPayload values when optional fields are undefined
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+stdout | server/intake.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
 [Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
@@ -1220,18 +1252,21 @@ stdout | server/email.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
-stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Complete loop from Ask to Confirm
-✅ E2E Test Complete - Ask → Understand → Apply → Confirm loop verified
+stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Unclear reply escalation
+✅ E2E Escalation Test Complete - Unclear reply escalated to human
 
-stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Edit reply flow
-[Webhook] Inbound email: {
-  to: 'approvals+action_1768929728575_b2aea7673d305f68@getlaunchbase.com',
-  from: 'e2e-test-1768929728560@test.com',
-  subject: 'Re: Approve your homepage headline'
-}
-
-stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Edit reply flow
-[Webhook] Classification: { intent: 'EDIT_EXACT', confidence: 0.75 }
+ ✓ server/__tests__/e2e-action-request-loop.test.ts (3 tests) 2216ms
+   ✓ E2E: Ask → Understand → Apply → Confirm Loop > E2E: Complete loop from Ask to Confirm 1497ms
+   ✓ E2E: Ask → Understand → Apply → Confirm Loop > E2E: Edit reply flow 332ms
+   ✓ E2E: Ask → Understand → Apply → Confirm Loop > E2E: Unclear reply escalation 384ms
+ ✓ server/db.rawPayload.test.ts (4 tests) 273ms
+stdout | server/__tests__/smoke.email-delivery.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
 stdout | server/__tests__/smoke.stripe-checkout-webhook.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
@@ -1241,32 +1276,16 @@ stdout | server/__tests__/smoke.stripe-checkout-webhook.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
-stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Edit reply flow
-[ConfidenceLearning] Updated homepage.headline: edited (approval rate: 50.0%, threshold: 0.95)
+stdout | server/__tests__/smoke.email-delivery.test.ts > smoke.email-delivery
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
 
-stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Edit reply flow
-✅ E2E Edit Test Complete - Customer edit reply processed
+stdout | server/__tests__/smoke.email-delivery.test.ts > smoke.email-delivery > sendEmail() succeeds and logs to email_logs
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
 
-stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Unclear reply escalation
-[Webhook] Inbound email: {
-  to: 'approvals+action_1768929728964_c0b03b44a92f5620@getlaunchbase.com',
-  from: 'e2e-test-1768929728944@test.com',
-  subject: 'Re: Approve your homepage headline'
-}
+ ✓ server/intake.test.ts (9 tests) 21ms
+stdout | server/__tests__/smoke.stripe-checkout-webhook.test.ts
+[OAuth] Initialized with baseURL: https://api.manus.im
 
-stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Unclear reply escalation
-[Webhook] Classification: { intent: 'EDIT_AMBIGUOUS', confidence: 0.6 }
-
- ✓ server/intake.test.ts (9 tests) 18ms
-stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Unclear reply escalation
-[ConfidenceLearning] Updated homepage.headline: unclear (approval rate: 33.3%, threshold: 0.95)
-
-stdout | server/__tests__/e2e-action-request-loop.test.ts > E2E: Ask → Understand → Apply → Confirm Loop > E2E: Unclear reply escalation
-✅ E2E Escalation Test Complete - Unclear reply escalated to human
-
- ✓ server/__tests__/e2e-action-request-loop.test.ts (3 tests) 2668ms
-   ✓ E2E: Ask → Understand → Apply → Confirm Loop > E2E: Complete loop from Ask to Confirm 2026ms
-   ✓ E2E: Ask → Understand → Apply → Confirm Loop > E2E: Edit reply flow 384ms
 stdout | server/actionRequests/extractSelectedProposal.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -1275,54 +1294,39 @@ stdout | server/actionRequests/extractSelectedProposal.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
-stdout | server/__tests__/smoke.stripe-checkout-webhook.test.ts
-[OAuth] Initialized with baseURL: https://api.manus.im
-
-stdout | server/__tests__/batch-approve.test.ts
-[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
-[Vitest Setup] Canonical DATABASE_URL set
-[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
-[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
-[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
-[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
-
-stdout | server/__tests__/tenant-filtering.test.ts > Tenant Filtering
-[Email] ✅ Sent via Resend: intake_confirmation to test@launchbase.com
-
- ✓ server/actionRequests/extractSelectedProposal.test.ts (19 tests) 7ms
-stdout | server/__tests__/batch-approve.test.ts > Batch Approval > should approve all 3 requests in batch
-[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
-
 stdout | server/email.test.ts > Email Service > sendEmail > should send email and return true on success
-[Email] ✅ Sent via Resend: intake_confirmation to john@smithplumbing.com
+[Email] ✅ Sent via notification (fallback): intake_confirmation to john@smithplumbing.com
 
-stderr | server/__tests__/tenant-filtering.test.ts > Tenant Filtering
+stderr | server/email.test.ts > Email Service > sendEmail > should send email and return true on success
 [Email] ❌ Resend failed: {
-  message: 'Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.',
-  name: 'rate_limit_exceeded',
+  message: 'You have reached your daily email sending quota.',
+  name: 'daily_quota_exceeded',
   status: 429,
   code: undefined,
   details: {
     statusCode: 429,
-    name: 'rate_limit_exceeded',
-    message: 'Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.'
+    message: 'You have reached your daily email sending quota.',
+    name: 'daily_quota_exceeded'
   }
 }
 
-stdout | server/__tests__/admin.stripeWebhooks.test.ts
-[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
-[Vitest Setup] Canonical DATABASE_URL set
-[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
-[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
-[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
-[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+stderr | server/__tests__/tenant-filtering.test.ts > Tenant Filtering
+[Email] ❌ Resend failed: {
+  message: 'You have reached your daily email sending quota.',
+  name: 'daily_quota_exceeded',
+  status: 429,
+  code: undefined,
+  details: {
+    statusCode: 429,
+    message: 'You have reached your daily email sending quota.',
+    name: 'daily_quota_exceeded'
+  }
+}
 
 stdout | server/__tests__/tenant-filtering.test.ts > Tenant Filtering
-[Email] ✅ Sent via notification (fallback): intake_confirmation to test@vincessnowplow.com
+[Email] ✅ Sent via notification (fallback): intake_confirmation to test@launchbase.com
 
-stdout | server/__tests__/smoke.stripe-checkout-webhook.test.ts > smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent)
-[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
-
+ ✓ server/actionRequests/extractSelectedProposal.test.ts (19 tests) 12ms
 stdout | server/email.test.ts > Email Service > sendEmail > should log email to database
 [Email] ✅ Sent via notification (fallback): ready_for_review to john@smithplumbing.com
 
@@ -1339,23 +1343,95 @@ stderr | server/email.test.ts > Email Service > sendEmail > should log email to 
   }
 }
 
- ✓ server/email.test.ts (14 tests) 1371ms
-   ✓ Email Service > sendEmail > should send email and return true on success 1025ms
-   ✓ Email Service > sendEmail > should log email to database 336ms
-stdout | server/__tests__/smoke.stripe-checkout-webhook.test.ts > smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent) > processes once; replay increments retryCount but no duplicate side-effects
-[Webhook body debug] isBuffer= true typeof= object content-type= application/json first20= {"id":"evt_53d2b9b92
-[Stripe Webhook] Received event: checkout.session.completed (evt_53d2b9b92c2c44f2adb54a05d36c5c80)
+stdout | server/__tests__/batch-approve.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stdout | server/__tests__/smoke.stripe-checkout-webhook.test.ts > smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent)
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
 
 stdout | server/__tests__/smoke.stripe-checkout-webhook.test.ts > smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent) > processes once; replay increments retryCount but no duplicate side-effects
-[Stripe Webhook] ✅ Successfully claimed session cs_test_128637c55bcf43d08377b4eeef0f928e for intake 37
+[Webhook body debug] isBuffer= true typeof= object content-type= application/json first20= {"id":"evt_9db11c7f6
+[Stripe Webhook] Received event: checkout.session.completed (evt_9db11c7f650149228c82fc3161acda01)
 
- ✓ server/__tests__/tenant-filtering.test.ts (7 tests) 2143ms
+stderr | server/__tests__/smoke.email-delivery.test.ts > smoke.email-delivery > sendEmail() succeeds and logs to email_logs
+[Email] ❌ Resend failed: {
+  message: 'Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.',
+  name: 'rate_limit_exceeded',
+  status: 429,
+  code: undefined,
+  details: {
+    statusCode: 429,
+    name: 'rate_limit_exceeded',
+    message: 'Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.'
+  }
+}
+
+stdout | server/__tests__/smoke.stripe-checkout-webhook.test.ts > smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent) > processes once; replay increments retryCount but no duplicate side-effects
+[Stripe Webhook] ✅ Successfully claimed session cs_test_971fccda739b4ab0bdc1659c6bacbf29 for intake 37
+
 stdout | server/__tests__/smoke.stripe-checkout-webhook.test.ts > smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent) > processes once; replay increments retryCount but no duplicate side-effects
 [Stripe Webhook] Intake 37 marked as paid
 
-stderr | server/__tests__/batch-approve.test.ts > Batch Approval > should approve all 3 requests in batch
-[ActionRequests] Unknown checklistKey: test.key.0
+stderr | server/__tests__/tenant-filtering.test.ts > Tenant Filtering
+[Email] ❌ Resend failed: {
+  message: 'You have reached your daily email sending quota.',
+  name: 'daily_quota_exceeded',
+  status: 429,
+  code: undefined,
+  details: {
+    statusCode: 429,
+    message: 'You have reached your daily email sending quota.',
+    name: 'daily_quota_exceeded'
+  }
+}
 
+stdout | server/email.test.ts > Email Service > sendEmail > should fallback to notification when Resend fails
+[Email] ✅ Sent via notification (fallback): intake_confirmation to john@smithplumbing.com
+
+stderr | server/email.test.ts > Email Service > sendEmail > should fallback to notification when Resend fails
+[Email] ❌ Resend failed: {
+  message: 'You have reached your daily email sending quota.',
+  name: 'daily_quota_exceeded',
+  status: 429,
+  code: undefined,
+  details: {
+    statusCode: 429,
+    message: 'You have reached your daily email sending quota.',
+    name: 'daily_quota_exceeded'
+  }
+}
+
+ ❯ server/email.test.ts (15 tests | 1 failed) 2696ms
+   × Email Service > sendEmail > should send email and return true on success 1726ms
+     → expected { ok: true, …(2) } to deeply equal { ok: true, provider: 'resend' }
+   ✓ Email Service > sendEmail > should log email to database 455ms
+   ✓ Email Service > sendEmail > should fallback to notification when Resend fails 503ms
+stdout | server/__tests__/smoke.email-delivery.test.ts > smoke.email-delivery > sendEmail() succeeds and logs to email_logs
+[Email] ✅ Sent via notification (fallback): intake_confirmation to vince@vincessnowplow.com
+
+stdout | server/__tests__/tenant-filtering.test.ts > Tenant Filtering
+[Email] ✅ Sent via notification (fallback): intake_confirmation to test@vincessnowplow.com
+
+stdout | server/__tests__/batch-approve.test.ts > Batch Approval > should approve all 3 requests in batch
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+stdout | server/__tests__/smoke.email-delivery.test.ts > smoke.email-delivery > enforces Resend routing when RESEND_API_KEY is present
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+stdout | server/__tests__/admin.stripeWebhooks.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/__tests__/tenant-filtering.test.ts (7 tests) 2908ms
 stdout | server/ai/engine/__tests__/swarm.gate5.collapse.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -1366,6 +1442,9 @@ stdout | server/ai/engine/__tests__/swarm.gate5.collapse.test.ts
 
  ↓ server/ai/engine/__tests__/swarm.gate5.collapse.test.ts (8 tests | 8 skipped)
 stderr | server/__tests__/batch-approve.test.ts > Batch Approval > should approve all 3 requests in batch
+[ActionRequests] Unknown checklistKey: test.key.0
+
+stderr | server/__tests__/batch-approve.test.ts > Batch Approval > should approve all 3 requests in batch
 [ActionRequests] Unknown checklistKey: test.key.1
 
 stdout | server/__tests__/smoke.stripe-webhook.test.ts
@@ -1379,6 +1458,27 @@ stdout | server/__tests__/smoke.stripe-webhook.test.ts
 stderr | server/__tests__/batch-approve.test.ts > Batch Approval > should approve all 3 requests in batch
 [ActionRequests] Unknown checklistKey: test.key.2
 
+stderr | server/__tests__/batch-approve.test.ts > Batch Approval > should skip already-locked requests
+[ActionRequests] Unknown checklistKey: test.key.1
+
+stderr | server/__tests__/batch-approve.test.ts > Batch Approval > should skip already-locked requests
+[ActionRequests] Unknown checklistKey: test.key.2
+
+stderr | server/__tests__/batch-approve.test.ts > Batch Approval > should handle partial failures gracefully
+[ActionRequests] Unknown checklistKey: test.key.0
+
+stdout | server/__tests__/admin.stripeWebhooks.test.ts > admin.stripeWebhooks security boundary > Test B — allows when admin > list returns array with correct shape when user is admin
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+stderr | server/__tests__/batch-approve.test.ts > Batch Approval > should handle partial failures gracefully
+[ActionRequests] Unknown checklistKey: test.key.1
+
+ ✓ server/__tests__/batch-approve.test.ts (3 tests) 1392ms
+   ✓ Batch Approval > should approve all 3 requests in batch 936ms
+ ✓ server/__tests__/admin.stripeWebhooks.test.ts (6 tests) 147ms
+stdout | server/__tests__/smoke.stripe-webhook.test.ts
+[OAuth] Initialized with baseURL: https://api.manus.im
+
 stdout | server/resendPreviewEmail.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -1386,16 +1486,6 @@ stdout | server/resendPreviewEmail.test.ts
 [Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
-
-stderr | server/__tests__/batch-approve.test.ts > Batch Approval > should skip already-locked requests
-[ActionRequests] Unknown checklistKey: test.key.1
-
- ✓ server/resendPreviewEmail.test.ts (13 tests) 10ms
-stderr | server/__tests__/batch-approve.test.ts > Batch Approval > should skip already-locked requests
-[ActionRequests] Unknown checklistKey: test.key.2
-
-stderr | server/__tests__/batch-approve.test.ts > Batch Approval > should handle partial failures gracefully
-[ActionRequests] Unknown checklistKey: test.key.0
 
 stdout | server/__tests__/smoke.prefs-language.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
@@ -1405,16 +1495,37 @@ stdout | server/__tests__/smoke.prefs-language.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
- ✓ server/__tests__/smoke.prefs-language.test.ts (7 tests) 25ms
-stderr | server/__tests__/batch-approve.test.ts > Batch Approval > should handle partial failures gracefully
-[ActionRequests] Unknown checklistKey: test.key.1
+ ✓ server/resendPreviewEmail.test.ts (13 tests) 9ms
+ ✓ server/__tests__/smoke.prefs-language.test.ts (7 tests) 26ms
+stderr | server/__tests__/smoke.email-delivery.test.ts > smoke.email-delivery > enforces Resend routing when RESEND_API_KEY is present
+[Email] ❌ Resend failed: {
+  message: 'Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.',
+  name: 'rate_limit_exceeded',
+  status: 429,
+  code: undefined,
+  details: {
+    statusCode: 429,
+    name: 'rate_limit_exceeded',
+    message: 'Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.'
+  }
+}
 
- ✓ server/__tests__/batch-approve.test.ts (3 tests) 1339ms
-   ✓ Batch Approval > should approve all 3 requests in batch 906ms
-stdout | server/__tests__/admin.stripeWebhooks.test.ts > admin.stripeWebhooks security boundary > Test B — allows when admin > list returns array with correct shape when user is admin
-[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+stderr | server/__tests__/smoke.stripe-checkout-webhook.test.ts > smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent) > processes once; replay increments retryCount but no duplicate side-effects
+[Email] ❌ Resend failed: {
+  message: 'You have reached your daily email sending quota.',
+  name: 'daily_quota_exceeded',
+  status: 429,
+  code: undefined,
+  details: {
+    statusCode: 429,
+    message: 'You have reached your daily email sending quota.',
+    name: 'daily_quota_exceeded'
+  }
+}
 
- ✓ server/__tests__/admin.stripeWebhooks.test.ts (6 tests) 159ms
+stdout | server/__tests__/smoke.email-delivery.test.ts > smoke.email-delivery > enforces Resend routing when RESEND_API_KEY is present
+[Email] ✅ Sent via notification (fallback): intake_confirmation to vince@vincessnowplow.com
+
 stdout | server/__tests__/confidence-learning.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -1423,11 +1534,21 @@ stdout | server/__tests__/confidence-learning.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
-stdout | server/__tests__/smoke.stripe-webhook.test.ts
-[OAuth] Initialized with baseURL: https://api.manus.im
+stdout | server/setIntakeStatus.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
+ ❯ server/__tests__/smoke.email-delivery.test.ts (2 tests | 2 failed) 3675ms
+   × smoke.email-delivery > sendEmail() succeeds and logs to email_logs 1685ms
+     → expected 'notification' to be 'resend' // Object.is equality
+   × smoke.email-delivery > enforces Resend routing when RESEND_API_KEY is present 1828ms
+     → expected 'notification' to be 'resend' // Object.is equality
 stdout | server/__tests__/smoke.stripe-checkout-webhook.test.ts > smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent) > processes once; replay increments retryCount but no duplicate side-effects
-[Email] ✅ Sent via Resend: deployment_started to smoke+stripe-c8a31214-1690-4e23-8f48-6de5640cdc7d@launchbase-test.com
+[Email] ✅ Sent via notification (fallback): deployment_started to smoke+stripe-8684a7f3-bd19-416d-9c51-2638b15a75bb@launchbase-test.com
 
 stderr | server/__tests__/smoke.stripe-checkout-webhook.test.ts > smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent) > processes once; replay increments retryCount but no duplicate side-effects
 [Stripe Webhook] Deployment safety gates failed for intake 37: [
@@ -1448,13 +1569,15 @@ stderr | server/__tests__/smoke.stripe-checkout-webhook.test.ts > smoke: Stripe 
   }
 ]
 
-stdout | server/setIntakeStatus.test.ts
-[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
-[Vitest Setup] Canonical DATABASE_URL set
-[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
-[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
-[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
-[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+stderr | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > rejects missing signature
+[Stripe Webhook] Missing stripe-signature header
+
+stdout | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+stdout | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed
+[Webhook body debug] isBuffer= true typeof= object content-type= application/json first20= {"id":"evt_176893372
+[Stripe Webhook] Received event: checkout.session.completed (evt_1768933722784)
 
 stdout | server/statusTransitions.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
@@ -1464,20 +1587,26 @@ stdout | server/statusTransitions.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
-stdout | server/__tests__/smoke.stripe-checkout-webhook.test.ts > smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent) > processes once; replay increments retryCount but no duplicate side-effects
-[Webhook body debug] isBuffer= true typeof= object content-type= application/json first20= {"id":"evt_53d2b9b92
-[Stripe Webhook] Received event: checkout.session.completed (evt_53d2b9b92c2c44f2adb54a05d36c5c80)
+stdout | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed
+[Stripe Webhook] ✅ Successfully claimed session cs_test_1768933722784 for intake 42
 
-stdout | server/__tests__/smoke.stripe-checkout-webhook.test.ts > smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent) > processes once; replay increments retryCount but no duplicate side-effects
-[Stripe Webhook] ✅ Duplicate checkout completion ignored (session cs_test_128637c55bcf43d08377b4eeef0f928e, intake 37)
-
- ✓ server/statusTransitions.test.ts (19 tests) 10ms
- ✓ server/__tests__/smoke.stripe-checkout-webhook.test.ts (1 test) 1494ms
-   ✓ smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent) > processes once; replay increments retryCount but no duplicate side-effects 1400ms
  ↓ server/__tests__/confidence-learning.test.ts (9 tests | 9 skipped)
+ ✓ server/statusTransitions.test.ts (19 tests) 9ms
+stdout | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed
+[Stripe Webhook] Intake 42 marked as paid
+
 stdout | server/setIntakeStatus.test.ts > setIntakeStatus
 [DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
 
+stdout | server/__tests__/smoke.stripe-checkout-webhook.test.ts > smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent) > processes once; replay increments retryCount but no duplicate side-effects
+[Webhook body debug] isBuffer= true typeof= object content-type= application/json first20= {"id":"evt_9db11c7f6
+[Stripe Webhook] Received event: checkout.session.completed (evt_9db11c7f650149228c82fc3161acda01)
+
+stdout | server/__tests__/smoke.stripe-checkout-webhook.test.ts > smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent) > processes once; replay increments retryCount but no duplicate side-effects
+[Stripe Webhook] ✅ Duplicate checkout completion ignored (session cs_test_971fccda739b4ab0bdc1659c6bacbf29, intake 37)
+
+ ✓ server/__tests__/smoke.stripe-checkout-webhook.test.ts (1 test) 2817ms
+   ✓ smoke: Stripe checkout.session.completed webhook (signed boundary + idempotent) > processes once; replay increments retryCount but no duplicate side-effects 2708ms
 stdout | server/ai/modelRouting/featureAliases.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -1485,18 +1614,6 @@ stdout | server/ai/modelRouting/featureAliases.test.ts
 [Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
-
-stdout | server/__tests__/smoke.email-delivery.test.ts
-[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
-[Vitest Setup] Canonical DATABASE_URL set
-[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
-[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
-[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
-[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
-
- ✓ server/ai/modelRouting/featureAliases.test.ts (13 tests) 12ms
-stderr | server/setIntakeStatus.test.ts > setIntakeStatus > rejects invalid transition without override (new → approved)
-[Database] Transition not allowed: new → approved. Allowed: review, needs_info, paid
 
 stdout | server/analytics.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
@@ -1506,11 +1623,12 @@ stdout | server/analytics.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
-stderr | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > rejects missing signature
-[Stripe Webhook] Missing stripe-signature header
+ ✓ server/ai/modelRouting/featureAliases.test.ts (13 tests) 9ms
+stderr | server/setIntakeStatus.test.ts > setIntakeStatus > rejects invalid transition without override (new → approved)
+[Database] Transition not allowed: new → approved. Allowed: review, needs_info, paid
 
-stdout | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed
-[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+stdout | server/setIntakeStatus.test.ts > setIntakeStatus > allows override with overrideReason and creates event
+[Database] Status change: intake 43: new → approved (actor: admin #admin123, reason: manual admin fix for testing, overridden: true)
 
 stdout | server/ai/__tests__/runAiTennis.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
@@ -1520,22 +1638,22 @@ stdout | server/ai/__tests__/runAiTennis.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
-stdout | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed
-[Webhook body debug] isBuffer= true typeof= object content-type= application/json first20= {"id":"evt_176892973
-[Stripe Webhook] Received event: checkout.session.completed (evt_1768929732063)
-
-stdout | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed
-[Stripe Webhook] ✅ Successfully claimed session cs_test_1768929732063 for intake 41
-
-stdout | server/setIntakeStatus.test.ts > setIntakeStatus > allows override with overrideReason and creates event
-[Database] Status change: intake 40: new → approved (actor: admin #admin123, reason: manual admin fix for testing, overridden: true)
-
-stdout | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed
-[Stripe Webhook] Intake 41 marked as paid
+stdout | server/setIntakeStatus.test.ts > setIntakeStatus > creates event for valid transition
+[Database] Status change: intake 43: approved → new (actor: system, reason: reset for test, overridden: true)
 
 stdout | server/setIntakeStatus.test.ts > setIntakeStatus > creates event for valid transition
-[Database] Status change: intake 40: approved → new (actor: system, reason: reset for test, overridden: true)
+[Database] Status change: intake 43: new → review (actor: system, reason: automated transition, overridden: false)
 
+ ✓ server/setIntakeStatus.test.ts (4 tests) 413ms
+stdout | server/worker.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/worker.test.ts (10 tests) 13ms
 stdout | server/analytics.test.ts > Analytics Service > trackEvent > should track a page view event
 [Analytics] Tracked: page_view_home { eventName: 'page_view_home', sessionId: 'test_session_123' }
 
@@ -1579,23 +1697,8 @@ stdout | server/analytics.test.ts > Analytics Event Types > should accept valid 
 [Analytics] Tracked: build_approved_first_pass { eventName: 'build_approved_first_pass' }
 [Analytics] Tracked: build_revision_requested { eventName: 'build_revision_requested' }
 
- ✓ server/analytics.test.ts (11 tests) 13ms
-stdout | server/setIntakeStatus.test.ts > setIntakeStatus > creates event for valid transition
-[Database] Status change: intake 40: new → review (actor: system, reason: automated transition, overridden: false)
-
- ✓ server/setIntakeStatus.test.ts (4 tests) 469ms
-stdout | server/__tests__/smoke.email-delivery.test.ts > smoke.email-delivery
-[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
-
+ ✓ server/analytics.test.ts (11 tests) 15ms
  ↓ server/ai/__tests__/runAiTennis.test.ts (8 tests | 8 skipped)
-stdout | server/worker.test.ts
-[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
-[Vitest Setup] Canonical DATABASE_URL set
-[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
-[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
-[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
-[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
-
 stdout | server/ai/modelRouting/modelNormalize.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -1604,8 +1707,7 @@ stdout | server/ai/modelRouting/modelNormalize.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
- ✓ server/worker.test.ts (10 tests) 8ms
- ✓ server/ai/modelRouting/modelNormalize.test.ts (17 tests) 10ms
+ ✓ server/ai/modelRouting/modelNormalize.test.ts (17 tests) 12ms
 stdout | server/__tests__/smoke.facebook-mutations.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -1622,6 +1724,19 @@ stdout | server/api-routing-guardrails.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
+stderr | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed
+[Email] ❌ Resend failed: {
+  message: 'You have reached your daily email sending quota.',
+  name: 'daily_quota_exceeded',
+  status: 429,
+  code: undefined,
+  details: {
+    statusCode: 429,
+    message: 'You have reached your daily email sending quota.',
+    name: 'daily_quota_exceeded'
+  }
+}
+
 stdout | server/ai/modelRouting/__tests__/modelRouter.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -1630,12 +1745,21 @@ stdout | server/ai/modelRouting/__tests__/modelRouter.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
- ✓ server/ai/modelRouting/__tests__/modelRouter.test.ts (4 tests) 25ms
+ ✓ server/ai/modelRouting/__tests__/modelRouter.test.ts (4 tests) 9ms
+stdout | server/suiteApply.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/suiteApply.test.ts (6 tests) 9ms
 stdout | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed
-[Email] ✅ Sent via Resend: deployment_started to idem-1768929731952@launchbase-test.com
+[Email] ✅ Sent via notification (fallback): deployment_started to idem-1768933722671@launchbase-test.com
 
 stderr | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed
-[Stripe Webhook] Deployment safety gates failed for intake 41: [
+[Stripe Webhook] Deployment safety gates failed for intake 42: [
   {
     check: 'build_plan_exists',
     passed: false,
@@ -1653,27 +1777,6 @@ stderr | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook b
   }
 ]
 
-stdout | server/suiteApply.test.ts
-[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
-[Vitest Setup] Canonical DATABASE_URL set
-[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
-[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
-[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
-[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
-
-stdout | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed
-[Webhook body debug] isBuffer= true typeof= object content-type= application/json first20= {"id":"evt_176892973
-[Stripe Webhook] Received event: checkout.session.completed (evt_1768929732063)
-
- ✓ server/suiteApply.test.ts (6 tests) 7ms
-stdout | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed
-[Stripe Webhook] ✅ Duplicate checkout completion ignored (session cs_test_1768929732063, intake 41)
-
-stdout | server/__tests__/smoke.email-delivery.test.ts > smoke.email-delivery > sendEmail() succeeds and logs to email_logs
-[Email] ✅ Sent via Resend: intake_confirmation to vince@vincessnowplow.com
-
- ✓ server/__tests__/smoke.stripe-webhook.test.ts (2 tests) 1294ms
-   ✓ smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed 1227ms
 stdout | server/__tests__/smoke.stripe-invoice.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -1690,22 +1793,19 @@ stdout | server/ai/modelRouting/__tests__/modelPolicy.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
- ✓ server/ai/modelRouting/__tests__/modelPolicy.test.ts (5 tests) 11ms
+ ✓ server/ai/modelRouting/__tests__/modelPolicy.test.ts (5 tests) 12ms
+stdout | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed
+[Webhook body debug] isBuffer= true typeof= object content-type= application/json first20= {"id":"evt_176893372
+[Stripe Webhook] Received event: checkout.session.completed (evt_1768933722784)
+
+stdout | server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed
+[Stripe Webhook] ✅ Duplicate checkout completion ignored (session cs_test_1768933722784, intake 42)
+
+ ❯ server/__tests__/smoke.stripe-webhook.test.ts (2 tests | 1 failed) 1612ms
+   × smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed 1548ms
+     → expected 2 to be 1 // Object.is equality
 stdout | server/api-routing-guardrails.test.ts
 [OAuth] Initialized with baseURL: https://api.manus.im
-
-stderr | server/__tests__/smoke.email-delivery.test.ts > smoke.email-delivery > enforces Resend routing when RESEND_API_KEY is present
-[Email] ❌ Resend failed: {
-  message: 'Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.',
-  name: 'rate_limit_exceeded',
-  status: 429,
-  code: undefined,
-  details: {
-    statusCode: 429,
-    name: 'rate_limit_exceeded',
-    message: 'Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.'
-  }
-}
 
 stdout | server/__tests__/cron-alerts-auth.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
@@ -1715,23 +1815,6 @@ stdout | server/__tests__/cron-alerts-auth.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
-stdout | server/__tests__/smoke.facebook-mutations.test.ts > SMOKE: Facebook Mutations (End-to-End) > blocks posting when daily cap is reached (2 posts)
-[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
-
-stdout | server/__tests__/smoke.email-delivery.test.ts > smoke.email-delivery > enforces Resend routing when RESEND_API_KEY is present
-[Email] ✅ Sent via notification (fallback): intake_confirmation to vince@vincessnowplow.com
-
-stdout | server/__tests__/smoke.facebook-mutations.test.ts > SMOKE: Facebook Mutations (End-to-End) > blocks posting when daily cap is reached (2 posts)
-✅ Cap block validated (end-to-end)
-
- ✓ server/__tests__/smoke.facebook-mutations.test.ts (1 test) 184ms
- ❯ server/__tests__/smoke.email-delivery.test.ts (2 tests | 1 failed) 1656ms
-   ✓ smoke.email-delivery > sendEmail() succeeds and logs to email_logs 976ms
-   × smoke.email-delivery > enforces Resend routing when RESEND_API_KEY is present 530ms
-     → expected 'notification' to be 'resend' // Object.is equality
-stdout | server/__tests__/smoke.stripe-invoice.test.ts
-[OAuth] Initialized with baseURL: https://api.manus.im
-
 stdout | server/ai/engine/__tests__/swarm.replay.invariants.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -1740,15 +1823,6 @@ stdout | server/ai/engine/__tests__/swarm.replay.invariants.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
-stdout | server/emails/emailCopy.test.ts
-[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
-[Vitest Setup] Canonical DATABASE_URL set
-[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
-[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
-[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
-[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
-
- ✓ server/emails/emailCopy.test.ts (9 tests) 9ms
 stdout | server/ai/engine/__tests__/swarm.replay.invariants.test.ts > Swarm Replay Invariants > apply_ok: produces APPLY decision
 [swarm] role=craft override.system=false override.user=false
 [completeJson] calling provider.chat {
@@ -1863,14 +1937,29 @@ stderr | server/ai/engine/__tests__/swarm.replay.invariants.test.ts > Swarm Repl
 [swarm] Critic output missing required field 'pass', applying schema gate
 [swarm] Critic output missing required field 'pass', applying schema gate
 
- ✓ server/ai/engine/__tests__/swarm.replay.invariants.test.ts (3 tests) 12ms
-stdout | server/api-routing-guardrails.test.ts > API guardrails (never repeat cron + SPA issues) > cron health returns JSON and includes db status
+ ✓ server/ai/engine/__tests__/swarm.replay.invariants.test.ts (3 tests) 17ms
+stdout | server/__tests__/smoke.stripe-invoice.test.ts
+[OAuth] Initialized with baseURL: https://api.manus.im
+
+stdout | server/emails/emailCopy.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ✓ server/emails/emailCopy.test.ts (9 tests) 8ms
+stdout | server/__tests__/smoke.facebook-mutations.test.ts > SMOKE: Facebook Mutations (End-to-End) > blocks posting when daily cap is reached (2 posts)
 [DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
 
+stdout | server/__tests__/smoke.facebook-mutations.test.ts > SMOKE: Facebook Mutations (End-to-End) > blocks posting when daily cap is reached (2 posts)
+✅ Cap block validated (end-to-end)
+
+ ✓ server/__tests__/smoke.facebook-mutations.test.ts (1 test) 182ms
 stdout | server/__tests__/cron-alerts-auth.test.ts
 [OAuth] Initialized with baseURL: https://api.manus.im
 
- ✓ server/api-routing-guardrails.test.ts (5 tests) 183ms
 stdout | server/__tests__/smoke.facebook-policy.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -1879,6 +1968,10 @@ stdout | server/__tests__/smoke.facebook-policy.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
+stdout | server/api-routing-guardrails.test.ts > API guardrails (never repeat cron + SPA issues) > cron health returns JSON and includes db status
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
+ ✓ server/api-routing-guardrails.test.ts (5 tests) 234ms
 stdout | server/ai/modelRouting/__tests__/modelRegistry.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -1887,7 +1980,10 @@ stdout | server/ai/modelRouting/__tests__/modelRegistry.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
- ✓ server/ai/modelRouting/__tests__/modelRegistry.test.ts (4 tests) 12ms
+ ✓ server/ai/modelRouting/__tests__/modelRegistry.test.ts (4 tests) 11ms
+stdout | server/__tests__/smoke.facebook-policy.test.ts > SMOKE: Facebook Policy > checkFacebookPostingPolicy returns valid PolicyCheckResult
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
 stdout | server/__tests__/facebook-webhook.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -1899,6 +1995,9 @@ stdout | server/__tests__/facebook-webhook.test.ts
 stdout | server/__tests__/smoke.stripe-invoice.test.ts > smoke: stripe invoice.paid webhook > activates subscription and dedupes on eventId
 [DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
 
+stdout | server/__tests__/smoke.facebook-policy.test.ts > SMOKE: Facebook Policy > checkFacebookPostingPolicy returns valid PolicyCheckResult
+✅ Policy contract validated: BLOCK
+
 stdout | server/__tests__/template-versioning.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -1907,32 +2006,42 @@ stdout | server/__tests__/template-versioning.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
-stdout | server/__tests__/smoke.stripe-invoice.test.ts > smoke: stripe invoice.paid webhook > activates subscription and dedupes on eventId
-[Webhook body debug] isBuffer= true typeof= object content-type= application/json first20= {"id":"evt_176892973
-[Stripe Webhook] Received event: invoice.paid (evt_1768929734607)
-
-stdout | server/__tests__/smoke.stripe-invoice.test.ts > smoke: stripe invoice.paid webhook > activates subscription and dedupes on eventId
-[Stripe Webhook] SMI module activated for user 1
-
-stdout | server/__tests__/smoke.stripe-invoice.test.ts > smoke: stripe invoice.paid webhook > activates subscription and dedupes on eventId
-[Webhook body debug] isBuffer= true typeof= object content-type= application/json first20= {"id":"evt_176892973
-[Stripe Webhook] Received event: invoice.paid (evt_1768929734607)
-
-stdout | server/__tests__/smoke.facebook-policy.test.ts > SMOKE: Facebook Policy > checkFacebookPostingPolicy returns valid PolicyCheckResult
-[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
-
-stdout | server/__tests__/smoke.stripe-invoice.test.ts > smoke: stripe invoice.paid webhook > activates subscription and dedupes on eventId
-[Stripe Webhook] SMI module activated for user 1
-
- ✓ server/__tests__/smoke.stripe-invoice.test.ts (1 test) 305ms
-   ✓ smoke: stripe invoice.paid webhook > activates subscription and dedupes on eventId 303ms
-stdout | server/__tests__/smoke.facebook-policy.test.ts > SMOKE: Facebook Policy > checkFacebookPostingPolicy returns valid PolicyCheckResult
-✅ Policy contract validated: BLOCK
-
 stdout | server/__tests__/smoke.facebook-policy.test.ts > SMOKE: Facebook Policy > returns BLOCK action when connection is missing
 ✅ Connection missing validated
 
- ✓ server/__tests__/smoke.facebook-policy.test.ts (2 tests) 124ms
+ ✓ server/__tests__/smoke.facebook-policy.test.ts (2 tests) 127ms
+stdout | server/__tests__/smoke.stripe-invoice.test.ts > smoke: stripe invoice.paid webhook > activates subscription and dedupes on eventId
+[Webhook body debug] isBuffer= true typeof= object content-type= application/json first20= {"id":"evt_176893372
+[Stripe Webhook] Received event: invoice.paid (evt_1768933725721)
+
+stdout | server/__tests__/smoke.stripe-invoice.test.ts > smoke: stripe invoice.paid webhook > activates subscription and dedupes on eventId
+[Stripe Webhook] SMI module activated for user 1
+
+stdout | server/__tests__/smoke.stripe-invoice.test.ts > smoke: stripe invoice.paid webhook > activates subscription and dedupes on eventId
+[Webhook body debug] isBuffer= true typeof= object content-type= application/json first20= {"id":"evt_176893372
+[Stripe Webhook] Received event: invoice.paid (evt_1768933725721)
+
+stdout | server/__tests__/smoke.stripe-invoice.test.ts > smoke: stripe invoice.paid webhook > activates subscription and dedupes on eventId
+[Stripe Webhook] SMI module activated for user 1
+
+ ✓ server/__tests__/smoke.stripe-invoice.test.ts (1 test) 300ms
+stdout | server/__tests__/health-dashboard.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+stderr | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Authentication > should reject requests without token
+[Alerts] Unauthorized request - invalid token
+
+stderr | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Authentication > should reject requests with invalid token
+[Alerts] Unauthorized request - invalid token
+
+stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Authentication > should accept requests with valid token (x-worker-token header)
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
+
 stdout | server/__tests__/facebook-webhook.test.ts > Facebook Webhook > handleWebhookVerification > should verify webhook with correct token
 [Facebook Webhook] Verification successful
 
@@ -1942,26 +2051,9 @@ stderr | server/__tests__/facebook-webhook.test.ts > Facebook Webhook > handleWe
 stderr | server/__tests__/facebook-webhook.test.ts > Facebook Webhook > handleWebhookVerification > should reject webhook with incorrect mode
 [Facebook Webhook] Verification failed { mode: 'unsubscribe', token: 'launchbase_fb_webhook_2026' }
 
- ✓ server/__tests__/facebook-webhook.test.ts (7 tests) 11ms
-stderr | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Authentication > should reject requests without token
-[Alerts] Unauthorized request - invalid token
-
-stderr | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Authentication > should reject requests with invalid token
-[Alerts] Unauthorized request - invalid token
-
+ ✓ server/__tests__/facebook-webhook.test.ts (7 tests) 9ms
 stdout | server/__tests__/template-versioning.test.ts > Template Versioning
 [DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
-
-stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Authentication > should accept requests with valid token (x-worker-token header)
-[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
-
-stdout | server/__tests__/health-dashboard.test.ts
-[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
-[Vitest Setup] Canonical DATABASE_URL set
-[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
-[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
-[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
-[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
 stdout | server/ai/engine/__tests__/bootstrap.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
@@ -1972,8 +2064,35 @@ stdout | server/ai/engine/__tests__/bootstrap.test.ts
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
 stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Authentication > should accept requests with valid token (x-worker-token header)
-[Cron] Started worker run: 3e10e16f-b1e5-4196-af0f-327b17ae624b
+[Cron] Started worker run: c822e3ad-d970-4385-8c15-225c00f51700
 
+stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Authentication > should accept requests with valid token (x-worker-token header)
+[Alerts] Updated existing alert: health:email_failures (launchbase|health:email_failures|3plus)
+
+stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Authentication > should accept requests with valid token (x-worker-token header)
+[Alerts] Processed alerts for tenant: launchbase
+
+stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Authentication > should accept requests with valid token (x-worker-token header)
+[Alerts] Processed alerts for tenant: vinces
+
+ ✓ server/ai/engine/__tests__/bootstrap.test.ts (4 tests) 11ms
+stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Authentication > should accept requests with valid token (Authorization Bearer header)
+[Alerts] Rate limited - last run was 0s ago
+
+stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Rate Limiting > should rate limit rapid successive calls
+[Cron] Finished worker run: c822e3ad-d970-4385-8c15-225c00f51700
+
+stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Rate Limiting > should rate limit rapid successive calls
+[Alerts] Rate limited - last run was 0s ago
+
+stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Rate Limiting > should rate limit rapid successive calls
+[Alerts] Rate limited - last run was 0s ago
+
+stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Rate Limiting > should allow calls after rate limit window expires
+[Alerts] Rate limited - last run was 0s ago
+
+ ✓ server/__tests__/template-versioning.test.ts (4 tests) 203ms
+ ✓ server/__tests__/cron-alerts-auth.test.ts (6 tests) 345ms
 stdout | server/ai/engine/__tests__/swarm.record.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -1982,32 +2101,10 @@ stdout | server/ai/engine/__tests__/swarm.record.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
- ✓ server/ai/engine/__tests__/swarm.record.test.ts (3 tests) 6ms
-stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Authentication > should accept requests with valid token (x-worker-token header)
-[Alerts] Resolved alert: health:email_failures (launchbase|health:email_failures|3plus)
-[Alerts] Processed alerts for tenant: launchbase
+ ✓ server/ai/engine/__tests__/swarm.record.test.ts (3 tests) 5ms
+stdout | server/__tests__/health-dashboard.test.ts > Health Dashboard > should return health metrics with correct structure
+[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
 
- ✓ server/__tests__/template-versioning.test.ts (4 tests) 235ms
-stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Authentication > should accept requests with valid token (x-worker-token header)
-[Alerts] Processed alerts for tenant: vinces
-
-stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Authentication > should accept requests with valid token (Authorization Bearer header)
-[Alerts] Rate limited - last run was 0s ago
-
-stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Rate Limiting > should rate limit rapid successive calls
-[Alerts] Rate limited - last run was 0s ago
-
-stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Rate Limiting > should rate limit rapid successive calls
-[Cron] Finished worker run: 3e10e16f-b1e5-4196-af0f-327b17ae624b
-
-stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Rate Limiting > should rate limit rapid successive calls
-[Alerts] Rate limited - last run was 0s ago
-
-stdout | server/__tests__/cron-alerts-auth.test.ts > POST /api/cron/alerts - Rate Limiting > should allow calls after rate limit window expires
-[Alerts] Rate limited - last run was 0s ago
-
- ✓ server/__tests__/cron-alerts-auth.test.ts (6 tests) 329ms
- ✓ server/ai/engine/__tests__/bootstrap.test.ts (4 tests) 16ms
 stdout | server/ai/providers/aimlProvider.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -2016,18 +2113,7 @@ stdout | server/ai/providers/aimlProvider.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
-stdout | server/__tests__/health-dashboard.test.ts > Health Dashboard > should return health metrics with correct structure
-[DB] Connecting to database: H86jcAdP392wwbWXRcEDMs
-
 stdout | server/__tests__/smoke.emailCopy-websiteStatus.test.ts
-[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
-[Vitest Setup] Canonical DATABASE_URL set
-[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
-[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
-[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
-[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
-
-stdout | server/utils/__tests__/idempotency.rowsAffected.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
 [Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
@@ -2043,9 +2129,17 @@ stdout | server/auth.logout.test.ts
 [Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
- ↓ server/ai/providers/aimlProvider.test.ts (2 tests | 2 skipped)
+ ✓ server/__tests__/health-dashboard.test.ts (4 tests) 188ms
  ✓ server/__tests__/smoke.emailCopy-websiteStatus.test.ts (3 tests) 4ms
- ✓ server/__tests__/health-dashboard.test.ts (4 tests) 257ms
+stdout | server/utils/__tests__/idempotency.rowsAffected.test.ts
+[tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
+[Vitest Setup] Canonical DATABASE_URL set
+[Vitest Setup] DB name: H86jcAdP392wwbWXRcEDMs
+[Vitest Setup] EMAIL_TRANSPORT set to 'memory' (deterministic tests)
+[Vitest Setup] IDEMPOTENCY_SECRET set to test value (deterministic tests)
+[Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
+
+ ↓ server/ai/providers/aimlProvider.test.ts (2 tests | 2 skipped)
 stdout | server/__tests__/__meta__/modelRegistry.mock.test.ts
 [tests] ALLOW_NETWORK_TESTS=0 AI_PROVIDER=(unset)
 [Vitest Setup] Canonical DATABASE_URL set
@@ -2055,10 +2149,49 @@ stdout | server/__tests__/__meta__/modelRegistry.mock.test.ts
 [Vitest Setup] AI_PROVIDER set to 'memory' (prevents ModelRouter in tests)
 
  ↓ server/__tests__/__meta__/modelRegistry.mock.test.ts (1 test | 1 skipped)
- ✓ server/utils/__tests__/idempotency.rowsAffected.test.ts (3 tests) 3ms
- ✓ server/auth.logout.test.ts (1 test) 6ms
+ ✓ server/utils/__tests__/idempotency.rowsAffected.test.ts (3 tests) 5ms
+ ✓ server/auth.logout.test.ts (1 test) 8ms
 
-⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  server/email.test.ts > Email Service > sendEmail > should send email and return true on success
+AssertionError: expected { ok: true, …(2) } to deeply equal { ok: true, provider: 'resend' }
+
+- Expected
++ Received
+
+  Object {
+    "ok": true,
+-   "provider": "resend",
++   "provider": "notification",
++   "warning": "resend_failed_429: You have reached your daily email sending quota.",
+  }
+
+ ❯ server/email.test.ts:138:22
+    136|       });
+    137|       
+    138|       expect(result).toEqual({ ok: true, provider: "resend" });
+       |                      ^
+    139|     });
+    140| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  server/__tests__/smoke.email-delivery.test.ts > smoke.email-delivery > sendEmail() succeeds and logs to email_logs
+AssertionError: expected 'notification' to be 'resend' // Object.is equality
+
+Expected: "resend"
+Received: "notification"
+
+ ❯ server/__tests__/smoke.email-delivery.test.ts:82:30
+     80|     // Assert success (now returns object with provider)
+     81|     expect(success.ok).toBe(true);
+     82|     expect(success.provider).toBe("resend");
+       |                              ^
+     83| 
+     84|     // Assert email_logs row exists with Resend delivery (use latest r…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
 
  FAIL  server/__tests__/smoke.email-delivery.test.ts > smoke.email-delivery > enforces Resend routing when RESEND_API_KEY is present
 AssertionError: expected 'notification' to be 'resend' // Object.is equality
@@ -2066,18 +2199,37 @@ AssertionError: expected 'notification' to be 'resend' // Object.is equality
 Expected: "resend"
 Received: "notification"
 
- ❯ server/__tests__/smoke.email-delivery.test.ts:126:32
-    124| 
-    125|       expect(success.ok).toBe(true);
-    126|       expect(success.provider).toBe("resend");
+ ❯ server/__tests__/smoke.email-delivery.test.ts:167:32
+    165| 
+    166|       expect(success.ok).toBe(true);
+    167|       expect(success.provider).toBe("resend");
        |                                ^
-    127| 
-    128|       // Assert Resend was used in logs (not notification fallback)
+    168| 
+    169|       // Assert Resend was used in logs (not notification fallback)
 
-⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
 
- Test Files  1 failed | 61 passed | 9 skipped (71)
-      Tests  1 failed | 578 passed | 59 skipped (638)
-   Start at  12:21:43
-   Duration  32.72s (transform 2.48s, setup 386ms, collect 26.29s, tests 23.57s, environment 17ms, prepare 6.37s)
+ FAIL  server/__tests__/smoke.stripe-webhook.test.ts > smoke: stripe webhook boundary > is idempotent for duplicate checkout.session.completed
+AssertionError: expected 2 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 2
+
+ ❯ server/__tests__/smoke.stripe-webhook.test.ts:152:30
+    150|       .from(emailLogs)
+    151|       .where(and(eq(emailLogs.intakeId, intakeId), eq(emailLogs.emailT…
+    152|     expect(emailRows.length).toBe(1);
+       |                              ^
+    153|     expect(emailRows[0].status).toBe("sent");
+    154| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+ Test Files  3 failed | 59 passed | 9 skipped (71)
+      Tests  4 failed | 576 passed | 59 skipped (639)
+   Start at  13:28:11
+   Duration  36.60s (transform 2.49s, setup 388ms, collect 28.42s, tests 29.68s, environment 18ms, prepare 6.69s)
 

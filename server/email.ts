@@ -64,7 +64,7 @@ function normalizeResendError(err: unknown): {
 }
 
 // Runtime Resend client (never cache at module level)
-function getResendClient(): Resend | null {
+export function getResendClient(): Resend | null {
   if (!ENV.resendApiKey) {
     console.log("[Email] No RESEND_API_KEY configured, will use notification fallback");
     return null;
@@ -431,13 +431,43 @@ export async function sendEmail(
     return { ok: false, provider: "notification", error: "db_unavailable" };
   }
 
+  // ---- Idempotency check: Skip if recently attempted (5-minute window) ----
+  // Prevents webhook retries from sending duplicate emails
+  const { eq, and, gte, sql } = await import("drizzle-orm");
+  
+  // Guard: intakeId must be valid
+  if (intakeId == null) {
+    throw new Error("[Email] intakeId is required for idempotency check");
+  }
+  
+  const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+  const recentLogs = await db
+    .select()
+    .from(emailLogs)
+    .where(
+      and(
+        eq(emailLogs.intakeId, intakeId),
+        eq(emailLogs.emailType, type),
+        gte(emailLogs.sentAt, fiveMinutesAgo)
+      )
+    )
+    .limit(1);
+
+  if (recentLogs.length > 0) {
+    const log = recentLogs[0];
+    console.log(`[Email] ⏭️  Skipped (recently sent): ${type} to ${recipientEmail}`);
+    return {
+      ok: log.status === "sent",
+      provider: log.deliveryProvider as "resend" | "notification",
+    };
+  }
+
   // ---- Attempt 1: Resend ----
   let resendErrorMsg: string | null = null;
 
   try {
-    if (!ENV.resendApiKey) throw new Error("RESEND_API_KEY missing");
-
-    const resend = new Resend(ENV.resendApiKey);
+    const resend = getResendClient();
+    if (!resend) throw new Error("RESEND_API_KEY missing");
 
     const r = await resend.emails.send({
       from: FROM_EMAIL,
@@ -482,18 +512,8 @@ export async function sendEmail(
     const norm = normalizeResendError(err);
     resendErrorMsg = `resend_failed${norm.status ? `_${norm.status}` : ""}: ${norm.message}`;
 
-    // IMPORTANT: Log the failure as FAILED (do not pretend "sent")
-    await db.insert(emailLogs).values({
-      intakeId,
-      tenant,
-      emailType: type,
-      recipientEmail,
-      subject,
-      status: "failed",
-      deliveryProvider: "resend",
-      errorMessage: resendErrorMsg,
-    });
-
+    // Don't log failure here - we'll log the final result after fallback attempt
+    // This prevents duplicate logs when fallback succeeds
     console.error("[Email] ❌ Resend failed:", norm);
   }
 
