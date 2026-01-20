@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import request from "supertest";
 import Stripe from "stripe";
+import http from "node:http";
 
 import { createApp } from "../_core/app";
 import { getDb } from "../db";
@@ -41,9 +42,10 @@ function makeSignedStripePayload(event: any) {
 
 describe("smoke: stripe webhook boundary", () => {
   it("rejects missing signature", async () => {
-    const app = createApp();
+    const app = await createApp();
+    const server = http.createServer(app);
 
-    const res = await request(app)
+    const res = await request(server)
       .post("/api/stripe/webhook")
       .set("content-type", "application/json")
       .send(JSON.stringify({ hello: "world" }));
@@ -54,7 +56,8 @@ describe("smoke: stripe webhook boundary", () => {
   });
 
   it("is idempotent for duplicate checkout.session.completed", async () => {
-    const app = createApp();
+    const app = await createApp();
+    const server = http.createServer(app);
     const db = await getDb();
     if (!db) throw new Error("DB not available");
 
@@ -104,7 +107,7 @@ describe("smoke: stripe webhook boundary", () => {
 
     // Act: send twice (same exact payload + signature)
     // IMPORTANT: Use .type() to set Content-Type without triggering JSON encoding
-    const res1 = await request(app)
+    const res1 = await request(server)
       .post("/api/stripe/webhook")
       .set("stripe-signature", signature)
       .type("application/json")
@@ -115,7 +118,7 @@ describe("smoke: stripe webhook boundary", () => {
       console.log("webhook res1 failed:", res1.status, res1.text);
     }
 
-    const res2 = await request(app)
+    const res2 = await request(server)
       .post("/api/stripe/webhook")
       .set("stripe-signature", signature)
       .type("application/json")
@@ -140,14 +143,31 @@ describe("smoke: stripe webhook boundary", () => {
       .where(and(eq(payments.intakeId, intakeId), eq(payments.stripePaymentIntentId, paymentIntentId)));
     expect(payRows.length).toBe(1);
 
-    // Assert: deployment_started email sent once
+    // Assert: deployment_started email sent once (via idempotencyKey)
     // (Deployment itself may not be created if build plan is missing - that's a separate concern)
+    const emailType = "deployment_started";
+    const expectedKey = `${event.id}:${emailType}`;
+    
+    // Assert: exactly one log for this idempotency key
     const emailRows = await db
       .select()
       .from(emailLogs)
-      .where(and(eq(emailLogs.intakeId, intakeId), eq(emailLogs.emailType, "deployment_started")));
+      .where(eq(emailLogs.idempotencyKey, expectedKey));
     expect(emailRows.length).toBe(1);
     expect(emailRows[0].status).toBe("sent");
+    expect(emailRows[0].emailType).toBe(emailType);
+    expect(emailRows[0].intakeId).toBe(intakeId);
+    
+    // Also verify total sent logs for this intake + type is 1
+    const sentRows = await db
+      .select()
+      .from(emailLogs)
+      .where(and(
+        eq(emailLogs.intakeId, intakeId),
+        eq(emailLogs.emailType, emailType),
+        eq(emailLogs.status, "sent")
+      ));
+    expect(sentRows.length).toBe(1);
 
     // Assert: webhook event logged with retry tracking
     const [webhookEvent] = await db

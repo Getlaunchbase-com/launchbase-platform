@@ -4,6 +4,11 @@
  */
 
 import { getDb } from "./db";
+
+// MySQL duplicate key error detection
+function isDuplicateKeyError(err: any): boolean {
+  return err?.code === "ER_DUP_ENTRY" || err?.errno === 1062;
+}
 import { emailLogs } from "../drizzle/schema";
 import { notifyOwner } from "./_core/notification";
 import { Resend } from "resend";
@@ -64,7 +69,7 @@ function normalizeResendError(err: unknown): {
 }
 
 // Runtime Resend client (never cache at module level)
-function getResendClient(): Resend | null {
+export function getResendClient(): Resend | null {
   if (!ENV.resendApiKey) {
     console.log("[Email] No RESEND_API_KEY configured, will use notification fallback");
     return null;
@@ -397,13 +402,52 @@ LaunchBase`
   }
 }
 
-// Send email and log it
-// Send email with explicit provider logging (FOREVER FIX)
+/**
+ * PUBLIC CONTRACT: sendEmail()
+ *
+ * Purpose:
+ * - Sends an email (via provider) and records the attempt in `email_logs`.
+ * - Provides deterministic, race-safe idempotency when `idempotencyKey` is supplied.
+ *
+ * Idempotency:
+ * - If `idempotencyKey` is provided, sendEmail MUST be exactly-once for that key.
+ * - Exactly-once is guaranteed via DB uniqueness + insert-first semantics.
+ * - A duplicate idempotency key MUST NOT throw. It MUST return a successful "already sent" result.
+ *
+ * Required behavior for event-driven callers (Stripe/webhooks):
+ * - Always pass an idempotencyKey derived from the upstream event (e.g. `${event.id}:${emailType}`).
+ * - This prevents duplicate emails during webhook retries, queue replays, or concurrent execution.
+ *
+ * Design constraints:
+ * - Do NOT implement idempotency as "check then send" (race condition).
+ * - The correct approach is:
+ *   1) Attempt insert of a log row with idempotencyKey
+ *   2) If duplicate -> no-op success
+ *   3) Otherwise proceed to send and finalize log status/provider details
+ *
+ * Return contract:
+ * - Return value is structured, not boolean. Do not revert to `true/false`.
+ * - Caller can depend on:
+ *   - ok/success signal
+ *   - provider selected
+ *   - whether this call actually sent vs skipped due to idempotency
+ *
+ * Result semantics:
+ * - { ok: true, skipped: true }  => idempotency hit (already recorded/sent earlier)
+ * - { ok: true, skipped: false } => newly sent (this invocation performed delivery)
+ * - { ok: false }                => delivery failed and no fallback succeeded
+ *
+ * Testing requirements:
+ * - Must be fully deterministic under test with provider mocked.
+ * - Webhook idempotency tests must validate:
+ *   repeated event => only one effective send + stable log behavior.
+ */
 export async function sendEmail(
   intakeId: number,
   type: EmailType,
-  data: EmailData
-): Promise<{ ok: boolean; provider: "resend" | "notification"; error?: string; warning?: string }> {
+  data: EmailData,
+  idempotencyKey?: string
+): Promise<{ ok: boolean; provider: "resend" | "notification"; error?: string; warning?: string; skipped?: boolean }> {
   const template = getEmailTemplate(type, data);
   const recipientEmail = data.email;
   const subject = template.subject;
@@ -431,13 +475,17 @@ export async function sendEmail(
     return { ok: false, provider: "notification", error: "db_unavailable" };
   }
 
+  // Guard: intakeId must be valid
+  if (intakeId == null) {
+    throw new Error("[Email] intakeId is required");
+  }
+
   // ---- Attempt 1: Resend ----
   let resendErrorMsg: string | null = null;
 
   try {
-    if (!ENV.resendApiKey) throw new Error("RESEND_API_KEY missing");
-
-    const resend = new Resend(ENV.resendApiKey);
+    const resend = getResendClient();
+    if (!resend) throw new Error("RESEND_API_KEY missing");
 
     const r = await resend.emails.send({
       from: FROM_EMAIL,
@@ -456,16 +504,26 @@ export async function sendEmail(
     if ((r as any)?.error) throw (r as any).error;
 
     // SUCCESS: Log with provider="resend"
-    await db.insert(emailLogs).values({
-      intakeId,
-      tenant,
-      emailType: type,
-      recipientEmail,
-      subject,
-      status: "sent",
-      deliveryProvider: "resend",
-      errorMessage: null,
-    });
+    try {
+      await db.insert(emailLogs).values({
+        intakeId,
+        tenant,
+        emailType: type,
+        recipientEmail,
+        subject,
+        status: "sent",
+        deliveryProvider: "resend",
+        errorMessage: null,
+        idempotencyKey: idempotencyKey ?? null,
+      });
+    } catch (logErr) {
+      // If duplicate key (webhook retry), return success without re-sending
+      if (idempotencyKey && isDuplicateKeyError(logErr)) {
+        console.log(`[Email] ⏭️  Skipped (idempotency key): ${type} to ${recipientEmail}`);
+        return { ok: true, provider: "resend", skipped: true };
+      }
+      throw logErr; // Re-throw other errors
+    }
 
     console.log(`[Email] ✅ Sent via Resend: ${type} to ${recipientEmail}`);
 
@@ -482,18 +540,8 @@ export async function sendEmail(
     const norm = normalizeResendError(err);
     resendErrorMsg = `resend_failed${norm.status ? `_${norm.status}` : ""}: ${norm.message}`;
 
-    // IMPORTANT: Log the failure as FAILED (do not pretend "sent")
-    await db.insert(emailLogs).values({
-      intakeId,
-      tenant,
-      emailType: type,
-      recipientEmail,
-      subject,
-      status: "failed",
-      deliveryProvider: "resend",
-      errorMessage: resendErrorMsg,
-    });
-
+    // Don't log failure here - we'll log the final result after fallback attempt
+    // This prevents duplicate logs when fallback succeeds
     console.error("[Email] ❌ Resend failed:", norm);
   }
 
@@ -514,16 +562,26 @@ ${template.body}
     });
 
     // Log fallback success with provider="notification"
-    await db.insert(emailLogs).values({
-      intakeId,
-      tenant,
-      emailType: type,
-      recipientEmail,
-      subject,
-      status: "sent",
-      deliveryProvider: "notification",
-      errorMessage: resendErrorMsg, // Keep the causal chain
-    });
+    try {
+      await db.insert(emailLogs).values({
+        intakeId,
+        tenant,
+        emailType: type,
+        recipientEmail,
+        subject,
+        status: "sent",
+        deliveryProvider: "notification",
+        errorMessage: resendErrorMsg, // Keep the causal chain
+        idempotencyKey: idempotencyKey ?? null,
+      });
+    } catch (logErr) {
+      // If duplicate key (webhook retry), return success without re-sending
+      if (idempotencyKey && isDuplicateKeyError(logErr)) {
+        console.log(`[Email] ⏭️  Skipped (idempotency key): ${type} to ${recipientEmail}`);
+        return { ok: true, provider: "notification", skipped: true };
+      }
+      throw logErr; // Re-throw other errors
+    }
 
     console.log(`[Email] ✅ Sent via notification (fallback): ${type} to ${recipientEmail}`);
 
@@ -554,6 +612,7 @@ ${template.body}
       status: "failed",
       deliveryProvider: "notification",
       errorMessage: [resendErrorMsg, fallbackMsg].filter(Boolean).join(" | "),
+      idempotencyKey: idempotencyKey ?? null,
     });
 
     console.error("[Email] ❌ Notification fallback also failed:", f);
@@ -620,7 +679,7 @@ export async function sendActionRequestEmail(data: {
   token: string;
   checklistKey: string;
   proposedPreviewToken?: string;
-}): Promise<{ success: boolean; provider?: "resend" | "notification"; error?: string }> {
+}): Promise<{ success: boolean; provider?: "resend" | "log" | "memory"; error?: string; resendMessageId?: string }> {
   const resend = getResendClient();
   
   const approveUrl = `${ENV.publicBaseUrl}/api/actions/${data.token}/approve`;

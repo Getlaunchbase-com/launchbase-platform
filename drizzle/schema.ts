@@ -291,43 +291,73 @@ export type AnalyticsEvent = typeof analyticsEvents.$inferSelect;
 export type InsertAnalyticsEvent = typeof analyticsEvents.$inferInsert;
 
 /**
- * Email logs for tracking sent emails
+ * PUBLIC CONTRACT: email_logs is the system-of-record for outbound email delivery attempts.
+ *
+ * Why this exists:
+ * - Prevents duplicate emails under webhook retry storms / concurrent workers.
+ * - Provides auditability: what we tried, what provider we used, what happened.
+ *
+ * Idempotency rules:
+ * - `idempotencyKey` is OPTIONAL for general email sends, but REQUIRED for event-driven sends
+ *   (e.g., Stripe webhooks) to guarantee exactly-once delivery behavior.
+ * - The database enforces uniqueness on `idempotencyKey` (unique index).
+ * - MySQL allows multiple NULLs, so "non-idempotent" sends (no key) are permitted.
+ *
+ * Canonical key format (recommendation):
+ * - `${sourceEventId}:${emailType}`
+ *   Example: `evt_123:intake_confirmation`
+ *
+ * Concurrency guarantee:
+ * - If two processes attempt the same `idempotencyKey`, at most ONE row is inserted.
+ * - Callers must treat duplicate-key insert errors as a successful no-op ("already sent").
+ *
+ * DO NOT weaken this contract:
+ * - Do NOT remove the unique index on idempotencyKey.
+ * - Do NOT "pre-check then insert" for idempotency (race-prone). Use insert-first.
  */
-export const emailLogs = mysqlTable("email_logs", {
-  id: int("id").autoincrement().primaryKey(),
-  intakeId: int("intakeId").notNull(),
-  // Tenant (for multi-tenant filtering)
-  tenant: mysqlEnum("tenant", ["launchbase", "vinces"]).notNull().default("launchbase"),
-  // Email details
-  emailType: mysqlEnum("emailType", [
-    "intake_confirmation",
-    "in_progress",
-    "ready_for_review",
-    "review_nudge",
-    "launch_confirmation",
-    "deployment_started",
-    "site_live",
-    "preview_followup",
-    "testimonial_request",
-    "founding_client_lockin",
-    "founder_welcome",
-    "day7_checkin",
-    "day30_value",
-    "contact_form_confirmation",
-    "ops_alert"
-  ]).notNull(),
-  recipientEmail: varchar("recipientEmail", { length: 320 }).notNull(),
-  subject: varchar("subject", { length: 255 }).notNull(),
-  // Status
-  status: mysqlEnum("status", ["sent", "failed", "opened", "clicked"]).default("sent").notNull(),
-  // Delivery tracking (forever observability)
-  deliveryProvider: mysqlEnum("deliveryProvider", ["resend", "notification"]),
-  errorMessage: text("errorMessage"),
-  // Timestamps
-  sentAt: timestamp("sentAt").defaultNow().notNull(),
-  openedAt: timestamp("openedAt"),
-  clickedAt: timestamp("clickedAt"),
-});
+export const emailLogs = mysqlTable(
+  "email_logs",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    intakeId: int("intakeId").notNull(),
+    // Tenant (for multi-tenant filtering)
+    tenant: mysqlEnum("tenant", ["launchbase", "vinces"]).notNull().default("launchbase"),
+    // Email details
+    emailType: mysqlEnum("emailType", [
+      "intake_confirmation",
+      "in_progress",
+      "ready_for_review",
+      "review_nudge",
+      "launch_confirmation",
+      "deployment_started",
+      "site_live",
+      "preview_followup",
+      "testimonial_request",
+      "founding_client_lockin",
+      "founder_welcome",
+      "day7_checkin",
+      "day30_value",
+      "contact_form_confirmation",
+      "ops_alert"
+    ]).notNull(),
+    recipientEmail: varchar("recipientEmail", { length: 320 }).notNull(),
+    subject: varchar("subject", { length: 255 }).notNull(),
+    // Status
+    status: mysqlEnum("status", ["sent", "failed", "opened", "clicked"]).default("sent").notNull(),
+    // Delivery tracking (forever observability)
+    deliveryProvider: mysqlEnum("deliveryProvider", ["resend", "notification"]),
+    errorMessage: text("errorMessage"),
+    // Idempotency (Stripe event-based deduplication)
+    idempotencyKey: varchar("idempotencyKey", { length: 255 }),
+    // Timestamps
+    sentAt: timestamp("sentAt").defaultNow().notNull(),
+    openedAt: timestamp("openedAt"),
+    clickedAt: timestamp("clickedAt"),
+  },
+  (t) => ({
+    idempotencyKeyUq: uniqueIndex("email_logs_idempotency_key_uq").on(t.idempotencyKey),
+  })
+);
 
 export type EmailLog = typeof emailLogs.$inferSelect;
 export type InsertEmailLog = typeof emailLogs.$inferInsert;
