@@ -4,6 +4,11 @@
  */
 
 import { getDb } from "./db";
+
+// MySQL duplicate key error detection
+function isDuplicateKeyError(err: any): boolean {
+  return err?.code === "ER_DUP_ENTRY" || err?.errno === 1062;
+}
 import { emailLogs } from "../drizzle/schema";
 import { notifyOwner } from "./_core/notification";
 import { Resend } from "resend";
@@ -402,8 +407,9 @@ LaunchBase`
 export async function sendEmail(
   intakeId: number,
   type: EmailType,
-  data: EmailData
-): Promise<{ ok: boolean; provider: "resend" | "notification"; error?: string; warning?: string }> {
+  data: EmailData,
+  idempotencyKey?: string
+): Promise<{ ok: boolean; provider: "resend" | "notification"; error?: string; warning?: string; skipped?: boolean }> {
   const template = getEmailTemplate(type, data);
   const recipientEmail = data.email;
   const subject = template.subject;
@@ -431,35 +437,9 @@ export async function sendEmail(
     return { ok: false, provider: "notification", error: "db_unavailable" };
   }
 
-  // ---- Idempotency check: Skip if recently attempted (5-minute window) ----
-  // Prevents webhook retries from sending duplicate emails
-  const { eq, and, gte, sql } = await import("drizzle-orm");
-  
   // Guard: intakeId must be valid
   if (intakeId == null) {
-    throw new Error("[Email] intakeId is required for idempotency check");
-  }
-  
-  const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-  const recentLogs = await db
-    .select()
-    .from(emailLogs)
-    .where(
-      and(
-        eq(emailLogs.intakeId, intakeId),
-        eq(emailLogs.emailType, type),
-        gte(emailLogs.sentAt, fiveMinutesAgo)
-      )
-    )
-    .limit(1);
-
-  if (recentLogs.length > 0) {
-    const log = recentLogs[0];
-    console.log(`[Email] ⏭️  Skipped (recently sent): ${type} to ${recipientEmail}`);
-    return {
-      ok: log.status === "sent",
-      provider: log.deliveryProvider as "resend" | "notification",
-    };
+    throw new Error("[Email] intakeId is required");
   }
 
   // ---- Attempt 1: Resend ----
@@ -486,16 +466,26 @@ export async function sendEmail(
     if ((r as any)?.error) throw (r as any).error;
 
     // SUCCESS: Log with provider="resend"
-    await db.insert(emailLogs).values({
-      intakeId,
-      tenant,
-      emailType: type,
-      recipientEmail,
-      subject,
-      status: "sent",
-      deliveryProvider: "resend",
-      errorMessage: null,
-    });
+    try {
+      await db.insert(emailLogs).values({
+        intakeId,
+        tenant,
+        emailType: type,
+        recipientEmail,
+        subject,
+        status: "sent",
+        deliveryProvider: "resend",
+        errorMessage: null,
+        idempotencyKey: idempotencyKey ?? null,
+      });
+    } catch (logErr) {
+      // If duplicate key (webhook retry), return success without re-sending
+      if (idempotencyKey && isDuplicateKeyError(logErr)) {
+        console.log(`[Email] ⏭️  Skipped (idempotency key): ${type} to ${recipientEmail}`);
+        return { ok: true, provider: "resend", skipped: true };
+      }
+      throw logErr; // Re-throw other errors
+    }
 
     console.log(`[Email] ✅ Sent via Resend: ${type} to ${recipientEmail}`);
 
@@ -534,16 +524,26 @@ ${template.body}
     });
 
     // Log fallback success with provider="notification"
-    await db.insert(emailLogs).values({
-      intakeId,
-      tenant,
-      emailType: type,
-      recipientEmail,
-      subject,
-      status: "sent",
-      deliveryProvider: "notification",
-      errorMessage: resendErrorMsg, // Keep the causal chain
-    });
+    try {
+      await db.insert(emailLogs).values({
+        intakeId,
+        tenant,
+        emailType: type,
+        recipientEmail,
+        subject,
+        status: "sent",
+        deliveryProvider: "notification",
+        errorMessage: resendErrorMsg, // Keep the causal chain
+        idempotencyKey: idempotencyKey ?? null,
+      });
+    } catch (logErr) {
+      // If duplicate key (webhook retry), return success without re-sending
+      if (idempotencyKey && isDuplicateKeyError(logErr)) {
+        console.log(`[Email] ⏭️  Skipped (idempotency key): ${type} to ${recipientEmail}`);
+        return { ok: true, provider: "notification", skipped: true };
+      }
+      throw logErr; // Re-throw other errors
+    }
 
     console.log(`[Email] ✅ Sent via notification (fallback): ${type} to ${recipientEmail}`);
 
@@ -574,6 +574,7 @@ ${template.body}
       status: "failed",
       deliveryProvider: "notification",
       errorMessage: [resendErrorMsg, fallbackMsg].filter(Boolean).join(" | "),
+      idempotencyKey: idempotencyKey ?? null,
     });
 
     console.error("[Email] ❌ Notification fallback also failed:", f);

@@ -143,14 +143,31 @@ describe("smoke: stripe webhook boundary", () => {
       .where(and(eq(payments.intakeId, intakeId), eq(payments.stripePaymentIntentId, paymentIntentId)));
     expect(payRows.length).toBe(1);
 
-    // Assert: deployment_started email sent once
+    // Assert: deployment_started email sent once (via idempotencyKey)
     // (Deployment itself may not be created if build plan is missing - that's a separate concern)
+    const emailType = "deployment_started";
+    const expectedKey = `${event.id}:${emailType}`;
+    
+    // Assert: exactly one log for this idempotency key
     const emailRows = await db
       .select()
       .from(emailLogs)
-      .where(and(eq(emailLogs.intakeId, intakeId), eq(emailLogs.emailType, "deployment_started")));
+      .where(eq(emailLogs.idempotencyKey, expectedKey));
     expect(emailRows.length).toBe(1);
     expect(emailRows[0].status).toBe("sent");
+    expect(emailRows[0].emailType).toBe(emailType);
+    expect(emailRows[0].intakeId).toBe(intakeId);
+    
+    // Also verify total sent logs for this intake + type is 1
+    const sentRows = await db
+      .select()
+      .from(emailLogs)
+      .where(and(
+        eq(emailLogs.intakeId, intakeId),
+        eq(emailLogs.emailType, emailType),
+        eq(emailLogs.status, "sent")
+      ));
+    expect(sentRows.length).toBe(1);
 
     // Assert: webhook event logged with retry tracking
     const [webhookEvent] = await db

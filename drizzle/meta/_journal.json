@@ -211,6 +211,20 @@
       "when": 1768743180340,
       "tag": "0029_red_valkyrie",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "5",
+      "when": 1768935713333,
+      "tag": "0030_spicy_solo",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "5",
+      "when": 1768936283175,
+      "tag": "0031_stale_frightful_four",
+      "breakpoints": true
     }
   ]
 }

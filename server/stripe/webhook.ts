@@ -61,9 +61,9 @@ export async function handleStripeWebhook(req: Request, res: Response) {
         
         // Check if this is a Social Media Intelligence checkout
         if (session.metadata?.module === "social_media_intelligence") {
-          await handleIntelligenceCheckoutCompleted(session);
+          await handleIntelligenceCheckoutCompleted(session, event.id);
         } else {
-          await handleCheckoutCompleted(session);
+          await handleCheckoutCompleted(session, event.id);
         }
         break;
       }
@@ -128,7 +128,7 @@ export async function handleStripeWebhook(req: Request, res: Response) {
 /**
  * Handle Social Media Intelligence checkout completed
  */
-async function handleIntelligenceCheckoutCompleted(session: Stripe.Checkout.Session) {
+async function handleIntelligenceCheckoutCompleted(session: Stripe.Checkout.Session, eventId: string) {
   const userId = session.metadata?.user_id;
   const cadence = session.metadata?.cadence as Cadence;
   const layersJson = session.metadata?.layers || "[]";
@@ -383,7 +383,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 /**
  * Handle legacy checkout completed (for website setup fees)
  */
-async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
+async function handleCheckoutCompleted(session: Stripe.Checkout.Session, eventId: string) {
   const intakeId = session.metadata?.intake_id;
   const paymentType = session.metadata?.payment_type;
   
@@ -453,7 +453,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         language: intake.language as any,
         audience: intake.audience as any,
         founderNumber: founderNum,
-      });
+      }, `${eventId}:founder_welcome`);
       console.log(`[Stripe Webhook] ✉️ Founder welcome email sent to ${intake.email}`);
     }
   }
@@ -506,7 +506,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       language: intake.language as any,
       audience: intake.audience as any,
       serviceSummaryText,
-    });
+    }, `${eventId}:deployment_started`);
     
     // Trigger deployment with safety gates
     await triggerDeploymentWithSafetyGates(intakeIdNum, intake, db);

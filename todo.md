@@ -3029,3 +3029,24 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
   - Assert no timeout/hang
 - [ ] Verify all tests pass with `pnpm vitest run`
 - [ ] Save checkpoint with clean boundary-mocked tests
+
+
+## Production Email Idempotency (Stripe Event-Based) ✅ COMPLETE
+
+**Goal:** Replace time-based idempotency with Stripe event ID-based idempotency
+
+**Tasks:**
+- [x] Add idempotencyKey column to email_logs schema (nullable TEXT)
+- [x] Create migration SQL: 001_add_idempotency_key_to_email_logs.sql
+- [x] Create migration SQL: 002_unique_index_on_idempotency_key.sql
+- [x] Run migrations via pnpm db:push
+- [x] Update sendEmail() to accept optional idempotencyKey parameter
+- [x] Handle unique constraint violation in sendEmail() (return skipped)
+- [x] Update Stripe webhook handler to pass idempotencyKey = event.id:emailType
+- [x] Create resetEmailLogs() test helper in server/__tests__/helpers/
+- [x] Update smoke.stripe-webhook.test.ts to assert idempotency via key
+- [x] Remove time-based idempotency check (replaced by key-based)
+- [x] Run full test suite to verify 580/580 passing
+- [x] Save checkpoint and sync to GitHub
+
+**Result:** ✅ 580/580 tests passing with production-ready Stripe event ID-based idempotency

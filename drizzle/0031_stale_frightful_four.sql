@@ -1,0 +1,1 @@
+ALTER TABLE `email_logs` ADD CONSTRAINT `email_logs_idempotency_key_uq` UNIQUE(`idempotencyKey`);
