@@ -10,8 +10,10 @@
 export * from "./preflight";
 
 // Full contract types (from dedicated files)
-export { FailurePacketV1, validateFailurePacket, EXAMPLE_FAILURE_PACKET } from "./failurePacket";
-export { RepairPacketV1, validateRepairPacket, EXAMPLE_REPAIR_PACKET } from "./repairPacket";
+export type { FailurePacketV1 } from "./failurePacket";
+export { validateFailurePacket, EXAMPLE_FAILURE_PACKET } from "./failurePacket";
+export type { RepairPacketV1 } from "./repairPacket";
+export { validateRepairPacket, EXAMPLE_REPAIR_PACKET } from "./repairPacket";
 
 // Other contracts
 export * from "./scoreCard";

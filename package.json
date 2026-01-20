@@ -13,7 +13,7 @@
     "test": "vitest run",
     "smoke": "vitest run server/__tests__/smoke.*.test.ts",
     "db:push": "drizzle-kit generate && drizzle-kit migrate",
-    "swarm:fix": "tsx scripts/swarm/runSwarmFix.mjs",
+    "swarm:fix": "tsx scripts/swarm/runSwarmFix.ts",
     "smoke:swarm-fix": "tsx scripts/smoke/smokeSwarmFix.mjs",
     "smoke:intake": "tsx scripts/smoke/smokeIntakeFlow.mjs"
   },

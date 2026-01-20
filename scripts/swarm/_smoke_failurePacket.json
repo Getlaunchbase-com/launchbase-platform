@@ -1,0 +1,40 @@
+{
+  "version": "failurepacket.v1",
+  "meta": {
+    "timestamp": "2026-01-20T17:00:00.000Z",
+    "sha": "3e4a0338",
+    "runId": "smoke_auto_repair_test",
+    "environment": "dev"
+  },
+  "failure": {
+    "type": "smoke_test",
+    "stopReason": "assertion_failed",
+    "errorMessage": "expected true to be false",
+    "stack": "AssertionError: expected true to be false\n    at /home/ubuntu/launchbase/server/__tests__/smoke.test.ts:42:15"
+  },
+  "context": {
+    "command": "pnpm vitest run -t smoke",
+    "inputs": {},
+    "outputs": {},
+    "logs": [
+      "[smoke_auto_repair_test] Running smoke test...",
+      "[smoke_auto_repair_test] FAIL: expected true to be false"
+    ],
+    "models": [],
+    "requestIds": []
+  },
+  "environment": {
+    "nodeVersion": "v22.13.0",
+    "platform": "linux",
+    "cwd": "/home/ubuntu/launchbase",
+    "envVars": {
+      "AIML_API_KEY": "REDACTED",
+      "DATABASE_URL": "REDACTED"
+    }
+  },
+  "diagnosis": {
+    "likelyCause": "Test assertion logic inverted",
+    "suggestedFix": "Change assertion from toBe(false) to toBe(true)",
+    "relatedFailures": []
+  }
+}
