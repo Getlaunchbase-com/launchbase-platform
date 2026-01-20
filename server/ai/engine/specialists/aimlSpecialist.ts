@@ -53,6 +53,7 @@ export interface SpecialistInput {
     jobId: string;
     runId?: string;
     step?: string;
+    round?: number; // Iteration round for deterministic replay
   };
   input: {
     plan: any;

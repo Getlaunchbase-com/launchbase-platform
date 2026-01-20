@@ -10,8 +10,8 @@
         "userPromptOverride": "You are fixing failing tests. Use the FailurePacket context (command, logs, file/line snippets, constraints).\nGoal: make the tests pass with the smallest safe change set.\nRules:\n1. proposedChanges MUST be non-empty.\n2. Each change MUST include: filePath, rationale, and a small diff-like description (what to change).\n3. Prefer test-only fixes when failures are test harness/mocks/fixtures.\n4. Do not change product behavior unless the failure proves a real bug.\nReturn JSON only."
       },
       "critic": {
-        "systemPromptOverride": "You are a strict code reviewer for test-repair patches.\n\nYou MUST reject or request revision if proposedChanges is empty, missing, or does not directly address the failures.\n\nYou MUST check constraints: no disabling tests, no skipLibCheck, no 'make it pass by weakening assertions' unless the test is objectively wrong and you justify it.\n\nPassing requires: (a) at least one concrete change, (b) a clear link from each change to a specific failure line, (c) no scope creep.\n\nOutput MUST be valid JSON matching the expected schema. No prose outside JSON.",
-        "userPromptOverride": "Review the proposed patch against the FailurePacket failures.\n\nIf proposedChanges is empty → verdict must be 'revise' (or 'reject') with concern: 'No patch proposed.'\n\nOtherwise:\n- List concerns keyed to specific failures.\n- If patch is minimal, safe, and likely fixes the failing tests → verdict 'pass'. Return JSON only."
+        "systemPromptOverride": "You are the Critic in a 2-role swarm (craft + critic). You MUST review Craft's proposedChanges.\n\nYou MUST output ONLY a single JSON object with this exact schema:\n\n{\n  \"pass\": boolean,\n  \"issues\": Array<{ \"severity\": \"low\"|\"medium\"|\"high\", \"message\": string }>,\n  \"previewRecommended\": boolean,\n  \"risks\": string[],\n  \"assumptions\": string[]\n}\n\nRules:\n- If proposedChanges is missing or empty -> pass=false and include at least one issue with severity=\"high\" explaining \"No proposedChanges\".\n- If any constraint is violated (more than 2 files, product logic touched, etc.) -> pass=false and include at least one \"high\" issue describing the violation.\n- If changes do not plausibly fix the described failures -> pass=false and include at least one \"high\" issue describing why.\n- Only set pass=true if the patch is bounded, follows constraints, and clearly addresses the failures.\n- You MUST NOT propose patches or code changes. Do NOT include proposedChanges. Do NOT include extra keys.\n\nReturn ONLY JSON.",
+        "userPromptOverride": "Review the Craft's proposed patch against the FailurePacket failures.\n\nCraft output to review:\n{craftOutput}\n\nFailure context:\n{failureContext}\n\nConstraints:\n{constraints}\n\nDecide pass vs fail. Return JSON only."
       }
     },
     "command": "pnpm vitest server/__tests__/facebook-mutations.policy.test.ts --run",
@@ -22,7 +22,7 @@
     ],
     "failureCount": 2
   },
-  "intent": "Fix facebook.postWeatherAware mutation to properly handle DRAFT and QUEUE policy responses. The mutation must set result.action based on policy check result. Both DRAFT (approval required) and QUEUE (outside business hours) responses must be handled correctly. If only one of the 2 tests is addressed, revise and produce a follow-up patch that clears both.",
+  "intent": "Fix facebook.postWeatherAware mutation to properly handle DRAFT and QUEUE policy responses. The mutation must set result.action based on policy check result. Both DRAFT (approval required) and QUEUE (outside business hours) responses must be handled correctly.",
   "constraints": {
     "maxFiles": 3,
     "noDependencies": true,

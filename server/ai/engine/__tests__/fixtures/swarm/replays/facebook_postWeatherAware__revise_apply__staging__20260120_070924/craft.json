@@ -1,0 +1,11 @@
+[
+  {
+    "proposedChanges": [
+      {
+        "filePath": "tests/testFile.test.js",
+        "rationale": "The test is failing due to a missing mock for the expected API call.",
+        "diff": "--- tests/testFile.test.js\n+++ tests/testFile.test.js\n@@ -10,6 +10,9 @@\n   it('should return expected data', async () => {\n     // Arrange\n     const expectedData = { key: 'value' };\n+    jest.mock('apiModule', () => ({\n+      apiCall: jest.fn().mockResolvedValue(expectedData),\n+    }));\n \n     // Act\n     const result = await someFunction();\n     \n"
+      }
+    ]
+  }
+]

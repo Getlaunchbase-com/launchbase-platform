@@ -319,6 +319,13 @@ const memoryProvider: AiProvider = {
 import path from "node:path";
 import fs from "node:fs";
 
+// Module-level singleton to preserve counter state across calls
+let _replayProvider: AiProvider | null = null;
+
+export function __resetReplayProviderForTests() {
+  _replayProvider = null;
+}
+
 function createReplayProvider(): AiProvider {
   const replayId = process.env.SWARM_REPLAY_RUN_ID ?? process.env.REPLAY_ID ?? "apply_ok"; // fallback for backward compat
   const baseDir = path.resolve(process.cwd(), "server/ai/engine/__tests__/fixtures/swarm/replays");
@@ -510,7 +517,10 @@ export function getAiProvider(transport?: AiTransport): AiProvider {
       return logProvider;
 
     case "replay":
-      return createReplayProvider();
+      if (!_replayProvider) {
+        _replayProvider = createReplayProvider();
+      }
+      return _replayProvider;
 
     default:
       console.warn(`[AI] Unknown transport: ${selectedTransport}, falling back to aiml`);

@@ -92,12 +92,16 @@ const workOrder: AiWorkOrderV1 = {
   version: "v1",
   scope: packet.context.component === "vitest" ? "fix_test_failure" : "fix_error",
   task: packet.failure?.errorMessage || "Fix test failures",
-  context: {
+  inputs: {
     component: packet.context.component,
     command: packet.context.command,
     logs: packet.context.logs,
     constraints: packet.context.constraints,
     expectedFixes: packet.context.expectedFixes,
+    // Pass through role-specific prompt overrides (swarmRunner expects inputs.promptOverrides[role])
+    ...(packet.context.promptOverrides ? {
+      promptOverrides: packet.context.promptOverrides,
+    } : {}),
   },
 };
 

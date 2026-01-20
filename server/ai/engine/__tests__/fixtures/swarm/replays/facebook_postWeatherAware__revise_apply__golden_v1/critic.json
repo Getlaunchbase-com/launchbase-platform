@@ -1,0 +1,30 @@
+[
+  {
+    "pass": false,
+    "issues": [
+      {
+        "severity": "high",
+        "message": "Proposed changes do not address the failures described in the logs. The changes are in a test file, but the failures stem from assertions related to the actual implementation of the business logic in the server code."
+      }
+    ],
+    "previewRecommended": false,
+    "risks": [
+      "Changes could lead to misalignment between expected and actual outputs if the underlying implementation does not match the updated test expectations."
+    ],
+    "assumptions": [
+      "It is assumed that the test failures are due to the implementation not returning the expected values, rather than an issue with the test itself."
+    ]
+  },
+  {
+    "pass": false,
+    "issues": [
+      {
+        "severity": "high",
+        "message": "Proposed changes do not address the failures in the specified tests. The changes are focused on a test file that is not related to the failures in the integration tests."
+      }
+    ],
+    "previewRecommended": false,
+    "risks": [],
+    "assumptions": []
+  }
+]

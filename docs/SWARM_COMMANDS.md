@@ -357,6 +357,61 @@ mv craft_clean.json craft.json
 ```
 
 ---
+## Golden Transcript Registry
+
+**Purpose:** Canonical golden transcripts captured from real swarm runs. Each transcript validates a specific decision path (APPLY, REJECT, REVISE→APPLY) and serves as a CI trust anchor.
+
+### 1. email_test__db_mock__golden_v1
+- **Scenario:** Email test failure (E3 bucket) with DB mock issues
+- **Decision Path:** APPLY (needs_human=true, single iteration)
+- **Fixture Location:** `server/ai/engine/__tests__/fixtures/swarm/replays/email_test__db_mock__golden_v1/`
+- **FailurePacket:** `server/ai/engine/__tests__/fixtures/swarm/failurePackets/email_test_e3_db_mock.json`
+- **Test Coverage:** 3 tests in `swarm.golden.invariants.test.ts`
+- **Captured:** January 19, 2026
+- **Status:** ✅ Locked (CI trust anchor)
+
+### 2. facebook_postWeatherAware__revise_apply__golden_v1
+- **Scenario:** Facebook posting integration test failure (weather-aware posting)
+- **Decision Path:** REVISE→REVISE→NEEDS_HUMAN (2 iterations, both critic.pass=false)
+- **Fixture Location:** `server/ai/engine/__tests__/fixtures/swarm/replays/facebook_postWeatherAware__revise_apply__golden_v1/`
+- **FailurePacket:** `server/ai/engine/__tests__/fixtures/swarm/failurePackets/facebook_postWeatherAware_revise_apply.json`
+- **Test Coverage:** 3 tests in `swarm.golden.invariants.test.ts`
+- **Captured:** January 20, 2026
+- **Status:** ✅ Locked (CI trust anchor)
+- **Key Validation:** Proves iteration loop works (craft[0] → critic[0].pass=false → craft[1] → critic[1].pass=false → needs_human)
+
+### Adding New Golden Transcripts
+
+1. **Capture to staging:**
+   ```bash
+   AI_PROVIDER=replay SWARM_RECORD=1 \
+   SWARM_REPLAY_RUN_ID=new_scenario__staging__$(date +%Y%m%d_%H%M%S) \
+   pnpm tsx scripts/swarm/captureGolden.ts --from path/to/failurePacket.json
+   ```
+
+2. **Validate replay:**
+   ```bash
+   AI_PROVIDER=replay \
+   SWARM_REPLAY_RUN_ID=new_scenario__staging__20260120_071419 \
+   pnpm tsx scripts/swarm/replayValidate.ts path/to/failurePacket.json
+   ```
+
+3. **Promote to golden:**
+   ```bash
+   mv server/ai/engine/__tests__/fixtures/swarm/replays/new_scenario__staging__20260120_071419 \
+      server/ai/engine/__tests__/fixtures/swarm/replays/new_scenario__golden_v1
+   ```
+
+4. **Add test coverage:**
+   - Add describe block to `server/ai/engine/__tests__/swarm.golden.invariants.test.ts`
+   - Include beforeEach with `__resetReplayProviderForTests()` and `process.env.SWARM_REPLAY_RUN_ID = GOLDEN_RUN_ID`
+   - Add 3 tests: determinism, decision path validation, fixture stability
+
+5. **Register in this document:**
+   - Add entry to Golden Transcript Registry with scenario details
+   - Mark as ✅ Locked after CI passes
+
+---
 
 ## Related Documents
 
@@ -366,4 +421,4 @@ mv craft_clean.json craft.json
 
 ---
 
-**Key Achievement:** Standardized environment variables, safety flags, and canonical commands. The promotion workflow prevents fixture drift and ensures golden transcripts remain trustworthy.
+**Key Achievement:** Standardized environment variables, safety flags, and canonical commands. The promotion workflow prevents fixture drift and ensures golden transcripts remain trustworthy. Two golden transcripts now serve as CI trust anchors for APPLY and REVISE→REVISE→NEEDS_HUMAN decision paths.

@@ -86,8 +86,38 @@ export async function runSwarmV1(
   };
   artifacts.push(planArtifact);
 
-  // Step 2-3: Run specialists (craft, critic) - skip field_general
-  for (const specialist of specialists) {
+  // Helper functions for iteration loop
+  function getProposedChanges(payload: any): any[] {
+    const pcs = payload?.proposedChanges;
+    return Array.isArray(pcs) ? pcs : [];
+  }
+
+  function hasHighIssues(criticPayload: any): boolean {
+    const issues = criticPayload?.issues;
+    if (!Array.isArray(issues)) return false;
+    return issues.some((i: any) => i?.severity === "high");
+  }
+
+  // Interpolate placeholders in prompt overrides
+  function interpolate(template: string, vars: Record<string, unknown>): string {
+    return template.replace(/\{(\w+)\}/g, (_, k) => {
+      const v = vars[k];
+      if (v === undefined) return `{${k}}`; // leave intact to make bugs visible
+      return typeof v === "string" ? v : JSON.stringify(v, null, 2);
+    });
+  }
+
+  // Step 2-3: Run specialists with iteration loop (craft → critic → revise)
+  const maxIterations = (workOrder.inputs as any)?.maxIterations ?? 2;
+  const craftRole = specialists[0] ?? "craft";
+  const criticRole = specialists[1] ?? "critic";
+  
+  let craftArtifactLast: AiArtifactV1 | undefined;
+  let criticArtifactLast: AiArtifactV1 | undefined;
+
+  for (let iter = 0; iter < maxIterations; iter++) {
+    // Run craft, then critic
+    for (const specialist of [craftRole, criticRole]) {
     const rawConfig = rolesSafe[specialist];
     if (!rawConfig) continue;
     
@@ -109,18 +139,60 @@ export async function runSwarmV1(
     try {
       // Extract prompt overrides for this role (if present)
       const inputs = workOrder.inputs as any;
-      const systemPromptOverride = inputs?.systemPromptOverride;
-      const userPromptOverride = inputs?.userPromptOverride;
+      
+      // Normalize role key (handles "critic", "swarm.specialist.critic", etc.)
+      const roleKey = specialist.split(".").pop() ?? specialist;
+      
+      // Role-specific overrides win, fall back to global
+      const roleOverrides = inputs?.promptOverrides?.[roleKey];
+      let systemPromptOverride = roleOverrides?.systemPromptOverride ?? inputs?.systemPromptOverride;
+      let userPromptOverride = roleOverrides?.userPromptOverride ?? inputs?.userPromptOverride;
+      
+      console.log(`[swarm] role=${roleKey} override.system=${!!systemPromptOverride} override.user=${!!userPromptOverride}`);
+      if (systemPromptOverride) {
+        console.log(`[swarm] ${roleKey} systemPrompt preview: ${systemPromptOverride.slice(0, 120)}...`);
+      }
+
+      // Build context with iteration feedback
+      const baseContext = workOrder.inputs ?? {};
+      const contextWithFeedback =
+        specialist === craftRole
+          ? { ...baseContext, swarmIteration: iter, priorCritic: criticArtifactLast?.payload ?? null }
+          : { ...baseContext, swarmIteration: iter, lastCraft: craftArtifactLast?.payload ?? null };
+
+      // Interpolate placeholders in prompt overrides
+      if (systemPromptOverride || userPromptOverride) {
+        const vars = {
+          failureContext: {
+            component: inputs?.component,
+            command: inputs?.command,
+            logs: inputs?.logs,
+            expectedFixes: inputs?.expectedFixes,
+            constraints: inputs?.constraints,
+          },
+          constraints: inputs?.constraints ?? [],
+          craftOutput: craftArtifactLast?.payload ?? null,
+          priorCritic: criticArtifactLast?.payload ?? null,
+          iteration: iter,
+        };
+        if (systemPromptOverride) {
+          systemPromptOverride = interpolate(systemPromptOverride, vars);
+        }
+        if (userPromptOverride) {
+          userPromptOverride = interpolate(userPromptOverride, vars);
+        }
+      }
 
       const result = await callSpecialistAIML({
         role: specialist as "craft" | "critic",
         trace: {
           jobId: ctx.traceId,
           step: `swarm.specialist.${specialist}`,
+          round: iter, // Pass iteration round for deterministic replay
         },
         input: {
           plan: planArtifact.payload,
-          context: workOrder.inputs,
+          context: contextWithFeedback,
           // Pass prompt overrides at top level (aimlSpecialist expects them here)
           ...(systemPromptOverride ? { systemPromptOverride } : {}),
           ...(userPromptOverride ? { userPromptOverride } : {}),
@@ -128,12 +200,41 @@ export async function runSwarmV1(
         roleConfig,
       });
 
-      // Inject stopReason into payload (single source of truth)
-      result.artifact.payload = {
-        ...(result.artifact.payload ?? {}),
-        role: specialist,
-        stopReason: result.stopReason,
-      };
+      // Critic schema gate: enforce required fields
+      if (roleKey === "critic") {
+        const p = result.artifact.payload as any;
+        if (typeof p?.pass !== "boolean") {
+          console.warn(`[swarm] Critic output missing required field 'pass', applying schema gate`);
+          result.artifact.payload = {
+            pass: false,
+            issues: [
+              {
+                severity: "high" as const,
+                message: "Critic output missing required field `pass` (schema gate).",
+              },
+            ],
+            previewRecommended: false,
+            risks: ["critic_schema_invalid"],
+            assumptions: [],
+            role: specialist,
+            stopReason: result.stopReason,
+          };
+        } else {
+          // Inject stopReason into valid critic payload
+          result.artifact.payload = {
+            ...(result.artifact.payload ?? {}),
+            role: specialist,
+            stopReason: result.stopReason,
+          };
+        }
+      } else {
+        // Inject stopReason into payload (single source of truth)
+        result.artifact.payload = {
+          ...(result.artifact.payload ?? {}),
+          role: specialist,
+          stopReason: result.stopReason,
+        };
+      }
 
       // Check per-role cap AFTER specialist call
       const perRoleCap = costCapsSafe.perRole?.[specialist];
@@ -216,6 +317,13 @@ export async function runSwarmV1(
         stopReason: result.stopReason,
       };
       artifacts.push(artifact);
+
+      // Track last artifacts for iteration feedback
+      if (specialist === craftRole) {
+        craftArtifactLast = artifact;
+      } else if (specialist === criticRole) {
+        criticArtifactLast = artifact;
+      }
 
       // Track cost
       costs.push({
@@ -378,7 +486,29 @@ export async function runSwarmV1(
         },
       };
     }
-  }
+    } // end specialist loop
+
+    // Check iteration stop conditions after both craft + critic have run
+    if (craftArtifactLast && criticArtifactLast) {
+      const craftPayload = craftArtifactLast.payload as any;
+      const criticPayload = criticArtifactLast.payload as any;
+      
+      const proposedChanges = getProposedChanges(craftPayload);
+      const hasChanges = proposedChanges.length > 0;
+      let pass = criticPayload?.pass === true;
+      const high = hasHighIssues(criticPayload);
+
+      // Guardrail: empty changes can never "pass"
+      if (pass && !hasChanges) pass = false;
+
+      // ✅ Stop if good (REVISE→APPLY lands here)
+      if (pass && hasChanges && !high) {
+        break;
+      }
+    }
+
+    // Otherwise iterate again (unless last iter, then fall out)
+  } // end iteration loop
 
   // Step 4: Field General "collapse" (deterministic synthesis)
   // Extract craft + critic artifacts to feed into collapse

@@ -100,10 +100,9 @@ if (failurePacketPath) {
       failureCount: packet.context.failureCount,
       constraints: packet.constraints,
       expectedOutcome: packet.expectedOutcome,
-      // Pass through prompt overrides if present
+      // Pass through role-specific prompt overrides (swarmRunner expects inputs.promptOverrides[role])
       ...(packet.context.promptOverrides ? {
-        systemPromptOverride: packet.context.promptOverrides.craft?.systemPromptOverride,
-        userPromptOverride: packet.context.promptOverrides.craft?.userPromptOverride,
+        promptOverrides: packet.context.promptOverrides,
       } : {}),
     },
   };
