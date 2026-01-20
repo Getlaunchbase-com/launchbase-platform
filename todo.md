@@ -3139,3 +3139,77 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
   - [ ] Create branch (not main) for safety
 - [ ] Test with existing repair artifacts (repair_1768946826657)
 - [ ] Update smoke test to verify --apply and --test work
+
+
+## Auto-Repair System: Production Hardening
+
+**Goal:** Make auto-repair safe, observable, and impossible to misinterpret
+
+**Tasks:**
+- [ ] Run real end-to-end verification
+  - [ ] Find existing FailurePacket in runs/smoke/
+  - [ ] Run `pnpm swarm:fix --from <failurePacket.json> --apply --test`
+  - [ ] Verify execution.applied === true
+  - [ ] Verify execution.testsPassed === true/false
+  - [ ] Verify stopReason is clear enum value
+  - [ ] Capture stdout/stderr per test step
+  - [ ] Add patchStats (files touched, lines added/removed)
+- [ ] Implement status enum + strict exit codes
+  - [ ] PASS_PROPOSED (no apply requested)
+  - [ ] PASS_APPLIED (apply ok, tests not requested)
+  - [ ] PASS_TESTED (apply ok + tests ok)
+  - [ ] FAIL_APPLY
+  - [ ] FAIL_TESTS
+  - [ ] FAIL_INVALID_PATCH
+  - [ ] FAIL_PRECONDITION (missing FailurePacket, dirty tree)
+  - [ ] Exit non-zero if apply fails
+  - [ ] Exit non-zero if tests fail
+- [ ] Add --commit with safety gates
+  - [ ] Check working tree clean before apply
+  - [ ] Only commit if --apply succeeded
+  - [ ] Only commit if --test passed (when provided)
+  - [ ] Create new branch (never main)
+  - [ ] Commit message: "auto-repair: <repairId> (<status>)"
+  - [ ] Optional: write docs/repairs/<repairId>.md for audit trail
+  - [ ] Optional: --push to remote branch
+- [ ] Build minimal dashboard (/admin/swarms)
+  - [ ] Create repairs table in DB (repairId, createdAt, status, cost, latency, stopReason, failurePacketPath, repairPacketPath)
+  - [ ] List view: repairId, createdAt, status, cost, latency, stopReason, View/Re-run/Download buttons
+  - [ ] Detail view: FailurePacket summary, diff preview, execution results, logs
+  - [ ] Trend view (later): pass rate 7/30 days, top stopReasons, avg cost/latency
+
+
+## Auto-Repair: Hard Gates for Deterministic Execution
+
+**Goal:** Make `pnpm swarm:fix --apply --test` deterministic - patches are always valid unified diffs, tests are machine-safe commands
+
+**Tasks:**
+- [x] Patch sanitization + validation in runSwarmFix.ts
+  - [x] Strip markdown code fences (```diff ... ```)
+  - [x] Trim leading/trailing whitespace
+  - [x] Ensure file ends with newline
+  - [x] Validate: must include `diff --git a/... b/...`
+  - [x] Validate: must include `--- a/...` and `+++ b/...`
+  - [x] Reject if contains `*** Begin Patch` or `*** Update File:`
+  - [x] Set stopReason="patch_invalid_format" with clear error
+  - [x] Run `git apply --check --whitespace=nowarn` before apply
+  - [x] Only apply if check passes
+- [x] Add testCommands schema to RepairPacket
+  - [x] Update server/contracts/repairPacket.ts
+  - [x] Add `testCommands?: Array<{cmd: string, args: string[], cwd?: string}>`
+  - [x] Keep testPlan for humans, but don't execute it
+- [x] Execute tests with shell:false
+  - [x] Prefer testCommands always
+  - [x] Use spawn(cmd, args, {shell: false})
+  - [x] Fail-fast: first non-zero exit → stopReason="test_failed"
+  - [x] If testCommands missing → stopReason="tests_missing_testCommands"
+- [x] Update Coder/Arbiter prompts
+  - [x] Coder: output ONLY unified diff (no fences, no commentary)
+  - [x] Coder: output testCommands as JSON array
+  - [x] Coder: never use "*** Begin Patch"
+  - [x] Arbiter: reject patches not starting with `diff --git`
+  - [x] Arbiter: reject test plans lacking testCommands
+- [x] Define PASS criteria
+  - [x] patchValid=true (unified diff validated)
+  - [x] applied=true (git apply succeeded)
+  - [x] testsPassed=true (all testCommands succeeded)

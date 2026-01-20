@@ -43,14 +43,19 @@ export type RepairPacketV1 = {
       diff?: string; // Unified diff (if applicable)
       rationale: string; // Why this change fixes the issue
     }>;
-    testPlan: string[]; // Steps to verify the fix
+    testPlan: string[]; // Human-readable test steps (not executed)
+    testCommands?: Array<{
+      cmd: string; // Command to execute (e.g., "pnpm")
+      args: string[]; // Command arguments (e.g., ["typecheck"])
+      cwd?: string; // Working directory (optional)
+    }>; // Machine-safe test commands (executed with shell:false)
     rollbackPlan: string; // How to undo if fix fails
   };
   
   execution: {
     applied: boolean; // Whether the patch was applied
     testsPassed: boolean; // Whether tests passed after applying
-    stopReason: "ok" | "tests_failed" | "patch_failed" | "human_review_required";
+    stopReason: "ok" | "tests_failed" | "patch_failed" | "patch_invalid_format" | "tests_missing_testCommands" | "human_review_required";
     logs: string[]; // Execution logs
     latencyMs: number; // Time taken for repair
     costUsd: number; // Cost of repair swarm

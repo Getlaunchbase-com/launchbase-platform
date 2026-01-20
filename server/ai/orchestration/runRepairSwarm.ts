@@ -141,6 +141,7 @@ Return JSON:
 async function runCoder(pkt: FailurePacketV1, diagnosis: any, reviseNotes: string = ""): Promise<{
   changes: RepairPacketV1["patchPlan"]["changes"];
   testPlan: string[];
+  testCommands?: RepairPacketV1["patchPlan"]["testCommands"];
   rollbackPlan: string;
   costUsd: number;
   latencyMs: number;
@@ -176,8 +177,15 @@ You MUST address the concerns and rationale above in your revised patch.
 
 **Your task:**
 1. Propose specific file changes to fix the issue
-2. Provide a test plan to verify the fix
+2. Provide machine-executable test commands
 3. Provide a rollback plan if the fix fails
+
+**CRITICAL FORMAT REQUIREMENTS:**
+- diff MUST be unified diff format (start with "diff --git a/... b/...", include "---" and "+++")
+- NEVER use "*** Begin Patch" or "*** Update File:" format
+- NO markdown code fences around diffs
+- NO commentary or prose in diffs
+- testCommands MUST be structured {cmd, args} - NO prose or parentheses
 
 Return JSON:
 {
@@ -186,11 +194,15 @@ Return JSON:
       "file": "path/to/file.ts",
       "operation": "edit|create|delete",
       "description": "What this change does",
-      "diff": "unified diff (optional)",
+      "diff": "diff --git a/path/to/file.ts b/path/to/file.ts\n--- a/path/to/file.ts\n+++ b/path/to/file.ts\n@@ -1,3 +1,3 @@\n-old line\n+new line",
       "rationale": "Why this fixes the issue"
     }
   ],
-  "testPlan": ["step 1", "step 2"],
+  "testPlan": ["Human-readable step 1", "Human-readable step 2"],
+  "testCommands": [
+    {"cmd": "pnpm", "args": ["typecheck"]},
+    {"cmd": "pnpm", "args": ["test", "--run", "path/to/test.ts"]}
+  ],
   "rollbackPlan": "How to undo if fix fails"
 }`;
 
@@ -224,6 +236,7 @@ Return JSON:
   return {
     changes,
     testPlan: Array.isArray(payload.testPlan) ? payload.testPlan : [],
+    testCommands: Array.isArray(payload.testCommands) ? payload.testCommands : undefined,
     rollbackPlan: typeof payload.rollbackPlan === "string" ? payload.rollbackPlan : "",
     costUsd,
     latencyMs,
@@ -325,14 +338,23 @@ ${JSON.stringify(patch, null, 2)}
 - Suggestions: ${review.suggestions.join(", ")}
 
 **Your task:**
-1. Decide whether to apply, reject, or revise the patch
-2. Provide rationale for your decision
-3. If revising, provide the final patch incorporating reviewer suggestions
+1. Validate patch format (MUST be unified diff starting with "diff --git")
+2. Validate testCommands exist and are structured {cmd, args}
+3. Decide whether to apply, reject, or revise the patch
+4. Provide rationale for your decision
+5. If revising, provide the final patch incorporating reviewer suggestions
+
+**REJECTION CRITERIA:**
+- REJECT if any diff does NOT start with "diff --git a/... b/..."
+- REJECT if any diff contains "*** Begin Patch" or "*** Update File:"
+- REJECT if testCommands is missing or empty
+- REJECT if testCommands contains prose instead of {cmd, args} structure
+- If rejected, instruct Coder to regenerate with correct format
 
 Return JSON:
 {
   "decision": "apply|reject|revise",
-  "rationale": "string",
+  "rationale": "string (include specific format violations if rejecting)",
   "finalPatch": { ... } // Only if decision is "apply" or "revise"
 }`;
 
@@ -582,6 +604,7 @@ export async function runRepairSwarm(opts: RepairSwarmOpts): Promise<RepairSwarm
     patchPlan: {
       changes: arbiter.finalPatch?.changes || patch.changes,
       testPlan: patch.testPlan,
+      testCommands: patch.testCommands,
       rollbackPlan: patch.rollbackPlan,
     },
     execution: {

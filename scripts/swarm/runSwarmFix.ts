@@ -14,6 +14,7 @@
  */
 
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { execSync, spawnSync } from "node:child_process";
 import { dirname } from "node:path";
 import { runRepairSwarm } from "../../server/ai/orchestration/runRepairSwarm.ts";
 import { createScoreCard } from "../../server/contracts/index.ts";
@@ -181,30 +182,80 @@ async function main() {
       result.repairPacket.execution.applied = false;
     } else {
       // Create temp patch file
-      const patchContent = changes.map(c => c.diff).join("\n");
-      const patchFile = `${outDir}/patch.diff`;
-      writeFileSync(patchFile, patchContent, "utf8");
-      applyLogs.push(`Created patch file: ${patchFile}`);
+      let patchContent = changes.map(c => c.diff).join("\n");
       
-      // Apply patch using git apply
-      try {
-        const { execSync } = require("child_process");
-        execSync(`git apply ${patchFile}`, { cwd: process.cwd(), stdio: "pipe" });
-        
-        // Log diff stats
-        const diffStat = execSync(`git diff --stat`, { cwd: process.cwd(), encoding: "utf8" });
-        console.log(`✅ Patch applied successfully`);
-        console.log(diffStat);
-        applyLogs.push(`git apply succeeded`);
-        applyLogs.push(`Diff stats:\n${diffStat}`);
-        
-        patchApplied = true;
-        result.repairPacket.execution.applied = true;
-      } catch (err) {
-        console.error(`❌ git apply failed: ${err.message}`);
-        applyLogs.push(`git apply failed: ${err.message}`);
-        result.repairPacket.execution.stopReason = "patch_failed";
+      // Sanitize patch
+      // 1. Strip markdown code fences
+      patchContent = patchContent.replace(/^```diff\n/gm, "").replace(/^```\n/gm, "");
+      // 2. Trim whitespace
+      patchContent = patchContent.trim();
+      // 3. Ensure newline at EOF
+      if (!patchContent.endsWith("\n")) {
+        patchContent += "\n";
+      }
+      
+      // Validate patch format
+      const isUnifiedDiff = patchContent.includes("diff --git") && 
+                           patchContent.includes("---") && 
+                           patchContent.includes("+++");
+      const isCustomFormat = patchContent.includes("*** Begin Patch") || 
+                            patchContent.includes("*** Update File:");
+      
+      if (isCustomFormat) {
+        console.error(`❌ Invalid patch format: *** Begin Patch style not supported`);
+        applyLogs.push(`Invalid patch format: must be unified diff (git apply compatible)`);
+        result.repairPacket.execution.stopReason = "patch_invalid_format";
         result.repairPacket.execution.applied = false;
+      } else if (!isUnifiedDiff) {
+        console.error(`❌ Invalid patch format: missing unified diff headers`);
+        applyLogs.push(`Invalid patch format: must include 'diff --git', '---', and '+++'`);
+        result.repairPacket.execution.stopReason = "patch_invalid_format";
+        result.repairPacket.execution.applied = false;
+      } else {
+        // Write sanitized patch
+        const patchFile = `${outDir}/patch.diff`;
+        writeFileSync(patchFile, patchContent, "utf8");
+        applyLogs.push(`Created patch file: ${patchFile}`);
+        
+        // Preflight check
+        try {
+          execSync(`git apply --check --whitespace=nowarn ${patchFile}`, { 
+            cwd: process.cwd(), 
+            stdio: "pipe" 
+          });
+          applyLogs.push(`git apply --check passed`);
+        } catch (checkErr) {
+          console.error(`❌ git apply --check failed: ${checkErr.message}`);
+          applyLogs.push(`git apply --check failed: ${checkErr.message}`);
+          if (checkErr.stderr) applyLogs.push(`stderr: ${checkErr.stderr}`);
+          result.repairPacket.execution.stopReason = "patch_failed";
+          result.repairPacket.execution.applied = false;
+        }
+        
+        // Apply patch if check passed
+        if (result.repairPacket.execution.stopReason !== "patch_failed") {
+          try {
+            execSync(`git apply --whitespace=nowarn ${patchFile}`, { 
+              cwd: process.cwd(), 
+              stdio: "pipe" 
+            });
+            
+            // Log diff stats
+            const diffStat = execSync(`git diff --stat`, { cwd: process.cwd(), encoding: "utf8" });
+            console.log(`✅ Patch applied successfully`);
+            console.log(diffStat);
+            applyLogs.push(`git apply succeeded`);
+            applyLogs.push(`Diff stats:\n${diffStat}`);
+            
+            patchApplied = true;
+            result.repairPacket.execution.applied = true;
+          } catch (err) {
+            console.error(`❌ git apply failed: ${err.message}`);
+            applyLogs.push(`git apply failed: ${err.message}`);
+            result.repairPacket.execution.stopReason = "patch_failed";
+            result.repairPacket.execution.applied = false;
+          }
+        }
       }
     }
   }
@@ -216,36 +267,40 @@ async function main() {
   if (shouldTest) {
     console.log(`\n🧪 Running tests...`);
     
-    const testPlan = result.repairPacket.patchPlan?.testPlan ?? [];
+    const testCommands = result.repairPacket.patchPlan?.testCommands;
     
-    if (testPlan.length === 0) {
-      console.log(`⚠️  No test plan provided`);
-      testLogs.push("No test plan in RepairPacket");
+    if (!testCommands || testCommands.length === 0) {
+      console.log(`⚠️  No testCommands provided`);
+      testLogs.push("testCommands missing - cannot execute tests");
+      result.repairPacket.execution.stopReason = "tests_missing_testCommands";
+      result.repairPacket.execution.testsPassed = false;
     } else {
-      const { execSync } = require("child_process");
+      // spawnSync already imported at top
       let allTestsPassed = true;
       
-      for (let i = 0; i < testPlan.length; i++) {
-        const testCmd = testPlan[i];
-        console.log(`   [${i + 1}/${testPlan.length}] Running: ${testCmd}`);
-        testLogs.push(`Test ${i + 1}: ${testCmd}`);
+      for (let i = 0; i < testCommands.length; i++) {
+        const { cmd, args, cwd } = testCommands[i];
+        const cmdStr = `${cmd} ${args.join(" ")}`;
+        console.log(`   [${i + 1}/${testCommands.length}] Running: ${cmdStr}`);
+        testLogs.push(`Test ${i + 1}: ${cmdStr}`);
         
-        try {
-          const output = execSync(testCmd, { 
-            cwd: process.cwd(), 
-            encoding: "utf8",
-            stdio: "pipe"
-          });
+        const testResult = spawnSync(cmd, args, {
+          cwd: cwd || process.cwd(),
+          shell: false,
+          encoding: "utf8",
+        });
+        
+        if (testResult.status === 0) {
           console.log(`   ✅ Passed`);
           testLogs.push(`Test ${i + 1} passed`);
-          if (output.trim()) {
-            testLogs.push(`Output: ${output.trim()}`);
+          if (testResult.stdout?.trim()) {
+            testLogs.push(`stdout: ${testResult.stdout.trim()}`);
           }
-        } catch (err) {
-          console.error(`   ❌ Failed: ${err.message}`);
-          testLogs.push(`Test ${i + 1} failed: ${err.message}`);
-          if (err.stdout) testLogs.push(`stdout: ${err.stdout}`);
-          if (err.stderr) testLogs.push(`stderr: ${err.stderr}`);
+        } else {
+          console.error(`   ❌ Failed (exit ${testResult.status})`);
+          testLogs.push(`Test ${i + 1} failed (exit ${testResult.status})`);
+          if (testResult.stdout) testLogs.push(`stdout: ${testResult.stdout}`);
+          if (testResult.stderr) testLogs.push(`stderr: ${testResult.stderr}`);
           
           allTestsPassed = false;
           result.repairPacket.execution.stopReason = "tests_failed";
