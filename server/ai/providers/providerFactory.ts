@@ -5,8 +5,8 @@
  * Mirrors EMAIL_TRANSPORT pattern for deterministic testing.
  */
 
-import * as fs from "node:fs";
-import * as path from "node:path";
+import * as nodeFs from "node:fs";
+import * as nodePath from "node:path";
 import type { AiProvider, AiChatRequest, AiChatResponse, AiChatMessage } from "./types";
 import { aimlProvider } from "./aimlProvider";
 import { safeError, safePreview, toSafeClientMessage } from "../security/redaction";
@@ -342,7 +342,7 @@ export function __resetReplayProviderForTests() {
 
 function createReplayProvider(): AiProvider {
   const replayId = process.env.SWARM_REPLAY_RUN_ID ?? process.env.REPLAY_ID ?? "apply_ok"; // fallback for backward compat
-  const baseDir = path.resolve(process.cwd(), "server/ai/engine/__tests__/fixtures/swarm/replays");
+  const baseDir = nodePath.resolve(process.cwd(), "server/ai/engine/__tests__/fixtures/swarm/replays");
   const recordMode = process.env.SWARM_RECORD === "1";
   const allowOverwrite = process.env.SWARM_RECORD_ALLOW_OVERWRITE === "1";
   
@@ -357,13 +357,13 @@ function createReplayProvider(): AiProvider {
   }
   
   function loadFixture(role: string, idx: number): any {
-    const filePath = path.join(baseDir, replayId, `${role}.json`);
+    const filePath = nodePath.join(baseDir, replayId, `${role}.json`);
     
-    if (!fs.existsSync(filePath)) {
+    if (!nodeFs.existsSync(filePath)) {
       throw new Error(`[replay] missing fixture: ${filePath}`);
     }
     
-    const raw = fs.readFileSync(filePath, "utf-8");
+    const raw = nodeFs.readFileSync(filePath, "utf-8");
     const data = JSON.parse(raw);
     
     // Support single object or array
@@ -380,17 +380,17 @@ function createReplayProvider(): AiProvider {
   }
   
   async function recordFixture(role: string, idx: number, response: AiChatResponse): Promise<void> {
-    const filePath = path.join(baseDir, replayId, `${role}.json`);
-    const dir = path.dirname(filePath);
+    const filePath = nodePath.join(baseDir, replayId, `${role}.json`);
+    const dir = nodePath.dirname(filePath);
     
     // Ensure directory exists
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+    if (!nodeFs.existsSync(dir)) {
+      nodeFs.mkdirSync(dir, { recursive: true });
     }
     
     // Read existing fixtures (if any)
     let existingData: any[] = [];
-    if (fs.existsSync(filePath)) {
+    if (nodeFs.existsSync(filePath)) {
       // Safety: refuse to overwrite unless explicitly allowed
       if (!allowOverwrite && idx === 0) {
         throw new Error(
@@ -399,7 +399,7 @@ function createReplayProvider(): AiProvider {
         );
       }
       
-      const raw = fs.readFileSync(filePath, "utf-8");
+      const raw = nodeFs.readFileSync(filePath, "utf-8");
       const data = JSON.parse(raw);
       existingData = Array.isArray(data) ? data : [data];
     }
@@ -416,7 +416,7 @@ function createReplayProvider(): AiProvider {
     existingData.push(artifact);
     
     // Write back to disk
-    fs.writeFileSync(filePath, JSON.stringify(existingData, null, 2), "utf-8");
+    nodeFs.writeFileSync(filePath, JSON.stringify(existingData, null, 2), "utf-8");
     console.log(`[replay:record] Wrote fixture: ${filePath} (entry ${idx})`);
   }
   
@@ -773,16 +773,16 @@ function writeAttemptArtifact(data: {
 }): void {
   try {
     // Determine output directory
-    const outDir = path.join(process.cwd(), "runs", "repair", data.repairId);
+    const outDir = nodePath.join(process.cwd(), "runs", "repair", data.repairId);
     
     // Create directory if it doesn't exist
-    if (!fs.existsSync(outDir)) {
-      fs.mkdirSync(outDir, { recursive: true });
+    if (!nodeFs.existsSync(outDir)) {
+      nodeFs.mkdirSync(outDir, { recursive: true });
     }
     
     // Write breadcrumb to prove function was called
-    const breadcrumbFile = path.join(outDir, ".attempts_called");
-    fs.writeFileSync(breadcrumbFile, Date.now().toString(), "utf8");
+    const breadcrumbFile = nodePath.join(outDir, ".attempts_called");
+    nodeFs.writeFileSync(breadcrumbFile, Date.now().toString(), "utf8");
     
     // Build JSONL line
     const line = JSON.stringify({
@@ -800,20 +800,20 @@ function writeAttemptArtifact(data: {
     }) + "\n";
     
     // Append to attempts.jsonl
-    const attemptsFile = path.join(outDir, "attempts.jsonl");
-    fs.appendFileSync(attemptsFile, line, "utf8");
+    const attemptsFile = nodePath.join(outDir, "attempts.jsonl");
+    nodeFs.appendFileSync(attemptsFile, line, "utf8");
   } catch (err: any) {
     // Write error to attempts.error.jsonl for debugging
     try {
-      const outDir = path.join(process.cwd(), "runs", "repair", data.repairId);
-      const errorFile = path.join(outDir, "attempts.error.jsonl");
+      const outDir = nodePath.join(process.cwd(), "runs", "repair", data.repairId);
+      const errorFile = nodePath.join(outDir, "attempts.error.jsonl");
       const errorLine = JSON.stringify({
         ts: new Date().toISOString(),
         error: String(err),
         stack: err?.stack,
         data,
       }) + "\n";
-      fs.appendFileSync(errorFile, errorLine, "utf8");
+      nodeFs.appendFileSync(errorFile, errorLine, "utf8");
     } catch {
       // If even error logging fails, silently continue
     }
