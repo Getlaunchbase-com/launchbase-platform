@@ -19,6 +19,11 @@ import { join } from "node:path";
 const FIXTURES_DIR = "runs/fixtures/failurePackets/v1";
 const REPO_ROOT = process.cwd();
 
+// Parse CLI args
+const args = process.argv.slice(2);
+const onlyIndex = args.indexOf("--only");
+const onlyFilter = onlyIndex !== -1 && args[onlyIndex + 1] ? args[onlyIndex + 1].split(",") : null;
+
 interface FixtureResult {
   id: string;
   stopReason: string;
@@ -33,9 +38,16 @@ function main() {
   console.log("[FixtureRunner] Starting fixture tests...\n");
   
   // Get all fixture files
-  const fixtures = readdirSync(join(REPO_ROOT, FIXTURES_DIR))
+  let fixtures = readdirSync(join(REPO_ROOT, FIXTURES_DIR))
     .filter(f => f.endsWith(".json"))
     .sort();
+  
+  // Filter by --only if specified
+  if (onlyFilter) {
+    const onlySet = new Set(onlyFilter.map(id => `${id}.json`));
+    fixtures = fixtures.filter(f => onlySet.has(f));
+    console.log(`[FixtureRunner] --only filter: ${onlyFilter.join(", ")}`);
+  }
   
   console.log(`[FixtureRunner] Found ${fixtures.length} fixtures\n`);
   
