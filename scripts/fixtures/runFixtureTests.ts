@@ -196,7 +196,16 @@ function main() {
     try {
       console.log(`\n[FixtureRunner] Reverting changes...`);
       execSync("git reset --hard HEAD", { cwd: REPO_ROOT, stdio: "ignore" });
-      console.log(`[FixtureRunner] ✅ Reverted`);
+      execSync("git clean -fd", { cwd: REPO_ROOT, stdio: "ignore" });
+      
+      // Verify clean status
+      const status = execSync("git status --porcelain=v1", { cwd: REPO_ROOT, encoding: "utf-8" }).trim();
+      if (status) {
+        console.error(`[FixtureRunner] ⚠️ Working tree not clean after revert:`);
+        console.error(status);
+      } else {
+        console.log(`[FixtureRunner] ✅ Reverted (working tree clean)`);
+      }
     } catch (error: any) {
       console.error(`[FixtureRunner] ⚠️ Failed to revert:`, error.message);
     }
