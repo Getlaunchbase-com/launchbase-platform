@@ -183,11 +183,14 @@ export async function callSpecialistAIML(
           temperature: 0.7,
           maxTokens: 2000,
           trace: {
+            // IMPORTANT: preserve runId so artifacts go to runs/repair/<repairId>/
+            runId: trace.runId,
             jobId: trace.jobId,
             step: `swarm.specialist.${role}`,
             round: 0,
             role, // explicit role for replay provider
-            replayRunId: trace.jobId, // stable per job
+            // stable per job for counter isolation; keep existing behavior
+            replayRunId: trace.jobId,
           },
         },
         roleConfig.transport,

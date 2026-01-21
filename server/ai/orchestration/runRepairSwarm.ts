@@ -107,7 +107,7 @@ Return JSON:
     role: "field_general",
     trace: {
       jobId: pkt.meta.jobId || "repair_job",
-      runId: pkt.meta.runId || "repair_run",
+      runId: pkt.meta.runId || pkt.meta.jobId || "repair_job",
     },
     input: {
       plan: { failurePacket: pkt, goal: "diagnose_and_fix" },
@@ -225,7 +225,7 @@ Return JSON:
     role: "coder",
     trace: {
       jobId: pkt.meta.jobId || "repair_job",
-      runId: pkt.meta.runId || "repair_run",
+      runId: pkt.meta.runId || pkt.meta.jobId || "repair_job",
     },
     input: {
       plan: { failurePacket: pkt, diagnosis, goal: "generate_patch" },
@@ -294,7 +294,7 @@ Return JSON:
     role: "reviewer",
     trace: {
       jobId: pkt.meta.jobId || "repair_job",
-      runId: pkt.meta.runId || "repair_run",
+      runId: pkt.meta.runId || pkt.meta.jobId || "repair_job",
     },
     input: {
       plan: { patch, goal: "review_patch" },
