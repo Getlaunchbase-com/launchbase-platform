@@ -91,10 +91,11 @@ async function main() {
     process.exit(1);
   }
 
-  // Get file metadata
+  // Get file metadata and contents
   const stats = statSync(targetPath);
   const sha256 = sha256File(targetPath);
   const relativePath = relative(repoRoot, targetPath);
+  const fileContents = readFileSync(targetPath, "utf8");
 
   console.log(`[MakeFixture] Building FailurePacket fixture:`);
   console.log(`  ID: ${id}`);
@@ -124,6 +125,9 @@ async function main() {
       },
       outputs: {},
       logs: [],
+      fileSnapshots: {
+        [relativePath]: fileContents,
+      },
       models: [],
       requestIds: [],
     },

@@ -3337,3 +3337,80 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
   - Command: `pnpm swarm:fix --from runs/fixtures/failurePackets/v1/minimal-tsconfig-test.json --apply --test`
   - Expected: patchValid=true, applied=true, testsPassed=true
 
+
+
+---
+
+## 🟢 GREEN PROOF RUN (Full Auto-Fix Success)
+
+**Goal:** Produce one fully green repair run (patchValid=true, applied=true, testsPassed=true)  
+**Status:** ✅ **ACHIEVED**
+
+**Strategy:** Use narrow single-file fixture (not tsconfig) with controlled failure
+
+### Steps
+- [x] Create controlled failing fixture
+  - Created server/utils/greenProofTest.ts with `return 42;` instead of string
+  - TypeScript error: TS2322 Type 'number' is not assignable to type 'string'
+- [x] Generate fixture with fixture:make
+  - Generated runs/fixtures/failurePackets/v1/green-proof-1.json
+  - Includes file contents, error logs, SHA256 hash
+- [x] Run swarm:fix --apply --test
+  - ✅ Field General diagnosed correctly (confidence: 0.99)
+  - ✅ Coder proposed fix: `return \`Hello, ${name}!\`;`
+  - ✅ Reviewer APPROVED (0 concerns)
+  - ✅ Arbiter Decision: apply
+  - ✅ Patch applied successfully
+  - ✅ pnpm typecheck PASSED
+- [x] Save artifacts and capture PASS metrics
+  - Artifact: runs/repair/repair_1768958884122/
+  - Cost: $0.06 | Latency: 22s
+  - Models: GPT-5.2 (Field General, Coder, Arbiter), GPT-4o-mini (Reviewer)
+- [ ] Revert intentional failure commit
+  - Keep fixture as golden test case
+
+### High Leverage Upgrades (Next)
+- [ ] Add StopReason taxonomy gating
+  - Hard gates: preflight_failed_*, patch_invalid, apply_failed, tests_failed, ok
+  - Enforce: only "ok" eligible for --commit
+- [ ] Add --commit flag for green runs
+  - Policy: only when patchValid && applied && testsPassed
+  - Commit to repair/<repairId> with artifact links
+- [ ] Auto-build fixture library (10 fixtures)
+  - 3 TS type errors
+  - 3 import/ESM errors
+  - 2 schema/contract mismatch errors
+  - 2 broken tests
+
+
+
+---
+
+## 🔧 SWARM CONTEXT FIX: Add File Contents to Agents
+
+**Goal:** Fix swarm blindness - agents need to see actual file contents to fix code  
+**Status:** ✅ Complete
+
+**Root Cause:** Swarm agents (Field General, Coder) only get error messages and logs, but NOT the actual file contents they need to fix.
+
+### Tasks
+- [x] Update FailurePacket schema to include file contents/snapshots
+  - Added `context.fileSnapshots: Record<string, string>` field
+  - Map of file paths → file contents at time of failure
+- [x] Update fixture builder to capture target file contents
+  - Reads target file and includes in fileSnapshots
+  - Auto-captures file contents during fixture generation
+- [x] Update Field General prompt to include file contents
+  - Added "**File Contents:**" section with fileSnapshots
+  - Field General can now see exact code
+- [x] Update Coder prompt to include file contents
+  - Added "**File Contents:**" section with fileSnapshots
+  - Coder can now see the exact code it needs to fix
+- [x] Regenerate green-proof-1 fixture with file contents
+  - Included server/utils/greenProofTest.ts contents
+  - Fixture now has complete context
+- [x] Run swarm:fix and verify green metrics
+  - ✅ applied=true, patchValid=true, pnpm typecheck PASSED
+  - ✅ Perfect fix: `return 42;` → `return \`Hello, ${name}!\`;`
+- [ ] Save checkpoint with swarm context fix
+

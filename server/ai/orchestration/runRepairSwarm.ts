@@ -88,6 +88,9 @@ ${pkt.failure.stack || "No stack trace available"}
 **Logs:**
 ${Array.isArray(pkt.context.logs) ? pkt.context.logs.join('\n') : typeof pkt.context.logs === 'string' ? pkt.context.logs : "No logs"}
 
+**File Contents:**
+${pkt.context.fileSnapshots ? Object.entries(pkt.context.fileSnapshots).map(([path, content]) => `--- ${path} ---\n${content}`).join('\n\n') : "No file snapshots available"}
+
 **Your task:**
 1. Identify the likely root cause
 2. Rate your confidence (0.0-1.0)
@@ -173,7 +176,13 @@ You MUST address the concerns and rationale above in your revised patch.
 **Failure Context:**
 - Type: ${pkt.failure.type}
 - Error: ${pkt.failure.errorMessage}
-- Component: ${component || "unknown"}${reviseSectionPrompt}
+- Component: ${component || "unknown"}
+
+**Logs:**
+${Array.isArray(pkt.context.logs) ? pkt.context.logs.join('\n') : "No logs"}
+
+**File Contents:**
+${pkt.context.fileSnapshots ? Object.entries(pkt.context.fileSnapshots).map(([path, content]) => `--- ${path} ---\n${content}`).join('\n\n') : "No file snapshots available"}${reviseSectionPrompt}
 
 **Your task:**
 1. Propose specific file changes to fix the issue

@@ -36,6 +36,7 @@ export type FailurePacketV1 = {
     inputs?: Record<string, any>; // Inputs to the failing operation (redacted)
     outputs?: Record<string, any>; // Partial outputs before failure (redacted)
     logs: string[]; // Last N lines of logs (redacted)
+    fileSnapshots?: Record<string, string>; // Map of file paths → file contents at time of failure
     models?: string[]; // AI models involved (if applicable)
     requestIds?: string[]; // Provider request IDs (if applicable)
   };
