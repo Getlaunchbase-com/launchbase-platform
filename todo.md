@@ -3482,3 +3482,18 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
 - [ ] Fix model ID prefix mismatches (remove anthropic/ prefix where needed)
 - [ ] Add pnpm refresh:models script to update aiml_models.json from aimlapi.com
 - [ ] Test with failing fixtures (f3, f6, f9) to verify models resolve correctly
+
+
+---
+
+## 🔧 FIX: attempts.jsonl Directory Path
+
+**Root cause:** `writeAttemptArtifact()` writes to `runs/repair/<trace.jobId>/` but fixture runner expects `runs/repair/<repairId>/` (e.g., `repair_1769034964479`). The `repairId` is actually `trace.runId`, not `trace.jobId`.
+
+### Tasks:
+- [ ] Update `completeJson()` to use `trace.runId` (or `trace.replayRunId`, fallback to `trace.jobId`) for artifact directory
+- [ ] Add `runId?: string` to `CompleteJsonOptions.trace` type
+- [ ] Test with fixture to verify `attempts.jsonl` lands in correct directory
+- [ ] Verify breadcrumb file `.attempts_called` exists in same directory
+
+**Expected outcome:** `runs/repair/<repairId>/attempts.jsonl` exists after every swarm run

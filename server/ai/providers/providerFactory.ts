@@ -563,6 +563,7 @@ export interface CompleteJsonOptions {
   maxTokens?: number;
   trace: {
     jobId: string;
+    runId?: string; // per-run directory for repair artifacts (e.g., repair_1769034964479)
     step: string;
     round: number;
     role?: string; // explicit role for replay provider
@@ -609,9 +610,14 @@ export async function completeJson(
 ): Promise<CompleteJsonResult> {
   // ---- Attempt logging state (must be visible to finally) ----
   const attemptStartMs = Date.now();
-  const repairId = options.trace.jobId.startsWith('repair_') 
-    ? options.trace.jobId 
-    : `repair_${options.trace.jobId}`;
+  
+  // IMPORTANT: For repair artifacts we want the per-run directory (repair_<ts>),
+  // which is carried through the stack as trace.runId. trace.jobId is often stable
+  // across runs and will not match runs/repair/<repairId>/ expected by the harness.
+  const repairRunId =
+    (options.trace as any)?.runId ||
+    options.trace.replayRunId ||
+    options.trace.jobId;
   const role = options.trace.role || routerOpts?.task || "generic";
   const requestedModel = options.model;
   let attemptedModels: string[] = [];
@@ -754,7 +760,7 @@ export async function completeJson(
       attemptedModels = selectedModel ? [selectedModel] : [requestedModel];
     }
     writeAttemptArtifact({
-      repairId,
+      repairId: repairRunId,
       trace: options.trace,
       role,
       requestedModel,
