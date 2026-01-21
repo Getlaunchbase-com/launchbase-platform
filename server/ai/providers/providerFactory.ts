@@ -5,6 +5,8 @@
  * Mirrors EMAIL_TRANSPORT pattern for deterministic testing.
  */
 
+import * as fs from "node:fs";
+import * as path from "node:path";
 import type { AiProvider, AiChatRequest, AiChatResponse, AiChatMessage } from "./types";
 import { aimlProvider } from "./aimlProvider";
 import { safeError, safePreview, toSafeClientMessage } from "../security/redaction";
@@ -330,9 +332,6 @@ const memoryProvider: AiProvider = {
 // ============================================
 // REPLAY TRANSPORT (for swarm deterministic testing)
 // ============================================
-
-import path from "node:path";
-import fs from "node:fs";
 
 // Module-level singleton to preserve counter state across calls
 let _replayProvider: AiProvider | null = null;
@@ -773,11 +772,8 @@ function writeAttemptArtifact(data: {
   error: string | null;
 }): void {
   try {
-    const fs = require('fs');
-    const path = require('path');
-    
     // Determine output directory
-    const outDir = path.join(process.cwd(), 'runs', 'repair', data.repairId);
+    const outDir = path.join(process.cwd(), "runs", "repair", data.repairId);
     
     // Create directory if it doesn't exist
     if (!fs.existsSync(outDir)) {
