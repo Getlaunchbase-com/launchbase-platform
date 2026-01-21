@@ -618,6 +618,7 @@ export async function completeJson(
   let failureReasons: Record<string, string> = {};
   let selectedModel: string | null = null;
   let attemptError: string | null = null;
+  let finalResult: CompleteJsonResult | null = null;
 
   try {
     const selectedTransport = transport || (process.env.AI_PROVIDER as AiTransport) || "aiml";
@@ -644,7 +645,7 @@ export async function completeJson(
       });
       
       // Wrap provider call with health-aware fallback
-      const result = await withModelFallback({
+      const fallbackResult = await withModelFallback({
         primary,
         fallbacks,
         call: async (modelId: string) => {
@@ -661,23 +662,23 @@ export async function completeJson(
 
       const latencyMs = Date.now() - startTime;
       const baseResult = buildCompleteJsonResult(
-        result.response,
-        result.selectedModel,
+        fallbackResult.response,
+        fallbackResult.selectedModel,
         selectedTransport,
         latencyMs,
         trace
       );
       
       // Populate attempt metadata from router result
-      attemptedModels = result.attemptedModels;
-      failureReasons = result.failureReasons;
-      selectedModel = result.selectedModel;
+      attemptedModels = fallbackResult.attemptedModels;
+      failureReasons = fallbackResult.failureReasons;
+      selectedModel = fallbackResult.selectedModel;
       
-      // Add fallback metadata
-      return {
+      // Store result (will be returned after finally)
+      finalResult = {
         ...baseResult,
-        attemptedModels: result.attemptedModels,
-        failureReasons: result.failureReasons,
+        attemptedModels: fallbackResult.attemptedModels,
+        failureReasons: fallbackResult.failureReasons,
       };
     } catch (err) {
       // Do NOT log raw error object.
@@ -712,13 +713,14 @@ export async function completeJson(
     });
 
     const latencyMs = Date.now() - startTime;
-    const finalResult = buildCompleteJsonResult(response, options.model, selectedTransport, latencyMs, trace);
+    const directResult = buildCompleteJsonResult(response, options.model, selectedTransport, latencyMs, trace);
     
     // Populate attempt metadata (direct call, no fallback)
     selectedModel = options.model;
     attemptedModels = [options.model];
     
-    return finalResult;
+    // Store result (will be returned after finally)
+    finalResult = directResult;
   } catch (err) {
     // Ensure we never leak provider message details to callers up-stack.
     const e = safeError(err);
@@ -736,6 +738,12 @@ export async function completeJson(
     
     throw new Error(toSafeClientMessage({ trace }));
   }
+  
+  // Return result (finally will run before this returns)
+  if (!finalResult) {
+    throw new Error("No result produced");
+  }
+  return finalResult;
   } catch (err: any) {
     attemptError = safeError(err).message || String(err);
     throw err;
