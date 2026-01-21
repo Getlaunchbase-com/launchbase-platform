@@ -187,6 +187,12 @@ You MUST address the concerns and rationale above in your revised patch.
 - NO commentary or prose in diffs
 - testCommands MUST be structured {cmd, args} - NO prose or parentheses
 
+**Diff format requirements (CRITICAL):**
+- For JSON/config files or files ≤ 30 lines: prefer full-file replacement diff
+- NEVER guess @@ hunk header counts (-a,b +c,d) - they MUST exactly match the hunk body line counts
+- If uncertain about hunk counts, use full-file replacement instead
+- Example: @@ -1,2 +1,3 @@ means "remove 2 lines starting at line 1, add 3 lines starting at line 1"
+
 Return JSON:
 {
   "changes": [
@@ -349,6 +355,8 @@ ${JSON.stringify(patch, null, 2)}
 - REJECT if any diff contains "*** Begin Patch" or "*** Update File:"
 - REJECT if testCommands is missing or empty
 - REJECT if testCommands contains prose instead of {cmd, args} structure
+- REJECT if patch would fail 'git apply --check' due to malformed hunks
+- REJECT if patch touches JSON/config files or files with 30 lines or fewer without using full-file replacement
 - If rejected, instruct Coder to regenerate with correct format
 
 Return JSON:

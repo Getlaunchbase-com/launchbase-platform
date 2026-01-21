@@ -3213,3 +3213,24 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
   - [x] patchValid=true (unified diff validated)
   - [x] applied=true (git apply succeeded)
   - [x] testsPassed=true (all testCommands succeeded)
+
+
+## Auto-Repair: Fix Corrupt Patch Issue with --recount
+
+**Goal:** Fix "corrupt patch at line X" errors by adding --recount retry logic and updating prompts
+
+**Tasks:**
+- [x] Add --recount retry logic to runSwarmFix.ts
+  - [x] Try `git apply --check patch.diff` first
+  - [x] If fails with "corrupt patch", retry with `git apply --check --recount patch.diff`
+  - [x] If check passes, apply with matching flags: `git apply --recount patch.diff`
+  - [x] If still fails → set stopReason="patch_invalid_format"
+- [x] Update Coder prompt (server/ai/orchestration/runRepairSwarm.ts)
+  - [x] Prefer full-file replacement for JSON/config files
+  - [x] Forbid guessing @@ hunk header counts
+  - [x] Require hunk header counts to match hunk body exactly
+- [x] Update Arbiter prompt (server/ai/orchestration/runRepairSwarm.ts)
+  - [x] Reject patches that would fail `git apply --check`
+  - [x] Require full-file replacement for files ≤ 30 lines
+- [x] Re-run verification: `pnpm swarm:fix --from <failurePacket> --apply --test`
+- [x] Verify PASS criteria: patchValid && applied && testsPassed (ALL GREEN ✅)

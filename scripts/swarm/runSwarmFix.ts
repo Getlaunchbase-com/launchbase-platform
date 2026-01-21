@@ -218,24 +218,57 @@ async function main() {
         applyLogs.push(`Created patch file: ${patchFile}`);
         
         // Preflight check
+        let checkPassed = false;
         try {
           execSync(`git apply --check --whitespace=nowarn ${patchFile}`, { 
             cwd: process.cwd(), 
             stdio: "pipe" 
           });
           applyLogs.push(`git apply --check passed`);
+          checkPassed = true;
         } catch (checkErr) {
-          console.error(`❌ git apply --check failed: ${checkErr.message}`);
-          applyLogs.push(`git apply --check failed: ${checkErr.message}`);
-          if (checkErr.stderr) applyLogs.push(`stderr: ${checkErr.stderr}`);
-          result.repairPacket.execution.stopReason = "patch_failed";
-          result.repairPacket.execution.applied = false;
+          const errorMsg = checkErr.message || "";
+          const stderr = checkErr.stderr?.toString() || "";
+          
+          // Retry with --recount if "corrupt patch" error
+          if (errorMsg.includes("corrupt patch") || stderr.includes("corrupt patch")) {
+            console.log(`⚠️ Corrupt patch detected, retrying with --recount...`);
+            applyLogs.push(`git apply --check failed: ${errorMsg}`);
+            applyLogs.push(`Retrying with --recount to fix hunk header counts...`);
+            
+            try {
+              execSync(`git apply --check --recount --whitespace=nowarn ${patchFile}`, { 
+                cwd: process.cwd(), 
+                stdio: "pipe" 
+              });
+              applyLogs.push(`git apply --check --recount passed`);
+              checkPassed = true;
+            } catch (recountErr) {
+              console.error(`❌ git apply --check --recount failed: ${recountErr.message}`);
+              applyLogs.push(`git apply --check --recount failed: ${recountErr.message}`);
+              if (recountErr.stderr) applyLogs.push(`stderr: ${recountErr.stderr}`);
+              result.repairPacket.execution.stopReason = "patch_failed";
+              result.repairPacket.execution.applied = false;
+            }
+          } else {
+            console.error(`❌ git apply --check failed: ${errorMsg}`);
+            applyLogs.push(`git apply --check failed: ${errorMsg}`);
+            if (stderr) applyLogs.push(`stderr: ${stderr}`);
+            result.repairPacket.execution.stopReason = "patch_failed";
+            result.repairPacket.execution.applied = false;
+          }
         }
         
         // Apply patch if check passed
-        if (result.repairPacket.execution.stopReason !== "patch_failed") {
+        if (checkPassed) {
           try {
-            execSync(`git apply --whitespace=nowarn ${patchFile}`, { 
+            // Use --recount if check needed it (detect from logs)
+            const needsRecount = applyLogs.some(log => log.includes("--recount passed"));
+            const applyCmd = needsRecount 
+              ? `git apply --recount --whitespace=nowarn ${patchFile}`
+              : `git apply --whitespace=nowarn ${patchFile}`;
+            
+            execSync(applyCmd, { 
               cwd: process.cwd(), 
               stdio: "pipe" 
             });
