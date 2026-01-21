@@ -3467,3 +3467,18 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
 - [ ] Commit message includes repairId + short summary
 - [ ] Never pushes to main
 
+
+
+---
+
+## 🔧 MODEL REGISTRY: One True Source Integration
+
+**Goal:** Make aiml_models.json the permanent, updateable source of truth for all models  
+**Status:** In progress
+
+### Tasks
+- [ ] Update ModelRegistry to load from aiml_models.json instead of live API calls
+- [ ] Add fallback to live API only if aiml_models.json is missing/corrupt
+- [ ] Fix model ID prefix mismatches (remove anthropic/ prefix where needed)
+- [ ] Add pnpm refresh:models script to update aiml_models.json from aimlapi.com
+- [ ] Test with failing fixtures (f3, f6, f9) to verify models resolve correctly

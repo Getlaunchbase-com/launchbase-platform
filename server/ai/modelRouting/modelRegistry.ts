@@ -1,11 +1,14 @@
 /**
  * Model Registry
  * 
- * Calls AIML /v1/models, caches with TTL, refreshes in background.
+ * Loads models from aiml_models.json (one true source).
+ * Falls back to AIML /v1/models only if file is missing/corrupt.
  * Keeps "last known good" on failure.
  */
 
 import OpenAI from "openai";
+import * as fs from "fs";
+import * as path from "path";
 import { NormalizedModel, ModelRegistryState, ModelType } from "./modelRouting.types";
 import { normalizeFeatures, inferTypeFromId } from "./modelNormalize";
 
@@ -63,6 +66,7 @@ export class ModelRegistry {
 
   /**
    * Refresh if TTL expired, otherwise no-op (unless force=true).
+   * Loads from aiml_models.json first, falls back to live API.
    */
   async refresh(force = false): Promise<void> {
     const now = Date.now();
@@ -73,8 +77,27 @@ export class ModelRegistry {
 
     this.inflight = (async () => {
       try {
-        const resp = await this.opts.openaiClient.models.list();
-        const rawModels = (resp as any).data ?? [];
+        // Try loading from aiml_models.json first (one true source)
+        let rawModels: any[] = [];
+        const modelFilePath = path.join(process.cwd(), "aiml_models.json");
+        
+        if (fs.existsSync(modelFilePath)) {
+          try {
+            const fileContent = fs.readFileSync(modelFilePath, "utf-8");
+            const json = JSON.parse(fileContent);
+            rawModels = json.data ?? [];
+            this.opts.logger?.info?.(`[ModelRegistry] loaded ${rawModels.length} models from aiml_models.json`);
+          } catch (fileError: any) {
+            this.opts.logger?.warn?.(`[ModelRegistry] failed to load aiml_models.json: ${fileError.message}`);
+          }
+        }
+        
+        // Fallback to live API only if file load failed
+        if (rawModels.length === 0) {
+          this.opts.logger?.info?.(`[ModelRegistry] falling back to live API`);
+          const resp = await this.opts.openaiClient.models.list();
+          rawModels = (resp as any).data ?? [];
+        }
         const deny = new Set(this.opts.denylist ?? []);
 
         const next = new Map<string, NormalizedModel>();
