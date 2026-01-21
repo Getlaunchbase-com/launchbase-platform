@@ -607,17 +607,24 @@ export async function completeJson(
   transport?: AiTransport,
   routerOpts?: { task?: string; useRouter?: boolean; strict?: boolean }
 ): Promise<CompleteJsonResult> {
-  const selectedTransport = transport || (process.env.AI_PROVIDER as AiTransport) || "aiml";
-  const provider = getAiProvider(selectedTransport);
-  const startTime = Date.now();
-
-  const trace = `${options.trace.jobId}:${options.trace.step}:${options.trace.round}`;
-  const role = options.trace.role || routerOpts?.task || "generic";
-  
-  // Extract repairId from jobId (format: repair_<timestamp>)
+  // ---- Attempt logging state (must be visible to finally) ----
+  const attemptStartMs = Date.now();
   const repairId = options.trace.jobId.startsWith('repair_') 
     ? options.trace.jobId 
     : `repair_${options.trace.jobId}`;
+  const role = options.trace.role || routerOpts?.task || "generic";
+  const requestedModel = options.model;
+  let attemptedModels: string[] = [];
+  let failureReasons: Record<string, string> = {};
+  let selectedModel: string | null = null;
+  let attemptError: string | null = null;
+
+  try {
+    const selectedTransport = transport || (process.env.AI_PROVIDER as AiTransport) || "aiml";
+    const provider = getAiProvider(selectedTransport);
+    const startTime = Date.now();
+
+    const trace = `${options.trace.jobId}:${options.trace.step}:${options.trace.round}`;
 
   // If router enabled and transport is aiml, use withModelFallback for health-aware routing
   if (routerOpts?.useRouter && selectedTransport === "aiml") {
@@ -661,18 +668,10 @@ export async function completeJson(
         trace
       );
       
-      // Write attempt artifact
-      writeAttemptArtifact({
-        repairId,
-        trace: options.trace,
-        role,
-        requestedModel: options.model,
-        attemptedModels: result.attemptedModels,
-        failureReasons: result.failureReasons,
-        selectedModel: result.selectedModel,
-        latencyMs,
-        error: null,
-      });
+      // Populate attempt metadata from router result
+      attemptedModels = result.attemptedModels;
+      failureReasons = result.failureReasons;
+      selectedModel = result.selectedModel;
       
       // Add fallback metadata
       return {
@@ -715,18 +714,9 @@ export async function completeJson(
     const latencyMs = Date.now() - startTime;
     const finalResult = buildCompleteJsonResult(response, options.model, selectedTransport, latencyMs, trace);
     
-    // Write attempt artifact (direct call, no fallback)
-    writeAttemptArtifact({
-      repairId,
-      trace: options.trace,
-      role,
-      requestedModel: options.model,
-      attemptedModels: [options.model],
-      failureReasons: {},
-      selectedModel: options.model,
-      latencyMs,
-      error: null,
-    });
+    // Populate attempt metadata (direct call, no fallback)
+    selectedModel = options.model;
+    attemptedModels = [options.model];
     
     return finalResult;
   } catch (err) {
@@ -739,21 +729,33 @@ export async function completeJson(
       error: e,
     });
     
-    // Write attempt artifact (failure)
-    const latencyMs = Date.now() - startTime;
+    // Populate failure metadata (will be written in finally)
+    selectedModel = null;
+    attemptedModels = [options.model];
+    failureReasons = { [options.model]: e.message || 'Provider call failed' };
+    
+    throw new Error(toSafeClientMessage({ trace }));
+  }
+  } catch (err: any) {
+    attemptError = safeError(err).message || String(err);
+    throw err;
+  } finally {
+    const latencyMs = Date.now() - attemptStartMs;
+    // Reasonable defaults if we never reached routing metadata
+    if (attemptedModels.length === 0) {
+      attemptedModels = selectedModel ? [selectedModel] : [requestedModel];
+    }
     writeAttemptArtifact({
       repairId,
       trace: options.trace,
       role,
-      requestedModel: options.model,
-      attemptedModels: [options.model],
-      failureReasons: { [options.model]: e.message || 'Provider call failed' },
-      selectedModel: null,
+      requestedModel,
+      attemptedModels,
+      failureReasons,
+      selectedModel,
       latencyMs,
-      error: e.message || 'Provider call failed',
+      error: attemptError,
     });
-    
-    throw new Error(toSafeClientMessage({ trace }));
   }
 }
 
