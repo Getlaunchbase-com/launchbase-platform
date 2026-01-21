@@ -592,6 +592,8 @@ export interface CompleteJsonResult {
     creditsUsed: number | null;
   };
   latencyMs: number;
+  attemptedModels?: string[];
+  failureReasons?: Record<string, string>;
 }
 
 /**
@@ -610,39 +612,83 @@ export async function completeJson(
   const provider = getAiProvider(selectedTransport);
   const startTime = Date.now();
 
-  let finalModel = options.model;
   const trace = `${options.trace.jobId}:${options.trace.step}:${options.trace.round}`;
+  const role = options.trace.role || routerOpts?.task || "generic";
+  
+  // Extract repairId from jobId (format: repair_<timestamp>)
+  const repairId = options.trace.jobId.startsWith('repair_') 
+    ? options.trace.jobId 
+    : `repair_${options.trace.jobId}`;
 
-  // If router enabled and transport is aiml, use ModelRouter for failover
+  // If router enabled and transport is aiml, use withModelFallback for health-aware routing
   if (routerOpts?.useRouter && selectedTransport === "aiml") {
     try {
-      const { modelRouter } = await import("../index");
-      const result = await modelRouter.route(
-        {
-          task: routerOpts.task || "json",
-          requestedModelId: options.model,
-          maxAttempts: 3,
-        },
-        async (modelId) => {
-          finalModel = modelId;
+      const { withModelFallback } = await import("../modelRouting/withModelFallback");
+      const { buildCandidates } = await import("../modelRouting/modelChains");
+      
+      // Build candidate list: primary + role-aware fallbacks
+      const candidates = buildCandidates(options.model, role);
+      const primary = candidates[0];
+      const fallbacks = candidates.slice(1);
+      
+      console.log(`[completeJson] Using health-aware routing for ${role}`, {
+        trace,
+        primary,
+        fallbacks,
+      });
+      
+      // Wrap provider call with health-aware fallback
+      const result = await withModelFallback({
+        primary,
+        fallbacks,
+        call: async (modelId: string) => {
           return await provider.chat({
             ...options,
             model: modelId,
             jsonOnly: true,
           });
-        }
-      );
+        },
+        maxAttempts: 3,
+        timeoutMs: 120000, // 120s timeout for swarm calls
+        context: `${role}:${trace}`,
+      });
 
       const latencyMs = Date.now() - startTime;
-      return buildCompleteJsonResult(result, finalModel, selectedTransport, latencyMs, trace);
+      const baseResult = buildCompleteJsonResult(
+        result.response,
+        result.selectedModel,
+        selectedTransport,
+        latencyMs,
+        trace
+      );
+      
+      // Write attempt artifact
+      writeAttemptArtifact({
+        repairId,
+        trace: options.trace,
+        role,
+        requestedModel: options.model,
+        attemptedModels: result.attemptedModels,
+        failureReasons: result.failureReasons,
+        selectedModel: result.selectedModel,
+        latencyMs,
+        error: null,
+      });
+      
+      // Add fallback metadata
+      return {
+        ...baseResult,
+        attemptedModels: result.attemptedModels,
+        failureReasons: result.failureReasons,
+      };
     } catch (err) {
       // Do NOT log raw error object.
       const e = safeError(err);
-      console.warn("[AI] ModelRouter failed", {
+      console.warn("[AI] withModelFallback failed", {
         trace,
         transport: selectedTransport,
         requestedModel: options.model,
-        task: routerOpts.task || "json",
+        role,
         error: e,
       });
 
@@ -656,11 +702,11 @@ export async function completeJson(
 
   // Call provider directly (no router)
   try {
-    console.log("[completeJson] calling provider.chat", {
+    console.log("[completeJson] calling provider.chat (direct)", {
       transport: selectedTransport,
       provider: provider?.constructor?.name || "unknown",
       trace,
-      model: finalModel,
+      model: options.model,
     });
     const response = await provider.chat({
       ...options,
@@ -668,17 +714,97 @@ export async function completeJson(
     });
 
     const latencyMs = Date.now() - startTime;
-    return buildCompleteJsonResult(response, finalModel, selectedTransport, latencyMs, trace);
+    const finalResult = buildCompleteJsonResult(response, options.model, selectedTransport, latencyMs, trace);
+    
+    // Write attempt artifact (direct call, no fallback)
+    writeAttemptArtifact({
+      repairId,
+      trace: options.trace,
+      role,
+      requestedModel: options.model,
+      attemptedModels: [options.model],
+      failureReasons: {},
+      selectedModel: options.model,
+      latencyMs,
+      error: null,
+    });
+    
+    return finalResult;
   } catch (err) {
     // Ensure we never leak provider message details to callers up-stack.
     const e = safeError(err);
     console.error("[AI] Provider chat failed", {
       trace,
       transport: selectedTransport,
-      model: finalModel,
+      model: options.model,
       error: e,
     });
+    
+    // Write attempt artifact (failure)
+    const latencyMs = Date.now() - startTime;
+    writeAttemptArtifact({
+      repairId,
+      trace: options.trace,
+      role,
+      requestedModel: options.model,
+      attemptedModels: [options.model],
+      failureReasons: { [options.model]: e.message || 'Provider call failed' },
+      selectedModel: null,
+      latencyMs,
+      error: e.message || 'Provider call failed',
+    });
+    
     throw new Error(toSafeClientMessage({ trace }));
+  }
+}
+
+/**
+ * Write attempt metadata to artifact file (JSONL format)
+ */
+function writeAttemptArtifact(data: {
+  repairId: string;
+  trace: { jobId: string; step: string; round: number; role?: string };
+  role: string;
+  requestedModel: string;
+  attemptedModels: string[];
+  failureReasons: Record<string, string>;
+  selectedModel: string | null;
+  latencyMs: number;
+  error: string | null;
+}): void {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    
+    // Determine output directory
+    const outDir = path.join(process.cwd(), 'runs', 'repair', data.repairId);
+    
+    // Create directory if it doesn't exist
+    if (!fs.existsSync(outDir)) {
+      fs.mkdirSync(outDir, { recursive: true });
+    }
+    
+    // Build JSONL line
+    const line = JSON.stringify({
+      ts: new Date().toISOString(),
+      jobId: data.trace.jobId,
+      step: data.trace.step,
+      round: data.trace.round,
+      role: data.role,
+      requestedModel: data.requestedModel,
+      attemptedModels: data.attemptedModels,
+      failureReasons: data.failureReasons,
+      selectedModel: data.selectedModel,
+      latencyMs: data.latencyMs,
+      error: data.error,
+    }) + '\n';
+    
+    // Append to attempts.jsonl
+    const attemptsFile = path.join(outDir, 'attempts.jsonl');
+    fs.appendFileSync(attemptsFile, line, 'utf8');
+  } catch (err) {
+    // Don't fail the request if artifact writing fails
+    console.warn('[completeJson] Failed to write attempt artifact:', err);
   }
 }
 
