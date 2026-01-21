@@ -195,6 +195,21 @@ async function main() {
   const outDir = `runs/repair/${repairId}`;
   mkdirSync(outDir, { recursive: true });
 
+  // ✅ FIX #1: Always persist FailurePacket to repair dir for reproducibility
+  const failurePacketPath = `${outDir}/failurePacket.json`;
+  writeFileSync(failurePacketPath, JSON.stringify(failurePacket, null, 2), "utf-8");
+  console.log(`📝 Wrote failurePacket.json to ${outDir}`);
+
+  // Optional: Write meta.json for audit trail
+  const metaPath = `${outDir}/meta.json`;
+  writeFileSync(metaPath, JSON.stringify({
+    repairId,
+    createdAtIso: new Date().toISOString(),
+    gitSha: failurePacket.context?.sha ?? process.env.GIT_SHA ?? null,
+    stopReason: null, // Will be updated at end
+  }, null, 2), "utf-8");
+  console.log(`📝 Wrote meta.json to ${outDir}`);
+
   let result;
   
   if (offline) {
