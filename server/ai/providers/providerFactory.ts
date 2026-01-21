@@ -615,7 +615,7 @@ export async function completeJson(
   // which is carried through the stack as trace.runId. trace.jobId is often stable
   // across runs and will not match runs/repair/<repairId>/ expected by the harness.
   const repairRunId =
-    (options.trace as any)?.runId ||
+    options.trace.runId ||
     options.trace.replayRunId ||
     options.trace.jobId;
   const role = options.trace.role || routerOpts?.task || "generic";
