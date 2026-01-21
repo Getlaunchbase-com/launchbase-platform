@@ -244,6 +244,13 @@ async function main() {
   }, null, 2), "utf-8");
   console.log(`📝 Wrote meta.json to ${outDir}`);
 
+  // IMPORTANT: Ensure all downstream AI calls log attempts under *this* repair directory.
+  // The AI provider writes attempts.jsonl using trace.runId, which comes from pkt.meta.runId.
+  // If we don't stamp this, artifacts will go to fixture_* or repair_run fallbacks.
+  failurePacket.meta = failurePacket.meta ?? ({} as any);
+  failurePacket.meta.runId = repairId;
+  failurePacket.meta.jobId = failurePacket.meta.jobId ?? `repair_job_${repairId}`;
+
   let result;
   
   if (offline) {
