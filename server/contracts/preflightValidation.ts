@@ -12,6 +12,7 @@
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import type { FailurePacketV1 } from "./failurePacket";
+import { validateTestCommandsOrThrow } from "./testCommandValidation";
 
 /**
  * Preflight validation result
@@ -175,40 +176,12 @@ export function validateFailurePacketOrThrow(pkt: any): asserts pkt is FailurePa
     }
   }
 
-  // 4. Test commands validation (required)
-  if (pkt.testCommands === undefined || pkt.testCommands === null) {
-    errors.push("testCommands is required (must be array of command strings)");
-  } else if (pkt.testCommands !== undefined) {
-    if (!Array.isArray(pkt.testCommands)) {
-      errors.push("testCommands must be an array of strings");
-    } else {
-      // Check for prose patterns (reject commands with prose)
-      for (let i = 0; i < pkt.testCommands.length; i++) {
-        const cmd = pkt.testCommands[i];
-        
-        if (typeof cmd !== "string") {
-          errors.push(`testCommands[${i}] must be a string, got ${typeof cmd}`);
-          continue;
-        }
-
-        // Reject prose patterns
-        const prosePatterns = [
-          /\(/,  // Parentheses (e.g., "Run the test (with flags)")
-          /`/,   // Backticks (e.g., "Run `pnpm test`")
-          /e\.g\./i,  // "e.g."
-          /confirm that/i,  // "confirm that..."
-          /make sure/i,  // "make sure..."
-          /verify/i,  // "verify..."
-        ];
-
-        const hasProse = prosePatterns.some(pattern => pattern.test(cmd));
-        if (hasProse) {
-          errors.push(`testCommands[${i}] contains prose (must be exact command): ${cmd}`);
-        }
-      }
-    }
+  // 4. Test commands validation (whitelist-based)
+  try {
+    validateTestCommandsOrThrow(pkt.testCommands ?? []);
+  } catch (err: any) {
+    errors.push(err.message);
   }
-
   // Check for _testCommandsInvalid flag (set by normalize)
   if (pkt._testCommandsInvalid) {
     errors.push("testCommands was not an array (normalized to [])");
