@@ -117,7 +117,7 @@ function flag(name) {
 async function main() {
   const from = arg("--from");
   if (!from) {
-    console.error("Usage: pnpm swarm:fix --from <failurePacket.json> [--max-cost-usd 2] [--max-iters 2] [--apply] [--test]");
+    console.error("Usage: pnpm swarm:fix --from <failurePacket.json> [--max-cost-usd 2] [--max-iters 2] [--apply] [--test] [--offline --repairPacket <path>]");
     process.exit(1);
   }
 
@@ -125,6 +125,8 @@ async function main() {
   const maxIterations = parseInt(arg("--max-iters") || "2", 10);
   const shouldApply = flag("--apply");
   const shouldTest = flag("--test");
+  const offline = flag("--offline");
+  const repairPacketPath = arg("--repairPacket");
 
   console.log(`[SwarmFix] Reading FailurePacket from: ${from}`);
   const raw = JSON.parse(readFileSync(from, "utf8"));
@@ -142,14 +144,30 @@ async function main() {
   const outDir = `runs/repair/${repairId}`;
   mkdirSync(outDir, { recursive: true });
 
-  console.log(`[SwarmFix] Running repair swarm (max cost: $${maxCostUsd}, max iters: ${maxIterations})...`);
+  let result;
   
-  const result = await runRepairSwarm({
-    failurePacket,
-    maxCostUsd,
-    maxIterations,
-    outputDir: outDir,
-  });
+  if (offline) {
+    console.log(`[SwarmFix] Offline mode: skipping swarm, loading pre-generated repairPacket...`);
+    if (!repairPacketPath) {
+      console.error("❌ --offline requires --repairPacket <path>");
+      process.exit(1);
+    }
+    const repairPacket = JSON.parse(readFileSync(repairPacketPath, "utf8"));
+    result = {
+      stopReason: "offline_mode",
+      totalCostUsd: 0,
+      totalLatencyMs: 0,
+      repairPacket,
+    };
+  } else {
+    console.log(`[SwarmFix] Running repair swarm (max cost: $${maxCostUsd}, max iters: ${maxIterations})...`);
+    result = await runRepairSwarm({
+      failurePacket,
+      maxCostUsd,
+      maxIterations,
+      outputDir: outDir,
+    });
+  }
 
 
 
@@ -370,9 +388,9 @@ async function main() {
   }
   
   // Write RepairPacket
-  const repairPacketPath = `${outDir}/repairPacket.json`;
-  writeFileSync(repairPacketPath, JSON.stringify(result.repairPacket, null, 2), "utf8");
-  console.log(`\n✅ Wrote RepairPacket: ${repairPacketPath}`);
+  const outputRepairPacketPath = `${outDir}/repairPacket.json`;
+  writeFileSync(outputRepairPacketPath, JSON.stringify(result.repairPacket, null, 2), "utf8");
+  console.log(`\n✅ Wrote RepairPacket: ${outputRepairPacketPath}`);
   
   // Create ScoreCard
   const scoreCard = createScoreCard({

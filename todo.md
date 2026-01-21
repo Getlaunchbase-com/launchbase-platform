@@ -3234,3 +3234,29 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
   - [x] Require full-file replacement for files ≤ 30 lines
 - [x] Re-run verification: `pnpm swarm:fix --from <failurePacket> --apply --test`
 - [x] Verify PASS criteria: patchValid && applied && testsPassed (ALL GREEN ✅)
+
+
+## Auto-Repair: Golden Regression Fixture + Deterministic Tests
+
+**Goal:** Lock in "it still works" forever with TWO golden tests (offline + online)
+
+**Tasks:**
+- [x] Add --offline flag to runSwarmFix.ts
+  - [x] Skip swarm calls when --offline is set
+  - [x] Require --repairPacket <path> to load pre-generated artifact
+  - [x] Run existing apply/test pipeline with loaded artifact
+- [x] Create offline golden test (deterministic, always runs)
+  - [x] Add pre-generated fixtures: repairPacket.json + patch.diff
+  - [x] Test file: `server/__tests__/golden.repair.offline.test.ts`
+  - [x] Assert: patchValid/applied/testsPassed/stopReason
+  - [x] Package script: `"test:golden-offline": "vitest run server/__tests__/golden.repair.offline.test.ts"`
+- [x] Create online golden test (real models, gated)
+  - [x] Test file: `server/__tests__/golden.repair.online.test.ts`
+  - [x] Skip if AIML_API_KEY not present or ALLOW_NETWORK_TESTS !== "1"
+  - [x] Run full swarm pipeline end-to-end with AI_PROVIDER=aiml
+  - [x] Package script: `"test:golden-online": "vitest run server/__tests__/golden.repair.online.test.ts"` 
+- [ ] Enforce deterministic test execution
+  - [ ] Treat testPlan as non-executable narrative (human-readable only)
+  - [ ] Execute ONLY testCommands with shell: false, timeout per command
+  - [ ] Capture stdout/stderr per command into scorecard.execution.testLogs[]
+  - [ ] Update RepairPacket schema to include testLogs field

@@ -86,7 +86,7 @@ async function runFieldGeneral(pkt: FailurePacketV1): Promise<{
 ${pkt.failure.stack || "No stack trace available"}
 
 **Logs:**
-${pkt.context.logs?.join('\n') || "No logs"}
+${Array.isArray(pkt.context.logs) ? pkt.context.logs.join('\n') : typeof pkt.context.logs === 'string' ? pkt.context.logs : "No logs"}
 
 **Your task:**
 1. Identify the likely root cause

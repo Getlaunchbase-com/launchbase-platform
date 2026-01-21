@@ -11,6 +11,8 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "test": "vitest run",
+    "test:golden-offline": "vitest run server/__tests__/golden.repair.offline.test.ts",
+    "test:golden-online": "vitest run server/__tests__/golden.repair.online.test.ts",
     "smoke": "vitest run server/__tests__/smoke.*.test.ts",
     "db:push": "drizzle-kit generate && drizzle-kit migrate",
     "swarm:fix": "tsx scripts/swarm/runSwarmFix.ts",
