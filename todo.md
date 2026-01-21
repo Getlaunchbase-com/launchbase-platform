@@ -3260,3 +3260,80 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
   - [ ] Execute ONLY testCommands with shell: false, timeout per command
   - [ ] Capture stdout/stderr per command into scorecard.execution.testLogs[]
   - [ ] Update RepairPacket schema to include testLogs field
+
+
+---
+
+## 🔧 AUTO-REPAIR SYSTEM: PREFLIGHT VALIDATION + FIXTURE BUILDER
+
+**Goal:** Harden auto-repair with preflight validation, fixture builder, and self-hardening mode  
+**Status:** ✅ Complete
+
+### Preflight Validation (Priority 1) ✅
+- [x] Implement `normalizeFailurePacket(pkt)` in server/contracts/preflightValidation.ts
+  - Normalize `context.logs`: string → [string]; missing → []
+  - Ensure testCommands exists (or set to [] and mark invalid)
+- [x] Implement `validateFailurePacketOrThrow(pkt)` in server/contracts/preflightValidation.ts
+  - Require: version, failureKind, repoRoot, targets, testCommands
+  - File existence: every target.path must exist
+  - Allowlist: every path must match allowed globs (client/**, server/**, tsconfig.json, package.json)
+  - Denylist: reject .env*, drizzle/**, secrets, lockfiles
+  - Validate test commands: must be string[], reject prose (parentheses, backticks, "e.g.", "confirm that…")
+- [x] Implement `preflightFailurePacket(pkt)` in server/contracts/preflightValidation.ts
+  - Calls normalize → validate → returns { ok: true } or { ok: false, stopReason, errors[] }
+- [x] Wire preflight into runSwarmFix.ts before any AI calls
+  - Load packet → normalize → preflight → if not ok, write artifacts + exit
+  - Add stopReason values: packet_invalid, target_missing, target_forbidden, test_commands_invalid
+- [x] Test preflight with invalid packets (missing files, forbidden paths, prose commands)
+  - Verified: Valid fixture passes, invalid fixture fails fast (<100ms, no AI calls)
+
+### Fixture Builder Script (Priority 2) ✅
+- [x] Create scripts/fixtures/makeFailurePacket.ts
+  - CLI args: --target, --kind, --id, --test (repeatable)
+  - Auto-fill: createdAtIso, repoRoot, targets with exists/sha256, context.logs, testCommands, policy
+  - Output: runs/fixtures/failurePackets/v1/<id>.json
+- [x] Test fixture builder with real repo files (tsconfig.json, package.json)
+  - Created: minimal-tsconfig-test.json fixture
+  - Verified: Fixture passes preflight validation
+- [x] Added `pnpm fixture:make` script to package.json
+
+### Swarm Self-Hardening Mode (Priority 3) ✅
+- [x] Add `pnpm swarm:harden` script
+  - Runs tool on curated fixture set (start with 3)
+  - Allowed modifications: contracts, prompts, preflight validation logic, fixture builder
+  - Must produce: patch diff, testCommands, "why" explanation
+  - Must pass: pnpm test, pnpm smoke:preflight, pnpm smoke:e2e:intake
+- [x] Create scripts/swarm/hardenSwarm.ts implementation
+  - Validates patch scope (only allowed files)
+  - Runs smoke tests after all fixtures pass
+  - Supports --fixture, --all flags
+- [x] Added `pnpm swarm:harden` script to package.json
+
+
+
+---
+
+## 🔒 CHECKPOINT + PROOF COMMANDS
+
+**Goal:** Lock in preflight validation and prove it works with golden proof set  
+**Status:** In progress
+
+### Pre-Checkpoint Fix
+- [ ] Fix testCommands validation to fail on missing testCommands
+  - testCommands missing → fail preflight with stopReason=test_commands_invalid
+  - Don't allow silent "missing → []" without failing the packet
+
+### Checkpoint
+- [ ] Save checkpoint: "preflight-validation + fixture maker + swarm harden mode"
+
+### Proof Commands (Minimum Proof Set)
+- [ ] Proof A: Invalid fixture blocks with $0 cost
+  - Command: `pnpm swarm:fix --from runs/fixtures/failurePackets/v1/INVALID_missing_target.json`
+  - Expected: stops immediately, stopReason=target_missing, no AI calls
+- [ ] Proof B: Fixture builder generates valid packet
+  - Command: `pnpm fixture:make --target tsconfig.json --id minimal-tsconfig-test --test "pnpm -w typecheck"`
+  - Expected: fixture created, includes hashes/size/testCommands, passes preflight
+- [ ] Proof C: Swarm fix end-to-end with apply+test
+  - Command: `pnpm swarm:fix --from runs/fixtures/failurePackets/v1/minimal-tsconfig-test.json --apply --test`
+  - Expected: patchValid=true, applied=true, testsPassed=true
+

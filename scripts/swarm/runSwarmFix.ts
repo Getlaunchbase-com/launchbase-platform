@@ -18,6 +18,7 @@ import { execSync, spawnSync } from "node:child_process";
 import { dirname } from "node:path";
 import { runRepairSwarm } from "../../server/ai/orchestration/runRepairSwarm.ts";
 import { createScoreCard } from "../../server/contracts/index.ts";
+import { preflightFailurePacket } from "../../server/contracts/preflightValidation.ts";
 
 /**
  * Normalize FailurePacket to handle both old and new shapes.
@@ -131,6 +132,56 @@ async function main() {
   console.log(`[SwarmFix] Reading FailurePacket from: ${from}`);
   const raw = JSON.parse(readFileSync(from, "utf8"));
   const failurePacket = normalizeFailurePacket(raw);
+
+  // Skip preflight validation in offline mode (using pre-generated repair packets)
+  if (!offline) {
+    // Preflight validation (fail fast before any AI calls)
+    console.log(`[SwarmFix] Running preflight validation...`);
+    const preflight = preflightFailurePacket(raw);
+  
+  if (!preflight.ok) {
+    console.error(`❌ Preflight validation failed: ${preflight.stopReason}`);
+    console.error(`Errors:`);
+    for (const error of preflight.errors) {
+      console.error(`  - ${error}`);
+    }
+    
+    // Write artifacts even on preflight failure
+    const repairId = `repair_${Date.now()}`;
+    const outDir = `runs/repair/${repairId}`;
+    mkdirSync(outDir, { recursive: true });
+    
+    // Write minimal RepairPacket with preflight failure
+    const failedPacket = {
+      version: "repairpacket.v1",
+      repairId,
+      failurePacketId: raw.meta?.runId || "unknown",
+      diagnosis: {
+        likelyCause: "Preflight validation failed",
+        confidence: 1.0,
+        relatedIssues: preflight.errors,
+      },
+      patchPlan: null,
+      execution: {
+        stopReason: preflight.stopReason,
+        applied: false,
+        testsPassed: false,
+        patchValid: false,
+        logs: preflight.errors,
+      },
+      meta: {
+        createdAt: new Date().toISOString(),
+        sha: process.env.GIT_SHA || "unknown",
+      },
+    };
+    
+    writeFileSync(`${outDir}/repairPacket.json`, JSON.stringify(failedPacket, null, 2));
+    console.log(`\n📝 Wrote preflight failure artifact: ${outDir}/repairPacket.json`);
+    process.exit(1);
+  }
+  
+    console.log(`✅ Preflight validation passed`);
+  }
 
   // Hard stop for permission blockers
   const msg = failurePacket.error?.message?.toLowerCase() || "";
