@@ -323,8 +323,21 @@ async function main() {
           const errorMsg = checkErr.message || "";
           const stderr = checkErr.stderr?.toString() || "";
           
+          // Detect "new file dependency context" failure
+          const isNewFileDep = stderr.includes("depends on old contents") || 
+                               stderr.includes("patch failed") ||
+                               errorMsg.includes("depends on old contents");
+          
+          if (isNewFileDep) {
+            console.log(`⚠️ New file dependency context issue detected`);
+            applyLogs.push(`git apply --check failed: ${errorMsg}`);
+            applyLogs.push(`Escalation hint: new_file_dep_context (needs Level 2 context)`);
+            result.repairPacket.execution.stopReason = "apply_failed_dependency_context";
+            result.repairPacket.execution.applied = false;
+            // TODO: Implement Level 2 escalation (rebuild packet with expanded context)
+          }
           // Retry with --recount if "corrupt patch" error
-          if (errorMsg.includes("corrupt patch") || stderr.includes("corrupt patch")) {
+          else if (errorMsg.includes("corrupt patch") || stderr.includes("corrupt patch")) {
             console.log(`⚠️ Corrupt patch detected, retrying with --recount...`);
             applyLogs.push(`git apply --check failed: ${errorMsg}`);
             applyLogs.push(`Retrying with --recount to fix hunk header counts...`);
