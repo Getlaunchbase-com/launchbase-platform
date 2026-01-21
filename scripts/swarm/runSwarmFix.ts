@@ -151,6 +151,15 @@ async function main() {
     const outDir = `runs/repair/${repairId}`;
     mkdirSync(outDir, { recursive: true });
     
+    // ✅ FIX #1: Write failurePacket.json + meta.json (preflight failure path)
+    writeFileSync(`${outDir}/failurePacket.json`, JSON.stringify(failurePacket, null, 2), "utf-8");
+    writeFileSync(`${outDir}/meta.json`, JSON.stringify({
+      repairId,
+      createdAtIso: new Date().toISOString(),
+      gitSha: failurePacket.context?.sha ?? process.env.GIT_SHA ?? null,
+      stopReason: preflight.stopReason,
+    }, null, 2), "utf-8");
+    
     // Write minimal RepairPacket with preflight failure
     const failedPacket = {
       version: "repairpacket.v1",
