@@ -7,7 +7,7 @@ const TEST_COMMAND_ALLOWLIST: RegExp[] = [
   // pnpm commands
   /^pnpm\s+(typecheck|test|lint|build)(\s+.*)?$/i,
   /^pnpm\s+-C\s+\S+\s+\S+(\s+.*)?$/i,
-  // node -e with quotes
+  // node -e with quotes (semicolons allowed inside the script)
   /^node\s+-e\s+["'].+["']$/i,
   // tsx
   /^tsx\s+.+$/i,
@@ -32,23 +32,30 @@ export function validateTestCommandsOrThrow(testCommands: string[]) {
       throw err;
     }
 
-    // Block newlines and command chains
-    if (/\n|;|&&|\|\|/.test(cmd)) {
-      const err: any = new Error(`testCommands[${i}] contains newlines or command chains: ${cmd}`);
+    // Block actual newlines (not semicolons - those are OK in node -e)
+    if (/\n/.test(cmd)) {
+      const err: any = new Error(`testCommands[${i}] contains literal newlines: ${cmd.substring(0, 100)}`);
+      err.errorCode = "test_command_unsafe";
+      throw err;
+    }
+
+    // Block command chains at shell level (but allow semicolons inside node -e quotes)
+    if (/&&|\|\||;/.test(cmd) && !/^node\s+-e\s+["']/.test(cmd)) {
+      const err: any = new Error(`testCommands[${i}] contains shell command chains: ${cmd.substring(0, 100)}`);
       err.errorCode = "test_command_unsafe";
       throw err;
     }
 
     // Block destructive operations
     if (/\b(rm|curl|wget|sudo|git\s+push)\b/.test(cmd)) {
-      const err: any = new Error(`testCommands[${i}] contains destructive operation: ${cmd}`);
+      const err: any = new Error(`testCommands[${i}] contains destructive operation: ${cmd.substring(0, 100)}`);
       err.errorCode = "test_command_destructive";
       throw err;
     }
 
     const ok = TEST_COMMAND_ALLOWLIST.some((re) => re.test(cmd));
     if (!ok) {
-      const err: any = new Error(`testCommands[${i}] not whitelisted: ${cmd}`);
+      const err: any = new Error(`testCommands[${i}] not whitelisted: ${cmd.substring(0, 100)}`);
       err.errorCode = "test_command_not_whitelisted";
       throw err;
     }
