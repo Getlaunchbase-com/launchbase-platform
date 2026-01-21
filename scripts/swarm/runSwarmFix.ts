@@ -19,6 +19,7 @@ import { dirname } from "node:path";
 import { runRepairSwarm } from "../../server/ai/orchestration/runRepairSwarm.ts";
 import { createScoreCard } from "../../server/contracts/index.ts";
 import { preflightFailurePacket } from "../../server/contracts/preflightValidation.ts";
+import { shouldEscalateOnApplyFailure } from "./shouldEscalateOnApplyFailure";
 
 /**
  * Normalize FailurePacket to handle both old and new shapes.
@@ -115,6 +116,25 @@ function flag(name) {
   return process.argv.includes(name);
 }
 
+
+/**
+ * Compute final stopReason from execution facts (executor-owned).
+ * Hard rule: stopReason="ok" IFF applied=true AND testsPassed=true
+ */
+function computeStopReason(facts: {
+  preflightOk?: boolean;
+  patchValid?: boolean;
+  applied?: boolean;
+  testsPassed?: boolean;
+}): string {
+  if (facts.preflightOk === false) return "packet_invalid";
+  if (facts.patchValid === false) return "patch_invalid";
+  if (facts.applied === false) return "apply_failed";
+  if (facts.testsPassed === false) return "tests_failed";
+  return "ok";
+}
+
+
 async function main() {
   const from = arg("--from");
   if (!from) {
@@ -172,7 +192,7 @@ async function main() {
       },
       patchPlan: null,
       execution: {
-        stopReason: preflight.stopReason,
+        stopReason: computeStopReason({ preflightOk: true, patchValid, applied: patchApplied, testsPassed }).stopReason,
         applied: false,
         testsPassed: false,
         patchValid: false,
