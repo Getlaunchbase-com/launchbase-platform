@@ -192,7 +192,12 @@ async function main() {
       },
       patchPlan: null,
       execution: {
-        stopReason: computeStopReason({ preflightOk: true, patchValid, applied: patchApplied, testsPassed }).stopReason,
+        stopReason: computeStopReason({
+          preflightOk: false,
+          patchValid: false,
+          applied: false,
+          testsPassed: false,
+        }).stopReason,
         applied: false,
         testsPassed: false,
         patchValid: false,
