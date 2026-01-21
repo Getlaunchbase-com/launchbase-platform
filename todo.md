@@ -3414,3 +3414,56 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
   - ✅ Perfect fix: `return 42;` → `return \`Hello, ${name}!\`;`
 - [ ] Save checkpoint with swarm context fix
 
+
+
+---
+
+## 📚 FIXTURE LIBRARY V1: Build Truth Harness (10 Fixtures)
+
+**Goal:** Ship "Fixture Library v1" with deterministic PASS criteria using `pnpm typecheck` as truth test  
+**Status:** ✅ Infrastructure Complete (fixtures ready to test)
+
+**Strategy:** Fixtures first, then --commit. Fixtures are the truth harness - if you add --commit before fixtures are stable, you'll auto-commit flaky wins and burn time undoing it.
+
+### Phase 1: Audit Existing Fixtures
+- [x] List all existing fixtures in runs/fixtures/failurePackets/v1/
+- [x] Map existing fixtures to 10 categories
+- [x] Identify missing categories
+
+### Phase 2: Create 10 Fixture Categories
+- [x] 1. Missing import / symbol not found (f1-missing-import.json)
+- [x] 2. Wrong import path (f2-wrong-path.json)
+- [x] 3. Type mismatch (f3-type-mismatch.json)
+- [x] 4. Unused import / unused var (f4-unused-import.json)
+- [x] 5. Incorrect type export/import (f5-type-export.json)
+- [x] 6. JSON import / resolveJsonModule issue (f6-json-import.json)
+- [x] 7. Node ESM/CJS interop import error (f7-esm-interop.json)
+- [x] 8. Zod schema mismatch (f8-zod-mismatch.json)
+- [x] 9. Drizzle schema typing mismatch (f9-drizzle-mismatch.json)
+- [x] 10. "Patch corrupt" case (f10-patch-corrupt.json)
+
+### Phase 3: Test Each Fixture
+- [ ] For each fixture: `pnpm swarm:fix --from <fixture> --apply --test`
+- [ ] PASS criteria (must be enforced):
+  - patchValid=true
+  - applied=true
+  - testsPassed=true (testsPassed = typecheck passed for now)
+  - stopReason="ok"
+- Note: Tested f1-missing-import manually - swarm works but needs isolated testing
+
+### Phase 4: Add Fixture Runner Command
+- [x] Add `pnpm smoke:repair:fixtures` command
+- [x] Created scripts/fixtures/runFixtureTests.ts
+- [x] Loops over fixture folder
+- [x] Runs swarm:fix --apply --test for each fixture
+- [x] Reverts changes after each test (git reset --hard)
+- [x] Tracks PASS/FAIL metrics and reports summary table
+- [x] Fail fast on first failure
+
+### Phase 5: Implement --commit (ONLY after fixtures are green)
+- [ ] Add --commit flag to swarm:fix
+- [ ] Only triggers if stopReason==="ok"
+- [ ] Commits to repair/<repairId> branch
+- [ ] Commit message includes repairId + short summary
+- [ ] Never pushes to main
+
