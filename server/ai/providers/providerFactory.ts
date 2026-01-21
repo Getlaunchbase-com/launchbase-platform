@@ -780,6 +780,10 @@ function writeAttemptArtifact(data: {
       fs.mkdirSync(outDir, { recursive: true });
     }
     
+    // Write breadcrumb to prove function was called
+    const breadcrumbFile = path.join(outDir, ".attempts_called");
+    fs.writeFileSync(breadcrumbFile, Date.now().toString(), "utf8");
+    
     // Build JSONL line
     const line = JSON.stringify({
       ts: new Date().toISOString(),
@@ -793,14 +797,26 @@ function writeAttemptArtifact(data: {
       selectedModel: data.selectedModel,
       latencyMs: data.latencyMs,
       error: data.error,
-    }) + '\n';
+    }) + "\n";
     
     // Append to attempts.jsonl
-    const attemptsFile = path.join(outDir, 'attempts.jsonl');
-    fs.appendFileSync(attemptsFile, line, 'utf8');
-  } catch (err) {
-    // Don't fail the request if artifact writing fails
-    console.warn('[completeJson] Failed to write attempt artifact:', err);
+    const attemptsFile = path.join(outDir, "attempts.jsonl");
+    fs.appendFileSync(attemptsFile, line, "utf8");
+  } catch (err: any) {
+    // Write error to attempts.error.jsonl for debugging
+    try {
+      const outDir = path.join(process.cwd(), "runs", "repair", data.repairId);
+      const errorFile = path.join(outDir, "attempts.error.jsonl");
+      const errorLine = JSON.stringify({
+        ts: new Date().toISOString(),
+        error: String(err),
+        stack: err?.stack,
+        data,
+      }) + "\n";
+      fs.appendFileSync(errorFile, errorLine, "utf8");
+    } catch {
+      // If even error logging fails, silently continue
+    }
   }
 }
 
