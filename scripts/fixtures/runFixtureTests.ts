@@ -12,9 +12,9 @@
  *   pnpm smoke:repair:fixtures
  */
 
-import { readdirSync } from "node:fs";
+import { readdirSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { execSync } from "node:child_process";
-import { join } from "node:path";
+import { join, dirname, isAbsolute, posix, normalize } from "node:path";
 
 const FIXTURES_DIR = "runs/fixtures/failurePackets/v1";
 const REPO_ROOT = process.cwd();
@@ -32,6 +32,76 @@ interface FixtureResult {
   cost: number;
   latency: number;
   pass: boolean;
+}
+
+type FileSnapshot = {
+  relPath: string;
+  contents: string;
+  sha256?: string;
+  bytes?: number;
+};
+
+function assertSafeRelPath(relPath: string) {
+  // no absolute paths
+  if (isAbsolute(relPath)) throw new Error(`absolute path not allowed: ${relPath}`);
+
+  // normalize and block traversal
+  const norm = posix.normalize(relPath.replaceAll("\\", "/"));
+  if (norm.startsWith("../") || norm.includes("/../")) throw new Error(`path traversal not allowed: ${relPath}`);
+
+  // block obvious secrets
+  const lower = norm.toLowerCase();
+  const deny = [".env", "secrets", "private", "drizzle", "server/auth", "oauth", "keys"];
+  if (lower.startsWith(".env") || lower.includes("/.env")) throw new Error(`env file not allowed: ${relPath}`);
+  if (deny.some((d) => lower.includes(d.trim()))) throw new Error(`blocked path: ${relPath}`);
+
+  // allowlist (adjust to your exact policy)
+  const allow =
+    norm === "tsconfig.json" ||
+    norm === "package.json" ||
+    norm.startsWith("client/") ||
+    norm.startsWith("server/");
+  if (!allow) throw new Error(`not allowlisted: ${relPath}`);
+}
+
+function restoreFileSnapshots(repoRoot: string, snapshots: Record<string, string> | FileSnapshot[]) {
+  const MAX_FILES = 20;
+  const MAX_BYTES_PER_FILE = 200_000;
+
+  // Convert object format to array format
+  let snapshotArray: FileSnapshot[];
+  if (Array.isArray(snapshots)) {
+    snapshotArray = snapshots;
+  } else if (typeof snapshots === "object" && snapshots !== null) {
+    snapshotArray = Object.entries(snapshots).map(([relPath, contents]) => ({
+      relPath,
+      contents: typeof contents === "string" ? contents : "",
+    }));
+  } else {
+    return;
+  }
+
+  if (snapshotArray.length > MAX_FILES) {
+    throw new Error(`too many snapshots: ${snapshotArray.length} > ${MAX_FILES}`);
+  }
+
+  for (const s of snapshotArray) {
+    if (!s?.relPath || typeof s.contents !== "string") {
+      throw new Error(`invalid snapshot entry: ${JSON.stringify(s)?.slice(0, 200)}`);
+    }
+
+    assertSafeRelPath(s.relPath);
+
+    const bytes = Buffer.byteLength(s.contents, "utf8");
+    if (bytes > MAX_BYTES_PER_FILE) {
+      throw new Error(`snapshot too large: ${s.relPath} (${bytes} bytes)`);
+    }
+
+    const abs = join(repoRoot, s.relPath);
+    mkdirSync(dirname(abs), { recursive: true });
+    writeFileSync(abs, s.contents, "utf8");
+    console.log(`  ✅ ${s.relPath} (${bytes} bytes)`);
+  }
 }
 
 function main() {
@@ -62,6 +132,15 @@ function main() {
     console.log(`${"=".repeat(80)}\n`);
     
     try {
+      // Load fixture and restore fileSnapshots
+      const fixtureData = JSON.parse(readFileSync(join(REPO_ROOT, fixturePath), "utf-8"));
+      const snapshots = fixtureData?.context?.fileSnapshots ?? fixtureData?.fileSnapshots ?? {};
+      
+      if (Object.keys(snapshots).length > 0) {
+        console.log(`[FixtureRunner] Restoring ${Object.keys(snapshots).length} file(s) from fileSnapshots...`);
+        restoreFileSnapshots(REPO_ROOT, snapshots);
+      }
+      
       // Run swarm:fix
       const output = execSync(
         `pnpm swarm:fix --from ${fixturePath} --apply --test`,
