@@ -3696,3 +3696,36 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
 - [ ] Update AdminSwarmNewRun fixture dropdown with human-readable labels
 - [ ] Add explanatory text: "Scenario = a built-in test case to benchmark Swarm reliability"
 - [ ] (Optional) Add toggle: "Real Run" vs "Scenario Test" modes for owner-friendly UX
+
+## CRITICAL: Admin Authentication Blocking Owner Access (2026-01-22)
+- [ ] **BUG: Permission error (10002) prevents owner from accessing Swarm Console**
+- [ ] Owner cannot access /admin/* routes - shows "You do not have required permission (10002)"
+- [ ] No login flow exists for admin console (only public OAuth for customers)
+- [ ] Need to implement one of:
+  - [ ] Option A: Add /admin/login route that redirects to OAuth
+  - [ ] Option B: Bypass auth check for OWNER_OPEN_ID in development
+  - [ ] Option C: Auto-authenticate owner on first admin route access
+- [ ] Test that owner can access Swarm Console without errors
+
+## Advanced Model Selector for Swarm Console
+- [x] Fetch dynamic model list from swarm.models.list tRPC endpoint (440 models from AIML API)
+- [x] Implement alphabetical sorting by display name (case-insensitive)
+- [x] Add favorites system with localStorage (swarm.favoriteModels)
+- [x] Add star icon toggle for marking/unmarking favorites
+- [x] Create favorites section pinned at top of dropdown
+- [x] Implement searchable combobox (search within dropdown)
+- [x] Add recommended model presets row above dropdown (Fast/Best/Critic/Fallback)
+- [x] Apply same advanced selector to both Model and Fallback model fields on /admin/swarm/new
+- [x] Update AdminSwarmRuns.tsx filter to use dynamic model list (was static)
+
+## Swarm Console: Context Persistence & Defaults System
+- [ ] Phase 1: Data Model (3 new tables)
+- [ ] Phase 2: Merge Logic (deterministic 4-tier priority)
+- [ ] Phase 3: tRPC Endpoints (defaults.get/update, enhanced runs.create)
+- [ ] Phase 4: Global Defaults Editor (/admin/swarm/settings page)
+- [ ] Phase 5: New Run Enhancements (auto-populate from merged defaults)
+- [ ] Phase 6: Profile Management (context fields + "Make global default")
+- [ ] Phase 7: Run Detail View (show resolved config + context)
+- [ ] Phase 8: Documentation (/swarm/ops/ folder with Task Starter Packets)
+- [ ] Phase 9: Testing (vitest tests for merge logic + integration tests)
+- [ ] Phase 10: Migration (seed defaults, backfill existing data)

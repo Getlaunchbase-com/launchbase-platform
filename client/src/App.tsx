@@ -21,6 +21,7 @@ import AdminSwarmModels from "./pages/AdminSwarmModels";
 import AdminSwarmProfileDetail from "./pages/AdminSwarmProfileDetail";
 import AdminSwarmDashboard from "./pages/AdminSwarmDashboard";
 import AdminSwarmRepoSources from "./pages/AdminSwarmRepoSources";
+import AdminLogin from "./pages/AdminLogin";
 import IntakeDetail from "./pages/IntakeDetail";
 import DeploymentStatus from "./pages/DeploymentStatus";
 import Clarify from "./pages/Clarify";
@@ -76,6 +77,7 @@ function Router() {
       <Route path="/trust" component={Trust} />
       
       {/* Admin routes (protected by DashboardLayout) */}
+      <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/intake/:id" component={IntakeDetail} />
       <Route path="/admin/deploy/:id" component={DeploymentStatus} />
