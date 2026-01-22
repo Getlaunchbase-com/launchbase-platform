@@ -278,6 +278,8 @@ function repairHunkCounts(patchText: string): { repaired: string; changed: boole
       // - context lines (" ") count in both old and new
       // - removed lines ("-") count only in old
       // - added lines ("+") count only in new
+      // Only count lines that start with space, +, or -
+      // Empty lines or lines without proper prefix are NOT part of the hunk
       if (l.startsWith(" ")) {
         oldCount++;
         newCount++;
@@ -285,15 +287,8 @@ function repairHunkCounts(patchText: string): { repaired: string; changed: boole
         oldCount++;
       } else if (l.startsWith("+")) {
         newCount++;
-      } else if (l === "") {
-        // blank line in a hunk body is still a context line
-        oldCount++;
-        newCount++;
-      } else {
-        // Unknown prefix; be conservative: treat as context
-        oldCount++;
-        newCount++;
       }
+      // Empty lines and unknown prefixes are ignored - they're not valid hunk content
     }
 
     // For new files, old side must be 0,0
