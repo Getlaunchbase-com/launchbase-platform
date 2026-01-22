@@ -622,7 +622,11 @@ async function main() {
 
     // Escalation trigger decision only on apply failure OR check failure (both are apply-stage failures)
     const stderrForEscalation = applyOutcome.applied ? "" : (applyOutcome.applyStderr || applyOutcome.checkStderr || "");
-    if (!applyOutcome.applied && stderrForEscalation && shouldEscalateOnApplyFailure(stderrForEscalation ?? "", patchText ?? "")) {
+    if (
+      !applyOutcome.applied &&
+      stderrForEscalation &&
+      (stderrForEscalation === "empty_patch" || shouldEscalateOnApplyFailure(stderrForEscalation ?? "", patchText ?? ""))
+    ) {
       retryMeta.escalationTriggered = true;
       retryMeta.reason = "apply_failure_escalation";
       retryMeta.originalApplyStderr = applyOutcome.applyStderr || null;
