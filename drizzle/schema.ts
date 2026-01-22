@@ -1614,3 +1614,88 @@ export const shipPackets = mysqlTable("ship_packets", {
 }));
 export type ShipPacket = typeof shipPackets.$inferSelect;
 export type InsertShipPacket = typeof shipPackets.$inferInsert;
+
+// ============ SWARM CONSOLE TABLES ============
+
+export const swarmRuns = mysqlTable("swarm_runs", {
+  repairId: varchar("repairId", { length: 64 }).primaryKey(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  finishedAt: timestamp("finishedAt"),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  status: mysqlEnum("status", ["running", "finished", "failed"]).default("finished").notNull(),
+  intention: mysqlEnum("intention", ["smoke_test", "pressure_test", "improve", "critic"]),
+  fixtureName: varchar("fixtureName", { length: 128 }),
+  stopReason: varchar("stopReason", { length: 64 }).default("unknown").notNull(),
+  applied: boolean("applied").default(false).notNull(),
+  testsPassed: boolean("testsPassed").default(false).notNull(),
+  patchValid: boolean("patchValid"),
+  modelPrimary: varchar("modelPrimary", { length: 128 }),
+  modelFallback: varchar("modelFallback", { length: 128 }),
+  costUsd: float("costUsd"),
+  latencyMs: int("latencyMs"),
+  escalationTriggered: boolean("escalationTriggered"),
+  didRetry: boolean("didRetry"),
+
+  // Optional linkage to a saved profile
+  profileId: int("profileId"),
+
+  // Feature pack used for this run (for "Save as profile" and reproducibility)
+  featurePackJson: json("featurePackJson"),
+
+  // Optional linkage to a repo source (local/git) used for the run
+  repoSourceId: int("repoSourceId"),
+  repoHeadSha: varchar("repoHeadSha", { length: 64 }),
+
+  // Optional push-to-branch metadata
+  pushedBranch: varchar("pushedBranch", { length: 256 }),
+  pushedAt: timestamp("pushedAt"),
+  pushedHeadSha: varchar("pushedHeadSha", { length: 64 }),
+
+  artifactPrefix: varchar("artifactPrefix", { length: 256 }),
+  artifactKeys: json("artifactKeys"), // string[] (JSON)
+  errorSummary: text("errorSummary"),
+}, (table) => ({
+  createdAtIdx: index("swarm_runs_createdAt_idx").on(table.createdAt),
+  stopReasonIdx: index("swarm_runs_stopReason_idx").on(table.stopReason),
+  modelPrimaryIdx: index("swarm_runs_modelPrimary_idx").on(table.modelPrimary),
+  fixtureIdx: index("swarm_runs_fixture_idx").on(table.fixtureName),
+  profileIdx: index("swarm_runs_profile_idx").on(table.profileId),
+  repoSourceIdx: index("swarm_runs_repoSource_idx").on(table.repoSourceId),
+}));
+export type SwarmRun = typeof swarmRuns.$inferSelect;
+export type InsertSwarmRun = typeof swarmRuns.$inferInsert;
+
+export const swarmProfiles = mysqlTable("swarm_profiles", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 128 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  createdByUserId: int("createdByUserId"),
+  isPromoted: boolean("isPromoted").default(false).notNull(),
+  configJson: json("configJson").notNull(), // FeaturePackV1 (JSON)
+}, (table) => ({
+  nameIdx: index("swarm_profiles_name_idx").on(table.name),
+  promotedIdx: index("swarm_profiles_promoted_idx").on(table.isPromoted),
+}));
+export type SwarmProfile = typeof swarmProfiles.$inferSelect;
+export type InsertSwarmProfile = typeof swarmProfiles.$inferInsert;
+
+export const repoSources = mysqlTable("repo_sources", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 128 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  type: mysqlEnum("type", ["local", "git"]).default("local").notNull(),
+  localPath: varchar("localPath", { length: 512 }),
+  repoUrl: varchar("repoUrl", { length: 512 }),
+  branch: varchar("branch", { length: 128 }),
+  authType: mysqlEnum("authType", ["token", "ssh"]),
+  encryptedSecret: text("encryptedSecret"),
+  lastSyncAt: timestamp("lastSyncAt"),
+  lastHeadSha: varchar("lastHeadSha", { length: 64 }),
+}, (table) => ({
+  nameIdx: index("repo_sources_name_idx").on(table.name),
+  typeIdx: index("repo_sources_type_idx").on(table.type),
+}));
+export type RepoSource = typeof repoSources.$inferSelect;
+export type InsertRepoSource = typeof repoSources.$inferInsert;

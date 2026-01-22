@@ -12,6 +12,15 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminHealth from "./pages/AdminHealth";
 import AdminAlerts from "./pages/AdminAlerts";
 import AdminTestCheckout from "./pages/AdminTestCheckout";
+import AdminSwarmRuns from "./pages/AdminSwarmRuns";
+import AdminSwarmRunDetail from "./pages/AdminSwarmRunDetail";
+import AdminSwarmNewRun from "./pages/AdminSwarmNewRun";
+import AdminSwarmProfiles from "./pages/AdminSwarmProfiles";
+import AdminSwarmCompare from "./pages/AdminSwarmCompare";
+import AdminSwarmModels from "./pages/AdminSwarmModels";
+import AdminSwarmProfileDetail from "./pages/AdminSwarmProfileDetail";
+import AdminSwarmDashboard from "./pages/AdminSwarmDashboard";
+import AdminSwarmRepoSources from "./pages/AdminSwarmRepoSources";
 import IntakeDetail from "./pages/IntakeDetail";
 import DeploymentStatus from "./pages/DeploymentStatus";
 import Clarify from "./pages/Clarify";
@@ -86,6 +95,15 @@ function Router() {
       <Route path="/admin/stripe-webhooks" component={AdminStripeWebhooks} />
       <Route path="/admin/email-monitoring" component={AdminEmailMonitoring} />
       <Route path="/admin/health" component={AdminHealth} />
+<Route path="/admin/swarm" component={AdminSwarmRuns} />
+<Route path="/admin/swarm/dashboard" component={AdminSwarmDashboard} />
+<Route path="/admin/swarm/new" component={AdminSwarmNewRun} />
+<Route path="/admin/swarm/profiles" component={AdminSwarmProfiles} />
+        <Route path="/admin/swarm/profiles/:id" component={AdminSwarmProfileDetail} />
+        <Route path="/admin/swarm/compare" component={AdminSwarmCompare} />
+        <Route path="/admin/swarm/models" component={AdminSwarmModels} />
+<Route path="/admin/swarm/runs/:repairId" component={AdminSwarmRunDetail} />
+
       <Route path="/admin/alerts" component={AdminAlerts} />
       <Route path="/admin/test-checkout" component={AdminTestCheckout} />
       
