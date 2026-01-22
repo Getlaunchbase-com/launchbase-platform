@@ -716,3 +716,4 @@ export async function runRepairSwarm(opts: RepairSwarmOpts): Promise<RepairSwarm
     totalLatencyMs: Date.now() - startMs,
   };
 }
+// Auto-repair pipeline stabilization - Thu Jan 22 05:41:28 EST 2026
