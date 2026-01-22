@@ -127,22 +127,7 @@ function flag(name) {
 }
 
 
-/**
- * Compute final stopReason from execution facts (executor-owned).
- * Hard rule: stopReason="ok" IFF applied=true AND testsPassed=true
- */
-function computeStopReason(facts: {
-  preflightOk?: boolean;
-  patchValid?: boolean;
-  applied?: boolean;
-  testsPassed?: boolean;
-}): string {
-  if (facts.preflightOk === false) return "packet_invalid";
-  if (facts.patchValid === false) return "patch_invalid";
-  if (facts.applied === false) return "apply_failed";
-  if (facts.testsPassed === false) return "tests_failed";
-  return "ok";
-}
+
 
 
 async function main() {
