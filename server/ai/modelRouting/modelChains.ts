@@ -7,6 +7,17 @@
 
 // Per-role fallback chains (in priority order)
 // Registry handles both prefixed and unprefixed IDs automatically
+function applyEnvOverride(role: string, chain: string[]): string[] {
+  const envKey = `SWARM_MODEL_${role.toUpperCase()}_PRIMARY`;
+  const override = process.env[envKey];
+  if (override && override.trim()) {
+    // Keep existing chain as fallbacks (dedupe)
+    const rest = chain.filter(m => m !== override.trim());
+    return [override.trim(), ...rest];
+  }
+  return chain;
+}
+
 const FALLBACK_CHAINS: Record<string, string[]> = {
   // Field General (diagnosis)
   fieldGeneral: [

@@ -13,4 +13,8 @@ export const ENV = {
   resendDomainVerified: process.env.RESEND_DOMAIN_VERIFIED === "true",
   emailTransport: (process.env.EMAIL_TRANSPORT ?? "resend") as "resend" | "log" | "memory",
   presentationTier: (process.env.PRESENTATION_TIER ?? "standard") as "standard" | "enhanced",
+
+  // AIMLAPI (OpenAI-compatible)
+  aimlBaseUrl: process.env.AIML_BASE_URL ?? "",
+  aimlApiKey: process.env.AIML_API_KEY ?? "",
 };

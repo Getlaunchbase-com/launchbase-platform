@@ -87,6 +87,7 @@ export default function AdminHealth() {
   const hasDeploymentErrors = metrics.deployments.failed > 0;
   const hasEmailErrors = metrics.emails.failed > 0;
   const hasStripeErrors = metrics.stripeWebhooks.failed > 0;
+  const hasSwarmErrors = (metrics as any).swarm ? (metrics as any).swarm.failed > 0 : false;
 
   // Critical alerts (RED)
   const criticalAlerts: string[] = [];
@@ -95,11 +96,18 @@ export default function AdminHealth() {
   if (metrics.stripeWebhooks.isStale && metrics.stripeWebhooks.total > 0) {
     criticalAlerts.push("Stripe webhooks stale (no events in 6+ hours)");
   }
+  if (hasSwarmErrors) {
+    const s: any = (metrics as any).swarm;
+    criticalAlerts.push(`${s.failed} swarm run failures in last 24h`);
+  }
 
   // Warning alerts (YELLOW)
   const warningAlerts: string[] = [];
   if (metrics.stripeWebhooks.retryEvents > 0) {
     warningAlerts.push(`${metrics.stripeWebhooks.retryEvents} webhook retry events (${metrics.stripeWebhooks.totalRetries} total retries)`);
+  }
+  if ((metrics as any).swarm && (metrics as any).swarm.failed > 0) {
+    warningAlerts.push(`${(metrics as any).swarm.failed} swarm run failures in last 24h (last: ${(metrics as any).swarm.lastFailureReason ?? "n/a"})`);
   }
   if (metrics.deployments.lastDeploymentAt) {
     const hoursSinceLastDeploy = (Date.now() - new Date(metrics.deployments.lastDeploymentAt).getTime()) / (1000 * 60 * 60);
@@ -238,6 +246,54 @@ export default function AdminHealth() {
           )}
         </CardContent>
       </Card>
+
+      {/* Swarm */}
+      {(metrics as any).swarm && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              {hasSwarmErrors ? (
+                <AlertCircle className="h-5 w-5 text-destructive" />
+              ) : (
+                <CheckCircle2 className="h-5 w-5 text-green-600" />
+              )}
+              Swarm Runs
+            </CardTitle>
+            <CardDescription>Auto-repair pipeline metrics (last 24h)</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              {(() => {
+                const s: any = (metrics as any).swarm;
+                return (
+                  <>
+                    <div>
+                      <div className="text-2xl font-bold">{s.total}</div>
+                      <div className="text-xs text-muted-foreground">Total runs</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold">{s.ok}</div>
+                      <div className="text-xs text-muted-foreground">OK</div>
+                    </div>
+                    <div>
+                      <div className={`text-2xl font-bold ${s.failed > 0 ? "text-destructive" : ""}`}>{s.failed}</div>
+                      <div className="text-xs text-muted-foreground">Failed</div>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium">{s.lastFailureReason || "—"}</div>
+                      <div className="text-xs text-muted-foreground">Last failure reason</div>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium">{formatTimestamp(s.lastRunAt || null)}</div>
+                      <div className="text-xs text-muted-foreground">Last run</div>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Emails */}
       <Card>

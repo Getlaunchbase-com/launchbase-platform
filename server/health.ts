@@ -5,7 +5,7 @@
  */
 
 import { getDb } from "./db";
-import { deployments, emailLogs, stripeWebhookEvents } from "../drizzle/schema";
+import { deployments, emailLogs, stripeWebhookEvents, swarmRuns } from "../drizzle/schema";
 import { sql, gte, eq, and } from "drizzle-orm";
 
 const TWENTY_FOUR_HOURS_AGO = () => new Date(Date.now() - 24 * 60 * 60 * 1000);
@@ -38,6 +38,13 @@ export interface HealthMetrics {
     lastError: string | null;
     lastEventAt: Date | null;
     isStale: boolean;
+  };
+  swarm: {
+    total: number;
+    ok: number;
+    failed: number;
+    lastFailureReason: string | null;
+    lastRunAt: Date | null;
   };
   system: {
     uptime: number; // seconds
@@ -149,11 +156,31 @@ export async function getHealthMetrics(tenant?: "launchbase" | "vinces"): Promis
     environment: process.env.NODE_ENV || "development",
   };
 
+  // Swarm metrics (last 24h)
+  const swarmRows = await db
+    .select()
+    .from(swarmRuns)
+    .where(gte(swarmRuns.createdAt, cutoff));
+  const lastRunAt = swarmRows.length > 0
+    ? swarmRows.sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0))[0].createdAt
+    : null;
+  const lastFailure = swarmRows
+    .filter(r => r.stopReason && r.stopReason !== "ok")
+    .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0))[0];
+  const swarmMetrics = {
+    total: swarmRows.length,
+    ok: swarmRows.filter(r => r.stopReason === "ok").length,
+    failed: swarmRows.filter(r => r.stopReason && r.stopReason !== "ok").length,
+    lastFailureReason: lastFailure?.stopReason || null,
+    lastRunAt,
+  };
+
   return {
     tenant: tenant ?? "all",
     deployments: deploymentMetrics,
     emails: emailMetrics,
     stripeWebhooks: stripeMetrics,
+    swarm: swarmMetrics,
     system: systemMetrics,
   };
 }
