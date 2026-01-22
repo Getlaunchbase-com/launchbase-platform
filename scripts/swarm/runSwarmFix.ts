@@ -106,6 +106,8 @@ function normalizeFailurePacket(fp: any) {
       sha: fp?.meta?.sha ?? fp?.sha ?? "unknown",
     },
     raw: fp, // keep original for debugging
+    // Preserve testCommands from fixture for scoped typecheck
+    testCommands: fp?.testCommands ?? undefined,
   };
 }
 
