@@ -189,18 +189,25 @@ ${pkt.context.fileSnapshots ? Object.entries(pkt.context.fileSnapshots).map(([pa
 2. Provide machine-executable test commands
 3. Provide a rollback plan if the fix fails
 
-**CRITICAL FORMAT REQUIREMENTS:**
-- diff MUST be unified diff format (start with "diff --git a/... b/...", include "---" and "+++")
-- NEVER use "*** Begin Patch" or "*** Update File:" format
-- NO markdown code fences around diffs
-- NO commentary or prose in diffs
-- testCommands MUST be structured {cmd, args} - NO prose or parentheses
+**CRITICAL: git apply COMPATIBLE DIFFS ONLY**
+The executor runs \`git apply --check\` and rejects malformed diffs. Your diff MUST pass that gate.
 
-**Diff format requirements (CRITICAL):**
-- For JSON/config files or files ≤ 30 lines: prefer full-file replacement diff
-- NEVER guess @@ hunk header counts (-a,b +c,d) - they MUST exactly match the hunk body line counts
-- If uncertain about hunk counts, use full-file replacement instead
-- Example: @@ -1,2 +1,3 @@ means "remove 2 lines starting at line 1, add 3 lines starting at line 1"
+**Required diff structure for EVERY file:**
+1. \`diff --git a/path b/path\`
+2. For MODIFIED files: \`index <old_hash>..<new_hash> <mode>\` (e.g., \`index abc1234..def5678 100644\`)
+3. For NEW files: \`new file mode 100644\` then \`index 0000000..<hash>\`
+4. For DELETED files: \`deleted file mode 100644\` then \`index <hash>..0000000\`
+5. \`--- a/path\` (or \`--- /dev/null\` for new files)
+6. \`+++ b/path\` (or \`+++ /dev/null\` for deleted files)
+7. \`@@ -start,count +start,count @@\` hunk headers with EXACT line counts
+
+**INVALID (will be rejected):**
+- Missing \`index\` line → corrupt patch error
+- Wrong hunk counts → patch does not apply
+- \`*** Begin Patch\` format → unsupported
+- Markdown fences around diff → parse failure
+
+**testCommands:** MUST be structured {cmd, args} - NO prose
 
 Return JSON:
 {
@@ -209,7 +216,7 @@ Return JSON:
       "file": "path/to/file.ts",
       "operation": "edit|create|delete",
       "description": "What this change does",
-      "diff": "diff --git a/path/to/file.ts b/path/to/file.ts\n--- a/path/to/file.ts\n+++ b/path/to/file.ts\n@@ -1,3 +1,3 @@\n-old line\n+new line",
+      "diff": "diff --git a/path/to/file.ts b/path/to/file.ts\nindex abc1234..def5678 100644\n--- a/path/to/file.ts\n+++ b/path/to/file.ts\n@@ -1,3 +1,3 @@\n-old line\n+new line",
       "rationale": "Why this fixes the issue"
     }
   ],

@@ -150,6 +150,51 @@ function containsUnsupportedPatchFormat(patchText: string): boolean {
   return patchText.includes("*** Begin Patch") || patchText.includes("*** Update File:");
 }
 
+/**
+ * Validate that each diff block has required index line.
+ * Returns { valid: true } or { valid: false, reason: string }
+ */
+function validatePatchFormat(patchText: string): { valid: boolean; reason?: string } {
+  if (!patchText || patchText.trim().length < 10) {
+    return { valid: false, reason: "empty_or_too_short" };
+  }
+  
+  // Split into individual diff blocks
+  const blocks = patchText.split(/(?=diff --git )/g).filter(b => b.trim().startsWith("diff --git"));
+  
+  if (blocks.length === 0) {
+    return { valid: false, reason: "no_diff_blocks_found" };
+  }
+  
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i];
+    const lines = block.split("\n");
+    
+    // Check for required components
+    const hasDiffGit = lines[0]?.startsWith("diff --git");
+    const hasIndexLine = lines.some(l => l.startsWith("index "));
+    const hasNewFileMode = lines.some(l => l.startsWith("new file mode"));
+    const hasDeletedFileMode = lines.some(l => l.startsWith("deleted file mode"));
+    const hasMinusDashes = lines.some(l => l.startsWith("--- "));
+    const hasPlusDashes = lines.some(l => l.startsWith("+++ "));
+    
+    if (!hasDiffGit) {
+      return { valid: false, reason: `block_${i + 1}_missing_diff_git_header` };
+    }
+    
+    // For modified files (not new/deleted), index line is required
+    if (!hasNewFileMode && !hasDeletedFileMode && !hasIndexLine) {
+      return { valid: false, reason: `block_${i + 1}_missing_index_line` };
+    }
+    
+    if (!hasMinusDashes || !hasPlusDashes) {
+      return { valid: false, reason: `block_${i + 1}_missing_file_markers` };
+    }
+  }
+  
+  return { valid: true };
+}
+
 function extractPatchTextFromRepairPacket(repairPacket: any): string {
   const changes = repairPacket?.patchPlan?.changes ?? [];
   return changes.map((c: any) => c?.diff ?? "").join("\n");
@@ -207,6 +252,13 @@ function tryGitApply(outDir: string, patchText: string): ApplyOutcome {
   if (!isUnifiedDiff(sanitized)) {
     logs.push("Invalid patch format: missing unified diff headers");
     return { patchValid: false, applied: false, checkStderr: "not_unified_diff", applyStderr: "", logs };
+  }
+
+  // Validate patch structure (index lines, etc.) before writing
+  const formatValidation = validatePatchFormat(sanitized);
+  if (!formatValidation.valid) {
+    logs.push(`Invalid patch structure: ${formatValidation.reason}`);
+    return { patchValid: false, applied: false, checkStderr: `format_validation_failed:${formatValidation.reason}`, applyStderr: "", logs };
   }
 
   const patchFile = `${outDir}/patch.diff`;
