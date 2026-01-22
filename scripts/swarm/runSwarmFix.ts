@@ -226,6 +226,128 @@ function classifyPermissionBlocker(failurePacket: any): boolean {
   return msg.includes("workflows permission") || msg.includes("insufficient permissions");
 }
 
+/**
+ * Repair hunk header counts when git says "corrupt patch".
+ * AI often gets the @@ -a,b +c,d @@ counts wrong. This fixes them deterministically.
+ */
+function repairHunkCounts(patchText: string): { repaired: string; changed: boolean } {
+  const lines = patchText.split("\n");
+  let changed = false;
+
+  const hunkRe = /^@@\s+-(\d+)(?:,(\d+))?\s+\+(\d+)(?:,(\d+))?\s+@@/;
+
+  // Track if we're in a new file block (--- /dev/null)
+  let isNewFile = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    // Detect new file blocks
+    if (lines[i].startsWith("--- /dev/null")) {
+      isNewFile = true;
+      continue;
+    }
+    if (lines[i].startsWith("--- ") && !lines[i].startsWith("--- /dev/null")) {
+      isNewFile = false;
+      continue;
+    }
+
+    const m = lines[i].match(hunkRe);
+    if (!m) continue;
+
+    const oldStart = m[1];
+    const newStart = m[3];
+
+    // Walk forward until next hunk header or next file header or EOF
+    let oldCount = 0;
+    let newCount = 0;
+
+    for (let j = i + 1; j < lines.length; j++) {
+      const l = lines[j];
+
+      // boundaries: next hunk or next diff block
+      if (l.startsWith("@@ ")) break;
+      if (l.startsWith("diff --git ")) break;
+
+      // Skip special headers inside diff blocks
+      if (l.startsWith("--- ")) continue;
+      if (l.startsWith("+++ ")) continue;
+
+      // End-of-file marker line used by diffs
+      if (l === "\\ No newline at end of file") continue;
+
+      // Count rules:
+      // - context lines (" ") count in both old and new
+      // - removed lines ("-") count only in old
+      // - added lines ("+") count only in new
+      if (l.startsWith(" ")) {
+        oldCount++;
+        newCount++;
+      } else if (l.startsWith("-")) {
+        oldCount++;
+      } else if (l.startsWith("+")) {
+        newCount++;
+      } else if (l === "") {
+        // blank line in a hunk body is still a context line
+        oldCount++;
+        newCount++;
+      } else {
+        // Unknown prefix; be conservative: treat as context
+        oldCount++;
+        newCount++;
+      }
+    }
+
+    // For new files, old side must be 0,0
+    const finalOldCount = isNewFile ? 0 : oldCount;
+    const finalOldStart = isNewFile ? "0" : oldStart;
+
+    const newHeader = `@@ -${finalOldStart},${finalOldCount} +${newStart},${newCount} @@`;
+    if (lines[i] !== newHeader) {
+      lines[i] = newHeader;
+      changed = true;
+    }
+  }
+
+  return { repaired: lines.join("\n"), changed };
+}
+
+/**
+ * Repair hunk header counts when git says "corrupt patch".
+ */
+function repairHunkCounts(patchText: string): { repaired: string; changed: boolean } {
+  const lines = patchText.split("\n");
+  let changed = false;
+  const hunkRe = /^@@\s+-(\d+)(?:,(\d+))?\s+\+(\d+)(?:,(\d+))?\s+@@/;
+  let isNewFile = false;
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].startsWith("--- /dev/null")) { isNewFile = true; continue; }
+    if (lines[i].startsWith("--- ") && !lines[i].startsWith("--- /dev/null")) { isNewFile = false; continue; }
+    const m = lines[i].match(hunkRe);
+    if (!m) continue;
+    const oldStart = m[1];
+    const newStart = m[3];
+    let oldCount = 0;
+    let newCount = 0;
+    for (let j = i + 1; j < lines.length; j++) {
+      const l = lines[j];
+      if (l.startsWith("@@ ")) break;
+      if (l.startsWith("diff --git ")) break;
+      if (l.startsWith("--- ")) continue;
+      if (l.startsWith("+++ ")) continue;
+      if (l === "\\ No newline at end of file") continue;
+      if (l.startsWith(" ")) { oldCount++; newCount++; }
+      else if (l.startsWith("-")) { oldCount++; }
+      else if (l.startsWith("+")) { newCount++; }
+      else if (l === "") { oldCount++; newCount++; }
+      else { oldCount++; newCount++; }
+    }
+    const finalOldCount = isNewFile ? 0 : oldCount;
+    const finalOldStart = isNewFile ? "0" : oldStart;
+    const newHeader = `@@ -${finalOldStart},${finalOldCount} +${newStart},${newCount} @@`;
+    if (lines[i] !== newHeader) { lines[i] = newHeader; changed = true; }
+  }
+  return { repaired: lines.join("\n"), changed };
+}
+
 type ApplyOutcome = {
   patchValid: boolean;
   applied: boolean;
@@ -267,6 +389,7 @@ function tryGitApply(outDir: string, patchText: string): ApplyOutcome {
 
   // 1) Preflight check
   let checkStderr = "";
+  let currentPatch = sanitized;
   try {
     execSync(`git apply --check --whitespace=nowarn ${patchFile}`, { cwd: process.cwd(), stdio: "pipe" });
     logs.push("git apply --check passed");
@@ -274,7 +397,31 @@ function tryGitApply(outDir: string, patchText: string): ApplyOutcome {
     checkStderr = e?.stderr?.toString?.() ?? e?.message ?? "";
     logs.push(`git apply --check failed`);
     if (checkStderr) logs.push(`check stderr: ${checkStderr}`);
-    return { patchValid: false, applied: false, checkStderr, applyStderr: "", logs, patchFilePath: patchFile };
+    
+    // Try to repair hunk counts if "corrupt patch" error
+    if (checkStderr.includes("corrupt patch")) {
+      logs.push("Attempting hunk count repair...");
+      const { repaired, changed } = repairHunkCounts(currentPatch);
+      if (changed) {
+        logs.push("Hunk counts repaired, retrying git apply --check");
+        writeFileSync(patchFile, repaired, "utf8");
+        currentPatch = repaired;
+        try {
+          execSync(`git apply --check --whitespace=nowarn ${patchFile}`, { cwd: process.cwd(), stdio: "pipe" });
+          logs.push("git apply --check passed after hunk repair");
+        } catch (e2: any) {
+          const checkStderr2 = e2?.stderr?.toString?.() ?? e2?.message ?? "";
+          logs.push(`git apply --check still failed after repair`);
+          if (checkStderr2) logs.push(`check stderr: ${checkStderr2}`);
+          return { patchValid: false, applied: false, checkStderr: checkStderr2, applyStderr: "", logs, patchFilePath: patchFile };
+        }
+      } else {
+        logs.push("No hunk count changes needed, repair did not help");
+        return { patchValid: false, applied: false, checkStderr, applyStderr: "", logs, patchFilePath: patchFile };
+      }
+    } else {
+      return { patchValid: false, applied: false, checkStderr, applyStderr: "", logs, patchFilePath: patchFile };
+    }
   }
 
   // 2) Apply
