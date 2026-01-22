@@ -119,7 +119,7 @@ export function applyPatchFromResult(opts: ApplyPatchOpts): ApplyPatchResult {
       result.repairPacket.execution.applied = true;
     } catch (err: any) {
       console.error(`❌ git apply failed: ${err?.message || ""}`);
-      patchValid = true;
+      patchValid = false;
       result.repairPacket.execution.stopReason = "patch_failed";
       result.repairPacket.execution.applied = false;
     }
