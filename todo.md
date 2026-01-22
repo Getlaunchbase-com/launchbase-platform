@@ -3504,3 +3504,14 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
 - [x] Replace Model filter with Select dropdown (static list: gpt-4o, gpt-4o-mini, claude-3.5-sonnet, claude-3-opus)
 - [x] Replace Fixture filter with Select dropdown (f1-f11 static list)
 - [x] Add mobile-friendly navigation for Swarm Console (bottom nav on mobile)
+
+## Advanced Model Selector for Swarm Console
+- [x] Fetch dynamic model list from swarm.models.list tRPC endpoint (440 models from AIML API)
+- [x] Implement alphabetical sorting by display name (case-insensitive)
+- [x] Add favorites system with localStorage (swarm.favoriteModels)
+- [x] Add star icon toggle for marking/unmarking favorites
+- [x] Create favorites section pinned at top of dropdown
+- [x] Implement searchable combobox (search within dropdown)
+- [x] Add recommended model presets row above dropdown (Fast/Best/Critic/Fallback)
+- [x] Apply same advanced selector to both Model and Fallback model fields on /admin/swarm/new
+- [x] Update AdminSwarmRuns.tsx filter to use dynamic model list (was static)

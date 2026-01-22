@@ -30,6 +30,7 @@ import { ingestLocalRepairRun } from "../../swarm/ingest";
 import { getArtifactUrl } from "../../swarm/artifactStore";
 import { ensureRepoWorkdir, searchRepoFiles, readRepoFile, pushCurrentChangesToBranch, getRepoWorkdirNoSync } from "../../swarm/repoManager";
 import { ENV } from "../../_core/env";
+import { modelRegistry } from "../../ai";
 
 function windowToMs(window: "24h" | "7d" | "30d"): number {
   switch (window) {
@@ -143,35 +144,14 @@ function resolveRelative(dir: string, rel: string): string {
 }
 
 
-export const adminSwarmConsoleRouter = router({
+export const swarmConsoleRouter = router({
   models: router({
-    list: adminProcedure.output(ListModelsOutputSchema).query(async () => {
-      // Prefer live AIMLAPI /v1/models if key configured, else fall back to known defaults.
-      const base = ENV.aimlBaseUrl || "https://api.aimlapi.com";
-      const key = ENV.aimlApiKey || "";
-      if (!key) {
-        return [
-          { id: "openai/gpt-5-2", label: "GPT-5.2" },
-          { id: "openai/gpt-4o", label: "GPT-4o" },
-          { id: "gpt-4o-mini", label: "GPT-4o mini" },
-        ];
-      }
-      try {
-        const res = await fetch(`${base.replace(/\/+$/,"")}/v1/models`, {
-          headers: { Authorization: `Bearer ${key}` }
-        });
-        const data = await res.json();
-        const items = Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : [];
-        return items
-          .map((m: any) => ({ id: String(m.id), label: m?.name ? String(m.name) : undefined }))
-          .filter((m: any) => m.id && m.id !== "undefined");
-      } catch {
-        return [
-          { id: "openai/gpt-5-2", label: "GPT-5.2" },
-          { id: "openai/gpt-4o", label: "GPT-4o" },
-          { id: "gpt-4o-mini", label: "GPT-4o mini" },
-        ];
-      }
+    list: adminProcedure.query(async () => {
+      const models = modelRegistry.list();
+      return models.map(m => ({
+        id: m.id,
+        label: m.name || m.id,
+      }));
     }),
   }),
 

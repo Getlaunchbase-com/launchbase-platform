@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { ModelSelector } from "@/components/ModelSelector";
 
 const FIXTURES = [
   "f1-missing-import",
@@ -142,35 +143,62 @@ export default function AdminSwarmNewRun() {
             </select>
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-2">
             <div className="text-xs text-muted-foreground">Primary model (AIMLAPI bot)</div>
-            <select
-              className="w-full border rounded-md h-10 px-3"
+            <div className="flex flex-wrap gap-2 mb-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setPrimaryModel("openai/gpt-4o-mini")}
+                className="text-xs"
+              >
+                ⚡ Fast/Cheap
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setPrimaryModel("openai/gpt-5-2")}
+                className="text-xs"
+              >
+                🎯 Best Repair
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setPrimaryModel("anthropic/claude-3.5-sonnet")}
+                className="text-xs"
+              >
+                🔍 Critic/Deep
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setPrimaryModel("openai/gpt-4o")}
+                className="text-xs"
+              >
+                🔄 Fallback
+              </Button>
+            </div>
+            <ModelSelector
+              models={modelOptions}
               value={primaryModel}
-              onChange={(e) => setPrimaryModel(e.target.value)}
-            >
-              {modelOptions.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.label ? `${m.label} (${m.id})` : m.id}
-                </option>
-              ))}
-            </select>
+              onValueChange={setPrimaryModel}
+              placeholder="Select primary model..."
+            />
           </div>
 
           <div className="space-y-1">
             <div className="text-xs text-muted-foreground">Fallback model</div>
-            <select
-              className="w-full border rounded-md h-10 px-3"
+            <ModelSelector
+              models={modelOptions}
               value={fallbackModel}
-              onChange={(e) => setFallbackModel(e.target.value)}
-            >
-              <option value="">(none)</option>
-              {modelOptions.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.label ? `${m.label} (${m.id})` : m.id}
-                </option>
-              ))}
-            </select>
+              onValueChange={setFallbackModel}
+              placeholder="(none)"
+            />
           </div>
 
           <div className="space-y-1">

@@ -4,7 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { adminStripeWebhooksRouter } from "./routers/admin/stripeWebhooks";
 import { adminEmailSmokeRouter } from "./routers/admin/emailSmoke";
 import { adminEmailMetricsRouter } from "./routers/admin/emailMetrics";
-import { adminSwarmConsoleRouter } from "./routers/admin/swarmConsole";
+import { swarmConsoleRouter } from "./routers/admin/swarmConsole";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -427,7 +427,7 @@ export const appRouter = router({
 
   // Admin routes (protected)
   admin: router({
-    swarm: adminSwarmConsoleRouter,
+    swarm: swarmConsoleRouter,
     intakes: router({
       list: protectedProcedure
         .input(z.object({

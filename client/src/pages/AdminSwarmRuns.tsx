@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AdminLayout } from "@/components/AdminLayout";
+import { ModelSelector } from "@/components/ModelSelector";
 
 function StopBadge({ value }: { value?: string | null }) {
   const v = value || "unknown";
@@ -16,6 +17,9 @@ export default function AdminSwarmRuns() {
   const [stopReason, setStopReason] = useState("");
   const [model, setModel] = useState("");
   const [fixtureName, setFixtureName] = useState("");
+  
+  const modelsQuery = trpc.admin.swarm.models.list.useQuery();
+  const modelOptions = useMemo(() => modelsQuery.data ?? [], [modelsQuery.data]);
 
   const query = trpc.admin.swarm.runs.list.useQuery({
     limit: 50,
@@ -67,18 +71,23 @@ export default function AdminSwarmRuns() {
           </div>
           <div className="space-y-1">
             <div className="text-xs text-muted-foreground">Model</div>
-            <Select value={model} onValueChange={setModel}>
-              <SelectTrigger>
-                <SelectValue placeholder="All models" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">All</SelectItem>
-                <SelectItem value="gpt-4o">gpt-4o</SelectItem>
-                <SelectItem value="gpt-4o-mini">gpt-4o-mini</SelectItem>
-                <SelectItem value="claude-3.5-sonnet">claude-3.5-sonnet</SelectItem>
-                <SelectItem value="claude-3-opus">claude-3-opus</SelectItem>
-              </SelectContent>
-            </Select>
+            {modelOptions.length > 0 ? (
+              <ModelSelector
+                models={[{ id: "", label: "All models" }, ...modelOptions]}
+                value={model}
+                onValueChange={setModel}
+                placeholder="All models"
+              />
+            ) : (
+              <Select value={model} onValueChange={setModel}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Loading models..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
           </div>
           <div className="space-y-1">
             <div className="text-xs text-muted-foreground">Fixture</div>
