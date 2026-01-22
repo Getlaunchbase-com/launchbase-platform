@@ -781,6 +781,8 @@ async function main() {
   console.log(`   Arbiter: ${fmtScore(scoreCard.agentScores?.arbiter)}`);
   console.log(`   Trust Delta: ${scoreCard.trustDelta > 0 ? "+" : ""}${fmtScore(scoreCard.trustDelta)}`);
 
+  console.log(`Stop Reason: ${finalStopReason}`);
+
   if (finalStopReason === "ok") {
     console.log(`\n✅ Repair completed successfully (executor-owned ok)`);
     process.exit(0);
