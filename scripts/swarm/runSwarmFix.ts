@@ -15,11 +15,21 @@
 
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { execSync, spawnSync } from "node:child_process";
-import { dirname } from "node:path";
+import { dirname, join } from "node:path";
 import { runRepairSwarm } from "../../server/ai/orchestration/runRepairSwarm.ts";
 import { createScoreCard } from "../../server/contracts/index.ts";
 import { preflightFailurePacket } from "../../server/contracts/preflightValidation.ts";
 import { shouldEscalateOnApplyFailure } from "./shouldEscalateOnApplyFailure";
+import { applyPatchFromResult } from "./applyPatchFromResult.js";
+import { buildEscalatedFailurePacket } from "./buildEscalatedFailurePacket.js";
+
+function computeStopReason(facts: { preflightOk: boolean; patchValid: boolean; applied: boolean; testsPassed: boolean }): string {
+  if (!facts.preflightOk) return "preflight_failed";
+  if (!facts.patchValid) return "patch_invalid";
+  if (!facts.applied) return "apply_failed";
+  if (!facts.testsPassed) return "tests_failed";
+  return "ok";
+}
 
 /**
  * Normalize FailurePacket to handle both old and new shapes.
@@ -229,6 +239,11 @@ async function main() {
   const outDir = `runs/repair/${repairId}`;
   mkdirSync(outDir, { recursive: true });
 
+  // Execution state tracking
+  const preflightOk = true;
+  let retryCount = 0;
+  let escalated = false;
+
   // ✅ FIX #1: Always persist FailurePacket to repair dir for reproducibility
   const failurePacketPath = `${outDir}/failurePacket.json`;
   writeFileSync(failurePacketPath, JSON.stringify(failurePacket, null, 2), "utf-8");
@@ -287,147 +302,58 @@ async function main() {
   console.log(`   Changes Proposed: ${(result.repairPacket.patchPlan?.changes ?? []).length}`);
 
   // Apply patch if requested
+  const patchFile = `${outDir}/patch.diff`;
   let patchApplied = false;
-  const applyLogs = [];
+  let patchValid = true;
+  let escalationHint: string | null = null;
+  const applyLogs: string[] = [];
   
   if (shouldApply) {
-    console.log(`\n🔧 Applying patch...`);
-    
-    const changes = result.repairPacket.patchPlan?.changes ?? [];
-    
-    // Validate all changes have diffs
-    const missingDiffs = changes.filter(c => !c.diff);
-    if (missingDiffs.length > 0) {
-      console.error(`❌ Cannot apply: ${missingDiffs.length} changes missing diffs`);
-      for (const change of missingDiffs) {
-        console.error(`   - ${change.file}: ${change.description}`);
-        applyLogs.push(`Missing diff for ${change.file}`);
-      }
-      result.repairPacket.execution.stopReason = "human_review_required";
-      result.repairPacket.execution.applied = false;
-    } else {
-      // Create temp patch file
-      let patchContent = changes.map(c => c.diff).join("\n");
-      
-      // Sanitize patch
-      // 1. Strip markdown code fences
-      patchContent = patchContent.replace(/^```diff\n/gm, "").replace(/^```\n/gm, "");
-      // 2. Trim whitespace
-      patchContent = patchContent.trim();
-      // 3. Ensure newline at EOF
-      if (!patchContent.endsWith("\n")) {
-        patchContent += "\n";
-      }
-      
-      // Validate patch format
-      const isUnifiedDiff = patchContent.includes("diff --git") && 
-                           patchContent.includes("---") && 
-                           patchContent.includes("+++");
-      const isCustomFormat = patchContent.includes("*** Begin Patch") || 
-                            patchContent.includes("*** Update File:");
-      
-      if (isCustomFormat) {
-        console.error(`❌ Invalid patch format: *** Begin Patch style not supported`);
-        applyLogs.push(`Invalid patch format: must be unified diff (git apply compatible)`);
-        result.repairPacket.execution.stopReason = "patch_invalid_format";
-        result.repairPacket.execution.applied = false;
-      } else if (!isUnifiedDiff) {
-        console.error(`❌ Invalid patch format: missing unified diff headers`);
-        applyLogs.push(`Invalid patch format: must include 'diff --git', '---', and '+++'`);
-        result.repairPacket.execution.stopReason = "patch_invalid_format";
-        result.repairPacket.execution.applied = false;
-      } else {
-        // Write sanitized patch
-        const patchFile = `${outDir}/patch.diff`;
-        writeFileSync(patchFile, patchContent, "utf8");
-        applyLogs.push(`Created patch file: ${patchFile}`);
-        
-        // Preflight check
-        let checkPassed = false;
-        try {
-          execSync(`git apply --check --whitespace=nowarn ${patchFile}`, { 
-            cwd: process.cwd(), 
-            stdio: "pipe" 
-          });
-          applyLogs.push(`git apply --check passed`);
-          checkPassed = true;
-        } catch (checkErr) {
-          const errorMsg = checkErr.message || "";
-          const stderr = checkErr.stderr?.toString() || "";
-          
-          // Detect "new file dependency context" failure
-          const isNewFileDep = stderr.includes("depends on old contents") || 
-                               stderr.includes("patch failed") ||
-                               errorMsg.includes("depends on old contents");
-          
-          if (isNewFileDep) {
-            console.log(`⚠️ New file dependency context issue detected`);
-            applyLogs.push(`git apply --check failed: ${errorMsg}`);
-            applyLogs.push(`Escalation hint: new_file_dep_context (needs Level 2 context)`);
-            result.repairPacket.execution.stopReason = "apply_failed_dependency_context";
-            result.repairPacket.execution.applied = false;
-            // TODO: Implement Level 2 escalation (rebuild packet with expanded context)
-          }
-          // Retry with --recount if "corrupt patch" error
-          else if (errorMsg.includes("corrupt patch") || stderr.includes("corrupt patch")) {
-            console.log(`⚠️ Corrupt patch detected, retrying with --recount...`);
-            applyLogs.push(`git apply --check failed: ${errorMsg}`);
-            applyLogs.push(`Retrying with --recount to fix hunk header counts...`);
-            
-            try {
-              execSync(`git apply --check --recount --whitespace=nowarn ${patchFile}`, { 
-                cwd: process.cwd(), 
-                stdio: "pipe" 
-              });
-              applyLogs.push(`git apply --check --recount passed`);
-              checkPassed = true;
-            } catch (recountErr) {
-              console.error(`❌ git apply --check --recount failed: ${recountErr.message}`);
-              applyLogs.push(`git apply --check --recount failed: ${recountErr.message}`);
-              if (recountErr.stderr) applyLogs.push(`stderr: ${recountErr.stderr}`);
-              result.repairPacket.execution.stopReason = "patch_failed";
-              result.repairPacket.execution.applied = false;
-            }
-          } else {
-            console.error(`❌ git apply --check failed: ${errorMsg}`);
-            applyLogs.push(`git apply --check failed: ${errorMsg}`);
-            if (stderr) applyLogs.push(`stderr: ${stderr}`);
-            result.repairPacket.execution.stopReason = "patch_failed";
-            result.repairPacket.execution.applied = false;
-          }
-        }
-        
-        // Apply patch if check passed
-        if (checkPassed) {
-          try {
-            // Use --recount if check needed it (detect from logs)
-            const needsRecount = applyLogs.some(log => log.includes("--recount passed"));
-            const applyCmd = needsRecount 
-              ? `git apply --recount --whitespace=nowarn ${patchFile}`
-              : `git apply --whitespace=nowarn ${patchFile}`;
-            
-            execSync(applyCmd, { 
-              cwd: process.cwd(), 
-              stdio: "pipe" 
-            });
-            
-            // Log diff stats
-            const diffStat = execSync(`git diff --stat`, { cwd: process.cwd(), encoding: "utf8" });
-            console.log(`✅ Patch applied successfully`);
-            console.log(diffStat);
-            applyLogs.push(`git apply succeeded`);
-            applyLogs.push(`Diff stats:\n${diffStat}`);
-            
-            patchApplied = true;
-            result.repairPacket.execution.applied = true;
-          } catch (err) {
-            console.error(`❌ git apply failed: ${err.message}`);
-            applyLogs.push(`git apply failed: ${err.message}`);
-            result.repairPacket.execution.stopReason = "patch_failed";
-            result.repairPacket.execution.applied = false;
-          }
-        }
-      }
+    const applied = applyPatchFromResult({ result, shouldApply, outDir, patchFile, applyLogs });
+    patchApplied = applied.patchApplied;
+    patchValid = applied.patchValid;
+    escalationHint = applied.escalationHint;
+   }
+
+  // Escalation retry executor
+  let escalationReason: string | null = null;
+  let escalationLevel: "L0" | "L2" | null = null;
+
+  if (shouldApply && !patchApplied && escalationHint === "apply_failed_dependency_context") {
+    escalationReason = "apply_failed_dependency_context";
+  }
+
+  if (shouldApply && !patchApplied && retryCount === 0 && escalationReason === "apply_failed_dependency_context") {
+    retryCount = 1;
+    escalated = true;
+    escalationLevel = "L2";
+
+    try {
+      writeFileSync(join(outDir, "failurePacket.original.json"), JSON.stringify(failurePacket, null, 2), "utf8");
+
+      const escalatedPacket = await buildEscalatedFailurePacket({
+        base: failurePacket,
+        patchDiffPath: patchFile,
+        repairId,
+        maxFiles: 25,
+        maxTotalBytes: 500_000,
+        includeRepoIndex: true,
+        includeTsconfig: true,
+        includePackageJson: true,
+      });
+
+      writeFileSync(join(outDir, "failurePacket.escalated.json"), JSON.stringify(escalatedPacket, null, 2), "utf8");
+
+      const retryResult = await runRepairSwarm({ pkt: escalatedPacket });
+      result = retryResult;
+
+      applyLogs.push(`[escalation] reran swarm with L2 context`);
+
+      const applied2 = applyPatchFromResult({ result, shouldApply, outDir, patchFile, applyLogs });
+      patchApplied = applied2.patchApplied;
+      patchValid = applied2.patchValid;
+    } catch (err: any) {
+      applyLogs.push(`[escalation] retry failed: ${err?.message || String(err)}`);
     }
   }
 
@@ -507,6 +433,20 @@ async function main() {
     }
   }
   
+  // Write retryMeta.json
+  const retryMeta = {
+    retryCount,
+    escalated,
+    escalationReason,
+    escalationLevel,
+    contextLevelUsedFirst: "L0",
+    contextLevelUsedRetry: escalated ? "L2" : null,
+  };
+  writeFileSync(`${outDir}/retryMeta.json`, JSON.stringify(retryMeta, null, 2), "utf8");
+
+  // Executor-owned stopReason (unconditional overwrite)
+  result.repairPacket.execution.stopReason = computeStopReason({ preflightOk, patchValid, applied: patchApplied, testsPassed });
+
   // Write RepairPacket
   const outputRepairPacketPath = `${outDir}/repairPacket.json`;
   writeFileSync(outputRepairPacketPath, JSON.stringify(result.repairPacket, null, 2), "utf8");
