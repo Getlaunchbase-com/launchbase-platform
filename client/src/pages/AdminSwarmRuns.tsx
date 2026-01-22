@@ -73,9 +73,9 @@ export default function AdminSwarmRuns() {
             <div className="text-xs text-muted-foreground">Model</div>
             {modelOptions.length > 0 ? (
               <ModelSelector
-                models={[{ id: "", label: "All models" }, ...modelOptions]}
-                value={model}
-                onValueChange={setModel}
+                models={[{ id: "__all__", label: "All models" }, ...modelOptions]}
+                value={model || "__all__"}
+                onValueChange={(v) => setModel(v === "__all__" ? "" : v)}
                 placeholder="All models"
               />
             ) : (

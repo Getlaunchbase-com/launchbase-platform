@@ -3515,3 +3515,124 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
 - [x] Add recommended model presets row above dropdown (Fast/Best/Critic/Fallback)
 - [x] Apply same advanced selector to both Model and Fallback model fields on /admin/swarm/new
 - [x] Update AdminSwarmRuns.tsx filter to use dynamic model list (was static)
+
+## Swarm Console: Context Persistence & Defaults System
+
+### Phase 1: Data Model & Schema
+- [ ] Create `swarm_defaults` table with single row (id="global")
+  - [ ] `id` (string PK) - "global"
+  - [ ] `defaults_json` (JSON) - partial FeaturePack defaults
+  - [ ] `context_block` (TEXT) - Task Starter Packet content
+  - [ ] `definition_of_done` (TEXT)
+  - [ ] `verification_command` (TEXT)
+  - [ ] `updated_at` (timestamp)
+- [ ] Add context fields to existing `swarm_profiles` table
+  - [ ] `context_block` (TEXT)
+  - [ ] `definition_of_done` (TEXT)
+  - [ ] `verification_command` (TEXT)
+- [ ] Add resolved config fields to existing `swarm_runs` table
+  - [ ] `resolved_config_json` (JSON) - fully merged final pack used
+  - [ ] `context_block` (TEXT) - final context used
+  - [ ] `definition_of_done` (TEXT)
+  - [ ] `verification_command` (TEXT)
+- [ ] Run `pnpm db:push` to apply schema changes
+
+### Phase 2: Merge Logic Implementation
+- [ ] Create `server/swarm/mergeFeaturePack.ts` with deterministic merge logic
+  - [ ] `isDefined<T>()` helper function
+  - [ ] `mergeFeaturePack()` - deep merge with array replace semantics
+  - [ ] `applyDefaults()` - 4-tier priority: run > profile > global > hardcoded
+  - [ ] Unit tests for merge logic (scalars, objects, arrays, context fields)
+- [ ] Define merge priority rules:
+  1. Run overrides (highest priority)
+  2. Profile config
+  3. Global defaults
+  4. Hardcoded safe fallbacks (lowest priority)
+- [ ] Array merge semantics: replace (not append) for selectedFiles and testCommands
+- [ ] Context fields merge: same priority order as feature pack
+
+### Phase 3: tRPC Endpoints
+- [ ] Add `admin.swarm.defaults` router
+  - [ ] `get()` - returns global defaults + context
+  - [ ] `update({ defaultsJson, contextBlock, definitionOfDone, verificationCommand })` - updates global row
+- [ ] Update `admin.swarm.profiles` endpoints to include context fields
+  - [ ] Add context fields to create/update mutations
+  - [ ] Return context fields in get/list queries
+- [ ] Update `admin.swarm.runs.create()` to use merge logic
+  - [ ] Load global defaults row
+  - [ ] Load profile if profileId provided
+  - [ ] Call `applyDefaults(runOverrides, profile.configJson, defaults.defaultsJson)`
+  - [ ] Resolve context fields with same priority order
+  - [ ] Store both `feature_pack_json` (user input) and `resolved_config_json` (merged final)
+  - [ ] Store resolved context fields
+  - [ ] Launch swarm using resolved config
+
+### Phase 4: UI - Global Defaults Editor
+- [ ] Create `/admin/swarm/settings` page
+  - [ ] Edit global defaults form (models, timeouts, toggles, repo settings)
+  - [ ] Context block textarea (Task Starter Packet)
+  - [ ] Definition of Done textarea
+  - [ ] Verification command input
+  - [ ] Save button → calls `admin.swarm.defaults.update()`
+- [ ] Add link to Settings in AdminLayout navigation
+
+### Phase 5: UI - New Run Page Enhancements
+- [ ] Update `/admin/swarm/new` to auto-populate from merged defaults
+  - [ ] On load: fetch `admin.swarm.defaults.get()`
+  - [ ] When profile selected: fetch profile and merge
+  - [ ] Auto-populate form fields from merged result
+  - [ ] Show "Preset: Global Defaults / Profile Name" indicator
+  - [ ] Mark user-changed fields as "Overrides"
+- [ ] Add collapsible "Context" section
+  - [ ] Context block textarea (pre-filled from merged context, editable)
+  - [ ] Definition of Done textarea
+  - [ ] Verification command input
+  - [ ] User edits become run overrides
+
+### Phase 6: UI - Profile Management Enhancements
+- [ ] Update `/admin/swarm/profiles/:id` detail page
+  - [ ] Add context fields to edit form
+  - [ ] "Set as default" button → sets `isPromoted = true`
+  - [ ] "Make this global default" button → copies profile into swarm_defaults
+- [ ] Update `/admin/swarm/profiles` list page
+  - [ ] Show indicator for promoted profiles
+  - [ ] Quick action to set as global default
+
+### Phase 7: UI - Run Detail View
+- [ ] Update `/admin/swarm/runs/:id` to show resolved config
+  - [ ] Display both `feature_pack_json` (user input) and `resolved_config_json` (final merged)
+  - [ ] Show context block, definition of done, verification command
+  - [ ] "Rerun with same config" button → uses resolved config
+  - [ ] "Create profile from this run" → includes context fields
+
+### Phase 8: Documentation & Task Starter Packet
+- [ ] Create `/swarm/ops/` folder in repo
+  - [ ] `task-starter-packet-template.md` - standardized template format
+  - [ ] `invariants.md` - system invariants and constraints
+  - [ ] `known-issues.md` - current blockers and workarounds
+  - [ ] `verification.md` - standard verification commands
+- [ ] Document merge priority rules in `/swarm/ops/merge-rules.md`
+- [ ] Add example Task Starter Packets for common scenarios:
+  - [ ] Auto-repair fixture run
+  - [ ] Manual code repair
+  - [ ] Pressure test
+  - [ ] Critic/review run
+
+### Phase 9: Testing & Validation
+- [ ] Write vitest tests for merge logic
+  - [ ] Test scalar field priority (run > profile > global > hardcoded)
+  - [ ] Test object deep merge
+  - [ ] Test array replace semantics
+  - [ ] Test context field resolution
+  - [ ] Test edge cases (null, undefined, empty arrays)
+- [ ] Integration test: create run with defaults only
+- [ ] Integration test: create run with profile override
+- [ ] Integration test: create run with full overrides
+- [ ] Verify reproducibility: same inputs → same resolved config
+
+### Phase 10: Migration & Rollout
+- [ ] Seed initial global defaults row with sensible values
+- [ ] Migrate existing profiles to add context fields (null initially)
+- [ ] Backfill existing runs with resolved_config_json (copy from feature_pack_json)
+- [ ] Update all Swarm Console documentation
+- [ ] Create user guide for Task Starter Packet system
