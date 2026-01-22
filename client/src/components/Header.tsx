@@ -2,9 +2,12 @@ import { useEffect, useState } from "react";
 import { getPrefs, setLanguage, setAudience, subscribePrefs, readLanguageForBoot, type Audience, type Language } from "@/lib/prefs";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Globe, Building2 } from "lucide-react";
+import { ArrowRight, Globe, Building2, LogIn, LayoutDashboard } from "lucide-react";
+import { trpc } from "@/lib/trpc";
 
 export function Header() {
+  const { data: user } = trpc.auth.me.useQuery();
+  
   const [prefs, setLocal] = useState(() => ({
     ...getPrefs(),
     language: readLanguageForBoot(), // Auto-detect on first visit
@@ -79,11 +82,26 @@ export function Header() {
             </select>
           </div>
 
-          <Link href="/apply">
-            <Button className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white">
-              Hand It Off <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </Link>
+          {user ? (
+            <Link href={user.role === 'admin' ? "/admin/swarm" : "/dashboard"}>
+              <Button className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white">
+                {user.role === 'admin' ? 'Admin' : 'Dashboard'} <LayoutDashboard className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+          ) : (
+            <>
+              <a href="/api/auth/google">
+                <Button variant="ghost" className="text-white hover:bg-white/10">
+                  <LogIn className="w-4 h-4 mr-2" /> Login
+                </Button>
+              </a>
+              <Link href="/apply">
+                <Button className="bg-[#FF6A00] hover:bg-[#FF6A00]/90 text-white">
+                  Hand It Off <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </nav>

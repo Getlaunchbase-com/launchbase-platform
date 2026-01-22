@@ -3636,3 +3636,63 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
 - [ ] Backfill existing runs with resolved_config_json (copy from feature_pack_json)
 - [ ] Update all Swarm Console documentation
 - [ ] Create user guide for Task Starter Packet system
+
+## Critical Swarm Console Bugs - Systematic Fix Checklist (2026-01-22)
+
+### 1. Fix Permission Error (10002) - Add Login/Dashboard Button
+- [ ] Find public Header component (client/src/components/Header.tsx)
+- [ ] Add `trpc.auth.me.useQuery()` to check login status
+- [ ] If `me` is null → show "Login" button
+- [ ] If `me` exists → show "Dashboard" link (or "Admin" if admin)
+- [ ] Login button should go to existing OAuth entrypoint
+- [ ] ✅ DONE WHEN: Refreshing /admin/swarm redirects to login or allows access after login
+
+### 2. Fix Double-Navbar Problem - Hide Public Header on /admin/*
+- [ ] Open client/src/App.tsx (root router file)
+- [ ] Detect admin route with `const [location] = useLocation()`
+- [ ] Add `const isAdmin = location.startsWith("/admin")`
+- [ ] Conditionally render: `!isAdmin && <Header />`
+- [ ] Admin routes still render their own AdminLayout
+- [ ] ✅ DONE WHEN: /admin/swarm no longer shows marketing header and "Hand It Off"
+
+### 3. Model Selector "All with No Options" (Fixes Itself After Auth)
+- [ ] Verify after step 1: Visit /admin/swarm/new
+- [ ] Model dropdown should list 440+ models
+- [ ] Runs list model filter should also list models
+- [ ] If still doesn't populate after login → read server logs for separate 500 error
+- [ ] ✅ DONE WHEN: Model dropdowns populated with full list
+
+### 4. Fixture UX - Rename to Scenario + Friendly Labels
+- [ ] Create FIXTURE_LABELS constant with human-readable names
+- [ ] Rename "Fixture" label → "Scenario" throughout UI
+- [ ] Update AdminSwarmRuns filter dropdown to show "f1 — Missing import" format
+- [ ] Update AdminSwarmNewRun dropdown with friendly labels
+- [ ] Add explanatory text: "Scenario = a built-in test case to benchmark Swarm reliability"
+- [ ] (Optional) Add toggle: "Real Run" vs "Scenario Test" modes
+- [ ] ✅ DONE WHEN: Dropdown shows meaningful names instead of f1/f2/f3
+
+### Final Verification Pass
+- [ ] Open /admin/swarm logged out → see Login path
+- [ ] Log in → /admin/swarm loads without 10002 error
+- [ ] /admin/swarm/new model dropdown populated
+- [ ] No public header on admin pages
+- [ ] Scenario dropdown shows friendly labels
+
+## Fixture UX Improvements (Human-Readable Scenarios)
+- [ ] Rename "Fixture" label to "Scenario" throughout UI
+- [ ] Create FIXTURE_LABELS mapping object with human-readable names:
+  - f1 → "Missing import"
+  - f2 → "Wrong path / module not found"
+  - f3 → "Type mismatch"
+  - f4 → "Unused import"
+  - f5 → "Type export missing"
+  - f6 → "JSON import parsing"
+  - f7 → "ESM interop issue"
+  - f8 → "Zod schema mismatch"
+  - f9 → "Database schema mismatch"
+  - f10 → "Patch format corruption"
+  - f11 → "New file dependency (create + import)"
+- [ ] Update AdminSwarmRuns filter dropdown to show "f1 — Missing import" format
+- [ ] Update AdminSwarmNewRun fixture dropdown with human-readable labels
+- [ ] Add explanatory text: "Scenario = a built-in test case to benchmark Swarm reliability"
+- [ ] (Optional) Add toggle: "Real Run" vs "Scenario Test" modes for owner-friendly UX

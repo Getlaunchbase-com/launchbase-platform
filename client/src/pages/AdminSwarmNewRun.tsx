@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { ModelSelector } from "@/components/ModelSelector";
+import { formatFixtureLabel } from "@/lib/fixtureLabels";
 
 const FIXTURES = [
   "f1-missing-import",
@@ -351,7 +352,7 @@ export default function AdminSwarmNewRun() {
               variant={sourceType === "fixture" ? "default" : "secondary"}
               onClick={() => setSourceType("fixture")}
             >
-              Fixture
+              Scenario Test
             </Button>
             <Button
               type="button"
@@ -364,7 +365,8 @@ export default function AdminSwarmNewRun() {
 
           {sourceType === "fixture" ? (
             <div className="space-y-1">
-              <div className="text-xs text-muted-foreground">Fixture</div>
+              <div className="text-xs text-muted-foreground">Scenario</div>
+              <div className="text-xs text-gray-500 mb-1">Built-in test case to benchmark Swarm reliability</div>
               <select
                 className="w-full border rounded-md h-10 px-3"
                 value={fixtureName}
@@ -372,7 +374,7 @@ export default function AdminSwarmNewRun() {
               >
                 {FIXTURES.map((f) => (
                   <option key={f} value={f}>
-                    {f}
+                    {formatFixtureLabel(f)}
                   </option>
                 ))}
               </select>

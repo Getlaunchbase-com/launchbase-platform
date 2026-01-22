@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Header } from "@/components/Header";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
@@ -116,12 +116,15 @@ function Router() {
 
 // LaunchBase uses a dark theme with orange accent
 function App() {
+  const [location] = useLocation();
+  const isAdmin = location.startsWith("/admin");
+  
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
           <Toaster />
-          <Header />
+          {!isAdmin && <Header />}
           <Router />
         </TooltipProvider>
       </ThemeProvider>

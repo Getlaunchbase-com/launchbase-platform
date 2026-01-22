@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AdminLayout } from "@/components/AdminLayout";
 import { ModelSelector } from "@/components/ModelSelector";
+import { formatFixtureLabel } from "@/lib/fixtureLabels";
 
 function StopBadge({ value }: { value?: string | null }) {
   const v = value || "unknown";
@@ -92,24 +93,25 @@ export default function AdminSwarmRuns() {
             )}
           </div>
           <div className="space-y-1">
-            <div className="text-xs text-muted-foreground">Fixture</div>
+            <div className="text-xs text-muted-foreground">Scenario</div>
+            <div className="text-xs text-gray-500 mb-1">Built-in test case to benchmark Swarm reliability</div>
             <Select value={fixtureName ?? ALL} onValueChange={(v) => setFixtureName(v === ALL ? undefined : v)}>
               <SelectTrigger>
-                <SelectValue placeholder="All fixtures" />
+                <SelectValue placeholder="All scenarios" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value={ALL}>All</SelectItem>
-                <SelectItem value="f1">f1</SelectItem>
-                <SelectItem value="f2">f2</SelectItem>
-                <SelectItem value="f3">f3</SelectItem>
-                <SelectItem value="f4">f4</SelectItem>
-                <SelectItem value="f5">f5</SelectItem>
-                <SelectItem value="f6">f6</SelectItem>
-                <SelectItem value="f7">f7</SelectItem>
-                <SelectItem value="f8">f8</SelectItem>
-                <SelectItem value="f9">f9</SelectItem>
-                <SelectItem value="f10">f10</SelectItem>
-                <SelectItem value="f11">f11</SelectItem>
+                <SelectItem value="f1-missing-import">{formatFixtureLabel("f1-missing-import")}</SelectItem>
+                <SelectItem value="f2-wrong-path">{formatFixtureLabel("f2-wrong-path")}</SelectItem>
+                <SelectItem value="f3-type-mismatch">{formatFixtureLabel("f3-type-mismatch")}</SelectItem>
+                <SelectItem value="f4-unused-import">{formatFixtureLabel("f4-unused-import")}</SelectItem>
+                <SelectItem value="f5-type-export">{formatFixtureLabel("f5-type-export")}</SelectItem>
+                <SelectItem value="f6-json-import">{formatFixtureLabel("f6-json-import")}</SelectItem>
+                <SelectItem value="f7-esm-interop">{formatFixtureLabel("f7-esm-interop")}</SelectItem>
+                <SelectItem value="f8-zod-mismatch">{formatFixtureLabel("f8-zod-mismatch")}</SelectItem>
+                <SelectItem value="f9-drizzle-mismatch">{formatFixtureLabel("f9-drizzle-mismatch")}</SelectItem>
+                <SelectItem value="f10-patch-corrupt">{formatFixtureLabel("f10-patch-corrupt")}</SelectItem>
+                <SelectItem value="f11-new-file-dep-context">{formatFixtureLabel("f11-new-file-dep-context")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
