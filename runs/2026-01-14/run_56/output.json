@@ -1,9 +1,0 @@
-{
-  "version": "v1",
-  "status": "failed",
-  "stopReason": "invalid_request",
-  "needsHuman": false,
-  "traceId": "trc_1768407185733_389cd0282cab1",
-  "artifacts": [],
-  "customerSafe": true
-}
