@@ -17,6 +17,7 @@ import type { FailurePacketV1 } from "../../contracts/failurePacket";
 import type { RepairPacketV1 } from "../../contracts/repairPacket";
 import { createRepairPacket } from "../../contracts/repairPacket";
 import { callSpecialistAIML } from "../engine/specialists/aimlSpecialist";
+import { normalizeTestCommands } from "../../contracts/normalizeTestCommands";
 // fileLog not needed - using console.log instead
 
 /**
@@ -628,7 +629,14 @@ export async function runRepairSwarm(opts: RepairSwarmOpts): Promise<RepairSwarm
     patchPlan: {
       changes: arbiter.finalPatch?.changes || patch.changes,
       testPlan: patch.testPlan,
-      testCommands: patch.testCommands,
+      // Use fixture's testCommands if provided, otherwise use AI-generated ones
+      testCommands: failurePacket.testCommands && failurePacket.testCommands.length > 0
+        ? normalizeTestCommands(failurePacket.testCommands).map(cmd => {
+            // Convert string command to structured format
+            const parts = cmd.split(/\s+/);
+            return { cmd: parts[0], args: parts.slice(1) };
+          })
+        : patch.testCommands,
       rollbackPlan: patch.rollbackPlan,
     },
     execution: {

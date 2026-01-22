@@ -53,6 +53,10 @@ export type FailurePacketV1 = {
     suggestedFix?: string; // AI-generated suggested fix
     relatedFailures?: string[]; // Related failure packet IDs
   };
+  
+  // Optional test commands to run after applying a fix
+  // If provided, these override AI-generated testCommands in the repair swarm
+  testCommands?: string[];
 };
 
 /**
