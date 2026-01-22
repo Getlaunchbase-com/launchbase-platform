@@ -107,7 +107,7 @@ function normalizeFailurePacket(fp: any) {
     },
     raw: fp, // keep original for debugging
     // Preserve testCommands from fixture for scoped typecheck
-    testCommands: fp?.testCommands ?? undefined,
+    testCommands: fp?.testCommands ?? fp?.signal?.testCommands ?? fp?.context?.testCommands ?? undefined,
   };
 }
 
