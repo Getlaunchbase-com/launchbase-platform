@@ -28,6 +28,47 @@ function payloadAsRecord(x: unknown): Record<string, unknown> {
   return x as Record<string, unknown>;
 }
 
+/**
+ * Quote-aware command line tokenizer for fixture testCommands.
+ * Supports '...' and "...", preserves spaces inside quotes.
+ */
+function splitCommandLine(s: string): string[] {
+  const out: string[] = [];
+  let cur = "";
+  let quote: "'" | '"' | null = null;
+
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+
+    if (quote) {
+      if (ch === quote) {
+        quote = null;
+      } else {
+        cur += ch;
+      }
+      continue;
+    }
+
+    if (ch === '"' || ch === "'") {
+      quote = ch as any;
+      continue;
+    }
+
+    if (/\s/.test(ch)) {
+      if (cur.length) {
+        out.push(cur);
+        cur = "";
+      }
+      continue;
+    }
+
+    cur += ch;
+  }
+
+  if (cur.length) out.push(cur);
+  return out;
+}
+
 export type RepairSwarmOpts = {
   failurePacket: FailurePacketV1;
   maxIterations?: number; // Default: 2
@@ -633,7 +674,7 @@ export async function runRepairSwarm(opts: RepairSwarmOpts): Promise<RepairSwarm
       testCommands: failurePacket.testCommands && failurePacket.testCommands.length > 0
         ? normalizeTestCommands(failurePacket.testCommands).map(cmd => {
             // Convert string command to structured format
-            const parts = cmd.split(/\s+/);
+            const parts = splitCommandLine(cmd);
             return { cmd: parts[0], args: parts.slice(1) };
           })
         : patch.testCommands,
