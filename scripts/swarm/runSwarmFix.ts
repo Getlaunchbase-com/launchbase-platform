@@ -229,6 +229,7 @@ function classifyPermissionBlocker(failurePacket: any): boolean {
 /**
  * Repair hunk header counts when git says "corrupt patch".
  * AI often gets the @@ -a,b +c,d @@ counts wrong. This fixes them deterministically.
+ * STRICT: only counts lines with valid hunk prefixes (" ", "+", "-").
  */
 function repairHunkCounts(patchText: string): { repaired: string; changed: boolean } {
   const lines = patchText.split("\n");
@@ -236,66 +237,58 @@ function repairHunkCounts(patchText: string): { repaired: string; changed: boole
 
   const hunkRe = /^@@\s+-(\d+)(?:,(\d+))?\s+\+(\d+)(?:,(\d+))?\s+@@/;
 
-  // Track if we're in a new file block (--- /dev/null)
-  let isNewFile = false;
-
   for (let i = 0; i < lines.length; i++) {
-    // Detect new file blocks
-    if (lines[i].startsWith("--- /dev/null")) {
-      isNewFile = true;
-      continue;
-    }
-    if (lines[i].startsWith("--- ") && !lines[i].startsWith("--- /dev/null")) {
-      isNewFile = false;
-      continue;
-    }
-
     const m = lines[i].match(hunkRe);
     if (!m) continue;
 
     const oldStart = m[1];
     const newStart = m[3];
 
-    // Walk forward until next hunk header or next file header or EOF
     let oldCount = 0;
     let newCount = 0;
 
     for (let j = i + 1; j < lines.length; j++) {
       const l = lines[j];
 
-      // boundaries: next hunk or next diff block
+      // boundaries
       if (l.startsWith("@@ ")) break;
       if (l.startsWith("diff --git ")) break;
 
-      // Skip special headers inside diff blocks
+      // headers that can appear before hunks; don't count them
+      if (l.startsWith("index ")) continue;
+      if (l.startsWith("new file mode ")) continue;
+      if (l.startsWith("deleted file mode ")) continue;
       if (l.startsWith("--- ")) continue;
       if (l.startsWith("+++ ")) continue;
 
-      // End-of-file marker line used by diffs
+      // special marker line: ignore
       if (l === "\\ No newline at end of file") continue;
 
-      // Count rules:
-      // - context lines (" ") count in both old and new
-      // - removed lines ("-") count only in old
-      // - added lines ("+") count only in new
-      // Only count lines that start with space, +, or -
-      // Empty lines or lines without proper prefix are NOT part of the hunk
-      if (l.startsWith(" ")) {
+      // STRICT counting: only lines with valid hunk prefixes count
+      const prefix = l[0];
+      if (prefix === " ") {
         oldCount++;
         newCount++;
-      } else if (l.startsWith("-")) {
-        oldCount++;
-      } else if (l.startsWith("+")) {
-        newCount++;
+        continue;
       }
-      // Empty lines and unknown prefixes are ignored - they're not valid hunk content
+      if (prefix === "-") {
+        oldCount++;
+        continue;
+      }
+      if (prefix === "+") {
+        newCount++;
+        continue;
+      }
+
+      // If we hit an empty line or anything else, it's not a valid hunk body line.
+      // Treat as boundary so we don't overcount trailing newlines/garbage.
+      break;
     }
 
-    // For new files, old side must be 0,0
-    const finalOldCount = isNewFile ? 0 : oldCount;
-    const finalOldStart = isNewFile ? "0" : oldStart;
+    // Skip if no valid lines found (malformed hunk)
+    if (oldCount === 0 && newCount === 0) continue;
 
-    const newHeader = `@@ -${finalOldStart},${finalOldCount} +${newStart},${newCount} @@`;
+    const newHeader = `@@ -${oldStart},${oldCount} +${newStart},${newCount} @@`;
     if (lines[i] !== newHeader) {
       lines[i] = newHeader;
       changed = true;
