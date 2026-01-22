@@ -743,7 +743,7 @@ async function main() {
 
   // Executor-owned summary markers for fixture runner
   console.log(facts.applied ? "✅ Patch applied successfully" : "❌ Patch not applied");
-  console.log(facts.testsPassed ? "✅ Tests passed" : "❌ Tests failed");
+  console.log(facts.testsPassed ? "✅ Passed" : "❌ Failed");
 
   // Persist RepairPacket
   const outputRepairPacketPath = `${outDir}/repairPacket.json`;
