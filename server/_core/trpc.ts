@@ -69,6 +69,29 @@ export const adminProcedure = t.procedure.use(
   t.middleware(async opts => {
     const { ctx, next } = opts;
 
+    // In development, bypass admin check for convenience
+    if (process.env.NODE_ENV === 'development') {
+      // Create a mock admin user if none exists
+      const mockUser = ctx.user || {
+        id: 1,
+        openId: 'dev-owner',
+        name: 'Dev Owner',
+        email: 'owner@launchbase.local',
+        role: 'admin' as const,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        lastSignedIn: new Date(),
+        loginMethod: 'dev',
+      };
+
+      return next({
+        ctx: {
+          ...ctx,
+          user: mockUser,
+        },
+      });
+    }
+
     if (!ctx.user || ctx.user.role !== 'admin') {
       throw new TRPCError({ code: "FORBIDDEN", message: NOT_ADMIN_ERR_MSG });
     }
