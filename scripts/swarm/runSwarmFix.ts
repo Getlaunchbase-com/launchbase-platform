@@ -1,49 +1,66 @@
 #!/usr/bin/env tsx
 /**
  * runSwarmFix - CLI runner for Auto-Swarm Fix Engine
- * 
+ *
  * Usage:
- *   pnpm swarm:fix --from runs/smoke/<runId>/failurePacket.json --max-cost-usd 2 --max-iters 2
- * 
- * This script:
- * 1. Reads a FailurePacket
- * 2. Runs the repair swarm (Field General → Coder → Reviewer → Arbiter)
- * 3. Writes RepairPacket
- * 4. Optionally applies the patch and re-runs tests
- * 5. Writes ScoreCard grading the repair
+ *   pnpm swarm:fix --from runs/smoke/<runId>/failurePacket.json --max-cost-usd 2 --max-iters 2 --apply --test
+ *
+ * Contract (executor-owned invariants):
+ * 1) stopReason MUST be executor-owned
+ *    - stopReason="ok" ONLY if patchValid=true AND applied=true AND testsPassed=true
+ *    - must overwrite swarm output at end of run
+ *
+ * 2) patchValid/applied/testsPassed must be consistent
+ *    - git apply --check fails → patchValid=false
+ *    - apply fails → applied=false
+ *    - if apply fails → tests must not run
+ *
+ * 3) Escalation retry ON apply failure
+ *    - Detect with stderr patterns (depends on old contents / patch does not apply / corrupt patch)
+ *    - Build escalated packet with fresh disk snapshots
+ *    - Retry exactly ONCE
+ *    - Write artifacts in runs/repair/<repairId>:
+ *        failurePacket.original.json
+ *        failurePacket.escalated.json
+ *        retryMeta.json
  */
 
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { execSync, spawnSync } from "node:child_process";
-import { dirname, join } from "node:path";
 import { runRepairSwarm } from "../../server/ai/orchestration/runRepairSwarm.ts";
 import { createScoreCard } from "../../server/contracts/index.ts";
 import { preflightFailurePacket } from "../../server/contracts/preflightValidation.ts";
 import { shouldEscalateOnApplyFailure } from "./shouldEscalateOnApplyFailure";
-import { applyPatchFromResult } from "./applyPatchFromResult.js";
-import { buildEscalatedFailurePacket } from "./buildEscalatedFailurePacket.js";
 
-function computeStopReason(facts: { preflightOk: boolean; patchValid: boolean; applied: boolean; testsPassed: boolean }): string {
-  if (!facts.preflightOk) return "preflight_failed";
-  if (!facts.patchValid) return "patch_invalid";
-  if (!facts.applied) return "apply_failed";
-  if (!facts.testsPassed) return "tests_failed";
-  return "ok";
+type ExecutionFacts = {
+  preflightOk: boolean;
+  patchValid: boolean;
+  applied: boolean;
+  testsPassed: boolean;
+};
+
+function arg(name: string) {
+  const i = process.argv.indexOf(name);
+  return i >= 0 ? process.argv[i + 1] : null;
+}
+
+function flag(name: string) {
+  return process.argv.includes(name);
+}
+
+function fmtScore(n: unknown) {
+  return typeof n === "number" && Number.isFinite(n) ? n.toFixed(2) : "n/a";
 }
 
 /**
  * Normalize FailurePacket to handle both old and new shapes.
  * Reads from any structure and returns the canonical internal format.
  */
-function normalizeFailurePacket(fp) {
+function normalizeFailurePacket(fp: any) {
   const version = fp?.version ?? fp?.kind ?? "failurePacket.unknown";
 
   // Prefer new shape (signal.*), fall back to old shapes
-  const command =
-    fp?.signal?.command ??
-    fp?.command ??
-    fp?.meta?.command ??
-    "unknown";
+  const command = fp?.signal?.command ?? fp?.command ?? fp?.meta?.command ?? "unknown";
 
   const errorMessage =
     fp?.signal?.errorMessage ??
@@ -53,26 +70,13 @@ function normalizeFailurePacket(fp) {
     fp?.summary ??
     "unknown error";
 
-  const stack =
-    fp?.error?.stack ??
-    fp?.signal?.stack ??
-    fp?.extra?.stack ??
-    undefined;
+  const stack = fp?.error?.stack ?? fp?.signal?.stack ?? fp?.extra?.stack ?? undefined;
 
-  const system =
-    fp?.system ??
-    fp?.source ??
-    "unknown";
+  const system = fp?.system ?? fp?.source ?? "unknown";
 
-  const summary =
-    fp?.summary ??
-    fp?.title ??
-    "failure";
+  const summary = fp?.summary ?? fp?.title ?? "failure";
 
-  const extra =
-    fp?.extra ??
-    fp?.context ??
-    {};
+  const extra = fp?.extra ?? fp?.context ?? {};
 
   // Return the exact structure runRepairSwarm expects
   return {
@@ -105,35 +109,189 @@ function normalizeFailurePacket(fp) {
   };
 }
 
-function arg(name) {
-  const i = process.argv.indexOf(name);
-  return i >= 0 ? process.argv[i + 1] : null;
+/**
+ * Compute final stopReason from execution facts (executor-owned).
+ * Hard rule: stopReason="ok" IFF patchValid=true AND applied=true AND testsPassed=true
+ */
+function computeStopReason(facts: ExecutionFacts): string {
+  if (!facts.preflightOk) return "packet_invalid";
+  if (!facts.patchValid) return "patch_invalid";
+  if (!facts.applied) return "apply_failed";
+  if (!facts.testsPassed) return "tests_failed";
+  return "ok";
 }
 
-function fmtMoney(n) {
-  return typeof n === "number" && Number.isFinite(n) ? `$${n.toFixed(2)}` : "n/a";
+function writeJson(path: string, value: any) {
+  writeFileSync(path, JSON.stringify(value, null, 2), "utf8");
 }
 
-function fmtSec(n) {
-  return typeof n === "number" && Number.isFinite(n) ? `${n.toFixed(1)}s` : "n/a";
+function safeReadFile(path: string): string | null {
+  try {
+    if (!existsSync(path)) return null;
+    return readFileSync(path, "utf8");
+  } catch {
+    return null;
+  }
 }
 
-function fmtScore(n) {
-  return typeof n === "number" && Number.isFinite(n) ? n.toFixed(2) : "n/a";
+function sanitizePatch(patchContent: string): string {
+  let out = patchContent ?? "";
+  out = out.replace(/^```diff\s*\n/gm, "").replace(/^```\s*\n/gm, "");
+  out = out.trim();
+  if (!out.endsWith("\n")) out += "\n";
+  return out;
 }
 
-function flag(name) {
-  return process.argv.includes(name);
+function isUnifiedDiff(patchText: string): boolean {
+  return patchText.includes("diff --git") && patchText.includes("---") && patchText.includes("+++");
 }
 
+function containsUnsupportedPatchFormat(patchText: string): boolean {
+  return patchText.includes("*** Begin Patch") || patchText.includes("*** Update File:");
+}
 
+function extractPatchTextFromRepairPacket(repairPacket: any): string {
+  const changes = repairPacket?.patchPlan?.changes ?? [];
+  return changes.map((c: any) => c?.diff ?? "").join("\n");
+}
 
+/**
+ * Build "fresh disk snapshots" for escalation:
+ * - Prefer the same set of files already present in raw.context.fileSnapshots
+ * - Also include raw.targets[].path if present
+ */
+function buildFreshFileSnapshots(raw: any): Record<string, string> {
+  const paths = new Set<string>();
 
+  for (const p of Object.keys(raw?.context?.fileSnapshots ?? {})) paths.add(p);
+  for (const t of raw?.targets ?? []) {
+    if (t?.path && typeof t.path === "string") paths.add(t.path);
+  }
+
+  const out: Record<string, string> = {};
+  for (const p of paths) {
+    const c = safeReadFile(p);
+    if (typeof c === "string") out[p] = c;
+  }
+  return out;
+}
+
+function classifyPermissionBlocker(failurePacket: any): boolean {
+  const msg = failurePacket?.error?.message?.toLowerCase?.() || "";
+  return msg.includes("workflows permission") || msg.includes("insufficient permissions");
+}
+
+type ApplyOutcome = {
+  patchValid: boolean;
+  applied: boolean;
+  checkStderr: string;
+  applyStderr: string;
+  logs: string[];
+  patchFilePath?: string;
+};
+
+function tryGitApply(outDir: string, patchText: string): ApplyOutcome {
+  const logs: string[] = [];
+  const sanitized = sanitizePatch(patchText);
+
+  if (!sanitized || sanitized.length < 10) {
+    logs.push("Patch text empty or too short");
+    return { patchValid: false, applied: false, checkStderr: "empty_patch", applyStderr: "", logs };
+  }
+
+  if (containsUnsupportedPatchFormat(sanitized)) {
+    logs.push("Invalid patch format: *** Begin Patch style not supported");
+    return { patchValid: false, applied: false, checkStderr: "unsupported_patch_format", applyStderr: "", logs };
+  }
+
+  if (!isUnifiedDiff(sanitized)) {
+    logs.push("Invalid patch format: missing unified diff headers");
+    return { patchValid: false, applied: false, checkStderr: "not_unified_diff", applyStderr: "", logs };
+  }
+
+  const patchFile = `${outDir}/patch.diff`;
+  writeFileSync(patchFile, sanitized, "utf8");
+  logs.push(`Wrote patch file: ${patchFile}`);
+
+  // 1) Preflight check
+  let checkStderr = "";
+  try {
+    execSync(`git apply --check --whitespace=nowarn ${patchFile}`, { cwd: process.cwd(), stdio: "pipe" });
+    logs.push("git apply --check passed");
+  } catch (e: any) {
+    checkStderr = e?.stderr?.toString?.() ?? e?.message ?? "";
+    logs.push(`git apply --check failed`);
+    if (checkStderr) logs.push(`check stderr: ${checkStderr}`);
+    return { patchValid: false, applied: false, checkStderr, applyStderr: "", logs, patchFilePath: patchFile };
+  }
+
+  // 2) Apply
+  let applyStderr = "";
+  try {
+    execSync(`git apply --whitespace=nowarn ${patchFile}`, { cwd: process.cwd(), stdio: "pipe" });
+    logs.push("git apply succeeded");
+
+    const diffStat = execSync(`git diff --stat`, { cwd: process.cwd(), encoding: "utf8" });
+    logs.push(`Diff stats:\n${diffStat}`);
+
+    return { patchValid: true, applied: true, checkStderr: "", applyStderr: "", logs, patchFilePath: patchFile };
+  } catch (e: any) {
+    applyStderr = e?.stderr?.toString?.() ?? e?.message ?? "";
+    logs.push("git apply failed");
+    if (applyStderr) logs.push(`apply stderr: ${applyStderr}`);
+    return { patchValid: true, applied: false, checkStderr: "", applyStderr, logs, patchFilePath: patchFile };
+  }
+}
+
+type TestOutcome = {
+  testsRan: boolean;
+  testsPassed: boolean;
+  logs: string[];
+};
+
+function runTestCommandsFromPacket(repairPacket: any): TestOutcome {
+  const logs: string[] = [];
+  const testCommands = repairPacket?.patchPlan?.testCommands;
+
+  if (!testCommands || testCommands.length === 0) {
+    logs.push("testCommands missing - cannot execute tests");
+    return { testsRan: false, testsPassed: false, logs };
+  }
+
+  let allPassed = true;
+
+  for (let i = 0; i < testCommands.length; i++) {
+    const { cmd, args, cwd } = testCommands[i];
+    const cmdStr = `${cmd} ${(args ?? []).join(" ")}`.trim();
+    logs.push(`Test ${i + 1}/${testCommands.length}: ${cmdStr}`);
+
+    const testResult = spawnSync(cmd, args, {
+      cwd: cwd || process.cwd(),
+      shell: false,
+      encoding: "utf8",
+    });
+
+    if (testResult.status === 0) {
+      logs.push(`✅ Passed`);
+      if (testResult.stdout?.trim()) logs.push(`stdout: ${testResult.stdout.trim()}`);
+    } else {
+      logs.push(`❌ Failed (exit ${testResult.status})`);
+      if (testResult.stdout) logs.push(`stdout: ${testResult.stdout}`);
+      if (testResult.stderr) logs.push(`stderr: ${testResult.stderr}`);
+      allPassed = false;
+      break; // fail fast
+    }
+  }
+
+  return { testsRan: true, testsPassed: allPassed, logs };
+}
 
 async function main() {
   const from = arg("--from");
   if (!from) {
-    console.error("Usage: pnpm swarm:fix --from <failurePacket.json> [--max-cost-usd 2] [--max-iters 2] [--apply] [--test] [--offline --repairPacket <path>]");
+    console.error(
+      "Usage: pnpm swarm:fix --from <failurePacket.json> [--max-cost-usd 2] [--max-iters 2] [--apply] [--test] [--offline --repairPacket <path>]"
+    );
     process.exit(1);
   }
 
@@ -148,314 +306,318 @@ async function main() {
   const raw = JSON.parse(readFileSync(from, "utf8"));
   const failurePacket = normalizeFailurePacket(raw);
 
-  // Skip preflight validation in offline mode (using pre-generated repair packets)
+  // Repair dir created once, shared across retry (same repairId)
+  const repairId = `repair_${Date.now()}`;
+  const outDir = `runs/repair/${repairId}`;
+  mkdirSync(outDir, { recursive: true });
+
+  // Persist canonical + raw for reproducibility
+  writeJson(`${outDir}/failurePacket.json`, failurePacket);
+  writeJson(`${outDir}/failurePacket.original.json`, raw);
+
+  // meta.json audit trail
+  const metaPath = `${outDir}/meta.json`;
+  writeJson(metaPath, {
+    repairId,
+    createdAtIso: new Date().toISOString(),
+    gitSha: failurePacket.context?.sha ?? process.env.GIT_SHA ?? null,
+    stopReason: null, // overwritten at end
+  });
+
+  // Preflight validation (skip in offline mode)
+  let preflightOk = true;
   if (!offline) {
-    // Preflight validation (fail fast before any AI calls)
     console.log(`[SwarmFix] Running preflight validation...`);
     const preflight = preflightFailurePacket(raw);
-  
-  if (!preflight.ok) {
-    console.error(`❌ Preflight validation failed: ${preflight.stopReason}`);
-    console.error(`Errors:`);
-    for (const error of preflight.errors) {
-      console.error(`  - ${error}`);
-    }
-    
-    // Write artifacts even on preflight failure
-    const repairId = `repair_${Date.now()}`;
-    const outDir = `runs/repair/${repairId}`;
-    mkdirSync(outDir, { recursive: true });
-    
-    // ✅ FIX #1: Write failurePacket.json + meta.json (preflight failure path)
-    writeFileSync(`${outDir}/failurePacket.json`, JSON.stringify(failurePacket, null, 2), "utf-8");
-    writeFileSync(`${outDir}/meta.json`, JSON.stringify({
-      repairId,
-      createdAtIso: new Date().toISOString(),
-      gitSha: failurePacket.context?.sha ?? process.env.GIT_SHA ?? null,
-      stopReason: preflight.stopReason,
-    }, null, 2), "utf-8");
-    
-    // Write minimal RepairPacket with preflight failure
-    const failedPacket = {
-      version: "repairpacket.v1",
-      repairId,
-      failurePacketId: raw.meta?.runId || "unknown",
-      diagnosis: {
-        likelyCause: "Preflight validation failed",
-        confidence: 1.0,
-        relatedIssues: preflight.errors,
-      },
-      patchPlan: null,
-      execution: {
-        stopReason: computeStopReason({
-          preflightOk: false,
-          patchValid: false,
+
+    if (!preflight.ok) {
+      preflightOk = false;
+      console.error(`❌ Preflight validation failed: ${preflight.stopReason}`);
+      console.error(`Errors:`);
+      for (const error of preflight.errors) console.error(`  - ${error}`);
+
+      // Minimal RepairPacket (executor-owned stopReason)
+      const facts: ExecutionFacts = { preflightOk: false, patchValid: false, applied: false, testsPassed: false };
+      const stopReason = computeStopReason(facts);
+
+      const failedPacket = {
+        version: "repairpacket.v1",
+        repairId,
+        failurePacketId: raw?.meta?.runId || "unknown",
+        diagnosis: {
+          likelyCause: "Preflight validation failed",
+          confidence: 1.0,
+          relatedIssues: preflight.errors,
+        },
+        patchPlan: null,
+        execution: {
+          stopReason,
           applied: false,
           testsPassed: false,
-        }).stopReason,
-        applied: false,
-        testsPassed: false,
-        patchValid: false,
-        logs: preflight.errors,
-      },
-      meta: {
-        createdAt: new Date().toISOString(),
-        sha: process.env.GIT_SHA || "unknown",
-      },
-    };
-    
-    writeFileSync(`${outDir}/repairPacket.json`, JSON.stringify(failedPacket, null, 2));
-    console.log(`\n📝 Wrote preflight failure artifact: ${outDir}/repairPacket.json`);
-    process.exit(1);
-  }
-  
+          patchValid: false,
+          logs: preflight.errors,
+          facts,
+        },
+        meta: {
+          createdAt: new Date().toISOString(),
+          sha: process.env.GIT_SHA || "unknown",
+        },
+      };
+
+      writeJson(`${outDir}/repairPacket.json`, failedPacket);
+      writeJson(metaPath, {
+        repairId,
+        createdAtIso: new Date().toISOString(),
+        gitSha: failurePacket.context?.sha ?? process.env.GIT_SHA ?? null,
+        stopReason,
+      });
+
+      process.exit(1);
+    }
+
     console.log(`✅ Preflight validation passed`);
   }
 
   // Hard stop for permission blockers
-  const msg = failurePacket.error?.message?.toLowerCase() || "";
-  if (msg.includes("workflows permission") || msg.includes("insufficient permissions")) {
+  if (classifyPermissionBlocker(failurePacket)) {
     console.error("❌ BLOCKED: GitHub App permission. Do not swarm this.");
     console.error("Manual action required: Fix GitHub App permissions in repo settings.");
     process.exit(2);
   }
 
-  const repairId = `repair_${Date.now()}`;
-  const outDir = `runs/repair/${repairId}`;
-  mkdirSync(outDir, { recursive: true });
+  // Shared mutable state across attempt + retry
+  let lastResult: any = null;
+  let didRetry = false;
 
-  // Execution state tracking
-  const preflightOk = true;
-  let retryCount = 0;
-  let escalated = false;
-
-  // ✅ FIX #1: Always persist FailurePacket to repair dir for reproducibility
-  const failurePacketPath = `${outDir}/failurePacket.json`;
-  writeFileSync(failurePacketPath, JSON.stringify(failurePacket, null, 2), "utf-8");
-  console.log(`📝 Wrote failurePacket.json to ${outDir}`);
-
-  // Optional: Write meta.json for audit trail
-  const metaPath = `${outDir}/meta.json`;
-  writeFileSync(metaPath, JSON.stringify({
+  const retryMeta: any = {
     repairId,
-    createdAtIso: new Date().toISOString(),
-    gitSha: failurePacket.context?.sha ?? process.env.GIT_SHA ?? null,
-    stopReason: null, // Will be updated at end
-  }, null, 2), "utf-8");
-  console.log(`📝 Wrote meta.json to ${outDir}`);
+    escalationTriggered: false,
+    didRetry: false,
+    reason: null,
+    originalApplyStderr: null,
+    originalCheckStderr: null,
+    startedAtIso: new Date().toISOString(),
+    finishedAtIso: null,
+  };
 
-  // IMPORTANT: Ensure all downstream AI calls log attempts under *this* repair directory.
-  // The AI provider writes attempts.jsonl using trace.runId, which comes from pkt.meta.runId.
-  // If we don't stamp this, artifacts will go to fixture_* or repair_run fallbacks.
-  failurePacket.meta = failurePacket.meta ?? ({} as any);
-  failurePacket.meta.runId = repairId;
-  failurePacket.meta.jobId = failurePacket.meta.jobId ?? `repair_job_${repairId}`;
-
-  let result;
-  
-  if (offline) {
-    console.log(`[SwarmFix] Offline mode: skipping swarm, loading pre-generated repairPacket...`);
-    if (!repairPacketPath) {
-      console.error("❌ --offline requires --repairPacket <path>");
-      process.exit(1);
+  async function runOneSwarmAttempt(attemptLabel: "original" | "escalated", fpNormalized: any) {
+    if (offline) {
+      console.log(`[SwarmFix] Offline mode: skipping swarm, loading pre-generated repairPacket...`);
+      if (!repairPacketPath) {
+        console.error("❌ --offline requires --repairPacket <path>");
+        process.exit(1);
+      }
+      const repairPacket = JSON.parse(readFileSync(repairPacketPath, "utf8"));
+      return {
+        stopReason: "offline_mode",
+        totalCostUsd: 0,
+        totalLatencyMs: 0,
+        repairPacket,
+        attemptLabel,
+      };
     }
-    const repairPacket = JSON.parse(readFileSync(repairPacketPath, "utf8"));
-    result = {
-      stopReason: "offline_mode",
-      totalCostUsd: 0,
-      totalLatencyMs: 0,
-      repairPacket,
-    };
-  } else {
-    console.log(`[SwarmFix] Running repair swarm (max cost: $${maxCostUsd}, max iters: ${maxIterations})...`);
-    result = await runRepairSwarm({
-      failurePacket,
+
+    console.log(
+      `[SwarmFix] Running repair swarm (${attemptLabel}) (max cost: $${maxCostUsd}, max iters: ${maxIterations})...`
+    );
+
+    const r = await runRepairSwarm({
+      failurePacket: fpNormalized,
       maxCostUsd,
       maxIterations,
       outputDir: outDir,
     });
+
+    return { ...r, attemptLabel };
   }
 
+  // === Attempt 1: original packet
+  lastResult = await runOneSwarmAttempt("original", failurePacket);
 
-
-  console.log(`\n📊 Swarm Result:`);
-  console.log(`   Stop Reason: ${result.stopReason}`);
-  console.log(`   Total Cost: $${result.totalCostUsd.toFixed(4)}`);
-  console.log(`   Total Latency: ${result.totalLatencyMs}ms`);
-  console.log(`   Diagnosis: ${result.repairPacket.diagnosis.likelyCause}`);
-  console.log(`   Confidence: ${result.repairPacket.diagnosis.confidence}`);
-  console.log(`   Changes Proposed: ${(result.repairPacket.patchPlan?.changes ?? []).length}`);
-
-  // Apply patch if requested
-  const patchFile = `${outDir}/patch.diff`;
-  let patchApplied = false;
-  let patchValid = true;
-  let escalationHint: string | null = null;
-  const applyLogs: string[] = [];
-  
-  if (shouldApply) {
-    const applied = applyPatchFromResult({ result, shouldApply, outDir, patchFile, applyLogs });
-    patchApplied = applied.patchApplied;
-    patchValid = applied.patchValid;
-    escalationHint = applied.escalationHint;
-   }
-
-  // Escalation retry executor
-  let escalationReason: string | null = null;
-  let escalationLevel: "L0" | "L2" | null = null;
-
-  if (shouldApply && !patchApplied && escalationHint === "apply_failed_dependency_context") {
-    escalationReason = "apply_failed_dependency_context";
-  }
-
-  if (shouldApply && !patchApplied && retryCount === 0 && escalationReason === "apply_failed_dependency_context") {
-    retryCount = 1;
-    escalated = true;
-    escalationLevel = "L2";
-
-    try {
-      writeFileSync(join(outDir, "failurePacket.original.json"), JSON.stringify(failurePacket, null, 2), "utf8");
-
-      const escalatedPacket = await buildEscalatedFailurePacket({
-        base: failurePacket,
-        patchDiffPath: patchFile,
-        repairId,
-        maxFiles: 25,
-        maxTotalBytes: 500_000,
-        includeRepoIndex: true,
-        includeTsconfig: true,
-        includePackageJson: true,
-      });
-
-      writeFileSync(join(outDir, "failurePacket.escalated.json"), JSON.stringify(escalatedPacket, null, 2), "utf8");
-
-      const retryResult = await runRepairSwarm({ pkt: escalatedPacket });
-      result = retryResult;
-
-      applyLogs.push(`[escalation] reran swarm with L2 context`);
-
-      const applied2 = applyPatchFromResult({ result, shouldApply, outDir, patchFile, applyLogs });
-      patchApplied = applied2.patchApplied;
-      patchValid = applied2.patchValid;
-    } catch (err: any) {
-      applyLogs.push(`[escalation] retry failed: ${err?.message || String(err)}`);
-    }
-  }
-
-  // Run tests if requested
-  let testsPassed = false;
-  const testLogs = [];
-  
-  if (shouldTest) {
-    console.log(`\n🧪 Running tests...`);
-    
-    const testCommands = result.repairPacket.patchPlan?.testCommands;
-    
-    if (!testCommands || testCommands.length === 0) {
-      console.log(`⚠️  No testCommands provided`);
-      testLogs.push("testCommands missing - cannot execute tests");
-      result.repairPacket.execution.stopReason = "tests_missing_testCommands";
-      result.repairPacket.execution.testsPassed = false;
-    } else {
-      // spawnSync already imported at top
-      let allTestsPassed = true;
-      
-      for (let i = 0; i < testCommands.length; i++) {
-        const { cmd, args, cwd } = testCommands[i];
-        const cmdStr = `${cmd} ${args.join(" ")}`;
-        console.log(`   [${i + 1}/${testCommands.length}] Running: ${cmdStr}`);
-        testLogs.push(`Test ${i + 1}: ${cmdStr}`);
-        
-        const testResult = spawnSync(cmd, args, {
-          cwd: cwd || process.cwd(),
-          shell: false,
-          encoding: "utf8",
-        });
-        
-        if (testResult.status === 0) {
-          console.log(`   ✅ Passed`);
-          testLogs.push(`Test ${i + 1} passed`);
-          if (testResult.stdout?.trim()) {
-            testLogs.push(`stdout: ${testResult.stdout.trim()}`);
-          }
-        } else {
-          console.error(`   ❌ Failed (exit ${testResult.status})`);
-          testLogs.push(`Test ${i + 1} failed (exit ${testResult.status})`);
-          if (testResult.stdout) testLogs.push(`stdout: ${testResult.stdout}`);
-          if (testResult.stderr) testLogs.push(`stderr: ${testResult.stderr}`);
-          
-          allTestsPassed = false;
-          result.repairPacket.execution.stopReason = "tests_failed";
-          break; // Fail fast
-        }
-      }
-      
-      testsPassed = allTestsPassed;
-      result.repairPacket.execution.testsPassed = testsPassed;
-      
-      if (testsPassed) {
-        console.log(`✅ All tests passed`);
-      } else {
-        console.error(`❌ Tests failed`);
-      }
-    }
-  }
-
-  // Update execution logs
-  result.repairPacket.execution.logs = [
-    ...applyLogs,
-    ...testLogs,
-  ];
-  
-  // Set final stopReason if not already set
-  if (!result.repairPacket.execution.stopReason || result.repairPacket.execution.stopReason === "ok") {
-    if (patchApplied && testsPassed) {
-      result.repairPacket.execution.stopReason = "ok";
-    } else if (!patchApplied && shouldApply) {
-      // stopReason already set in apply logic
-    } else if (!testsPassed && shouldTest) {
-      // stopReason already set in test logic
-    }
-  }
-  
-  // Write retryMeta.json
-  const retryMeta = {
-    retryCount,
-    escalated,
-    escalationReason,
-    escalationLevel,
-    contextLevelUsedFirst: "L0",
-    contextLevelUsedRetry: escalated ? "L2" : null,
+  // Executor-owned execution facts (defaults)
+  const facts: ExecutionFacts = {
+    preflightOk,
+    patchValid: false,
+    applied: false,
+    testsPassed: false,
   };
-  writeFileSync(`${outDir}/retryMeta.json`, JSON.stringify(retryMeta, null, 2), "utf8");
 
-  // Executor-owned stopReason (unconditional overwrite)
-  result.repairPacket.execution.stopReason = computeStopReason({ preflightOk, patchValid, applied: patchApplied, testsPassed });
+  const logs: string[] = [];
 
-  // Write RepairPacket
+  function printSwarmSummary(result: any) {
+    console.log(`\n📊 Swarm Result (${result.attemptLabel}):`);
+    console.log(`   Swarm stopReason: ${result.stopReason}`);
+    console.log(`   Total Cost: $${Number(result.totalCostUsd ?? 0).toFixed(4)}`);
+    console.log(`   Total Latency: ${result.totalLatencyMs}ms`);
+    console.log(`   Diagnosis: ${result.repairPacket?.diagnosis?.likelyCause ?? "unknown"}`);
+    console.log(`   Confidence: ${result.repairPacket?.diagnosis?.confidence ?? "n/a"}`);
+    console.log(`   Changes Proposed: ${(result.repairPacket?.patchPlan?.changes ?? []).length}`);
+  }
+
+  printSwarmSummary(lastResult);
+
+  // === Apply + Test pipeline (attempt 1)
+  const patchText = extractPatchTextFromRepairPacket(lastResult.repairPacket);
+
+  let applyOutcome: ApplyOutcome | null = null;
+  if (shouldApply) {
+    console.log(`\n🔧 Applying patch (original)...`);
+    applyOutcome = tryGitApply(outDir, patchText);
+
+    facts.patchValid = applyOutcome.patchValid;
+    facts.applied = applyOutcome.applied;
+
+    logs.push(...applyOutcome.logs);
+
+    // Escalation trigger decision only on apply failure OR check failure (both are apply-stage failures)
+    const stderrForEscalation = applyOutcome.applied ? "" : (applyOutcome.applyStderr || applyOutcome.checkStderr || "");
+    if (!applyOutcome.applied && stderrForEscalation && shouldEscalateOnApplyFailure(stderrForEscalation)) {
+      retryMeta.escalationTriggered = true;
+      retryMeta.reason = "apply_failure_escalation";
+      retryMeta.originalApplyStderr = applyOutcome.applyStderr || null;
+      retryMeta.originalCheckStderr = applyOutcome.checkStderr || null;
+    }
+  } else {
+    logs.push("Apply skipped (no --apply)");
+  }
+
+  let testOutcome: TestOutcome | null = null;
+  if (shouldTest) {
+    if (!facts.applied) {
+      // Invariant: if apply fails, tests must not run
+      logs.push("Tests skipped because patch was not applied");
+      facts.testsPassed = false;
+    } else {
+      console.log(`\n🧪 Running tests (original)...`);
+      testOutcome = runTestCommandsFromPacket(lastResult.repairPacket);
+      logs.push(...testOutcome.logs);
+      facts.testsPassed = testOutcome.testsPassed;
+    }
+  } else {
+    logs.push("Tests skipped (no --test)");
+  }
+
+  // === Escalation retry (exactly once) if triggered
+  if (retryMeta.escalationTriggered && !didRetry) {
+    didRetry = true;
+    retryMeta.didRetry = true;
+
+    console.log(`\n♻️ Escalation triggered: rebuilding packet with fresh disk snapshots + retrying ONCE...`);
+
+    // Build escalated raw packet:
+    // - clone raw
+    // - overwrite raw.context.fileSnapshots with fresh disk reads
+    // - annotate meta to make it obvious this is escalated
+    const escalatedRaw = JSON.parse(JSON.stringify(raw));
+    const fresh = buildFreshFileSnapshots(raw);
+
+    if (!escalatedRaw.context) escalatedRaw.context = {};
+    escalatedRaw.context.fileSnapshots = fresh;
+
+    if (!escalatedRaw.meta) escalatedRaw.meta = {};
+    escalatedRaw.meta.escalation = {
+      level: "L2",
+      reason: "apply_failure",
+      createdAtIso: new Date().toISOString(),
+    };
+
+    writeJson(`${outDir}/failurePacket.escalated.json`, escalatedRaw);
+
+    // Run swarm again using escalated packet (normalized)
+    const escalatedNormalized = normalizeFailurePacket(escalatedRaw);
+    const escalatedResult = await runOneSwarmAttempt("escalated", escalatedNormalized);
+    lastResult = escalatedResult;
+
+    printSwarmSummary(lastResult);
+
+    // Reset apply/test facts for final verdict: we care about the end-of-run correctness
+    // (Facts are always end-state)
+    facts.patchValid = false;
+    facts.applied = false;
+    facts.testsPassed = false;
+
+    // Apply + Test pipeline (attempt 2)
+    const patchText2 = extractPatchTextFromRepairPacket(lastResult.repairPacket);
+
+    let applyOutcome2: ApplyOutcome | null = null;
+    if (shouldApply) {
+      console.log(`\n🔧 Applying patch (escalated)...`);
+      applyOutcome2 = tryGitApply(outDir, patchText2);
+
+      facts.patchValid = applyOutcome2.patchValid;
+      facts.applied = applyOutcome2.applied;
+
+      logs.push("----- escalation retry -----");
+      logs.push(...applyOutcome2.logs);
+    } else {
+      logs.push("Apply skipped (no --apply)");
+    }
+
+    if (shouldTest) {
+      if (!facts.applied) {
+        logs.push("Tests skipped because patch was not applied");
+        facts.testsPassed = false;
+      } else {
+        console.log(`\n🧪 Running tests (escalated)...`);
+        const testOutcome2 = runTestCommandsFromPacket(lastResult.repairPacket);
+        logs.push(...testOutcome2.logs);
+        facts.testsPassed = testOutcome2.testsPassed;
+      }
+    } else {
+      logs.push("Tests skipped (no --test)");
+    }
+  }
+
+  // Write retryMeta.json if escalation triggered (contract)
+  if (retryMeta.escalationTriggered) {
+    retryMeta.finishedAtIso = new Date().toISOString();
+    writeJson(`${outDir}/retryMeta.json`, retryMeta);
+  }
+
+  // Executor-owned final stopReason (overwrite anything swarm produced)
+  const finalStopReason = computeStopReason(facts);
+
+  // Ensure execution section exists and is consistent
+  if (!lastResult.repairPacket.execution) lastResult.repairPacket.execution = {};
+  lastResult.repairPacket.execution.logs = logs;
+  lastResult.repairPacket.execution.patchValid = facts.patchValid;
+  lastResult.repairPacket.execution.applied = facts.applied;
+  lastResult.repairPacket.execution.testsPassed = facts.testsPassed;
+  lastResult.repairPacket.execution.facts = facts;
+  lastResult.repairPacket.execution.stopReason = finalStopReason;
+
+  // Persist RepairPacket
   const outputRepairPacketPath = `${outDir}/repairPacket.json`;
-  writeFileSync(outputRepairPacketPath, JSON.stringify(result.repairPacket, null, 2), "utf8");
+  writeJson(outputRepairPacketPath, lastResult.repairPacket);
   console.log(`\n✅ Wrote RepairPacket: ${outputRepairPacketPath}`);
-  
-  // Create ScoreCard
+
+  // Overwrite meta.json stopReason (audit)
+  writeJson(metaPath, {
+    repairId,
+    createdAtIso: new Date().toISOString(),
+    gitSha: failurePacket.context?.sha ?? process.env.GIT_SHA ?? null,
+    stopReason: finalStopReason,
+  });
+
+  // Create ScoreCard (still useful even if stopReason != ok)
   const scoreCard = createScoreCard({
     repairId,
     failurePacket,
-    repairPacket: result.repairPacket,
+    repairPacket: lastResult.repairPacket,
     testResults: {
-      passed: testsPassed,
+      passed: facts.testsPassed,
       regressions: [],
       newFailures: [],
     },
     humanReview: {
-      coderAccuracy: result.repairPacket.scorecard.coderScore,
-      reviewerUseful: result.repairPacket.scorecard.reviewerScore,
-      arbiterCorrect: result.repairPacket.scorecard.arbiterScore,
+      coderAccuracy: lastResult.repairPacket?.scorecard?.coderScore,
+      reviewerUseful: lastResult.repairPacket?.scorecard?.reviewerScore,
+      arbiterCorrect: lastResult.repairPacket?.scorecard?.arbiterScore,
     },
   });
 
   const scoreCardPath = `${outDir}/scorecard.json`;
-  writeFileSync(scoreCardPath, JSON.stringify(scoreCard, null, 2), "utf8");
+  writeJson(scoreCardPath, scoreCard);
   console.log(`\n📋 Wrote ScoreCard: ${scoreCardPath}`);
 
   console.log(`\n🎯 Overall Score: ${fmtScore(scoreCard.overallScore)}`);
@@ -464,12 +626,11 @@ async function main() {
   console.log(`   Arbiter: ${fmtScore(scoreCard.agentScores?.arbiter)}`);
   console.log(`   Trust Delta: ${scoreCard.trustDelta > 0 ? "+" : ""}${fmtScore(scoreCard.trustDelta)}`);
 
-  if (result.stopReason === "ok") {
-    console.log(`\n✅ Repair swarm completed successfully`);
+  if (finalStopReason === "ok") {
+    console.log(`\n✅ Repair completed successfully (executor-owned ok)`);
     process.exit(0);
   } else {
-    console.log(`\n⚠️  Repair swarm stopped: ${result.stopReason}`);
-    console.log(`   Manual review required.`);
+    console.log(`\n⚠️  Repair stopped: ${finalStopReason}`);
     process.exit(1);
   }
 }
