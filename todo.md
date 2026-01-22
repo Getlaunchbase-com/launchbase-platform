@@ -3794,3 +3794,72 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
 - [x] Check what route it's linking to (/admin/swarm/repo)
 - [x] Added missing route to App.tsx pointing to AdminSwarmRepoSources component
 - [x] ✅ DONE: Repo button now works, shows Swarm Repo Sources management page
+
+
+---
+
+## 🎯 OPS CHAT MVP INTEGRATION
+
+**Goal:** Integrate Ops Chat feature pack into LaunchBase platform  
+**Status:** Files received, needs integration and testing  
+**Added:** January 22, 2026
+
+### Files to Integrate (6 total: 3 new, 3 modified)
+
+**3 New Files:**
+- [x] Add `server/swarm/chatStore.ts` - Storage-backed chat persistence (no DB migration)
+- [x] Add `server/routers/admin/swarmOpsChat.ts` - tRPC admin router with 4 endpoints (threads.list, threads.create, messages.list, messages.send)
+- [x] Add `client/src/pages/AdminSwarmChat.tsx` - New admin page at /admin/swarm/chat with 3-panel layout (threads, chat, run controls)
+
+**3 Modified Files:**
+- [x] Modify `server/routers.ts` - Wire new router under admin.opsChat
+- [x] Modify `client/src/App.tsx` - Add route for /admin/swarm/chat
+- [x] Modify `client/src/components/AdminLayout.tsx` - Add nav item "Ops Chat" pointing to /admin/swarm/chat
+
+### Integration Tasks
+- [x] Extract files from launchbase-ops-chat-mvp.zip
+- [x] Copy 3 new files to correct locations in project
+- [x] Apply modifications to 3 existing files
+- [x] Verify tRPC router integration in routers.ts
+- [x] Verify route added to App.tsx
+- [x] Verify nav item added to AdminLayout.tsx
+- [x] Check for TypeScript compilation errors
+- [x] Test storage backend (create thread, send message, verify files created)
+
+**Storage Architecture (No DB Migration Needed):**
+- Uses LaunchBase storage helpers (not database tables)
+- Storage keys:
+  - `swarm/ops-chat/index.json` (thread index)
+  - `swarm/ops-chat/threads/<threadId>.messages.json` (per-thread messages)
+- Integration is "copy files + run" (not "migrate tables")
+- Storage uses S3 backend via storagePut/storageGet helpers (no local filesystem files)
+
+### Testing & Validation
+- [x] Navigate to /admin/swarm/chat and verify page loads
+- [x] Verify 3-panel layout renders correctly (threads list, chat area, run controls panel)
+- [x] Test thread creation (verify new thread appears in list)
+- [x] Test message sending (verify messages appear in chat)
+- [x] Test "Run Controls" panel (models/role/intention/fixture/timeout selectors)
+- [x] Verify "Launch Swarm" button shows status (Idle/Running)
+- [x] Verify selected "bots" display correctly
+- [x] Verify formatFixtureLabel() shows human-readable fixture names (f11 — New file dependency, not f1/f2)
+- [x] Verify no Radix Select empty value crashes (all selects use "__all__" for None)
+- [x] Test storage persistence (refresh page, verify threads/messages persist)
+
+### Documentation
+- [x] Update todo.md with Ops Chat MVP completion status
+- [x] Document storage structure in WHERE_WE_ARE.md or relevant docs
+- [x] Add Ops Chat to feature list in project documentation
+
+### Post-Integration
+- [x] Run TypeScript compilation: `pnpm tsc --noEmit`
+- [x] Restart dev server: `pnpm dev`
+- [x] Test end-to-end workflow (create thread → send messages → launch swarm run)
+- [ ] Save checkpoint after successful integration
+- [x] Mark all tasks as [x] in todo.md
+
+**Notes:**
+- No database migration needed (uses storage backend)
+- Avoids Radix Select empty value crash by using "__all__" sentinel
+- Uses existing formatFixtureLabel() for human-readable fixture names
+- Right panel shows "Run Controls" with model/role/intention/fixture/timeout + Launch Swarm button

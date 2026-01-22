@@ -13,6 +13,7 @@ export function AdminLayout({ children, title = "Admin" }: AdminLayoutProps) {
     { path: "/admin", label: "Dashboard" },
     { path: "/admin/swarm", label: "Runs" },
     { path: "/admin/swarm/new", label: "New Run" },
+    { path: "/admin/swarm/chat", label: "Ops Chat" },
     { path: "/admin/swarm/profiles", label: "Profiles" },
     { path: "/admin/swarm/repo", label: "Repo" },
     { path: "/admin/swarm/dashboard", label: "Dashboard" },

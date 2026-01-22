@@ -5,6 +5,7 @@ import { adminStripeWebhooksRouter } from "./routers/admin/stripeWebhooks";
 import { adminEmailSmokeRouter } from "./routers/admin/emailSmoke";
 import { adminEmailMetricsRouter } from "./routers/admin/emailMetrics";
 import { swarmConsoleRouter } from "./routers/admin/swarmConsole";
+import { swarmOpsChatRouter } from "./routers/admin/swarmOpsChat";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -428,6 +429,7 @@ export const appRouter = router({
   // Admin routes (protected)
   admin: router({
     swarm: swarmConsoleRouter,
+    opsChat: swarmOpsChatRouter,
     intakes: router({
       list: protectedProcedure
         .input(z.object({
