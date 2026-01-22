@@ -3736,3 +3736,12 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
 - [ ] Need to run `pnpm db:push` to sync Drizzle schema with database
 - [ ] Verify migration doesn't break existing data
 - [ ] Test Swarm Console loads after migration
+
+## Exclude Intentionally Broken Fixtures from Main Build (2026-01-22)
+- [x] Check current `pnpm typecheck` script in package.json
+- [x] Identify which tsconfig.json is used for typecheck
+- [x] Add exclude pattern for fixture files: `"server/utils/fixture*.ts"`
+- [ ] (Optional) Create separate tsconfig.fixtures.json for fixture-only typechecking
+- [x] Verify `pnpm typecheck` passes without fixture errors
+- [x] Verify dev server builds cleanly
+- [x] ✅ DONE: Main build is green (0 errors), fixtures remain intentionally broken for Swarm testing
