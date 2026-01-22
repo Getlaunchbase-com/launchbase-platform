@@ -2,8 +2,9 @@
  * Determines if an apply failure should trigger context escalation.
  */
 
-export function shouldEscalateOnApplyFailure(stderr: string, patchText: string): boolean {
-  const stderrLower = stderr.toLowerCase();
+export function shouldEscalateOnApplyFailure(stderr: string, patchText?: string): boolean {
+  const stderrLower = (stderr ?? "").toLowerCase();
+  const patch = patchText ?? "";
   
   // Trigger patterns in stderr
   const triggerPatterns = [
@@ -20,7 +21,7 @@ export function shouldEscalateOnApplyFailure(stderr: string, patchText: string):
   }
   
   // Check if patch creates new files
-  if (patchText.includes("new file mode") && patchText.includes("--- /dev/null")) {
+  if (patch.includes("new file mode") && patch.includes("--- /dev/null")) {
     return true;
   }
   
