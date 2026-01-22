@@ -3497,3 +3497,10 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
 - [ ] Verify breadcrumb file `.attempts_called` exists in same directory
 
 **Expected outcome:** `runs/repair/<repairId>/attempts.jsonl` exists after every swarm run
+
+## Swarm Console UI Fixes
+- [x] Create AdminLayout component (remove public navbar from /admin/* routes)
+- [x] Replace Stop reason filter with Select dropdown (ok/tests_failed/patch_invalid/error/unknown)
+- [x] Replace Model filter with Select dropdown (static list: gpt-4o, gpt-4o-mini, claude-3.5-sonnet, claude-3-opus)
+- [x] Replace Fixture filter with Select dropdown (f1-f11 static list)
+- [x] Add mobile-friendly navigation for Swarm Console (bottom nav on mobile)

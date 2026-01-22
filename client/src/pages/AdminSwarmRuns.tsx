@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { AdminLayout } from "@/components/AdminLayout";
 
 function StopBadge({ value }: { value?: string | null }) {
   const v = value || "unknown";
@@ -26,7 +27,8 @@ export default function AdminSwarmRuns() {
   const rows = query.data ?? [];
 
   return (
-    <div className="p-6 space-y-4">
+    <AdminLayout title="Swarm Console">
+      <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Swarm Runs</h1>
@@ -49,15 +51,56 @@ export default function AdminSwarmRuns() {
         <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div className="space-y-1">
             <div className="text-xs text-muted-foreground">Stop reason</div>
-            <Input value={stopReason} onChange={(e) => setStopReason(e.target.value)} placeholder="ok / tests_failed / patch_invalid" />
+            <Select value={stopReason} onValueChange={setStopReason}>
+              <SelectTrigger>
+                <SelectValue placeholder="All stop reasons" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All</SelectItem>
+                <SelectItem value="ok">ok</SelectItem>
+                <SelectItem value="tests_failed">tests_failed</SelectItem>
+                <SelectItem value="patch_invalid">patch_invalid</SelectItem>
+                <SelectItem value="error">error</SelectItem>
+                <SelectItem value="unknown">unknown</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-1">
-            <div className="text-xs text-muted-foreground">Model contains</div>
-            <Input value={model} onChange={(e) => setModel(e.target.value)} placeholder="openai/gpt-5-2" />
+            <div className="text-xs text-muted-foreground">Model</div>
+            <Select value={model} onValueChange={setModel}>
+              <SelectTrigger>
+                <SelectValue placeholder="All models" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All</SelectItem>
+                <SelectItem value="gpt-4o">gpt-4o</SelectItem>
+                <SelectItem value="gpt-4o-mini">gpt-4o-mini</SelectItem>
+                <SelectItem value="claude-3.5-sonnet">claude-3.5-sonnet</SelectItem>
+                <SelectItem value="claude-3-opus">claude-3-opus</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-1">
             <div className="text-xs text-muted-foreground">Fixture</div>
-            <Input value={fixtureName} onChange={(e) => setFixtureName(e.target.value)} placeholder="f11-new-file-dep-context" />
+            <Select value={fixtureName} onValueChange={setFixtureName}>
+              <SelectTrigger>
+                <SelectValue placeholder="All fixtures" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All</SelectItem>
+                <SelectItem value="f1">f1</SelectItem>
+                <SelectItem value="f2">f2</SelectItem>
+                <SelectItem value="f3">f3</SelectItem>
+                <SelectItem value="f4">f4</SelectItem>
+                <SelectItem value="f5">f5</SelectItem>
+                <SelectItem value="f6">f6</SelectItem>
+                <SelectItem value="f7">f7</SelectItem>
+                <SelectItem value="f8">f8</SelectItem>
+                <SelectItem value="f9">f9</SelectItem>
+                <SelectItem value="f10">f10</SelectItem>
+                <SelectItem value="f11">f11</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </CardContent>
       </Card>
@@ -109,6 +152,7 @@ export default function AdminSwarmRuns() {
           </div>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </AdminLayout>
   );
 }
