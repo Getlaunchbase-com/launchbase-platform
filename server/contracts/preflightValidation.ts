@@ -13,6 +13,7 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import type { FailurePacketV1 } from "./failurePacket";
 import { validateTestCommandsOrThrow } from "./testCommandValidation";
+import { normalizeTestCommandsFromFailurePacket } from "./normalizeTestCommands";
 
 /**
  * Preflight validation result
@@ -87,12 +88,8 @@ export function normalizeFailurePacket(pkt: any): any {
     normalized.context.command = "unknown";
   }
 
-  // Normalize testCommands (if present)
-  if (normalized.testCommands !== undefined && !Array.isArray(normalized.testCommands)) {
-    // Mark as invalid by setting to empty array
-    normalized.testCommands = [];
-    normalized._testCommandsInvalid = true;
-  }
+  // Normalize testCommands: prose → commands, missing → defaults
+  normalized.testCommands = normalizeTestCommandsFromFailurePacket(normalized);
 
   return normalized;
 }
@@ -177,14 +174,11 @@ export function validateFailurePacketOrThrow(pkt: any): asserts pkt is FailurePa
   }
 
   // 4. Test commands validation (whitelist-based)
+  // Note: testCommands are already normalized by normalizeFailurePacket()
   try {
     validateTestCommandsOrThrow(pkt.testCommands ?? []);
   } catch (err: any) {
     errors.push(err.message);
-  }
-  // Check for _testCommandsInvalid flag (set by normalize)
-  if (pkt._testCommandsInvalid) {
-    errors.push("testCommands was not an array (normalized to [])");
   }
 
   // Throw if any errors

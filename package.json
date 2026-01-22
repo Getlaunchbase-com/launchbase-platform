@@ -19,6 +19,7 @@
     "swarm:harden": "tsx scripts/swarm/hardenSwarm.ts",
     "fixture:make": "tsx scripts/fixtures/makeFailurePacket.ts",
     "smoke:repair:fixtures": "tsx scripts/fixtures/runFixtureTests.ts",
+    "repair:summarize": "tsx scripts/repair/summarizeRepairRuns.ts",
     "smoke:swarm-fix": "tsx scripts/smoke/smokeSwarmFix.mjs",
     "smoke:intake": "tsx scripts/smoke/smokeIntakeFlow.mjs"
   },
