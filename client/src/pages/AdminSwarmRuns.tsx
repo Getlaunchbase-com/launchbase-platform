@@ -13,10 +13,12 @@ function StopBadge({ value }: { value?: string | null }) {
   return <Badge variant={v === "ok" ? "default" : v === "running" ? "secondary" : "destructive"}>{v}</Badge>;
 }
 
+const ALL = "__all__";
+
 export default function AdminSwarmRuns() {
-  const [stopReason, setStopReason] = useState("");
+  const [stopReason, setStopReason] = useState<string | undefined>(undefined);
   const [model, setModel] = useState("");
-  const [fixtureName, setFixtureName] = useState("");
+  const [fixtureName, setFixtureName] = useState<string | undefined>(undefined);
   
   const modelsQuery = trpc.admin.swarm.models.list.useQuery();
   const modelOptions = useMemo(() => modelsQuery.data ?? [], [modelsQuery.data]);
@@ -55,12 +57,12 @@ export default function AdminSwarmRuns() {
         <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div className="space-y-1">
             <div className="text-xs text-muted-foreground">Stop reason</div>
-            <Select value={stopReason} onValueChange={setStopReason}>
+            <Select value={stopReason ?? ALL} onValueChange={(v) => setStopReason(v === ALL ? undefined : v)}>
               <SelectTrigger>
                 <SelectValue placeholder="All stop reasons" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All</SelectItem>
+                <SelectItem value={ALL}>All</SelectItem>
                 <SelectItem value="ok">ok</SelectItem>
                 <SelectItem value="tests_failed">tests_failed</SelectItem>
                 <SelectItem value="patch_invalid">patch_invalid</SelectItem>
@@ -79,24 +81,24 @@ export default function AdminSwarmRuns() {
                 placeholder="All models"
               />
             ) : (
-              <Select value={model} onValueChange={setModel}>
+              <Select value={model || ALL} onValueChange={(v) => setModel(v === ALL ? "" : v)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Loading models..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All</SelectItem>
+                  <SelectItem value={ALL}>All</SelectItem>
                 </SelectContent>
               </Select>
             )}
           </div>
           <div className="space-y-1">
             <div className="text-xs text-muted-foreground">Fixture</div>
-            <Select value={fixtureName} onValueChange={setFixtureName}>
+            <Select value={fixtureName ?? ALL} onValueChange={(v) => setFixtureName(v === ALL ? undefined : v)}>
               <SelectTrigger>
                 <SelectValue placeholder="All fixtures" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All</SelectItem>
+                <SelectItem value={ALL}>All</SelectItem>
                 <SelectItem value="f1">f1</SelectItem>
                 <SelectItem value="f2">f2</SelectItem>
                 <SelectItem value="f3">f3</SelectItem>
