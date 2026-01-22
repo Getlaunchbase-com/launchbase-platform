@@ -310,44 +310,6 @@ function repairHunkCounts(patchText: string): { repaired: string; changed: boole
   return { repaired: lines.join("\n"), changed };
 }
 
-/**
- * Repair hunk header counts when git says "corrupt patch".
- */
-function repairHunkCounts(patchText: string): { repaired: string; changed: boolean } {
-  const lines = patchText.split("\n");
-  let changed = false;
-  const hunkRe = /^@@\s+-(\d+)(?:,(\d+))?\s+\+(\d+)(?:,(\d+))?\s+@@/;
-  let isNewFile = false;
-  for (let i = 0; i < lines.length; i++) {
-    if (lines[i].startsWith("--- /dev/null")) { isNewFile = true; continue; }
-    if (lines[i].startsWith("--- ") && !lines[i].startsWith("--- /dev/null")) { isNewFile = false; continue; }
-    const m = lines[i].match(hunkRe);
-    if (!m) continue;
-    const oldStart = m[1];
-    const newStart = m[3];
-    let oldCount = 0;
-    let newCount = 0;
-    for (let j = i + 1; j < lines.length; j++) {
-      const l = lines[j];
-      if (l.startsWith("@@ ")) break;
-      if (l.startsWith("diff --git ")) break;
-      if (l.startsWith("--- ")) continue;
-      if (l.startsWith("+++ ")) continue;
-      if (l === "\\ No newline at end of file") continue;
-      if (l.startsWith(" ")) { oldCount++; newCount++; }
-      else if (l.startsWith("-")) { oldCount++; }
-      else if (l.startsWith("+")) { newCount++; }
-      else if (l === "") { oldCount++; newCount++; }
-      else { oldCount++; newCount++; }
-    }
-    const finalOldCount = isNewFile ? 0 : oldCount;
-    const finalOldStart = isNewFile ? "0" : oldStart;
-    const newHeader = `@@ -${finalOldStart},${finalOldCount} +${newStart},${newCount} @@`;
-    if (lines[i] !== newHeader) { lines[i] = newHeader; changed = true; }
-  }
-  return { repaired: lines.join("\n"), changed };
-}
-
 type ApplyOutcome = {
   patchValid: boolean;
   applied: boolean;
