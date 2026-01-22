@@ -3745,3 +3745,52 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
 - [x] Verify `pnpm typecheck` passes without fixture errors
 - [x] Verify dev server builds cleanly
 - [x] ✅ DONE: Main build is green (0 errors), fixtures remain intentionally broken for Swarm testing
+
+## Production Security for Private Internal Deployment (2026-01-22)
+
+### 1. Gate Dev-Bypass for Production (CRITICAL)
+- [ ] Update `server/_core/trpc.ts` adminProcedure middleware
+- [ ] Add check: `process.env.NODE_ENV !== 'production'` AND `process.env.DEV_ADMIN_BYPASS === '1'`
+- [ ] Ensure production NEVER bypasses auth even if misconfigured
+- [ ] ✅ DONE WHEN: Dev bypass only works in development with explicit flag
+
+### 2. Require Authentication on /admin/* Routes
+- [ ] Add authentication check in AdminLayout component
+- [ ] If user not logged in → redirect to `/login?next=/admin/swarm`
+- [ ] If logged in but not admin → show "Not authorized" message (no data leak)
+- [ ] ✅ DONE WHEN: Unauthenticated users cannot access admin pages
+
+### 3. Add Visible Login Link in Header
+- [ ] Update `client/src/components/Header.tsx`
+- [ ] Show "Login" button when logged out
+- [ ] Show "Dashboard" or "Admin" link when logged in
+- [ ] Link to proper OAuth entrypoint
+- [ ] ✅ DONE WHEN: Users can easily find login from public site
+
+### 4. Implement ADMIN_EMAILS Allowlist
+- [ ] Use existing `ADMIN_EMAILS` env var (already configured)
+- [ ] Update `server/db.ts` user upsert logic
+- [ ] Check `ADMIN_EMAILS.split(',').includes(user.email)`
+- [ ] Set `role = 'admin'` only if email in allowlist
+- [ ] ✅ DONE WHEN: Only allowlisted emails get admin access
+
+### 5. Add Audit Logging for Run Creation
+- [ ] Update `server/routers/admin/swarmConsole.ts` runs.create endpoint
+- [ ] Log: userId, email, repairKey, model, timeout, repoSource
+- [ ] Store in database (add audit_log table) OR console.log for now
+- [ ] Include timestamp and IP address if available
+- [ ] ✅ DONE WHEN: All run creations are logged for audit trail
+
+### Final Security Verification
+- [ ] Test: Logged out user redirected to login on /admin/* access
+- [ ] Test: Non-admin user sees "Not authorized" message
+- [ ] Test: Admin user (in ADMIN_EMAILS) can access Swarm Console
+- [ ] Test: Dev bypass does NOT work when NODE_ENV=production
+- [ ] Test: Run creation logs appear in console/database
+- [ ] ✅ READY FOR: Private internal deployment
+
+## Fix Repo Button 404 Error (2026-01-22)
+- [x] Find Repo button in AdminLayout bottom navigation
+- [x] Check what route it's linking to (/admin/swarm/repo)
+- [x] Added missing route to App.tsx pointing to AdminSwarmRepoSources component
+- [x] ✅ DONE: Repo button now works, shows Swarm Repo Sources management page

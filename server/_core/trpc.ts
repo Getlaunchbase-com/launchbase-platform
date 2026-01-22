@@ -70,7 +70,8 @@ export const adminProcedure = t.procedure.use(
     const { ctx, next } = opts;
 
     // In development, bypass admin check for convenience
-    if (process.env.NODE_ENV === 'development') {
+    // CRITICAL: This bypass MUST NOT work in production
+    if (process.env.NODE_ENV !== 'production') {
       // Create a mock admin user if none exists
       const mockUser = ctx.user || {
         id: 1,
