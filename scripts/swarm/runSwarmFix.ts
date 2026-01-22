@@ -741,6 +741,10 @@ async function main() {
   lastResult.repairPacket.execution.facts = facts;
   lastResult.repairPacket.execution.stopReason = finalStopReason;
 
+  // Executor-owned summary markers for fixture runner
+  console.log(facts.applied ? "✅ Patch applied successfully" : "❌ Patch not applied");
+  console.log(facts.testsPassed ? "✅ Tests passed" : "❌ Tests failed");
+
   // Persist RepairPacket
   const outputRepairPacketPath = `${outDir}/repairPacket.json`;
   writeJson(outputRepairPacketPath, lastResult.repairPacket);
