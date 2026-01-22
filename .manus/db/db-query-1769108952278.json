@@ -1,0 +1,19 @@
+{
+  "query": "SHOW TABLES LIKE 'swarm%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SHOW TABLES LIKE 'swarm%';",
+  "rows": [
+    {
+      "Tables_in_H86jcAdP392wwbWXRcEDMs (swarm%)": "swarm_profile_stats"
+    },
+    {
+      "Tables_in_H86jcAdP392wwbWXRcEDMs (swarm%)": "swarm_profiles"
+    },
+    {
+      "Tables_in_H86jcAdP392wwbWXRcEDMs (swarm%)": "swarm_runs"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_H86jcAdP392wwbWXRcEDMs (swarm%)\nswarm_profile_stats\nswarm_profiles\nswarm_runs\n",
+  "stderr": "",
+  "execution_time_ms": 362
+}
