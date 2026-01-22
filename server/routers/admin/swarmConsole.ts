@@ -242,7 +242,7 @@ export const swarmConsoleRouter = router({
     get: adminProcedure.input(GetRunInputSchema).query(async ({ input }) => {
       const db = await getDb();
       if (!db) return null;
-      const rows = await db.select().from(swarmRuns).where(eq(swarmRuns.repairId, input.repairId)).limit(1);
+      const rows = await db.select().from(swarmRuns).where(eq(swarmRuns.repairKey, input.repairKey)).limit(1);
       if (!rows.length) return null;
       const r: any = rows[0];
       r.artifactKeys = typeof r.artifactKeys === "string" ? JSON.parse(r.artifactKeys) : r.artifactKeys;
@@ -310,7 +310,7 @@ export const swarmConsoleRouter = router({
       const launch = await launchSwarmRun(featurePack, { cwd: runCwd });
 
       await db.insert(swarmRuns).values({
-        repairId: launch.repairId,
+        repairKey: launch.repairId, // Store swarm's string ID in repairKey
         status: "running",
         intention: featurePack.intention,
         fixtureName: featurePack.fixtureName ?? null,
@@ -322,8 +322,8 @@ export const swarmConsoleRouter = router({
         modelFallback: featurePack.fallbackModel ?? null,
         costUsd: null,
         latencyMs: null,
-        escalationTriggered: null,
-        didRetry: null,
+        escalationTriggered: false,
+        didRetry: false,
         profileId: profileId ?? null,
         featurePackJson: featurePack as any,
         repoSourceId: featurePack.repoSourceId ?? null,
@@ -338,12 +338,12 @@ export const swarmConsoleRouter = router({
         updatedAt: new Date(),
       } as any);
 
-      return { repairId: launch.repairId, startedAtIso: launch.startedAtIso };
+      return { repairKey: launch.repairId, startedAtIso: launch.startedAtIso };
     }),
 
     ingest: adminProcedure.input(GetRunInputSchema).mutation(async ({ input }) => {
       // reads local runs/repair/<id> and uploads artifacts to storage + updates DB
-      return await ingestLocalRepairRun(input.repairId);
+      return await ingestLocalRepairRun(input.repairKey);
     }),
 
     artifactUrl: adminProcedure.input(GetArtifactUrlInputSchema).query(async ({ input }) => {
@@ -354,13 +354,13 @@ export const swarmConsoleRouter = router({
     pushToBranch: adminProcedure.input(PushRunToBranchInputSchema).mutation(async ({ input, ctx }) => {
       const db = await getDb();
       if (!db) throw new Error("DB unavailable");
-      const [run] = await db.select().from(swarmRuns).where(eq(swarmRuns.repairId, input.repairId)).limit(1);
+      const [run] = await db.select().from(swarmRuns).where(eq(swarmRuns.repairKey, input.repairKey)).limit(1);
       if (!run) throw new Error("Run not found");
       const [repo] = await db.select().from(repoSources).where(eq(repoSources.id, input.repoSourceId)).limit(1);
       if (!repo) throw new Error("Repo source not found");
 
-      const branch = input.branchName || `swarm/${input.repairId}`;
-      const message = input.commitMessage || `Swarm repair ${input.repairId}`;
+      const branch = input.branchName || `swarm/${input.repairKey}`;
+      const message = input.commitMessage || `Swarm repair ${input.repairKey}`;
 
       // IMPORTANT: do NOT sync/reset here; we want the dirty workdir with applied changes.
       await getRepoWorkdirNoSync(repo as any);
@@ -374,7 +374,7 @@ export const swarmConsoleRouter = router({
         pushedAt: new Date(pushed.pushedAtIso),
         pushedHeadSha: pushed.headSha,
         updatedAt: new Date(),
-      } as any).where(eq(swarmRuns.repairId, input.repairId));
+      } as any).where(eq(swarmRuns.repairKey, input.repairKey));
 
       return pushed;
     }),
@@ -432,11 +432,11 @@ export const swarmConsoleRouter = router({
     createFromRun: adminProcedure.input(CreateProfileFromRunInputSchema).mutation(async ({ input, ctx }) => {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
-      const runs = await db.select().from(swarmRuns).where(eq(swarmRuns.repairId, input.repairId)).limit(1);
+      const runs = await db.select().from(swarmRuns).where(eq(swarmRuns.repairKey, input.repairKey)).limit(1);
       if (!runs.length) throw new Error("Run not found");
       const fp = (runs[0] as any).featurePackJson;
       if (!fp) throw new Error("Run does not have featurePackJson");
-      const name = input.name || `Profile from ${input.repairId}`;
+      const name = input.name || `Profile from ${input.repairKey}`;
       await db.insert(swarmProfiles).values({
         name,
         configJson: fp as any,

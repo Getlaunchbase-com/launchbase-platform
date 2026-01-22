@@ -1,0 +1,8 @@
+{
+  "query": "SELECT `repairId`, `createdAt`, `finishedAt`, `updatedAt`, `status`, `intention`, `fixtureName`, `stopReason`, `applied`, `testsPassed`, `patchValid`, `modelPrimary`, `modelFallback`, `costUsd`, `latencyMs`, `escalationTriggered`, `didRetry`, `profileId`, `featurePackJson`, `repoSourceId`, `repoHeadSha`, `pushedBranch`, `pushedAt`, `pushedHeadSha`, `artifactPrefix`, `artifactKeys`, `errorSummary` FROM `swarm_runs` ORDER BY `swarm_runs`.`createdAt` DESC LIMIT 50;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT `repairId`, `createdAt`, `finishedAt`, `updatedAt`, `status`, `intention`, `fixtureName`, `stopReason`, `applied`, `testsPassed`, `patchValid`, `modelPrimary`, `modelFallback`, `costUsd`, `latencyMs`, `escalationTriggered`, `didRetry`, `profileId`, `featurePackJson`, `repoSourceId`, `repoHeadSha`, `pushedBranch`, `pushedAt`, `pushedHeadSha`, `artifactPrefix`, `artifactKeys`, `errorSummary` FROM `swarm_runs` ORDER BY `swarm_runs`.`createdAt` DESC LIMIT 50;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'swarm_runs.createdAt' in 'order clause'"
+  ]
+}

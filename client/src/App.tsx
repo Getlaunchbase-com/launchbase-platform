@@ -104,7 +104,7 @@ function Router() {
         <Route path="/admin/swarm/profiles/:id" component={AdminSwarmProfileDetail} />
         <Route path="/admin/swarm/compare" component={AdminSwarmCompare} />
         <Route path="/admin/swarm/models" component={AdminSwarmModels} />
-<Route path="/admin/swarm/runs/:repairId" component={AdminSwarmRunDetail} />
+ <Route path="/admin/swarm/runs/:repairKey" component={AdminSwarmRunDetail} />
 
       <Route path="/admin/alerts" component={AdminAlerts} />
       <Route path="/admin/test-checkout" component={AdminTestCheckout} />

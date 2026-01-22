@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE swarm_runs ADD COLUMN repair_key VARCHAR(64) UNIQUE NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute ALTER TABLE swarm_runs ADD COLUMN repair_key VARCHAR(64) UNIQUE NULL;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 8200 (HY000) at line 1: unsupported add column 'repair_key' constraint UNIQUE KEY when altering 'H86jcAdP392wwbWXRcEDMs.swarm_runs'"
+  ]
+}

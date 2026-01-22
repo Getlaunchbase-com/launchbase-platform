@@ -83,7 +83,7 @@ export default function AdminSwarmNewRun() {
   );
 
   const createRun = trpc.admin.swarm.runs.create.useMutation({
-    onSuccess: (data) => setLocation(`/admin/swarm/runs/${data.repairId}`),
+    onSuccess: (data) => setLocation(`/admin/swarm/runs/${data.repairKey}`),
   });
 
   const modelOptions = useMemo(() => {

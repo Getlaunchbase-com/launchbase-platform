@@ -1617,51 +1617,73 @@ export type InsertShipPacket = typeof shipPackets.$inferInsert;
 
 // ============ SWARM CONSOLE TABLES ============
 
-export const swarmRuns = mysqlTable("swarm_runs", {
-  repairId: varchar("repairId", { length: 64 }).primaryKey(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  finishedAt: timestamp("finishedAt"),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-  status: mysqlEnum("status", ["running", "finished", "failed"]).default("finished").notNull(),
-  intention: mysqlEnum("intention", ["smoke_test", "pressure_test", "improve", "critic"]),
-  fixtureName: varchar("fixtureName", { length: 128 }),
-  stopReason: varchar("stopReason", { length: 64 }).default("unknown").notNull(),
-  applied: boolean("applied").default(false).notNull(),
-  testsPassed: boolean("testsPassed").default(false).notNull(),
-  patchValid: boolean("patchValid"),
-  modelPrimary: varchar("modelPrimary", { length: 128 }),
-  modelFallback: varchar("modelFallback", { length: 128 }),
-  costUsd: float("costUsd"),
-  latencyMs: int("latencyMs"),
-  escalationTriggered: boolean("escalationTriggered"),
-  didRetry: boolean("didRetry"),
+export const swarmRuns = mysqlTable(
+  "swarm_runs",
+  {
+    // DB: repairId int auto_increment primary key
+    repairId: int("repairId").primaryKey().autoincrement(),
 
-  // Optional linkage to a saved profile
-  profileId: int("profileId"),
+    // External string identifier from swarm system
+    repairKey: varchar("repair_key", { length: 64 }).unique(),
 
-  // Feature pack used for this run (for "Save as profile" and reproducibility)
-  featurePackJson: json("featurePackJson"),
+    // DB snake_case columns
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    finishedAt: timestamp("finished_at"),
+    updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow(),
 
-  // Optional linkage to a repo source (local/git) used for the run
-  repoSourceId: int("repoSourceId"),
-  repoHeadSha: varchar("repoHeadSha", { length: 64 }),
+    // DB enum: pending,running,completed,failed,timeout
+    status: mysqlEnum("status", ["pending", "running", "completed", "failed", "timeout"])
+      .notNull()
+      .default("pending"),
 
-  // Optional push-to-branch metadata
-  pushedBranch: varchar("pushedBranch", { length: 256 }),
-  pushedAt: timestamp("pushedAt"),
-  pushedHeadSha: varchar("pushedHeadSha", { length: 64 }),
+    // DB: text
+    intention: text("intention"),
 
-  artifactPrefix: varchar("artifactPrefix", { length: 256 }),
-  artifactKeys: json("artifactKeys"), // string[] (JSON)
-  errorSummary: text("errorSummary"),
-}, (table) => ({
-  createdAtIdx: index("swarm_runs_createdAt_idx").on(table.createdAt),
-  stopReasonIdx: index("swarm_runs_stopReason_idx").on(table.stopReason),
-  modelPrimaryIdx: index("swarm_runs_modelPrimary_idx").on(table.modelPrimary),
-  fixtureIdx: index("swarm_runs_fixture_idx").on(table.fixtureName),
-  profileIdx: index("swarm_runs_profile_idx").on(table.profileId),
-  repoSourceIdx: index("swarm_runs_repoSource_idx").on(table.repoSourceId),
-}));
+    fixtureName: varchar("fixture_name", { length: 64 }),
+
+    stopReason: varchar("stop_reason", { length: 64 }),
+
+    applied: boolean("applied"),
+    testsPassed: boolean("tests_passed"),
+    patchValid: boolean("patch_valid"),
+
+    modelPrimary: varchar("model_primary", { length: 128 }),
+    modelFallback: varchar("model_fallback", { length: 128 }),
+
+    // DB: decimal(10,6)
+    costUsd: decimal("cost_usd", { precision: 10, scale: 6 }),
+    latencyMs: int("latency_ms"),
+
+    // DB tinyint(1) NOT NULL default 0
+    escalationTriggered: boolean("escalation_triggered").notNull().default(false),
+    didRetry: boolean("did_retry").notNull().default(false),
+
+    profileId: int("profile_id"),
+
+    featurePackJson: json("feature_pack_json"),
+
+    repoSourceId: int("repo_source_id"),
+    repoHeadSha: varchar("repo_head_sha", { length: 64 }),
+
+    pushedBranch: varchar("pushed_branch", { length: 128 }),
+    pushedAt: timestamp("pushed_at"),
+    pushedHeadSha: varchar("pushed_head_sha", { length: 64 }),
+
+    // Missing in DB - will add via ALTER TABLE
+    artifactPrefix: varchar("artifact_prefix", { length: 512 }),
+    artifactKeys: json("artifact_keys"),
+    errorSummary: text("error_summary"),
+  },
+  (table) => ({
+    repairKeyIdx: uniqueIndex("uq_swarm_runs_repair_key").on(table.repairKey),
+    createdAtIdx: index("swarm_runs_createdAt_idx").on(table.createdAt),
+    stopReasonIdx: index("swarm_runs_stopReason_idx").on(table.stopReason),
+    modelPrimaryIdx: index("swarm_runs_modelPrimary_idx").on(table.modelPrimary),
+    fixtureIdx: index("swarm_runs_fixture_idx").on(table.fixtureName),
+    profileIdx: index("swarm_runs_profile_idx").on(table.profileId),
+    repoSourceIdx: index("swarm_runs_repoSource_idx").on(table.repoSourceId),
+  })
+);
 export type SwarmRun = typeof swarmRuns.$inferSelect;
 export type InsertSwarmRun = typeof swarmRuns.$inferInsert;
 

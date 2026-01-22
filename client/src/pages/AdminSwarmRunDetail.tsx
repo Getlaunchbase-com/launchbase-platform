@@ -11,11 +11,11 @@ function StopBadge({ value }: { value?: string | null }) {
 }
 
 export default function AdminSwarmRunDetail() {
-  const [match, params] = useRoute<{ repairId: string }>("/admin/swarm/runs/:repairId");
-  const repairId = params?.repairId || "";
+  const [match, params] = useRoute<{ repairKey: string }>("/admin/swarm/runs/:repairKey");
+  const repairKey = params?.repairKey || "";
   const utils = trpc.useUtils();
 
-  const runQuery = trpc.admin.swarm.runs.get.useQuery({ repairId }, { enabled: !!repairId });
+  const runQuery = trpc.admin.swarm.runs.get.useQuery({ repairKey }, { enabled: !!repairKey });
   const ingestMutation = trpc.admin.swarm.runs.ingest.useMutation({
     onSuccess: async () => {
       await runQuery.refetch();
@@ -27,7 +27,7 @@ export default function AdminSwarmRunDetail() {
 
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const urlQuery = trpc.admin.swarm.runs.artifactUrl.useQuery(
-    selectedKey ? { repairId, key: selectedKey } : ({} as any),
+    selectedKey ? { repairKey, key: selectedKey } : ({} as any),
     { enabled: !!selectedKey }
   );
 
@@ -43,17 +43,17 @@ export default function AdminSwarmRunDetail() {
     },
   });
 
-  const defaultBranch = useMemo(() => `swarm/${repairId}`, [repairId]);
+  const defaultBranch = useMemo(() => `swarm/${repairKey}`, [repairKey]);
   const [branchName, setBranchName] = useState<string>(defaultBranch);
-  const [commitMessage, setCommitMessage] = useState<string>(() => `Swarm repair ${repairId}`);
-  const [profileName, setProfileName] = useState<string>(() => `Profile from ${repairId}`);
+  const [commitMessage, setCommitMessage] = useState<string>(() => `Swarm repair ${repairKey}`);
+  const [profileName, setProfileName] = useState<string>(() => `Profile from ${repairKey}`);
 
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <Link href="/admin/swarm" className="text-sm text-blue-600 hover:underline">← Back to runs</Link>
-          <h1 className="text-2xl font-semibold">{repairId}</h1>
+          <h1 className="text-2xl font-semibold">{repairKey}</h1>
           <div className="flex items-center gap-2">
             <StopBadge value={run?.stopReason} />
             <Badge variant="secondary">{run?.status ?? "unknown"}</Badge>
@@ -64,7 +64,7 @@ export default function AdminSwarmRunDetail() {
         <div className="flex gap-2">
           <Button
             variant="secondary"
-            onClick={() => ingestMutation.mutate({ repairId })}
+            onClick={() => ingestMutation.mutate({ repairKey })}
             disabled={ingestMutation.isPending}
           >
             {ingestMutation.isPending ? "Ingesting…" : "Ingest artifacts"}
@@ -107,7 +107,7 @@ export default function AdminSwarmRunDetail() {
       <div className="flex items-end">
         <Button
           disabled={createProfileFromRun.isPending}
-          onClick={() => createProfileFromRun.mutate({ repairId, name: profileName })}
+          onClick={() => createProfileFromRun.mutate({ repairKey, name: profileName })}
         >
           {createProfileFromRun.isPending ? "Saving…" : "Save profile"}
         </Button>
@@ -145,7 +145,7 @@ export default function AdminSwarmRunDetail() {
                   className="w-full border rounded-md px-3 py-2 text-sm"
                   value={commitMessage}
                   onChange={(e) => setCommitMessage(e.target.value)}
-                  placeholder={`Swarm repair ${repairId}`}
+                  placeholder={`Swarm repair ${repairKey}`}
                 />
               </div>
             </div>
@@ -153,7 +153,14 @@ export default function AdminSwarmRunDetail() {
               <Button
                 variant="secondary"
                 disabled={!run?.applied || pushMutation.isPending}
-                onClick={() => pushMutation.mutate({ repairId, repoSourceId: run.repoSourceId, branchName, commitMessage })}
+                onClick={() =>
+                  pushMutation.mutate({
+                    repairKey,
+                    repoSourceId: run.repoSourceId,
+                    branchName,
+                    commitMessage,
+                  })
+                }
               >
                 {pushMutation.isPending ? "Pushing…" : "Push branch"}
               </Button>

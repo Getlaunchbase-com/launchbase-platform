@@ -141,10 +141,10 @@ export default function AdminSwarmRuns() {
               </thead>
               <tbody>
                 {rows.map((r: any) => (
-                  <tr key={r.repairId} className="border-b last:border-b-0">
+                  <tr key={r.repairKey || r.repairId} className="border-b last:border-b-0">
                     <td className="py-2 pr-4">
-                      <Link href={`/admin/swarm/runs/${r.repairId}`} className="text-blue-600 hover:underline">
-                        {r.repairId}
+                      <Link href={`/admin/swarm/runs/${r.repairKey || r.repairId}`} className="text-blue-600 hover:underline">
+                        {r.repairKey || r.repairId}
                       </Link>
                       {r.fixtureName ? <div className="text-xs text-muted-foreground">{r.fixtureName}</div> : null}
                     </td>

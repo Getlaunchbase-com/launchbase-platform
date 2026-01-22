@@ -60,7 +60,7 @@ export const CreateRunInputSchema = z.object({
 
 
 export const CreateProfileFromRunInputSchema = z.object({
-  repairId: z.string().min(1),
+  repairKey: z.string().min(1),
   name: z.string().min(1).optional(),
 });
 
@@ -100,11 +100,11 @@ export const ListRunsInputSchema = z.object({
 });
 
 export const GetRunInputSchema = z.object({
-  repairId: z.string().min(1),
+  repairKey: z.string().min(1),
 });
 
 export const GetArtifactUrlInputSchema = z.object({
-  repairId: z.string().min(1),
+  repairKey: z.string().min(1),
   key: z.string().min(1),
 });
 
@@ -174,7 +174,7 @@ export const FileReadInputSchema = z.object({
 });
 
 export const PushRunToBranchInputSchema = z.object({
-  repairId: z.string().min(1),
+  repairKey: z.string().min(1),
   repoSourceId: z.number().int(),
   branchName: z.string().min(1).optional(),
   commitMessage: z.string().min(1).optional(),

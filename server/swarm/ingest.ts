@@ -53,12 +53,12 @@ export async function ingestLocalRepairRun(repairId: string, runRoot = join(proc
 
   const now = new Date();
   // Upsert-ish: if exists, update
-  const existing = await db.select().from(swarmRuns).where(eq(swarmRuns.repairId, repairId)).limit(1);
+  const existing = await db.select().from(swarmRuns).where(eq(swarmRuns.repairKey, repairId)).limit(1);
   const row = {
-    repairId,
+    repairKey: repairId, // Store swarm's string ID in repairKey
     createdAt: existing[0]?.createdAt ?? now,
     finishedAt: now,
-    status: "finished",
+    status: "completed",
     stopReason: parsed.stopReason ?? "unknown",
     applied: !!parsed.applied,
     testsPassed: !!parsed.testsPassed,
@@ -67,8 +67,8 @@ export async function ingestLocalRepairRun(repairId: string, runRoot = join(proc
     modelFallback: parsed.modelFallback ?? null,
     costUsd: parsed.costUsd ?? null,
     latencyMs: parsed.latencyMs ?? null,
-    escalationTriggered: parsed.escalationTriggered ?? null,
-    didRetry: parsed.didRetry ?? null,
+    escalationTriggered: parsed.escalationTriggered ?? false,
+    didRetry: parsed.didRetry ?? false,
     fixtureName: existing[0]?.fixtureName ?? null,
     intention: existing[0]?.intention ?? null,
     artifactPrefix: `swarm/runs/${repairId}/`,
@@ -78,7 +78,7 @@ export async function ingestLocalRepairRun(repairId: string, runRoot = join(proc
   } as any;
 
   if (existing.length) {
-    await db.update(swarmRuns).set(row).where(eq(swarmRuns.repairId, repairId));
+    await db.update(swarmRuns).set(row).where(eq(swarmRuns.repairKey, repairId));
   } else {
     await db.insert(swarmRuns).values(row);
   }

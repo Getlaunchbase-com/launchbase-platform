@@ -3729,3 +3729,10 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
 - [ ] Phase 8: Documentation (/swarm/ops/ folder with Task Starter Packets)
 - [ ] Phase 9: Testing (vitest tests for merge logic + integration tests)
 - [ ] Phase 10: Migration (seed defaults, backfill existing data)
+
+## Database Schema Mismatch (2026-01-22)
+- [ ] **BUG: swarm_runs query failing** - Schema expects columns that don't exist in database
+- [ ] Error: "Failed query: select `repairId`, `createdAt`, ... from `swarm_runs`"
+- [ ] Need to run `pnpm db:push` to sync Drizzle schema with database
+- [ ] Verify migration doesn't break existing data
+- [ ] Test Swarm Console loads after migration
