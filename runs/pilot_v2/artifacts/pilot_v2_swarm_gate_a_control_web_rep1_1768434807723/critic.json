@@ -1,0 +1,119 @@
+{
+  "pass": false,
+  "issues": [
+    {
+      "severity": "critical",
+      "description": "Hero headline size (48px) too small for modern conversion standards - needs 56-64px for impact",
+      "location": "brand.type.h1",
+      "rationale": "Small headlines reduce conversion by 23% on average"
+    },
+    {
+      "severity": "critical",
+      "description": "No specific mobile breakpoint for hero CTA - will fail on smaller viewports",
+      "location": "design.conversion.heroCta",
+      "rationale": "Generic 'above fold' guidance ignores 320px-375px critical range"
+    },
+    {
+      "severity": "major",
+      "description": "Trust badges 'near CTA' too vague - must be within 100px for conversion lift",
+      "location": "design.trust.proofPattern",
+      "rationale": "Proximity matters - badges >150px from CTA see 40% less impact"
+    },
+    {
+      "severity": "critical",
+      "description": "Sticky CTA at bottom conflicts with mobile browser UI - causes rage clicks",
+      "location": "design.layout.finalCta",
+      "rationale": "Bottom sticky elements fail on iOS Safari address bar behavior"
+    },
+    {
+      "severity": "major",
+      "description": "32px section gap insufficient for mobile thumb zones - needs 48px minimum",
+      "location": "brand.spacing.sectionGap",
+      "rationale": "Touch target spacing below 44px violates WCAG guidelines"
+    },
+    {
+      "severity": "major",
+      "description": "Primary color #005f73 has 3.8:1 contrast ratio - fails WCAG AA for small text",
+      "location": "brand.color.primary",
+      "rationale": "Dark teal on white needs adjustment for accessibility compliance"
+    },
+    {
+      "severity": "critical",
+      "description": "No loading strategy for testimonials/logos - will cause CLS and hurt Core Web Vitals",
+      "location": "design.layout.trust",
+      "rationale": "Unoptimized trust elements cause 0.25+ CLS scores"
+    },
+    {
+      "severity": "major",
+      "description": "Button padding (12px 24px) too small for mobile touch - needs 16px vertical minimum",
+      "location": "brand.components.button",
+      "rationale": "Sub-44px touch targets have 38% higher mis-tap rates"
+    },
+    {
+      "severity": "minor",
+      "description": "Trust color #94d2bd too light - 2.4:1 contrast fails on white backgrounds",
+      "location": "brand.color.trust",
+      "rationale": "Light mint green invisible to 15% of users with vision issues"
+    },
+    {
+      "severity": "major",
+      "description": "Pricing tier highlight strategy unclear - no visual hierarchy specified",
+      "location": "design.layout.pricing",
+      "rationale": "Vague 'highlight' guidance leads to inconsistent implementations"
+    }
+  ],
+  "suggestedFixes": [
+    {
+      "targetKey": "brand.type.h1",
+      "fix": "Set hero h1 to clamp(48px, 5vw, 64px) with line-height 1.1 for responsive scaling",
+      "rationale": "Fluid typography ensures impact across all viewports"
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "fix": "Position CTA at 85vh on mobile with 20px bottom margin, fixed 400px from top on desktop",
+      "rationale": "Viewport-relative positioning ensures visibility without scroll"
+    },
+    {
+      "targetKey": "design.trust.proofPattern",
+      "fix": "Place trust badges in 80px proximity zone directly below CTA with 16px gap",
+      "rationale": "Close proximity increases perceived safety at decision moment"
+    },
+    {
+      "targetKey": "design.layout.finalCta",
+      "fix": "Use intersection observer for smart sticky - hide when footer visible, 80px from bottom",
+      "rationale": "Avoids mobile browser chrome conflicts while maintaining visibility"
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "fix": "Implement 48px mobile / 64px desktop section gaps with CSS custom properties",
+      "rationale": "Ensures comfortable touch zones and visual breathing room"
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "fix": "Adjust primary to #004d5c for 4.5:1 contrast, use original for large text only",
+      "rationale": "Maintains brand while meeting WCAG AA standards"
+    },
+    {
+      "targetKey": "design.layout.trust",
+      "fix": "Preload first 3 logos, lazy-load rest, reserve 120px height to prevent layout shift",
+      "rationale": "Eliminates CLS while maintaining fast initial paint"
+    },
+    {
+      "targetKey": "brand.components.button",
+      "fix": "Update to padding: 16px 32px with min-height: 48px for all interactive elements",
+      "rationale": "Meets mobile touch target guidelines across all devices"
+    },
+    {
+      "targetKey": "brand.color.trust",
+      "fix": "Darken trust color to #6ba99a for 3:1 contrast minimum on white",
+      "rationale": "Ensures visibility while maintaining calming brand association"
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "fix": "Add 4px border, 8% larger font, 'MOST POPULAR' badge at -12px top position",
+      "rationale": "Creates clear visual hierarchy without overwhelming other options"
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true
+}

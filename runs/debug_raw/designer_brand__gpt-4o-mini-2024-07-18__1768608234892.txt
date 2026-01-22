@@ -1,0 +1,116 @@
+=== RAW RESPONSE (designer_brand) ===
+Model: gpt-4o-mini-2024-07-18
+Request ID: chatcmpl-Cyo5099pp6jZgeZggXpoL5EMCAFyz
+Input Tokens: 1599
+Output Tokens: 590
+Finish Reason: stop
+
+=== RAW TEXT (2460 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use a type scale with H1 at 48px (mobile: 32px) and body text at 16px with a line-height of 1.5 to enhance readability and instill a calm tone.",
+      "rationale": "A clear hierarchy promotes confidence and operational clarity.",
+      "confidence": 0.90,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Set card style with a soft shadow, 8px radius, and 20px padding to create a premium feel while ensuring content is easily digestible.",
+      "rationale": "This density balances aesthetics and functionality, making information approachable.",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Utilize a neutral color palette with light greys (e.g., #F5F5F5) as background to enhance calm and safe-by-default feel.",
+      "rationale": "Lighter backgrounds reduce strain and foster a sense of safety.",
+      "confidence": 0.92,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a button hierarchy with primary buttons at 16px padding, rounded corners, and subtle hover effects; secondary buttons with 12px padding and no shadow.",
+      "rationale": "This distinction supports confident decision-making through clear call-to-action.",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.layout.sectionOrder",
+      "value": "Apply a vertical spacing of 80px (mobile: 48px) between sections to ensure clarity and operational flow.",
+      "rationale": "Consistent spacing improves scannability and reduces cognitive load.",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Introduce a proof bar below the hero with 3-5 compact proof chips to immediately present trust signals.",
+      "rationale": "This displays social proof early, establishing a sense of safety and confidence.",
+      "confidence": 0.90,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Create an audit log preview pattern with a clear, compact design showing 5-7 recent activities to reinforce transparency.",
+      "rationale": "Visible logs foster trust by showing accountability and operational integrity.",
+      "confidence": 0.89,
+      "risks": []
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use a type scale with H1 at 48px (mobile: 32px) and body text at 16px with a line-height of 1.5 to enhance readability and instill a calm tone.",
+      "rationale": "A clear hierarchy promotes confidence and operational clarity.",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Set card style with a soft shadow, 8px radius, and 20px padding to create a premium feel while ensuring content is easily digestible.",
+      "rationale": "This density balances aesthetics and functionality, making information approachable.",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Utilize a neutral color palette with light greys (e.g., #F5F5F5) as background to enhance calm and safe-by-default feel.",
+      "rationale": "Lighter backgrounds reduce strain and foster a sense of safety.",
+      "confidence": 0.92,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a button hierarchy with primary buttons at 16px padding, rounded corners, and subtle hover effects; secondary buttons with 12px padding and no shadow.",
+      "rationale": "This distinction supports confident decision-making through clear call-to-action.",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.layout.sectionOrder",
+      "value": "Apply a vertical spacing of 80px (mobile: 48px) between sections to ensure clarity and operational flow.",
+      "rationale": "Consistent spacing improves scannability and reduces cognitive load.",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Introduce a proof bar below the hero with 3-5 compact proof chips to immediately present trust signals.",
+      "rationale": "This displays social proof early, establishing a sense of safety and confidence.",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Create an audit log preview pattern with a clear, compact design showing 5-7 recent activities to reinforce transparency.",
+      "rationale": "Visible logs foster trust by showing accountability and operational integrity.",
+      "confidence": 0.89,
+      "risks": []
+    }
+  ]
+}

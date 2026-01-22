@@ -1,0 +1,19 @@
+{
+  "model": "gpt-4o-mini",
+  "n": 10,
+  "exact8Rate": 0.3,
+  "schemaValidRate": 0.3,
+  "avgAttempts": null,
+  "stopReasonCounts": {
+    "unknown": 7,
+    "ok": 3
+  },
+  "tokens": {
+    "inputAvg": 3924.1,
+    "outputAvg": 1485.2
+  },
+  "latencyMsAvg": 33812,
+  "costUsdAvg": 0.08379700000000001,
+  "schemaFailRate": 0,
+  "timeoutRate": 0
+}

@@ -1,0 +1,288 @@
+# Showroom Run Summary
+
+**Showroom:** showroom.getlaunchbase.designer
+**Policy:** swarm_designer_premium
+**KeyHash:** getlaunchbase-designer-1768404795229
+**Timestamp:** 2026-01-14T15:33:55.236Z
+
+## Outcome
+
+- **Status:** succeeded
+- **StopReason:** needs_human
+- **NeedsHuman:** true
+- **Duration:** 40001ms
+
+## Telemetry
+
+- **Total Cost:** $0.0937
+- **Craft Cost:** $0.0000
+- **Critic Cost:** $0.0000
+- **Craft Model:** unknown
+- **Critic Model:** claude-opus-4-1-20250805
+
+## Artifacts
+
+Total: 5
+
+### swarm.plan
+
+- **CustomerSafe:** false
+- **Payload:**
+  ```json
+  {
+  "scope": "showroom.getlaunchbase.designer",
+  "inputs": {
+    "task": "Design and improve the LaunchBase homepage from first principles",
+    "business": "LaunchBase",
+    "whitePaper": "LaunchBase is an operating system for small businesses.\nNot a website builder. Not another tool. Not a one-time agency project.\n\nLaunchBase is ongoing ownership of a business's digital operating layer:\n- website uptime + maintenance\n- lead capture + forms\n- monitoring + safety decisions\n- updates + publishing cadence\n- integrations + visibility\n- logging + accountability\n\nLaunchBase exists because most small businesses already have tools, but no one owns the system.\nThey have a website, a payment tool, a calendar, a Google profile, and logins…\n…but the owner still carries the burden of making sure everything works.\n\nLaunchBase sells relief from that cognitive load.\n\nCore customer pain: The customer isn't buying a website. They're buying the ability to stop thinking about:\n- \"Is it still working?\"\n- \"Did that form actually send?\"\n- \"What should I post?\"\n- \"Is anything broken?\"\n- \"Am I missing something?\"\n\nThis is background anxiety, not a feature gap.\nThe enemy is not \"lack of tools.\"\nThe enemy is lack of ownership.\n\nLaunchBase replaces the customer as the default system-checker.\n\nPromise:\n✅ Change is reversible\n✅ Non-action is safe\n✅ Silence is a valid decision\n✅ Every action is logged\n✅ Customer sees their real site before paying\n✅ LaunchBase acts only after approval\n\nThe brand is accountability.\nLaunchBase is responsibility-as-a-service.\n\nTarget customer:\n- owner-operator\n- service business\n- small team\n- not \"tech obsessed\"\n- wants a business to run, not to \"manage tools\"\n\nTone: calm, competent, honest, operationally serious, safety-first, premium but not flashy.\nThis is a systems product, not a \"creative brand party.\"\n\nDesign objective:\n✅ Create instant trust\n✅ Communicate the contract clearly\n✅ Show the \"safe-by-default\" nature\n✅ Make \"Hand It Off\" feel low-risk\n✅ Explain observability in plain English\n✅ Look premium enough to justify recurring ownership",
+    "currentCopy": {
+      "hero": "Stop carrying the system in your head. Hand it off. Keep visibility.",
+      "problem": "No one owns the system. You're the fallback for everything.",
+      "solution": "LaunchBase becomes the owner. You stay informed, not involved.",
+      "trust": "Safe by default. Fully logged. Reversible."
+    },
+    "audience": "Owner-operators of service businesses (fitness studios, coffee shops, consulting firms) who want stability and accountability, not tool management",
+    "tone": "Calm, minimal, trustworthy, premium. Avoid hype. Avoid 'AI magic.' Avoid exaggerated claims.",
+    "constraints": "Mobile-first. Must feel like 'responsibility-as-a-service.' Must emphasize safety, reversibility, observability. Must reduce mental load while reading."
+  },
+  "specialists": [
+    "designer_systems",
+    "designer_brand",
+    "critic"
+  ],
+  "fingerprint": "trc_1768404795230_1319123d9d8ed:plan"
+}
+  ```
+
+### swarm.specialist.designer_systems
+
+- **CustomerSafe:** false
+- **Payload:**
+  ```json
+  {
+  "proposedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Add a secondary CTA button next to the primary CTA for learning more about the service.",
+      "rationale": "Provides immediate options for users to either take action or learn more, reducing bounce rates.",
+      "confidence": 0.9,
+      "risks": [
+        "May slightly clutter the hero section."
+      ]
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to place the 'Solution' right after the 'Problem' for better narrative flow.",
+      "rationale": "Logical sequence from problem identification to solution increases comprehension.",
+      "confidence": 0.92,
+      "risks": [
+        "Could disrupt existing user expectations if they are accustomed to the current order."
+      ]
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Convert pricing tables to cards with one highlighted default tier; add 'what you get' bullets.",
+      "rationale": "Improves clarity and helps users quickly understand pricing options and value.",
+      "confidence": 0.93,
+      "risks": [
+        "May require more vertical space, impacting layout."
+      ]
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add sticky primary CTA on mobile after 40% scroll; keep secondary CTA in hero only.",
+      "rationale": "Maintains user focus on conversion actions while ensuring visibility as they scroll.",
+      "confidence": 0.9,
+      "risks": [
+        "Potentially intrusive if not designed discretely."
+      ]
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Include a small visual indicator of an audit log in the footer for transparency.",
+      "rationale": "Enhances trust by providing visibility into actions and changes.",
+      "confidence": 0.85,
+      "risks": [
+        "May be overlooked if not prominent enough."
+      ]
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge 'Problem' and 'Solution' into one section with a before/after two-column layout.",
+      "rationale": "Reduces cognitive load and enhances scannability by presenting contrasting states side-by-side.",
+      "confidence": 0.9,
+      "risks": [
+        "Might oversimplify the narrative for some users."
+      ]
+    },
+    {
+      "targetKey": "design.tokens.color.accent",
+      "value": "Use a consistent accent color for CTAs and key links to improve visual hierarchy.",
+      "rationale": "Helps guide user attention to important actions and links.",
+      "confidence": 0.9,
+      "risks": [
+        "Overuse might reduce the impact of accent colors."
+      ]
+    },
+    {
+      "targetKey": "design.spacing.sectionGapDesktop",
+      "value": "Increase section gap to 80px for desktop to improve visual separation.",
+      "rationale": "Enhances readability and prevents sections from feeling cramped.",
+      "confidence": 0.88,
+      "risks": [
+        "Could cause excessive scrolling if not managed well."
+      ]
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Implement a proof bar with customer logos and testimonials above the fold.",
+      "rationale": "Builds credibility and trust by showcasing real customer experiences.",
+      "confidence": 0.91,
+      "risks": [
+        "May initially distract from the main message if too prominent."
+      ]
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Use a step-by-step visual process diagram to explain 'How It Works'.",
+      "rationale": "Simplifies complex processes and improves user comprehension.",
+      "confidence": 0.89,
+      "risks": [
+        "Could oversimplify nuanced processes."
+      ]
+    }
+  ],
+  "role": "designer_systems",
+  "stopReason": "ok"
+}
+  ```
+
+### swarm.specialist.designer_brand
+
+- **CustomerSafe:** false
+- **Payload:**
+  ```json
+  {
+  "proposedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use a 1.25x modular scale for typography with a base font size of 16px to create a calm and readable hierarchy",
+      "rationale": "A modular scale provides consistent sizing, enhancing readability and calmness",
+      "confidence": 0.8,
+      "risks": [
+        "May require adjustments for longer text sections"
+      ]
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Apply a 12px border radius to all cards and buttons to create a subtle, premium feel",
+      "rationale": "A moderate radius adds softness and approachability without compromising professionalism",
+      "confidence": 0.85,
+      "risks": [
+        "May not stand out on all backgrounds if contrast is low"
+      ]
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Use pill-shaped buttons with 16px padding and a subtle shadow for emphasis and clarity",
+      "rationale": "Pill-shaped buttons are approachable and clear, supporting the calm and premium brand tone",
+      "confidence": 0.9,
+      "risks": [
+        "May appear too informal if shadow is not subtle enough"
+      ]
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Adopt a two-column grid layout for card sections on desktop, switching to a single column on mobile",
+      "rationale": "A two-column layout improves information density and clarity on larger screens",
+      "confidence": 0.75,
+      "risks": [
+        "Could overwhelm users on smaller screens if not adjusted properly"
+      ]
+    },
+    {
+      "targetKey": "brand.marketing.heroVisualTreatment",
+      "value": "Integrate a subtle gradient background in hero sections to enhance visual interest while maintaining calmness",
+      "rationale": "A gradient adds depth without overwhelming the simplicity of the design",
+      "confidence": 0.88,
+      "risks": [
+        "May require color adjustments to maintain text readability"
+      ]
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Include a 3-chip row below hero with contrasting colors: 'Safe by default', 'Fully auditable', 'Reversible changes'",
+      "rationale": "Highlighting key trust signals reinforces the brand's commitment to safety and reliability",
+      "confidence": 0.9,
+      "risks": [
+        "Chips may compete with other elements if not spaced properly"
+      ]
+    },
+    {
+      "targetKey": "brand.components.backgroundTreatments",
+      "value": "Use light grey backgrounds for information-heavy sections to improve focus and readability",
+      "rationale": "A neutral background helps differentiate content without adding visual noise",
+      "confidence": 0.82,
+      "risks": [
+        "Potentially insufficient contrast if not carefully selected"
+      ]
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Utilize a timeline-style layout for the audit log preview to visually communicate sequence and accountability",
+      "rationale": "A timeline format intuitively communicates the chronological nature of logs",
+      "confidence": 0.92,
+      "risks": [
+        "Complex layouts may appear cluttered if not properly spaced"
+      ]
+    },
+    {
+      "targetKey": "brand.tokens.color.primary",
+      "value": "Adopt a deep blue as the primary color to convey trust and professionalism",
+      "rationale": "Deep blue is associated with security and reliability, aligning with the brand's tone",
+      "confidence": 0.9,
+      "risks": [
+        "May require careful pairing with other colors to ensure vibrancy"
+      ]
+    }
+  ],
+  "role": "designer_brand",
+  "stopReason": "ok"
+}
+  ```
+
+### swarm.specialist.critic
+
+- **CustomerSafe:** false
+- **Payload:**
+  ```json
+  {
+  "ok": false,
+  "stopReason": "provider_failed",
+  "fingerprint": "trc_1768404795230_1319123d9d8ed:critic:provider_failed",
+  "role": "critic"
+}
+  ```
+
+### swarm.collapse
+
+- **CustomerSafe:** true
+
+## Input Brief
+
+```json
+{
+  "task": "Design and improve the LaunchBase homepage from first principles",
+  "business": "LaunchBase",
+  "whitePaper": "LaunchBase is an operating system for small businesses.\nNot a website builder. Not another tool. Not a one-time agency project.\n\nLaunchBase is ongoing ownership of a business's digital operating layer:\n- website uptime + maintenance\n- lead capture + forms\n- monitoring + safety decisions\n- updates + publishing cadence\n- integrations + visibility\n- logging + accountability\n\nLaunchBase exists because most small businesses already have tools, but no one owns the system.\nThey have a website, a payment tool, a calendar, a Google profile, and logins…\n…but the owner still carries the burden of making sure everything works.\n\nLaunchBase sells relief from that cognitive load.\n\nCore customer pain: The customer isn't buying a website. They're buying the ability to stop thinking about:\n- \"Is it still working?\"\n- \"Did that form actually send?\"\n- \"What should I post?\"\n- \"Is anything broken?\"\n- \"Am I missing something?\"\n\nThis is background anxiety, not a feature gap.\nThe enemy is not \"lack of tools.\"\nThe enemy is lack of ownership.\n\nLaunchBase replaces the customer as the default system-checker.\n\nPromise:\n✅ Change is reversible\n✅ Non-action is safe\n✅ Silence is a valid decision\n✅ Every action is logged\n✅ Customer sees their real site before paying\n✅ LaunchBase acts only after approval\n\nThe brand is accountability.\nLaunchBase is responsibility-as-a-service.\n\nTarget customer:\n- owner-operator\n- service business\n- small team\n- not \"tech obsessed\"\n- wants a business to run, not to \"manage tools\"\n\nTone: calm, competent, honest, operationally serious, safety-first, premium but not flashy.\nThis is a systems product, not a \"creative brand party.\"\n\nDesign objective:\n✅ Create instant trust\n✅ Communicate the contract clearly\n✅ Show the \"safe-by-default\" nature\n✅ Make \"Hand It Off\" feel low-risk\n✅ Explain observability in plain English\n✅ Look premium enough to justify recurring ownership",
+  "currentCopy": {
+    "hero": "Stop carrying the system in your head. Hand it off. Keep visibility.",
+    "problem": "No one owns the system. You're the fallback for everything.",
+    "solution": "LaunchBase becomes the owner. You stay informed, not involved.",
+    "trust": "Safe by default. Fully logged. Reversible."
+  },
+  "audience": "Owner-operators of service businesses (fitness studios, coffee shops, consulting firms) who want stability and accountability, not tool management",
+  "tone": "Calm, minimal, trustworthy, premium. Avoid hype. Avoid 'AI magic.' Avoid exaggerated claims.",
+  "constraints": "Mobile-first. Must feel like 'responsibility-as-a-service.' Must emphasize safety, reversibility, observability. Must reduce mental load while reading."
+}
+```

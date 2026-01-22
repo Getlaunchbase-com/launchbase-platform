@@ -1,0 +1,102 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTZUv39-2j9zxn-9bf01c8459b89694
+Input Tokens: 1939
+Output Tokens: 708
+Finish Reason: stop
+
+=== RAW TEXT (2910 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce a reusable audit-log component pattern: timestamp, actor, action, object, status chip (e.g., queued/in-progress/done), and a ‘view details’ affordance...",
+      "rationale": "Makes “observability” concrete and trustable by showing what gets tracked and how a user can review decisions/actions.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Restructure hero into a 2-column grid on desktop (60/40): left = H1 + 3 scannable bullets (max 12 words each) + primary/secondary CTAs; right = a static product...",
+      "rationale": "Improves above-the-fold clarity and immediately demonstrates “hand it off without losing control” via an observable artifact (audit-style feed) rather than abst...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.pricingTable",
+      "value": "Implement a consistent pricing component system: bullets limited to 5 lines, line-height 1.4, and a ‘What’s included’ list with check icons; add a ‘See full com...",
+      "rationale": "Improves visual hierarchy and scan speed; consistent alignment reduces cognitive load and supports faster selection.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Place 2 CTAs in hero: primary CTA as a full-width button on mobile (min 48px height) and inline on desktop; secondary CTA as a text/button link to Pricing ancho...",
+      "rationale": "Creates a clear conversion path while offering a lower-friction option for hesitant users; reduces decision paralysis by limiting choices to two.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge “Problem” and “Solution” into a single section using a 2-column before/after layout on desktop (50/50) and stacked cards on mobile. Limit to 3 paired rows...",
+      "rationale": "Improves scannability and removes repetitive explanation by showing contrast in one glance.",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a mobile sticky CTA bar that appears after 40% scroll: left = secondary (Pricing), right = primary (Get started). Keep height 56px, with safe-area padding a...",
+      "rationale": "Recovers conversions on long pages and ensures CTA availability without forcing users to scroll back to the top.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move Pricing above FAQ and convert it into a 3-card layout on desktop (equal widths) and stacked on mobile. Each card: price, 5-bullet ‘included’ list, and a si...",
+      "rationale": "Makes pricing easier to parse and reduces table fatigue while preserving detail for users who want to compare.",
+      "confidence": 0.9
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce a reusable audit-log component pattern: timestamp, actor, action, object, status chip (e.g., queued/in-progress/done), and a ‘view details’ affordance...",
+      "rationale": "Makes “observability” concrete and trustable by showing what gets tracked and how a user can review decisions/actions.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Restructure hero into a 2-column grid on desktop (60/40): left = H1 + 3 scannable bullets (max 12 words each) + primary/secondary CTAs; right = a static product...",
+      "rationale": "Improves above-the-fold clarity and immediately demonstrates “hand it off without losing control” via an observable artifact (audit-style feed) rather than abst...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.pricingTable",
+      "value": "Implement a consistent pricing component system: bullets limited to 5 lines, line-height 1.4, and a ‘What’s included’ list with check icons; add a ‘See full com...",
+      "rationale": "Improves visual hierarchy and scan speed; consistent alignment reduces cognitive load and supports faster selection.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Place 2 CTAs in hero: primary CTA as a full-width button on mobile (min 48px height) and inline on desktop; secondary CTA as a text/button link to Pricing ancho...",
+      "rationale": "Creates a clear conversion path while offering a lower-friction option for hesitant users; reduces decision paralysis by limiting choices to two.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge “Problem” and “Solution” into a single section using a 2-column before/after layout on desktop (50/50) and stacked cards on mobile. Limit to 3 paired rows...",
+      "rationale": "Improves scannability and removes repetitive explanation by showing contrast in one glance.",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a mobile sticky CTA bar that appears after 40% scroll: left = secondary (Pricing), right = primary (Get started). Keep height 56px, with safe-area padding a...",
+      "rationale": "Recovers conversions on long pages and ensures CTA availability without forcing users to scroll back to the top.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move Pricing above FAQ and convert it into a 3-card layout on desktop (equal widths) and stacked on mobile. Each card: price, 5-bullet ‘included’ list, and a si...",
+      "rationale": "Makes pricing easier to parse and reduces table fatigue while preserving detail for users who want to compare.",
+      "confidence": 0.9
+    }
+  ]
+}

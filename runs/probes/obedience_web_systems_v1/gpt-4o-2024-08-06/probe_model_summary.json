@@ -1,0 +1,18 @@
+{
+  "model": "gpt-4o-2024-08-06",
+  "n": 3,
+  "exact8Rate": 0,
+  "schemaValidRate": 0,
+  "avgAttempts": null,
+  "stopReasonCounts": {
+    "unknown": 3
+  },
+  "tokens": {
+    "inputAvg": 1350,
+    "outputAvg": 887
+  },
+  "latencyMsAvg": 19033,
+  "costUsdAvg": 0.04011,
+  "schemaFailRate": 0,
+  "timeoutRate": 0
+}

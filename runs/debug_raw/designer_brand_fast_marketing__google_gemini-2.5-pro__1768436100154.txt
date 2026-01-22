@@ -1,0 +1,16 @@
+=== RAW RESPONSE (designer_brand_fast_marketing) ===
+Model: google/gemini-2.5-pro
+Request ID: cTFoafL5CsK42PgPpOjOuAQ
+Input Tokens: 795
+Output Tokens: 66
+Finish Reason: length
+
+=== RAW TEXT (234 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.visual.tierHierarchy",
+      "value": "Apply a 2px solid border in `brand.color.conversionPrimary` and a light gray background (`#F9FAFB`) to the recommended pricing tier. Other
+
+=== PARSED JSON ===
+NULL (parse failed)

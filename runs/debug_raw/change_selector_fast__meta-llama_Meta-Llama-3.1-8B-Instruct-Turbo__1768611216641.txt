@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTb7mmJ-2j9zxn-9bf1e05e1a3e53d9
+Input Tokens: 1495
+Output Tokens: 548
+Finish Reason: stop
+
+=== RAW TEXT (2340 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Set border-radius to 8px for all component corners to maintain a cohesive and premium appe...",
+      "rationale": "Consistent corner rounding creates a familiar and safe experience.",
+      "confidence": 0.92
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 16px for body text with a max line length of 65ch to enhance readability and create a ...",
+      "rationale": "Improved readability fosters a confident and calm user experience.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Use a light neutral color palette for backgrounds with dark text for contrast, ensuring a ...",
+      "rationale": "High contrast improves readability and creates a safe environment for users.",
+      "confidence": 0.91
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Use rounded buttons with 16px padding, a subtle drop shadow, and a neutral background on h...",
+      "rationale": "Rounded shapes and shadow add a sense of safety and confidence to interactive elements.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Implement card styles with 12px padding, moderate elevation, and rounded corners to enhanc...",
+      "rationale": "Well-defined cards create a calm and organized layout.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Design proof chips with 12px padding and a light neutral background to emphasize trust wit...",
+      "rationale": "Subtle chips enhance the perception of trust in the design.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Utilize subtle dividers with 1px thickness and a neutral tone to create a clear separation...",
+      "rationale": "Maintains a clean layout, fostering a sense of calm and organization.",
+      "confidence": 0.89
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Incorporate a log preview with a clear layout showing 8–10 entries, using alternating back...",
+      "rationale": "A structured log presentation increases the sense of operational transparency.",
+      "confidence": 0.84
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Set border-radius to 8px for all component corners to maintain a cohesive and premium appe...",
+      "rationale": "Consistent corner rounding creates a familiar and safe experience.",
+      "confidence": 0.92
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 16px for body text with a max line length of 65ch to enhance readability and create a ...",
+      "rationale": "Improved readability fosters a confident and calm user experience.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Use a light neutral color palette for backgrounds with dark text for contrast, ensuring a ...",
+      "rationale": "High contrast improves readability and creates a safe environment for users.",
+      "confidence": 0.91
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Use rounded buttons with 16px padding, a subtle drop shadow, and a neutral background on h...",
+      "rationale": "Rounded shapes and shadow add a sense of safety and confidence to interactive elements.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Implement card styles with 12px padding, moderate elevation, and rounded corners to enhanc...",
+      "rationale": "Well-defined cards create a calm and organized layout.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Design proof chips with 12px padding and a light neutral background to emphasize trust wit...",
+      "rationale": "Subtle chips enhance the perception of trust in the design.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Utilize subtle dividers with 1px thickness and a neutral tone to create a clear separation...",
+      "rationale": "Maintains a clean layout, fostering a sense of calm and organization.",
+      "confidence": 0.89
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Incorporate a log preview with a clear layout showing 8–10 entries, using alternating back...",
+      "rationale": "A structured log presentation increases the sense of operational transparency.",
+      "confidence": 0.84
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTb63Ru-2j9zxn-9bf1d8202ed99b30
+Input Tokens: 1730
+Output Tokens: 632
+Finish Reason: stop
+
+=== RAW TEXT (2544 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Convert hero to a 2-column desktop grid (60/40) with: left = H1 + 3 scannable bullets (max...",
+      "rationale": "Improves above-the-fold clarity and immediately demonstrates the \"hand it off without losi...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Standardize hero CTA group: 1 primary CTA (filled) + 1 secondary CTA (outline) in a single...",
+      "rationale": "Creates a clear conversion path with one dominant action while keeping a lower-commitment ...",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder homepage sections to: Hero → Proof bar → Problem/Solution (compressed) → How it wo...",
+      "rationale": "Moves trust/observability earlier (before feature sprawl), creates a more linear story, an...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an audit-log pattern section: a left-aligned timeline/feed component (8–12 rows)...",
+      "rationale": "Strengthens trust by showing \"who did what, when\"—a concrete auditability mechanism rather...",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Restructure pricing into 3 tier cards on desktop (equal width) and a single-column stack o...",
+      "rationale": "Makes pricing easier to parse quickly, reduces decision fatigue, and clarifies inclusions ...",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a mobile sticky CTA that appears after 40% scroll and hides on upward scroll; include ...",
+      "rationale": "Improves conversion without cluttering the hero; mobile users get persistent access to the...",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Compress problem/solution into a single section using a 2-column layout on desktop (50/50)...",
+      "rationale": "Improves scannability and reduces reading load while reinforcing the control/visibility co...",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Add a proof bar directly under the hero (within 24–32px): single-line, horizontally scroll...",
+      "rationale": "Adds immediate trust signals and supports observability/auditability without relying on hy...",
+      "confidence": 0.83
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Convert hero to a 2-column desktop grid (60/40) with: left = H1 + 3 scannable bullets (max...",
+      "rationale": "Improves above-the-fold clarity and immediately demonstrates the \"hand it off without losi...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Standardize hero CTA group: 1 primary CTA (filled) + 1 secondary CTA (outline) in a single...",
+      "rationale": "Creates a clear conversion path with one dominant action while keeping a lower-commitment ...",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder homepage sections to: Hero → Proof bar → Problem/Solution (compressed) → How it wo...",
+      "rationale": "Moves trust/observability earlier (before feature sprawl), creates a more linear story, an...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an audit-log pattern section: a left-aligned timeline/feed component (8–12 rows)...",
+      "rationale": "Strengthens trust by showing \"who did what, when\"—a concrete auditability mechanism rather...",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Restructure pricing into 3 tier cards on desktop (equal width) and a single-column stack o...",
+      "rationale": "Makes pricing easier to parse quickly, reduces decision fatigue, and clarifies inclusions ...",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a mobile sticky CTA that appears after 40% scroll and hides on upward scroll; include ...",
+      "rationale": "Improves conversion without cluttering the hero; mobile users get persistent access to the...",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Compress problem/solution into a single section using a 2-column layout on desktop (50/50)...",
+      "rationale": "Improves scannability and reduces reading load while reinforcing the control/visibility co...",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Add a proof bar directly under the hero (within 24–32px): single-line, horizontally scroll...",
+      "rationale": "Adds immediate trust signals and supports observability/auditability without relying on hy...",
+      "confidence": 0.83
+    }
+  ]
+}

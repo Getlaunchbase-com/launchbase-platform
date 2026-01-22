@@ -1,0 +1,335 @@
+{
+  "lane": "marketing",
+  "rep": 8,
+  "runId": "pilot20_marketing_8_1768611738659",
+  "timestamp": "2026-01-17T01:03:48.628Z",
+  "runMode": "production",
+  "status": "VALID",
+  "systems": {
+    "changes": [
+      {
+        "targetKey": "design.trust.auditLogPattern",
+        "value": "Add a dedicated “auditability” pattern section: include a read-only activity feed (5 rows)...",
+        "rationale": "Strengthens trust through concrete observability (audit trail) rather than hype, making th...",
+        "confidence": 0.88,
+        "risks": []
+      },
+      {
+        "targetKey": "design.conversion.heroCta",
+        "value": "Use a single dominant primary CTA in hero (1 button) with one secondary CTA as a text link...",
+        "rationale": "Reduces choice overload and increases conversion focus while keeping a clear alternative p...",
+        "confidence": 0.83,
+        "risks": []
+      },
+      {
+        "targetKey": "design.conversion.socialProof",
+        "value": "Insert a proof bar immediately under the hero (above the fold on desktop when possible): 1...",
+        "rationale": "Adds fast trust signals early without adding a full section, improving confidence to click...",
+        "confidence": 0.82,
+        "risks": []
+      },
+      {
+        "targetKey": "design.layout.problemSolution",
+        "value": "Merge any separate “Problem”, “Why”, and “Benefits” blocks into one section using a before...",
+        "rationale": "Improves scannability and reduces repeated explanations by presenting the contrast in a si...",
+        "confidence": 0.8,
+        "risks": []
+      },
+      {
+        "targetKey": "design.trust.visibilityPanel",
+        "value": "Introduce a reusable “Visibility panel” component used in hero and again mid-page: a compa...",
+        "rationale": "Reinforces the control/visibility promise repeatedly without adding long text, improving c...",
+        "confidence": 0.81,
+        "risks": []
+      },
+      {
+        "targetKey": "design.layout.pricing",
+        "value": "Move pricing to a 3-card layout with one highlighted default tier; align tiers in a grid w...",
+        "rationale": "Makes pricing easier to parse quickly, reduces scrolling, and prevents feature comparison ...",
+        "confidence": 0.85,
+        "risks": []
+      },
+      {
+        "targetKey": "design.conversion.stickyCta",
+        "value": "Add a mobile-only sticky CTA bar that appears after ~40% scroll and hides near the pricing...",
+        "rationale": "Improves conversion path continuity on mobile where users often lose the primary CTA after...",
+        "confidence": 0.87,
+        "risks": []
+      },
+      {
+        "targetKey": "design.components.pricingTable",
+        "value": "Replace dense tables with pricing cards + a lightweight comparison matrix revealed via acc...",
+        "rationale": "Improves scannability and reduces cognitive load while still supporting deeper evaluation ...",
+        "confidence": 0.84,
+        "risks": []
+      }
+    ],
+    "anchorCount": 8
+  },
+  "brand": {
+    "changes": [
+      {
+        "targetKey": "brand.tokens.typeScale",
+        "value": "Use a type scale with a maximum line length of 65ch for body text to enhance readability a...",
+        "rationale": "Improves text legibility and reduces cognitive load, creating a more confident user experi...",
+        "confidence": 0.85
+      },
+      {
+        "targetKey": "brand.tokens.radius",
+        "value": "Apply a 8px corner radius for buttons to evoke a premium feel while maintaining safety.",
+        "rationale": "Softens the button appearance, making it feel more approachable and safe-by-default.",
+        "confidence": 0.8
+      },
+      {
+        "targetKey": "brand.components.buttons",
+        "value": "Use a button hierarchy of primary (filled, 16px padding), secondary (outlined, 16px paddin...",
+        "rationale": "Establishes a clear visual hierarchy, enhancing user confidence in navigation.",
+        "confidence": 0.9
+      },
+      {
+        "targetKey": "brand.tokens.color.neutral",
+        "value": "Utilize a neutral color palette with high contrast for text (e.g., dark gray on white back...",
+        "rationale": "Improves readability and user experience, while adhering to accessibility standards.",
+        "confidence": 0.92
+      },
+      {
+        "targetKey": "brand.components.cards",
+        "value": "Design cards with a 16px padding, 8px radius, and subtle shadow to create a premium, invit...",
+        "rationale": "Increases visual separation and focuses attention on card content, promoting operational c...",
+        "confidence": 0.88
+      },
+      {
+        "targetKey": "brand.trust.proofPresentation",
+        "value": "Integrate proof chips in a horizontal row below the hero section: 'Safe by default • Fully...",
+        "rationale": "Reinforces trust and safety signals early in the user journey, fostering confidence.",
+        "confidence": 0.87
+      },
+      {
+        "targetKey": "brand.components.dividers",
+        "value": "Use subtle dividers between sections with a light gray color (10% opacity) to maintain a c...",
+        "rationale": "Creates separation without harsh lines, contributing to a serene overall aesthetic.",
+        "confidence": 0.84
+      },
+      {
+        "targetKey": "brand.trust.logVisualLanguage",
+        "value": "Implement a compact, visually distinct audit log preview pattern that shows recent actions...",
+        "rationale": "Enhances transparency and accountability, supporting a sense of safety and operational int...",
+        "confidence": 0.82
+      }
+    ],
+    "anchorCount": 8
+  },
+  "critic": {
+    "issues": [
+      {
+        "severity": "critical",
+        "description": "Hero CTA may lack urgency signal for '48 hours' promise - no countdown or time-sensitive messaging",
+        "location": "design.conversion.heroCta",
+        "rationale": "48-hour promise needs reinforcement at decision point to drive immediate action vs later consideration"
+      },
+      {
+        "severity": "critical",
+        "description": "Audit log pattern may confuse users about what they're viewing - unclear if demo or real data",
+        "location": "design.trust.auditLogPattern",
+        "rationale": "Users need clear context about preview vs actual functionality to avoid abandonment after signup"
+      },
+      {
+        "severity": "major",
+        "description": "Sticky CTA appears at 40% scroll but pricing at bottom - long gap without conversion option",
+        "location": "design.conversion.stickyCta",
+        "rationale": "Users may lose momentum in middle sections without persistent conversion path visibility"
+      },
+      {
+        "severity": "major",
+        "description": "Problem-solution merge may bury key pain points that drive urgency for immediate action",
+        "location": "design.layout.problemSolution",
+        "rationale": "Condensing problem articulation risks losing emotional hook that motivates 48-hour urgency"
+      },
+      {
+        "severity": "major",
+        "description": "Pricing cards lack risk reversal messaging - no trial, guarantee, or cancellation clarity",
+        "location": "design.layout.pricing",
+        "rationale": "High-commitment pricing without safety net increases hesitation at final conversion moment"
+      },
+      {
+        "severity": "major",
+        "description": "Visibility panel component may create repetitive experience without progressive disclosure",
+        "location": "design.trust.visibilityPanel",
+        "rationale": "Repeated identical trust signals can feel marketing-heavy rather than progressively building confidence"
+      },
+      {
+        "severity": "minor",
+        "description": "Proof bar placement above fold may push hero CTA below fold on smaller desktop screens",
+        "location": "design.conversion.socialProof",
+        "rationale": "Adding content above CTA risks burying primary conversion action on constrained viewports"
+      },
+      {
+        "severity": "minor",
+        "description": "65ch line length may be too wide for mobile scanning - optimal mobile is 45-50ch",
+        "location": "brand.tokens.typeScale",
+        "rationale": "Wide text blocks reduce mobile readability and increase cognitive load during quick evaluation"
+      },
+      {
+        "severity": "minor",
+        "description": "8px button radius may feel too soft for business tool - could signal consumer app vs professional",
+        "location": "brand.tokens.radius",
+        "rationale": "Professional users expect sharper, more precise visual language that signals business capability"
+      },
+      {
+        "severity": "minor",
+        "description": "Accordion comparison matrix may hide key differentiators that drive tier selection decisions",
+        "location": "design.components.pricingTable",
+        "rationale": "Hidden comparison features increase cognitive load and may lead to suboptimal tier choices"
+      }
+    ],
+    "suggestedFixes": [
+      {
+        "targetKey": "design.conversion.heroCta",
+        "fix": "Add urgency microcopy above CTA: 'Start your 48-hour launch' with subtle timer icon, 48px height button",
+        "rationale": "Reinforces time promise at decision moment and creates urgency without pressure"
+      },
+      {
+        "targetKey": "design.trust.auditLogPattern",
+        "fix": "Add clear header 'Preview: Your Business Activity Feed' with 'See it live' secondary CTA, 320px width",
+        "rationale": "Sets proper expectations and provides path to experience full functionality"
+      },
+      {
+        "targetKey": "design.conversion.stickyCta",
+        "fix": "Show sticky CTA at 25% scroll and include pricing anchor link: 'See Pricing' as secondary action",
+        "rationale": "Reduces gap to pricing decision and provides alternative path for price-sensitive users"
+      },
+      {
+        "targetKey": "design.layout.problemSolution",
+        "fix": "Keep problem statement as separate 80px height callout box above solution to maintain emotional impact",
+        "rationale": "Preserves pain point emphasis while improving flow and maintaining urgency drivers"
+      },
+      {
+        "targetKey": "design.layout.pricing",
+        "fix": "Add '14-day free trial' badge to recommended tier and 'Cancel anytime' footer text, 16px size",
+        "rationale": "Reduces commitment friction and provides clear exit strategy for hesitant prospects"
+      },
+      {
+        "targetKey": "design.trust.visibilityPanel",
+        "fix": "Use progressive disclosure: simple icon in hero, expanded view mid-page with 3-4 specific examples",
+        "rationale": "Builds trust progressively without repetition and provides concrete proof points"
+      },
+      {
+        "targetKey": "design.conversion.socialProof",
+        "fix": "Make proof bar compact 40px height with horizontal scroll on mobile to preserve hero CTA position",
+        "rationale": "Maintains above-fold CTA visibility while adding trust signals efficiently"
+      },
+      {
+        "targetKey": "brand.tokens.typeScale",
+        "fix": "Use responsive line length: 65ch desktop, 50ch tablet, 45ch mobile with 1.6 line height",
+        "rationale": "Optimizes readability across devices while maintaining professional appearance"
+      },
+      {
+        "targetKey": "brand.tokens.radius",
+        "fix": "Use 4px radius for primary buttons, 8px for cards to balance professional feel with approachability",
+        "rationale": "Maintains business credibility while softening overall experience appropriately"
+      },
+      {
+        "targetKey": "design.components.pricingTable",
+        "fix": "Show top 3 features per tier by default, 'Compare all features' button reveals full matrix below",
+        "rationale": "Balances quick scanning with comprehensive comparison for detailed evaluation"
+      }
+    ],
+    "pass": false
+  },
+  "finalScore": 89.99,
+  "truthPenalty": 0.10000000000000002,
+  "qualityPenalty": 0.01,
+  "meta": {
+    "totalCostUsd": 0.18792999999999999,
+    "totalLatencyMs": 72566,
+    "attempts": 1,
+    "models": {
+      "systems": "gpt-5.2-2025-12-11",
+      "brand": "gpt-4o-mini-2024-07-18",
+      "critic": "claude-sonnet-4-20250514"
+    },
+    "stopReasons": {
+      "systems": "ok",
+      "brand": "ok",
+      "critic": "ok"
+    },
+    "requestIds": {
+      "systems": "chatcmpl-CyozjKSAhKDPThGS47dee9qXBZwms",
+      "brand": "chatcmpl-Cyp08f5lI48QUhgicLEik9qrsoaQw",
+      "critic": "msg_01XY4fMdxWGZ9e867z72P6yS"
+    },
+    "normalization": {
+      "enabled": true,
+      "applied": false,
+      "mode": "truncate_first_n",
+      "events": {
+        "systems": {
+          "kind": "truncate",
+          "applied": false,
+          "from": 0,
+          "to": 0
+        },
+        "brand": {
+          "kind": "truncate",
+          "applied": false,
+          "from": 0,
+          "to": 0
+        },
+        "critic": {
+          "kind": "coerce_risks",
+          "applied": false,
+          "coercedCount": 0,
+          "fromType": "object",
+          "toType": "string"
+        }
+      }
+    },
+    "usage": {
+      "systems": {
+        "inputTokens": 1231,
+        "outputTokens": 1448,
+        "latencyMs": 22930,
+        "costUsd": 0.05575
+      },
+      "brand": {
+        "inputTokens": 1609,
+        "outputTokens": 621,
+        "latencyMs": 12319,
+        "costUsd": 0.03472
+      },
+      "critic": {
+        "inputTokens": 4916,
+        "outputTokens": 1610,
+        "latencyMs": 37317,
+        "costUsd": 0.09746
+      },
+      "totals": {
+        "inputTokens": 10980,
+        "outputTokens": 4900,
+        "latencyMs": 76367,
+        "costUsd": 0.2568
+      },
+      "selector": {
+        "inputTokens": 3224,
+        "outputTokens": 1221,
+        "latencyMs": 3801,
+        "costUsd": 0.06887
+      }
+    },
+    "selection": {
+      "enabled": true,
+      "systems": {
+        "candidatesCount": 10,
+        "cappedCount": 10,
+        "selectedCount": 8,
+        "selectorModel": "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"
+      },
+      "brand": {
+        "candidatesCount": 8,
+        "cappedCount": 8,
+        "selectedCount": 8,
+        "selectorModel": "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"
+      }
+    }
+  }
+}

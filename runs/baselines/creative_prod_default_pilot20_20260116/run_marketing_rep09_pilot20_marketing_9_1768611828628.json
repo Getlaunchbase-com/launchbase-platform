@@ -1,0 +1,327 @@
+{
+  "lane": "marketing",
+  "rep": 9,
+  "runId": "pilot20_marketing_9_1768611828628",
+  "timestamp": "2026-01-17T01:04:59.335Z",
+  "runMode": "production",
+  "status": "VALID",
+  "systems": {
+    "changes": [
+      {
+        "targetKey": "design.conversion.heroCta",
+        "value": "Use a single primary CTA in hero plus one secondary CTA (text-link style). Place CTAs dire...",
+        "rationale": "Reduces choice overload and makes the conversion path unambiguous while keeping a lower-co...",
+        "confidence": 0.84
+      },
+      {
+        "targetKey": "design.components.proofBar",
+        "value": "Add a proof bar directly under the hero (within 24–32px) with 3–5 compact items in a singl...",
+        "rationale": "Immediate trust reinforcement and frames credibility around operational transparency, not ...",
+        "confidence": 0.82
+      },
+      {
+        "targetKey": "design.layout.problemSolution",
+        "value": "Convert Problem/Solution into a before/after two-column layout on desktop (50/50) and stac...",
+        "rationale": "Improves cognitive load and makes the core promise legible in <10 seconds of scanning.",
+        "confidence": 0.85
+      },
+      {
+        "targetKey": "design.layout.sectionOrder",
+        "value": "Reorder sections to: Hero → Proof bar → Problem/Solution (compressed) → How it Works → Vis...",
+        "rationale": "Creates a clearer narrative flow (what it is → why it matters → how it works → how you sta...",
+        "confidence": 0.88
+      },
+      {
+        "targetKey": "design.layout.hero",
+        "value": "Rebuild hero into a 2-column grid on desktop (60/40): left = H1 + 3-bullet value list + pr...",
+        "rationale": "Clarifies the offer above the fold, improves scannability with bullets, and visually ancho...",
+        "confidence": 0.86
+      },
+      {
+        "targetKey": "design.trust.visibilityPanel",
+        "value": "Add a persistent “Visibility Panel” UI motif inside relevant sections (How it Works / Suit...",
+        "rationale": "Reinforces control/visibility repeatedly without adding paragraphs; improves comprehension...",
+        "confidence": 0.79
+      },
+      {
+        "targetKey": "design.layout.pricing",
+        "value": "Move pricing higher (after Suite) and restructure into 3 pricing cards on desktop (highlig...",
+        "rationale": "Makes pricing easier to parse quickly and reduces the mental effort of comparing plans.",
+        "confidence": 0.87
+      },
+      {
+        "targetKey": "design.components.pricingTable",
+        "value": "Implement pricing cards with: clear price block, 1-line tier descriptor, 5–7 feature bulle...",
+        "rationale": "Standardizes hierarchy inside pricing and improves scannability across tiers.",
+        "confidence": 0.81
+      }
+    ],
+    "anchorCount": 8
+  },
+  "brand": {
+    "changes": [
+      {
+        "targetKey": "brand.tokens.typeScale",
+        "value": "Set max line length for body text to 65ch to enhance reading comfort",
+        "rationale": "Improves legibility and reduces cognitive load for users",
+        "confidence": 0.9
+      },
+      {
+        "targetKey": "brand.components.buttons",
+        "value": "Establish a button hierarchy with primary buttons at 16px padding and secondary buttons at...",
+        "rationale": "Differentiates importance and guides user actions effectively",
+        "confidence": 0.88
+      },
+      {
+        "targetKey": "brand.components.cards",
+        "value": "Design pricing cards with a density of 3 cards per row on desktop, ensuring 16px padding a...",
+        "rationale": "Enhances visual organization and makes comparison easier",
+        "confidence": 0.87
+      },
+      {
+        "targetKey": "brand.trust.proofPresentation",
+        "value": "Implement proof chips below the hero with 3 visible chips: 'Safe by default', 'Fully audit...",
+        "rationale": "Reinforces trust and operational integrity in a compact format",
+        "confidence": 0.84
+      },
+      {
+        "targetKey": "brand.trust.logVisualLanguage",
+        "value": "Add an audit log preview pattern in relevant sections with timestamps and actions clearly ...",
+        "rationale": "Enhances transparency and user confidence through visible tracking",
+        "confidence": 0.85
+      },
+      {
+        "targetKey": "brand.tokens.color.neutral",
+        "value": "Use a neutral color palette for backgrounds to maintain a calm and premium feel, ensuring ...",
+        "rationale": "Improves focus on content while enhancing visual comfort",
+        "confidence": 0.9
+      },
+      {
+        "targetKey": "brand.components.dividers",
+        "value": "Incorporate subtle dividers with a color contrast ratio of at least 4.5:1 for section sepa...",
+        "rationale": "Creates a clear visual distinction between sections, enhancing navigability",
+        "confidence": 0.92
+      },
+      {
+        "targetKey": "brand.tokens.radius",
+        "value": "Use a radius of 8px for button and card corners to promote a friendly and premium aestheti...",
+        "rationale": "Softens visual elements, contributing to a calm and confident brand presence",
+        "confidence": 0.86
+      }
+    ],
+    "anchorCount": 8
+  },
+  "critic": {
+    "issues": [
+      {
+        "severity": "critical",
+        "description": "Hero CTA placement may not be visible above fold on mobile devices with stacked layout",
+        "location": "design.conversion.heroCta",
+        "rationale": "Primary conversion point could be buried below hero content, killing immediate action"
+      },
+      {
+        "severity": "critical",
+        "description": "Pricing moved higher without risk reversal messaging creates purchase anxiety",
+        "location": "design.layout.pricing",
+        "rationale": "Early pricing exposure without trust-building context increases abandonment risk"
+      },
+      {
+        "severity": "major",
+        "description": "Proof bar with only 3-5 items lacks density for immediate credibility establishment",
+        "location": "design.components.proofBar",
+        "rationale": "Insufficient social proof volume fails to overcome initial skepticism in 8-second window"
+      },
+      {
+        "severity": "major",
+        "description": "Two-column problem/solution layout may create scanning confusion on desktop",
+        "location": "design.layout.problemSolution",
+        "rationale": "Side-by-side layout forces eye movement pattern that slows comprehension vs linear flow"
+      },
+      {
+        "severity": "major",
+        "description": "Visibility panel UI motif lacks clear interaction affordances and purpose",
+        "location": "design.trust.visibilityPanel",
+        "rationale": "Ambiguous UI element creates cognitive load without clear value proposition"
+      },
+      {
+        "severity": "major",
+        "description": "Pricing cards with 5-7 features create comparison fatigue and decision paralysis",
+        "location": "design.components.pricingTable",
+        "rationale": "Too many comparison points slow decision-making and increase cognitive burden"
+      },
+      {
+        "severity": "minor",
+        "description": "65ch line length may be too wide for comfortable scanning on large desktop screens",
+        "location": "brand.tokens.typeScale",
+        "rationale": "Optimal scanning requires shorter line lengths for quick comprehension"
+      },
+      {
+        "severity": "minor",
+        "description": "16px button padding may create insufficient tap targets for mobile users",
+        "location": "brand.components.buttons",
+        "rationale": "Small touch targets increase interaction friction and accessibility issues"
+      },
+      {
+        "severity": "minor",
+        "description": "3-card desktop layout forces horizontal scrolling on smaller laptop screens",
+        "location": "brand.components.cards",
+        "rationale": "Fixed 3-column grid breaks responsive behavior below standard desktop widths"
+      },
+      {
+        "severity": "minor",
+        "description": "Proof chips positioning below hero delays trust signals until after value prop",
+        "location": "brand.trust.proofPresentation",
+        "rationale": "Trust elements should precede or accompany value claims for maximum impact"
+      }
+    ],
+    "suggestedFixes": [
+      {
+        "targetKey": "design.conversion.heroCta",
+        "fix": "Add sticky CTA at 48px height with primary action, visible at all breakpoints below 768px",
+        "rationale": "Ensures conversion opportunity remains accessible during mobile scroll"
+      },
+      {
+        "targetKey": "design.layout.pricing",
+        "fix": "Add risk reversal messaging above pricing cards: '30-day money back' with 24px spacing",
+        "rationale": "Reduces purchase anxiety by addressing refund concerns before price exposure"
+      },
+      {
+        "targetKey": "design.components.proofBar",
+        "fix": "Expand to 7-9 proof items in horizontal scroll on mobile, grid layout on desktop",
+        "rationale": "Increases credibility density while maintaining mobile usability"
+      },
+      {
+        "targetKey": "design.layout.problemSolution",
+        "fix": "Use single-column layout with problem/solution cards stacked vertically, 32px gap",
+        "rationale": "Maintains natural reading flow while preserving before/after comparison"
+      },
+      {
+        "targetKey": "design.trust.visibilityPanel",
+        "fix": "Convert to expandable audit log preview with 'View Details' CTA and timestamp examples",
+        "rationale": "Provides clear interaction model and demonstrates transparency value"
+      },
+      {
+        "targetKey": "design.components.pricingTable",
+        "fix": "Limit to 3 key features per card with 'See all features' expandable section",
+        "rationale": "Reduces decision complexity while maintaining feature transparency"
+      },
+      {
+        "targetKey": "brand.tokens.typeScale",
+        "fix": "Set max line length to 55ch for body text with 1.6 line height for improved scanning",
+        "rationale": "Optimizes reading speed and comprehension for web content"
+      },
+      {
+        "targetKey": "brand.components.buttons",
+        "fix": "Increase primary button padding to 20px vertical, 32px horizontal for 44px min touch target",
+        "rationale": "Meets accessibility guidelines and improves mobile interaction success"
+      },
+      {
+        "targetKey": "brand.components.cards",
+        "fix": "Use CSS grid with minmax(320px, 1fr) for responsive 1-3 column layout based on viewport",
+        "rationale": "Maintains optimal card width across all screen sizes without horizontal scroll"
+      },
+      {
+        "targetKey": "brand.trust.proofPresentation",
+        "fix": "Move proof chips inline with hero headline as prefix badges with 12px spacing",
+        "rationale": "Establishes credibility immediately with value proposition for maximum impact"
+      }
+    ],
+    "pass": false
+  },
+  "finalScore": 99.99,
+  "truthPenalty": 0,
+  "qualityPenalty": 0.01,
+  "meta": {
+    "totalCostUsd": 0.18576,
+    "totalLatencyMs": 66234,
+    "attempts": 1,
+    "models": {
+      "systems": "gpt-5.2-2025-12-11",
+      "brand": "gpt-4o-mini-2024-07-18",
+      "critic": "claude-sonnet-4-20250514"
+    },
+    "stopReasons": {
+      "systems": "ok",
+      "brand": "ok",
+      "critic": "ok"
+    },
+    "requestIds": {
+      "systems": "chatcmpl-Cyp1B1oPxkl9SKVwu6Q49INKJEjTR",
+      "brand": "chatcmpl-Cyp1ZSXwJzfW64mb4akS66cMeRv8b",
+      "critic": "msg_0193oSnGEHfdAHRBw1VitrPG"
+    },
+    "normalization": {
+      "enabled": true,
+      "applied": false,
+      "mode": "truncate_first_n",
+      "events": {
+        "systems": {
+          "kind": "truncate",
+          "applied": false,
+          "from": 0,
+          "to": 0
+        },
+        "brand": {
+          "kind": "truncate",
+          "applied": false,
+          "from": 0,
+          "to": 0
+        },
+        "critic": {
+          "kind": "coerce_risks",
+          "applied": false,
+          "coercedCount": 0,
+          "fromType": "object",
+          "toType": "string"
+        }
+      }
+    },
+    "usage": {
+      "systems": {
+        "inputTokens": 1231,
+        "outputTokens": 1410,
+        "latencyMs": 22704,
+        "costUsd": 0.054610000000000006
+      },
+      "brand": {
+        "inputTokens": 1584,
+        "outputTokens": 752,
+        "latencyMs": 14883,
+        "costUsd": 0.038400000000000004
+      },
+      "critic": {
+        "inputTokens": 4841,
+        "outputTokens": 1478,
+        "latencyMs": 28647,
+        "costUsd": 0.09275
+      },
+      "totals": {
+        "inputTokens": 10939,
+        "outputTokens": 4794,
+        "latencyMs": 70702,
+        "costUsd": 0.25321000000000005
+      },
+      "selector": {
+        "inputTokens": 3283,
+        "outputTokens": 1154,
+        "latencyMs": 4468,
+        "costUsd": 0.06745000000000001
+      }
+    },
+    "selection": {
+      "enabled": true,
+      "systems": {
+        "candidatesCount": 10,
+        "cappedCount": 10,
+        "selectedCount": 8,
+        "selectorModel": "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"
+      },
+      "brand": {
+        "candidatesCount": 9,
+        "cappedCount": 9,
+        "selectedCount": 8,
+        "selectorModel": "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"
+      }
+    }
+  }
+}

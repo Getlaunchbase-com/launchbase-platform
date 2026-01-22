@@ -1,0 +1,167 @@
+=== RAW RESPONSE (designer_brand_fast) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy1ySwn3St2BRxRaQBIExliw0H5q2
+Input Tokens: 878
+Output Tokens: 562
+Finish Reason: stop
+
+=== RAW TEXT (2267 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "48px",
+      "rationale": "Increase H1 size for better visual hierarchy",
+      "confidence": 0.9,
+      "risks": ["May need layout adjustments", "Could impact mobile view"]
+    },
+    {
+      "targetKey": "brand.type.h2",
+      "value": "36px",
+      "rationale": "Differentiate H2 from H1 for clearer hierarchy",
+      "confidence": 0.85,
+      "risks": ["Requires consistent styling", "Minor mobile adjustments"]
+    },
+    {
+      "targetKey": "brand.type.lineHeight",
+      "value": "1.6",
+      "rationale": "Improve readability and visual comfort",
+      "confidence": 0.92,
+      "risks": ["Content may need reflow", "Potential space increase"]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "64px",
+      "rationale": "Enhance section differentiation for clarity",
+      "confidence": 0.88,
+      "risks": ["May affect fold visibility", "Requires space reallocation"]
+    },
+    {
+      "targetKey": "brand.spacing.componentGap",
+      "value": "24px",
+      "rationale": "Ensure consistent component spacing",
+      "confidence": 0.87,
+      "risks": ["May impact dense content areas", "Layout adjustments needed"]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Rounded corners, 16px padding",
+      "rationale": "Modernize buttons for a premium look",
+      "confidence": 0.9,
+      "risks": ["Potential style clash with existing elements"]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#004080",
+      "rationale": "Create a trustworthy and professional color scheme",
+      "confidence": 0.89,
+      "risks": ["Compatibility with other elements", "Brand recognition shift"]
+    },
+    {
+      "targetKey": "brand.system.consistency",
+      "value": "Unified component styles",
+      "rationale": "Maintain a cohesive brand experience",
+      "confidence": 0.93,
+      "risks": ["Time-consuming to implement", "Potential for overlooked elements"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["Potential for design inconsistencies", "Increased development time"],
+  "assumptions": ["Current design lacks clarity and hierarchy", "Need for a premium feel"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "48px",
+      "rationale": "Increase H1 size for better visual hierarchy",
+      "confidence": 0.9,
+      "risks": [
+        "May need layout adjustments",
+        "Could impact mobile view"
+      ]
+    },
+    {
+      "targetKey": "brand.type.h2",
+      "value": "36px",
+      "rationale": "Differentiate H2 from H1 for clearer hierarchy",
+      "confidence": 0.85,
+      "risks": [
+        "Requires consistent styling",
+        "Minor mobile adjustments"
+      ]
+    },
+    {
+      "targetKey": "brand.type.lineHeight",
+      "value": "1.6",
+      "rationale": "Improve readability and visual comfort",
+      "confidence": 0.92,
+      "risks": [
+        "Content may need reflow",
+        "Potential space increase"
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "64px",
+      "rationale": "Enhance section differentiation for clarity",
+      "confidence": 0.88,
+      "risks": [
+        "May affect fold visibility",
+        "Requires space reallocation"
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.componentGap",
+      "value": "24px",
+      "rationale": "Ensure consistent component spacing",
+      "confidence": 0.87,
+      "risks": [
+        "May impact dense content areas",
+        "Layout adjustments needed"
+      ]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Rounded corners, 16px padding",
+      "rationale": "Modernize buttons for a premium look",
+      "confidence": 0.9,
+      "risks": [
+        "Potential style clash with existing elements"
+      ]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#004080",
+      "rationale": "Create a trustworthy and professional color scheme",
+      "confidence": 0.89,
+      "risks": [
+        "Compatibility with other elements",
+        "Brand recognition shift"
+      ]
+    },
+    {
+      "targetKey": "brand.system.consistency",
+      "value": "Unified component styles",
+      "rationale": "Maintain a cohesive brand experience",
+      "confidence": 0.93,
+      "risks": [
+        "Time-consuming to implement",
+        "Potential for overlooked elements"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Potential for design inconsistencies",
+    "Increased development time"
+  ],
+  "assumptions": [
+    "Current design lacks clarity and hierarchy",
+    "Need for a premium feel"
+  ]
+}

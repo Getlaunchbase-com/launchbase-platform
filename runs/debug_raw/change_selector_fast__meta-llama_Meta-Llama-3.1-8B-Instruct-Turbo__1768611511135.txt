@@ -1,0 +1,130 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTb9HHh-4YNCb4-9bf1e78e3a15121f
+Input Tokens: 1714
+Output Tokens: 579
+Finish Reason: stop
+
+=== RAW TEXT (2264 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Rebuild hero into a 2-column desktop grid (60/40): left = H1 + 3 scannable bullets + prima...",
+      "rationale": "Improves above-the-fold clarity and scannability",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Standardize hero CTA cluster: primary CTA as a full-height button (48px) with a short supp...",
+      "rationale": "Clarifies the conversion path",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an “audit log” pattern section with a lightweight activity feed component: 6–8 r...",
+      "rationale": "Strengthens trust through concrete auditability/observability UI",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "design.pricing",
+      "value": "Move pricing higher only after the trust/visibility section; restructure into: (1) plan ca...",
+      "rationale": "Makes pricing easier to parse",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Replace any wide pricing table with card-based pricing plus an optional condensed comparis...",
+      "rationale": "Improves mobile readability",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to: Hero → Proof bar → Problem/Solution (merged) → How it works → Visibil...",
+      "rationale": "Creates a clearer narrative",
+      "confidence": 0.82,
+      "risks": []
+    },
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "value": "Add a compact “visibility panel” component (dashboard card) showing 3 status indicators (e...",
+      "rationale": "Reframes trust as ongoing observability",
+      "confidence": 0.83,
+      "risks": []
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Replace any wide pricing table with card-based pricing plus an optional condensed comparis...",
+      "rationale": "Improves mobile readability and reduces cognitive load",
+      "confidence": 0.87,
+      "risks": []
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Rebuild hero into a 2-column desktop grid (60/40): left = H1 + 3 scannable bullets + prima...",
+      "rationale": "Improves above-the-fold clarity and scannability",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Standardize hero CTA cluster: primary CTA as a full-height button (48px) with a short supp...",
+      "rationale": "Clarifies the conversion path",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an “audit log” pattern section with a lightweight activity feed component: 6–8 r...",
+      "rationale": "Strengthens trust through concrete auditability/observability UI",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "design.pricing",
+      "value": "Move pricing higher only after the trust/visibility section; restructure into: (1) plan ca...",
+      "rationale": "Makes pricing easier to parse",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Replace any wide pricing table with card-based pricing plus an optional condensed comparis...",
+      "rationale": "Improves mobile readability",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to: Hero → Proof bar → Problem/Solution (merged) → How it works → Visibil...",
+      "rationale": "Creates a clearer narrative",
+      "confidence": 0.82,
+      "risks": []
+    },
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "value": "Add a compact “visibility panel” component (dashboard card) showing 3 status indicators (e...",
+      "rationale": "Reframes trust as ongoing observability",
+      "confidence": 0.83,
+      "risks": []
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Replace any wide pricing table with card-based pricing plus an optional condensed comparis...",
+      "rationale": "Improves mobile readability and reduces cognitive load",
+      "confidence": 0.87,
+      "risks": []
+    }
+  ]
+}

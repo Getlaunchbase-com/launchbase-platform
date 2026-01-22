@@ -1,0 +1,260 @@
+=== RAW RESPONSE (design_critic_ruthless) ===
+Model: gpt-5.2-2025-12-11
+Request ID: chatcmpl-CyQboceah1BOnWYVE9cVlcY4ypnzK
+Input Tokens: 5521
+Output Tokens: 1459
+Finish Reason: stop
+
+=== RAW TEXT (6269 chars) ===
+{
+  "pass": false,
+  "issues": [
+    {
+      "severity": "critical",
+      "description": "Hero may read like software UI, not consulting, hurting 8-sec comprehension.",
+      "location": "design.layout.hero",
+      "rationale": "If visitors think it's a tool, they won't click; confusion happens before any scroll."
+    },
+    {
+      "severity": "critical",
+      "description": "Inline email form under hero CTA can add friction and reduce clicks.",
+      "location": "design.conversion.heroCta",
+      "rationale": "Forms trigger hesitation; above-fold friction can drop lead intent before value is absorbed."
+    },
+    {
+      "severity": "major",
+      "description": "Sticky CTA at 40% scroll may appear too late for fast deciders.",
+      "location": "design.conversion.stickyCta",
+      "rationale": "Users who decide early may scroll a bit then lose the action; continuity breaks mid-flow."
+    },
+    {
+      "severity": "major",
+      "description": "Conditional: Sticky bar may overlap cookie/chat, blocking content and taps.",
+      "location": "design.mobile.stickyCtaBehavior",
+      "rationale": "Overlaps create rage taps and hidden CTAs; mobile conversion path becomes unreliable."
+    },
+    {
+      "severity": "major",
+      "description": "Section order adds many blocks; narrative may feel long before pricing/CTA.",
+      "location": "design.layout.sectionOrder",
+      "rationale": "Scroll fatigue increases abandonment; users may never reach pricing or FAQs to resolve doubts."
+    },
+    {
+      "severity": "major",
+      "description": "Problem/Solution bullets risk dense scanning; key outcomes may be buried.",
+      "location": "design.conversion.scannability",
+      "rationale": "Owners skim; dense bullets reduce retention and delay the moment they feel 'this is for me'."
+    },
+    {
+      "severity": "minor",
+      "description": "Pricing table may be hard to compare on mobile without clear emphasis/stacking.",
+      "location": "design.components.pricingTable",
+      "rationale": "If comparison requires effort, users postpone decision; pricing becomes a drop-off point."
+    },
+    {
+      "severity": "minor",
+      "description": "Audit log UI can imply real-time monitoring; trust hit if service isn't that.",
+      "location": "design.trust.auditLogPattern",
+      "rationale": "Over-promising via UI cues creates skepticism; trust breaks right before contacting."
+    },
+    {
+      "severity": "minor",
+      "description": "Visibility panel preview may be too subtle; proof of control could be missed.",
+      "location": "design.trust.visibilityPanel",
+      "rationale": "If users don’t notice it, the main differentiator fails; hero loses persuasive power."
+    },
+    {
+      "severity": "minor",
+      "description": "Type scale + 65ch constraints may cause awkward reflow in hero on small laptops.",
+      "location": "brand.tokens.typeScale",
+      "rationale": "Bad wraps and tall hero push CTAs down; readability and action suffer above the fold."
+    }
+  ],
+  "suggestedFixes": [
+    {
+      "targetKey": "design.layout.hero",
+      "fix": "Add explicit H1: 'Done-for-you consulting' + 1-line scope; label panel 'Project visibility example (sample)'.",
+      "rationale": "Prevents 'software product' misread and anchors the offer within 8 seconds."
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "fix": "Default to button-only; move email capture to step-2 modal or below fold; test form only on desktop ≥1200px.",
+      "rationale": "Reduces above-fold friction while preserving lead capture for motivated users."
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "fix": "Trigger sticky CTA at 15–20% scroll or after hero exits; keep 56px height with clear label 'Book a call'.",
+      "rationale": "Maintains action access earlier for fast deciders without waiting mid-page."
+    },
+    {
+      "targetKey": "design.mobile.stickyCtaBehavior",
+      "fix": "Add collision rules: offset above cookie/chat by 8–16px; auto-hide on input focus; respect safe-area inset.",
+      "rationale": "Prevents overlap and tap failures that silently kill mobile conversions."
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "fix": "Compress to fewer blocks: merge Trust/Observability into How-it-works; add midpage CTA after Proof bar + Step 2.",
+      "rationale": "Shortens path to action and reduces scroll fatigue while keeping narrative intact."
+    },
+    {
+      "targetKey": "design.conversion.scannability",
+      "fix": "Enforce bullet max 10–12 words; add 3 outcome chips (e.g., 'More time', 'Clear scope', 'Visible progress').",
+      "rationale": "Improves skim speed and ensures outcomes land quickly for busy owners."
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "fix": "On mobile, stack tiers as cards with 1 primary plan highlighted; show 3 key rows + 'See all' expand.",
+      "rationale": "Reduces comparison effort and clarifies the decision without horizontal scrolling."
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "fix": "Add 'Sample view' badge + disclaimer line; remove hover states; keep filters visibly non-interactive (disabled).",
+      "rationale": "Avoids implying real-time tooling and protects trust by matching actual service."
+    },
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "fix": "Increase panel prominence: min 320px width, 16px padding, 1px border; add header 'You always know what's next'.",
+      "rationale": "Makes the differentiator noticeable and ties UI preview to the promise."
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "fix": "Add breakpoint at 1024–1280px: H1 40px, hero lead max 38–42ch, tighten hero vertical padding by 16–24px.",
+      "rationale": "Prevents ugly wraps and keeps CTAs above fold on small laptops."
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [],
+  "assumptions": [
+    "No homepage copy provided; critiques assume typical consulting hero messaging and service-based conversion goals.",
+    "Sticky CTA may coexist with cookie banners or chat widgets on mobile.",
+    "Pricing uses a comparison table that could require horizontal scrolling on mobile."
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "pass": false,
+  "issues": [
+    {
+      "severity": "critical",
+      "description": "Hero may read like software UI, not consulting, hurting 8-sec comprehension.",
+      "location": "design.layout.hero",
+      "rationale": "If visitors think it's a tool, they won't click; confusion happens before any scroll."
+    },
+    {
+      "severity": "critical",
+      "description": "Inline email form under hero CTA can add friction and reduce clicks.",
+      "location": "design.conversion.heroCta",
+      "rationale": "Forms trigger hesitation; above-fold friction can drop lead intent before value is absorbed."
+    },
+    {
+      "severity": "major",
+      "description": "Sticky CTA at 40% scroll may appear too late for fast deciders.",
+      "location": "design.conversion.stickyCta",
+      "rationale": "Users who decide early may scroll a bit then lose the action; continuity breaks mid-flow."
+    },
+    {
+      "severity": "major",
+      "description": "Conditional: Sticky bar may overlap cookie/chat, blocking content and taps.",
+      "location": "design.mobile.stickyCtaBehavior",
+      "rationale": "Overlaps create rage taps and hidden CTAs; mobile conversion path becomes unreliable."
+    },
+    {
+      "severity": "major",
+      "description": "Section order adds many blocks; narrative may feel long before pricing/CTA.",
+      "location": "design.layout.sectionOrder",
+      "rationale": "Scroll fatigue increases abandonment; users may never reach pricing or FAQs to resolve doubts."
+    },
+    {
+      "severity": "major",
+      "description": "Problem/Solution bullets risk dense scanning; key outcomes may be buried.",
+      "location": "design.conversion.scannability",
+      "rationale": "Owners skim; dense bullets reduce retention and delay the moment they feel 'this is for me'."
+    },
+    {
+      "severity": "minor",
+      "description": "Pricing table may be hard to compare on mobile without clear emphasis/stacking.",
+      "location": "design.components.pricingTable",
+      "rationale": "If comparison requires effort, users postpone decision; pricing becomes a drop-off point."
+    },
+    {
+      "severity": "minor",
+      "description": "Audit log UI can imply real-time monitoring; trust hit if service isn't that.",
+      "location": "design.trust.auditLogPattern",
+      "rationale": "Over-promising via UI cues creates skepticism; trust breaks right before contacting."
+    },
+    {
+      "severity": "minor",
+      "description": "Visibility panel preview may be too subtle; proof of control could be missed.",
+      "location": "design.trust.visibilityPanel",
+      "rationale": "If users don’t notice it, the main differentiator fails; hero loses persuasive power."
+    },
+    {
+      "severity": "minor",
+      "description": "Type scale + 65ch constraints may cause awkward reflow in hero on small laptops.",
+      "location": "brand.tokens.typeScale",
+      "rationale": "Bad wraps and tall hero push CTAs down; readability and action suffer above the fold."
+    }
+  ],
+  "suggestedFixes": [
+    {
+      "targetKey": "design.layout.hero",
+      "fix": "Add explicit H1: 'Done-for-you consulting' + 1-line scope; label panel 'Project visibility example (sample)'.",
+      "rationale": "Prevents 'software product' misread and anchors the offer within 8 seconds."
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "fix": "Default to button-only; move email capture to step-2 modal or below fold; test form only on desktop ≥1200px.",
+      "rationale": "Reduces above-fold friction while preserving lead capture for motivated users."
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "fix": "Trigger sticky CTA at 15–20% scroll or after hero exits; keep 56px height with clear label 'Book a call'.",
+      "rationale": "Maintains action access earlier for fast deciders without waiting mid-page."
+    },
+    {
+      "targetKey": "design.mobile.stickyCtaBehavior",
+      "fix": "Add collision rules: offset above cookie/chat by 8–16px; auto-hide on input focus; respect safe-area inset.",
+      "rationale": "Prevents overlap and tap failures that silently kill mobile conversions."
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "fix": "Compress to fewer blocks: merge Trust/Observability into How-it-works; add midpage CTA after Proof bar + Step 2.",
+      "rationale": "Shortens path to action and reduces scroll fatigue while keeping narrative intact."
+    },
+    {
+      "targetKey": "design.conversion.scannability",
+      "fix": "Enforce bullet max 10–12 words; add 3 outcome chips (e.g., 'More time', 'Clear scope', 'Visible progress').",
+      "rationale": "Improves skim speed and ensures outcomes land quickly for busy owners."
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "fix": "On mobile, stack tiers as cards with 1 primary plan highlighted; show 3 key rows + 'See all' expand.",
+      "rationale": "Reduces comparison effort and clarifies the decision without horizontal scrolling."
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "fix": "Add 'Sample view' badge + disclaimer line; remove hover states; keep filters visibly non-interactive (disabled).",
+      "rationale": "Avoids implying real-time tooling and protects trust by matching actual service."
+    },
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "fix": "Increase panel prominence: min 320px width, 16px padding, 1px border; add header 'You always know what's next'.",
+      "rationale": "Makes the differentiator noticeable and ties UI preview to the promise."
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "fix": "Add breakpoint at 1024–1280px: H1 40px, hero lead max 38–42ch, tighten hero vertical padding by 16–24px.",
+      "rationale": "Prevents ugly wraps and keeps CTAs above fold on small laptops."
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [],
+  "assumptions": [
+    "No homepage copy provided; critiques assume typical consulting hero messaging and service-based conversion goals.",
+    "Sticky CTA may coexist with cookie banners or chat widgets on mobile.",
+    "Pricing uses a comparison table that could require horizontal scrolling on mobile."
+  ]
+}

@@ -1,0 +1,248 @@
+=== RAW RESPONSE (design_critic_ruthless_marketing) ===
+Model: claude-opus-4-1-20250805
+Request ID: msg_01FtWekLUihiTGLtqpQC1ykS
+Input Tokens: 2592
+Output Tokens: 1472
+Finish Reason: end_turn
+
+=== RAW TEXT (5488 chars) ===
+{
+  "pass": false,
+  "issues": [
+    {
+      "severity": "critical",
+      "description": "Value prop 'Operating system for small businesses' is too vague - doesn't explain what it actually does or why it's needed",
+      "location": "design.valueProp.headlineClarity",
+      "rationale": "Small business owners won't understand how this solves their specific pain points"
+    },
+    {
+      "severity": "critical",
+      "description": "No clear objection handling for 'I don't have time to learn a new system' - major barrier for busy owners",
+      "location": "design.objections.pricingConcerns",
+      "rationale": "Time investment fear is bigger than price for overwhelmed business owners"
+    },
+    {
+      "severity": "major",
+      "description": "Pricing tier comparison lacks concrete outcomes - just lists features instead of business results",
+      "location": "design.pricing.tierComparison",
+      "rationale": "Owners care about revenue/time saved, not feature counts"
+    },
+    {
+      "severity": "critical",
+      "description": "Trust signals use generic logos without context - no indication of business size/type relevance",
+      "location": "design.trust.proofPlacement",
+      "rationale": "Small businesses need to see peers, not enterprise logos"
+    },
+    {
+      "severity": "major",
+      "description": "Tagline 'Stop carrying the system in your head' doesn't connect to measurable business benefits",
+      "location": "brand.positioning.headline",
+      "rationale": "Mental relief isn't quantifiable - needs revenue/efficiency angle"
+    },
+    {
+      "severity": "major",
+      "description": "FAQ only addresses pricing objections, ignores control/delegation fears that 'hand it off' triggers",
+      "location": "design.objections.pricingConcerns",
+      "rationale": "Business owners fear losing control when delegating"
+    },
+    {
+      "severity": "minor",
+      "description": "Competitor comparison grid focuses on features not outcomes - missing emotional differentiation",
+      "location": "design.valueProp.differentiation",
+      "rationale": "Feature wars don't win hearts - need transformation stories"
+    },
+    {
+      "severity": "major",
+      "description": "No clear migration/onboarding messaging - huge hidden objection for switching systems",
+      "location": "design.valueProp.benefitHierarchy",
+      "rationale": "Switching costs kill conversions even with better products"
+    },
+    {
+      "severity": "critical",
+      "description": "Pricing transparency claim but no actual prices shown - creates trust deficit immediately",
+      "location": "design.pricing.valuePerTier",
+      "rationale": "Claiming transparency without showing prices is contradictory"
+    },
+    {
+      "severity": "major",
+      "description": "Urgency elements (red CTAs) clash with 'retain control' messaging - sends mixed signals",
+      "location": "brand.color.urgency",
+      "rationale": "Pressure tactics contradict empowerment positioning"
+    }
+  ],
+  "suggestedFixes": [
+    {
+      "targetKey": "design.valueProp.headlineClarity",
+      "fix": "Change to 'Turn your business chaos into automated systems that run without you - in 14 days'",
+      "rationale": "Specific outcome + timeline = clarity on transformation"
+    },
+    {
+      "targetKey": "design.objections.pricingConcerns",
+      "fix": "Add '5-minute daily commitment' badge and '2-week implementation guarantee' to hero",
+      "rationale": "Addresses time fear upfront with specific commitment"
+    },
+    {
+      "targetKey": "design.pricing.tierComparison",
+      "fix": "Replace feature lists with outcome metrics: 'Save 10hrs/week', 'Handle 50% more clients', 'Scale to $1M'",
+      "rationale": "Business outcomes resonate more than feature counts"
+    },
+    {
+      "targetKey": "design.trust.proofPlacement",
+      "fix": "Show '327 businesses under $500K revenue' with industry breakdown chart instead of logos",
+      "rationale": "Peer validation through numbers beats ambiguous logos"
+    },
+    {
+      "targetKey": "brand.positioning.headline",
+      "fix": "Update tagline to 'From 60-hour weeks to 40 - systematically'",
+      "rationale": "Quantifiable time benefit with method promise"
+    },
+    {
+      "targetKey": "design.objections.pricingConcerns",
+      "fix": "Add control retention section: 'You approve every automation before it runs'",
+      "rationale": "Directly addresses delegation fear with control promise"
+    },
+    {
+      "targetKey": "design.valueProp.differentiation",
+      "fix": "Replace feature grid with before/after day-in-the-life timeline comparison",
+      "rationale": "Emotional transformation story beats feature lists"
+    },
+    {
+      "targetKey": "design.valueProp.benefitHierarchy",
+      "fix": "Lead with 'Import from Excel/QuickBooks in 1 click - keep your data, upgrade your systems'",
+      "rationale": "Migration ease removes switching friction upfront"
+    },
+    {
+      "targetKey": "design.pricing.valuePerTier",
+      "fix": "Show actual prices: Basic $97/mo, Standard $297/mo, Premium $597/mo with ROI calculator",
+      "rationale": "Real transparency builds trust and qualifies leads"
+    },
+    {
+      "targetKey": "brand.color.urgency",
+      "fix": "Replace red urgency with progress green: 'Join 327 owners taking back their time'",
+      "rationale": "Social momentum without pressure aligns with empowerment"
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true
+}
+
+=== PARSED JSON ===
+{
+  "pass": false,
+  "issues": [
+    {
+      "severity": "critical",
+      "description": "Value prop 'Operating system for small businesses' is too vague - doesn't explain what it actually does or why it's needed",
+      "location": "design.valueProp.headlineClarity",
+      "rationale": "Small business owners won't understand how this solves their specific pain points"
+    },
+    {
+      "severity": "critical",
+      "description": "No clear objection handling for 'I don't have time to learn a new system' - major barrier for busy owners",
+      "location": "design.objections.pricingConcerns",
+      "rationale": "Time investment fear is bigger than price for overwhelmed business owners"
+    },
+    {
+      "severity": "major",
+      "description": "Pricing tier comparison lacks concrete outcomes - just lists features instead of business results",
+      "location": "design.pricing.tierComparison",
+      "rationale": "Owners care about revenue/time saved, not feature counts"
+    },
+    {
+      "severity": "critical",
+      "description": "Trust signals use generic logos without context - no indication of business size/type relevance",
+      "location": "design.trust.proofPlacement",
+      "rationale": "Small businesses need to see peers, not enterprise logos"
+    },
+    {
+      "severity": "major",
+      "description": "Tagline 'Stop carrying the system in your head' doesn't connect to measurable business benefits",
+      "location": "brand.positioning.headline",
+      "rationale": "Mental relief isn't quantifiable - needs revenue/efficiency angle"
+    },
+    {
+      "severity": "major",
+      "description": "FAQ only addresses pricing objections, ignores control/delegation fears that 'hand it off' triggers",
+      "location": "design.objections.pricingConcerns",
+      "rationale": "Business owners fear losing control when delegating"
+    },
+    {
+      "severity": "minor",
+      "description": "Competitor comparison grid focuses on features not outcomes - missing emotional differentiation",
+      "location": "design.valueProp.differentiation",
+      "rationale": "Feature wars don't win hearts - need transformation stories"
+    },
+    {
+      "severity": "major",
+      "description": "No clear migration/onboarding messaging - huge hidden objection for switching systems",
+      "location": "design.valueProp.benefitHierarchy",
+      "rationale": "Switching costs kill conversions even with better products"
+    },
+    {
+      "severity": "critical",
+      "description": "Pricing transparency claim but no actual prices shown - creates trust deficit immediately",
+      "location": "design.pricing.valuePerTier",
+      "rationale": "Claiming transparency without showing prices is contradictory"
+    },
+    {
+      "severity": "major",
+      "description": "Urgency elements (red CTAs) clash with 'retain control' messaging - sends mixed signals",
+      "location": "brand.color.urgency",
+      "rationale": "Pressure tactics contradict empowerment positioning"
+    }
+  ],
+  "suggestedFixes": [
+    {
+      "targetKey": "design.valueProp.headlineClarity",
+      "fix": "Change to 'Turn your business chaos into automated systems that run without you - in 14 days'",
+      "rationale": "Specific outcome + timeline = clarity on transformation"
+    },
+    {
+      "targetKey": "design.objections.pricingConcerns",
+      "fix": "Add '5-minute daily commitment' badge and '2-week implementation guarantee' to hero",
+      "rationale": "Addresses time fear upfront with specific commitment"
+    },
+    {
+      "targetKey": "design.pricing.tierComparison",
+      "fix": "Replace feature lists with outcome metrics: 'Save 10hrs/week', 'Handle 50% more clients', 'Scale to $1M'",
+      "rationale": "Business outcomes resonate more than feature counts"
+    },
+    {
+      "targetKey": "design.trust.proofPlacement",
+      "fix": "Show '327 businesses under $500K revenue' with industry breakdown chart instead of logos",
+      "rationale": "Peer validation through numbers beats ambiguous logos"
+    },
+    {
+      "targetKey": "brand.positioning.headline",
+      "fix": "Update tagline to 'From 60-hour weeks to 40 - systematically'",
+      "rationale": "Quantifiable time benefit with method promise"
+    },
+    {
+      "targetKey": "design.objections.pricingConcerns",
+      "fix": "Add control retention section: 'You approve every automation before it runs'",
+      "rationale": "Directly addresses delegation fear with control promise"
+    },
+    {
+      "targetKey": "design.valueProp.differentiation",
+      "fix": "Replace feature grid with before/after day-in-the-life timeline comparison",
+      "rationale": "Emotional transformation story beats feature lists"
+    },
+    {
+      "targetKey": "design.valueProp.benefitHierarchy",
+      "fix": "Lead with 'Import from Excel/QuickBooks in 1 click - keep your data, upgrade your systems'",
+      "rationale": "Migration ease removes switching friction upfront"
+    },
+    {
+      "targetKey": "design.pricing.valuePerTier",
+      "fix": "Show actual prices: Basic $97/mo, Standard $297/mo, Premium $597/mo with ROI calculator",
+      "rationale": "Real transparency builds trust and qualifies leads"
+    },
+    {
+      "targetKey": "brand.color.urgency",
+      "fix": "Replace red urgency with progress green: 'Join 327 owners taking back their time'",
+      "rationale": "Social momentum without pressure aligns with empowerment"
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true
+}

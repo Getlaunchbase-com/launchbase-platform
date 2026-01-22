@@ -1,0 +1,273 @@
+{
+  "gate": "A",
+  "runs": 10,
+  "passCount": 10,
+  "failCount": 0,
+  "successRate": 100,
+  "totalCostUsd": 0,
+  "avgCostUsd": 0,
+  "totalDurationMs": 322702,
+  "avgDurationMs": 76109.2,
+  "results": [
+    {
+      "runId": "designer_macro_127922_3d0a60",
+      "runIndex": 1,
+      "ok": true,
+      "systems": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true
+      },
+      "brand": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true
+      },
+      "critic": {
+        "ok": true,
+        "stopReason": "ok",
+        "issues": 10,
+        "fixes": 10,
+        "pass": false
+      },
+      "costUsd": 0,
+      "durationMs": 86232
+    },
+    {
+      "runId": "designer_macro_127923_bd2e03",
+      "runIndex": 2,
+      "ok": true,
+      "systems": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true
+      },
+      "brand": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true
+      },
+      "critic": {
+        "ok": true,
+        "stopReason": "ok",
+        "issues": 10,
+        "fixes": 10,
+        "pass": false
+      },
+      "costUsd": 0,
+      "durationMs": 77779
+    },
+    {
+      "runId": "designer_macro_127924_f93a1e",
+      "runIndex": 3,
+      "ok": true,
+      "systems": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true
+      },
+      "brand": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true
+      },
+      "critic": {
+        "ok": true,
+        "stopReason": "ok",
+        "issues": 10,
+        "fixes": 10,
+        "pass": false
+      },
+      "costUsd": 0,
+      "durationMs": 83792
+    },
+    {
+      "runId": "designer_macro_214154_e21e11",
+      "runIndex": 4,
+      "ok": true,
+      "systems": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true
+      },
+      "brand": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true
+      },
+      "critic": {
+        "ok": true,
+        "stopReason": "ok",
+        "issues": 10,
+        "fixes": 10,
+        "pass": false
+      },
+      "costUsd": 0,
+      "durationMs": 69509
+    },
+    {
+      "runId": "designer_macro_214154_6e7053",
+      "runIndex": 5,
+      "ok": true,
+      "systems": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true
+      },
+      "brand": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true
+      },
+      "critic": {
+        "ok": true,
+        "stopReason": "ok",
+        "issues": 10,
+        "fixes": 10,
+        "pass": false
+      },
+      "costUsd": 0,
+      "durationMs": 79466
+    },
+    {
+      "runId": "designer_macro_214155_065d0f",
+      "runIndex": 6,
+      "ok": true,
+      "systems": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true
+      },
+      "brand": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true
+      },
+      "critic": {
+        "ok": true,
+        "stopReason": "ok",
+        "issues": 10,
+        "fixes": 10,
+        "pass": false
+      },
+      "costUsd": 0,
+      "durationMs": 64896
+    },
+    {
+      "runId": "designer_macro_293621_690e10",
+      "runIndex": 7,
+      "ok": true,
+      "systems": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true
+      },
+      "brand": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true
+      },
+      "critic": {
+        "ok": true,
+        "stopReason": "ok",
+        "issues": 10,
+        "fixes": 10,
+        "pass": false
+      },
+      "costUsd": 0,
+      "durationMs": 68660
+    },
+    {
+      "runId": "designer_macro_293622_964403",
+      "runIndex": 8,
+      "ok": true,
+      "systems": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true
+      },
+      "brand": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true
+      },
+      "critic": {
+        "ok": true,
+        "stopReason": "ok",
+        "issues": 10,
+        "fixes": 10,
+        "pass": false
+      },
+      "costUsd": 0,
+      "durationMs": 73760
+    },
+    {
+      "runId": "designer_macro_293622_e37d27",
+      "runIndex": 9,
+      "ok": true,
+      "systems": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true
+      },
+      "brand": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true
+      },
+      "critic": {
+        "ok": true,
+        "stopReason": "ok",
+        "issues": 10,
+        "fixes": 10,
+        "pass": false
+      },
+      "costUsd": 0,
+      "durationMs": 75030
+    },
+    {
+      "runId": "designer_macro_368653_9f6876",
+      "runIndex": 10,
+      "ok": true,
+      "systems": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true
+      },
+      "brand": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true
+      },
+      "critic": {
+        "ok": true,
+        "stopReason": "ok",
+        "issues": 10,
+        "fixes": 10,
+        "pass": false
+      },
+      "costUsd": 0,
+      "durationMs": 81968
+    }
+  ]
+}

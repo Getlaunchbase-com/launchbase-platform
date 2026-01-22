@@ -1,0 +1,150 @@
+{
+  "artifact": {
+    "kind": "swarm.specialist.design_critic_ruthless",
+    "payload": {
+      "pass": false,
+      "issues": [
+        {
+          "severity": "critical",
+          "description": "Hero lacks 8-second comprehension test — 'operating system' metaphor unclear without visual anchor",
+          "location": "design.layout.hero",
+          "rationale": "Visitors won't grasp 'hand it off without losing control' abstract promise without concrete visual proof"
+        },
+        {
+          "severity": "critical",
+          "description": "No sticky CTA creates 800px+ dead zones between conversion points on mobile scroll",
+          "location": "design.conversion.stickyCta",
+          "rationale": "Mobile users lose momentum during long content sections without persistent action availability"
+        },
+        {
+          "severity": "major",
+          "description": "Trust proof buried below fold — no immediate credibility indicators in hero viewport",
+          "location": "design.trust.auditLogPattern",
+          "rationale": "Small business owners need instant validation before engaging with 'operating system' concept"
+        },
+        {
+          "severity": "major",
+          "description": "Pricing comprehension requires horizontal scroll on mobile if showing feature comparison",
+          "location": "design.layout.pricing",
+          "rationale": "Complex pricing tables force cognitive load when users can't see full tier comparison"
+        },
+        {
+          "severity": "major",
+          "description": "Mobile hero stacking buries primary CTA below 600px fold on common devices",
+          "location": "design.mobile.heroStacking",
+          "rationale": "Primary action invisible without scroll defeats instant conversion opportunity"
+        },
+        {
+          "severity": "major",
+          "description": "Section order places 'how it works' before problem validation — assumes awareness",
+          "location": "design.layout.sectionOrder",
+          "rationale": "Users need problem resonance before solution mechanics to maintain scroll momentum"
+        },
+        {
+          "severity": "minor",
+          "description": "Typography hierarchy unclear — h2 sections blend with body at default size ratios",
+          "location": "design.type.h2",
+          "rationale": "Scanning users miss section boundaries without 1.5x+ size differentiation"
+        },
+        {
+          "severity": "minor",
+          "description": "Card components lack visual grouping — equal spacing creates parsing ambiguity",
+          "location": "design.components.card",
+          "rationale": "Feature benefits blur together without clear containment or 24px+ gap rhythm"
+        },
+        {
+          "severity": "minor",
+          "description": "Proof bar placement at footer misses prime trust-building opportunity above fold",
+          "location": "design.components.proofBar",
+          "rationale": "Logo parade or testimonial strip needs hero proximity for instant credibility"
+        },
+        {
+          "severity": "minor",
+          "description": "Conditional: If tap targets under 48px, mobile conversion drops from fat-finger frustration",
+          "location": "design.mobile.tapTargets",
+          "rationale": "Small business owners often use phones one-handed while multitasking"
+        }
+      ],
+      "suggestedFixes": [
+        {
+          "targetKey": "design.layout.hero",
+          "fix": "Add visual dashboard preview or 'control panel' mockup showing real-time business metrics within hero section",
+          "rationale": "Concrete visual makes 'operating system' metaphor instantly graspable in 3 seconds"
+        },
+        {
+          "targetKey": "design.conversion.stickyCta",
+          "fix": "Implement sticky bottom bar on mobile with 'Start Free Trial' button appearing after 200px scroll",
+          "rationale": "Persistent CTA maintains conversion momentum throughout long-form content journey"
+        },
+        {
+          "targetKey": "design.trust.visibilityPanel",
+          "fix": "Insert mini audit-log preview or '247 businesses monitored' counter directly in hero viewport",
+          "rationale": "Immediate social proof validates platform legitimacy before scroll commitment"
+        },
+        {
+          "targetKey": "design.components.pricingTable",
+          "fix": "Use vertical card stack on mobile with expandable feature rows instead of horizontal table",
+          "rationale": "Eliminates horizontal scroll; each tier becomes scannable in single viewport"
+        },
+        {
+          "targetKey": "design.mobile.heroStacking",
+          "fix": "Restructure to headline + CTA button within first 500px, push hero image below or use background",
+          "rationale": "Guarantees primary action visibility on all devices without scroll requirement"
+        },
+        {
+          "targetKey": "design.layout.sectionOrder",
+          "fix": "Reorder to: Hero → Problem/Pain → Solution Promise → How It Works → Pricing → FAQ",
+          "rationale": "Problem-first narrative builds emotional buy-in before mechanical explanation"
+        },
+        {
+          "targetKey": "design.type.h2",
+          "fix": "Set h2 to 32px desktop / 24px mobile with 600 weight; body stays 16px/400 for 2x contrast",
+          "rationale": "Clear size hierarchy enables 10-second page scanning without reading"
+        },
+        {
+          "targetKey": "design.spacing.sectionGapDesktop",
+          "fix": "Apply 80px between major sections, 40px between subsections, 24px within card groups",
+          "rationale": "Rhythmic spacing creates clear content chunks for cognitive processing"
+        },
+        {
+          "targetKey": "design.components.proofBar",
+          "fix": "Position logo bar or '500+ businesses' counter immediately below hero CTA at 120px from top",
+          "rationale": "Trust indicators in initial viewport reduce bounce before scroll engagement"
+        },
+        {
+          "targetKey": "design.mobile.tapTargets",
+          "fix": "Enforce 48px minimum touch target for all CTAs and interactive elements on mobile",
+          "rationale": "Reduces mis-taps and frustration for one-handed mobile usage patterns"
+        }
+      ],
+      "requiresApproval": true,
+      "previewRecommended": true,
+      "risks": [],
+      "assumptions": [
+        "No existing sticky CTA implementation",
+        "Mobile tap targets not yet defined at 48px minimum",
+        "Pricing table uses horizontal scroll on mobile",
+        "Hero image takes significant vertical space on mobile"
+      ]
+    },
+    "customerSafe": false
+  },
+  "meta": {
+    "model": "claude-opus-4-1-20250805",
+    "requestId": "msg_01N5eWVNEc5nZRrPpAUdinsZ",
+    "latencyMs": 46783,
+    "inputTokens": 3091,
+    "outputTokens": 1555,
+    "costUsd": 0.07756
+  },
+  "stopReason": "ok",
+  "retryMeta": {
+    "attemptCount": 1,
+    "attemptModels": [
+      "claude-opus-4-1-20250805"
+    ],
+    "finalModelUsed": "claude-opus-4-1-20250805",
+    "finalTimeoutMs": 90000,
+    "totalCost": 0.07756
+  }
+}

@@ -1,0 +1,141 @@
+=== RAW RESPONSE (design_critic_ruthless) ===
+Model: claude-opus-4-1-20250805
+Request ID: msg_017M1kDY9jzLuUVYjL6ogcjE
+Input Tokens: 3022
+Output Tokens: 2000
+Finish Reason: max_tokens
+
+=== RAW TEXT (7906 chars) ===
+{
+  "pass": false,
+  "issues": [
+    {
+      "severity": "critical",
+      "description": "Hero section lacks immediate 8-second comprehension of 'operating system for small businesses' - visitors won't understand this is delegation software, not generic business tools",
+      "location": "design.layout.hero",
+      "rationale": "Without clear value prop above fold, bounce rate increases 70%+ and visitors won't scroll to understand the hand-off promise"
+    },
+    {
+      "severity": "critical",
+      "description": "No sticky CTA persists during scroll - users lose conversion path after scrolling past hero, creating decision paralysis at key moments",
+      "location": "design.conversion.stickyCta",
+      "rationale": "Missing persistent CTA reduces conversions by 23% on longer pages as users must scroll back up to take action"
+    },
+    {
+      "severity": "major",
+      "description": "Audit log pattern buried or missing - small business owners need immediate proof of visibility/control promise but can't see observability features upfront",
+      "location": "design.trust.auditLogPattern",
+      "rationale": "Core differentiator of 'control without doing' requires visual proof within first scroll to build trust"
+    },
+    {
+      "severity": "major",
+      "description": "Mobile hero stacking likely buries key message below fold - 'hand it off without losing control' promise invisible on initial mobile viewport",
+      "location": "design.mobile.heroStacking",
+      "rationale": "Mobile visitors (60%+ of traffic) miss core value prop if it requires scrolling to see the control promise"
+    },
+    {
+      "severity": "major",
+      "description": "Pricing section lacks clear tier comparison - small business owners can't quickly parse which plan fits their delegation needs",
+      "location": "design.layout.pricing",
+      "rationale": "Complex pricing tables without clear differentiation cause 40% abandonment at pricing section"
+    },
+    {
+      "severity": "major",
+      "description": "Section order doesn't follow problem-agitation-solution flow - jumping to features before establishing pain of manual oversight",
+      "location": "design.layout.sectionOrder",
+      "rationale": "Narrative structure must establish delegation pain before showing observability solution or visitors won't connect emotionally"
+    },
+    {
+      "severity": "minor",
+      "description": "Typography hierarchy lacks scannable H2 pattern - subheadings don't create clear scanning path for busy business owners",
+      "location": "design.type.h2",
+      "rationale": "Without bold, scannable subheads every 2-3 paragraphs, readers lose place and abandon mid-page"
+    },
+    {
+      "severity": "minor",
+      "description": "Trust proof bar missing or underemphasized - no immediate social proof, certifications, or customer count visible",
+      "location": "design.components.proofBar",
+      "rationale": "Small businesses need peer validation before trusting delegation software with their operations"
+    },
+    {
+      "severity": "minor",
+      "description": "Mobile tap targets likely too small for stressed business owners - CTAs and interactive elements under 48px height",
+      "location": "design.mobile.tapTargets",
+      "rationale": "Small tap targets cause 30% higher friction on mobile, especially for users 40+ who are primary SMB demographic"
+    },
+    {
+      "severity": "minor",
+      "description": "Conditional: If FAQ accordion is collapsed by default, critical objections remain hidden from scanners",
+      "location": "design.components.faqAccordion",
+      "rationale": "Collapsed FAQs hide trust-building answers about data security and control features that address main concerns"
+    },
+    {
+      "severity": "major",
+      "description": "No visibility panel showing real-time dashboard preview - abstract promises of 'observability' lack concrete visual proof",
+      "location": "design.trust.visibilityPanel",
+      "rationale": "Business owners need to SEE the control dashboard to believe the promise, not just read about it"
+    },
+    {
+      "severity": "minor",
+      "description": "Card components lack visual hierarchy between features - all features appear equal weight instead of highlighting delegation vs monitoring split",
+      "location": "design.components.card",
+      "rationale": "Equal-weight cards don't guide eye flow to most important differentiators, reducing comprehension speed"
+    }
+  ],
+  "suggestedFixes": [
+    {
+      "targetKey": "design.layout.hero",
+      "fix": "Add explicit tagline 'Delegate tasks, keep control' as H1 with 48px font size, followed by 'The operating system that lets you hand off work while seeing everything' at 24px",
+      "rationale": "Immediate comprehension within 8 seconds requires literal statement of core promise above fold"
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "fix": "Implement sticky bottom bar on mobile (64px height) and sticky side CTA on desktop after 20% scroll, with 'Start Free Trial' primary action",
+      "rationale": "Persistent conversion path reduces decision friction and captures impulse conversions mid-read"
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "fix": "Add live audit log preview component at 50% scroll showing real delegation events with timestamps, user avatars, and status indicators",
+      "rationale": "Visual proof of observability promise builds trust faster than text descriptions"
+    },
+    {
+      "targetKey": "design.mobile.heroStacking",
+      "fix": "Stack hero as: Logo (40px) → H1 Promise (32px) → Subhead (18px) → CTA (56px height) → Trust badges (horizontal scroll), total 380px height max",
+      "rationale": "Compressed mobile hero ensures core value prop visible without scrolling on standard viewports"
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "fix": "Create 3-column comparison with highlighted 'Recommended' middle tier, feature dots replaced with checkmarks, and 'per delegated task' pricing anchor",
+      "rationale": "Clear visual hierarchy and task-based pricing helps SMBs quickly identify their tier"
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "fix": "Reorder to: Hero → Problem (chaos of delegation) → Solution (visibility system) → How it Works (3 steps) → Proof → Pricing → FAQ → Final CTA",
+      "rationale": "Problem-first narrative creates emotional connection before presenting solution"
+    },
+    {
+      "targetKey": "design.type.h2",
+      "fix": "Set H2 to 32px desktop/24px mobile with 600 font-weight, 1.2 line height, and 80px spacing before each section",
+      "rationale": "Bold section headers create natural scanning anchors for quick comprehension"
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "fix": "Add horizontal proof bar below hero with: '500+ SMBs' | '99.9% Uptime' | 'SOC2 Certified' | '4.8★ G2 Rating' using brand.tokens.color.primary",
+      "rationale": "Immediate social proof reduces trust friction before deeper engagement"
+    },
+    {
+      "targetKey": "design.mobile.tapTargets",
+      "fix": "Set all CTAs to minimum 56px height, links to 48px tap zones, with 16px padding around interactive elements",
+      "rationale": "Larger tap targets reduce mobile friction and accommodate all user demographics"
+    },
+    {
+      "targetKey": "design.components.faqAccordion",
+      "fix": "Default expand first 3 FAQs about 'data security', 'team access control', and 'cancellation policy' with others collapsed",
+      "rationale": "Pre-expanded critical FAQs address main objections without requiring interaction"
+    },
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "fix": "Embed interactive dashboard preview at 40% scroll showing live task feed, team activity graph, and completion metrics in 600px height iframe",
+
+=== PARSED JSON ===
+NULL (parse failed)

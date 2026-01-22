@@ -1,0 +1,130 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTb1WL3-4YNCb4-9bf1c284cbb1fef9
+Input Tokens: 1728
+Output Tokens: 667
+Finish Reason: stop
+
+=== RAW TEXT (2715 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an “audit log” UI pattern inside the Trust/Observability section: a 6–8 row table...",
+      "rationale": "Shifts trust from hype to auditability by showing how responsibility + visibility works in...",
+      "confidence": 0.91,
+      "risks": []
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Add a proof bar directly under the hero (desktop and mobile) as a single-row component wit...",
+      "rationale": "Provides immediate trust reinforcement and improves scannability without requiring users t...",
+      "confidence": 0.82,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a mobile sticky CTA bar that appears after 40% scroll; include primary CTA + a compact...",
+      "rationale": "Increases conversions on mobile while preventing CTA overload near pricing where users nee...",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use one primary CTA and one secondary CTA in the hero; place primary CTA above the fold an...",
+      "rationale": "Creates a clearer conversion path and reinforces observability/auditability at the decisio...",
+      "confidence": 0.86,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.riskReversal",
+      "value": "Place a risk-reversal block immediately under pricing (within the pricing section): 3 icon...",
+      "rationale": "Addresses last-mile objections at the moment of price evaluation and provides a clear next...",
+      "confidence": 0.8,
+      "risks": []
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Convert pricing into 3 tier cards (desktop: 3-column grid; mobile: stacked) with one highl...",
+      "rationale": "Makes pricing easier to parse and reduces cognitive load by separating quick decision info...",
+      "confidence": 0.89,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to: Hero → Proof bar → Problem/Solution → How it Works → Trust/Observabil...",
+      "rationale": "Aligns narrative flow (why → how → what → cost) and places trust/observability before feat...",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.scannability",
+      "value": "Standardize section headers to a consistent pattern: eyebrow + H2 + 1 supporting line, fol...",
+      "rationale": "Improves hierarchy and reduces cognitive load by making each section predictable and easy ...",
+      "confidence": 0.87,
+      "risks": []
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an “audit log” UI pattern inside the Trust/Observability section: a 6–8 row table...",
+      "rationale": "Shifts trust from hype to auditability by showing how responsibility + visibility works in...",
+      "confidence": 0.91,
+      "risks": []
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Add a proof bar directly under the hero (desktop and mobile) as a single-row component wit...",
+      "rationale": "Provides immediate trust reinforcement and improves scannability without requiring users t...",
+      "confidence": 0.82,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a mobile sticky CTA bar that appears after 40% scroll; include primary CTA + a compact...",
+      "rationale": "Increases conversions on mobile while preventing CTA overload near pricing where users nee...",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use one primary CTA and one secondary CTA in the hero; place primary CTA above the fold an...",
+      "rationale": "Creates a clearer conversion path and reinforces observability/auditability at the decisio...",
+      "confidence": 0.86,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.riskReversal",
+      "value": "Place a risk-reversal block immediately under pricing (within the pricing section): 3 icon...",
+      "rationale": "Addresses last-mile objections at the moment of price evaluation and provides a clear next...",
+      "confidence": 0.8,
+      "risks": []
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Convert pricing into 3 tier cards (desktop: 3-column grid; mobile: stacked) with one highl...",
+      "rationale": "Makes pricing easier to parse and reduces cognitive load by separating quick decision info...",
+      "confidence": 0.89,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to: Hero → Proof bar → Problem/Solution → How it Works → Trust/Observabil...",
+      "rationale": "Aligns narrative flow (why → how → what → cost) and places trust/observability before feat...",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.scannability",
+      "value": "Standardize section headers to a consistent pattern: eyebrow + H2 + 1 supporting line, fol...",
+      "rationale": "Improves hierarchy and reduces cognitive load by making each section predictable and easy ...",
+      "confidence": 0.87,
+      "risks": []
+    }
+  ]
+}

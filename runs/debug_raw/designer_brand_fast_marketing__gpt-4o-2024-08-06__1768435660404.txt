@@ -1,0 +1,160 @@
+=== RAW RESPONSE (designer_brand_fast_marketing) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy5BeyLK64S5c8DjlvqYvoItTtvg3
+Input Tokens: 738
+Output Tokens: 550
+Finish Reason: stop
+
+=== RAW TEXT (2186 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.marketingHeadline",
+      "value": "32px, bold, sans-serif",
+      "rationale": "Enhances headline impact and readability.",
+      "confidence": 0.85,
+      "risks": ["Might overwhelm other text"]
+    },
+    {
+      "targetKey": "brand.type.benefitText",
+      "value": "16px, regular, serif",
+      "rationale": "Improves readability and focuses on clarity.",
+      "confidence": 0.80,
+      "risks": ["May not stand out enough"]
+    },
+    {
+      "targetKey": "brand.color.conversionPrimary",
+      "value": "#4CAF50",
+      "rationale": "Green signals trust and encourages action.",
+      "confidence": 0.90,
+      "risks": ["May clash with existing colors"]
+    },
+    {
+      "targetKey": "brand.color.trustSignals",
+      "value": "#3B5998",
+      "rationale": "Blue is associated with trust and reliability.",
+      "confidence": 0.88,
+      "risks": ["Too common, may lack uniqueness"]
+    },
+    {
+      "targetKey": "brand.components.pricingTable",
+      "value": "Use alternating row colors",
+      "rationale": "Improves feature comparison clarity.",
+      "confidence": 0.87,
+      "risks": ["Color clash with brand palette"]
+    },
+    {
+      "targetKey": "brand.components.trustBadge",
+      "value": "Circular design with subtle shadow",
+      "rationale": "Increases perception of authority and trust.",
+      "confidence": 0.83,
+      "risks": ["May not align with brand aesthetics"]
+    },
+    {
+      "targetKey": "brand.components.ctaButton",
+      "value": "Rounded corners with shadow",
+      "rationale": "Creates a sense of urgency and approachability.",
+      "confidence": 0.89,
+      "risks": ["Shadow may reduce text clarity"]
+    },
+    {
+      "targetKey": "brand.visual.tierHierarchy",
+      "value": "Highlight current plan with larger font",
+      "rationale": "Clarifies user's position within tiers.",
+      "confidence": 0.86,
+      "risks": ["Might overshadow other tiers"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["Color mismatch", "Text clarity issues"],
+  "assumptions": ["Current design lacks contrast", "Audience appreciates simplicity"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.marketingHeadline",
+      "value": "32px, bold, sans-serif",
+      "rationale": "Enhances headline impact and readability.",
+      "confidence": 0.85,
+      "risks": [
+        "Might overwhelm other text"
+      ]
+    },
+    {
+      "targetKey": "brand.type.benefitText",
+      "value": "16px, regular, serif",
+      "rationale": "Improves readability and focuses on clarity.",
+      "confidence": 0.8,
+      "risks": [
+        "May not stand out enough"
+      ]
+    },
+    {
+      "targetKey": "brand.color.conversionPrimary",
+      "value": "#4CAF50",
+      "rationale": "Green signals trust and encourages action.",
+      "confidence": 0.9,
+      "risks": [
+        "May clash with existing colors"
+      ]
+    },
+    {
+      "targetKey": "brand.color.trustSignals",
+      "value": "#3B5998",
+      "rationale": "Blue is associated with trust and reliability.",
+      "confidence": 0.88,
+      "risks": [
+        "Too common, may lack uniqueness"
+      ]
+    },
+    {
+      "targetKey": "brand.components.pricingTable",
+      "value": "Use alternating row colors",
+      "rationale": "Improves feature comparison clarity.",
+      "confidence": 0.87,
+      "risks": [
+        "Color clash with brand palette"
+      ]
+    },
+    {
+      "targetKey": "brand.components.trustBadge",
+      "value": "Circular design with subtle shadow",
+      "rationale": "Increases perception of authority and trust.",
+      "confidence": 0.83,
+      "risks": [
+        "May not align with brand aesthetics"
+      ]
+    },
+    {
+      "targetKey": "brand.components.ctaButton",
+      "value": "Rounded corners with shadow",
+      "rationale": "Creates a sense of urgency and approachability.",
+      "confidence": 0.89,
+      "risks": [
+        "Shadow may reduce text clarity"
+      ]
+    },
+    {
+      "targetKey": "brand.visual.tierHierarchy",
+      "value": "Highlight current plan with larger font",
+      "rationale": "Clarifies user's position within tiers.",
+      "confidence": 0.86,
+      "risks": [
+        "Might overshadow other tiers"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Color mismatch",
+    "Text clarity issues"
+  ],
+  "assumptions": [
+    "Current design lacks contrast",
+    "Audience appreciates simplicity"
+  ]
+}

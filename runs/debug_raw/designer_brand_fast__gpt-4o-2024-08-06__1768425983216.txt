@@ -1,0 +1,160 @@
+=== RAW RESPONSE (designer_brand_fast) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy2fVe8gs9HLEscmxjl3wijNGu7Lp
+Input Tokens: 878
+Output Tokens: 553
+Finish Reason: stop
+
+=== RAW TEXT (2224 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "48px, bold",
+      "rationale": "Increase font size for better hierarchy and emphasis.",
+      "confidence": 0.9,
+      "risks": ["Might require layout adjustments"]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "16px, regular",
+      "rationale": "Ensure readability and consistent text legibility.",
+      "confidence": 0.85,
+      "risks": ["Might affect overall page length"]
+    },
+    {
+      "targetKey": "brand.type.cta",
+      "value": "18px, bold",
+      "rationale": "Enhance call-to-action visibility and user engagement.",
+      "confidence": 0.9,
+      "risks": ["CTA might overshadow body text"]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "40px",
+      "rationale": "Provide clear separation between sections for better flow.",
+      "confidence": 0.8,
+      "risks": ["Could increase scrolling"]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Rounded corners, 12px padding",
+      "rationale": "Modernize button design and improve clickability.",
+      "confidence": 0.9,
+      "risks": ["May not align with existing style"]
+    },
+    {
+      "targetKey": "brand.components.trustBadge",
+      "value": "Add subtle shadow",
+      "rationale": "Increase prominence and credibility of trust badges.",
+      "confidence": 0.85,
+      "risks": ["Could distract from main content"]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#0055FF",
+      "rationale": "Enhance color contrast for clarity and brand recognition.",
+      "confidence": 0.9,
+      "risks": ["Might clash with existing brand colors"]
+    },
+    {
+      "targetKey": "brand.system.consistency",
+      "value": "Align all headings",
+      "rationale": "Ensure uniformity and predictability across the site.",
+      "confidence": 0.9,
+      "risks": ["Potential misalignment with current elements"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["Changes may alter brand perception", "Potential increased development time"],
+  "assumptions": ["Current typography and color need refinement", "Website aims for a premium feel"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "48px, bold",
+      "rationale": "Increase font size for better hierarchy and emphasis.",
+      "confidence": 0.9,
+      "risks": [
+        "Might require layout adjustments"
+      ]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "16px, regular",
+      "rationale": "Ensure readability and consistent text legibility.",
+      "confidence": 0.85,
+      "risks": [
+        "Might affect overall page length"
+      ]
+    },
+    {
+      "targetKey": "brand.type.cta",
+      "value": "18px, bold",
+      "rationale": "Enhance call-to-action visibility and user engagement.",
+      "confidence": 0.9,
+      "risks": [
+        "CTA might overshadow body text"
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "40px",
+      "rationale": "Provide clear separation between sections for better flow.",
+      "confidence": 0.8,
+      "risks": [
+        "Could increase scrolling"
+      ]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Rounded corners, 12px padding",
+      "rationale": "Modernize button design and improve clickability.",
+      "confidence": 0.9,
+      "risks": [
+        "May not align with existing style"
+      ]
+    },
+    {
+      "targetKey": "brand.components.trustBadge",
+      "value": "Add subtle shadow",
+      "rationale": "Increase prominence and credibility of trust badges.",
+      "confidence": 0.85,
+      "risks": [
+        "Could distract from main content"
+      ]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#0055FF",
+      "rationale": "Enhance color contrast for clarity and brand recognition.",
+      "confidence": 0.9,
+      "risks": [
+        "Might clash with existing brand colors"
+      ]
+    },
+    {
+      "targetKey": "brand.system.consistency",
+      "value": "Align all headings",
+      "rationale": "Ensure uniformity and predictability across the site.",
+      "confidence": 0.9,
+      "risks": [
+        "Potential misalignment with current elements"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Changes may alter brand perception",
+    "Potential increased development time"
+  ],
+  "assumptions": [
+    "Current typography and color need refinement",
+    "Website aims for a premium feel"
+  ]
+}

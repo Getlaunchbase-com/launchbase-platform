@@ -1,0 +1,160 @@
+=== RAW RESPONSE (designer_brand_fast) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy1xDbLVOrRGprYE92nR9pr7PHeon
+Input Tokens: 878
+Output Tokens: 536
+Finish Reason: stop
+
+=== RAW TEXT (2118 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "48px, bold",
+      "rationale": "Enhances hierarchy and focus on main message.",
+      "confidence": 0.9,
+      "risks": ["May require layout adjustments"]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "16px, regular",
+      "rationale": "Ensures readability and a clean layout.",
+      "confidence": 0.85,
+      "risks": ["Possible slight increase in scroll"]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "80px",
+      "rationale": "Creates clear separation between sections.",
+      "confidence": 0.9,
+      "risks": ["Potential increased page length"]
+    },
+    {
+      "targetKey": "brand.spacing.componentGap",
+      "value": "24px",
+      "rationale": "Balances component spacing for a cohesive look.",
+      "confidence": 0.88,
+      "risks": ["Minor layout rework needed"]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Solid primary color with rounded edges",
+      "rationale": "Enhances call-to-action visibility and clickability.",
+      "confidence": 0.9,
+      "risks": ["Might need testing for contrast"]
+    },
+    {
+      "targetKey": "brand.components.card",
+      "value": "Shadow effect, 16px padding",
+      "rationale": "Improves card prominence and focus.",
+      "confidence": 0.87,
+      "risks": ["Potential impact on load time"]
+    },
+    {
+      "targetKey": "brand.color.accent",
+      "value": "#FF6F61",
+      "rationale": "Provides a modern, energetic accent color.",
+      "confidence": 0.9,
+      "risks": ["Requires consistency check"]
+    },
+    {
+      "targetKey": "brand.system.consistency",
+      "value": "Ensure uniformity across all elements",
+      "rationale": "Maintains brand integrity and user trust.",
+      "confidence": 0.95,
+      "risks": ["May require comprehensive audit"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["Increased page length", "Layout adjustments needed"],
+  "assumptions": ["Target audience values clarity", "Consistent brand experience needed"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "48px, bold",
+      "rationale": "Enhances hierarchy and focus on main message.",
+      "confidence": 0.9,
+      "risks": [
+        "May require layout adjustments"
+      ]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "16px, regular",
+      "rationale": "Ensures readability and a clean layout.",
+      "confidence": 0.85,
+      "risks": [
+        "Possible slight increase in scroll"
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "80px",
+      "rationale": "Creates clear separation between sections.",
+      "confidence": 0.9,
+      "risks": [
+        "Potential increased page length"
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.componentGap",
+      "value": "24px",
+      "rationale": "Balances component spacing for a cohesive look.",
+      "confidence": 0.88,
+      "risks": [
+        "Minor layout rework needed"
+      ]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Solid primary color with rounded edges",
+      "rationale": "Enhances call-to-action visibility and clickability.",
+      "confidence": 0.9,
+      "risks": [
+        "Might need testing for contrast"
+      ]
+    },
+    {
+      "targetKey": "brand.components.card",
+      "value": "Shadow effect, 16px padding",
+      "rationale": "Improves card prominence and focus.",
+      "confidence": 0.87,
+      "risks": [
+        "Potential impact on load time"
+      ]
+    },
+    {
+      "targetKey": "brand.color.accent",
+      "value": "#FF6F61",
+      "rationale": "Provides a modern, energetic accent color.",
+      "confidence": 0.9,
+      "risks": [
+        "Requires consistency check"
+      ]
+    },
+    {
+      "targetKey": "brand.system.consistency",
+      "value": "Ensure uniformity across all elements",
+      "rationale": "Maintains brand integrity and user trust.",
+      "confidence": 0.95,
+      "risks": [
+        "May require comprehensive audit"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Increased page length",
+    "Layout adjustments needed"
+  ],
+  "assumptions": [
+    "Target audience values clarity",
+    "Consistent brand experience needed"
+  ]
+}

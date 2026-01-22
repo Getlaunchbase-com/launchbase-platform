@@ -1,0 +1,26 @@
+{
+  "runId": "designer_macro_293622_964403",
+  "enableLadder": false,
+  "ok": true,
+  "systems": {
+    "ok": true,
+    "stopReason": "ok",
+    "tokens": {},
+    "changes": 8
+  },
+  "brand": {
+    "ok": true,
+    "stopReason": "ok",
+    "tokens": {},
+    "changes": 8
+  },
+  "critic": {
+    "ok": true,
+    "stopReason": "ok",
+    "tokens": {},
+    "issues": 10,
+    "fixes": 10,
+    "requiresApproval": true
+  },
+  "totalCostUsd": 0
+}

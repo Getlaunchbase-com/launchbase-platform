@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTbAick-4YNCb4-9bf1ee663d7d3d49
+Input Tokens: 1523
+Output Tokens: 576
+Finish Reason: stop
+
+=== RAW TEXT (2477 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use a type scale with a maximum line length of 65ch for body text to enhance readability a...",
+      "rationale": "Improves text legibility and reduces cognitive load, creating a more confident user experi...",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Apply a 8px corner radius for buttons to evoke a premium feel while maintaining safety.",
+      "rationale": "Softens the button appearance, making it feel more approachable and safe-by-default.",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Use a button hierarchy of primary (filled, 16px padding), secondary (outlined, 16px paddin...",
+      "rationale": "Establishes a clear visual hierarchy, enhancing user confidence in navigation.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Utilize a neutral color palette with high contrast for text (e.g., dark gray on white back...",
+      "rationale": "Improves readability and user experience, while adhering to accessibility standards.",
+      "confidence": 0.92
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Design cards with a 16px padding, 8px radius, and subtle shadow to create a premium, invit...",
+      "rationale": "Increases visual separation and focuses attention on card content, promoting operational c...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Integrate proof chips in a horizontal row below the hero section: 'Safe by default • Fully...",
+      "rationale": "Reinforces trust and safety signals early in the user journey, fostering confidence.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Use subtle dividers between sections with a light gray color (10% opacity) to maintain a c...",
+      "rationale": "Creates separation without harsh lines, contributing to a serene overall aesthetic.",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Implement a compact, visually distinct audit log preview pattern that shows recent actions...",
+      "rationale": "Enhances transparency and accountability, supporting a sense of safety and operational int...",
+      "confidence": 0.82
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use a type scale with a maximum line length of 65ch for body text to enhance readability a...",
+      "rationale": "Improves text legibility and reduces cognitive load, creating a more confident user experi...",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Apply a 8px corner radius for buttons to evoke a premium feel while maintaining safety.",
+      "rationale": "Softens the button appearance, making it feel more approachable and safe-by-default.",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Use a button hierarchy of primary (filled, 16px padding), secondary (outlined, 16px paddin...",
+      "rationale": "Establishes a clear visual hierarchy, enhancing user confidence in navigation.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Utilize a neutral color palette with high contrast for text (e.g., dark gray on white back...",
+      "rationale": "Improves readability and user experience, while adhering to accessibility standards.",
+      "confidence": 0.92
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Design cards with a 16px padding, 8px radius, and subtle shadow to create a premium, invit...",
+      "rationale": "Increases visual separation and focuses attention on card content, promoting operational c...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Integrate proof chips in a horizontal row below the hero section: 'Safe by default • Fully...",
+      "rationale": "Reinforces trust and safety signals early in the user journey, fostering confidence.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Use subtle dividers between sections with a light gray color (10% opacity) to maintain a c...",
+      "rationale": "Creates separation without harsh lines, contributing to a serene overall aesthetic.",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Implement a compact, visually distinct audit log preview pattern that shows recent actions...",
+      "rationale": "Enhances transparency and accountability, supporting a sense of safety and operational int...",
+      "confidence": 0.82
+    }
+  ]
+}

@@ -1,0 +1,252 @@
+=== RAW RESPONSE (design_critic_ruthless) ===
+Model: gpt-5.2-2025-12-11
+Request ID: chatcmpl-CyQNYVVb5maU4TJu6ba2iM1zrpOra
+Input Tokens: 5490
+Output Tokens: 1461
+Finish Reason: stop
+
+=== RAW TEXT (6289 chars) ===
+{
+  "pass": false,
+  "issues": [
+    {
+      "severity": "critical",
+      "description": "Hero 2-col + UI mock may fail 8-sec test if it looks like SaaS, not consulting.",
+      "location": "design.layout.hero",
+      "rationale": "Misclassification kills trust fast; visitors may bounce before seeing services fit or CTA."
+    },
+    {
+      "severity": "critical",
+      "description": "Hero inline email form adds friction without trust cues; may depress lead completion.",
+      "location": "design.conversion.heroCta",
+      "rationale": "Asking email pre-trust triggers hesitation; hurts primary goal (lead gen) at first touch."
+    },
+    {
+      "severity": "major",
+      "description": "Sticky CTA at 40% scroll may appear before intent; can feel pushy on mobile.",
+      "location": "design.conversion.stickyCta",
+      "rationale": "Premature interruption reduces perceived professionalism; can cause abandonment mid-scroll."
+    },
+    {
+      "severity": "major",
+      "description": "Sticky bar height/safe-area may cover content or conflict with mobile browser UI.",
+      "location": "design.mobile.stickyCtaBehavior",
+      "rationale": "Obscured content blocks reading and taps; users miss key proof/pricing details."
+    },
+    {
+      "severity": "major",
+      "description": "Section reorder adds many blocks; scannability may drop if each has bullets/cards.",
+      "location": "design.conversion.scannability",
+      "rationale": "Too many micro-messages increases scroll fatigue; narrative clarity suffers before pricing."
+    },
+    {
+      "severity": "major",
+      "description": "Pricing 3-tier highlight can feel arbitrary for services; may trigger skepticism.",
+      "location": "design.components.pricingTable",
+      "rationale": "Services pricing needs rationale/fit; forced tiering creates doubt and stalls decision."
+    },
+    {
+      "severity": "minor",
+      "description": "Proof bar with placeholders/logos risks looking fake and undermining credibility.",
+      "location": "design.components.proofBar",
+      "rationale": "Low-quality proof near hero backfires; reduces trust right when asking for action."
+    },
+    {
+      "severity": "minor",
+      "description": "Audit log motif may overpromise operational tooling that consulting may not provide.",
+      "location": "design.trust.auditLogPattern",
+      "rationale": "Expectation mismatch creates distrust; prospects worry about bait-and-switch delivery."
+    },
+    {
+      "severity": "minor",
+      "description": "Repeated visibility panel in 2 sections may feel repetitive and “productized” vs bespoke.",
+      "location": "design.trust.visibilityPanel",
+      "rationale": "Repetition can read as template marketing; weakens premium consulting positioning."
+    },
+    {
+      "severity": "minor",
+      "description": "65ch max width + new type scale may cause rag/awkward breaks in short sections.",
+      "location": "brand.tokens.typeScale",
+      "rationale": "Poor rhythm hurts readability and perceived polish; users skim less and miss value."
+    }
+  ],
+  "suggestedFixes": [
+    {
+      "targetKey": "design.layout.hero",
+      "fix": "Make hero right panel a “deliverables preview” (timeline/checklist) not app UI; label it; keep 60/40 but add 16px eyebrow clarifier.",
+      "rationale": "Reduces SaaS confusion and clarifies consulting outcome within 8 seconds."
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "fix": "Gate inline email form behind secondary link (“Get a plan by email”); default hero to 1 primary CTA + 1 secondary; add 1-line privacy note.",
+      "rationale": "Lowers early friction while keeping fast lead capture for high-intent visitors."
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "fix": "Delay sticky CTA to 60% scroll or after Proof bar; add dismiss (X) and don’t reappear for 7 days via localStorage.",
+      "rationale": "Preserves continuity without feeling aggressive; reduces repeat-visitor annoyance."
+    },
+    {
+      "targetKey": "design.mobile.stickyCtaBehavior",
+      "fix": "Set sticky bar to 56px + safe-area inset; ensure it never overlaps inputs; hide on scroll-down, show on scroll-up; test iOS Safari.",
+      "rationale": "Prevents content occlusion and improves thumb ergonomics on mobile."
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "fix": "Trim to 6 core sections before pricing: Hero→Proof→Services overview→How it works→Objections/Risk reversal→Pricing; move auditability below pricing.",
+      "rationale": "Reduces scroll fatigue and gets to decision content faster for busy owners."
+    },
+    {
+      "targetKey": "design.conversion.scannability",
+      "fix": "Enforce 1 headline + max 3 bullets per section; convert remaining details into accordions; add midpage CTA after “How it works”.",
+      "rationale": "Improves skim path and adds a second conversion moment without extra length."
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "fix": "Add “Who it’s for” line per tier + starting-at language; highlight tier only if backed by a “Most common” reason; avoid forced comparison on mobile.",
+      "rationale": "Makes services tiers feel legitimate and reduces skepticism around highlighted plan."
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "fix": "Do not ship placeholders; use 3 verifiable items (client types, years, projects) with footnote links; on mobile use snap scroll with 12px gaps.",
+      "rationale": "Real proof increases trust; fake-looking proof destroys it."
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "fix": "Rename to “Accountability log” and frame as process artifact; add disclaimer microcopy (“sample deliverable”); keep feed to 6 rows @ 44px.",
+      "rationale": "Keeps observability benefit without implying a software product."
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "fix": "Set section intros to 58–62ch and allow 72ch only for long-form; add responsive clamp() for H1 32–48px; test rag at 375px.",
+      "rationale": "Maintains readability/polish across breakpoints and avoids awkward line breaks."
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [],
+  "assumptions": []
+}
+
+=== PARSED JSON ===
+{
+  "pass": false,
+  "issues": [
+    {
+      "severity": "critical",
+      "description": "Hero 2-col + UI mock may fail 8-sec test if it looks like SaaS, not consulting.",
+      "location": "design.layout.hero",
+      "rationale": "Misclassification kills trust fast; visitors may bounce before seeing services fit or CTA."
+    },
+    {
+      "severity": "critical",
+      "description": "Hero inline email form adds friction without trust cues; may depress lead completion.",
+      "location": "design.conversion.heroCta",
+      "rationale": "Asking email pre-trust triggers hesitation; hurts primary goal (lead gen) at first touch."
+    },
+    {
+      "severity": "major",
+      "description": "Sticky CTA at 40% scroll may appear before intent; can feel pushy on mobile.",
+      "location": "design.conversion.stickyCta",
+      "rationale": "Premature interruption reduces perceived professionalism; can cause abandonment mid-scroll."
+    },
+    {
+      "severity": "major",
+      "description": "Sticky bar height/safe-area may cover content or conflict with mobile browser UI.",
+      "location": "design.mobile.stickyCtaBehavior",
+      "rationale": "Obscured content blocks reading and taps; users miss key proof/pricing details."
+    },
+    {
+      "severity": "major",
+      "description": "Section reorder adds many blocks; scannability may drop if each has bullets/cards.",
+      "location": "design.conversion.scannability",
+      "rationale": "Too many micro-messages increases scroll fatigue; narrative clarity suffers before pricing."
+    },
+    {
+      "severity": "major",
+      "description": "Pricing 3-tier highlight can feel arbitrary for services; may trigger skepticism.",
+      "location": "design.components.pricingTable",
+      "rationale": "Services pricing needs rationale/fit; forced tiering creates doubt and stalls decision."
+    },
+    {
+      "severity": "minor",
+      "description": "Proof bar with placeholders/logos risks looking fake and undermining credibility.",
+      "location": "design.components.proofBar",
+      "rationale": "Low-quality proof near hero backfires; reduces trust right when asking for action."
+    },
+    {
+      "severity": "minor",
+      "description": "Audit log motif may overpromise operational tooling that consulting may not provide.",
+      "location": "design.trust.auditLogPattern",
+      "rationale": "Expectation mismatch creates distrust; prospects worry about bait-and-switch delivery."
+    },
+    {
+      "severity": "minor",
+      "description": "Repeated visibility panel in 2 sections may feel repetitive and “productized” vs bespoke.",
+      "location": "design.trust.visibilityPanel",
+      "rationale": "Repetition can read as template marketing; weakens premium consulting positioning."
+    },
+    {
+      "severity": "minor",
+      "description": "65ch max width + new type scale may cause rag/awkward breaks in short sections.",
+      "location": "brand.tokens.typeScale",
+      "rationale": "Poor rhythm hurts readability and perceived polish; users skim less and miss value."
+    }
+  ],
+  "suggestedFixes": [
+    {
+      "targetKey": "design.layout.hero",
+      "fix": "Make hero right panel a “deliverables preview” (timeline/checklist) not app UI; label it; keep 60/40 but add 16px eyebrow clarifier.",
+      "rationale": "Reduces SaaS confusion and clarifies consulting outcome within 8 seconds."
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "fix": "Gate inline email form behind secondary link (“Get a plan by email”); default hero to 1 primary CTA + 1 secondary; add 1-line privacy note.",
+      "rationale": "Lowers early friction while keeping fast lead capture for high-intent visitors."
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "fix": "Delay sticky CTA to 60% scroll or after Proof bar; add dismiss (X) and don’t reappear for 7 days via localStorage.",
+      "rationale": "Preserves continuity without feeling aggressive; reduces repeat-visitor annoyance."
+    },
+    {
+      "targetKey": "design.mobile.stickyCtaBehavior",
+      "fix": "Set sticky bar to 56px + safe-area inset; ensure it never overlaps inputs; hide on scroll-down, show on scroll-up; test iOS Safari.",
+      "rationale": "Prevents content occlusion and improves thumb ergonomics on mobile."
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "fix": "Trim to 6 core sections before pricing: Hero→Proof→Services overview→How it works→Objections/Risk reversal→Pricing; move auditability below pricing.",
+      "rationale": "Reduces scroll fatigue and gets to decision content faster for busy owners."
+    },
+    {
+      "targetKey": "design.conversion.scannability",
+      "fix": "Enforce 1 headline + max 3 bullets per section; convert remaining details into accordions; add midpage CTA after “How it works”.",
+      "rationale": "Improves skim path and adds a second conversion moment without extra length."
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "fix": "Add “Who it’s for” line per tier + starting-at language; highlight tier only if backed by a “Most common” reason; avoid forced comparison on mobile.",
+      "rationale": "Makes services tiers feel legitimate and reduces skepticism around highlighted plan."
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "fix": "Do not ship placeholders; use 3 verifiable items (client types, years, projects) with footnote links; on mobile use snap scroll with 12px gaps.",
+      "rationale": "Real proof increases trust; fake-looking proof destroys it."
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "fix": "Rename to “Accountability log” and frame as process artifact; add disclaimer microcopy (“sample deliverable”); keep feed to 6 rows @ 44px.",
+      "rationale": "Keeps observability benefit without implying a software product."
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "fix": "Set section intros to 58–62ch and allow 72ch only for long-form; add responsive clamp() for H1 32–48px; test rag at 375px.",
+      "rationale": "Maintains readability/polish across breakpoints and avoids awkward line breaks."
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [],
+  "assumptions": []
+}

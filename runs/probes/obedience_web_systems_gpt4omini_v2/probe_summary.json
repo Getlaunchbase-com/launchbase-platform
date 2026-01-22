@@ -1,0 +1,29 @@
+{
+  "generatedAt": "2026-01-15T21:16:16.581Z",
+  "scope": {
+    "lane": "web",
+    "role": "designer_systems_fast",
+    "repsPerModel": 10,
+    "mode": "tournament"
+  },
+  "results": [
+    {
+      "model": "gpt-4o-mini",
+      "n": 10,
+      "exact8Rate": 0.3,
+      "schemaValidRate": 0.3,
+      "validRate": 0.3,
+      "avgAttempts": null,
+      "stopReasonCounts": {
+        "unknown": 7,
+        "ok": 3
+      },
+      "tokens": {
+        "inputAvg": 3924.1,
+        "outputAvg": 1485.2
+      },
+      "latencyMsAvg": 33812,
+      "costUsdAvg": 0.08379700000000001
+    }
+  ]
+}

@@ -1,0 +1,546 @@
+{
+  "gate": "B",
+  "runs": 10,
+  "passCount": 10,
+  "failCount": 0,
+  "successRate": 100,
+  "totalCostUsd": 0,
+  "avgCostUsd": 0,
+  "totalDurationMs": 343995,
+  "avgDurationMs": 80361.9,
+  "totalRetries": 0,
+  "fallbackCount": 0,
+  "fallbackRate": 0,
+  "results": [
+    {
+      "runId": "designer_macro_764665_ca64f1",
+      "runIndex": 1,
+      "ok": true,
+      "systems": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "gpt-4o-2024-08-06"
+          ],
+          "finalModelUsed": "gpt-4o-2024-08-06",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.02896
+        }
+      },
+      "brand": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "gpt-4o-2024-08-06"
+          ],
+          "finalModelUsed": "gpt-4o-2024-08-06",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.025190000000000004
+        }
+      },
+      "critic": {
+        "ok": true,
+        "stopReason": "ok",
+        "issues": 10,
+        "fixes": 10,
+        "pass": false,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "claude-opus-4-1-20250805"
+          ],
+          "finalModelUsed": "claude-opus-4-1-20250805",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.07777
+        }
+      },
+      "costUsd": 0,
+      "durationMs": 89935
+    },
+    {
+      "runId": "designer_macro_764667_758cc2",
+      "runIndex": 2,
+      "ok": true,
+      "systems": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "gpt-4o-2024-08-06"
+          ],
+          "finalModelUsed": "gpt-4o-2024-08-06",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.029830000000000002
+        }
+      },
+      "brand": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "gpt-4o-2024-08-06"
+          ],
+          "finalModelUsed": "gpt-4o-2024-08-06",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.026120000000000004
+        }
+      },
+      "critic": {
+        "ok": true,
+        "stopReason": "ok",
+        "issues": 10,
+        "fixes": 10,
+        "pass": false,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "claude-opus-4-1-20250805"
+          ],
+          "finalModelUsed": "claude-opus-4-1-20250805",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.08173000000000001
+        }
+      },
+      "costUsd": 0,
+      "durationMs": 90963
+    },
+    {
+      "runId": "designer_macro_764668_3c30f1",
+      "runIndex": 3,
+      "ok": true,
+      "systems": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "gpt-4o-2024-08-06"
+          ],
+          "finalModelUsed": "gpt-4o-2024-08-06",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.02728
+        }
+      },
+      "brand": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "gpt-4o-2024-08-06"
+          ],
+          "finalModelUsed": "gpt-4o-2024-08-06",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.02567
+        }
+      },
+      "critic": {
+        "ok": true,
+        "stopReason": "ok",
+        "issues": 10,
+        "fixes": 10,
+        "pass": false,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "claude-opus-4-1-20250805"
+          ],
+          "finalModelUsed": "claude-opus-4-1-20250805",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.07840000000000001
+        }
+      },
+      "costUsd": 0,
+      "durationMs": 121413
+    },
+    {
+      "runId": "designer_macro_886082_ec7b7c",
+      "runIndex": 4,
+      "ok": true,
+      "systems": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "gpt-4o-2024-08-06"
+          ],
+          "finalModelUsed": "gpt-4o-2024-08-06",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.02719
+        }
+      },
+      "brand": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "gpt-4o-2024-08-06"
+          ],
+          "finalModelUsed": "gpt-4o-2024-08-06",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.026750000000000003
+        }
+      },
+      "critic": {
+        "ok": true,
+        "stopReason": "ok",
+        "issues": 10,
+        "fixes": 10,
+        "pass": false,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "claude-opus-4-1-20250805"
+          ],
+          "finalModelUsed": "claude-opus-4-1-20250805",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.07924
+        }
+      },
+      "costUsd": 0,
+      "durationMs": 71663
+    },
+    {
+      "runId": "designer_macro_886082_cc3527",
+      "runIndex": 5,
+      "ok": true,
+      "systems": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "gpt-4o-2024-08-06"
+          ],
+          "finalModelUsed": "gpt-4o-2024-08-06",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.027910000000000004
+        }
+      },
+      "brand": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "gpt-4o-2024-08-06"
+          ],
+          "finalModelUsed": "gpt-4o-2024-08-06",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.026090000000000002
+        }
+      },
+      "critic": {
+        "ok": true,
+        "stopReason": "ok",
+        "issues": 10,
+        "fixes": 10,
+        "pass": false,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "claude-opus-4-1-20250805"
+          ],
+          "finalModelUsed": "claude-opus-4-1-20250805",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.0805
+        }
+      },
+      "costUsd": 0,
+      "durationMs": 73690
+    },
+    {
+      "runId": "designer_macro_886083_e04085",
+      "runIndex": 6,
+      "ok": true,
+      "systems": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "gpt-4o-2024-08-06"
+          ],
+          "finalModelUsed": "gpt-4o-2024-08-06",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.027640000000000005
+        }
+      },
+      "brand": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "gpt-4o-2024-08-06"
+          ],
+          "finalModelUsed": "gpt-4o-2024-08-06",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.02654
+        }
+      },
+      "critic": {
+        "ok": true,
+        "stopReason": "ok",
+        "issues": 10,
+        "fixes": 10,
+        "pass": false,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "claude-opus-4-1-20250805"
+          ],
+          "finalModelUsed": "claude-opus-4-1-20250805",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.07783000000000001
+        }
+      },
+      "costUsd": 0,
+      "durationMs": 68263
+    },
+    {
+      "runId": "designer_macro_959773_6b6c1d",
+      "runIndex": 7,
+      "ok": true,
+      "systems": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "gpt-4o-2024-08-06"
+          ],
+          "finalModelUsed": "gpt-4o-2024-08-06",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.02932
+        }
+      },
+      "brand": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "gpt-4o-2024-08-06"
+          ],
+          "finalModelUsed": "gpt-4o-2024-08-06",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.025370000000000004
+        }
+      },
+      "critic": {
+        "ok": true,
+        "stopReason": "ok",
+        "issues": 10,
+        "fixes": 10,
+        "pass": false,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "claude-opus-4-1-20250805"
+          ],
+          "finalModelUsed": "claude-opus-4-1-20250805",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.08005000000000001
+        }
+      },
+      "costUsd": 0,
+      "durationMs": 74607
+    },
+    {
+      "runId": "designer_macro_959774_681189",
+      "runIndex": 8,
+      "ok": true,
+      "systems": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "gpt-4o-2024-08-06"
+          ],
+          "finalModelUsed": "gpt-4o-2024-08-06",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.030130000000000004
+        }
+      },
+      "brand": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "gpt-4o-2024-08-06"
+          ],
+          "finalModelUsed": "gpt-4o-2024-08-06",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.02459
+        }
+      },
+      "critic": {
+        "ok": true,
+        "stopReason": "ok",
+        "issues": 10,
+        "fixes": 10,
+        "pass": false,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "claude-opus-4-1-20250805"
+          ],
+          "finalModelUsed": "claude-opus-4-1-20250805",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.07711
+        }
+      },
+      "costUsd": 0,
+      "durationMs": 66614
+    },
+    {
+      "runId": "designer_macro_959775_1025d1",
+      "runIndex": 9,
+      "ok": true,
+      "systems": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "gpt-4o-2024-08-06"
+          ],
+          "finalModelUsed": "gpt-4o-2024-08-06",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.02914
+        }
+      },
+      "brand": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "gpt-4o-2024-08-06"
+          ],
+          "finalModelUsed": "gpt-4o-2024-08-06",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.02567
+        }
+      },
+      "critic": {
+        "ok": true,
+        "stopReason": "ok",
+        "issues": 10,
+        "fixes": 10,
+        "pass": false,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "claude-opus-4-1-20250805"
+          ],
+          "finalModelUsed": "claude-opus-4-1-20250805",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.07543000000000001
+        }
+      },
+      "costUsd": 0,
+      "durationMs": 72195
+    },
+    {
+      "runId": "designer_macro_034381_f69546",
+      "runIndex": 10,
+      "ok": true,
+      "systems": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "gpt-4o-2024-08-06"
+          ],
+          "finalModelUsed": "gpt-4o-2024-08-06",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.027790000000000002
+        }
+      },
+      "brand": {
+        "ok": true,
+        "stopReason": "ok",
+        "changes": 8,
+        "validKeys": true,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "gpt-4o-2024-08-06"
+          ],
+          "finalModelUsed": "gpt-4o-2024-08-06",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.02651
+        }
+      },
+      "critic": {
+        "ok": true,
+        "stopReason": "ok",
+        "issues": 10,
+        "fixes": 10,
+        "pass": false,
+        "retryMeta": {
+          "attemptCount": 1,
+          "attemptModels": [
+            "claude-opus-4-1-20250805"
+          ],
+          "finalModelUsed": "claude-opus-4-1-20250805",
+          "finalTimeoutMs": 90000,
+          "totalCost": 0.07897
+        }
+      },
+      "costUsd": 0,
+      "durationMs": 74276
+    }
+  ]
+}

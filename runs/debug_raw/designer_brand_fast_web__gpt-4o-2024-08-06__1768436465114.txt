@@ -1,0 +1,160 @@
+=== RAW RESPONSE (designer_brand_fast_web) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy5OaKJxIqVci4xbex4FL47Q3qfdH
+Input Tokens: 944
+Output Tokens: 517
+Finish Reason: stop
+
+=== RAW TEXT (1986 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "48px, weight 600",
+      "rationale": "Enhances readability and focus",
+      "confidence": 0.90,
+      "risks": ["May appear too large"]
+    },
+    {
+      "targetKey": "brand.type.h2",
+      "value": "36px, weight 500",
+      "rationale": "Creates a clear hierarchy under H1",
+      "confidence": 0.88,
+      "risks": ["Potential text overflow"]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#0047AB",
+      "rationale": "Conveys trust and professionalism",
+      "confidence": 0.92,
+      "risks": ["Color blindness issues"]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "40px",
+      "rationale": "Provides consistent breathing room",
+      "confidence": 0.85,
+      "risks": ["May increase page length"]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Rounded corners, 12px padding",
+      "rationale": "Improves clickability and aesthetics",
+      "confidence": 0.87,
+      "risks": ["Might not align with brand"]
+    },
+    {
+      "targetKey": "brand.components.badge",
+      "value": "Solid border, light shadow",
+      "rationale": "Enhances badge visibility",
+      "confidence": 0.86,
+      "risks": ["Increases visual clutter"]
+    },
+    {
+      "targetKey": "brand.visual.consistency",
+      "value": "Aligned text and elements",
+      "rationale": "Ensures professional appearance",
+      "confidence": 0.93,
+      "risks": ["Requires layout adjustments"]
+    },
+    {
+      "targetKey": "brand.color.contrast",
+      "value": "High contrast for legibility",
+      "rationale": "Improves text readability",
+      "confidence": 0.91,
+      "risks": ["Overwhelms subtle designs"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["Color blindness issues", "Potential text overflow"],
+  "assumptions": ["Current design lacks clarity", "Target audience values professionalism"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "48px, weight 600",
+      "rationale": "Enhances readability and focus",
+      "confidence": 0.9,
+      "risks": [
+        "May appear too large"
+      ]
+    },
+    {
+      "targetKey": "brand.type.h2",
+      "value": "36px, weight 500",
+      "rationale": "Creates a clear hierarchy under H1",
+      "confidence": 0.88,
+      "risks": [
+        "Potential text overflow"
+      ]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#0047AB",
+      "rationale": "Conveys trust and professionalism",
+      "confidence": 0.92,
+      "risks": [
+        "Color blindness issues"
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "40px",
+      "rationale": "Provides consistent breathing room",
+      "confidence": 0.85,
+      "risks": [
+        "May increase page length"
+      ]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Rounded corners, 12px padding",
+      "rationale": "Improves clickability and aesthetics",
+      "confidence": 0.87,
+      "risks": [
+        "Might not align with brand"
+      ]
+    },
+    {
+      "targetKey": "brand.components.badge",
+      "value": "Solid border, light shadow",
+      "rationale": "Enhances badge visibility",
+      "confidence": 0.86,
+      "risks": [
+        "Increases visual clutter"
+      ]
+    },
+    {
+      "targetKey": "brand.visual.consistency",
+      "value": "Aligned text and elements",
+      "rationale": "Ensures professional appearance",
+      "confidence": 0.93,
+      "risks": [
+        "Requires layout adjustments"
+      ]
+    },
+    {
+      "targetKey": "brand.color.contrast",
+      "value": "High contrast for legibility",
+      "rationale": "Improves text readability",
+      "confidence": 0.91,
+      "risks": [
+        "Overwhelms subtle designs"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Color blindness issues",
+    "Potential text overflow"
+  ],
+  "assumptions": [
+    "Current design lacks clarity",
+    "Target audience values professionalism"
+  ]
+}

@@ -1,0 +1,118 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTT2MCH-2j9zxn-9be924479b243016
+Input Tokens: 2764
+Output Tokens: 953
+Finish Reason: stop
+
+=== RAW TEXT (4379 chars) ===
+Here's a Python solution that implements the described functionality:
+
+```python
+import json
+
+def select_changes(candidate_changes, context):
+    # Define a dictionary to map change types to their respective weights
+    change_weights = {
+        "content": 0.4,
+        "style": 0.3,
+        "layout": 0.2,
+        "asset": 0.1
+    }
+
+    # Initialize a dictionary to store the selected changes
+    selected_changes = {}
+
+    # Iterate over the candidate changes
+    for change in candidate_changes:
+        # Check if the change is already selected
+        if change["targetKey"] in selected_changes:
+            # If it's already selected, skip it
+            continue
+
+        # Check if the change is buildable and specific
+        if "unbuildable" in change and change["unbuildable"]:
+            # If it's not buildable, skip it
+            continue
+
+        # Calculate the change score based on its type and confidence
+        change_score = change_weights.get(change["changeType"], 0) * change["confidence"]
+
+        # Check if the change is already selected with a higher score
+        existing_change = next((c for c in selected_changes.values() if c["targetKey"] == change["targetKey"]), None)
+        if existing_change and existing_change["score"] >= change_score:
+            # If it's already selected with a higher score, skip it
+            continue
+
+        # Add the change to the selected changes
+        selected_changes[change["targetKey"]] = {
+            "targetKey": change["targetKey"],
+            "changeType": change["changeType"],
+            "proposedValue": change["value"],
+            "rationale": change["rationale"],
+            "anchor": {"type": change["changeType"], "currentValue": change["value"]},
+            "score": change_score
+        }
+
+        # If the maximum number of selected changes is reached, break the loop
+        if len(selected_changes) == 8:
+            break
+
+    # Convert the selected changes to a list of dictionaries
+    selected_changes = [{"targetKey": change["targetKey"], "changeType": change["changeType"], "proposedValue": change["proposedValue"], "rationale": change["rationale"], "anchor": change["anchor"]} for change in selected_changes.values()]
+
+    # Sort the selected changes by their scores in descending order
+    selected_changes.sort(key=lambda x: x["score"], reverse=True)
+
+    # Return the selected changes
+    return {"selectedChanges": selected_changes}
+
+# Load the input data
+input_data = json.loads(json.dumps({
+    "lane": "web",
+    "roleKind": "systems",
+    "goals": [],
+    "constraints": {},
+    "candidateChanges": [
+        # ... your candidate changes ...
+    ]
+}))
+
+# Load the context
+context = json.loads(json.dumps({
+    "lane": "web",
+    "currentDesign": {
+        "hero": {
+            "headline": "Launch Your Business",
+            "cta": "Get Started"
+        },
+        "pricing": {
+            "tier1": "$49/mo",
+            "tier2": "$99/mo"
+        }
+    },
+    "creativeMode": {
+        "enabled": True,
+        "capBeforeSelect": 24
+    }
+}))
+
+# Select the changes
+selected_changes = select_changes(input_data["candidateChanges"], context)
+
+# Print the selected changes
+print(json.dumps(selected_changes, indent=4))
+```
+
+This code first loads the input data and context, then it defines a function `select_changes` that implements the described functionality. The function iterates over the candidate changes, checks if each change is already selected, and calculates its score based on its type and confidence. If the change is already selected with a higher score, it skips it. Otherwise, it adds the change to the selected changes. The function returns the selected changes as a list of dictionaries.
+
+Note that this code assumes that the input data and context are valid JSON objects. If they are not, you may need to modify the code to handle the errors properly.
+
+Also, this code uses the `json.loads` function to load the input data and context from their string representations. This is because the `json` module in Python 3.x does not have a way to directly load JSON data from a string without using `json.loads`.
+
+Finally, this code uses the `json.dumps` function to convert the output data to a JSON string with indentation. This makes the output easier to read.
+
+I hope this helps! Let me know if you have any questions or need further clarification.
+
+=== PARSED JSON ===
+NULL (parse failed)

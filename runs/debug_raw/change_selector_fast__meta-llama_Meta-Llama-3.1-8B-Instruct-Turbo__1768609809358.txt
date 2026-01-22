@@ -1,0 +1,130 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTazZNz-4YNCb4-9bf1be017a95147f
+Input Tokens: 1510
+Output Tokens: 611
+Finish Reason: stop
+
+=== RAW TEXT (2547 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 16px for body text with a max line length of 75ch to enhance readability and calmness.",
+      "rationale": "Improving line length and font size creates a more comfortable reading experience.",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a primary button style with 16px padding, rounded corners (8px radius), and a 0....",
+      "rationale": "Creates a clear hierarchy and encourages action while maintaining a calm appearance.",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.color.primary",
+      "value": "Utilize a soft blue (#007BFF) for primary elements to evoke a calm and trustworthy atmosph...",
+      "rationale": "Color choice can significantly influence user perception of safety and confidence.",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Set border-radius to 4px for all input fields and buttons for a cohesive and modern UI.",
+      "rationale": "Rounded edges can soften the UI and enhance user comfort and safety.",
+      "confidence": 0.86,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Design proof chips with a subtle border and 12px font size to present trust signals effect...",
+      "rationale": "Clear presentation of trust signals helps reinforce safety and confidence.",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Implement 1px solid dividers with a neutral color (#E0E0E0) to create distinct sections wi...",
+      "rationale": "Subtle dividers enhance the operational layout while maintaining a premium look.",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Use 16px padding and subtle shadows on cards to create a premium feel while ensuring clari...",
+      "rationale": "Increases the perceived quality and usability of information presented in cards.",
+      "confidence": 0.8,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Introduce a concise 3-column grid layout for the audit log preview with clear timestamps a...",
+      "rationale": "Enhances clarity and operational transparency, reinforcing user trust.",
+      "confidence": 0.82,
+      "risks": []
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 16px for body text with a max line length of 75ch to enhance readability and calmness.",
+      "rationale": "Improving line length and font size creates a more comfortable reading experience.",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a primary button style with 16px padding, rounded corners (8px radius), and a 0....",
+      "rationale": "Creates a clear hierarchy and encourages action while maintaining a calm appearance.",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.color.primary",
+      "value": "Utilize a soft blue (#007BFF) for primary elements to evoke a calm and trustworthy atmosph...",
+      "rationale": "Color choice can significantly influence user perception of safety and confidence.",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Set border-radius to 4px for all input fields and buttons for a cohesive and modern UI.",
+      "rationale": "Rounded edges can soften the UI and enhance user comfort and safety.",
+      "confidence": 0.86,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Design proof chips with a subtle border and 12px font size to present trust signals effect...",
+      "rationale": "Clear presentation of trust signals helps reinforce safety and confidence.",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Implement 1px solid dividers with a neutral color (#E0E0E0) to create distinct sections wi...",
+      "rationale": "Subtle dividers enhance the operational layout while maintaining a premium look.",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Use 16px padding and subtle shadows on cards to create a premium feel while ensuring clari...",
+      "rationale": "Increases the perceived quality and usability of information presented in cards.",
+      "confidence": 0.8,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Introduce a concise 3-column grid layout for the audit log preview with clear timestamps a...",
+      "rationale": "Enhances clarity and operational transparency, reinforcing user trust.",
+      "confidence": 0.82,
+      "risks": []
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTargY4-2j9zxn-9bf1987c7c9e1f9b
+Input Tokens: 1712
+Output Tokens: 605
+Finish Reason: stop
+
+=== RAW TEXT (2553 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "value": "Add a dedicated 'Visibility panel' section with a split layout: left = 3 auditability bull...",
+      "rationale": "Strengthens the \"hand it off without losing control\" promise by showing concrete observabi...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge any separate 'problem', 'pain', and 'why us' blocks into one Problem/Solution sectio...",
+      "rationale": "Reduces cognitive load and improves scannability by consolidating repeated messaging into ...",
+      "confidence": 0.81
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a single primary CTA and one secondary CTA in the hero; place them in a horizontal row...",
+      "rationale": "Tightens the decision path above the fold and reduces choice overload while keeping a clea...",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to: Hero → Proof bar → Problem/Solution → How it works → Visibility/Audit...",
+      "rationale": "Creates a more linear narrative: promise → credibility → mechanism → control/observability...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move pricing into a single dedicated section with a clear two-tier (or three-tier) card la...",
+      "rationale": "Makes pricing easier to parse by turning it into scannable cards with consistent included-...",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an audit-log pattern component reused in 2 places: (1) hero preview (mini) and (...",
+      "rationale": "Repeated visual evidence of auditability increases trust and reduces ambiguity about what ...",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Convert How-it-works into a 3-step horizontal stepper on desktop and vertical stepper on m...",
+      "rationale": "Clarifies the mechanism quickly and provides a natural conversion moment after users under...",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Replace any dense pricing table with pricing cards + a lightweight comparison drawer: on d...",
+      "rationale": "Preserves detail for evaluators without overwhelming most users; improves scannability and...",
+      "confidence": 0.85
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "value": "Add a dedicated 'Visibility panel' section with a split layout: left = 3 auditability bull...",
+      "rationale": "Strengthens the \"hand it off without losing control\" promise by showing concrete observabi...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge any separate 'problem', 'pain', and 'why us' blocks into one Problem/Solution sectio...",
+      "rationale": "Reduces cognitive load and improves scannability by consolidating repeated messaging into ...",
+      "confidence": 0.81
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a single primary CTA and one secondary CTA in the hero; place them in a horizontal row...",
+      "rationale": "Tightens the decision path above the fold and reduces choice overload while keeping a clea...",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to: Hero → Proof bar → Problem/Solution → How it works → Visibility/Audit...",
+      "rationale": "Creates a more linear narrative: promise → credibility → mechanism → control/observability...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move pricing into a single dedicated section with a clear two-tier (or three-tier) card la...",
+      "rationale": "Makes pricing easier to parse by turning it into scannable cards with consistent included-...",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an audit-log pattern component reused in 2 places: (1) hero preview (mini) and (...",
+      "rationale": "Repeated visual evidence of auditability increases trust and reduces ambiguity about what ...",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Convert How-it-works into a 3-step horizontal stepper on desktop and vertical stepper on m...",
+      "rationale": "Clarifies the mechanism quickly and provides a natural conversion moment after users under...",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Replace any dense pricing table with pricing cards + a lightweight comparison drawer: on d...",
+      "rationale": "Preserves detail for evaluators without overwhelming most users; improves scannability and...",
+      "confidence": 0.85
+    }
+  ]
+}

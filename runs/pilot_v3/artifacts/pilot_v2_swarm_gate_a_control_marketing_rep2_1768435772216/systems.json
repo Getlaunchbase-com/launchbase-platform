@@ -1,0 +1,86 @@
+{
+  "proposedChanges": [
+    {
+      "targetKey": "design.valueProp.headlineClarity",
+      "value": "Refine headline in hero section for clearer 'hand it off' message",
+      "rationale": "Improves immediate understanding of key differentiator",
+      "confidence": 0.85,
+      "risks": [
+        "May require content rewrite"
+      ]
+    },
+    {
+      "targetKey": "design.valueProp.differentiation",
+      "value": "Add 3 bullets in hero section highlighting 'hand it off' benefits",
+      "rationale": "Emphasizes unique offering clearly",
+      "confidence": 0.9,
+      "risks": [
+        "Could clutter hero section"
+      ]
+    },
+    {
+      "targetKey": "design.objections.pricingConcerns",
+      "value": "Include 4-item FAQ accordion addressing 'too expensive' concern below pricing table",
+      "rationale": "Directly handles cost objections",
+      "confidence": 0.92,
+      "risks": [
+        "May not address all cost concerns"
+      ]
+    },
+    {
+      "targetKey": "design.pricing.tierComparison",
+      "value": "Add 3-column comparison chart after pricing hero showing Basic/Standard/Premium tiers",
+      "rationale": "Clarifies differences between pricing tiers",
+      "confidence": 0.93,
+      "risks": [
+        "May require detailed tier info"
+      ]
+    },
+    {
+      "targetKey": "design.trust.proofPlacement",
+      "value": "Place 5 customer logos in proof bar above fold",
+      "rationale": "Builds trust and credibility quickly",
+      "confidence": 0.88,
+      "risks": [
+        "Logos might not be recognizable"
+      ]
+    },
+    {
+      "targetKey": "design.trust.testimonialEffectiveness",
+      "value": "Feature 6 testimonials in grid format between sections",
+      "rationale": "Enhances credibility through peer validation",
+      "confidence": 0.91,
+      "risks": [
+        "Testimonials may not be relatable"
+      ]
+    },
+    {
+      "targetKey": "design.pricing.transparencySignals",
+      "value": "Use clear pricing card format with breakdown of what's included per tier",
+      "rationale": "Enhances understanding of value for cost",
+      "confidence": 0.94,
+      "risks": [
+        "Could overwhelm with too much detail"
+      ]
+    },
+    {
+      "targetKey": "design.positioning.messageAlignment",
+      "value": "Align homepage and FAQ messaging with 2-column grid format for consistency",
+      "rationale": "Ensures coherent value communication",
+      "confidence": 0.89,
+      "risks": [
+        "Potentially difficult layout change"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Potential layout changes",
+    "Content rewrite needed"
+  ],
+  "assumptions": [
+    "Current messaging lacks clarity",
+    "Consistency needed across touchpoints"
+  ]
+}

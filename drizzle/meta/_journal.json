@@ -232,13 +232,6 @@
       "when": 1768938514860,
       "tag": "0032_lowly_metal_master",
       "breakpoints": true
-    },
-    {
-      "idx": 33,
-      "version": "5",
-      "when": 1769100618662,
-      "tag": "0033_cute_green_goblin",
-      "breakpoints": true
     }
   ]
 }

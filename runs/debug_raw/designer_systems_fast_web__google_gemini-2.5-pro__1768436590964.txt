@@ -1,0 +1,80 @@
+=== RAW RESPONSE (designer_systems_fast_web) ===
+Model: google/gemini-2.5-pro
+Request ID: VTNoaaihAs-JidsP4Ni7mQY
+Input Tokens: 1151
+Output Tokens: 939
+Finish Reason: length
+
+=== RAW TEXT (3853 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Add a 3-item icon-and-text list below the H1 to summarize the core value prop: 'Ongoing Responsibility', 'Total Visibility', 'Fixed Monthly Cost'.",
+      "rationale": "Immediately clarifies the 'how' behind the main promise, addressing key user questions before they need to scroll. Reduces cognitive load.",
+      "confidence": 0.9,
+      "risks": [
+        "May clutter the hero if icons/text are too large.",
+        "Requires concise copy to be effective."
+      ]
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Redesign the primary CTA with a high-contrast background. Add a secondary, ghost-style button CTA like 'See How It Works' next to it.",
+      "rationale": "Caters to users at different readiness stages. A strong primary CTA guides decisive users, while the secondary option engages curious ones.",
+      "confidence": 0.95,
+      "risks": [
+        "Secondary CTA might slightly reduce primary clicks.",
+        "Poor color choice could reduce overall CTA visibility."
+      ]
+    },
+    {
+      "targetKey": "design.trust.placementStrategy",
+      "value": "Insert a 'Trusted by' logo strip immediately below the hero section, before the problem/solution blocks. Use grayscale logos for subtlety.",
+      "rationale": "Builds immediate credibility and reduces perceived risk for new visitors. Placing it high reinforces the hero's claims before diving into details.",
+      "confidence": 0.92,
+      "risks": [
+        "Can feel generic if not implemented well.",
+        "Requires recognizable client logos to be impactful."
+      ]
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Redesign the pricing table to visually emphasize the most popular tier with a 'Most Popular' badge and a subtle border or background color.",
+      "rationale": "Reduces choice paralysis by guiding users to the recommended option. Highlighting the best value makes the decision process faster and easier.",
+      "confidence": 0.88,
+      "risks": [
+        "May inadvertently push users away from a higher-tier plan.",
+        "The 'wrong' plan might be highlighted for some segments."
+      ]
+    },
+    {
+      "targetKey": "design.mobile.heroStacking",
+      "value": "On mobile viewports (<768px), re-stack the hero to ensure the H1, sub-headline, and primary CTA button are all visible above the 600px fold.",
+      "rationale": "Increases immediate conversion opportunities on mobile by presenting the primary action without requiring a scroll. Critical for user engagement.",
+      "confidence": 0.95,
+      "risks": [
+        "May require reducing headline font size or image height.",
+        "Could make the hero feel cramped on very small screens."
+      ]
+    },
+    {
+      "targetKey": "design.hierarchy.sectionOrder",
+      "value": "Ensure section order follows: Hero -> Social Proof -> Problem ('Tired of managing your site?') -> Solution ('We handle it all') -> How it Works -> Pricing.",
+      "rationale": "Creates a logical narrative that mirrors the customer's journey, increasing resonance and making the solution feel more compelling and necessary.",
+      "confidence": 0.9,
+      "risks": [
+        "May de-prioritize a section that currently performs well.",
+        "Requires smooth transitions between the re-ordered sections."
+      ]
+    },
+    {
+      "targetKey": "design.layout.finalCta",
+      "value": "Create a visually distinct, full-width final CTA section with a contrasting background color, a clear headline, and the primary CTA button.",
+      "rationale": "Captures users who have scrolled through the entire page, giving them one last, unmissable opportunity to convert before they exit.",
+      "confidence": 0.85,
+      "risks": [
+        "Can feel repetitive if
+
+=== PARSED JSON ===
+NULL (parse failed)

@@ -1,0 +1,130 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTbAaNT-4YNCb4-9bf1edb8d98db024
+Input Tokens: 1701
+Output Tokens: 645
+Finish Reason: stop
+
+=== RAW TEXT (2709 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Add a dedicated “auditability” pattern section: include a read-only activity feed (5 rows)...",
+      "rationale": "Strengthens trust through concrete observability (audit trail) rather than hype, making th...",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a single dominant primary CTA in hero (1 button) with one secondary CTA as a text link...",
+      "rationale": "Reduces choice overload and increases conversion focus while keeping a clear alternative p...",
+      "confidence": 0.83,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.socialProof",
+      "value": "Insert a proof bar immediately under the hero (above the fold on desktop when possible): 1...",
+      "rationale": "Adds fast trust signals early without adding a full section, improving confidence to click...",
+      "confidence": 0.82,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge any separate “Problem”, “Why”, and “Benefits” blocks into one section using a before...",
+      "rationale": "Improves scannability and reduces repeated explanations by presenting the contrast in a si...",
+      "confidence": 0.8,
+      "risks": []
+    },
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "value": "Introduce a reusable “Visibility panel” component used in hero and again mid-page: a compa...",
+      "rationale": "Reinforces the control/visibility promise repeatedly without adding long text, improving c...",
+      "confidence": 0.81,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move pricing to a 3-card layout with one highlighted default tier; align tiers in a grid w...",
+      "rationale": "Makes pricing easier to parse quickly, reduces scrolling, and prevents feature comparison ...",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a mobile-only sticky CTA bar that appears after ~40% scroll and hides near the pricing...",
+      "rationale": "Improves conversion path continuity on mobile where users often lose the primary CTA after...",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Replace dense tables with pricing cards + a lightweight comparison matrix revealed via acc...",
+      "rationale": "Improves scannability and reduces cognitive load while still supporting deeper evaluation ...",
+      "confidence": 0.84,
+      "risks": []
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Add a dedicated “auditability” pattern section: include a read-only activity feed (5 rows)...",
+      "rationale": "Strengthens trust through concrete observability (audit trail) rather than hype, making th...",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a single dominant primary CTA in hero (1 button) with one secondary CTA as a text link...",
+      "rationale": "Reduces choice overload and increases conversion focus while keeping a clear alternative p...",
+      "confidence": 0.83,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.socialProof",
+      "value": "Insert a proof bar immediately under the hero (above the fold on desktop when possible): 1...",
+      "rationale": "Adds fast trust signals early without adding a full section, improving confidence to click...",
+      "confidence": 0.82,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge any separate “Problem”, “Why”, and “Benefits” blocks into one section using a before...",
+      "rationale": "Improves scannability and reduces repeated explanations by presenting the contrast in a si...",
+      "confidence": 0.8,
+      "risks": []
+    },
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "value": "Introduce a reusable “Visibility panel” component used in hero and again mid-page: a compa...",
+      "rationale": "Reinforces the control/visibility promise repeatedly without adding long text, improving c...",
+      "confidence": 0.81,
+      "risks": []
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move pricing to a 3-card layout with one highlighted default tier; align tiers in a grid w...",
+      "rationale": "Makes pricing easier to parse quickly, reduces scrolling, and prevents feature comparison ...",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a mobile-only sticky CTA bar that appears after ~40% scroll and hides near the pricing...",
+      "rationale": "Improves conversion path continuity on mobile where users often lose the primary CTA after...",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Replace dense tables with pricing cards + a lightweight comparison matrix revealed via acc...",
+      "rationale": "Improves scannability and reduces cognitive load while still supporting deeper evaluation ...",
+      "confidence": 0.84,
+      "risks": []
+    }
+  ]
+}

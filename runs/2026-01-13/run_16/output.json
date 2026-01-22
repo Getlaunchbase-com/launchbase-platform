@@ -1,0 +1,154 @@
+{
+  "version": "v1",
+  "status": "succeeded",
+  "stopReason": "needs_human",
+  "needsHuman": true,
+  "traceId": "trc_1768343024520_23d6f9264242a",
+  "artifacts": [
+    {
+      "kind": "swarm.plan",
+      "payload": {
+        "scope": "showroom.getlaunchbase.premium",
+        "inputs": {
+          "task": "Review and improve homepage copy for LaunchBase",
+          "business": "LaunchBase",
+          "description": "AI-powered website operations system that handles website updates, social media, and business intelligence for small businesses. Core value: responsibility transfer (hand off operations, keep visibility). Not a website builder - a complete operations handoff with observability, reversibility, and safety gating.",
+          "currentCopy": {
+            "hero": "Stop carrying the system in your head. Hand it off. Keep visibility.",
+            "problem": "No one owns the system. You're the fallback for everything.",
+            "solution": "LaunchBase becomes the owner. You stay informed, not involved.",
+            "trust": "Safe by default. Fully logged. Reversible."
+          },
+          "audience": "Small business owners (fitness studios, coffee shops, consulting firms, e-commerce) who are tired of being the bottleneck for their website and marketing operations",
+          "tone": "Direct, honest, reassuring. B2B professional. Emphasize responsibility transfer and observability.",
+          "constraints": "No hype language. No unverifiable claims. Focus on concrete benefits: mental load reduction, visibility, reversibility, safety gating."
+        },
+        "specialists": [
+          "craft",
+          "critic"
+        ],
+        "fingerprint": "trc_1768343024520_23d6f9264242a:plan"
+      },
+      "customerSafe": false
+    },
+    {
+      "kind": "swarm.specialist.craft",
+      "payload": {
+        "proposedChanges": [
+          {
+            "targetKey": "hero.headline",
+            "value": "Stop being the fallback for everything. Hand it off.",
+            "rationale": "More direct, clearly communicates the value of transferring responsibility.",
+            "confidence": 0.85
+          },
+          {
+            "targetKey": "problem.headline",
+            "value": "No one takes ownership of the system. You end up being the fallback.",
+            "rationale": "Clarifies the issue of ownership and emphasizes the pain point of being a fallback.",
+            "confidence": 0.88
+          },
+          {
+            "targetKey": "trust",
+            "value": "Safe by default, fully logged, and reversible.",
+            "rationale": "Streamlines the trust statement for conciseness and clarity.",
+            "confidence": 0.9
+          }
+        ],
+        "role": "craft",
+        "stopReason": "ok"
+      },
+      "customerSafe": false
+    },
+    {
+      "kind": "swarm.specialist.critic",
+      "payload": {
+        "pass": false,
+        "issues": [
+          {
+            "severity": "critical",
+            "description": "Claims 'AI-powered website operations system' without necessary proof in input.",
+            "location": "description",
+            "rationale": "Unverified claim - introduces AI capability not present in input."
+          },
+          {
+            "severity": "major",
+            "description": "Phrase 'fully logged' is vague and not defined in input.",
+            "location": "trust",
+            "rationale": "Ambiguity - term is not concrete or specific."
+          }
+        ],
+        "suggestedFixes": [
+          {
+            "targetKey": "description",
+            "fix": "Website operations system that handles updates, social media, and business intelligence for small businesses.",
+            "rationale": "Removes unverified AI claim, focuses on core functionalities."
+          },
+          {
+            "targetKey": "trust",
+            "fix": "Safe by default. Operations are documented and can be reverted.",
+            "rationale": "Provides concrete definitions for logging and reversibility."
+          }
+        ],
+        "requiresApproval": true,
+        "previewRecommended": true,
+        "risks": [
+          "Changes may alter initial perception of technology capabilities."
+        ],
+        "assumptions": [
+          "Business owners understand the importance of documented operations."
+        ],
+        "role": "critic",
+        "stopReason": "ok"
+      },
+      "customerSafe": false
+    },
+    {
+      "kind": "swarm.collapse",
+      "customerSafe": true,
+      "payload": null
+    }
+  ],
+  "customerSafe": true,
+  "extensions": {
+    "swarm": {
+      "costs": [
+        {
+          "specialist": "craft",
+          "inputTokens": 1684,
+          "outputTokens": 186,
+          "costUsd": 0.022420000000000002,
+          "model": "gpt-4o-mini-2024-07-18",
+          "latencyMs": 8781,
+          "stopReason": "ok"
+        },
+        {
+          "specialist": "critic",
+          "inputTokens": 1856,
+          "outputTokens": 275,
+          "costUsd": 0.02681,
+          "model": "gpt-4o-mini-2024-07-18",
+          "latencyMs": 6498,
+          "stopReason": "ok"
+        }
+      ],
+      "totalCostUsd": 0.04923,
+      "roleCostsUsd": {
+        "craft": 0.022420000000000002,
+        "critic": 0.02681
+      },
+      "roleModels": {
+        "craft": "gpt-4o-mini-2024-07-18",
+        "critic": "gpt-4o-mini-2024-07-18"
+      },
+      "collapseDebug": {
+        "craftStop": "ok",
+        "criticStop": "ok",
+        "pass": false,
+        "requiresApproval": true,
+        "issueCount": 2,
+        "criticalIssueCount": 1,
+        "hasChanges": true
+      }
+    }
+  }
+}

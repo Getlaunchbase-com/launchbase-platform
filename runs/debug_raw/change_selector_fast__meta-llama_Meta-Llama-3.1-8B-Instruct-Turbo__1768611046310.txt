@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTb6ta3-4YNCb4-9bf1dc28db134b48
+Input Tokens: 1713
+Output Tokens: 615
+Finish Reason: stop
+
+=== RAW TEXT (2541 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Replace any dense table with pricing cards that include: price, intended user, 4–6 include...",
+      "rationale": "Cards improve scanability and decision-making; the toggle and shared-inclusions strip redu...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Convert How-it-works into a numbered 3-step horizontal stepper on desktop and vertical ste...",
+      "rationale": "Makes the operating model concrete and reinforces observability/auditability through artif...",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Rebuild hero into a 2-column grid on desktop (60/40) and a stacked layout on mobile: left ...",
+      "rationale": "Improves above-the-fold clarity and scannability while reinforcing the “hand it off withou...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an audit-log pattern section as a compact UI component: a scrollable activity fe...",
+      "rationale": "Shifts trust from hype to auditability by showing what users can verify and export, suppor...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to: Hero → Proof bar → Problem/Solution → How it works → Visibility/Audit...",
+      "rationale": "Moves trust and observability earlier, aligns story flow (why → how → proof → buy), and re...",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Place primary CTA as the first button in the hero and repeat it once below the hero featur...",
+      "rationale": "Reduces decision friction and increases conversion by making the primary path obvious and ...",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge any separate “problem”, “benefits”, and “mental load” blocks into one Problem/Soluti...",
+      "rationale": "Improves hierarchy and comprehension by pairing pain → resolution without forcing users to...",
+      "confidence": 0.81
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move pricing higher (after Suite) and restructure into: (1) plan cards (3 columns desktop,...",
+      "rationale": "Reduces pricing cognitive load and makes selection faster while still allowing detail for ...",
+      "confidence": 0.87
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Replace any dense table with pricing cards that include: price, intended user, 4–6 include...",
+      "rationale": "Cards improve scanability and decision-making; the toggle and shared-inclusions strip redu...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Convert How-it-works into a numbered 3-step horizontal stepper on desktop and vertical ste...",
+      "rationale": "Makes the operating model concrete and reinforces observability/auditability through artif...",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Rebuild hero into a 2-column grid on desktop (60/40) and a stacked layout on mobile: left ...",
+      "rationale": "Improves above-the-fold clarity and scannability while reinforcing the “hand it off withou...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an audit-log pattern section as a compact UI component: a scrollable activity fe...",
+      "rationale": "Shifts trust from hype to auditability by showing what users can verify and export, suppor...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to: Hero → Proof bar → Problem/Solution → How it works → Visibility/Audit...",
+      "rationale": "Moves trust and observability earlier, aligns story flow (why → how → proof → buy), and re...",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Place primary CTA as the first button in the hero and repeat it once below the hero featur...",
+      "rationale": "Reduces decision friction and increases conversion by making the primary path obvious and ...",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge any separate “problem”, “benefits”, and “mental load” blocks into one Problem/Soluti...",
+      "rationale": "Improves hierarchy and comprehension by pairing pain → resolution without forcing users to...",
+      "confidence": 0.81
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move pricing higher (after Suite) and restructure into: (1) plan cards (3 columns desktop,...",
+      "rationale": "Reduces pricing cognitive load and makes selection faster while still allowing detail for ...",
+      "confidence": 0.87
+    }
+  ]
+}

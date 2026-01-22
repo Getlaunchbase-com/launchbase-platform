@@ -1,0 +1,160 @@
+=== RAW RESPONSE (designer_brand_fast) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy1xA57NaILfT8CcHvGMctoyxgGrw
+Input Tokens: 878
+Output Tokens: 578
+Finish Reason: stop
+
+=== RAW TEXT (2259 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "font-size: 48px; font-weight: bold;",
+      "rationale": "Increases visual hierarchy and focus on main headline.",
+      "confidence": 0.9,
+      "risks": ["May overpower other text"]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "font-size: 16px; line-height: 1.6;",
+      "rationale": "Improves readability and comfort for body text.",
+      "confidence": 0.85,
+      "risks": ["Slight increase in page length"]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "32px",
+      "rationale": "Enhances separation of content sections for clarity.",
+      "confidence": 0.8,
+      "risks": ["May increase scroll length"]
+    },
+    {
+      "targetKey": "brand.spacing.componentGap",
+      "value": "16px",
+      "rationale": "Ensures consistent spacing between components.",
+      "confidence": 0.8,
+      "risks": ["May require layout adjustments"]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#0056b3",
+      "rationale": "Establishes a strong, trustworthy brand color.",
+      "confidence": 0.9,
+      "risks": ["Color may not suit all preferences"]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "padding: 12px 24px; border-radius: 4px;",
+      "rationale": "Creates a more inviting and accessible button design.",
+      "confidence": 0.85,
+      "risks": ["May clash with overly styled pages"]
+    },
+    {
+      "targetKey": "brand.components.proofPattern",
+      "value": "Incorporate subtle testimonials with icons",
+      "rationale": "Builds trust through visual and textual evidence.",
+      "confidence": 0.9,
+      "risks": ["Overcrowding if not balanced"]
+    },
+    {
+      "targetKey": "brand.system.consistency",
+      "value": "Align all component styles across pages",
+      "rationale": "Ensures a cohesive brand experience site-wide.",
+      "confidence": 0.95,
+      "risks": ["Initial time investment for alignment"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["Potential increased load times", "User adjustment to new layout"],
+  "assumptions": ["Current design lacks hierarchy", "Users value clarity and readability"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "font-size: 48px; font-weight: bold;",
+      "rationale": "Increases visual hierarchy and focus on main headline.",
+      "confidence": 0.9,
+      "risks": [
+        "May overpower other text"
+      ]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "font-size: 16px; line-height: 1.6;",
+      "rationale": "Improves readability and comfort for body text.",
+      "confidence": 0.85,
+      "risks": [
+        "Slight increase in page length"
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "32px",
+      "rationale": "Enhances separation of content sections for clarity.",
+      "confidence": 0.8,
+      "risks": [
+        "May increase scroll length"
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.componentGap",
+      "value": "16px",
+      "rationale": "Ensures consistent spacing between components.",
+      "confidence": 0.8,
+      "risks": [
+        "May require layout adjustments"
+      ]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#0056b3",
+      "rationale": "Establishes a strong, trustworthy brand color.",
+      "confidence": 0.9,
+      "risks": [
+        "Color may not suit all preferences"
+      ]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "padding: 12px 24px; border-radius: 4px;",
+      "rationale": "Creates a more inviting and accessible button design.",
+      "confidence": 0.85,
+      "risks": [
+        "May clash with overly styled pages"
+      ]
+    },
+    {
+      "targetKey": "brand.components.proofPattern",
+      "value": "Incorporate subtle testimonials with icons",
+      "rationale": "Builds trust through visual and textual evidence.",
+      "confidence": 0.9,
+      "risks": [
+        "Overcrowding if not balanced"
+      ]
+    },
+    {
+      "targetKey": "brand.system.consistency",
+      "value": "Align all component styles across pages",
+      "rationale": "Ensures a cohesive brand experience site-wide.",
+      "confidence": 0.95,
+      "risks": [
+        "Initial time investment for alignment"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Potential increased load times",
+    "User adjustment to new layout"
+  ],
+  "assumptions": [
+    "Current design lacks hierarchy",
+    "Users value clarity and readability"
+  ]
+}

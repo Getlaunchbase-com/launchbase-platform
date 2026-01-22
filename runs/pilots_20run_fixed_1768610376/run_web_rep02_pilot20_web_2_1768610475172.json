@@ -1,0 +1,335 @@
+{
+  "lane": "web",
+  "rep": 2,
+  "runId": "pilot20_web_2_1768610475172",
+  "timestamp": "2026-01-17T00:42:28.451Z",
+  "runMode": "production",
+  "status": "VALID",
+  "systems": {
+    "changes": [
+      {
+        "targetKey": "design.trust.auditLogPattern",
+        "value": "Introduce a dedicated “Auditability” section (placed after How it works) featuring: a mini...",
+        "rationale": "Turns “visibility/observability” into concrete, verifiable UI patterns (audit log + timest...",
+        "confidence": 0.88
+      },
+      {
+        "targetKey": "design.components.proofBar",
+        "value": "Add a proof bar directly under the hero (above first content section) with 3–5 compact ite...",
+        "rationale": "Introduces trust quickly without adding narrative sections, reducing cognitive load while ...",
+        "confidence": 0.8
+      },
+      {
+        "targetKey": "design.components.pricingTable",
+        "value": "Replace any dense table with 3 pricing cards on desktop (equal height) and a swipeable car...",
+        "rationale": "Improves scannability and comparison, especially on mobile, while keeping feature detail a...",
+        "confidence": 0.85
+      },
+      {
+        "targetKey": "design.layout.hero",
+        "value": "Rebuild hero into a 2-column grid on desktop (60/40) and stacked on mobile: left = headlin...",
+        "rationale": "Improves above-the-fold clarity and immediately demonstrates the “hand it off without losi...",
+        "confidence": 0.86
+      },
+      {
+        "targetKey": "design.layout.sectionOrder",
+        "value": "Reorder homepage sections to: Hero → Proof bar → Problem/Solution (compressed) → How it wo...",
+        "rationale": "Creates a clearer narrative flow from promise → credibility → mechanism → control/observab...",
+        "confidence": 0.84
+      },
+      {
+        "targetKey": "design.conversion.heroCta",
+        "value": "Place primary CTA as a filled button (min height 48px) and secondary CTA as an outline/tex...",
+        "rationale": "Tightens the conversion path by ensuring the primary action is always the most visually do...",
+        "confidence": 0.82
+      },
+      {
+        "targetKey": "design.layout.problemSolution",
+        "value": "Merge any separate “problem,” “mental load,” and “solution” blocks into one section using ...",
+        "rationale": "Reduces cognitive load and improves scannability by consolidating overlapping content into...",
+        "confidence": 0.83
+      },
+      {
+        "targetKey": "design.layout.howItWorks",
+        "value": "Convert “How it works” into a 3-step horizontal stepper on desktop and vertical stepper on...",
+        "rationale": "Makes the operating model understandable at a glance and reinforces ongoing responsibility...",
+        "confidence": 0.81
+      }
+    ],
+    "anchorCount": 8
+  },
+  "brand": {
+    "changes": [
+      {
+        "targetKey": "brand.tokens.typeScale",
+        "value": "Use a type scale with a max line length of 75ch for body text to enhance readability and c...",
+        "rationale": "Improves clarity and keeps the user focused on the content.",
+        "confidence": 0.9,
+        "risks": []
+      },
+      {
+        "targetKey": "brand.tokens.color.neutral",
+        "value": "Use a neutral color palette with a contrast ratio of at least 4.5:1 for body text to ensur...",
+        "rationale": "Supports readability and ensures all users can access content effectively.",
+        "confidence": 0.92,
+        "risks": []
+      },
+      {
+        "targetKey": "brand.components.buttons",
+        "value": "Utilize a primary button with 48px height and 16px padding, featuring a soft shadow and ro...",
+        "rationale": "Creates a visually appealing and accessible CTA that instills confidence.",
+        "confidence": 0.85,
+        "risks": []
+      },
+      {
+        "targetKey": "brand.components.cards",
+        "value": "Design pricing cards with equal heights, 20px padding, and a subtle drop shadow to ensure ...",
+        "rationale": "Enhances visual hierarchy and aids in quick content comparison.",
+        "confidence": 0.88,
+        "risks": []
+      },
+      {
+        "targetKey": "brand.components.chips",
+        "value": "Introduce proof chips below the hero section, using a subtle background and 12px padding f...",
+        "rationale": "Provides quick trust signals without overwhelming the user.",
+        "confidence": 0.87,
+        "risks": []
+      },
+      {
+        "targetKey": "brand.components.dividers",
+        "value": "Incorporate 40px vertical spacing with soft dividers between sections to enhance clarity a...",
+        "rationale": "Improves visual separation and guides users naturally through content.",
+        "confidence": 0.84,
+        "risks": []
+      },
+      {
+        "targetKey": "brand.trust.proofPresentation",
+        "value": "Add an audit log preview pattern in the footer with 3 recent actions and timestamps to bui...",
+        "rationale": "Provides a sense of safety by showcasing operational integrity.",
+        "confidence": 0.89,
+        "risks": []
+      },
+      {
+        "targetKey": "brand.tokens.radius",
+        "value": "Apply a 8px border radius to buttons and cards to embody a friendly and approachable brand...",
+        "rationale": "Softens the interface, aligning with a calm and premium aesthetic.",
+        "confidence": 0.8,
+        "risks": []
+      }
+    ],
+    "anchorCount": 8
+  },
+  "critic": {
+    "issues": [
+      {
+        "severity": "critical",
+        "description": "Hero CTA may not be visible above fold on mobile with 2-column layout collapse",
+        "location": "design.layout.hero",
+        "rationale": "60/40 desktop grid stacking on mobile could push primary CTA below fold, killing conversions"
+      },
+      {
+        "severity": "critical",
+        "description": "Pricing cards lack risk reversal messaging to overcome purchase hesitation",
+        "location": "design.components.pricingTable",
+        "rationale": "Equal-height cards focus on features but miss addressing buyer anxiety and commitment fears"
+      },
+      {
+        "severity": "major",
+        "description": "Proof bar placement after hero creates trust gap during initial 8-second evaluation",
+        "location": "design.components.proofBar",
+        "rationale": "Trust signals arrive too late in scan pattern, after user already forms first impression"
+      },
+      {
+        "severity": "major",
+        "description": "Audit log pattern buried after How It Works reduces conversion impact",
+        "location": "design.trust.auditLogPattern",
+        "rationale": "Critical observability proof placed too far down page when users need trust signals earlier"
+      },
+      {
+        "severity": "major",
+        "description": "Section reordering creates 5-section scroll fatigue before reaching pricing",
+        "location": "design.layout.sectionOrder",
+        "rationale": "Hero→Proof→Problem→HowItWorks→Audit→Pricing sequence may exhaust mobile users before conversion"
+      },
+      {
+        "severity": "major",
+        "description": "75ch max line length may be too wide for mobile scanning comfort",
+        "location": "brand.tokens.typeScale",
+        "rationale": "Optimal mobile reading is 45-65ch; 75ch could slow comprehension on smaller screens"
+      },
+      {
+        "severity": "minor",
+        "description": "Secondary CTA as outline button lacks sufficient visual weight for fallback action",
+        "location": "design.conversion.heroCta",
+        "rationale": "Outline style may be too subtle, reducing conversion opportunities for hesitant users"
+      },
+      {
+        "severity": "minor",
+        "description": "40px section spacing may feel cramped on mobile between compressed content blocks",
+        "location": "brand.components.dividers",
+        "rationale": "Mobile needs more breathing room between sections to maintain scannability and reduce fatigue"
+      },
+      {
+        "severity": "minor",
+        "description": "Pricing card swipe behavior lacks clear affordance indicators for mobile users",
+        "location": "design.components.pricingTable",
+        "rationale": "Users may not discover horizontal scrolling without visible scroll hints or pagination dots"
+      },
+      {
+        "severity": "minor",
+        "description": "Audit log footer placement reduces visibility when users need observability proof",
+        "location": "brand.trust.proofPresentation",
+        "rationale": "Footer location makes trust signal discoverable only after full page scroll completion"
+      }
+    ],
+    "suggestedFixes": [
+      {
+        "targetKey": "design.layout.hero",
+        "fix": "Set mobile hero stack with CTA above fold: hero content max 60vh, CTA positioned at 50vh minimum",
+        "rationale": "Guarantees primary conversion action stays visible during critical first impression window"
+      },
+      {
+        "targetKey": "design.components.pricingTable",
+        "fix": "Add risk reversal text under each pricing card: '30-day money-back guarantee' with 14px font",
+        "rationale": "Addresses purchase anxiety directly at decision point with concrete safety assurance"
+      },
+      {
+        "targetKey": "design.components.proofBar",
+        "fix": "Move proof bar inside hero section as subtitle: 3 compact proof chips at 12px below headline",
+        "rationale": "Integrates trust signals into 8-second evaluation window without adding scroll friction"
+      },
+      {
+        "targetKey": "design.trust.auditLogPattern",
+        "fix": "Relocate audit preview to Problem/Solution section as inline proof element with 2 log entries",
+        "rationale": "Places observability evidence where users question reliability, earlier in conversion flow"
+      },
+      {
+        "targetKey": "design.layout.sectionOrder",
+        "fix": "Compress to 4 sections: Hero+Proof → Problem+AuditPreview → HowItWorks → Pricing+CTA",
+        "rationale": "Reduces scroll fatigue while maintaining narrative flow and trust-building sequence"
+      },
+      {
+        "targetKey": "brand.tokens.typeScale",
+        "fix": "Set responsive max line length: 65ch desktop, 50ch tablet, 45ch mobile for optimal readability",
+        "rationale": "Optimizes reading comfort across devices while maintaining desktop content density"
+      },
+      {
+        "targetKey": "design.conversion.heroCta",
+        "fix": "Style secondary CTA as filled button with 80% primary color opacity and same 48px height",
+        "rationale": "Maintains visual hierarchy while giving secondary action sufficient weight for conversions"
+      },
+      {
+        "targetKey": "brand.components.dividers",
+        "fix": "Increase mobile section spacing to 60px vertical with 20px horizontal margins for breathing room",
+        "rationale": "Improves mobile scanning comfort and reduces cognitive load between content sections"
+      },
+      {
+        "targetKey": "design.components.pricingTable",
+        "fix": "Add horizontal scroll indicators: subtle gradient fade + pagination dots below mobile cards",
+        "rationale": "Provides clear affordance for horizontal navigation without cluttering card design"
+      },
+      {
+        "targetKey": "brand.trust.proofPresentation",
+        "fix": "Duplicate audit log preview in hero sidebar: 2 recent actions with timestamps, 16px font",
+        "rationale": "Makes observability proof visible during initial evaluation without relying on footer discovery"
+      }
+    ],
+    "pass": false
+  },
+  "finalScore": 98.32333333333332,
+  "truthPenalty": 0.016666666666666666,
+  "qualityPenalty": 0.01,
+  "meta": {
+    "totalCostUsd": 0.19154000000000002,
+    "totalLatencyMs": 69269,
+    "attempts": 1,
+    "models": {
+      "systems": "gpt-5.2-2025-12-11",
+      "brand": "gpt-4o-mini-2024-07-18",
+      "critic": "claude-sonnet-4-20250514"
+    },
+    "stopReasons": {
+      "systems": "ok",
+      "brand": "ok",
+      "critic": "ok"
+    },
+    "requestIds": {
+      "systems": "chatcmpl-CyofLFQpzwbRM0vowYJqLOKmIW5vx",
+      "brand": "chatcmpl-Cyofk2QhOFBUaEypw3Uial7Sf0fQh",
+      "critic": "msg_01BNGyoiq4zgRwZ1gc2gixR2"
+    },
+    "normalization": {
+      "enabled": true,
+      "applied": false,
+      "mode": "truncate_first_n",
+      "events": {
+        "systems": {
+          "kind": "truncate",
+          "applied": false,
+          "from": 0,
+          "to": 0
+        },
+        "brand": {
+          "kind": "truncate",
+          "applied": false,
+          "from": 0,
+          "to": 0
+        },
+        "critic": {
+          "kind": "coerce_risks",
+          "applied": false,
+          "coercedCount": 0,
+          "fromType": "object",
+          "toType": "string"
+        }
+      }
+    },
+    "usage": {
+      "systems": {
+        "inputTokens": 1231,
+        "outputTokens": 1519,
+        "latencyMs": 23039,
+        "costUsd": 0.05788
+      },
+      "brand": {
+        "inputTokens": 1580,
+        "outputTokens": 710,
+        "latencyMs": 13923,
+        "costUsd": 0.0371
+      },
+      "critic": {
+        "inputTokens": 4904,
+        "outputTokens": 1584,
+        "latencyMs": 32307,
+        "costUsd": 0.09656
+      },
+      "totals": {
+        "inputTokens": 10928,
+        "outputTokens": 5030,
+        "latencyMs": 73275,
+        "costUsd": 0.26018
+      },
+      "selector": {
+        "inputTokens": 3213,
+        "outputTokens": 1217,
+        "latencyMs": 4006,
+        "costUsd": 0.06864
+      }
+    },
+    "selection": {
+      "enabled": true,
+      "systems": {
+        "candidatesCount": 10,
+        "cappedCount": 10,
+        "selectedCount": 8,
+        "selectorModel": "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"
+      },
+      "brand": {
+        "candidatesCount": 8,
+        "cappedCount": 8,
+        "selectedCount": 8,
+        "selectorModel": "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"
+      }
+    }
+  }
+}

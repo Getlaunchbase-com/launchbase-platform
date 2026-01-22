@@ -1,0 +1,150 @@
+{
+  "artifact": {
+    "kind": "swarm.specialist.design_critic_ruthless",
+    "payload": {
+      "pass": false,
+      "issues": [
+        {
+          "severity": "critical",
+          "description": "Hero lacks 8-second comprehension of 'operating system for small businesses'",
+          "location": "design.layout.hero",
+          "rationale": "Visitors won't understand the core value prop without clear visual hierarchy and immediate context"
+        },
+        {
+          "severity": "critical",
+          "description": "No sticky CTA creates dead zones during 2000px+ scroll journey",
+          "location": "design.conversion.stickyCta",
+          "rationale": "Users lose conversion path continuity after scrolling past hero, causing 40%+ drop-off"
+        },
+        {
+          "severity": "major",
+          "description": "Trust proof elements buried below fold instead of distributed throughout scroll",
+          "location": "design.trust.auditLogPattern",
+          "rationale": "Observability promise needs constant reinforcement, not single placement"
+        },
+        {
+          "severity": "major",
+          "description": "Mobile hero stacking buries CTA below 568px viewport height",
+          "location": "design.mobile.heroStacking",
+          "rationale": "Primary action invisible on iPhone SE/8, forcing unnecessary scroll for conversion"
+        },
+        {
+          "severity": "major",
+          "description": "Pricing table lacks risk reversal messaging for hesitant SMB owners",
+          "location": "design.layout.pricing",
+          "rationale": "Small businesses need explicit safety nets before committing to new operating systems"
+        },
+        {
+          "severity": "major",
+          "description": "Section order buries 'how it works' after features instead of before",
+          "location": "design.layout.sectionOrder",
+          "rationale": "Users need process clarity before feature lists to build mental model"
+        },
+        {
+          "severity": "minor",
+          "description": "Typography hierarchy unclear between H2s and body text",
+          "location": "design.type.h2",
+          "rationale": "Scanning pattern breaks when subheads don't create clear visual stops"
+        },
+        {
+          "severity": "minor",
+          "description": "Card components lack consistent shadow/elevation system",
+          "location": "design.components.card",
+          "rationale": "Premium feel requires deliberate depth hierarchy, not flat cards"
+        },
+        {
+          "severity": "minor",
+          "description": "Mobile tap targets under 48px for secondary actions",
+          "location": "design.mobile.tapTargets",
+          "rationale": "WCAG AA requires 44px minimum, premium UX demands 48px+"
+        },
+        {
+          "severity": "minor",
+          "description": "Proof bar missing from above-fold trust reinforcement",
+          "location": "design.components.proofBar",
+          "rationale": "Social proof delayed until mid-page reduces initial credibility"
+        }
+      ],
+      "suggestedFixes": [
+        {
+          "targetKey": "design.layout.hero",
+          "fix": "Add tagline 'Your business operating system' in 32px above headline with 80px breathing room",
+          "rationale": "Instant category understanding reduces cognitive load for SMB owners scanning options"
+        },
+        {
+          "targetKey": "design.conversion.stickyCta",
+          "fix": "Implement sticky bottom bar on mobile at 72px height, top bar on desktop after 600px scroll",
+          "rationale": "Persistent conversion path maintains 15-20% higher engagement through long pages"
+        },
+        {
+          "targetKey": "design.trust.visibilityPanel",
+          "fix": "Insert mini audit log components every 3 sections showing '247 actions logged today'",
+          "rationale": "Distributed proof points reinforce observability promise throughout journey"
+        },
+        {
+          "targetKey": "design.mobile.heroStacking",
+          "fix": "Stack hero as headline→tagline→CTA in 420px max height with 16px gaps",
+          "rationale": "Guarantees CTA visibility on all devices while maintaining hierarchy"
+        },
+        {
+          "targetKey": "design.components.pricingTable",
+          "fix": "Add '30-day money back' badge + 'Cancel anytime' below each tier at 14px",
+          "rationale": "Risk reversal messaging directly adjacent to price reduces abandonment"
+        },
+        {
+          "targetKey": "design.layout.sectionOrder",
+          "fix": "Reorder to Hero→Problem→How It Works→Suite→Pricing→FAQ",
+          "rationale": "Process-first sequencing builds understanding before feature exposition"
+        },
+        {
+          "targetKey": "design.type.h2",
+          "fix": "Set H2s to 28px desktop/24px mobile with 600 weight and 48px margin-top",
+          "rationale": "Clear typographic stops improve 10-second scan comprehension"
+        },
+        {
+          "targetKey": "brand.tokens.shadow",
+          "fix": "Define 3-tier elevation: sm:0,2,4,0.08 md:0,4,8,0.12 lg:0,8,16,0.16",
+          "rationale": "Consistent depth system creates premium layered feel"
+        },
+        {
+          "targetKey": "design.mobile.tapTargets",
+          "fix": "Set all interactive elements to min 48px height with 12px padding",
+          "rationale": "Larger targets reduce mis-taps and feel more premium on mobile"
+        },
+        {
+          "targetKey": "design.components.proofBar",
+          "fix": "Place 60px proof bar with 3 trust signals directly below hero",
+          "rationale": "Early trust injection increases scroll depth by 25%+"
+        }
+      ],
+      "requiresApproval": true,
+      "previewRecommended": true,
+      "risks": [],
+      "assumptions": [
+        "Missing upstream designer outputs — critiquing brief directly",
+        "Assuming standard SaaS page length of 4000-6000px",
+        "Assuming mobile-first audience given SMB target",
+        "Assuming no existing sticky CTA implementation"
+      ]
+    },
+    "customerSafe": false
+  },
+  "meta": {
+    "model": "claude-opus-4-1-20250805",
+    "requestId": "msg_018jEoBeYVc9rVSm9poawHwS",
+    "latencyMs": 46105,
+    "inputTokens": 3091,
+    "outputTokens": 1518,
+    "costUsd": 0.07645
+  },
+  "stopReason": "ok",
+  "retryMeta": {
+    "attemptCount": 1,
+    "attemptModels": [
+      "claude-opus-4-1-20250805"
+    ],
+    "finalModelUsed": "claude-opus-4-1-20250805",
+    "finalTimeoutMs": 90000,
+    "totalCost": 0.07645
+  }
+}

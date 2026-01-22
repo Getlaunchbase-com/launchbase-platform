@@ -1,0 +1,160 @@
+=== RAW RESPONSE (designer_brand_fast_marketing) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy4zUebuC49bIqwSfOX5fALrq1nVx
+Input Tokens: 738
+Output Tokens: 604
+Finish Reason: stop
+
+=== RAW TEXT (2297 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.marketingHeadline",
+      "value": "font-size: 44px; font-weight: bold;",
+      "rationale": "Enhance headline impact and readability.",
+      "confidence": 0.9,
+      "risks": ["May need layout adjustments"]
+    },
+    {
+      "targetKey": "brand.type.benefitText",
+      "value": "font-size: 18px; line-height: 1.6;",
+      "rationale": "Improves benefit readability and clarity.",
+      "confidence": 0.85,
+      "risks": ["Potential overlap with other elements"]
+    },
+    {
+      "targetKey": "brand.color.conversionPrimary",
+      "value": "#4CAF50",
+      "rationale": "Green tones promote trust and action.",
+      "confidence": 0.92,
+      "risks": ["Color blindness considerations"]
+    },
+    {
+      "targetKey": "brand.color.trustSignals",
+      "value": "#0056b3",
+      "rationale": "Blue conveys stability and professionalism.",
+      "confidence": 0.9,
+      "risks": ["Less contrast with certain backgrounds"]
+    },
+    {
+      "targetKey": "brand.components.pricingTable",
+      "value": "border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);",
+      "rationale": "Enhances visual hierarchy and focus.",
+      "confidence": 0.88,
+      "risks": ["Increased loading time"]
+    },
+    {
+      "targetKey": "brand.components.trustBadge",
+      "value": "size: 40px; color: #4CAF50;",
+      "rationale": "Ensures badges are noticeable and consistent.",
+      "confidence": 0.87,
+      "risks": ["May clash with existing branding"]
+    },
+    {
+      "targetKey": "brand.components.ctaButton",
+      "value": "padding: 14px 28px; border-radius: 6px;",
+      "rationale": "Improves CTA button visibility and clickability.",
+      "confidence": 0.9,
+      "risks": ["Inconsistent with current button styles"]
+    },
+    {
+      "targetKey": "brand.visual.tierHierarchy",
+      "value": "highlight featured tier with a subtle gradient;",
+      "rationale": "Differentiates pricing tiers clearly.",
+      "confidence": 0.9,
+      "risks": ["Visual clutter"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["May require further testing", "Potential need for accessibility adjustments"],
+  "assumptions": ["Users prefer clear and trustworthy visuals", "Current design lacks hierarchy"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.marketingHeadline",
+      "value": "font-size: 44px; font-weight: bold;",
+      "rationale": "Enhance headline impact and readability.",
+      "confidence": 0.9,
+      "risks": [
+        "May need layout adjustments"
+      ]
+    },
+    {
+      "targetKey": "brand.type.benefitText",
+      "value": "font-size: 18px; line-height: 1.6;",
+      "rationale": "Improves benefit readability and clarity.",
+      "confidence": 0.85,
+      "risks": [
+        "Potential overlap with other elements"
+      ]
+    },
+    {
+      "targetKey": "brand.color.conversionPrimary",
+      "value": "#4CAF50",
+      "rationale": "Green tones promote trust and action.",
+      "confidence": 0.92,
+      "risks": [
+        "Color blindness considerations"
+      ]
+    },
+    {
+      "targetKey": "brand.color.trustSignals",
+      "value": "#0056b3",
+      "rationale": "Blue conveys stability and professionalism.",
+      "confidence": 0.9,
+      "risks": [
+        "Less contrast with certain backgrounds"
+      ]
+    },
+    {
+      "targetKey": "brand.components.pricingTable",
+      "value": "border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);",
+      "rationale": "Enhances visual hierarchy and focus.",
+      "confidence": 0.88,
+      "risks": [
+        "Increased loading time"
+      ]
+    },
+    {
+      "targetKey": "brand.components.trustBadge",
+      "value": "size: 40px; color: #4CAF50;",
+      "rationale": "Ensures badges are noticeable and consistent.",
+      "confidence": 0.87,
+      "risks": [
+        "May clash with existing branding"
+      ]
+    },
+    {
+      "targetKey": "brand.components.ctaButton",
+      "value": "padding: 14px 28px; border-radius: 6px;",
+      "rationale": "Improves CTA button visibility and clickability.",
+      "confidence": 0.9,
+      "risks": [
+        "Inconsistent with current button styles"
+      ]
+    },
+    {
+      "targetKey": "brand.visual.tierHierarchy",
+      "value": "highlight featured tier with a subtle gradient;",
+      "rationale": "Differentiates pricing tiers clearly.",
+      "confidence": 0.9,
+      "risks": [
+        "Visual clutter"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "May require further testing",
+    "Potential need for accessibility adjustments"
+  ],
+  "assumptions": [
+    "Users prefer clear and trustworthy visuals",
+    "Current design lacks hierarchy"
+  ]
+}

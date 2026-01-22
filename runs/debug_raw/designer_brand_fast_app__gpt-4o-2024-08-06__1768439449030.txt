@@ -1,0 +1,159 @@
+=== RAW RESPONSE (designer_brand_fast_app) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy6AhwyTtfZumcWBLIfwYeVh2YciZ
+Input Tokens: 838
+Output Tokens: 565
+Finish Reason: stop
+
+=== RAW TEXT (2195 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.appScale",
+      "value": "Use a type scale of 1.125 for headings.",
+      "rationale": "Improves readability and hierarchy.",
+      "confidence": 0.85,
+      "risks": ["May require UI adjustments"]
+    },
+    {
+      "targetKey": "brand.color.status",
+      "value": "Use #FF6B35 for success status color.",
+      "rationale": "Aligns with brand primary color.",
+      "confidence": 0.9,
+      "risks": ["Potential color blindness issues"]
+    },
+    {
+      "targetKey": "brand.color.darkMode",
+      "value": "Adjust dark mode primary to #2C2C2C.",
+      "rationale": "Enhances contrast in dark mode.",
+      "confidence": 0.88,
+      "risks": ["May affect component visibility"]
+    },
+    {
+      "targetKey": "brand.components.input",
+      "value": "Add 2px border radius to inputs.",
+      "rationale": "Provides a softer, modern look.",
+      "confidence": 0.8,
+      "risks": ["Inconsistent with existing components"]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Increase padding to 12px horizontally.",
+      "rationale": "Improves touch target size on mobile.",
+      "confidence": 0.9,
+      "risks": ["May affect layout on small screens"]
+    },
+    {
+      "targetKey": "brand.spacing.grid",
+      "value": "Implement 8px grid system.",
+      "rationale": "Ensures consistent spacing across UI.",
+      "confidence": 0.92,
+      "risks": ["May require redesign of current layout"]
+    },
+    {
+      "targetKey": "brand.visual.consistency",
+      "value": "Standardize shadow to 4px for all cards.",
+      "rationale": "Creates uniformity in visual elements.",
+      "confidence": 0.87,
+      "risks": ["May impact performance on low-end devices"]
+    },
+    {
+      "targetKey": "brand.visual.states",
+      "value": "Use #FF6B35 for hover states on buttons.",
+      "rationale": "Maintains brand consistency.",
+      "confidence": 0.9,
+      "risks": ["Might not be noticeable on dark backgrounds"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["UI adjustments", "Color blindness issues"],
+  "assumptions": ["Current design is flexible for updates"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.appScale",
+      "value": "Use a type scale of 1.125 for headings.",
+      "rationale": "Improves readability and hierarchy.",
+      "confidence": 0.85,
+      "risks": [
+        "May require UI adjustments"
+      ]
+    },
+    {
+      "targetKey": "brand.color.status",
+      "value": "Use #FF6B35 for success status color.",
+      "rationale": "Aligns with brand primary color.",
+      "confidence": 0.9,
+      "risks": [
+        "Potential color blindness issues"
+      ]
+    },
+    {
+      "targetKey": "brand.color.darkMode",
+      "value": "Adjust dark mode primary to #2C2C2C.",
+      "rationale": "Enhances contrast in dark mode.",
+      "confidence": 0.88,
+      "risks": [
+        "May affect component visibility"
+      ]
+    },
+    {
+      "targetKey": "brand.components.input",
+      "value": "Add 2px border radius to inputs.",
+      "rationale": "Provides a softer, modern look.",
+      "confidence": 0.8,
+      "risks": [
+        "Inconsistent with existing components"
+      ]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Increase padding to 12px horizontally.",
+      "rationale": "Improves touch target size on mobile.",
+      "confidence": 0.9,
+      "risks": [
+        "May affect layout on small screens"
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.grid",
+      "value": "Implement 8px grid system.",
+      "rationale": "Ensures consistent spacing across UI.",
+      "confidence": 0.92,
+      "risks": [
+        "May require redesign of current layout"
+      ]
+    },
+    {
+      "targetKey": "brand.visual.consistency",
+      "value": "Standardize shadow to 4px for all cards.",
+      "rationale": "Creates uniformity in visual elements.",
+      "confidence": 0.87,
+      "risks": [
+        "May impact performance on low-end devices"
+      ]
+    },
+    {
+      "targetKey": "brand.visual.states",
+      "value": "Use #FF6B35 for hover states on buttons.",
+      "rationale": "Maintains brand consistency.",
+      "confidence": 0.9,
+      "risks": [
+        "Might not be noticeable on dark backgrounds"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "UI adjustments",
+    "Color blindness issues"
+  ],
+  "assumptions": [
+    "Current design is flexible for updates"
+  ]
+}

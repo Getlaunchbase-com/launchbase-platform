@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTZUPop-4YNCb4-9bf01a08ab738639
+Input Tokens: 1915
+Output Tokens: 794
+Finish Reason: stop
+
+=== RAW TEXT (3377 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Restructure hero into a 2-column grid on desktop (60/40): left = H1 + 3-bullet value list, right = product UI preview focused on visibility (activity feed + own...",
+      "rationale": "Improves above-the-fold clarity and scannability while visually anchoring the promise around control/visibility rather than hype.",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a primary CTA + secondary CTA directly under the hero bullets (inline row on desktop, stacked on mobile). Add a small 1-line micro-proof area directly benea...",
+      "rationale": "Creates an immediate conversion path without forcing users to hunt for the next step; reduces decision friction by presenting two clear actions.",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a sticky primary CTA on mobile after 40% scroll (hide on hero to avoid redundancy). Include a compact secondary link in the same bar. Set bar height ~56px w...",
+      "rationale": "Maintains a persistent conversion path on long pages and improves mobile conversion without adding cognitive load.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to: Hero → Proof bar → Problem/Solution (compressed) → How it works (3 steps) → Visibility/Auditability (panel) → Suite/Features → Pricing → FA...",
+      "rationale": "Aligns the narrative from promise → credibility → mechanism → trust/observability → details → decision, reducing cognitive load and improving flow to pricing.",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Insert a proof bar directly under the hero (desktop: single row; mobile: horizontally scrollable chips). Limit to 4–6 items (logos, outcomes, or trust markers) ...",
+      "rationale": "Adds immediate credibility and reduces skepticism before users invest effort in reading deeper sections.",
+      "confidence": 0.78
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge problem + solution into one section using a 2-column layout on desktop (left: 3 pain bullets, right: 3 outcome bullets). On mobile, present as a toggleabl...",
+      "rationale": "Cuts repetition, increases scannability, and quickly connects pain to resolution without requiring long scroll.",
+      "confidence": 0.81
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Convert 'How it works' into exactly 3 numbered steps in a horizontal stepper (desktop) and vertical timeline (mobile). Each step uses a card with 1 short descri...",
+      "rationale": "Clarifies mechanism quickly and supports the 'hand it off without losing control' promise with a concrete process.",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Add an 'Audit log' pattern section near midpage: a bordered panel (1px neutral border) showing a 6–8 row activity feed with timestamps, actor, action, and statu...",
+      "rationale": "Strengthens trust via auditability/observability with a concrete UI pattern instead of claims, reducing perceived risk of delegating operations.",
+      "confidence": 0.88
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Restructure hero into a 2-column grid on desktop (60/40): left = H1 + 3-bullet value list, right = product UI preview focused on visibility (activity feed + own...",
+      "rationale": "Improves above-the-fold clarity and scannability while visually anchoring the promise around control/visibility rather than hype.",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a primary CTA + secondary CTA directly under the hero bullets (inline row on desktop, stacked on mobile). Add a small 1-line micro-proof area directly benea...",
+      "rationale": "Creates an immediate conversion path without forcing users to hunt for the next step; reduces decision friction by presenting two clear actions.",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a sticky primary CTA on mobile after 40% scroll (hide on hero to avoid redundancy). Include a compact secondary link in the same bar. Set bar height ~56px w...",
+      "rationale": "Maintains a persistent conversion path on long pages and improves mobile conversion without adding cognitive load.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder sections to: Hero → Proof bar → Problem/Solution (compressed) → How it works (3 steps) → Visibility/Auditability (panel) → Suite/Features → Pricing → FA...",
+      "rationale": "Aligns the narrative from promise → credibility → mechanism → trust/observability → details → decision, reducing cognitive load and improving flow to pricing.",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Insert a proof bar directly under the hero (desktop: single row; mobile: horizontally scrollable chips). Limit to 4–6 items (logos, outcomes, or trust markers) ...",
+      "rationale": "Adds immediate credibility and reduces skepticism before users invest effort in reading deeper sections.",
+      "confidence": 0.78
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge problem + solution into one section using a 2-column layout on desktop (left: 3 pain bullets, right: 3 outcome bullets). On mobile, present as a toggleabl...",
+      "rationale": "Cuts repetition, increases scannability, and quickly connects pain to resolution without requiring long scroll.",
+      "confidence": 0.81
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Convert 'How it works' into exactly 3 numbered steps in a horizontal stepper (desktop) and vertical timeline (mobile). Each step uses a card with 1 short descri...",
+      "rationale": "Clarifies mechanism quickly and supports the 'hand it off without losing control' promise with a concrete process.",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Add an 'Audit log' pattern section near midpage: a bordered panel (1px neutral border) showing a 6–8 row activity feed with timestamps, actor, action, and statu...",
+      "rationale": "Strengthens trust via auditability/observability with a concrete UI pattern instead of claims, reducing perceived risk of delegating operations.",
+      "confidence": 0.88
+    }
+  ]
+}

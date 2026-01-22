@@ -1,0 +1,160 @@
+=== RAW RESPONSE (designer_brand_fast) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy2WMQNN1Vda5GWmjrmGwq6NuJh0c
+Input Tokens: 878
+Output Tokens: 581
+Finish Reason: stop
+
+=== RAW TEXT (2320 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "font-size: 48px; font-weight: 700;",
+      "rationale": "Enhances the hierarchy and draws attention to key messages.",
+      "confidence": 0.9,
+      "risks": ["Might require layout adjustments"]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "font-size: 16px; line-height: 1.6;",
+      "rationale": "Improves readability and comfort for extended reading.",
+      "confidence": 0.85,
+      "risks": ["May affect text overflow"]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "64px",
+      "rationale": "Provides clear separation between sections, enhancing flow.",
+      "confidence": 0.8,
+      "risks": ["Could increase page length"]
+    },
+    {
+      "targetKey": "brand.spacing.componentGap",
+      "value": "24px",
+      "rationale": "Ensures consistent and comfortable spacing between components.",
+      "confidence": 0.85,
+      "risks": ["Might require redesign of component layout"]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "border-radius: 8px; padding: 12px 24px;",
+      "rationale": "Provides a modern and approachable feel to buttons.",
+      "confidence": 0.9,
+      "risks": ["Changes button size perception"]
+    },
+    {
+      "targetKey": "brand.components.proofPattern",
+      "value": "Use subtle background patterns in cards",
+      "rationale": "Adds visual interest while maintaining focus on content.",
+      "confidence": 0.8,
+      "risks": ["Could distract if too bold"]
+    },
+    {
+      "targetKey": "brand.color.accent",
+      "value": "#FF5733",
+      "rationale": "Offers a vibrant contrast for calls to action, enhancing visibility.",
+      "confidence": 0.9,
+      "risks": ["May clash with existing colors"]
+    },
+    {
+      "targetKey": "brand.system.restraint",
+      "value": "Limit decorative elements to essential areas",
+      "rationale": "Maintains focus on content and improves trust.",
+      "confidence": 0.95,
+      "risks": ["Risk of appearing too minimalistic"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["Potential for increased page length", "Layout adjustments needed"],
+  "assumptions": ["Changes align with brand identity", "Target audience prefers clarity"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "font-size: 48px; font-weight: 700;",
+      "rationale": "Enhances the hierarchy and draws attention to key messages.",
+      "confidence": 0.9,
+      "risks": [
+        "Might require layout adjustments"
+      ]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "font-size: 16px; line-height: 1.6;",
+      "rationale": "Improves readability and comfort for extended reading.",
+      "confidence": 0.85,
+      "risks": [
+        "May affect text overflow"
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "64px",
+      "rationale": "Provides clear separation between sections, enhancing flow.",
+      "confidence": 0.8,
+      "risks": [
+        "Could increase page length"
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.componentGap",
+      "value": "24px",
+      "rationale": "Ensures consistent and comfortable spacing between components.",
+      "confidence": 0.85,
+      "risks": [
+        "Might require redesign of component layout"
+      ]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "border-radius: 8px; padding: 12px 24px;",
+      "rationale": "Provides a modern and approachable feel to buttons.",
+      "confidence": 0.9,
+      "risks": [
+        "Changes button size perception"
+      ]
+    },
+    {
+      "targetKey": "brand.components.proofPattern",
+      "value": "Use subtle background patterns in cards",
+      "rationale": "Adds visual interest while maintaining focus on content.",
+      "confidence": 0.8,
+      "risks": [
+        "Could distract if too bold"
+      ]
+    },
+    {
+      "targetKey": "brand.color.accent",
+      "value": "#FF5733",
+      "rationale": "Offers a vibrant contrast for calls to action, enhancing visibility.",
+      "confidence": 0.9,
+      "risks": [
+        "May clash with existing colors"
+      ]
+    },
+    {
+      "targetKey": "brand.system.restraint",
+      "value": "Limit decorative elements to essential areas",
+      "rationale": "Maintains focus on content and improves trust.",
+      "confidence": 0.95,
+      "risks": [
+        "Risk of appearing too minimalistic"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Potential for increased page length",
+    "Layout adjustments needed"
+  ],
+  "assumptions": [
+    "Changes align with brand identity",
+    "Target audience prefers clarity"
+  ]
+}

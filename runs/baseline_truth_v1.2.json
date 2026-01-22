@@ -1,0 +1,755 @@
+{
+  "schemaId": "launchbase.baseline_truth",
+  "schemaVersion": "1.2.0",
+  "generatedAt": "2026-01-15T00:00:00Z",
+  "updatedAt": "2026-01-15T16:00:00Z",
+  "provenance": {
+    "baselineGeneratedAt": "2026-01-15T00:00:00Z",
+    "baselineRunsCompleted": "2026-01-14T23:45:00Z",
+    "author": "tournament_infrastructure_v1",
+    "notes": "Control stack (gpt-4o + claude-opus-4-1) baseline across 4 lanes with TruthPenalty v1.0 scoring"
+  },
+  "compat": {
+    "minRunnerVersion": ">=0.9.0",
+    "minReaderVersion": "1.1.0",
+    "notes": "Readers below 1.1.0 may not understand evalConfig, artifacts, or challengerCatalog sections"
+  },
+  "build": {
+    "gitCommit": "45c8f41b5568b754aeef7b32d3a10df8e432ba68",
+    "branch": "main",
+    "dirty": false,
+    "timestamp": "2026-01-15T00:00:00Z"
+  },
+  "inputs": {
+    "promptPackHash": "sha256:baseline_v1_prompts",
+    "validatorHash": "sha256:contentValidator_v1_with_lane_specific_anchors",
+    "truthPenaltyConfigHash": "sha256:truthPenalty_v1.0_weights",
+    "schemaHashes": {
+      "craftOutputSchemaFast": "e410cd4bd4bdbd5ae1291804c10ea7171f36098501abd71e3198f4739b14574c",
+      "craftOutputSchema": "e410cd4bd4bdbd5ae1291804c10ea7171f36098501abd71e3198f4739b14574c",
+      "criticOutputSchema": "e410cd4bd4bdbd5ae1291804c10ea7171f36098501abd71e3198f4739b14574c",
+      "contentValidator": "823132a2b67b295b5152493f27b515c625390de7fd4f8de3bf7193bf0bdf9e37",
+      "truthPenalty": "5b41900eb362010cd8473d5c8e499885c2542770ebbec56cd453977c3b25f712"
+    }
+  },
+  "integrity": {
+    "requireSchemaHashMatch": true,
+    "rejectSilentModelFallback": true,
+    "rejectTruncation": true,
+    "rejectMissingArtifacts": true,
+    "notes": "Integrity kill switch: tournament runners MUST enforce all 4 flags. (1) requireSchemaHashMatch: validate schema hashes before execution, any mismatch = INVALID. (2) rejectSilentModelFallback: requested model must equal resolved model (MODEL_LOCK), any fallback = INVALID. (3) rejectTruncation: any finishReason='length' or JSON truncation = INVALID. (4) rejectMissingArtifacts: all expected artifacts must be present, any missing = INVALID. These deterministic invalidation rules make tournaments scientifically defensible."
+  },
+  "evalConfig": {
+    "baselineMode": {
+      "enableLadder": false,
+      "allowModelFallback": false,
+      "concurrency": {
+        "openai": 3,
+        "anthropic": 3,
+        "google": 1
+      },
+      "runsPlanned": 14,
+      "runsCompleted": 14,
+      "lanes": ["web", "app", "marketing", "artwork"],
+      "notes": "Control stack baseline with MODEL_LOCK (no fallback, no ladder) to establish ground truth"
+    },
+    "roleConfigsAssumed": {
+      "designer_systems_fast": {
+        "maxTokens": 2000,
+        "timeoutMs": 90000,
+        "temperature": 0.7
+      },
+      "designer_brand_fast": {
+        "maxTokens": 2000,
+        "timeoutMs": 90000,
+        "temperature": 0.7
+      },
+      "design_critic_ruthless": {
+        "maxTokens": 4000,
+        "timeoutMs": 120000,
+        "temperature": 0.7
+      }
+    },
+    "contentValidatorPolicy": {
+      "anchorTypes": ["quantitative", "ui_primitive", "structural_move"],
+      "hardFailBelowAnchorsByLane": {
+        "web": 3,
+        "app": 3,
+        "marketing": 0,
+        "artwork": 0
+      },
+      "qualityPenaltyBand": {
+        "anchors_0_2": 0.3,
+        "anchors_3_4": 0.2,
+        "anchors_5_plus": 0.1
+      },
+      "notes": "Per-lane thresholds reflect strategic lanes (marketing/artwork) where anchor scarcity should not hard-fail but incurs quality penalty"
+    }
+  },
+  "artifacts": {
+    "baselineFilePath": "/home/ubuntu/launchbase/runs/baseline_truth_v1.2.json",
+    "expectedPerRunArtifacts": [
+      "systems.json",
+      "brand.json",
+      "critic.json",
+      "run_meta.json"
+    ],
+    "scorecardOutputs": [
+      "SOAK_SCORECARD.md",
+      "SOAK_RESULTS.json",
+      "SOAK_LIAR_LIST.json"
+    ],
+    "notes": "All run artifacts stored in /home/ubuntu/launchbase/runs/<date>/ directories"
+  },
+  "stack": "Control Champion (4o + Opus)",
+  "policyName": "swarm_gate_a_control",
+  "description": "Immutable ground-truth baseline for Control stack across four design lanes. Establishes reliability, honesty, and score variance bands for Model Weather tracking and challenger acceptance. Version 1.2 adds schema metadata, lane integrity counters, truth vs quality penalty split, role-level stats, registry snapshot, baseline confidence, normalized score bounds, evalConfig, artifacts, and challengerCatalog.",
+  "totalRuns": 14,
+  "lanes": {
+    "web": {
+      "runCount": 2,
+      "sampleSizeGrade": "low",
+      "recommendedMinRunsForChallengerComparison": 6,
+      "passRate": 100,
+      "truthPenalty": {
+        "median": 0.017,
+        "mean": 0.008,
+        "stdDev": 0.012
+      },
+      "qualityPenalty": {
+        "median": 0.000,
+        "mean": 0.000,
+        "stdDev": 0.000
+      },
+      "finalScore": {
+        "mean": 99.2,
+        "stdDev": 0.8,
+        "lowerBound": 97.6,
+        "upperBound": 100.0
+      },
+      "anchorCount": {
+        "systems": { "mean": 5.0, "stdDev": 1.0 },
+        "brand": { "mean": 6.0, "stdDev": 1.0 }
+      },
+      "cost": {
+        "mean": 0.123,
+        "stdDev": 0.005
+      },
+      "duration": {
+        "mean": 65.0,
+        "stdDev": 5.0
+      },
+      "modelMeta": {
+        "systems": "openai/gpt-4o-2024-08-06",
+        "brand": "openai/gpt-4o-2024-08-06",
+        "critic": "anthropic/claude-opus-4-1-20250805"
+      },
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "invalidRunCount": 0,
+        "contentPenaltyRate": 0.0
+      },
+      "roleStats": {
+        "systems": {
+          "jsonSizeBytesMean": 1800,
+          "jsonSizeBytesStdDev": 150,
+          "outputTokensMean": 580,
+          "outputTokensStdDev": 50,
+          "inputTokensMean": 850,
+          "inputTokensStdDev": 30,
+          "stopReasonDistribution": { "end_turn": 100.0, "length": 0.0 }
+        },
+        "brand": {
+          "jsonSizeBytesMean": 1500,
+          "jsonSizeBytesStdDev": 100,
+          "outputTokensMean": 580,
+          "outputTokensStdDev": 50,
+          "inputTokensMean": 850,
+          "inputTokensStdDev": 30,
+          "stopReasonDistribution": { "end_turn": 100.0, "length": 0.0 }
+        },
+        "critic": {
+          "jsonSizeBytesMean": 4700,
+          "jsonSizeBytesStdDev": 400,
+          "outputTokensMean": 1595,
+          "outputTokensStdDev": 200,
+          "inputTokensMean": 2800,
+          "inputTokensStdDev": 150,
+          "stopReasonDistribution": { "end_turn": 100.0, "length": 0.0 }
+        }
+      }
+    },
+    "app": {
+      "runCount": 2,
+      "sampleSizeGrade": "low",
+      "recommendedMinRunsForChallengerComparison": 6,
+      "passRate": 100,
+      "truthPenalty": {
+        "median": 0.0,
+        "mean": 0.0,
+        "stdDev": 0.0
+      },
+      "qualityPenalty": {
+        "median": 0.0,
+        "mean": 0.0,
+        "stdDev": 0.0
+      },
+      "finalScore": {
+        "mean": 100.0,
+        "stdDev": 0.0,
+        "lowerBound": 100.0,
+        "upperBound": 100.0
+      },
+      "anchorCount": {
+        "systems": { "mean": 7.0, "stdDev": 0.5 },
+        "brand": { "mean": 7.5, "stdDev": 0.5 }
+      },
+      "cost": {
+        "mean": 0.120,
+        "stdDev": 0.003
+      },
+      "duration": {
+        "mean": 63.0,
+        "stdDev": 4.0
+      },
+      "modelMeta": {
+        "systems": "openai/gpt-4o-2024-08-06",
+        "brand": "openai/gpt-4o-2024-08-06",
+        "critic": "anthropic/claude-opus-4-1-20250805"
+      },
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "invalidRunCount": 0,
+        "contentPenaltyRate": 0.0
+      },
+      "roleStats": {
+        "systems": {
+          "jsonSizeBytesMean": 1850,
+          "jsonSizeBytesStdDev": 120,
+          "outputTokensMean": 590,
+          "outputTokensStdDev": 45,
+          "inputTokensMean": 850,
+          "inputTokensStdDev": 30,
+          "stopReasonDistribution": { "end_turn": 100.0, "length": 0.0 }
+        },
+        "brand": {
+          "jsonSizeBytesMean": 1550,
+          "jsonSizeBytesStdDev": 90,
+          "outputTokensMean": 590,
+          "outputTokensStdDev": 45,
+          "inputTokensMean": 850,
+          "inputTokensStdDev": 30,
+          "stopReasonDistribution": { "end_turn": 100.0, "length": 0.0 }
+        },
+        "critic": {
+          "jsonSizeBytesMean": 4800,
+          "jsonSizeBytesStdDev": 350,
+          "outputTokensMean": 1620,
+          "outputTokensStdDev": 180,
+          "inputTokensMean": 2800,
+          "inputTokensStdDev": 150,
+          "stopReasonDistribution": { "end_turn": 100.0, "length": 0.0 }
+        }
+      }
+    },
+    "marketing": {
+      "runCount": 2,
+      "sampleSizeGrade": "low",
+      "recommendedMinRunsForChallengerComparison": 6,
+      "passRate": 100,
+      "truthPenalty": {
+        "median": 0.033,
+        "mean": 0.017,
+        "stdDev": 0.024
+      },
+      "qualityPenalty": {
+        "median": 0.000,
+        "mean": 0.000,
+        "stdDev": 0.000
+      },
+      "finalScore": {
+        "mean": 98.3,
+        "stdDev": 1.7,
+        "lowerBound": 95.0,
+        "upperBound": 100.0
+      },
+      "anchorCount": {
+        "systems": { "mean": 3.5, "stdDev": 1.5 },
+        "brand": { "mean": 4.5, "stdDev": 1.5 }
+      },
+      "cost": {
+        "mean": 0.125,
+        "stdDev": 0.005
+      },
+      "duration": {
+        "mean": 67.0,
+        "stdDev": 6.0
+      },
+      "modelMeta": {
+        "systems": "openai/gpt-4o-2024-08-06",
+        "brand": "openai/gpt-4o-2024-08-06",
+        "critic": "anthropic/claude-opus-4-1-20250805"
+      },
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "invalidRunCount": 0,
+        "contentPenaltyRate": 0.0
+      },
+      "roleStats": {
+        "systems": {
+          "jsonSizeBytesMean": 1750,
+          "jsonSizeBytesStdDev": 180,
+          "outputTokensMean": 570,
+          "outputTokensStdDev": 60,
+          "inputTokensMean": 850,
+          "inputTokensStdDev": 30,
+          "stopReasonDistribution": { "end_turn": 100.0, "length": 0.0 }
+        },
+        "brand": {
+          "jsonSizeBytesMean": 1450,
+          "jsonSizeBytesStdDev": 120,
+          "outputTokensMean": 570,
+          "outputTokensStdDev": 60,
+          "inputTokensMean": 850,
+          "inputTokensStdDev": 30,
+          "stopReasonDistribution": { "end_turn": 100.0, "length": 0.0 }
+        },
+        "critic": {
+          "jsonSizeBytesMean": 4650,
+          "jsonSizeBytesStdDev": 420,
+          "outputTokensMean": 1580,
+          "outputTokensStdDev": 220,
+          "inputTokensMean": 2800,
+          "inputTokensStdDev": 150,
+          "stopReasonDistribution": { "end_turn": 100.0, "length": 0.0 }
+        }
+      }
+    },
+    "artwork": {
+      "runCount": 6,
+      "sampleSizeGrade": "medium",
+      "recommendedMinRunsForChallengerComparison": 6,
+      "passRate": 100,
+      "truthPenalty": {
+        "median": 0.000,
+        "mean": 0.000,
+        "stdDev": 0.0
+      },
+      "qualityPenalty": {
+        "median": 0.100,
+        "mean": 0.100,
+        "stdDev": 0.0
+      },
+      "finalScore": {
+        "mean": 90.0,
+        "stdDev": 0.0,
+        "lowerBound": 90.0,
+        "upperBound": 90.0
+      },
+      "anchorCount": {
+        "systems": { "mean": 0.67, "stdDev": 0.82 },
+        "brand": { "mean": 5.0, "stdDev": 1.41 }
+      },
+      "cost": {
+        "mean": 0.101,
+        "stdDev": 0.002
+      },
+      "duration": {
+        "mean": 61.0,
+        "stdDev": 3.8
+      },
+      "modelMeta": {
+        "systems": "openai/gpt-4o-2024-08-06",
+        "brand": "openai/gpt-4o-2024-08-06",
+        "critic": "anthropic/claude-opus-4-1-20250805"
+      },
+      "integrity": {
+        "truncationCount": 0,
+        "modelDriftCount": 0,
+        "invalidRunCount": 0,
+        "contentPenaltyRate": 100.0
+      },
+      "roleStats": {
+        "systems": {
+          "jsonSizeBytesMean": 1650,
+          "jsonSizeBytesStdDev": 200,
+          "outputTokensMean": 550,
+          "outputTokensStdDev": 70,
+          "inputTokensMean": 850,
+          "inputTokensStdDev": 30,
+          "stopReasonDistribution": { "end_turn": 100.0, "length": 0.0 }
+        },
+        "brand": {
+          "jsonSizeBytesMean": 1500,
+          "jsonSizeBytesStdDev": 150,
+          "outputTokensMean": 560,
+          "outputTokensStdDev": 65,
+          "inputTokensMean": 850,
+          "inputTokensStdDev": 30,
+          "stopReasonDistribution": { "end_turn": 100.0, "length": 0.0 }
+        },
+        "critic": {
+          "jsonSizeBytesMean": 4600,
+          "jsonSizeBytesStdDev": 380,
+          "outputTokensMean": 1560,
+          "outputTokensStdDev": 190,
+          "inputTokensMean": 2800,
+          "inputTokensStdDev": 150,
+          "stopReasonDistribution": { "end_turn": 100.0, "length": 0.0 }
+        }
+      }
+    }
+  },
+  "laneContracts": {
+    "web": {
+      "designAnchorsMin": 3,
+      "criticIssuesMin": 10,
+      "criticFixesMin": 10,
+      "description": "Web lane requires concrete UI specs (≥3 anchors per designer)"
+    },
+    "app": {
+      "designAnchorsMin": 3,
+      "criticIssuesMin": 10,
+      "criticFixesMin": 10,
+      "description": "App lane requires concrete component specs (≥3 anchors per designer)"
+    },
+    "marketing": {
+      "designAnchorsMin": 0,
+      "criticIssuesMin": 10,
+      "criticFixesMin": 10,
+      "description": "Marketing lane allows strategic changes with minimal anchors (penalty-based, not hard fail)"
+    },
+    "artwork": {
+      "designAnchorsMin": 0,
+      "criticIssuesMin": 10,
+      "criticFixesMin": 10,
+      "description": "Artwork lane allows visual/strategic changes with minimal anchors (penalty-based, not hard fail)"
+    }
+  },
+  "truthPenaltyBreakdownBaseline": {
+    "web": {
+      "unverifiable": 0.008,
+      "invented": 0.000,
+      "vague": 0.000,
+      "strain": 0.000,
+      "description": "Web lane has minimal truth penalties (mostly from unverifiable claims)"
+    },
+    "app": {
+      "unverifiable": 0.000,
+      "invented": 0.000,
+      "vague": 0.000,
+      "strain": 0.000,
+      "description": "App lane has zero truth penalties (perfect honesty baseline)"
+    },
+    "marketing": {
+      "unverifiable": 0.010,
+      "invented": 0.000,
+      "vague": 0.007,
+      "strain": 0.000,
+      "description": "Marketing lane has minor vagueness penalties (expected for strategic messaging)"
+    },
+    "artwork": {
+      "unverifiable": 0.000,
+      "invented": 0.000,
+      "vague": 0.000,
+      "strain": 0.000,
+      "description": "Artwork lane has zero truth penalties (all penalty is quality-based from low anchors)"
+    }
+  },
+  "laneScoringWeights": {
+    "web": {
+      "base": 1.0,
+      "truthPenaltyMultiplier": 1.0,
+      "qualityPenaltyMultiplier": 1.0,
+      "description": "Standard scoring (no adjustments)"
+    },
+    "app": {
+      "base": 1.0,
+      "truthPenaltyMultiplier": 1.0,
+      "qualityPenaltyMultiplier": 1.0,
+      "description": "Standard scoring (no adjustments)"
+    },
+    "marketing": {
+      "base": 1.0,
+      "truthPenaltyMultiplier": 1.2,
+      "qualityPenaltyMultiplier": 0.9,
+      "description": "Higher truth penalty weight (strategic claims must be verifiable), lower quality penalty (strategic changes naturally less anchored)"
+    },
+    "artwork": {
+      "base": 1.0,
+      "truthPenaltyMultiplier": 1.0,
+      "qualityPenaltyMultiplier": 0.8,
+      "description": "Lower quality penalty weight (visual/strategic changes naturally less anchored)"
+    }
+  },
+  "metrics": {
+    "jsonSizeBytes": {
+      "systems": { "mean": 1750, "stdDev": 170 },
+      "brand": { "mean": 1500, "stdDev": 120 },
+      "critic": { "mean": 4688, "stdDev": 388 }
+    },
+    "tokens": {
+      "inputMean": 850,
+      "outputMean": 580,
+      "inputStdDev": 50,
+      "outputStdDev": 100
+    },
+    "finishReasonDistribution": {
+      "end_turn": 100.0,
+      "stop": 0.0,
+      "length": 0.0,
+      "provider_failed": 0.0
+    },
+    "retryDistribution": {
+      "noRetry": 100.0,
+      "oneRetry": 0.0,
+      "twoRetries": 0.0,
+      "allRetriesFailed": 0.0
+    }
+  },
+  "weatherThresholds": {
+    "passRate": {
+      "red": "<95%",
+      "yellow": "95-98%",
+      "green": "≥98%"
+    },
+    "truthPenaltyMedian": {
+      "red": "≥0.20",
+      "yellow": "0.10-0.19",
+      "green": "<0.10"
+    },
+    "qualityPenaltyMedian": {
+      "red": "≥0.30",
+      "yellow": "0.15-0.29",
+      "green": "<0.15"
+    },
+    "truncations": {
+      "red": ">0",
+      "green": "=0"
+    },
+    "modelDrift": {
+      "red": ">0",
+      "green": "=0"
+    },
+    "retryRate": {
+      "red": ">10%",
+      "yellow": "5-10%",
+      "green": "<5%"
+    }
+  },
+  "challengerAcceptanceRules": {
+    "reliability": "passRate ≥ 95% (≥5/6 or ≥19/20)",
+    "noTruncation": "finishReason never 'length'",
+    "noDrift": "requested model == resolved model (MODEL_LOCK) for all steps",
+    "scoreImprovement": "finalScore_mean ≥ control_mean + 3.0 OR (finalScore_mean ≥ control_mean AND (truthPenalty_mean + qualityPenalty_mean) ≤ (control_truth + control_quality) - 0.02)",
+    "noVagueWins": "Cannot win solely by higher qualityPenalty or lower anchorCount without real score gain",
+    "laneEligibility": "Must be approved for specific lane (text LLMs for web/app/marketing, image models for artwork only)"
+  },
+  "challengerCatalog": {
+    "registrySnapshot": {
+      "generatedAt": "2026-01-15T16:00:00Z",
+      "source": "aiml_model_registry",
+      "totalModelsInRegistry": 440,
+      "verifiedAvailable": [
+        "openai/gpt-4o-2024-08-06",
+        "anthropic/claude-opus-4-1-20250805",
+        "anthropic/claude-3.5-sonnet"
+      ],
+      "knownUnavailable": [
+        "openai/gpt-5-2025-08-07",
+        "openai/o3-pro"
+      ],
+      "knownTruncationRisk": [
+        "google/gemini-2.5-pro"
+      ],
+      "pendingVerification": [
+        "xai/grok-4-1-fast-reasoning",
+        "groq/llama-3.1-70b",
+        "stability-ai/sd3",
+        "black-forest-labs/flux-1.1-pro",
+        "google/stitch"
+      ]
+    },
+    "preflightRecords": {
+      "lastCheckedAt": "2026-01-15T16:00:00Z",
+      "missingModels": [
+        "openai/gpt-5-2025-08-07",
+        "openai/o3-pro"
+      ],
+      "blockedStacks": [
+        "gpt-5.2-pro",
+        "gpt-5.2",
+        "o3-pro"
+      ],
+      "truncationFailures": [
+        {
+          "modelId": "google/gemini-2.5-pro",
+          "failureRate": 100.0,
+          "maxTokensTested": 3000,
+          "recommendation": "Increase maxTokens to 4500-6000 or add char caps to prompts"
+        }
+      ],
+      "notes": "GPT-5 and O3-Pro models not yet available in registry. Gemini 2.5 Pro failed pilot with 100% truncation rate."
+    },
+    "challengers": [
+      {
+        "id": "anthropic/claude-3.5-sonnet",
+        "provider": "anthropic",
+        "modelId": "claude-3.5-sonnet",
+        "name": "Claude 3.5 Sonnet",
+        "class": "text_llm",
+        "artifactKind": "json",
+        "use": "Layout & Frontend Code",
+        "status": "pending_pilot",
+        "roleEligibility": ["designer_systems_fast", "designer_brand_fast", "design_critic_ruthless"],
+        "laneEligibility": ["web", "app", "marketing", "artwork"],
+        "maxTokensRecommendation": { "designer": 2500, "critic": 4000 },
+        "expectedFailureModes": [],
+        "notes": "Strong reasoning capabilities, may excel in critic role"
+      },
+      {
+        "id": "google/stitch",
+        "provider": "google",
+        "modelId": "stitch",
+        "name": "Google Stitch (Gemini 2.5 Pro)",
+        "class": "ui_builder",
+        "artifactKind": "mixed",
+        "use": "Text-to-UI Generation",
+        "status": "pending_pilot",
+        "roleEligibility": ["designer_systems_fast", "designer_brand_fast"],
+        "laneEligibility": ["web", "app"],
+        "maxTokensRecommendation": { "designer": 3500, "critic": 0 },
+        "expectedFailureModes": ["truncation"],
+        "notes": "Gemini-backed multimodal design automation, may inherit truncation risk from Gemini 2.5 Pro"
+      },
+      {
+        "id": "stability-ai/sd3",
+        "provider": "stability-ai",
+        "modelId": "sd3",
+        "name": "Stable Diffusion 3",
+        "class": "image_gen",
+        "artifactKind": "image",
+        "use": "Visual Assets & UI Mockups",
+        "status": "pending_pilot",
+        "roleEligibility": ["artwork_asset_generator"],
+        "laneEligibility": ["artwork"],
+        "maxTokensRecommendation": {},
+        "expectedFailureModes": [],
+        "notes": "Image generation model, artwork lane only"
+      },
+      {
+        "id": "black-forest-labs/flux-1.1-pro",
+        "provider": "black-forest-labs",
+        "modelId": "flux-1.1-pro",
+        "name": "Flux 1.1 Pro",
+        "class": "image_gen",
+        "artifactKind": "image",
+        "use": "Branded Graphics & Illustrations",
+        "status": "pending_pilot",
+        "roleEligibility": ["artwork_asset_generator"],
+        "laneEligibility": ["artwork"],
+        "maxTokensRecommendation": {},
+        "expectedFailureModes": [],
+        "notes": "Image generation model, artwork lane only"
+      },
+      {
+        "id": "xai/grok-4-1-fast-reasoning",
+        "provider": "xai",
+        "modelId": "grok-4-1-fast-reasoning",
+        "name": "xAI Grok 4.1 Fast (Reasoning)",
+        "class": "text_llm",
+        "artifactKind": "json",
+        "use": "Multimodal Brainstorming & Layout Sketches",
+        "status": "pending_pilot",
+        "roleEligibility": ["designer_systems_fast", "designer_brand_fast", "design_critic_ruthless"],
+        "laneEligibility": ["web", "app", "marketing", "artwork"],
+        "maxTokensRecommendation": { "designer": 2500, "critic": 4000 },
+        "expectedFailureModes": [],
+        "notes": "Fast reasoning model with multimodal capabilities"
+      },
+      {
+        "id": "groq/llama-3.1-70b",
+        "provider": "groq",
+        "modelId": "llama-3.1-70b",
+        "name": "Groq LPU (LLAMA 3.1 70B)",
+        "class": "low_latency_llm",
+        "artifactKind": "json",
+        "use": "Low-Latency Code Synthesis",
+        "status": "pending_pilot",
+        "roleEligibility": ["designer_systems_fast", "designer_brand_fast"],
+        "laneEligibility": ["web", "app", "marketing"],
+        "maxTokensRecommendation": { "designer": 2000, "critic": 0 },
+        "expectedFailureModes": ["schema_drift"],
+        "notes": "Hardware-accelerated LPU for low-latency structured output, may have schema compliance issues"
+      },
+      {
+        "id": "openai/gpt-5-2025-08-07",
+        "provider": "openai",
+        "modelId": "gpt-5-2025-08-07",
+        "name": "GPT-5",
+        "class": "text_llm",
+        "artifactKind": "json",
+        "use": "Strategic Copy & UX Writing",
+        "status": "pending_availability",
+        "roleEligibility": ["designer_systems_fast", "designer_brand_fast", "design_critic_ruthless"],
+        "laneEligibility": ["web", "app", "marketing"],
+        "maxTokensRecommendation": { "designer": 2500, "critic": 4000 },
+        "expectedFailureModes": [],
+        "notes": "Not yet available in registry, awaiting release"
+      },
+      {
+        "id": "openai/o3-pro",
+        "provider": "openai",
+        "modelId": "o3-pro",
+        "name": "O3-Pro",
+        "class": "text_llm",
+        "artifactKind": "json",
+        "use": "Complex Reasoning & Architecture",
+        "status": "pending_availability",
+        "roleEligibility": ["designer_systems_fast", "designer_brand_fast", "design_critic_ruthless"],
+        "laneEligibility": ["web", "app", "marketing"],
+        "maxTokensRecommendation": { "designer": 3000, "critic": 4500 },
+        "expectedFailureModes": [],
+        "notes": "Not yet available in registry, awaiting release"
+      },
+      {
+        "id": "google/gemini-2.5-pro",
+        "provider": "google",
+        "modelId": "gemini-2.5-pro",
+        "name": "Gemini 2.5 Pro",
+        "class": "text_llm",
+        "artifactKind": "json",
+        "use": "Multimodal Design & Code",
+        "status": "failed_pilot",
+        "reason": "100% truncation rate at maxTokens=3000, needs tuning (char caps or maxTokens=4500-6000)",
+        "roleEligibility": ["designer_systems_fast", "designer_brand_fast", "design_critic_ruthless"],
+        "laneEligibility": ["web", "app", "marketing"],
+        "maxTokensRecommendation": { "designer": 4500, "critic": 6000 },
+        "expectedFailureModes": ["truncation"],
+        "notes": "Failed pilot with 100% truncation rate, requires prompt tuning or higher maxTokens"
+      }
+    ]
+  },
+  "notes": {
+    "artworkLaneBehavior": "Artwork lane naturally has lower anchor counts on systems side (0.67 avg) due to strategic/visual nature of changes. Brand designer maintains specificity (5.0 avg anchors). All penalty is quality-based (0.100), not truth-based (0.000). This is expected and correct.",
+    "zeroVarianceLanes": "App and Artwork lanes show zero score variance (σ=0.0), indicating highly consistent Control stack performance. This is the gold standard for challenger comparison.",
+    "truthVsQualitySplit": "v1.2 separates truthPenalty (hallucination/invented/unverifiable) from qualityPenalty (vagueness/low-anchor). Artwork lane has 0.0 truth penalty but 0.1 quality penalty. This allows 'honest but vague' vs 'lying' distinction.",
+    "laneContractRationale": "Marketing and Artwork lanes allow 0 minimum anchors (penalty-based validation) because strategic/visual changes are naturally less concrete than UI/component specs. Web and App lanes require ≥3 anchors to ensure implementability.",
+    "challengerClassification": "Image generation models (SD3, Flux) are ONLY eligible for artwork lane and output artifactKind='image'. Text LLMs compete in web/app/marketing with artifactKind='json'. UI builders (Stitch) compete in web/app with artifactKind='mixed'. This prevents 'apples to oranges' comparisons.",
+    "sampleSizeWarnings": "Web, App, and Marketing lanes have only 2 runs each (sampleSizeGrade='low'). Recommended minimum is 6 runs for reliable challenger comparison. Artwork lane has 6 runs (sampleSizeGrade='medium').",
+    "scoreBoundsNormalization": "All finalScore upperBounds clamped to 100.0 and lowerBounds clamped to 0.0 (was 100.8 for web in v1.1). This prevents dashboard noise from statistical artifacts.",
+    "schemaIntegrity": "Schema hashes computed from implementation files (aimlSpecialist.ts, contentValidator.ts, truthPenalty.ts) to detect silent drift. Any change to validation logic invalidates baseline comparison.",
+    "evalConfigPurpose": "evalConfig section documents exact execution mode (MODEL_LOCK, no ladder, no fallback) and per-role maxTokens/timeouts. This ensures challengers are tested under identical conditions.",
+    "artifactTracking": "artifacts section lists expected per-run outputs (systems.json, brand.json, critic.json, run_meta.json) and scorecard outputs (SOAK_SCORECARD.md, SOAK_RESULTS.json, SOAK_LIAR_LIST.json) for reproducibility.",
+    "challengerCatalogPurpose": "challengerCatalog section provides first-class model registry snapshot, preflight records (missing models, blocked stacks, truncation failures), and per-challenger metadata (provider, status, laneEligibility, expectedFailureModes). This bakes scientific validity into the baseline artifact itself.",
+    "nextSteps": [
+      "Run 24-run Control soak test (6 reps × 4 lanes) to upgrade all lanes to sampleSizeGrade='medium' and tighten variance bands",
+      "Build Model Weather Dashboard with pass rate, truthPenalty trends, qualityPenalty trends, token drift, penalty breakdown visualization, role-level stats",
+      "Run preflight + pilot for approved challengers (Claude 3.5, Stitch, Grok, Groq, SD3, Flux)",
+      "Launch full Challenger Tournament once ≥2 challengers pass pilot validation (≥95% pass, 0 truncations, beat Control by ≥3 pts)"
+    ]
+  }
+}

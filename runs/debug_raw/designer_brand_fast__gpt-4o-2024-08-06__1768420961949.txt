@@ -1,0 +1,160 @@
+=== RAW RESPONSE (designer_brand_fast) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy1MSUMMfoxaCIoT7oBzXfgCWt12s
+Input Tokens: 878
+Output Tokens: 572
+Finish Reason: stop
+
+=== RAW TEXT (2145 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "font-size: 48px; font-weight: 700;",
+      "rationale": "Enhance hierarchy and draw focus to main messages.",
+      "confidence": 0.9,
+      "risks": ["May require layout adjustments"]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "font-size: 16px; line-height: 1.5;",
+      "rationale": "Improve readability and user comfort.",
+      "confidence": 0.85,
+      "risks": ["Minor text overflow issues"]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "48px",
+      "rationale": "Create clear separation and improve scanability.",
+      "confidence": 0.9,
+      "risks": ["May increase page length"]
+    },
+    {
+      "targetKey": "brand.spacing.rhythm",
+      "value": "8px, 16px, 32px, 48px",
+      "rationale": "Establish consistent spacing for visual harmony.",
+      "confidence": 0.9,
+      "risks": ["Inconsistent application at first"]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "padding: 12px 24px; border-radius: 4px;",
+      "rationale": "Enhance clickability and modern look.",
+      "confidence": 0.9,
+      "risks": ["May impact secondary button styles"]
+    },
+    {
+      "targetKey": "brand.components.trustBadge",
+      "value": "size: 40px; margin: 16px;",
+      "rationale": "Increase visibility of trust elements.",
+      "confidence": 0.85,
+      "risks": ["Potential badge clutter"]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#0070f3",
+      "rationale": "Convey trust and professionalism.",
+      "confidence": 0.95,
+      "risks": ["Overuse may reduce impact"]
+    },
+    {
+      "targetKey": "brand.system.restraint",
+      "value": "Limit decorative elements to essentials.",
+      "rationale": "Focus on clarity and user experience.",
+      "confidence": 0.9,
+      "risks": ["May seem too minimalistic"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["Potential implementation issues", "Need for consistency checks"],
+  "assumptions": ["Design elements are flexible", "Typography is web-safe"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "font-size: 48px; font-weight: 700;",
+      "rationale": "Enhance hierarchy and draw focus to main messages.",
+      "confidence": 0.9,
+      "risks": [
+        "May require layout adjustments"
+      ]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "font-size: 16px; line-height: 1.5;",
+      "rationale": "Improve readability and user comfort.",
+      "confidence": 0.85,
+      "risks": [
+        "Minor text overflow issues"
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "48px",
+      "rationale": "Create clear separation and improve scanability.",
+      "confidence": 0.9,
+      "risks": [
+        "May increase page length"
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.rhythm",
+      "value": "8px, 16px, 32px, 48px",
+      "rationale": "Establish consistent spacing for visual harmony.",
+      "confidence": 0.9,
+      "risks": [
+        "Inconsistent application at first"
+      ]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "padding: 12px 24px; border-radius: 4px;",
+      "rationale": "Enhance clickability and modern look.",
+      "confidence": 0.9,
+      "risks": [
+        "May impact secondary button styles"
+      ]
+    },
+    {
+      "targetKey": "brand.components.trustBadge",
+      "value": "size: 40px; margin: 16px;",
+      "rationale": "Increase visibility of trust elements.",
+      "confidence": 0.85,
+      "risks": [
+        "Potential badge clutter"
+      ]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#0070f3",
+      "rationale": "Convey trust and professionalism.",
+      "confidence": 0.95,
+      "risks": [
+        "Overuse may reduce impact"
+      ]
+    },
+    {
+      "targetKey": "brand.system.restraint",
+      "value": "Limit decorative elements to essentials.",
+      "rationale": "Focus on clarity and user experience.",
+      "confidence": 0.9,
+      "risks": [
+        "May seem too minimalistic"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Potential implementation issues",
+    "Need for consistency checks"
+  ],
+  "assumptions": [
+    "Design elements are flexible",
+    "Typography is web-safe"
+  ]
+}

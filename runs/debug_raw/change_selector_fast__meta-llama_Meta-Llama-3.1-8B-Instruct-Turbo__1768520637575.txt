@@ -1,0 +1,162 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTT7XKL-4YNCb4-9be93ced7ca9884d
+Input Tokens: 2396
+Output Tokens: 1100
+Finish Reason: stop
+
+=== RAW TEXT (4805 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an “audit log” pattern section: a lightweight activity-feed component (10 rows max) with filters (All / Changes / Approvals) and timestamps; place it above Pricing and repeat a mini version in the hero right column on desktop.",
+      "rationale": "Strengthens trust via auditability and visibility rather than claims, showing concrete control and accountability mechanisms.",
+      "confidence": 0.9,
+      "risks": [
+        "Needs careful data anonymization if using real examples"
+      ]
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge problem + solution into one section using a before/after two-column layout on desktop (50/50) and a stacked layout on mobile. Limit to 3 bullets per side and add a small “control/visibility” callout card beneath (single card, max 2 rows).",
+      "rationale": "Makes the value proposition easier to parse quickly and ties directly to the core promise (hand-off + control) without extra scrolling.",
+      "confidence": 0.83,
+      "risks": [
+        "Over-compressing may remove nuance if too many points currently exist"
+      ]
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move pricing higher (after Trust/Observability) and present as 2 pricing cards side-by-side on desktop / stacked on mobile. Add a “what you get” bullet list (5 bullets max) per tier, and a clearly highlighted default tier with a stronger border and subtle elevation.",
+      "rationale": "Makes pricing easier to parse and compare, reduces ambiguity about inclusions, and places pricing after trust signals to reduce sticker shock.",
+      "confidence": 0.87,
+      "risks": [
+        "Highlighting one tier may reduce selection of the other if not balanced"
+      ]
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Convert How It Works into a 3-step horizontal stepper on desktop and vertical stepper on mobile, with each step as a compact card (icon + 1–2 lines). Add a single mid-section CTA after step 3.",
+      "rationale": "Improves hierarchy and scannability by turning process into a quick visual sequence and adds a natural conversion moment after understanding is established.",
+      "confidence": 0.79,
+      "risks": [
+        "If steps require more explanation, cards may feel too terse"
+      ]
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Add a proof bar directly under the hero with a 4-column grid on desktop / 2x2 on mobile: 1 short testimonial card + 3 compact proof items (e.g., counts/ratings/placeholders). Constrain height to ~96px desktop, ~140px mobile.",
+      "rationale": "Increases trust early without adding a full testimonial section, improving scannability and reducing the need for hype copy.",
+      "confidence": 0.81,
+      "risks": [
+        "If proof items are weak or vague, it can reduce credibility"
+      ]
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Add a secondary CTA next to the primary CTA in hero (desktop inline; mobile stacked): primary stays first, secondary opens a lightweight modal with a 60–90s product walkthrough (no form). Keep CTA group within the first 400px on mobile.",
+      "rationale": "Creates a clearer conversion path for both ready-to-start and need-to-see users, reducing bounce and decision friction.",
+      "confidence": 0.82,
+      "risks": [
+        "Modal walkthrough requires tight performance to avoid hurting LCP"
+      ]
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Replace any table-style comparison with card-based pricing plus an optional collapsible “compare details” accordion below (desktop open by default, mobile collapsed). Keep feature rows to 8–12 max and group into 2 categories.",
+      "rationale": "Reduces cognitive load and improves mobile readability while still allowing deeper comparison for evaluators.",
+      "confidence": 0.85,
+      "risks": [
+        "Too much hidden detail could frustrate users if essentials are collapsed"
+      ]
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder homepage to: Hero → Proof bar (logos/metrics/testimonial snippet) → Problem/Solution (single merged section) → How it Works → Suite → Trust/Observability (audit log + visibility panel) → Pricing → FAQ → Footer. Keep each section header within a consistent 2-line max.",
+      "rationale": "Reduces cognitive load and creates a more linear narrative: credibility early, then explanation, then details, then pricing and objections.",
+      "confidence": 0.84,
+      "risks": [
+        "Requires re-anchoring internal nav links if present"
+      ]
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an “audit log” pattern section: a lightweight activity-feed component (10 rows max) with filters (All / Changes / Approvals) and timestamps; place it above Pricing and repeat a mini version in the hero right column on desktop.",
+      "rationale": "Strengthens trust via auditability and visibility rather than claims, showing concrete control and accountability mechanisms.",
+      "confidence": 0.9,
+      "risks": [
+        "Needs careful data anonymization if using real examples"
+      ]
+    },
+    {
+      "targetKey": "design.layout.problemSolution",
+      "value": "Merge problem + solution into one section using a before/after two-column layout on desktop (50/50) and a stacked layout on mobile. Limit to 3 bullets per side and add a small “control/visibility” callout card beneath (single card, max 2 rows).",
+      "rationale": "Makes the value proposition easier to parse quickly and ties directly to the core promise (hand-off + control) without extra scrolling.",
+      "confidence": 0.83,
+      "risks": [
+        "Over-compressing may remove nuance if too many points currently exist"
+      ]
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move pricing higher (after Trust/Observability) and present as 2 pricing cards side-by-side on desktop / stacked on mobile. Add a “what you get” bullet list (5 bullets max) per tier, and a clearly highlighted default tier with a stronger border and subtle elevation.",
+      "rationale": "Makes pricing easier to parse and compare, reduces ambiguity about inclusions, and places pricing after trust signals to reduce sticker shock.",
+      "confidence": 0.87,
+      "risks": [
+        "Highlighting one tier may reduce selection of the other if not balanced"
+      ]
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Convert How It Works into a 3-step horizontal stepper on desktop and vertical stepper on mobile, with each step as a compact card (icon + 1–2 lines). Add a single mid-section CTA after step 3.",
+      "rationale": "Improves hierarchy and scannability by turning process into a quick visual sequence and adds a natural conversion moment after understanding is established.",
+      "confidence": 0.79,
+      "risks": [
+        "If steps require more explanation, cards may feel too terse"
+      ]
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Add a proof bar directly under the hero with a 4-column grid on desktop / 2x2 on mobile: 1 short testimonial card + 3 compact proof items (e.g., counts/ratings/placeholders). Constrain height to ~96px desktop, ~140px mobile.",
+      "rationale": "Increases trust early without adding a full testimonial section, improving scannability and reducing the need for hype copy.",
+      "confidence": 0.81,
+      "risks": [
+        "If proof items are weak or vague, it can reduce credibility"
+      ]
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Add a secondary CTA next to the primary CTA in hero (desktop inline; mobile stacked): primary stays first, secondary opens a lightweight modal with a 60–90s product walkthrough (no form). Keep CTA group within the first 400px on mobile.",
+      "rationale": "Creates a clearer conversion path for both ready-to-start and need-to-see users, reducing bounce and decision friction.",
+      "confidence": 0.82,
+      "risks": [
+        "Modal walkthrough requires tight performance to avoid hurting LCP"
+      ]
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Replace any table-style comparison with card-based pricing plus an optional collapsible “compare details” accordion below (desktop open by default, mobile collapsed). Keep feature rows to 8–12 max and group into 2 categories.",
+      "rationale": "Reduces cognitive load and improves mobile readability while still allowing deeper comparison for evaluators.",
+      "confidence": 0.85,
+      "risks": [
+        "Too much hidden detail could frustrate users if essentials are collapsed"
+      ]
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder homepage to: Hero → Proof bar (logos/metrics/testimonial snippet) → Problem/Solution (single merged section) → How it Works → Suite → Trust/Observability (audit log + visibility panel) → Pricing → FAQ → Footer. Keep each section header within a consistent 2-line max.",
+      "rationale": "Reduces cognitive load and creates a more linear narrative: credibility early, then explanation, then details, then pricing and objections.",
+      "confidence": 0.84,
+      "risks": [
+        "Requires re-anchoring internal nav links if present"
+      ]
+    }
+  ]
+}

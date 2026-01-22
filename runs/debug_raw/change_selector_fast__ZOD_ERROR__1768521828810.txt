@@ -1,0 +1,73 @@
+=== ZOD VALIDATION ERROR (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTTDdiP-4YNCb4-9be95a08adc723a3
+
+=== ERRORS ===
+[
+  "selectedChanges.3.targetKey: targetKey must start with 'design.' or 'brand.' and follow taxonomy",
+  "selectedChanges.4.targetKey: targetKey must start with 'design.' or 'brand.' and follow taxonomy",
+  "selectedChanges.5.targetKey: targetKey must start with 'design.' or 'brand.' and follow taxonomy",
+  "selectedChanges.6.targetKey: targetKey must start with 'design.' or 'brand.' and follow taxonomy"
+]
+
+=== RAW TEXT ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.hero.headline",
+      "value": "Launch Your Business in 48 Hours",
+      "rationale": "More specific timeframe creates urgency",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "design.hero.subheadline",
+      "value": "Build your website in just 1 minute",
+      "rationale": "More specific timeframe creates urgency",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "design.hero.cta",
+      "value": "Get Started Today",
+      "rationale": "Emphasizes the importance of immediate action",
+      "confidence": 0.8,
+      "risks": []
+    },
+    {
+      "targetKey": "pricing.tier1.name",
+      "value": "Starter Pro",
+      "rationale": "Simplifies the pricing tiers for better understanding",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "pricing.tier1.price",
+      "value": "$79/mo",
+      "rationale": "Makes the pricing more competitive",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "testimonials.0.quote",
+      "value": "Excellent product!",
+      "rationale": "Makes the testimonial more enthusiastic and positive",
+      "confidence": 0.95,
+      "risks": []
+    },
+    {
+      "targetKey": "testimonials.0.author",
+      "value": "Jane Doe, CEO",
+      "rationale": "Adds more credibility to the testimonial",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "design.hero.headline",
+      "value": "Launch Your Business Fast",
+      "rationale": "Original headline",
+      "confidence": 0.5,
+      "risks": []
+    }
+  ]
+}

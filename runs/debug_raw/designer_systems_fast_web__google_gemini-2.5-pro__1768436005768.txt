@@ -1,0 +1,25 @@
+=== RAW RESPONSE (designer_systems_fast_web) ===
+Model: google/gemini-2.5-pro
+Request ID: EjFoaeuFHrq4nvgPtf_YyAw
+Input Tokens: 1151
+Output Tokens: 163
+Finish Reason: length
+
+=== RAW TEXT (618 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Redesign hero with a 2-column layout. Left: Headline, Sub-headline, CTA. Right: Simple dashboard UI visual. Place a 'Trusted by 100+ Businesses' logo bar directly below.",
+      "rationale": "Clarifies the offer and provides immediate social proof, increasing trust and guiding users to the primary action before they scroll.",
+      "confidence": 0.95,
+      "risks": [
+        "Visual may be too abstract and confuse users.",
+        "Requires good headline copy to be effective."
+      ]
+    },
+    {
+      "targetKey": "design
+
+=== PARSED JSON ===
+NULL (parse failed)

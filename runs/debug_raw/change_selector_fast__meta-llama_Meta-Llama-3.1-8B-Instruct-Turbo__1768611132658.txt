@@ -1,0 +1,130 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTb7LqE-4YNCb4-9bf1de51c8150055
+Input Tokens: 1522
+Output Tokens: 559
+Finish Reason: stop
+
+=== RAW TEXT (2230 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 16px body text with line-height 1.5 and max line length of 75ch to enhance readability",
+      "rationale": "Improves clarity and reduces cognitive load for users",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a primary button style with 20px padding and 4px border radius",
+      "rationale": "Creates a premium feel while ensuring buttons are visually distinct",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Select a neutral palette with soft grays and off-whites to enhance calmness",
+      "rationale": "Promotes a serene user experience",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Use rounded chips with 14px text and 10px padding to signal trust",
+      "rationale": "Promotes a safe-by-default appearance",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Introduce a structured audit log preview pattern with timestamp and action icons",
+      "rationale": "Enhances user confidence by providing a clear record of actions",
+      "confidence": 0.92,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Use 1px solid dividers with a neutral color to create separation",
+      "rationale": "Enhances clarity and organization of content",
+      "confidence": 0.89,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Apply a consistent 8px border radius to all interactive elements to foster a friendly",
+      "rationale": "Enhances user experience by making elements feel more touch-friendly",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Design cards with 16px padding and 8px border radius to promote a visual hierarchy",
+      "rationale": "Enhances visual hierarchy, making information easier to scan",
+      "confidence": 0.88,
+      "risks": []
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 16px body text with line-height 1.5 and max line length of 75ch to enhance readability",
+      "rationale": "Improves clarity and reduces cognitive load for users",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a primary button style with 20px padding and 4px border radius",
+      "rationale": "Creates a premium feel while ensuring buttons are visually distinct",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Select a neutral palette with soft grays and off-whites to enhance calmness",
+      "rationale": "Promotes a serene user experience",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Use rounded chips with 14px text and 10px padding to signal trust",
+      "rationale": "Promotes a safe-by-default appearance",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Introduce a structured audit log preview pattern with timestamp and action icons",
+      "rationale": "Enhances user confidence by providing a clear record of actions",
+      "confidence": 0.92,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Use 1px solid dividers with a neutral color to create separation",
+      "rationale": "Enhances clarity and organization of content",
+      "confidence": 0.89,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Apply a consistent 8px border radius to all interactive elements to foster a friendly",
+      "rationale": "Enhances user experience by making elements feel more touch-friendly",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Design cards with 16px padding and 8px border radius to promote a visual hierarchy",
+      "rationale": "Enhances visual hierarchy, making information easier to scan",
+      "confidence": 0.88,
+      "risks": []
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+=== RAW RESPONSE (designer_brand_fast_web) ===
+Model: gpt-4o-mini-2024-07-18
+Request ID: chatcmpl-Cy3Iu9xO0QOkQaTcvVp2fFAhHiZUc
+Input Tokens: 914
+Output Tokens: 636
+Finish Reason: stop
+
+=== RAW TEXT (2620 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "H1 should be 48px, weight 700, line-height 1.2.",
+      "rationale": "Enhances readability and visibility for primary messaging.",
+      "confidence": 0.85,
+      "risks": ["Potential for overcrowded layout."]
+    },
+    {
+      "targetKey": "brand.type.h2",
+      "value": "H2 should be 32px, weight 600, line-height 1.3.",
+      "rationale": "Creates a clear hierarchy beneath H1 for subsections.",
+      "confidence": 0.80,
+      "risks": ["May require adjustment of existing spacing."]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "Use a calming blue (#5A99D8) as the primary color.",
+      "rationale": "Conveys trust and professionalism, appealing to target audience.",
+      "confidence": 0.90,
+      "risks": ["Might clash with existing color elements."]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Buttons should be 14px, rounded corners, primary color with white text.",
+      "rationale": "Improves visibility and consistency across CTAs.",
+      "confidence": 0.88,
+      "risks": ["Existing button styles may need significant updates."]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "Set section gaps to 40px for clarity between content areas.",
+      "rationale": "Provides breathing room and reduces visual clutter.",
+      "confidence": 0.87,
+      "risks": ["Could lead to longer page length."]
+    },
+    {
+      "targetKey": "brand.components.badge",
+      "value": "Trust badges should have a subtle shadow and consistent size.",
+      "rationale": "Increases visibility and trustworthiness without being flashy.",
+      "confidence": 0.82,
+      "risks": ["May require redesign of existing badge elements."]
+    },
+    {
+      "targetKey": "brand.visual.consistency",
+      "value": "Ensure all components align to a 12-column grid layout.",
+      "rationale": "Creates a uniform structure that enhances professionalism.",
+      "confidence": 0.86,
+      "risks": ["Revising layout could disrupt existing designs."]
+    },
+    {
+      "targetKey": "brand.spacing.componentPadding",
+      "value": "Set component padding to 16px for uniformity across elements.",
+      "rationale": "Ensures each component is clearly defined and accessible.",
+      "confidence": 0.84,
+      "risks": ["Might require adjustments to existing component sizes."]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["Changes may affect overall design flow."],
+  "assumptions": ["Existing design elements can be modified."]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "H1 should be 48px, weight 700, line-height 1.2.",
+      "rationale": "Enhances readability and visibility for primary messaging.",
+      "confidence": 0.85,
+      "risks": [
+        "Potential for overcrowded layout."
+      ]
+    },
+    {
+      "targetKey": "brand.type.h2",
+      "value": "H2 should be 32px, weight 600, line-height 1.3.",
+      "rationale": "Creates a clear hierarchy beneath H1 for subsections.",
+      "confidence": 0.8,
+      "risks": [
+        "May require adjustment of existing spacing."
+      ]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "Use a calming blue (#5A99D8) as the primary color.",
+      "rationale": "Conveys trust and professionalism, appealing to target audience.",
+      "confidence": 0.9,
+      "risks": [
+        "Might clash with existing color elements."
+      ]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "Buttons should be 14px, rounded corners, primary color with white text.",
+      "rationale": "Improves visibility and consistency across CTAs.",
+      "confidence": 0.88,
+      "risks": [
+        "Existing button styles may need significant updates."
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "Set section gaps to 40px for clarity between content areas.",
+      "rationale": "Provides breathing room and reduces visual clutter.",
+      "confidence": 0.87,
+      "risks": [
+        "Could lead to longer page length."
+      ]
+    },
+    {
+      "targetKey": "brand.components.badge",
+      "value": "Trust badges should have a subtle shadow and consistent size.",
+      "rationale": "Increases visibility and trustworthiness without being flashy.",
+      "confidence": 0.82,
+      "risks": [
+        "May require redesign of existing badge elements."
+      ]
+    },
+    {
+      "targetKey": "brand.visual.consistency",
+      "value": "Ensure all components align to a 12-column grid layout.",
+      "rationale": "Creates a uniform structure that enhances professionalism.",
+      "confidence": 0.86,
+      "risks": [
+        "Revising layout could disrupt existing designs."
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.componentPadding",
+      "value": "Set component padding to 16px for uniformity across elements.",
+      "rationale": "Ensures each component is clearly defined and accessible.",
+      "confidence": 0.84,
+      "risks": [
+        "Might require adjustments to existing component sizes."
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Changes may affect overall design flow."
+  ],
+  "assumptions": [
+    "Existing design elements can be modified."
+  ]
+}

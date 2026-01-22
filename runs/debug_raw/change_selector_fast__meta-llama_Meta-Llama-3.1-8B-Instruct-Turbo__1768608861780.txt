@@ -1,0 +1,130 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTauhmd-4YNCb4-9bf1a6e0aaa9fef7
+Input Tokens: 1587
+Output Tokens: 621
+Finish Reason: stop
+
+=== RAW TEXT (2571 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.color.primary",
+      "value": "Use a calming blue (#007BFF) as the primary color for components to convey safety and trus...",
+      "rationale": "Harmonizes the brand identity with user expectations of a safe digital environment.",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "branch.components.buttons",
+      "value": "Implement a primary button style with 16px font size, 12px padding, and a subtle shadow to...",
+      "rationale": "A well-defined button hierarchy enhances user confidence in interaction.",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 16px body text with line-height 1.5, max line length of 70ch to enhance readability an...",
+      "rationale": "Improves text clarity and reduces cognitive load, fostering a confident user experience.",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Use a card style with 16px padding, rounded corners (8px radius), and a consistent shadow ...",
+      "rationale": "Improves the visual hierarchy and density, enhancing operational clarity.",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Implement a light neutral background color (#F7F7F7) to enhance contrast and reduce visual...",
+      "rationale": "Improves accessibility and contributes to a calm overall aesthetic.",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Introduce subtle dividers (1px solid #E0E0E0) between sections to create a structured layo...",
+      "rationale": "Promotes visual separation without overwhelming users, fostering a premium feel.",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Introduce a clean, organized layout for the audit log with alternating row colors to enhan...",
+      "rationale": "Clear presentation of information builds user confidence and reinforces operational transp...",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Standardize corner radius to 4px for all interactive elements to create a consistent and a...",
+      "rationale": "Enhances the premium quality of the design while maintaining user comfort.",
+      "confidence": 0.82,
+      "risks": []
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.color.primary",
+      "value": "Use a calming blue (#007BFF) as the primary color for components to convey safety and trus...",
+      "rationale": "Harmonizes the brand identity with user expectations of a safe digital environment.",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "branch.components.buttons",
+      "value": "Implement a primary button style with 16px font size, 12px padding, and a subtle shadow to...",
+      "rationale": "A well-defined button hierarchy enhances user confidence in interaction.",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 16px body text with line-height 1.5, max line length of 70ch to enhance readability an...",
+      "rationale": "Improves text clarity and reduces cognitive load, fostering a confident user experience.",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Use a card style with 16px padding, rounded corners (8px radius), and a consistent shadow ...",
+      "rationale": "Improves the visual hierarchy and density, enhancing operational clarity.",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Implement a light neutral background color (#F7F7F7) to enhance contrast and reduce visual...",
+      "rationale": "Improves accessibility and contributes to a calm overall aesthetic.",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Introduce subtle dividers (1px solid #E0E0E0) between sections to create a structured layo...",
+      "rationale": "Promotes visual separation without overwhelming users, fostering a premium feel.",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Introduce a clean, organized layout for the audit log with alternating row colors to enhan...",
+      "rationale": "Clear presentation of information builds user confidence and reinforces operational transp...",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Standardize corner radius to 4px for all interactive elements to create a consistent and a...",
+      "rationale": "Enhances the premium quality of the design while maintaining user comfort.",
+      "confidence": 0.82,
+      "risks": []
+    }
+  ]
+}

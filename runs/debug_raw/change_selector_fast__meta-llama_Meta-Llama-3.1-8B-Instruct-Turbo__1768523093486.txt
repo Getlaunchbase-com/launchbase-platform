@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTTL7Ww-4YNCb4-9be978e5e8d520eb
+Input Tokens: 2057
+Output Tokens: 811
+Finish Reason: stop
+
+=== RAW TEXT (3513 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "value": "Introduce a dedicated “visibility panel” module (one section) using a 2-column layout: left = 4 concise bullets; right = a dashboard mock showing: task ownershi...",
+      "rationale": "Makes the 'responsibility + visibility' promise tangible and audit-like, shifting trust from hype to observable artifacts and improving comprehension.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a mobile-only sticky CTA bar that appears after ~40% scroll or after the hero (whichever comes first): primary CTA button + secondary 'See pricing' link. Hi...",
+      "rationale": "Improves conversion path continuity on mobile without cluttering the hero, keeping a clear next action available as users evaluate sections.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.conversion.socialProof",
+      "value": "Add a proof bar directly under the hero CTAs (desktop) / under the hero preview (mobile): 1 row with 3–5 proof items (logos, metrics, or short verification labe...",
+      "rationale": "Places trust signals at the decision point without adding a full section, improving conversion confidence and reducing the need to scroll for validation.",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "design.pricing",
+      "value": "Move pricing higher (after Suite) and redesign into 3 pricing cards with one highlighted default tier. Each card: price, 5 bullet inclusions, and a compact 'Vis...",
+      "rationale": "Makes pricing easier to parse at a glance while emphasizing auditability as a concrete included capability, reducing decision friction.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Replace any dense table with card-based pricing + a toggleable comparison drawer: default view shows 5 bullets; 'Compare all features' expands into a 2-column (...",
+      "rationale": "Preserves detail for evaluators without forcing everyone to parse a matrix; improves scannability and reduces cognitive load.",
+      "confidence": 0.81
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Add an audit-log pattern component reused in 2 places: (1) inside the hero preview (3 rows) and (2) in the trust section (8–10 rows with filters). Include times...",
+      "rationale": "Reinforces auditability through repeated, consistent UI patterns and supports “hand it off without losing control” with verifiable history.",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.hero.conversion",
+      "value": "Use a single primary CTA button and one secondary text-link CTA in the hero; place them directly under the 3 bullets. Add a small inline form option only on des...",
+      "rationale": "Reduces choice overload and tightens the conversion path while keeping an alternate low-commitment path; ensures CTA visibility without forcing a form on small ...",
+      "confidence": 0.79
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Convert How It Works into a 3-step horizontal stepper on desktop and vertical timeline on mobile (step numbers 1–3). Each step should include: input → what Laun...",
+      "rationale": "Turns process into an easy-to-follow flow and repeatedly anchors on observability, improving understanding and moving users toward conversion mid-page.",
+      "confidence": 0.8
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "value": "Introduce a dedicated “visibility panel” module (one section) using a 2-column layout: left = 4 concise bullets; right = a dashboard mock showing: task ownershi...",
+      "rationale": "Makes the 'responsibility + visibility' promise tangible and audit-like, shifting trust from hype to observable artifacts and improving comprehension.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Add a mobile-only sticky CTA bar that appears after ~40% scroll or after the hero (whichever comes first): primary CTA button + secondary 'See pricing' link. Hi...",
+      "rationale": "Improves conversion path continuity on mobile without cluttering the hero, keeping a clear next action available as users evaluate sections.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.conversion.socialProof",
+      "value": "Add a proof bar directly under the hero CTAs (desktop) / under the hero preview (mobile): 1 row with 3–5 proof items (logos, metrics, or short verification labe...",
+      "rationale": "Places trust signals at the decision point without adding a full section, improving conversion confidence and reducing the need to scroll for validation.",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "design.pricing",
+      "value": "Move pricing higher (after Suite) and redesign into 3 pricing cards with one highlighted default tier. Each card: price, 5 bullet inclusions, and a compact 'Vis...",
+      "rationale": "Makes pricing easier to parse at a glance while emphasizing auditability as a concrete included capability, reducing decision friction.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.components.pricingTable",
+      "value": "Replace any dense table with card-based pricing + a toggleable comparison drawer: default view shows 5 bullets; 'Compare all features' expands into a 2-column (...",
+      "rationale": "Preserves detail for evaluators without forcing everyone to parse a matrix; improves scannability and reduces cognitive load.",
+      "confidence": 0.81
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Add an audit-log pattern component reused in 2 places: (1) inside the hero preview (3 rows) and (2) in the trust section (8–10 rows with filters). Include times...",
+      "rationale": "Reinforces auditability through repeated, consistent UI patterns and supports “hand it off without losing control” with verifiable history.",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.hero.conversion",
+      "value": "Use a single primary CTA button and one secondary text-link CTA in the hero; place them directly under the 3 bullets. Add a small inline form option only on des...",
+      "rationale": "Reduces choice overload and tightens the conversion path while keeping an alternate low-commitment path; ensures CTA visibility without forcing a form on small ...",
+      "confidence": 0.79
+    },
+    {
+      "targetKey": "design.layout.howItWorks",
+      "value": "Convert How It Works into a 3-step horizontal stepper on desktop and vertical timeline on mobile (step numbers 1–3). Each step should include: input → what Laun...",
+      "rationale": "Turns process into an easy-to-follow flow and repeatedly anchors on observability, improving understanding and moving users toward conversion mid-page.",
+      "confidence": 0.8
+    }
+  ]
+}

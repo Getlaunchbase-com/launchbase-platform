@@ -1,0 +1,95 @@
+{
+  "version": "v1",
+  "status": "succeeded",
+  "stopReason": "needs_human",
+  "needsHuman": true,
+  "traceId": "trc_1768415233567_c9a786cfcb54d",
+  "artifacts": [
+    {
+      "kind": "swarm.plan",
+      "payload": {
+        "scope": "showroom.coffee-shop.baseline",
+        "inputs": {
+          "task": "Write homepage copy for artisan coffee shop",
+          "business": "The Daily Grind",
+          "description": "Locally roasted coffee, cozy atmosphere, community gathering space"
+        },
+        "specialists": [
+          "craft",
+          "critic"
+        ],
+        "fingerprint": "trc_1768415233567_c9a786cfcb54d:plan"
+      },
+      "customerSafe": false
+    },
+    {
+      "kind": "swarm.specialist.craft",
+      "payload": {
+        "ok": false,
+        "stopReason": "provider_failed",
+        "fingerprint": "trc_1768415233567_c9a786cfcb54d:craft:all_retries_failed",
+        "role": "craft"
+      },
+      "customerSafe": false
+    },
+    {
+      "kind": "swarm.specialist.critic",
+      "payload": {
+        "ok": false,
+        "stopReason": "provider_failed",
+        "fingerprint": "trc_1768415233567_c9a786cfcb54d:critic:all_retries_failed",
+        "role": "critic"
+      },
+      "customerSafe": false
+    },
+    {
+      "kind": "swarm.collapse",
+      "customerSafe": true,
+      "payload": null
+    }
+  ],
+  "customerSafe": true,
+  "extensions": {
+    "swarm": {
+      "costs": [
+        {
+          "specialist": "craft",
+          "inputTokens": 0,
+          "outputTokens": 0,
+          "costUsd": 0,
+          "model": "gpt-4o-mini",
+          "latencyMs": 0,
+          "stopReason": "provider_failed"
+        },
+        {
+          "specialist": "critic",
+          "inputTokens": 0,
+          "outputTokens": 0,
+          "costUsd": 0,
+          "model": "gpt-4o-mini",
+          "latencyMs": 0,
+          "stopReason": "provider_failed"
+        }
+      ],
+      "totalCostUsd": 0,
+      "roleCostsUsd": {
+        "craft": 0,
+        "critic": 0
+      },
+      "roleModels": {
+        "craft": "gpt-4o-mini",
+        "critic": "gpt-4o-mini"
+      },
+      "warnings": [
+        {
+          "kind": "swarm.incomplete_inputs",
+          "message": "One or more specialists missing or failed",
+          "detail": {
+            "craftStop": "provider_failed",
+            "criticStop": "provider_failed"
+          }
+        }
+      ]
+    }
+  }
+}

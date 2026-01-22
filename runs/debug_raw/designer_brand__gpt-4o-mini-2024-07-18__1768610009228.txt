@@ -1,0 +1,144 @@
+=== RAW RESPONSE (designer_brand) ===
+Model: gpt-4o-mini-2024-07-18
+Request ID: chatcmpl-CyoXaawDWFQ1LX9tHUBml895rln0h
+Input Tokens: 1622
+Output Tokens: 721
+Finish Reason: stop
+
+=== RAW TEXT (3142 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 16px body text with a maximum line length of 70ch for improved readability and calmness.",
+      "rationale": "This ensures users can read content comfortably, reducing strain and enhancing a calm experience.",
+      "confidence": 0.90,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Set H2 to 32px with a line-height of 1.3 to create a confident and premium feel for section headings.",
+      "rationale": "This size and spacing help establish a clear hierarchy and visual comfort, conveying confidence.",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a button hierarchy with primary buttons at 48px height and secondary buttons at 40px height.",
+      "rationale": "The height distinction provides a clear visual priority, enhancing operational clarity and usability.",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Design cards with 16px padding and a subtle shadow for depth, ensuring a premium and inviting feel.",
+      "rationale": "The padding and shadow create a sense of safety and comfort, encouraging user interaction.",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Introduce a standardized audit log with a clean, minimalistic design and clear labeling for each row.",
+      "rationale": "This enhances transparency and trust, making users feel safe in their actions and decisions.",
+      "confidence": 0.89,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Add proof chips below the hero section: 'Safe by default • Fully auditable • Reversible changes' to reinforce trust.",
+      "rationale": "These chips provide quick, reassuring information that enhances the feeling of safety and confidence.",
+      "confidence": 0.86,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Ensure background colors maintain a contrast ratio of at least 4.5:1 against body text for accessibility.",
+      "rationale": "This compliance with accessibility standards makes content legible for all, reinforcing a safe environment.",
+      "confidence": 0.92,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Use a consistent corner radius of 8px for buttons and cards to create a cohesive and calming visual language.",
+      "rationale": "Rounded corners enhance the premium feel and create a more approachable aesthetic.",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Incorporate subtle dividers with a light neutral color to separate content sections, enhancing organization.",
+      "rationale": "This aids in visual clarity and operational ease, making navigation through content feel smoother.",
+      "confidence": 0.81,
+      "risks": []
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 16px body text with a maximum line length of 70ch for improved readability and calmness.",
+      "rationale": "This ensures users can read content comfortably, reducing strain and enhancing a calm experience.",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Set H2 to 32px with a line-height of 1.3 to create a confident and premium feel for section headings.",
+      "rationale": "This size and spacing help establish a clear hierarchy and visual comfort, conveying confidence.",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a button hierarchy with primary buttons at 48px height and secondary buttons at 40px height.",
+      "rationale": "The height distinction provides a clear visual priority, enhancing operational clarity and usability.",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Design cards with 16px padding and a subtle shadow for depth, ensuring a premium and inviting feel.",
+      "rationale": "The padding and shadow create a sense of safety and comfort, encouraging user interaction.",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Introduce a standardized audit log with a clean, minimalistic design and clear labeling for each row.",
+      "rationale": "This enhances transparency and trust, making users feel safe in their actions and decisions.",
+      "confidence": 0.89,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Add proof chips below the hero section: 'Safe by default • Fully auditable • Reversible changes' to reinforce trust.",
+      "rationale": "These chips provide quick, reassuring information that enhances the feeling of safety and confidence.",
+      "confidence": 0.86,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Ensure background colors maintain a contrast ratio of at least 4.5:1 against body text for accessibility.",
+      "rationale": "This compliance with accessibility standards makes content legible for all, reinforcing a safe environment.",
+      "confidence": 0.92,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Use a consistent corner radius of 8px for buttons and cards to create a cohesive and calming visual language.",
+      "rationale": "Rounded corners enhance the premium feel and create a more approachable aesthetic.",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Incorporate subtle dividers with a light neutral color to separate content sections, enhancing organization.",
+      "rationale": "This aids in visual clarity and operational ease, making navigation through content feel smoother.",
+      "confidence": 0.81,
+      "risks": []
+    }
+  ]
+}

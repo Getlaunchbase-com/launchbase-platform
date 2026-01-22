@@ -1,0 +1,76 @@
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.icons.sizeTokens",
+      "value": "16px, 24px, 32px",
+      "rationale": "Consistent sizing for clarity in various contexts.",
+      "confidence": 0.92,
+      "risks": [
+        "Inflexibility in unique cases"
+      ]
+    },
+    {
+      "targetKey": "brand.icons.strokeWidth",
+      "value": "2px",
+      "rationale": "Ensures visibility and maintains a professional look.",
+      "confidence": 0.9,
+      "risks": [
+        "May appear heavy on small screens"
+      ]
+    },
+    {
+      "targetKey": "brand.icons.cornerRadius",
+      "value": "4px",
+      "rationale": "Softens icons for a calm and approachable appearance.",
+      "confidence": 0.88,
+      "risks": [
+        "Might reduce sharpness"
+      ]
+    },
+    {
+      "targetKey": "brand.icons.colorUsage",
+      "value": "Monochrome with blue accents",
+      "rationale": "Aligns with a trustworthy and modern brand palette.",
+      "confidence": 0.91,
+      "risks": [
+        "Limited color differentiation"
+      ]
+    },
+    {
+      "targetKey": "brand.illustration.lineWeight",
+      "value": "1.5px",
+      "rationale": "Balanced line weight for clarity without being too bold.",
+      "confidence": 0.87,
+      "risks": [
+        "May not stand out in complex backgrounds"
+      ]
+    },
+    {
+      "targetKey": "brand.illustration.colorPalette",
+      "value": "Calm blues and greys",
+      "rationale": "Conveys trust and professionalism.",
+      "confidence": 0.93,
+      "risks": [
+        "Potentially too subdued"
+      ]
+    },
+    {
+      "targetKey": "brand.motifs.patternSpecs",
+      "value": "Geometric patterns",
+      "rationale": "Reflects modernity and systematic organization.",
+      "confidence": 0.89,
+      "risks": [
+        "May feel too rigid"
+      ]
+    },
+    {
+      "targetKey": "brand.hero.imageTreatment",
+      "value": "Soft focus with blue overlay",
+      "rationale": "Maintains calmness and visual interest.",
+      "confidence": 0.85,
+      "risks": [
+        "May blur important details"
+      ]
+    }
+  ]
+}

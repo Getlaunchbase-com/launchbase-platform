@@ -1,0 +1,161 @@
+=== RAW RESPONSE (designer_brand_fast_web) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy4rF7KGVIZGmB3FRAEQM1W7gGOLX
+Input Tokens: 942
+Output Tokens: 584
+Finish Reason: stop
+
+=== RAW TEXT (2233 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "font-size: 48px; font-weight: 700;",
+      "rationale": "Enhances visibility and clarity of the main message.",
+      "confidence": 0.9,
+      "risks": ["Might appear too large", "May require layout adjustment"]
+    },
+    {
+      "targetKey": "brand.type.h2",
+      "value": "font-size: 36px; font-weight: 600;",
+      "rationale": "Creates a clear hierarchy beneath H1, aiding readability.",
+      "confidence": 0.85,
+      "risks": ["Could overwhelm smaller screens"]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#0056b3",
+      "rationale": "Conveys professionalism and trust with a calm blue tone.",
+      "confidence": 0.9,
+      "risks": ["May require contrast adjustment"]
+    },
+    {
+      "targetKey": "brand.color.trust",
+      "value": "#64c4ed",
+      "rationale": "Light blue signals reliability and transparency.",
+      "confidence": 0.87,
+      "risks": ["Could be too light for text"]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "64px",
+      "rationale": "Provides sufficient breathing room between sections.",
+      "confidence": 0.9,
+      "risks": ["Might increase scrolling"]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "border-radius: 8px; padding: 12px 24px;",
+      "rationale": "Rounded corners and ample padding enhance approachability.",
+      "confidence": 0.92,
+      "risks": ["May seem less formal"]
+    },
+    {
+      "targetKey": "brand.visual.borders",
+      "value": "1px solid #d1d5db;",
+      "rationale": "Subtle borders add structure without distraction.",
+      "confidence": 0.88,
+      "risks": ["Could be too subtle"]
+    },
+    {
+      "targetKey": "brand.visual.consistency",
+      "value": "Align elements to a 12-column grid system.",
+      "rationale": "Ensures uniformity and balance across the layout.",
+      "confidence": 0.95,
+      "risks": ["Requires layout overhaul"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["Increased development time", "Potential for layout disruption"],
+  "assumptions": ["Current design uses a grid system", "Brand guidelines are flexible"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "font-size: 48px; font-weight: 700;",
+      "rationale": "Enhances visibility and clarity of the main message.",
+      "confidence": 0.9,
+      "risks": [
+        "Might appear too large",
+        "May require layout adjustment"
+      ]
+    },
+    {
+      "targetKey": "brand.type.h2",
+      "value": "font-size: 36px; font-weight: 600;",
+      "rationale": "Creates a clear hierarchy beneath H1, aiding readability.",
+      "confidence": 0.85,
+      "risks": [
+        "Could overwhelm smaller screens"
+      ]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#0056b3",
+      "rationale": "Conveys professionalism and trust with a calm blue tone.",
+      "confidence": 0.9,
+      "risks": [
+        "May require contrast adjustment"
+      ]
+    },
+    {
+      "targetKey": "brand.color.trust",
+      "value": "#64c4ed",
+      "rationale": "Light blue signals reliability and transparency.",
+      "confidence": 0.87,
+      "risks": [
+        "Could be too light for text"
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "64px",
+      "rationale": "Provides sufficient breathing room between sections.",
+      "confidence": 0.9,
+      "risks": [
+        "Might increase scrolling"
+      ]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "border-radius: 8px; padding: 12px 24px;",
+      "rationale": "Rounded corners and ample padding enhance approachability.",
+      "confidence": 0.92,
+      "risks": [
+        "May seem less formal"
+      ]
+    },
+    {
+      "targetKey": "brand.visual.borders",
+      "value": "1px solid #d1d5db;",
+      "rationale": "Subtle borders add structure without distraction.",
+      "confidence": 0.88,
+      "risks": [
+        "Could be too subtle"
+      ]
+    },
+    {
+      "targetKey": "brand.visual.consistency",
+      "value": "Align elements to a 12-column grid system.",
+      "rationale": "Ensures uniformity and balance across the layout.",
+      "confidence": 0.95,
+      "risks": [
+        "Requires layout overhaul"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Increased development time",
+    "Potential for layout disruption"
+  ],
+  "assumptions": [
+    "Current design uses a grid system",
+    "Brand guidelines are flexible"
+  ]
+}

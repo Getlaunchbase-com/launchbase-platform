@@ -1,0 +1,104 @@
+{
+  "runId": "baseline_soak_swarm_gate_a_control_web_rep1_1768438488870",
+  "lane": "web",
+  "stack": "Control Champion (4o + Opus)",
+  "rep": 1,
+  "timestamp": 1768438488870,
+  "pass": true,
+  "failureReason": null,
+  "modelLock": {
+    "systems": {
+      "requested": "gpt-4o-2024-08-06",
+      "resolved": "gpt-4o-2024-08-06",
+      "ok": true
+    },
+    "brand": {
+      "requested": "gpt-4o-2024-08-06",
+      "resolved": "gpt-4o-2024-08-06",
+      "ok": true
+    },
+    "critic": {
+      "requested": "claude-opus-4-1-20250805",
+      "resolved": "claude-opus-4-1-20250805",
+      "ok": true
+    }
+  },
+  "finishReason": {
+    "systems": "ok",
+    "brand": "ok",
+    "critic": "ok"
+  },
+  "schema": {
+    "systems": {
+      "count": 8,
+      "valid": true
+    },
+    "brand": {
+      "count": 8,
+      "valid": true
+    },
+    "critic": {
+      "issueCount": 10,
+      "fixCount": 10,
+      "valid": true
+    }
+  },
+  "retries": {
+    "systems": 1,
+    "brand": 1,
+    "critic": 1
+  },
+  "artifacts": {
+    "systems": {
+      "jsonSizeBytes": 1896
+    },
+    "brand": {
+      "jsonSizeBytes": 1789
+    },
+    "critic": {
+      "jsonSizeBytes": 4835
+    }
+  },
+  "anchors": {
+    "systems": null,
+    "brand": null
+  },
+  "truthPenalty": {
+    "systems": 0.1,
+    "brand": 0,
+    "critic": 0,
+    "total": 0.03333333333333333
+  },
+  "penaltyBreakdown": {
+    "systems": {
+      "unverifiable": 0.1,
+      "inventedConstraints": 0,
+      "vagueness": 0,
+      "contractStrain": 0
+    },
+    "brand": {
+      "unverifiable": 0,
+      "inventedConstraints": 0,
+      "vagueness": 0,
+      "contractStrain": 0
+    },
+    "critic": {
+      "unverifiable": 0,
+      "inventedConstraints": 0,
+      "vagueness": 0,
+      "contractStrain": 0
+    }
+  },
+  "penaltyTriggers": {
+    "systems": [
+      "Claims analytics data not provided (e.g., 'Users are bouncing...')"
+    ],
+    "brand": [],
+    "critic": []
+  },
+  "baseScore": 100,
+  "finalScore": 96.66666666666667,
+  "cost": null,
+  "isTruncated": false,
+  "isValid": true
+}

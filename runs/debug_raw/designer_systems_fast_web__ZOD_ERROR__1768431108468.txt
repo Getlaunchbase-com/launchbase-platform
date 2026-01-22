@@ -1,0 +1,25 @@
+=== ZOD VALIDATION ERROR (designer_systems_fast_web) ===
+Model: google/gemini-2.5-pro
+Request ID: 4h1oafriK8-JidsP4Ni7mQY
+
+=== ERRORS ===
+
+
+=== RAW TEXT ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Place the primary CTA and a 3-item bulleted list of key outcomes (e.g., 'Save 10 hrs/week') directly adjacent to the main headline, ensuring visibility above the 600px fold.",
+      "rationale": "Increases immediate clarity of the value proposition and provides a clear next step, reducing bounce rates for users who don't scroll.",
+      "confidence": 0.95,
+      "risks": [
+        "May push supporting visuals below the fold",
+        "Requires extremely concise outcome-focused copy"
+      ]
+    },
+    {
+      "targetKey": "design.trust.placementStrategy",
+      "value": "Insert a 'Trusted By' logo strip (5-7 client or partner logos) as the second section on the page, directly below the hero.",
+      "rationale": "Establishes immediate social proof and credibility before presenting the problem, framing the subsequent claims as more trustworthy.",
+      "confidence": 0.92,

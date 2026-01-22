@@ -1,0 +1,327 @@
+{
+  "lane": "web",
+  "rep": 3,
+  "runId": "pilot20_web_3_1768610548451",
+  "timestamp": "2026-01-17T00:43:41.817Z",
+  "runMode": "production",
+  "status": "VALID",
+  "systems": {
+    "changes": [
+      {
+        "targetKey": "design.layout.hero",
+        "value": "Rebuild hero into a 2-column grid on desktop (60/40). Left column: H1 + 3-bullet value lis...",
+        "rationale": "Clarifies the promise above the fold, reduces reading load, and immediately demonstrates o...",
+        "confidence": 0.86
+      },
+      {
+        "targetKey": "design.conversion.heroCta",
+        "value": "Use a single primary CTA style in hero (one button) and demote the secondary action to a t...",
+        "rationale": "Reduces choice paralysis and strengthens the main conversion action without removing the a...",
+        "confidence": 0.82
+      },
+      {
+        "targetKey": "design.layout.sectionOrder",
+        "value": "Reorder sections to: Hero → Proof bar → Problem/Solution (before/after) → How it works → V...",
+        "rationale": "Creates a clearer narrative flow: promise → credibility → pain/solution → process → trust/...",
+        "confidence": 0.84
+      },
+      {
+        "targetKey": "design.layout.howItWorks",
+        "value": "Present How-it-Works as a 3-step horizontal stepper on desktop (Step 1–3) and vertical ste...",
+        "rationale": "Makes the 'hand it off without losing control' workflow concrete and easy to scan, while n...",
+        "confidence": 0.83
+      },
+      {
+        "targetKey": "design.trust.auditLogPattern",
+        "value": "Add an 'Audit log' pattern section using a table-like activity feed component (8 rows) sho...",
+        "rationale": "Strengthens trust by showing auditability/observability as a tangible artifact rather than...",
+        "confidence": 0.88
+      },
+      {
+        "targetKey": "design.layout.pricing",
+        "value": "Restructure pricing into 3 plan cards in a single row on desktop and stacked on mobile; hi...",
+        "rationale": "Makes pricing faster to parse, supports quick decision-making, and avoids overwhelming use...",
+        "confidence": 0.85
+      },
+      {
+        "targetKey": "design.conversion.stickyCta",
+        "value": "Add a mobile-only sticky CTA bar that appears after 40% scroll or after the hero leaves vi...",
+        "rationale": "Improves conversion path on mobile by keeping the primary action available without requiri...",
+        "confidence": 0.9
+      },
+      {
+        "targetKey": "design.layout.problemSolution",
+        "value": "Convert Problem/Solution into a single before/after two-column layout on desktop with 2 ca...",
+        "rationale": "Improves scannability and reduces cognitive load by compressing multiple narrative blocks ...",
+        "confidence": 0.79
+      }
+    ],
+    "anchorCount": 8
+  },
+  "brand": {
+    "changes": [
+      {
+        "targetKey": "brand.tokens.color.neutral",
+        "value": "Introduce a light gray background (#F7F7F7) for sections to create a calm and spacious fee...",
+        "rationale": "Softens contrast while providing a clean backdrop, enhancing the premium feel",
+        "confidence": 0.8
+      },
+      {
+        "targetKey": "brand.tokens.radius",
+        "value": "Standardize corner radius to 8px across all components to unify visual language",
+        "rationale": "Creates a cohesive look and feel, reinforcing a premium and polished interface",
+        "confidence": 0.83
+      },
+      {
+        "targetKey": "brand.tokens.color.primary",
+        "value": "Utilize a calming blue (#007BFF) as the primary color for actionable elements to evoke tru...",
+        "rationale": "Blue is often associated with reliability and professionalism, enhancing the overall brand...",
+        "confidence": 0.9
+      },
+      {
+        "targetKey": "brand.components.buttons",
+        "value": "Implement a primary button style with 20px padding, rounded corners, and a subtle drop sha...",
+        "rationale": "Conveys confidence and premium quality through thoughtful design and tactile feedback",
+        "confidence": 0.9
+      },
+      {
+        "targetKey": "brand.components.cards",
+        "value": "Use a card style with 16px padding and 8px border-radius; maintain a consistent 2-column g...",
+        "rationale": "Creates a structured and clean layout that feels operational and organized",
+        "confidence": 0.88
+      },
+      {
+        "targetKey": "brand.components.chips",
+        "value": "Use proof chips with a minimalist design, featuring a light background and dark text for h...",
+        "rationale": "Enhances visibility of key trust signals while maintaining a calm aesthetic",
+        "confidence": 0.85
+      },
+      {
+        "targetKey": "brand.components.dividers",
+        "value": "Introduce a soft line divider (1px, light gray) between key sections to enhance separation...",
+        "rationale": "Promotes clarity in content organization, contributing to a safe and calm user experience",
+        "confidence": 0.84
+      },
+      {
+        "targetKey": "brand.trust.auditLogPattern",
+        "value": "Design the audit log section with a visually distinct table format, maintaining 1.5em row ...",
+        "rationale": "Promotes clarity and trust through visual organization of activity logs",
+        "confidence": 0.87
+      }
+    ],
+    "anchorCount": 8
+  },
+  "critic": {
+    "issues": [
+      {
+        "severity": "critical",
+        "description": "Hero 60/40 split may push CTA below fold on laptops with shorter screens",
+        "location": "design.layout.hero",
+        "rationale": "Critical conversion loss if primary action requires scrolling on common 1366x768 displays"
+      },
+      {
+        "severity": "critical",
+        "description": "Single hero CTA removes fallback conversion path for hesitant users",
+        "location": "design.conversion.heroCta",
+        "rationale": "Eliminating secondary action may reduce total conversions despite reducing choice paralysis"
+      },
+      {
+        "severity": "major",
+        "description": "Sticky CTA at 40% scroll triggers too late for impatient mobile users",
+        "location": "design.conversion.stickyCta",
+        "rationale": "Users may bounce before reaching trigger point, missing conversion opportunity entirely"
+      },
+      {
+        "severity": "major",
+        "description": "3-step horizontal stepper may not fit on smaller desktop screens",
+        "location": "design.layout.howItWorks",
+        "rationale": "Horizontal overflow forces scrolling, breaking the scanning flow and reducing comprehension"
+      },
+      {
+        "severity": "major",
+        "description": "Audit log table with 8 rows creates excessive vertical scroll on mobile",
+        "location": "design.trust.auditLogPattern",
+        "rationale": "Trust section becomes too long, pushing pricing and CTA further down conversion funnel"
+      },
+      {
+        "severity": "major",
+        "description": "3-plan pricing cards may require horizontal scrolling on tablets",
+        "location": "design.layout.pricing",
+        "rationale": "Pricing comprehension drops when users must scroll to compare all options side by side"
+      },
+      {
+        "severity": "minor",
+        "description": "Before/after two-column layout lacks clear visual separator",
+        "location": "design.layout.problemSolution",
+        "rationale": "Users may not immediately grasp the comparison without stronger visual distinction"
+      },
+      {
+        "severity": "minor",
+        "description": "8px border radius may feel too sharp for premium positioning",
+        "location": "brand.tokens.radius",
+        "rationale": "Slightly rounded corners could feel more approachable and less corporate"
+      },
+      {
+        "severity": "minor",
+        "description": "Light gray background may reduce contrast for accessibility compliance",
+        "location": "brand.tokens.color.neutral",
+        "rationale": "WCAG contrast requirements may not be met with #F7F7F7 background on certain text colors"
+      },
+      {
+        "severity": "minor",
+        "description": "20px button padding may create oversized CTAs that dominate visual hierarchy",
+        "location": "brand.components.buttons",
+        "rationale": "Large buttons may overwhelm other page elements and feel aggressive rather than inviting"
+      }
+    ],
+    "suggestedFixes": [
+      {
+        "targetKey": "design.layout.hero",
+        "fix": "Test hero height at 480px max on desktop to ensure CTA visibility above 768px fold",
+        "rationale": "Guarantees primary action remains visible on most common laptop screen sizes"
+      },
+      {
+        "targetKey": "design.conversion.heroCta",
+        "fix": "Keep single primary CTA but add subtle text link below for demo/trial option",
+        "rationale": "Maintains clear hierarchy while providing low-friction alternative for uncertain users"
+      },
+      {
+        "targetKey": "design.conversion.stickyCta",
+        "fix": "Trigger sticky CTA after 20% scroll or 3 seconds on page, whichever comes first",
+        "rationale": "Captures more impatient users while avoiding premature interruption of reading flow"
+      },
+      {
+        "targetKey": "design.layout.howItWorks",
+        "fix": "Use responsive stepper: 3 columns on desktop 1200px+, vertical stack below 1200px",
+        "rationale": "Ensures process visibility across all screen sizes without horizontal scrolling"
+      },
+      {
+        "targetKey": "design.trust.auditLogPattern",
+        "fix": "Limit audit log to 4 rows on mobile with 'View more' expansion option",
+        "rationale": "Reduces initial scroll length while maintaining trust signal accessibility"
+      },
+      {
+        "targetKey": "design.layout.pricing",
+        "fix": "Stack pricing cards vertically on screens below 900px width instead of 768px",
+        "rationale": "Prevents horizontal scrolling on tablets while maintaining readability"
+      },
+      {
+        "targetKey": "design.layout.problemSolution",
+        "fix": "Add vertical divider line or contrasting background colors between before/after columns",
+        "rationale": "Creates clear visual separation to enhance comparison comprehension"
+      },
+      {
+        "targetKey": "brand.tokens.radius",
+        "fix": "Increase border radius to 12px for softer, more premium feel across components",
+        "rationale": "Balances modern aesthetics with approachable design for better brand positioning"
+      },
+      {
+        "targetKey": "brand.tokens.color.neutral",
+        "fix": "Use #F9F9F9 background instead of #F7F7F7 to improve contrast ratios",
+        "rationale": "Maintains clean aesthetic while ensuring WCAG AA compliance for accessibility"
+      },
+      {
+        "targetKey": "brand.components.buttons",
+        "fix": "Reduce button padding to 16px vertical, 24px horizontal for balanced proportions",
+        "rationale": "Creates prominent but not overwhelming CTAs that integrate better with page hierarchy"
+      }
+    ],
+    "pass": false
+  },
+  "finalScore": 93.32333333333332,
+  "truthPenalty": 0.06666666666666667,
+  "qualityPenalty": 0.01,
+  "meta": {
+    "totalCostUsd": 0.19093000000000002,
+    "totalLatencyMs": 69332,
+    "attempts": 1,
+    "models": {
+      "systems": "gpt-5.2-2025-12-11",
+      "brand": "gpt-4o-mini-2024-07-18",
+      "critic": "claude-sonnet-4-20250514"
+    },
+    "stopReasons": {
+      "systems": "ok",
+      "brand": "ok",
+      "critic": "ok"
+    },
+    "requestIds": {
+      "systems": "chatcmpl-CyogWjxnnO9GibCPOcAVH71TSRHl9",
+      "brand": "chatcmpl-Cyogy0kFnesZ0HpAyosoHJP5TVYTc",
+      "critic": "msg_01EBLbotaJSxK6wNUvW6ZHQA"
+    },
+    "normalization": {
+      "enabled": true,
+      "applied": false,
+      "mode": "truncate_first_n",
+      "events": {
+        "systems": {
+          "kind": "truncate",
+          "applied": false,
+          "from": 0,
+          "to": 0
+        },
+        "brand": {
+          "kind": "truncate",
+          "applied": false,
+          "from": 0,
+          "to": 0
+        },
+        "critic": {
+          "kind": "coerce_risks",
+          "applied": false,
+          "coercedCount": 0,
+          "fromType": "object",
+          "toType": "string"
+        }
+      }
+    },
+    "usage": {
+      "systems": {
+        "inputTokens": 1231,
+        "outputTokens": 1383,
+        "latencyMs": 25636,
+        "costUsd": 0.0538
+      },
+      "brand": {
+        "inputTokens": 1591,
+        "outputTokens": 882,
+        "latencyMs": 13912,
+        "costUsd": 0.042370000000000005
+      },
+      "critic": {
+        "inputTokens": 4883,
+        "outputTokens": 1531,
+        "latencyMs": 29784,
+        "costUsd": 0.09476000000000001
+      },
+      "totals": {
+        "inputTokens": 11016,
+        "outputTokens": 4985,
+        "latencyMs": 73360,
+        "costUsd": 0.25971
+      },
+      "selector": {
+        "inputTokens": 3311,
+        "outputTokens": 1189,
+        "latencyMs": 4028,
+        "costUsd": 0.06878000000000001
+      }
+    },
+    "selection": {
+      "enabled": true,
+      "systems": {
+        "candidatesCount": 9,
+        "cappedCount": 9,
+        "selectedCount": 8,
+        "selectorModel": "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"
+      },
+      "brand": {
+        "candidatesCount": 10,
+        "cappedCount": 10,
+        "selectedCount": 8,
+        "selectorModel": "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"
+      }
+    }
+  }
+}

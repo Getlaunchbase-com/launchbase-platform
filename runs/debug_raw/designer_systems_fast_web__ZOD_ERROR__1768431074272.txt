@@ -1,0 +1,13 @@
+=== ZOD VALIDATION ERROR (designer_systems_fast_web) ===
+Model: google/gemini-2.5-pro
+Request ID: zx1oacGIGpObm9IPkorW0AQ
+
+=== ERRORS ===
+
+
+=== RAW TEXT ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Place a simplified, 3-column feature highlight (e.g., 'Ongoing Updates', 'Performance Monitoring', 'Expert Support') directly below the main H1 headline,

@@ -1,0 +1,16 @@
+=== RAW RESPONSE (designer_systems_fast_web) ===
+Model: google/gemini-2.5-pro
+Request ID: nSJoafX-E9q2idsPzuTa-AM
+Input Tokens: 1114
+Output Tokens: 66
+Finish Reason: length
+
+=== RAW TEXT (249 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Embed a short, muted, looping video of the dashboard UI behind the headline. Add a 'Trusted by 500+ Businesses' social proof element with logos below the primary
+
+=== PARSED JSON ===
+NULL (parse failed)

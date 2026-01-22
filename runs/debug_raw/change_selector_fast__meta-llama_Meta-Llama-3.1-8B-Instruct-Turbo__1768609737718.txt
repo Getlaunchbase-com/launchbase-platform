@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTazC4d-2j9zxn-9bf1bc417e32ff03
+Input Tokens: 1510
+Output Tokens: 563
+Finish Reason: stop
+
+=== RAW TEXT (2393 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Set body text to 16px with a max line length of 70ch to enhance readability and create a c...",
+      "rationale": "Improves clarity and ensures comfortable reading experience across devices.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Standardize border-radius across components to 8px for consistency and a premium feel.",
+      "rationale": "Creates a harmonious visual experience across the platform.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Use rounded buttons with 20px padding, subtle shadow, and primary color for the main actio...",
+      "rationale": "Creates a clear hierarchy and distinction between primary and secondary actions, enhancing...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Use circular chips with 16px padding and 0.5px border, applying a subtle shadow for depth,...",
+      "rationale": "Enhances visibility of trust markers in a compact, premium format.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Style cards with 16px padding, 8px border-radius, and a neutral background to maintain a p...",
+      "rationale": "Increases the visual appeal and creates a safe browsing experience by clearly defining car...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Use 1px dividers with a light neutral color and 20px spacing above and below to create cle...",
+      "rationale": "Enhances organization and flow of content, contributing to a calm browsing experience.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Adjust neutral color palette to include softer tones (e.g., light gray) for backgrounds, e...",
+      "rationale": "Creates a more inviting environment that feels safe and premium.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Implement an audit log component with a clean, 3-column layout to display recent actions; ...",
+      "rationale": "Increases transparency and user trust through visual representation of activity.",
+      "confidence": 0.84
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Set body text to 16px with a max line length of 70ch to enhance readability and create a c...",
+      "rationale": "Improves clarity and ensures comfortable reading experience across devices.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Standardize border-radius across components to 8px for consistency and a premium feel.",
+      "rationale": "Creates a harmonious visual experience across the platform.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Use rounded buttons with 20px padding, subtle shadow, and primary color for the main actio...",
+      "rationale": "Creates a clear hierarchy and distinction between primary and secondary actions, enhancing...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Use circular chips with 16px padding and 0.5px border, applying a subtle shadow for depth,...",
+      "rationale": "Enhances visibility of trust markers in a compact, premium format.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Style cards with 16px padding, 8px border-radius, and a neutral background to maintain a p...",
+      "rationale": "Increases the visual appeal and creates a safe browsing experience by clearly defining car...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Use 1px dividers with a light neutral color and 20px spacing above and below to create cle...",
+      "rationale": "Enhances organization and flow of content, contributing to a calm browsing experience.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Adjust neutral color palette to include softer tones (e.g., light gray) for backgrounds, e...",
+      "rationale": "Creates a more inviting environment that feels safe and premium.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Implement an audit log component with a clean, 3-column layout to display recent actions; ...",
+      "rationale": "Increases transparency and user trust through visual representation of activity.",
+      "confidence": 0.84
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTb9Pa4-4YNCb4-9bf1e8124e9dca84
+Input Tokens: 1493
+Output Tokens: 511
+Finish Reason: stop
+
+=== RAW TEXT (1998 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 16px for body text with line-height 1.5 and max line length of 80ch to enhance readabi...",
+      "rationale": "Improves readability.",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a three-tier button hierarchy: primary button (48px, rounded corners) for main a...",
+      "rationale": "Establishes clear action priorities.",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Use card design with 16px padding, consistent 8px margin, and subtle shadow to create a pr...",
+      "rationale": "Promotes organization and clarity.",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Design an audit log preview pattern with a clean, organized layout.",
+      "rationale": "Enhances trust through transparency.",
+      "confidence": 0.92,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Introduce proof chips with rounded edges and 8px padding.",
+      "rationale": "Visually communicates trust.",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Adopt a neutral color palette with high contrast for text.",
+      "rationale": "Enhances readability.",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Standardize corner radius to 8px across components.",
+      "rationale": "Creates a consistent visual language.",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Use thin dividers with ample spacing between sections.",
+      "rationale": "Facilitates visual clarity.",
+      "confidence": 0.86,
+      "risks": []
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 16px for body text with line-height 1.5 and max line length of 80ch to enhance readabi...",
+      "rationale": "Improves readability.",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a three-tier button hierarchy: primary button (48px, rounded corners) for main a...",
+      "rationale": "Establishes clear action priorities.",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Use card design with 16px padding, consistent 8px margin, and subtle shadow to create a pr...",
+      "rationale": "Promotes organization and clarity.",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Design an audit log preview pattern with a clean, organized layout.",
+      "rationale": "Enhances trust through transparency.",
+      "confidence": 0.92,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Introduce proof chips with rounded edges and 8px padding.",
+      "rationale": "Visually communicates trust.",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Adopt a neutral color palette with high contrast for text.",
+      "rationale": "Enhances readability.",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Standardize corner radius to 8px across components.",
+      "rationale": "Creates a consistent visual language.",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Use thin dividers with ample spacing between sections.",
+      "rationale": "Facilitates visual clarity.",
+      "confidence": 0.86,
+      "risks": []
+    }
+  ]
+}

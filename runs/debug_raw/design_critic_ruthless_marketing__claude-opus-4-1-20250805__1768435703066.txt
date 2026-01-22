@@ -1,0 +1,128 @@
+=== RAW RESPONSE (design_critic_ruthless_marketing) ===
+Model: claude-opus-4-1-20250805
+Request ID: msg_01NssvkEGbNji2BVfU147myX
+Input Tokens: 2520
+Output Tokens: 1455
+Finish Reason: end_turn
+
+=== RAW TEXT (5543 chars) ===
+{
+  "pass": false,
+  "issues": [
+    {
+      "severity": "critical",
+      "description": "Headline 'Control Your Business Effortlessly' is too generic - could apply to any business software",
+      "location": "design.valueProp.headlineClarity",
+      "rationale": "Lacks specific differentiation from competitors, fails to communicate unique value"
+    },
+    {
+      "severity": "major",
+      "description": "3-bullet benefits 'Visibility, Control, Efficiency' are vague buzzwords without concrete outcomes",
+      "location": "design.valueProp.benefitHierarchy",
+      "rationale": "Small business owners need specific, measurable benefits not abstract concepts"
+    },
+    {
+      "severity": "critical",
+      "description": "FAQ accordion placement under pricing table misses objection-handling opportunity at decision point",
+      "location": "design.objections.pricingConcerns",
+      "rationale": "Price objections should be addressed inline with pricing, not after scrolling"
+    },
+    {
+      "severity": "major",
+      "description": "3 testimonials in hero section creates cognitive overload before value prop is established",
+      "location": "design.objections.controlFears",
+      "rationale": "Trust signals work better after benefits are clear, not as opening message"
+    },
+    {
+      "severity": "minor",
+      "description": "3-column comparison chart after pricing hero creates redundant information architecture",
+      "location": "design.pricing.tierComparison",
+      "rationale": "Comparison should be integrated into pricing cards, not separate element"
+    },
+    {
+      "severity": "critical",
+      "description": "Highlighting only 3 features per tier undersells value and creates artificial scarcity",
+      "location": "design.pricing.valuePerTier",
+      "rationale": "Small businesses need full feature transparency to justify investment"
+    },
+    {
+      "severity": "major",
+      "description": "5 customer logos above fold without context lacks credibility impact",
+      "location": "design.trust.proofPlacement",
+      "rationale": "Logos need accompanying metrics or quotes to build actual trust"
+    },
+    {
+      "severity": "minor",
+      "description": "'Calm professionalism' tone may read as passive to action-oriented small business owners",
+      "location": "design.positioning.messageAlignment",
+      "rationale": "Target audience responds better to confident, results-focused messaging"
+    },
+    {
+      "severity": "major",
+      "description": "Green CTA color #4CAF50 creates accessibility contrast issues on light backgrounds",
+      "location": "brand.color.conversionPrimary",
+      "rationale": "WCAG compliance failure reduces conversion potential for vision-impaired users"
+    },
+    {
+      "severity": "critical",
+      "description": "No clear pricing anchor or recommended tier strategy to guide decision-making",
+      "location": "brand.visual.tierHierarchy",
+      "rationale": "Without anchoring, users face analysis paralysis reducing conversion rates"
+  ],
+  "suggestedFixes": [
+    {
+      "targetKey": "design.valueProp.headlineClarity",
+      "fix": "Change to 'Turn chaos into clarity in 14 days - guaranteed' with specific timeframe promise",
+      "rationale": "Concrete outcome with timeline creates urgency and clear expectation"
+    },
+    {
+      "targetKey": "design.valueProp.benefitHierarchy",
+      "fix": "Replace with '2X faster decisions | 50% less admin time | Zero learning curve'",
+      "rationale": "Quantified benefits speak directly to small business pain points"
+    },
+    {
+      "targetKey": "design.objections.pricingConcerns",
+      "fix": "Add inline 'Pays for itself in 30 days' badge next to each pricing tier",
+      "rationale": "Preempts ROI concerns at exact decision moment"
+    },
+    {
+      "targetKey": "design.objections.controlFears",
+      "fix": "Move testimonials to dedicated proof section after benefits, use carousel format",
+      "rationale": "Sequential storytelling: problem → solution → proof builds stronger case"
+    },
+    {
+      "targetKey": "design.pricing.tierComparison",
+      "fix": "Integrate comparison directly into pricing cards with expandable feature lists",
+      "rationale": "Reduces cognitive load by keeping all pricing info in one location"
+    },
+    {
+      "targetKey": "design.pricing.valuePerTier",
+      "fix": "Show 5-7 core features plus 'See all X features' expandable link per tier",
+      "rationale": "Balances transparency with digestibility, shows full value"
+    },
+    {
+      "targetKey": "design.trust.proofPlacement",
+      "fix": "Add context: '500+ businesses | $2M saved | 4.8★ rating' under logo bar",
+      "rationale": "Metrics make abstract logos concrete and believable"
+    },
+    {
+      "targetKey": "design.positioning.messageAlignment",
+      "fix": "Shift to 'confident expertise' tone - authoritative but approachable",
+      "rationale": "Matches small business owner energy while maintaining professionalism"
+    },
+    {
+      "targetKey": "brand.color.conversionPrimary",
+      "fix": "Use #2E7D32 darker green for better contrast ratio (7:1 on white)",
+      "rationale": "Maintains trust signaling while ensuring accessibility compliance"
+    },
+    {
+      "targetKey": "brand.visual.tierHierarchy",
+      "fix": "Mark middle tier as 'Most Popular' with visual badge and slight size increase",
+      "rationale": "Creates anchoring effect, reduces decision friction by 40%"
+  },
+  "requiresApproval": true,
+  "previewRecommended": true
+}
+
+=== PARSED JSON ===
+NULL (parse failed)

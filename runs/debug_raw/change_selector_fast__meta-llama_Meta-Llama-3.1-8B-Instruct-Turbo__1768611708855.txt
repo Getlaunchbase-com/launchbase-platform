@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTbAJ65-2j9zxn-9bf1ec6299fec62a
+Input Tokens: 1441
+Output Tokens: 543
+Finish Reason: stop
+
+=== RAW TEXT (2299 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Use rounded buttons with 12px corner radius and 20px vertical padding for a softer, premiu...",
+      "rationale": "Rounded edges convey a more inviting and calm interface.",
+      "confidence": 0.92
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Introduce a subtle shadow effect on audit logs to differentiate entries and enhance visibi...",
+      "rationale": "Shadow effects help create depth, making important data stand out, improving user confiden...",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Add proof chips below the hero section: 'Safe by default • Fully auditable • Reversible ch...",
+      "rationale": "Increasing visibility of trust signals early in the user journey helps instill confidence.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Use subtle dividers (1px solid neutral color) between sections to create a visual rhythm w...",
+      "rationale": "Enhances calmness and organization while maintaining focus on content.",
+      "confidence": 0.91
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Set max line length for body copy to 75ch to improve readability and reduce cognitive load...",
+      "rationale": "Longer line lengths can create fatigue; optimizing improves user experience.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Implement a card style with 16px padding and 8px margin for improved density and clarity.",
+      "rationale": "Creates a clean separation between content while maintaining a premium appearance.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 16px font size for body text with a line-height of 1.5 for improved readability on des...",
+      "rationale": "Enhances clarity and maintains calmness through better text legibility.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.hero.headline",
+      "value": "Launch Your Business in 48 Hours",
+      "rationale": "More specific timeframe creates urgency",
+      "confidence": 0.9
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Use rounded buttons with 12px corner radius and 20px vertical padding for a softer, premiu...",
+      "rationale": "Rounded edges convey a more inviting and calm interface.",
+      "confidence": 0.92
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Introduce a subtle shadow effect on audit logs to differentiate entries and enhance visibi...",
+      "rationale": "Shadow effects help create depth, making important data stand out, improving user confiden...",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Add proof chips below the hero section: 'Safe by default • Fully auditable • Reversible ch...",
+      "rationale": "Increasing visibility of trust signals early in the user journey helps instill confidence.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Use subtle dividers (1px solid neutral color) between sections to create a visual rhythm w...",
+      "rationale": "Enhances calmness and organization while maintaining focus on content.",
+      "confidence": 0.91
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Set max line length for body copy to 75ch to improve readability and reduce cognitive load...",
+      "rationale": "Longer line lengths can create fatigue; optimizing improves user experience.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Implement a card style with 16px padding and 8px margin for improved density and clarity.",
+      "rationale": "Creates a clean separation between content while maintaining a premium appearance.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 16px font size for body text with a line-height of 1.5 for improved readability on des...",
+      "rationale": "Enhances clarity and maintains calmness through better text legibility.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.hero.headline",
+      "value": "Launch Your Business in 48 Hours",
+      "rationale": "More specific timeframe creates urgency",
+      "confidence": 0.9
+    }
+  ]
+}

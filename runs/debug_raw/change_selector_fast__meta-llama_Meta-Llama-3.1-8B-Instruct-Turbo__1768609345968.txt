@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTaxBdX-4YNCb4-9bf1b2b14b2e8bee
+Input Tokens: 1591
+Output Tokens: 562
+Finish Reason: stop
+
+=== RAW TEXT (2433 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Establish a button hierarchy: primary buttons at 16px padding, secondary at 12px padding, ...",
+      "rationale": "Creates a clear distinction between actions, enhancing user confidence in navigation.",
+      "confidence": 0.92
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Use 8px corner radius for buttons and cards to convey a sense of premium safety without be...",
+      "rationale": "Rounded corners enhance approachability while maintaining an operational aesthetic.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Use rounded chips with 12px padding and a soft background color to create a more approacha...",
+      "rationale": "Enhances user perception of safety and trust through design.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Implement card styles with a subtle drop shadow and consistent padding of 20px to create a...",
+      "rationale": "Enhances visual hierarchy and improves readability for users, supporting operational aspec...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Adjust neutral color palette to include softer tones (e.g., light greys and muted whites) ...",
+      "rationale": "Soft colors can reduce visual strain and promote a calm user experience.",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Design an audit log preview pattern with expandable sections, providing clear, accessible ...",
+      "rationale": "Enhances operational confidence by allowing users to easily track their activities.",
+      "confidence": 0.89
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Introduce proof chips below the hero section: 'Safe by default', 'Fully auditable', 'Rever...",
+      "rationale": "Presents key trust signals upfront, addressing safety concerns and promoting confidence.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Implement subtle dividers with a color contrast ratio of at least 4.5:1 to ensure accessib...",
+      "rationale": "Ensures clear separation of content while adhering to accessibility standards.",
+      "confidence": 0.9
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Establish a button hierarchy: primary buttons at 16px padding, secondary at 12px padding, ...",
+      "rationale": "Creates a clear distinction between actions, enhancing user confidence in navigation.",
+      "confidence": 0.92
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Use 8px corner radius for buttons and cards to convey a sense of premium safety without be...",
+      "rationale": "Rounded corners enhance approachability while maintaining an operational aesthetic.",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Use rounded chips with 12px padding and a soft background color to create a more approacha...",
+      "rationale": "Enhances user perception of safety and trust through design.",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Implement card styles with a subtle drop shadow and consistent padding of 20px to create a...",
+      "rationale": "Enhances visual hierarchy and improves readability for users, supporting operational aspec...",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Adjust neutral color palette to include softer tones (e.g., light greys and muted whites) ...",
+      "rationale": "Soft colors can reduce visual strain and promote a calm user experience.",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Design an audit log preview pattern with expandable sections, providing clear, accessible ...",
+      "rationale": "Enhances operational confidence by allowing users to easily track their activities.",
+      "confidence": 0.89
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Introduce proof chips below the hero section: 'Safe by default', 'Fully auditable', 'Rever...",
+      "rationale": "Presents key trust signals upfront, addressing safety concerns and promoting confidence.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Implement subtle dividers with a color contrast ratio of at least 4.5:1 to ensure accessib...",
+      "rationale": "Ensures clear separation of content while adhering to accessibility standards.",
+      "confidence": 0.9
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.icons.sizeTokens",
+      "value": "16, 24, 32px",
+      "rationale": "Consistent sizing for clarity and hierarchy.",
+      "confidence": 0.9,
+      "risks": [
+        "Limited flexibility"
+      ]
+    },
+    {
+      "targetKey": "brand.icons.strokeWidth",
+      "value": "2px",
+      "rationale": "Ensures visibility and modern look.",
+      "confidence": 0.85,
+      "risks": [
+        "Might appear too bold"
+      ]
+    },
+    {
+      "targetKey": "brand.icons.cornerRadius",
+      "value": "4px",
+      "rationale": "Softens icons for a calm appearance.",
+      "confidence": 0.88,
+      "risks": [
+        "Potential inconsistency"
+      ]
+    },
+    {
+      "targetKey": "brand.icons.colorUsage",
+      "value": "Monochrome with primary accents",
+      "rationale": "Maintains professional tone.",
+      "confidence": 0.92,
+      "risks": [
+        "Reduced visual variety"
+      ]
+    },
+    {
+      "targetKey": "brand.illustration.lineWeight",
+      "value": "1.5px",
+      "rationale": "Balances detail with simplicity.",
+      "confidence": 0.89,
+      "risks": [
+        "Detail loss in small sizes"
+      ]
+    },
+    {
+      "targetKey": "brand.illustration.colorPalette",
+      "value": "Soft blues and greys",
+      "rationale": "Conveys calmness and trust.",
+      "confidence": 0.93,
+      "risks": [
+        "Limited color range"
+      ]
+    },
+    {
+      "targetKey": "brand.motifs.patternSpecs",
+      "value": "Geometric shapes",
+      "rationale": "Supports modern but not trendy feel.",
+      "confidence": 0.87,
+      "risks": [
+        "Overuse risks busyness"
+      ]
+    },
+    {
+      "targetKey": "brand.hero.overlaySpecs",
+      "value": "50% transparency gradient",
+      "rationale": "Enhances text readability.",
+      "confidence": 0.91,
+      "risks": [
+        "Potential legibility issues"
+      ]
+    }
+  ]
+}

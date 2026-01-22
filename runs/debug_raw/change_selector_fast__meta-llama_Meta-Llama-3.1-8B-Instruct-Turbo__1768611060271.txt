@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTb6yHt-2j9zxn-9bf1dc8d09881d89
+Input Tokens: 1583
+Output Tokens: 568
+Finish Reason: stop
+
+=== RAW TEXT (2417 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Use a neutral background color (e.g. #F9F9F9) to create a calm environment for content.",
+      "rationale": "A neutral background supports a safe-by-default experience and contrasts well with primary...",
+      "confidence": 0.92
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a button hierarchy: primary buttons at 16px padding and secondary buttons at 12p...",
+      "rationale": "Differentiating button sizes enhances visual hierarchy and guides user actions confidently...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Style cards with 16px padding, 8px border-radius, and a subtle shadow to create a premium ...",
+      "rationale": "Stylish cards enhance content presentation and promote a safe-by-default experience.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 20px body text with line-height 1.5 and max line length 65ch to enhance readability an...",
+      "rationale": "Improving readability contributes to a calm and confident user experience.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Introduce proof chips with a 4px border-radius and 12px padding to highlight key features.",
+      "rationale": "Proof chips serve as visual cues that enhance user trust and confidence.",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Use 1px solid dividers with subtle color to enhance section separation without overwhelmin...",
+      "rationale": "Subtle dividers maintain clarity and organization, contributing to a calm interface.",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Design an audit log section with a clear, scrollable layout that highlights recent activit...",
+      "rationale": "A clear audit log increases user confidence and promotes an operational feel.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Set border-radius to 4px for all components to maintain a cohesive and premium feel.",
+      "rationale": "Consistent radius across components creates a unified, premium appearance.",
+      "confidence": 0.8
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Use a neutral background color (e.g. #F9F9F9) to create a calm environment for content.",
+      "rationale": "A neutral background supports a safe-by-default experience and contrasts well with primary...",
+      "confidence": 0.92
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a button hierarchy: primary buttons at 16px padding and secondary buttons at 12p...",
+      "rationale": "Differentiating button sizes enhances visual hierarchy and guides user actions confidently...",
+      "confidence": 0.9
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Style cards with 16px padding, 8px border-radius, and a subtle shadow to create a premium ...",
+      "rationale": "Stylish cards enhance content presentation and promote a safe-by-default experience.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 20px body text with line-height 1.5 and max line length 65ch to enhance readability an...",
+      "rationale": "Improving readability contributes to a calm and confident user experience.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Introduce proof chips with a 4px border-radius and 12px padding to highlight key features.",
+      "rationale": "Proof chips serve as visual cues that enhance user trust and confidence.",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Use 1px solid dividers with subtle color to enhance section separation without overwhelmin...",
+      "rationale": "Subtle dividers maintain clarity and organization, contributing to a calm interface.",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Design an audit log section with a clear, scrollable layout that highlights recent activit...",
+      "rationale": "A clear audit log increases user confidence and promotes an operational feel.",
+      "confidence": 0.87
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Set border-radius to 4px for all components to maintain a cohesive and premium feel.",
+      "rationale": "Consistent radius across components creates a unified, premium appearance.",
+      "confidence": 0.8
+    }
+  ]
+}

@@ -1,0 +1,119 @@
+{
+  "pass": false,
+  "issues": [
+    {
+      "severity": "critical",
+      "description": "No hero headline spec defined - visitors won't understand value prop in 3 seconds. Missing core messaging structure.",
+      "location": "design.hero.headline",
+      "rationale": "Without clear headline hierarchy, conversion rates tank by 30-40%"
+    },
+    {
+      "severity": "critical",
+      "description": "No CTA button placement strategy - primary action unclear. Missing above/below fold positioning rules.",
+      "location": "design.hero.cta",
+      "rationale": "Undefined CTA placement loses 50% of potential conversions"
+    },
+    {
+      "severity": "major",
+      "description": "Trust signals not positioned near CTAs - no safety messaging at conversion points. Social proof placement undefined.",
+      "location": "design.trust.placement",
+      "rationale": "Trust elements 200px+ from CTAs reduce click-through by 25%"
+    },
+    {
+      "severity": "critical",
+      "description": "Mobile touch targets undefined - button padding spec (12px 24px) too small for thumbs. Need 44x44px minimum.",
+      "location": "brand.components.button",
+      "rationale": "Sub-44px touch targets fail WCAG and lose 40% mobile conversions"
+    },
+    {
+      "severity": "major",
+      "description": "Pricing card differentiation too subtle - 2px border won't scan on mobile. Needs stronger visual hierarchy.",
+      "location": "brand.components.card",
+      "rationale": "Weak pricing emphasis reduces plan selection clarity by 35%"
+    },
+    {
+      "severity": "major",
+      "description": "96px section gaps excessive on mobile - creates disconnected scroll experience. Needs responsive scaling.",
+      "location": "brand.spacing.sectionGap",
+      "rationale": "Large gaps on mobile increase bounce rate by 20%"
+    },
+    {
+      "severity": "minor",
+      "description": "Badge styling too muted (#F7FAFC bg) - trust indicators invisible. Need more contrast for authority.",
+      "location": "brand.components.badge",
+      "rationale": "Low-contrast badges reduce perceived credibility"
+    },
+    {
+      "severity": "major",
+      "description": "No mobile-first type scaling - 48px H1 breaks on 320px screens. Missing responsive typography system.",
+      "location": "brand.type.h1",
+      "rationale": "Fixed large type causes horizontal scroll on 30% of devices"
+    },
+    {
+      "severity": "critical",
+      "description": "No conversion funnel architecture - missing step indicators, progress bars, urgency patterns.",
+      "location": "design.conversion.funnel",
+      "rationale": "Undefined funnel flow loses 60% of interested visitors"
+    },
+    {
+      "severity": "major",
+      "description": "Primary color application too restrictive - no accent usage for key messaging or value props.",
+      "location": "brand.color.primary",
+      "rationale": "Overly neutral palette reduces emotional engagement by 25%"
+    }
+  ],
+  "suggestedFixes": [
+    {
+      "targetKey": "design.hero.headline",
+      "fix": "Add 3-tier headline system: main value prop (8 words max), sub-head (15 words), micro-copy (social proof). Stack vertically, left-align.",
+      "rationale": "Clear hierarchy increases comprehension speed by 40% and improves conversion"
+    },
+    {
+      "targetKey": "design.hero.cta",
+      "fix": "Place primary CTA at 400px from top (above fold), repeat at 800px with different text. Add micro-commitment CTA (Learn More) as secondary.",
+      "rationale": "Dual CTA placement captures both quick and considered decision makers"
+    },
+    {
+      "targetKey": "design.trust.placement",
+      "fix": "Position trust badges within 100px of every CTA. Add 'Safe & Secure' microcopy directly under buttons. Include live customer count.",
+      "rationale": "Proximity principle - trust near action reduces hesitation by 30%"
+    },
+    {
+      "targetKey": "brand.components.button",
+      "fix": "Update button padding to 16px 32px minimum. On mobile, use full-width buttons with 48px height. Add 8px active state depression.",
+      "rationale": "Larger touch targets improve mobile conversion by 35% and meet accessibility standards"
+    },
+    {
+      "targetKey": "brand.components.card",
+      "fix": "Make recommended plan 8% larger, add subtle shadow (0 4px 6px rgba(0,0,0,0.1)), use primary color background with white text for header.",
+      "rationale": "Strong visual differentiation increases preferred plan selection by 45%"
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "fix": "Use clamp(48px, 10vw, 96px) for responsive gaps. Critical sections (hero→benefits) use 48px max. Add visual connectors between related sections.",
+      "rationale": "Dynamic spacing maintains visual flow across all devices, reduces bounce by 15%"
+    },
+    {
+      "targetKey": "brand.components.badge",
+      "fix": "Use white background with 1px solid border (#E2E8F0), add subtle icon, increase text contrast to #2D3748. Group 3 badges horizontally.",
+      "rationale": "Higher contrast badges increase trust perception by 20%, grouping improves scanning"
+    },
+    {
+      "targetKey": "brand.type.h1",
+      "fix": "Use clamp(32px, 5vw, 48px) for H1. Line-height: 1.1 on mobile, 1.2 on desktop. Add letter-spacing: -0.02em for tighter, modern look.",
+      "rationale": "Fluid typography prevents layout breaks and maintains readability across all viewports"
+    },
+    {
+      "targetKey": "design.conversion.funnel",
+      "fix": "Add 3-step visual progress bar in hero. Include urgency element (limited spots/time). Show 'You're 1 click away' near final CTA.",
+      "rationale": "Visual progress and urgency patterns increase completion rates by 40%"
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "fix": "Use primary color for: CTAs (100%), value props (tint 20%), success messages. Add complementary accent (#10B981) for positive indicators.",
+      "rationale": "Strategic color usage guides attention and increases emotional engagement by 25%"
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true
+}

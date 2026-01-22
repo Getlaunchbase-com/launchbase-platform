@@ -1,0 +1,33 @@
+{
+  "runId": "pilot_v2_swarm_o3_pro_web_rep1_1768435829301",
+  "lane": "web",
+  "stack": "O3-Pro Stack",
+  "policyName": "swarm_o3_pro",
+  "rep": 1,
+  "modelLocks": {
+    "systems": {
+      "requested": "openai/o3-pro",
+      "resolved": "openai/o3-pro"
+    },
+    "brand": {
+      "requested": "openai/o3-pro",
+      "resolved": "openai/o3-pro"
+    },
+    "critic": {
+      "requested": "claude-opus-4-1-20250805",
+      "resolved": "claude-opus-4-1-20250805"
+    }
+  },
+  "pass": false,
+  "failureReason": "Systems: 0/8, Brand: 0/8, Critic: 10/10, RequiredFields: true",
+  "validationDetails": {
+    "systemsChanges": 0,
+    "brandChanges": 0,
+    "criticIssues": 10,
+    "criticFixes": 10,
+    "hasRequiredFields": true
+  },
+  "durationMs": 36942,
+  "costUsd": 0.05176,
+  "liarFlags": []
+}

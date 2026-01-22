@@ -1,0 +1,248 @@
+=== RAW RESPONSE (design_critic_ruthless_artwork) ===
+Model: claude-opus-4-1-20250805
+Request ID: msg_01Co4ry76LzGXZmisVahQhyF
+Input Tokens: 941
+Output Tokens: 1338
+Finish Reason: end_turn
+
+=== RAW TEXT (5235 chars) ===
+{
+  "pass": false,
+  "issues": [
+    {
+      "severity": "critical",
+      "description": "No icon grid system defined - sizes, padding, stroke weights will be inconsistent across product",
+      "location": "design.iconography.system",
+      "rationale": "Professional products need strict 8px grid alignment for icons"
+    },
+    {
+      "severity": "critical",
+      "description": "Missing illustration complexity tiers - no clear rules for hero vs inline vs spot illustrations",
+      "location": "design.illustration.hierarchy",
+      "rationale": "Business users need visual hierarchy to navigate complex information"
+    },
+    {
+      "severity": "major",
+      "description": "No trust visual metaphors defined - shields, locks, checkmarks need consistent treatment",
+      "location": "design.trust.symbols",
+      "rationale": "Trust signals must be instantly recognizable and consistent"
+    },
+    {
+      "severity": "critical",
+      "description": "Hero visual direction undefined - no strategy for photography vs illustration vs abstract",
+      "location": "design.hero.direction",
+      "rationale": "Mixed hero styles will confuse brand perception"
+    },
+    {
+      "severity": "major",
+      "description": "No motif library for transparency theme - glass, layers, overlays need definition",
+      "location": "design.motifs.transparency",
+      "rationale": "Core brand promise of transparency lacks visual language"
+    },
+    {
+      "severity": "major",
+      "description": "Icon metaphors not mapped to business concepts - no visual dictionary for operations",
+      "location": "design.iconography.metaphors",
+      "rationale": "Business owners need familiar visual shortcuts"
+    },
+    {
+      "severity": "critical",
+      "description": "No color usage rules for illustrations - risk of rainbow soup instead of professional palette",
+      "location": "design.illustration.colors",
+      "rationale": "Uncontrolled color use undermines professional tone"
+    },
+    {
+      "severity": "minor",
+      "description": "Missing spot illustration library for empty states and micro-interactions",
+      "location": "design.illustration.spots",
+      "rationale": "Empty states need human touch without overwhelming"
+    },
+    {
+      "severity": "major",
+      "description": "No defined style for data visualization icons - charts, graphs need consistent treatment",
+      "location": "design.iconography.data",
+      "rationale": "Business data needs clear, trustworthy representation"
+    },
+    {
+      "severity": "minor",
+      "description": "Pattern library undefined - no repeatable backgrounds or texture systems",
+      "location": "design.motifs.patterns",
+      "rationale": "Subtle patterns add depth without distraction"
+    }
+  ],
+  "suggestedFixes": [
+    {
+      "targetKey": "design.iconography.system",
+      "fix": "Implement 24px base grid with 2px strokes, 16/24/32/48px sizes, 4px corner radius standard",
+      "rationale": "Creates predictable, scalable icon system matching modern business tools"
+    },
+    {
+      "targetKey": "design.illustration.hierarchy",
+      "fix": "Define 3 tiers: Hero (full detail), Spot (simplified), Micro (single color) with clear use cases",
+      "rationale": "Establishes when to use which complexity level"
+    },
+    {
+      "targetKey": "design.trust.symbols",
+      "fix": "Create unified shield system: outline for pending, filled for verified, with consistent badge shapes",
+      "rationale": "Users instantly understand security states"
+    },
+    {
+      "targetKey": "design.hero.direction",
+      "fix": "Use abstract geometric illustrations only - no photography or hand-drawn elements",
+      "rationale": "Maintains professional distance while being approachable"
+    },
+    {
+      "targetKey": "design.motifs.transparency",
+      "fix": "Develop glass morphism kit: 20% opacity overlays, 8px blur backgrounds, subtle gradients",
+      "rationale": "Visual transparency reinforces brand promise"
+    },
+    {
+      "targetKey": "design.iconography.metaphors",
+      "fix": "Map icons: folder=organization, gear=settings, chart=growth, people=team, shield=security",
+      "rationale": "Familiar metaphors reduce cognitive load"
+    },
+    {
+      "targetKey": "design.illustration.colors",
+      "fix": "Limit to brand blue + 2 accent colors max per illustration, 60-30-10 ratio",
+      "rationale": "Controlled palette maintains professional appearance"
+    },
+    {
+      "targetKey": "design.illustration.spots",
+      "fix": "Create 20 spot illustrations: empty inbox, no data, success states using single accent color",
+      "rationale": "Humanizes empty states without overwhelming"
+    },
+    {
+      "targetKey": "design.iconography.data",
+      "fix": "Standardize chart icons: 2px strokes, no fills, simplified axes, consistent proportions",
+      "rationale": "Data visualization needs clarity over decoration"
+    },
+    {
+      "targetKey": "design.motifs.patterns",
+      "fix": "Create dot grid (5% opacity), wave pattern (10% opacity), geometric tiles for backgrounds",
+      "rationale": "Subtle patterns add texture without distraction"
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true
+}
+
+=== PARSED JSON ===
+{
+  "pass": false,
+  "issues": [
+    {
+      "severity": "critical",
+      "description": "No icon grid system defined - sizes, padding, stroke weights will be inconsistent across product",
+      "location": "design.iconography.system",
+      "rationale": "Professional products need strict 8px grid alignment for icons"
+    },
+    {
+      "severity": "critical",
+      "description": "Missing illustration complexity tiers - no clear rules for hero vs inline vs spot illustrations",
+      "location": "design.illustration.hierarchy",
+      "rationale": "Business users need visual hierarchy to navigate complex information"
+    },
+    {
+      "severity": "major",
+      "description": "No trust visual metaphors defined - shields, locks, checkmarks need consistent treatment",
+      "location": "design.trust.symbols",
+      "rationale": "Trust signals must be instantly recognizable and consistent"
+    },
+    {
+      "severity": "critical",
+      "description": "Hero visual direction undefined - no strategy for photography vs illustration vs abstract",
+      "location": "design.hero.direction",
+      "rationale": "Mixed hero styles will confuse brand perception"
+    },
+    {
+      "severity": "major",
+      "description": "No motif library for transparency theme - glass, layers, overlays need definition",
+      "location": "design.motifs.transparency",
+      "rationale": "Core brand promise of transparency lacks visual language"
+    },
+    {
+      "severity": "major",
+      "description": "Icon metaphors not mapped to business concepts - no visual dictionary for operations",
+      "location": "design.iconography.metaphors",
+      "rationale": "Business owners need familiar visual shortcuts"
+    },
+    {
+      "severity": "critical",
+      "description": "No color usage rules for illustrations - risk of rainbow soup instead of professional palette",
+      "location": "design.illustration.colors",
+      "rationale": "Uncontrolled color use undermines professional tone"
+    },
+    {
+      "severity": "minor",
+      "description": "Missing spot illustration library for empty states and micro-interactions",
+      "location": "design.illustration.spots",
+      "rationale": "Empty states need human touch without overwhelming"
+    },
+    {
+      "severity": "major",
+      "description": "No defined style for data visualization icons - charts, graphs need consistent treatment",
+      "location": "design.iconography.data",
+      "rationale": "Business data needs clear, trustworthy representation"
+    },
+    {
+      "severity": "minor",
+      "description": "Pattern library undefined - no repeatable backgrounds or texture systems",
+      "location": "design.motifs.patterns",
+      "rationale": "Subtle patterns add depth without distraction"
+    }
+  ],
+  "suggestedFixes": [
+    {
+      "targetKey": "design.iconography.system",
+      "fix": "Implement 24px base grid with 2px strokes, 16/24/32/48px sizes, 4px corner radius standard",
+      "rationale": "Creates predictable, scalable icon system matching modern business tools"
+    },
+    {
+      "targetKey": "design.illustration.hierarchy",
+      "fix": "Define 3 tiers: Hero (full detail), Spot (simplified), Micro (single color) with clear use cases",
+      "rationale": "Establishes when to use which complexity level"
+    },
+    {
+      "targetKey": "design.trust.symbols",
+      "fix": "Create unified shield system: outline for pending, filled for verified, with consistent badge shapes",
+      "rationale": "Users instantly understand security states"
+    },
+    {
+      "targetKey": "design.hero.direction",
+      "fix": "Use abstract geometric illustrations only - no photography or hand-drawn elements",
+      "rationale": "Maintains professional distance while being approachable"
+    },
+    {
+      "targetKey": "design.motifs.transparency",
+      "fix": "Develop glass morphism kit: 20% opacity overlays, 8px blur backgrounds, subtle gradients",
+      "rationale": "Visual transparency reinforces brand promise"
+    },
+    {
+      "targetKey": "design.iconography.metaphors",
+      "fix": "Map icons: folder=organization, gear=settings, chart=growth, people=team, shield=security",
+      "rationale": "Familiar metaphors reduce cognitive load"
+    },
+    {
+      "targetKey": "design.illustration.colors",
+      "fix": "Limit to brand blue + 2 accent colors max per illustration, 60-30-10 ratio",
+      "rationale": "Controlled palette maintains professional appearance"
+    },
+    {
+      "targetKey": "design.illustration.spots",
+      "fix": "Create 20 spot illustrations: empty inbox, no data, success states using single accent color",
+      "rationale": "Humanizes empty states without overwhelming"
+    },
+    {
+      "targetKey": "design.iconography.data",
+      "fix": "Standardize chart icons: 2px strokes, no fills, simplified axes, consistent proportions",
+      "rationale": "Data visualization needs clarity over decoration"
+    },
+    {
+      "targetKey": "design.motifs.patterns",
+      "fix": "Create dot grid (5% opacity), wave pattern (10% opacity), geometric tiles for backgrounds",
+      "rationale": "Subtle patterns add texture without distraction"
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true
+}

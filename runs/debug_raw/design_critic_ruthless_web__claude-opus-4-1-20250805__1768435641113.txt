@@ -1,0 +1,128 @@
+=== RAW RESPONSE (design_critic_ruthless_web) ===
+Model: claude-opus-4-1-20250805
+Request ID: msg_01VEXBzMn4oa5H9znDUeXCgB
+Input Tokens: 2546
+Output Tokens: 1547
+Finish Reason: end_turn
+
+=== RAW TEXT (5489 chars) ===
+{
+  "pass": false,
+  "issues": [
+    {
+      "severity": "critical",
+      "description": "Hero headline at 48px will break on mobile devices under 375px width. No responsive scaling defined.",
+      "location": "brand.type.h1",
+      "rationale": "Mobile users will see cut-off text or horizontal scroll, killing conversions"
+    },
+    {
+      "severity": "critical",
+      "description": "No contrast ratio specified between primary color #2D3748 and backgrounds. WCAG AA compliance at risk.",
+      "location": "brand.color.primary",
+      "rationale": "Poor contrast = accessibility failures = lost customers and legal risk"
+    },
+    {
+      "severity": "major",
+      "description": "Sticky CTA will conflict with mobile browser chrome. 91% confidence ignores iOS Safari issues.",
+      "location": "design.conversion.stickyCta",
+      "rationale": "iOS users (40% of SMB market) will have broken UX with overlapping elements"
+    },
+    {
+      "severity": "critical",
+      "description": "Trust color #38B2AC has 3.2:1 contrast on white. Fails WCAG for body text sizes.",
+      "location": "brand.color.trust",
+      "rationale": "Trust signals become unreadable, defeating their entire purpose"
+    },
+    {
+      "severity": "major",
+      "description": "40px section gaps too small for mobile thumb navigation. Need 60px minimum for touch targets.",
+      "location": "brand.spacing.sectionGap",
+      "rationale": "Users will accidentally tap wrong sections, increasing bounce rate"
+    },
+    {
+      "severity": "major",
+      "description": "Button padding 12px vertical is below 44px iOS minimum touch target height.",
+      "location": "brand.components.button",
+      "rationale": "Primary CTAs become unusable on mobile, directly impacting conversion"
+    },
+    {
+      "severity": "critical",
+      "description": "No loading state or disabled state defined for CTAs. Users will multi-click and break forms.",
+      "location": "design.conversion.heroCta",
+      "rationale": "Double submissions = confused users = support tickets = lost revenue"
+    },
+    {
+      "severity": "major",
+      "description": "Testimonials below solution creates 3+ scroll depths before social proof on mobile.",
+      "location": "design.trust.placementStrategy",
+      "rationale": "85% of users never scroll that far - trust signals become invisible"
+    },
+    {
+      "severity": "minor",
+      "description": "H2 at 36px only 25% smaller than H1 48px. Weak hierarchy breaks scannability.",
+      "location": "brand.type.h2",
+      "rationale": "Users can't distinguish section importance, increasing cognitive load"
+    },
+    {
+      "severity": "major",
+      "description": "Security messaging near CTAs adds friction at decision point. Raises doubt instead of confidence.",
+      "location": "design.trust.safetyMessaging",
+      "rationale": "Conversion psychology 101: don't introduce objections at commitment moment"
+  ],
+  "suggestedFixes": [
+    {
+      "targetKey": "brand.type.h1",
+      "fix": "Use clamp(32px, 5vw, 48px) for responsive scaling. Add font-display: swap for performance.",
+      "rationale": "Maintains readability from 320px to 1440px screens without media queries"
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "fix": "Darken to #1A202C for 7:1 contrast on white. Keep #2D3748 for large text only.",
+      "rationale": "Ensures WCAG AAA compliance while maintaining brand sophistication"
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "fix": "Use position: fixed with bottom: env(safe-area-inset-bottom) + 20px for iOS safe areas.",
+      "rationale": "Respects device UI while maintaining persistent CTA visibility"
+    },
+    {
+      "targetKey": "brand.color.trust",
+      "fix": "Darken trust color to #2C7A7B for 4.5:1 minimum contrast. Use original for backgrounds only.",
+      "rationale": "Maintains brand identity while ensuring all text is readable"
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "fix": "Set to clamp(48px, 8vw, 80px) for responsive spacing. Add scroll-margin-top: 60px.",
+      "rationale": "Provides adequate touch clearance and smooth scroll targeting"
+    },
+    {
+      "targetKey": "brand.components.button",
+      "fix": "Update to min-height: 44px; padding: 14px 24px; with touch-action: manipulation.",
+      "rationale": "Meets all platform guidelines and prevents zoom on double-tap"
+    },
+    {
+      "targetKey": "design.conversion.heroCta",
+      "fix": "Add data-loading and aria-busy states. Implement 300ms debounce on click handlers.",
+      "rationale": "Prevents duplicate submissions and provides clear user feedback"
+    },
+    {
+      "targetKey": "design.trust.placementStrategy",
+      "fix": "Move mini testimonials (logos only) directly under hero. Full testimonials after pricing.",
+      "rationale": "Immediate trust validation without disrupting conversion flow"
+    },
+    {
+      "targetKey": "brand.type.h2",
+      "fix": "Reduce to 32px (33% smaller than H1). Add letter-spacing: -0.02em for visual density.",
+      "rationale": "Creates clear 3-tier hierarchy: H1 (hero) > H2 (sections) > H3 (features)"
+    },
+    {
+      "targetKey": "design.trust.safetyMessaging",
+      "fix": "Move security badges to footer. Add 'SSL Secured' micro-badge next to form fields only.",
+      "rationale": "Provides reassurance without introducing friction at conversion point"
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true
+}
+
+=== PARSED JSON ===
+NULL (parse failed)

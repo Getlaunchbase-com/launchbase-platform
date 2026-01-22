@@ -1,0 +1,131 @@
+{
+  "version": "v1",
+  "status": "succeeded",
+  "stopReason": "needs_human",
+  "needsHuman": true,
+  "traceId": "trc_1768352117028_7b90a79d7ddba",
+  "artifacts": [
+    {
+      "kind": "swarm.plan",
+      "payload": {
+        "scope": "showroom.getlaunchbase.designer",
+        "inputs": {
+          "task": "Design and improve the LaunchBase homepage from first principles",
+          "business": "LaunchBase",
+          "whitePaper": "LaunchBase is an operating system for small businesses.\nNot a website builder. Not another tool. Not a one-time agency project.\n\nLaunchBase is ongoing ownership of a business's digital operating layer:\n- website uptime + maintenance\n- lead capture + forms\n- monitoring + safety decisions\n- updates + publishing cadence\n- integrations + visibility\n- logging + accountability\n\nLaunchBase exists because most small businesses already have tools, but no one owns the system.\nThey have a website, a payment tool, a calendar, a Google profile, and logins…\n…but the owner still carries the burden of making sure everything works.\n\nLaunchBase sells relief from that cognitive load.\n\nCore customer pain: The customer isn't buying a website. They're buying the ability to stop thinking about:\n- \"Is it still working?\"\n- \"Did that form actually send?\"\n- \"What should I post?\"\n- \"Is anything broken?\"\n- \"Am I missing something?\"\n\nThis is background anxiety, not a feature gap.\nThe enemy is not \"lack of tools.\"\nThe enemy is lack of ownership.\n\nLaunchBase replaces the customer as the default system-checker.\n\nPromise:\n✅ Change is reversible\n✅ Non-action is safe\n✅ Silence is a valid decision\n✅ Every action is logged\n✅ Customer sees their real site before paying\n✅ LaunchBase acts only after approval\n\nThe brand is accountability.\nLaunchBase is responsibility-as-a-service.\n\nTarget customer:\n- owner-operator\n- service business\n- small team\n- not \"tech obsessed\"\n- wants a business to run, not to \"manage tools\"\n\nTone: calm, competent, honest, operationally serious, safety-first, premium but not flashy.\nThis is a systems product, not a \"creative brand party.\"\n\nDesign objective:\n✅ Create instant trust\n✅ Communicate the contract clearly\n✅ Show the \"safe-by-default\" nature\n✅ Make \"Hand It Off\" feel low-risk\n✅ Explain observability in plain English\n✅ Look premium enough to justify recurring ownership",
+          "currentCopy": {
+            "hero": "Stop carrying the system in your head. Hand it off. Keep visibility.",
+            "problem": "No one owns the system. You're the fallback for everything.",
+            "solution": "LaunchBase becomes the owner. You stay informed, not involved.",
+            "trust": "Safe by default. Fully logged. Reversible."
+          },
+          "audience": "Owner-operators of service businesses (fitness studios, coffee shops, consulting firms) who want stability and accountability, not tool management",
+          "tone": "Calm, minimal, trustworthy, premium. Avoid hype. Avoid 'AI magic.' Avoid exaggerated claims.",
+          "constraints": "Mobile-first. Must feel like 'responsibility-as-a-service.' Must emphasize safety, reversibility, observability. Must reduce mental load while reading."
+        },
+        "specialists": [
+          "designer_systems",
+          "designer_brand",
+          "critic"
+        ],
+        "fingerprint": "trc_1768352117028_7b90a79d7ddba:plan"
+      },
+      "customerSafe": false
+    },
+    {
+      "kind": "swarm.specialist.designer_systems",
+      "payload": {
+        "ok": false,
+        "stopReason": "timeout",
+        "fingerprint": "trc_1768352117028_7b90a79d7ddba:designer_systems:timeout",
+        "role": "designer_systems"
+      },
+      "customerSafe": false
+    },
+    {
+      "kind": "swarm.specialist.designer_brand",
+      "payload": {
+        "ok": false,
+        "stopReason": "timeout",
+        "fingerprint": "trc_1768352117028_7b90a79d7ddba:designer_brand:timeout",
+        "role": "designer_brand"
+      },
+      "customerSafe": false
+    },
+    {
+      "kind": "swarm.specialist.critic",
+      "payload": {
+        "ok": false,
+        "stopReason": "provider_failed",
+        "fingerprint": "trc_1768352117028_7b90a79d7ddba:critic:provider_failed",
+        "role": "critic"
+      },
+      "customerSafe": false
+    },
+    {
+      "kind": "swarm.collapse",
+      "customerSafe": true,
+      "payload": null
+    }
+  ],
+  "customerSafe": true,
+  "extensions": {
+    "swarm": {
+      "costs": [
+        {
+          "specialist": "designer_systems",
+          "inputTokens": 0,
+          "outputTokens": 0,
+          "costUsd": 0,
+          "model": "openai/gpt-5-2025-08-07",
+          "latencyMs": 0,
+          "stopReason": "timeout"
+        },
+        {
+          "specialist": "designer_brand",
+          "inputTokens": 0,
+          "outputTokens": 0,
+          "costUsd": 0,
+          "model": "openai/gpt-5-2025-08-07",
+          "latencyMs": 0,
+          "stopReason": "timeout"
+        },
+        {
+          "specialist": "critic",
+          "inputTokens": 0,
+          "outputTokens": 0,
+          "costUsd": 0,
+          "model": "claude-opus-4-1-20250805",
+          "latencyMs": 0,
+          "stopReason": "provider_failed"
+        }
+      ],
+      "totalCostUsd": 0,
+      "roleCostsUsd": {
+        "designer_systems": 0,
+        "designer_brand": 0,
+        "critic": 0
+      },
+      "roleModels": {
+        "designer_systems": "openai/gpt-5-2025-08-07",
+        "designer_brand": "openai/gpt-5-2025-08-07",
+        "critic": "claude-opus-4-1-20250805"
+      },
+      "warnings": [
+        {
+          "role": "designer_systems",
+          "stopReason": "timeout"
+        },
+        {
+          "role": "designer_brand",
+          "stopReason": "timeout"
+        },
+        {
+          "role": "critic",
+          "stopReason": "provider_failed"
+        }
+      ],
+      "reason": "Missing craft or critic artifact for collapse"
+    }
+  }
+}

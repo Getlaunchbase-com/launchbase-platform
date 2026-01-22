@@ -1,0 +1,160 @@
+=== RAW RESPONSE (designer_brand_fast) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy1w2wHMq9ucVMOZEZGyyWZOeOR4N
+Input Tokens: 878
+Output Tokens: 570
+Finish Reason: stop
+
+=== RAW TEXT (2184 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "font-size: 48px; font-weight: bold;",
+      "rationale": "Creates strong visual hierarchy and focus.",
+      "confidence": 0.9,
+      "risks": ["May need adjustment for mobile"]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "font-size: 16px; line-height: 1.6;",
+      "rationale": "Improves readability and user comfort.",
+      "confidence": 0.85,
+      "risks": ["Content length may increase"]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "40px",
+      "rationale": "Enhances separation between sections for clarity.",
+      "confidence": 0.88,
+      "risks": ["May affect fold content"]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "padding: 12px 24px; border-radius: 5px;",
+      "rationale": "Increases clickability and modern look.",
+      "confidence": 0.9,
+      "risks": ["May affect button text length"]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#0056b3",
+      "rationale": "Enhances brand recognition and trust.",
+      "confidence": 0.92,
+      "risks": ["May affect color contrast"]
+    },
+    {
+      "targetKey": "brand.components.trustBadge",
+      "value": "size: 50px; border: 1px solid #ccc;",
+      "rationale": "Conveys reliability and professionalism.",
+      "confidence": 0.87,
+      "risks": ["May clutter small spaces"]
+    },
+    {
+      "targetKey": "brand.system.consistency",
+      "value": "Uniform card styles across site.",
+      "rationale": "Ensures cohesive user experience.",
+      "confidence": 0.9,
+      "risks": ["Design updates may be required"]
+    },
+    {
+      "targetKey": "brand.system.restraint",
+      "value": "Limit accent color use to CTAs only.",
+      "rationale": "Maintains brand focus and prevents over-design.",
+      "confidence": 0.95,
+      "risks": ["May reduce visual interest"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["Increased development time", "Potential for layout shifts"],
+  "assumptions": ["Current design follows standard patterns", "Audience prefers clarity and simplicity"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.h1",
+      "value": "font-size: 48px; font-weight: bold;",
+      "rationale": "Creates strong visual hierarchy and focus.",
+      "confidence": 0.9,
+      "risks": [
+        "May need adjustment for mobile"
+      ]
+    },
+    {
+      "targetKey": "brand.type.body",
+      "value": "font-size: 16px; line-height: 1.6;",
+      "rationale": "Improves readability and user comfort.",
+      "confidence": 0.85,
+      "risks": [
+        "Content length may increase"
+      ]
+    },
+    {
+      "targetKey": "brand.spacing.sectionGap",
+      "value": "40px",
+      "rationale": "Enhances separation between sections for clarity.",
+      "confidence": 0.88,
+      "risks": [
+        "May affect fold content"
+      ]
+    },
+    {
+      "targetKey": "brand.components.button",
+      "value": "padding: 12px 24px; border-radius: 5px;",
+      "rationale": "Increases clickability and modern look.",
+      "confidence": 0.9,
+      "risks": [
+        "May affect button text length"
+      ]
+    },
+    {
+      "targetKey": "brand.color.primary",
+      "value": "#0056b3",
+      "rationale": "Enhances brand recognition and trust.",
+      "confidence": 0.92,
+      "risks": [
+        "May affect color contrast"
+      ]
+    },
+    {
+      "targetKey": "brand.components.trustBadge",
+      "value": "size: 50px; border: 1px solid #ccc;",
+      "rationale": "Conveys reliability and professionalism.",
+      "confidence": 0.87,
+      "risks": [
+        "May clutter small spaces"
+      ]
+    },
+    {
+      "targetKey": "brand.system.consistency",
+      "value": "Uniform card styles across site.",
+      "rationale": "Ensures cohesive user experience.",
+      "confidence": 0.9,
+      "risks": [
+        "Design updates may be required"
+      ]
+    },
+    {
+      "targetKey": "brand.system.restraint",
+      "value": "Limit accent color use to CTAs only.",
+      "rationale": "Maintains brand focus and prevents over-design.",
+      "confidence": 0.95,
+      "risks": [
+        "May reduce visual interest"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Increased development time",
+    "Potential for layout shifts"
+  ],
+  "assumptions": [
+    "Current design follows standard patterns",
+    "Audience prefers clarity and simplicity"
+  ]
+}

@@ -1,0 +1,144 @@
+=== RAW RESPONSE (designer_brand) ===
+Model: gpt-4o-mini-2024-07-18
+Request ID: chatcmpl-CyoeUeq8IbdpFD60Ca0sV3Rt2wwo8
+Input Tokens: 1652
+Output Tokens: 709
+Finish Reason: stop
+
+=== RAW TEXT (3070 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use a type scale with 16px body text, 20px subheading, and 32px H2 for improved readability and calm tone.",
+      "rationale": "Promotes a calm and confident aesthetic by ensuring clear hierarchy and spacing.",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Set max line length for body text to 75ch to enhance readability and reduce cognitive load.",
+      "rationale": "Improves clarity and gives a premium feel by making text easier to read.",
+      "confidence": 0.90,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a button hierarchy with primary buttons as filled, secondary buttons as outlined, and use subtle hover effects.",
+      "rationale": "Creates a clear visual hierarchy that instills confidence and guides user actions effectively.",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Use card styling with rounded corners (8px radius), subtle shadows, and spacing of 20px between cards for a premium feel.",
+      "rationale": "Enhances aesthetics and provides a calm visual structure while keeping content digestible.",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.auditLogPattern",
+      "value": "Implement a compact audit log preview pattern with a timeline layout that highlights key events and actions.",
+      "rationale": "Provides users with a clear understanding of actions taken, enhancing safety and trust.",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Add proof chips below the hero section with concise, impactful phrases that reinforce trust.",
+      "rationale": "Increases user confidence by showcasing key trust signals without overwhelming text.",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Use a neutral color palette with a primary background of #f5f5f5 and secondary elements in #ffffff for a calm look.",
+      "rationale": "Creates a safe and premium environment that promotes tranquility and operational clarity.",
+      "confidence": 0.92,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.color.primary",
+      "value": "Ensure primary color has at least a 4.5:1 contrast ratio against background colors to meet accessibility standards.",
+      "rationale": "Enhances readability and safety by ensuring all users can access content effectively.",
+      "confidence": 0.90,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Use rounded chips with 12px padding and subtle shadows to present trust signals effectively.",
+      "rationale": "Provides a modern and premium look while ensuring visibility and user engagement.",
+      "confidence": 0.83,
+      "risks": []
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use a type scale with 16px body text, 20px subheading, and 32px H2 for improved readability and calm tone.",
+      "rationale": "Promotes a calm and confident aesthetic by ensuring clear hierarchy and spacing.",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Set max line length for body text to 75ch to enhance readability and reduce cognitive load.",
+      "rationale": "Improves clarity and gives a premium feel by making text easier to read.",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Implement a button hierarchy with primary buttons as filled, secondary buttons as outlined, and use subtle hover effects.",
+      "rationale": "Creates a clear visual hierarchy that instills confidence and guides user actions effectively.",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Use card styling with rounded corners (8px radius), subtle shadows, and spacing of 20px between cards for a premium feel.",
+      "rationale": "Enhances aesthetics and provides a calm visual structure while keeping content digestible.",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.auditLogPattern",
+      "value": "Implement a compact audit log preview pattern with a timeline layout that highlights key events and actions.",
+      "rationale": "Provides users with a clear understanding of actions taken, enhancing safety and trust.",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Add proof chips below the hero section with concise, impactful phrases that reinforce trust.",
+      "rationale": "Increases user confidence by showcasing key trust signals without overwhelming text.",
+      "confidence": 0.85,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Use a neutral color palette with a primary background of #f5f5f5 and secondary elements in #ffffff for a calm look.",
+      "rationale": "Creates a safe and premium environment that promotes tranquility and operational clarity.",
+      "confidence": 0.92,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.color.primary",
+      "value": "Ensure primary color has at least a 4.5:1 contrast ratio against background colors to meet accessibility standards.",
+      "rationale": "Enhances readability and safety by ensuring all users can access content effectively.",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.chips",
+      "value": "Use rounded chips with 12px padding and subtle shadows to present trust signals effectively.",
+      "rationale": "Provides a modern and premium look while ensuring visibility and user engagement.",
+      "confidence": 0.83,
+      "risks": []
+    }
+  ]
+}

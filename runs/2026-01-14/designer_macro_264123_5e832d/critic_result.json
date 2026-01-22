@@ -1,0 +1,30 @@
+{
+  "artifact": {
+    "kind": "swarm.specialist.design_critic_ruthless",
+    "payload": {
+      "ok": false,
+      "stopReason": "provider_failed",
+      "fingerprint": "undefined:design_critic_ruthless:all_retries_failed",
+      "role": "design_critic_ruthless"
+    },
+    "customerSafe": false
+  },
+  "meta": {
+    "model": "claude-opus-4-1-20250805",
+    "requestId": "none",
+    "latencyMs": 0,
+    "inputTokens": 0,
+    "outputTokens": 0,
+    "costUsd": 0
+  },
+  "stopReason": "provider_failed",
+  "retryMeta": {
+    "attemptCount": 1,
+    "attemptModels": [
+      "claude-opus-4-1-20250805"
+    ],
+    "finalModelUsed": "claude-opus-4-1-20250805",
+    "finalTimeoutMs": 90000,
+    "totalCost": 0
+  }
+}

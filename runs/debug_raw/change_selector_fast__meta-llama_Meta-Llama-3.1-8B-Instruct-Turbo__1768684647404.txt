@@ -1,0 +1,130 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oThc87o-4YNCb4-9bf8e11b3890f896
+Input Tokens: 1551
+Output Tokens: 608
+Finish Reason: stop
+
+=== RAW TEXT (2515 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Set a neutral color palette with a contrast ratio of at least 4.5:1 for body text to ensur...",
+      "rationale": "Enhances readability and comfort, making the interface feel safe and operational.",
+      "confidence": 0.92,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Implement a consistent 8px border radius across all interactive components to create a uni...",
+      "rationale": "Encourages a sense of safety and approachability in the interface.",
+      "confidence": 0.86,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Use 20px spacing between cards and 16px padding within cards to create a less dense, more ...",
+      "rationale": "Enhances the visual hierarchy and makes information easier to digest.",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Use rounded corners with 8px radius and 16px padding for buttons to evoke a friendly, safe...",
+      "rationale": "Softens the button design, creating a more inviting and premium look.",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Design audit log previews with a clean, compact table format and alternating row colors fo...",
+      "rationale": "Improves clarity and trust through organized presentation of information.",
+      "confidence": 0.89,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Incorporate proof chips below the hero section with a soft background and subtle drop shad...",
+      "rationale": "Provides visible trust signals without being intrusive, enhancing a sense of safety.",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Use 1px solid dividers with a neutral color to subtly separate sections without overwhelmi...",
+      "rationale": "Creates a calm flow between sections while maintaining a premium look.",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 16px for body text with a maximum line length of 65ch to enhance readability and calmn...",
+      "rationale": "Improves readability and creates a calm, premium aesthetic.",
+      "confidence": 0.85,
+      "risks": []
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "brand.tokens.color.neutral",
+      "value": "Set a neutral color palette with a contrast ratio of at least 4.5:1 for body text to ensur...",
+      "rationale": "Enhances readability and comfort, making the interface feel safe and operational.",
+      "confidence": 0.92,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.radius",
+      "value": "Implement a consistent 8px border radius across all interactive components to create a uni...",
+      "rationale": "Encourages a sense of safety and approachability in the interface.",
+      "confidence": 0.86,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.cards",
+      "value": "Use 20px spacing between cards and 16px padding within cards to create a less dense, more ...",
+      "rationale": "Enhances the visual hierarchy and makes information easier to digest.",
+      "confidence": 0.88,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.buttons",
+      "value": "Use rounded corners with 8px radius and 16px padding for buttons to evoke a friendly, safe...",
+      "rationale": "Softens the button design, creating a more inviting and premium look.",
+      "confidence": 0.9,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.logVisualLanguage",
+      "value": "Design audit log previews with a clean, compact table format and alternating row colors fo...",
+      "rationale": "Improves clarity and trust through organized presentation of information.",
+      "confidence": 0.89,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.trust.proofPresentation",
+      "value": "Incorporate proof chips below the hero section with a soft background and subtle drop shad...",
+      "rationale": "Provides visible trust signals without being intrusive, enhancing a sense of safety.",
+      "confidence": 0.87,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.components.dividers",
+      "value": "Use 1px solid dividers with a neutral color to subtly separate sections without overwhelmi...",
+      "rationale": "Creates a calm flow between sections while maintaining a premium look.",
+      "confidence": 0.84,
+      "risks": []
+    },
+    {
+      "targetKey": "brand.tokens.typeScale",
+      "value": "Use 16px for body text with a maximum line length of 65ch to enhance readability and calmn...",
+      "rationale": "Improves readability and creates a calm, premium aesthetic.",
+      "confidence": 0.85,
+      "risks": []
+    }
+  ]
+}

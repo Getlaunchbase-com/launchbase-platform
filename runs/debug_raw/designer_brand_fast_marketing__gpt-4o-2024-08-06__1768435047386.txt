@@ -1,0 +1,160 @@
+=== RAW RESPONSE (designer_brand_fast_marketing) ===
+Model: gpt-4o-2024-08-06
+Request ID: chatcmpl-Cy51hm6YmYaGNQTKe7atEwTvBKNCQ
+Input Tokens: 738
+Output Tokens: 547
+Finish Reason: stop
+
+=== RAW TEXT (2163 chars) ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.marketingHeadline",
+      "value": "Larger font size with bold weight",
+      "rationale": "Enhances visibility and impact",
+      "confidence": 0.9,
+      "risks": ["May overwhelm smaller screens"]
+    },
+    {
+      "targetKey": "brand.type.benefitText",
+      "value": "Use a sans-serif font for readability",
+      "rationale": "Improves legibility and clarity",
+      "confidence": 0.85,
+      "risks": ["May not align with current branding"]
+    },
+    {
+      "targetKey": "brand.color.conversionPrimary",
+      "value": "#4CAF50 for buttons",
+      "rationale": "Conveys trust and action",
+      "confidence": 0.9,
+      "risks": ["May clash with existing colors"]
+    },
+    {
+      "targetKey": "brand.color.trustSignals",
+      "value": "#007BFF for badges",
+      "rationale": "Blue is associated with trust",
+      "confidence": 0.9,
+      "risks": ["May not stand out on all backgrounds"]
+    },
+    {
+      "targetKey": "brand.components.pricingTable",
+      "value": "Add subtle shadows for depth",
+      "rationale": "Improves focus on tier levels",
+      "confidence": 0.87,
+      "risks": ["Shadows may reduce readability"]
+    },
+    {
+      "targetKey": "brand.components.testimonial",
+      "value": "Include customer photos",
+      "rationale": "Adds authenticity and relatability",
+      "confidence": 0.9,
+      "risks": ["May require image quality control"]
+    },
+    {
+      "targetKey": "brand.visual.tierHierarchy",
+      "value": "Differentiate tiers with color",
+      "rationale": "Clarifies pricing distinctions",
+      "confidence": 0.88,
+      "risks": ["Colors may not be distinct enough"]
+    },
+    {
+      "targetKey": "brand.visual.comparisonClarity",
+      "value": "Use icons for feature availability",
+      "rationale": "Simplifies feature comparison",
+      "confidence": 0.9,
+      "risks": ["Icons may be misinterpreted"]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": ["Inconsistent visual identity", "User interface disruption"],
+  "assumptions": ["Business values clarity and trust", "Current branding is flexible"]
+}
+
+=== PARSED JSON ===
+{
+  "proposedChanges": [
+    {
+      "targetKey": "brand.type.marketingHeadline",
+      "value": "Larger font size with bold weight",
+      "rationale": "Enhances visibility and impact",
+      "confidence": 0.9,
+      "risks": [
+        "May overwhelm smaller screens"
+      ]
+    },
+    {
+      "targetKey": "brand.type.benefitText",
+      "value": "Use a sans-serif font for readability",
+      "rationale": "Improves legibility and clarity",
+      "confidence": 0.85,
+      "risks": [
+        "May not align with current branding"
+      ]
+    },
+    {
+      "targetKey": "brand.color.conversionPrimary",
+      "value": "#4CAF50 for buttons",
+      "rationale": "Conveys trust and action",
+      "confidence": 0.9,
+      "risks": [
+        "May clash with existing colors"
+      ]
+    },
+    {
+      "targetKey": "brand.color.trustSignals",
+      "value": "#007BFF for badges",
+      "rationale": "Blue is associated with trust",
+      "confidence": 0.9,
+      "risks": [
+        "May not stand out on all backgrounds"
+      ]
+    },
+    {
+      "targetKey": "brand.components.pricingTable",
+      "value": "Add subtle shadows for depth",
+      "rationale": "Improves focus on tier levels",
+      "confidence": 0.87,
+      "risks": [
+        "Shadows may reduce readability"
+      ]
+    },
+    {
+      "targetKey": "brand.components.testimonial",
+      "value": "Include customer photos",
+      "rationale": "Adds authenticity and relatability",
+      "confidence": 0.9,
+      "risks": [
+        "May require image quality control"
+      ]
+    },
+    {
+      "targetKey": "brand.visual.tierHierarchy",
+      "value": "Differentiate tiers with color",
+      "rationale": "Clarifies pricing distinctions",
+      "confidence": 0.88,
+      "risks": [
+        "Colors may not be distinct enough"
+      ]
+    },
+    {
+      "targetKey": "brand.visual.comparisonClarity",
+      "value": "Use icons for feature availability",
+      "rationale": "Simplifies feature comparison",
+      "confidence": 0.9,
+      "risks": [
+        "Icons may be misinterpreted"
+      ]
+    }
+  ],
+  "requiresApproval": true,
+  "previewRecommended": true,
+  "risks": [
+    "Inconsistent visual identity",
+    "User interface disruption"
+  ],
+  "assumptions": [
+    "Business values clarity and trust",
+    "Current branding is flexible"
+  ]
+}

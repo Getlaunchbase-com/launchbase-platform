@@ -1,0 +1,114 @@
+=== RAW RESPONSE (change_selector_fast) ===
+Model: meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo
+Request ID: oTTMDhH-4YNCb4-9be97e2b4c845135
+Input Tokens: 1885
+Output Tokens: 782
+Finish Reason: stop
+
+=== RAW TEXT (3274 chars) ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a single primary CTA in the hero plus one secondary CTA as text-link style; place CTAs immediately below the bullet list with 16–24px spacing. Add a short i...",
+      "rationale": "Tightens decision path above the fold and increases CTA visibility while keeping choices minimal.",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder to: Hero → Proof bar → Problem/Solution → How it works → Visibility/Auditability panel → Suite/Features → Pricing → FAQ → Footer. Keep total sections to...",
+      "rationale": "Creates a cleaner narrative: credibility first, then value, then mechanics, then trust/observability before asking for pricing commitment.",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Add a proof bar directly under the hero (desktop) and after the first scroll (mobile): 1-row horizontal strip with 3–5 items (logos/metrics/testimonial snippet)...",
+      "rationale": "Adds immediate trust without adding paragraphs, improving scannability and conversion readiness early.",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Restructure hero into a 2-column grid on desktop (60/40): left = H1 + 2–3 scannable bullets, right = product UI preview focusing on visibility/auditability (act...",
+      "rationale": "Improves above-the-fold clarity and reduces cognitive load by turning the promise into quick-scan bullets and a concrete observability preview rather than abstr...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an 'audit log' pattern section (mid-page) as a carded activity feed: 6–8 sample rows with timestamps, actor, action, and status (success/pending). Inc...",
+      "rationale": "Strengthens the 'hand it off without losing control' promise via concrete auditability/observability UI, not hype.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "value": "Add a compact visibility panel component adjacent to the audit log on desktop (2-column) and stacked on mobile: include 3 KPI tiles (e.g., tasks in progress, co...",
+      "rationale": "Makes 'visibility' tangible and quickly scannable, reinforcing control and responsibility outcomes.",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move pricing to a dedicated, high-contrast section with a 3-card layout on desktop and stacked cards on mobile. Add a 'recommended' highlight state (border + su...",
+      "rationale": "Improves pricing parseability and reduces comparison effort, increasing conversion likelihood at the decision point.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Enable a sticky primary CTA after ~40% scroll on mobile only; keep height 56–64px with a single button and optional secondary text link. Hide sticky CTA within ...",
+      "rationale": "Improves conversion path on mobile without cluttering the hero or pricing decision moment.",
+      "confidence": 0.79
+    }
+  ]
+}
+
+=== PARSED JSON ===
+{
+  "selectedChanges": [
+    {
+      "targetKey": "design.conversion.heroCta",
+      "value": "Use a single primary CTA in the hero plus one secondary CTA as text-link style; place CTAs immediately below the bullet list with 16–24px spacing. Add a short i...",
+      "rationale": "Tightens decision path above the fold and increases CTA visibility while keeping choices minimal.",
+      "confidence": 0.82
+    },
+    {
+      "targetKey": "design.layout.sectionOrder",
+      "value": "Reorder to: Hero → Proof bar → Problem/Solution → How it works → Visibility/Auditability panel → Suite/Features → Pricing → FAQ → Footer. Keep total sections to...",
+      "rationale": "Creates a cleaner narrative: credibility first, then value, then mechanics, then trust/observability before asking for pricing commitment.",
+      "confidence": 0.84
+    },
+    {
+      "targetKey": "design.components.proofBar",
+      "value": "Add a proof bar directly under the hero (desktop) and after the first scroll (mobile): 1-row horizontal strip with 3–5 items (logos/metrics/testimonial snippet)...",
+      "rationale": "Adds immediate trust without adding paragraphs, improving scannability and conversion readiness early.",
+      "confidence": 0.8
+    },
+    {
+      "targetKey": "design.layout.hero",
+      "value": "Restructure hero into a 2-column grid on desktop (60/40): left = H1 + 2–3 scannable bullets, right = product UI preview focusing on visibility/auditability (act...",
+      "rationale": "Improves above-the-fold clarity and reduces cognitive load by turning the promise into quick-scan bullets and a concrete observability preview rather than abstr...",
+      "confidence": 0.86
+    },
+    {
+      "targetKey": "design.trust.auditLogPattern",
+      "value": "Introduce an 'audit log' pattern section (mid-page) as a carded activity feed: 6–8 sample rows with timestamps, actor, action, and status (success/pending). Inc...",
+      "rationale": "Strengthens the 'hand it off without losing control' promise via concrete auditability/observability UI, not hype.",
+      "confidence": 0.88
+    },
+    {
+      "targetKey": "design.trust.visibilityPanel",
+      "value": "Add a compact visibility panel component adjacent to the audit log on desktop (2-column) and stacked on mobile: include 3 KPI tiles (e.g., tasks in progress, co...",
+      "rationale": "Makes 'visibility' tangible and quickly scannable, reinforcing control and responsibility outcomes.",
+      "confidence": 0.83
+    },
+    {
+      "targetKey": "design.layout.pricing",
+      "value": "Move pricing to a dedicated, high-contrast section with a 3-card layout on desktop and stacked cards on mobile. Add a 'recommended' highlight state (border + su...",
+      "rationale": "Improves pricing parseability and reduces comparison effort, increasing conversion likelihood at the decision point.",
+      "confidence": 0.85
+    },
+    {
+      "targetKey": "design.conversion.stickyCta",
+      "value": "Enable a sticky primary CTA after ~40% scroll on mobile only; keep height 56–64px with a single button and optional secondary text link. Hide sticky CTA within ...",
+      "rationale": "Improves conversion path on mobile without cluttering the hero or pricing decision moment.",
+      "confidence": 0.79
+    }
+  ]
+}

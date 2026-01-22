@@ -1,0 +1,285 @@
+{
+  "version": "v1",
+  "status": "succeeded",
+  "stopReason": "needs_human",
+  "needsHuman": true,
+  "traceId": "trc_1768410711841_c367872a7ea3d",
+  "artifacts": [
+    {
+      "kind": "swarm.plan",
+      "payload": {
+        "scope": "showroom.getlaunchbase.designer",
+        "inputs": {
+          "task": "Design and improve the LaunchBase homepage from first principles",
+          "business": "LaunchBase",
+          "whitePaper": "LaunchBase is an operating system for small businesses.\nNot a website builder. Not another tool. Not a one-time agency project.\n\nLaunchBase is ongoing ownership of a business's digital operating layer:\n- website uptime + maintenance\n- lead capture + forms\n- monitoring + safety decisions\n- updates + publishing cadence\n- integrations + visibility\n- logging + accountability\n\nLaunchBase exists because most small businesses already have tools, but no one owns the system.\nThey have a website, a payment tool, a calendar, a Google profile, and logins…\n…but the owner still carries the burden of making sure everything works.\n\nLaunchBase sells relief from that cognitive load.\n\nCore customer pain: The customer isn't buying a website. They're buying the ability to stop thinking about:\n- \"Is it still working?\"\n- \"Did that form actually send?\"\n- \"What should I post?\"\n- \"Is anything broken?\"\n- \"Am I missing something?\"\n\nThis is background anxiety, not a feature gap.\nThe enemy is not \"lack of tools.\"\nThe enemy is lack of ownership.\n\nLaunchBase replaces the customer as the default system-checker.\n\nPromise:\n✅ Change is reversible\n✅ Non-action is safe\n✅ Silence is a valid decision\n✅ Every action is logged\n✅ Customer sees their real site before paying\n✅ LaunchBase acts only after approval\n\nThe brand is accountability.\nLaunchBase is responsibility-as-a-service.\n\nTarget customer:\n- owner-operator\n- service business\n- small team\n- not \"tech obsessed\"\n- wants a business to run, not to \"manage tools\"\n\nTone: calm, competent, honest, operationally serious, safety-first, premium but not flashy.\nThis is a systems product, not a \"creative brand party.\"\n\nDesign objective:\n✅ Create instant trust\n✅ Communicate the contract clearly\n✅ Show the \"safe-by-default\" nature\n✅ Make \"Hand It Off\" feel low-risk\n✅ Explain observability in plain English\n✅ Look premium enough to justify recurring ownership",
+          "currentCopy": {
+            "hero": "Stop carrying the system in your head. Hand it off. Keep visibility.",
+            "problem": "No one owns the system. You're the fallback for everything.",
+            "solution": "LaunchBase becomes the owner. You stay informed, not involved.",
+            "trust": "Safe by default. Fully logged. Reversible."
+          },
+          "audience": "Owner-operators of service businesses (fitness studios, coffee shops, consulting firms) who want stability and accountability, not tool management",
+          "tone": "Calm, minimal, trustworthy, premium. Avoid hype. Avoid 'AI magic.' Avoid exaggerated claims.",
+          "constraints": "Mobile-first. Must feel like 'responsibility-as-a-service.' Must emphasize safety, reversibility, observability. Must reduce mental load while reading."
+        },
+        "specialists": [
+          "designer_systems",
+          "designer_brand",
+          "critic"
+        ],
+        "fingerprint": "trc_1768410711841_c367872a7ea3d:plan"
+      },
+      "customerSafe": false
+    },
+    {
+      "kind": "swarm.specialist.designer_systems",
+      "payload": {
+        "proposedChanges": [
+          {
+            "targetKey": "design.layout.pageStructure",
+            "value": "Introduce a clear visual hierarchy by using a three-column grid for the main sections, ensuring each column represents a distinct aspect of the service.",
+            "rationale": "A structured grid layout will enhance scannability and help users quickly identify key information.",
+            "confidence": 0.85,
+            "risks": [
+              "Could appear too rigid if not visually balanced."
+            ]
+          },
+          {
+            "targetKey": "design.layout.hero",
+            "value": "Add a sticky primary CTA button within the hero section that remains visible as users scroll past 20% of the page.",
+            "rationale": "Keeping the CTA consistently visible will facilitate conversion by providing easy access to action at any time.",
+            "confidence": 0.9,
+            "risks": [
+              "May obscure other elements if not properly designed."
+            ]
+          },
+          {
+            "targetKey": "design.layout.sectionOrder",
+            "value": "Reorder sections to place Trust immediately after the Hero to emphasize safety and accountability as key differentiators early on.",
+            "rationale": "Highlighting trust elements early can build confidence and align with the brand's responsibility promise.",
+            "confidence": 0.92,
+            "risks": [
+              "Could disrupt narrative flow if not carefully transitioned."
+            ]
+          },
+          {
+            "targetKey": "design.layout.pricing",
+            "value": "Convert pricing tables to cards with one highlighted default tier; add 'what you get' bullets for each tier to clarify offerings.",
+            "rationale": "Card layout with visual differentiation for the recommended tier can simplify decision-making and enhance understanding.",
+            "confidence": 0.88,
+            "risks": [
+              "May require additional design iterations to ensure clarity."
+            ]
+          },
+          {
+            "targetKey": "design.conversion.heroCta",
+            "value": "Enhance the hero CTA by including a brief, trust-building statement above it, such as 'See your real site before paying.'",
+            "rationale": "Pairing the CTA with a trust statement can reduce user hesitation and increase click-through rates.",
+            "confidence": 0.93,
+            "risks": [
+              "Potential to clutter the hero if not properly integrated."
+            ]
+          },
+          {
+            "targetKey": "design.layout.suite",
+            "value": "Introduce a slider component to display the suite of features, allowing users to interactively explore offerings without overwhelming them.",
+            "rationale": "An interactive component can engage users while presenting comprehensive information in digestible chunks.",
+            "confidence": 0.87,
+            "risks": [
+              "Slider implementation may affect load times."
+            ]
+          },
+          {
+            "targetKey": "design.spacing.sectionGapDesktop",
+            "value": "Increase section gap to 80px on desktop to provide clearer separation and improve visual breathing room.",
+            "rationale": "Increased spacing can enhance readability and prevent sections from feeling cramped.",
+            "confidence": 0.84,
+            "risks": [
+              "Could result in excessive scrolling if not balanced with content density."
+            ]
+          },
+          {
+            "targetKey": "design.conversion.scannability",
+            "value": "Implement a visual breadcrumb trail at the top of the page to show page sections for quick navigation.",
+            "rationale": "A breadcrumb can enhance scannability by providing context and facilitating easy access to desired sections.",
+            "confidence": 0.8,
+            "risks": [
+              "May add complexity if not intuitively designed."
+            ]
+          },
+          {
+            "targetKey": "design.trust.auditLogPattern",
+            "value": "Embed a dynamic audit log preview in the Trust section showing example actions and reversible changes.",
+            "rationale": "Demonstrating real audit log functionality can concretize observability and accountability promises.",
+            "confidence": 0.91,
+            "risks": [
+              "Technical implementation may require significant resources."
+            ]
+          }
+        ],
+        "role": "designer_systems",
+        "stopReason": "ok"
+      },
+      "customerSafe": false
+    },
+    {
+      "kind": "swarm.specialist.designer_brand",
+      "payload": {
+        "proposedChanges": [
+          {
+            "targetKey": "brand.tokens.typeScale",
+            "value": "Use 44px H1 (mobile: 28px) with 1.2 line-height for main headlines",
+            "rationale": "A slightly smaller and tighter headline size creates a calm and confident tone without overwhelming the reader.",
+            "confidence": 0.9,
+            "risks": [
+              "Might reduce impact on larger screens if not balanced with adequate spacing"
+            ]
+          },
+          {
+            "targetKey": "brand.tokens.typeScale",
+            "value": "Set max text width to 65ch for body copy to improve readability",
+            "rationale": "Limiting line length prevents eye strain and makes the text feel more approachable and manageable.",
+            "confidence": 0.95,
+            "risks": [
+              "Potentially could create excess whitespace on larger screens"
+            ]
+          },
+          {
+            "targetKey": "brand.components.buttons",
+            "value": "Use pill-shaped buttons with 16px padding, subtle shadow, no gradients",
+            "rationale": "A simple and clean button style enhances the premium feel and supports the calm, operational tone.",
+            "confidence": 0.92,
+            "risks": [
+              "May not stand out as much against complex backgrounds"
+            ]
+          },
+          {
+            "targetKey": "brand.components.cards",
+            "value": "Implement cards with 12px border radius and light shadow for depth",
+            "rationale": "Rounded corners and subtle shadows provide a modern and premium look that suggests a safe environment.",
+            "confidence": 0.9,
+            "risks": [
+              "Might not fit well with very strict grid systems"
+            ]
+          },
+          {
+            "targetKey": "brand.tokens.color.primary",
+            "value": "Use a soft blue (#4A90E2) as primary color to evoke trust and calmness",
+            "rationale": "Blue is a color associated with trust and reliability, aligning with the brand's message.",
+            "confidence": 0.93,
+            "risks": [
+              "Could clash with other elements if not harmonized properly"
+            ]
+          },
+          {
+            "targetKey": "brand.trust.proofPresentation",
+            "value": "Incorporate a 3-chip row with key trust features: 'Safe by default • Fully auditable • Reversible changes'",
+            "rationale": "Highlighting these features in a compact chip format reinforces the trustworthiness of the service.",
+            "confidence": 0.9,
+            "risks": [
+              "May be overlooked if not visually distinct enough"
+            ]
+          },
+          {
+            "targetKey": "brand.trust.logVisualLanguage",
+            "value": "Use a subtle visual cue (like a small icon) next to logged actions for quick recognition",
+            "rationale": "This provides a clear, visual representation of the logging feature, enhancing user understanding and trust.",
+            "confidence": 0.91,
+            "risks": [
+              "Icons could be misinterpreted if not universally understood"
+            ]
+          },
+          {
+            "targetKey": "brand.components.backgroundTreatments",
+            "value": "Apply a light textured background to sections for subtle separation",
+            "rationale": "This helps to visually break up content without using harsh lines, maintaining the calm tone.",
+            "confidence": 0.88,
+            "risks": [
+              "May clutter the design if texture is too pronounced"
+            ]
+          },
+          {
+            "targetKey": "brand.tokens.shadow",
+            "value": "Use soft shadows (4px blur, 10% opacity) for depth without distraction",
+            "rationale": "Soft shadows add depth and sophistication without overpowering the content, supporting the premium feel.",
+            "confidence": 0.9,
+            "risks": [
+              "If not used sparingly, could reduce contrast with background"
+            ]
+          }
+        ],
+        "role": "designer_brand",
+        "stopReason": "ok"
+      },
+      "customerSafe": false
+    },
+    {
+      "kind": "swarm.specialist.critic",
+      "payload": {
+        "ok": false,
+        "stopReason": "provider_failed",
+        "fingerprint": "trc_1768410711841_c367872a7ea3d:critic:provider_failed",
+        "role": "critic"
+      },
+      "customerSafe": false
+    },
+    {
+      "kind": "swarm.collapse",
+      "customerSafe": true,
+      "payload": null
+    }
+  ],
+  "customerSafe": true,
+  "extensions": {
+    "swarm": {
+      "costs": [
+        {
+          "specialist": "designer_systems",
+          "inputTokens": 2423,
+          "outputTokens": 818,
+          "costUsd": 0.04877,
+          "model": "gpt-4o-2024-08-06",
+          "latencyMs": 22645,
+          "stopReason": "ok"
+        },
+        {
+          "specialist": "designer_brand",
+          "inputTokens": 2155,
+          "outputTokens": 635,
+          "costUsd": 0.040600000000000004,
+          "model": "gpt-4o-2024-08-06",
+          "latencyMs": 18244,
+          "stopReason": "ok"
+        },
+        {
+          "specialist": "critic",
+          "inputTokens": 0,
+          "outputTokens": 0,
+          "costUsd": 0,
+          "model": "claude-opus-4-1-20250805",
+          "latencyMs": 0,
+          "stopReason": "provider_failed"
+        }
+      ],
+      "totalCostUsd": 0.08937,
+      "roleCostsUsd": {
+        "designer_systems": 0.04877,
+        "designer_brand": 0.040600000000000004,
+        "critic": 0
+      },
+      "roleModels": {
+        "designer_systems": "gpt-4o-2024-08-06",
+        "designer_brand": "gpt-4o-2024-08-06",
+        "critic": "claude-opus-4-1-20250805"
+      },
+      "warnings": [
+        {
+          "role": "critic",
+          "stopReason": "provider_failed"
+        }
+      ],
+      "reason": "Missing craft or critic artifact for collapse"
+    }
+  }
+}
