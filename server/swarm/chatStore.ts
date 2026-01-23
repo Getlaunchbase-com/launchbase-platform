@@ -17,7 +17,37 @@ export type OpsChatMessage = {
   meta?: Record<string, unknown>;
 };
 
-const INDEX_KEY = "swarm/ops-chat/index.json";
+const INDEX_KEY = "swarm/ops-chat/index.json" as const;
+
+// Per-thread write lock to prevent lost updates
+const threadLocks = new Map<string, Promise<void>>();
+
+async function withThreadLock<T>(threadId: string, fn: () => Promise<T>): Promise<T> {
+  // Get the previous promise in the chain (or resolved if this is the first)
+  const prev = threadLocks.get(threadId) ?? Promise.resolve();
+  
+  // Create a new promise that will be resolved when this operation completes
+  let release!: () => void;
+  const current = new Promise<void>(r => (release = r));
+  
+  // Chain: next operation must wait for prev AND current to complete
+  const next = prev.then(() => current);
+  threadLocks.set(threadId, next);
+
+  // Wait for previous operation to complete
+  await prev;
+  
+  try {
+    return await fn();
+  } finally {
+    // Release the lock for this operation
+    release();
+    // Clean up if we're the last operation
+    if (threadLocks.get(threadId) === next) {
+      threadLocks.delete(threadId);
+    }
+  }
+}
 
 function nowIso(): string {
   return new Date().toISOString();
@@ -125,6 +155,7 @@ export async function appendOpsChatMessage(
   threadId: string,
   msg: Omit<OpsChatMessage, "id" | "threadId" | "createdAtIso">,
 ): Promise<OpsChatMessage> {
+  return withThreadLock(threadId, async () => {
   console.log('[chatStore] appendOpsChatMessage called:', { threadId, role: msg.role, text: msg.text.substring(0, 50) });
   const createdAtIso = nowIso();
   const full: OpsChatMessage = {
@@ -164,4 +195,5 @@ export async function appendOpsChatMessage(
   await writeJsonToStorage(INDEX_KEY, idx);
 
   return full;
+  });
 }

@@ -3898,3 +3898,1302 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
 - Presigned URL caching may cause stale reads immediately after write
 - Workaround: 2-second refetch interval eventually picks up new messages
 - Does not affect core functionality (messages display correctly)
+
+
+---
+
+## 🐛 OPS CHAT RACE CONDITION FIX
+
+**Issue:** Lost update problem - concurrent message sends overwrite each other  
+**Root Cause:** No synchronization on read-modify-write operations  
+**Status:** Fixing  
+**Added:** January 23, 2026
+
+### Implementation Tasks
+- [x] Add per-thread write lock (in-memory mutex Map)
+- [x] Wrap appendOpsChatMessage in withThreadLock
+- [ ] Test rapid sends (2-3 messages within 1 second)
+- [ ] Verify all messages persist correctly
+- [ ] Save checkpoint after fix
+
+### Technical Details
+- Using lightweight in-memory mutex pattern
+- Lock scope: per threadId (allows concurrent writes to different threads)
+- Lock lifetime: held during read-modify-write cycle only
+- Single-process assumption: LaunchBase dev server is single-process
+
+
+---
+
+## 🤖 AGENT EXECUTION SYSTEM - "HANDS + BRAIN"
+
+**Goal:** Build Manus-level execution with GPT-5.2 reasoning + Launchbase control  
+**Status:** Planning  
+**Added:** January 23, 2026
+
+### Phase 1 — MVP "Hands + Brain" (Priority: High)
+- [ ] Build minimal agent orchestrator loop (call model → execute tools → append results → repeat)
+- [ ] Implement 5 core tools for MVP digital employee:
+  - [ ] `launchbase_create_task(title, description, priority)`
+  - [ ] `launchbase_update_task(task_id, updates)`
+  - [ ] `sandbox_run(cmd, cwd, timeout_s)`
+  - [ ] `workspace_read(path)`
+  - [ ] `workspace_write(path, content)`
+- [ ] Set up aimlapi OpenAI-compatible client with GPT-5.2
+- [ ] Create tool registry mapping (tool name → Python function)
+- [ ] Define tool schemas for function calling
+- [ ] Test basic workflow: plan work → create tasks → run code → report progress
+
+### Phase 2 — Manus-Level Execution (Priority: Medium)
+- [ ] Add browser automation tools (Playwright):
+  - [ ] `browser_goto(url)`
+  - [ ] `browser_click(selector)`
+  - [ ] `browser_type(selector, text)`
+  - [ ] `browser_screenshot()`
+  - [ ] `browser_extract_text()` (DOM scrape)
+- [ ] Add file operations:
+  - [ ] Downloads + uploads
+  - [ ] Structured research capabilities
+- [ ] (Optional) Add multi-agent "wide research" capability
+
+### Phase 3 — Safe Autonomy (Priority: High)
+- [ ] Implement approval gates system with risk tiers:
+  - [ ] ✅ Green (auto-run): sandbox, read, screenshot
+  - [ ] ⚠️ Yellow (confirm): browser interactions, task creation
+  - [ ] 🛑 Red (explicit approval): deploy prod, send email, post Slack, delete data
+- [ ] Build `request_approval(action, preview)` tool
+- [ ] Create approval UI in Launchbase (approve/deny/edit)
+- [ ] Add audit trail for all agent actions
+
+### Architecture Decisions Needed
+- [ ] **Deployment location** (choose one):
+  - Option 1: Local Docker (fastest, simplest)
+  - Option 2: VPS / cloud server (always-on)
+  - Option 3: Inside Launchbase infra (tightest integration)
+- [ ] **Model selection** (aimlapi):
+  - Planner/liaison: `openai/gpt-5-2-chat-latest`
+  - Coding sub-agent: `openai/gpt-5-1-codex` or `gpt-5-1-codex-mini`
+  - Decision: Start with single model or multi-model?
+
+### Integration Requirements
+- [ ] Convert integration list to Tool Registry JSON
+- [ ] Define risk tiers for each integration (green/yellow/red)
+- [ ] Create function calling schemas for all integrations
+- [ ] Systems to integrate: GitHub, Slack, Notion, Stripe, GCal, Gmail (TBD)
+
+### Target Workflow ("Wow Demo")
+- [ ] End-to-end workflow: Research → Draft PRD → Create Launchbase tasks → Scaffold repo → Run tests → Open PR → Ask approval before merge/deploy
+- [ ] Break down into specific tool calls and approval gates
+- [ ] Test with real use case
+
+### Technical Implementation
+- [ ] Create agent orchestrator Python module
+- [ ] Set up tool handler registry
+- [ ] Implement max_turns limit (default: 12)
+- [ ] Add system prompt with safety guidelines
+- [ ] Handle tool execution errors gracefully
+- [ ] Log all tool calls and results for debugging
+- [ ] Implement tool result verification before claiming success
+
+### Notes
+- Core insight: "Tool calling = hands, Loop = autonomy, Launchbase = control plane, Sandbox = execution plane"
+- Agent quality = quality of tools + verification
+- Single approval gate (`request_approval`) makes it safe to run autonomously
+
+
+---
+
+## 🚀 AGENT DEPLOYMENT & ARCHITECTURE
+
+**Status:** Planning  
+**Added:** January 23, 2026
+
+### Deployment Strategy (DECIDED)
+- [x] **Deployment location:** Option 2 - VPS always-on (designed to plug into Launchbase from day 1)
+  - Rationale: Fastest to ship without Launchbase-infra changes, easier debugging, can lift-and-shift to option 3 later
+- [ ] **Domain:** Namecheap-published URL
+- [ ] **Reverse proxy:** Nginx → app
+- [ ] **Backend stack:** FastAPI (Python) or Node (Express/Nest) - **DECISION NEEDED**
+- [ ] **Sandbox runner:** Docker-in-Docker or separate worker VM/container service
+- [ ] **Storage:** Postgres (runs + logs + state) + S3-compatible bucket (artifacts)
+
+### Agent Architecture Components
+
+#### 1) Agent Orchestrator ("Brain Loop")
+- [ ] Model: `openai/gpt-5-2-chat-latest` (via aimlapi)
+- [ ] Core loop: Plan → Select tool → Execute → Observe → Update state → Continue until done
+- [ ] State management: Per-run storage (DB or durable KV) for resumability
+- [ ] Task graph + checkpoints (every step writes progress + next action)
+- [ ] Budget controls (max tool calls, max minutes, max $/day)
+
+#### 2) Tool Router ("Hands")
+**Launchbase Tools:**
+- [ ] `launchbase.create_epic(title, summary, acceptance_criteria)`
+- [ ] `launchbase.create_task(epic_id, title, description, owner, labels, estimate)`
+- [ ] `launchbase.update_task(task_id, status, comment)`
+- [ ] `launchbase.attach_file(task_id, file_path)`
+- [ ] `launchbase.search(query)` (project/task/wiki lookups)
+- [ ] `launchbase.read_context()` (projects, docs, etc.)
+
+**Code Execution Tools:**
+- [ ] `runner.exec(cwd, command, timeout_s)` (runs commands in sandbox container)
+- [ ] `repo.init(name, template)` (optional but 🔥)
+- [ ] `repo.commit(message, files)` (optional but 🔥)
+- [ ] `repo.open_pr(title, description, base, head)` (optional but 🔥)
+
+**Browser Operator Tools (Phase 2):**
+- [ ] `browser.open_url(url)`
+- [ ] `browser.click(selector)`
+- [ ] `browser.type(selector, text)`
+- [ ] `browser.screenshot()`
+- [ ] `browser.extract_text(selector)`
+- [ ] `browser.download_file(url, dest)`
+
+#### 3) Coding Agent (Specialist Worker)
+- [ ] `coding_agent.generate_patch(goal, repo_state, constraints)`
+- [ ] `coding_agent.run_tests(repo_state)`
+- [ ] `coding_agent.fix_failures(test_output)`
+- [ ] Separate system prompt + stricter constraints
+- [ ] Deterministic outputs (patch-based workflow, tests required)
+
+### Execution Modes & Risk Tiers
+
+#### Execution Modes
+- [x] **Default mode:** Autopilot (as much as reasonably possible)
+- [ ] Copilot mode: pauses before risky actions
+- [ ] Locked mode: plan-only
+
+#### Risk Tiers (Autopilot Safety)
+- [ ] **Tier 0 (always allowed):**
+  - Read-only actions, analysis, planning
+  - Generating docs, creating Launchbase tasks
+  - Running local tests
+- [ ] **Tier 1 (allowed):**
+  - Creating branches/commits
+  - Scaffolding files
+  - Drafting emails/messages (NOT sending)
+- [ ] **Tier 2 (allowed, logged heavily):**
+  - Opening PRs
+  - Creating tickets/issues
+  - Pushing to non-prod
+  - Downloading files
+- [ ] **Tier 3 (requires approval):**
+  - Sending emails/messages externally
+  - Deploying to production
+  - Spending money / hitting paid APIs beyond threshold
+  - Logging into accounts / using auth cookies/tokens interactively
+  - Deleting data or destructive ops
+
+### Safety Rails (Anti-AutoGPT Chaos)
+- [ ] Task graph + checkpoints (prevents loops)
+- [ ] Budget controls (max tool calls, max minutes, max $/day)
+- [ ] Deterministic outputs for code (patch-based workflow, tests required)
+- [ ] Every tool call logged to audit trail
+- [ ] Diffs/previews shown before Tier 3 actions
+- [ ] `request_approval({action, diff/preview, impact})` for all Tier 3
+
+###- MVP: "Orchestrator" (brain + policy + state)
+#### Target Experience
+User says: "Here's an idea..."
+
+Agent outputs:
+1. Coherent PRD + milestones
+2. Launchbase epic + child tasks
+3. Optional repo scaffold + v0 implementation
+4. Status updates as it goes
+
+#### MVP Constraints (Ship Fast)
+- [ ] Browser operator deferred to Phase 2
+- [ ] Focus: "Launchbase + code runner + repo patcher" = already magical
+
+### First Build Milestone ("Holy Sh*t It Works" Demo)
+
+**One command:** "Turn this idea into reality."
+
+Agent will:
+1. [ ] Ask 3–5 clarifying questions (only if needed)
+2. [ ] Produce PRD + checklist
+3. [ ] Create Launchbase tasks automatically
+4. [ ] Scaffold repo (or project folder)
+5. [ ] Implement v0
+6. [ ] Run tests
+7. [ ] Produce "Ready for approval" report + links/artifacts
+
+User only steps in at approvals.
+
+### Integration with Launchbase
+
+#### AgentOps Project
+- [ ] Create "AgentOps" project in Launchbase
+- [ ] Every agent run creates:
+  - [ ] An "Epic" task
+  - [ ] Child tasks for steps
+  - [ ] Automatic status updates + logs
+
+#### Requirements
+- [ ] **Launchbase URL:** (NEEDED)
+- [ ] **Launchbase API:** REST with token auth (assumption)
+- [ ] **Code writing:** YES (confirmed)
+
+### Next Steps (Blocked on Decision)
+- [ ] **Backend language decision:** Python (FastAPI) or Node (Express/Nest)?
+  - If no preference: Default to Python/FastAPI
+
+### Deliverables After Language Decision
+- [ ] Full system prompt(s)
+- [ ] Tool schemas (function calling format)
+- [ ] Orchestration loop pseudocode + guardrails
+- [ ] Repo tree (files/folders)
+- [ ] Launchbase task templates for building the agent itself
+
+
+---
+
+## 🤖 AI/ML API MODEL CATALOG (aimlapi.com)
+
+**Status:** Reference  
+**Added:** January 23, 2026  
+**Source:** AI/ML API Documentation - Models That Support Function Calling
+
+### Available Models for Agent System
+
+#### OpenAI Models (Primary Choice for Agent)
+- [ ] `openai/gpt-5-2-chat-latest` (PRIMARY: Planner/liaison)
+- [ ] `openai/gpt-5-2` 
+- [ ] `openai/gpt-5-1-chat-latest`
+- [ ] `openai/gpt-5-1-codex` (Coding sub-agent)
+- [ ] `openai/gpt-5-1-codex-mini` (Fast coding)
+- [ ] `openai/gpt-5-2025-08-07`
+- [ ] `openai/gpt-5-mini-2025-08-07`
+- [ ] `openai/gpt-5-nano-2025-08-07`
+- [ ] `openai/gpt-5-1`
+- [ ] `openai/o3-2025-04-16`
+- [ ] `openai/gpt-4.1-2025-04-14`
+- [ ] `openai/gpt-4.1-mini-2025-04-14`
+- [ ] `openai/gpt-4.1-nano-2025-04-14`
+- [ ] `openai/o4-mini-2025-04-16`
+- [ ] `openai/gpt-oss-20b`
+- [ ] `openai/gpt-oss-120b`
+- [ ] `o1`
+- [ ] `o3-mini`
+- [ ] `gpt-4o`, `gpt-4o-mini`, `gpt-4o-audio-preview`, `gpt-4o-mini-audio-preview`
+- [ ] `gpt-4`, `gpt-4-turbo`, `gpt-4-0125-preview`, `gpt-4-1106-preview`
+- [ ] `gpt-3.5-turbo`, `gpt-3.5-turbo-0125`, `gpt-3.5-turbo-1106`
+- [ ] `chatgpt-4o-latest`
+
+#### Claude Models (Anthropic)
+- [ ] `claude-3-haiku-20240307`
+- [ ] `claude-3-opus-20240229`
+- [ ] `claude-3-5-haiku-20241022`
+- [ ] `claude-3-7-sonnet-20250219`
+- [ ] `claude-opus-4-20250514`
+- [ ] `claude-sonnet-4-20250514`
+- [ ] `anthropic/claude-opus-4.1`
+- [ ] `anthropic/claude-sonnet-4.5`
+- [ ] `anthropic/claude-opus-4-5`
+
+#### Qwen Models (Alibaba)
+- [ ] `Qwen/Qwen2.5-7B-Instruct-Turbo`
+- [ ] `Qwen/Qwen2.5-72B-Instruct-Turbo`
+- [ ] `Qwen/Qwen3-235B-A22B-fp8-tput`
+- [ ] `alibaba/qwen3-32b`
+- [ ] `alibaba/qwen3-coder-480b-a35b-instruct`
+- [ ] `alibaba/qwen3-235b-a22b-thinking-2507`
+- [ ] `alibaba/qwen3-max-preview`
+- [ ] `alibaba/qwen3-max-instruct`
+- [ ] `alibaba/qwen3-vl-32b-instruct`
+- [ ] `alibaba/qwen3-vl-32b-thinking`
+- [ ] `qwen-max`
+- [ ] `qwen-max-2025-01-25`
+- [ ] `qwen-plus`
+- [ ] `qwen-turbo`
+
+#### DeepSeek Models
+- [ ] `deepseek/deepseek-r1`
+- [ ] `deepseek/deepseek-thinking-v3.2-exp`
+- [ ] `deepseek/deepseek-non-thinking-v3.2-exp`
+
+#### Google Gemini Models
+- [ ] `google/gemini-2.0-flash`
+- [ ] `google/gemini-2.5-flash-lite-preview`
+- [ ] `google/gemini-2.5-flash`
+- [ ] `google/gemini-2.5-pro`
+- [ ] `google/gemini-3-pro-preview`
+
+#### Meta Llama Models
+- [ ] `meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo`
+- [ ] `meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo`
+- [ ] `meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo`
+- [ ] `meta-llama/Llama-3.2-3B-Instruct-Turbo`
+- [ ] `meta-llama/Llama-3.3-70B-Instruct-Turbo`
+- [ ] `meta-llama/LlamaGuard-2-8b`
+- [ ] `meta-llama/llama-4-scout`
+- [ ] `meta-llama/llama-4-maverick`
+
+#### Mistral Models
+- [ ] `mistralai/mistral-tiny`
+- [ ] `mistralai/mistral-nemo`
+
+#### X.AI Grok Models
+- [ ] `x-ai/grok-3-beta`
+- [ ] `x-ai/grok-3-mini-beta`
+- [ ] `x-ai/grok-4-07-09`
+- [ ] `x-ai/grok-code-fast-1`
+- [ ] `x-ai/grok-4-fast-non-reasoning`
+- [ ] `x-ai/grok-4-fast-reasoning`
+- [ ] `x-ai/grok-4-1-fast-non-reasoning`
+- [ ] `x-ai/grok-4-1-fast-reasoning`
+
+#### Zhipu GLM Models
+- [ ] `zhipu/glm-4.5-air`
+- [ ] `zhipu/glm-4.5`
+- [ ] `zhipu/glm-4.7`
+
+#### Baidu Ernie Models
+- [ ] `baidu/ernie-4.5-21b-a3b`
+- [ ] `baidu/ernie-4.5-21b-a3b-thinking`
+- [ ] `baidu/ernie-4.5-300b-a47b`
+- [ ] `baidu/ernie-4.5-vl-28b-a3b`
+- [ ] `baidu/ernie-4.5-vl-424b-a47b`
+
+#### Other Models
+- [ ] `MiniMax-Text-01`
+- [ ] `minimax/m1`
+- [ ] `minimax/m2-1`
+- [ ] `moonshot/kimi-k2-preview`
+- [ ] `moonshot/kimi-k2-0905-preview`
+- [ ] `moonshot/kimi-k2-turbo-preview`
+- [ ] `vidia/nemotron-nano-9b-v2`
+- [ ] `nvidia/nemotron-nano-12b-v2-vl`
+
+### Model Selection Strategy for Agent
+- [ ] **Primary planner:** `openai/gpt-5-2-chat-latest` (best reasoning + function calling)
+- [ ] **Coding specialist:** `openai/gpt-5-1-codex` or `openai/gpt-5-1-codex-mini` (speed)
+- [ ] **Fallback options:** Claude Opus 4, Qwen3-max, DeepSeek R1
+- [ ] **Cost optimization:** Consider `gpt-4o-mini` or `claude-3-5-haiku` for low-tier tasks
+
+### Integration Notes
+- [ ] All listed models support function calling (verified by AI/ML API docs)
+- [ ] API base URL: `https://api.aimlapi.com/v1`
+- [ ] API key: Use `AI_ML_API_KEY` environment variable
+- [ ] Complete model list available via API endpoint (see docs)
+- [ ] Model filtering available at: https://aimlapi.com/models/
+- [ ] New model requests: Discord community https://discord.gg/8CwhkUuCR6
+
+### Reference
+- [ ] Documentation: AI/ML API Documentation
+- [ ] Screenshots saved: 5 images showing model catalog
+- [ ] Integration list file: OurIntegrationList_AI_MLAPIDocumentation (binary, needs conversion)
+
+
+---
+
+## 🔧 HYBRID APPROACH: BUILD NOW, SWAP LAUNCHBASE API LATER
+
+**Status:** Ready to implement  
+**Added:** January 23, 2026  
+**Strategy:** Option C - Build complete agent system with mock Launchbase layer, swap for real API when docs available
+
+### Implementation Plan
+
+#### Phase 1: Mock Launchbase API Layer
+- [ ] Create OpenAPI 3.0 spec for mock Launchbase API
+  - Base URL: `https://launchbase.local/api/v1` (mock)
+  - Endpoints: `/epics`, `/tasks`, `/tasks/{task_id}`, `/search`, `/attachments`
+  - Auth: API key header (placeholder)
+- [ ] Define schemas:
+  - [ ] Epic (id, title, description, labels, priority, created_at)
+  - [ ] Task (id, title, description, epic_id, assignee, status, labels, due_date, updated_at)
+  - [ ] Attachment (id, parent_type, parent_id, filename, mime_type, size_bytes, created_at)
+  - [ ] SearchResult (type, id, title, snippet, url)
+- [ ] Status enum: `todo`, `in_progress`, `blocked`, `review`, `done`
+- [ ] Priority enum: `low`, `medium`, `high`, `critical`
+
+#### Phase 2: AIMLAPI Function Schemas
+- [ ] Define tool schemas for function calling:
+  - [ ] `launchbase_create_task(title, description, epic_id, assignee, status, labels, due_date)`
+  - [ ] `launchbase_update_task(task_id, title, description, status, labels, notes)`
+  - [ ] `launchbase_search(q, limit)`
+  - [ ] `launchbase_attach_file(parent_type, parent_id, filename, content_base64, mime_type, note)`
+- [ ] Add sandbox/workspace/repo tools (same format)
+
+#### Phase 3: FastAPI Tool-Router
+- [ ] Create FastAPI app: "Agent Tool Router v0.1.0"
+- [ ] In-memory mock store (DB dict with tasks/epics/attachments)
+- [ ] Implement tool endpoints:
+  - [ ] `POST /tools/launchbase_create_task`
+  - [ ] `POST /tools/launchbase_update_task`
+  - [ ] `POST /tools/launchbase_search`
+  - [ ] `POST /tools/launchbase_attach_file`
+  - [ ] `POST /tools/sandbox_run`
+  - [ ] `POST /tools/workspace_read`
+  - [ ] `POST /tools/workspace_write`
+  - [ ] `POST /tools/repo_commit`
+  - [ ] `POST /tools/repo_open_pr`
+  - [ ] `POST /tools/request_approval`
+- [ ] Return structured responses matching schemas
+
+#### Phase 4: Agent Orchestrator Loop
+- [ ] Set up aimlapi client with GPT-5.2
+- [ ] Implement core loop:
+  1. Call model with messages + tools
+  2. If tool_calls → execute via tool-router
+  3. Append tool results as role="tool"
+  4. Repeat until final answer
+- [ ] Add max_turns limit (default: 12)
+- [ ] Add budget controls (max API calls, max cost)
+- [ ] Add state persistence (per-run storage)
+
+#### Phase 5: "Make a PR" Runbook (First End-to-End Demo)
+- [ ] User input: "Create a feature that does X"
+- [ ] Agent workflow:
+  1. [ ] Ask clarifying questions (if needed)
+  2. [ ] Create Launchbase epic + tasks
+  3. [ ] Initialize repo / create branch
+  4. [ ] Generate code patch
+  5. [ ] Run tests
+  6. [ ] Commit changes
+  7. [ ] Open PR with description
+  8. [ ] Update Launchbase task status
+  9. [ ] Request approval before merge
+- [ ] Test with real example
+
+#### Phase 6: Swap Mock for Real Launchbase API
+**Blocked until we receive:**
+- [ ] Launchbase API base URL
+- [ ] Auth method (API key? OAuth? JWT?)
+- [ ] Real endpoint documentation
+- [ ] One working curl/Postman example
+
+**Swap process (30 minutes):**
+- [ ] Replace mock DB with HTTP client
+- [ ] Update base URL in config
+- [ ] Add auth headers
+- [ ] Map mock endpoints to real endpoints
+- [ ] Test with real Launchbase instance
+- [ ] No changes to agent orchestrator needed!
+
+### What We Can Accept Instead of Full Docs
+- [ ] Screenshot of Launchbase API page
+- [ ] Postman collection
+- [ ] Single curl example (e.g., "create task")
+- [ ] Swagger/OpenAPI spec URL
+- [ ] Any working API request example
+
+### Benefits of Hybrid Approach
+- ✅ Start building immediately (no waiting)
+- ✅ Test agent logic independently
+- ✅ Clean separation of concerns
+- ✅ Easy to swap mock → real (30 min)
+- ✅ No re-architecture needed later
+- ✅ Can demo full workflow before Launchbase integration
+
+### Files to Create
+- [ ] `mock_launchbase_api.yaml` - OpenAPI spec
+- [ ] `tool_schemas.py` - AIMLAPI function definitions
+- [ ] `tool_router.py` - FastAPI app with tool endpoints
+- [ ] `agent_orchestrator.py` - Main agent loop
+- [ ] `make_pr_runbook.md` - Step-by-step workflow
+- [ ] `config.py` - Environment variables and settings
+- [ ] `requirements.txt` - Python dependencies
+
+### Next Action
+- [ ] **DECISION NEEDED:** Proceed with Hybrid approach implementation?
+- [ ] If YES: Start with Phase 1 (Mock Launchbase API spec)
+- [ ] If NO: Wait for real Launchbase API docs
+
+
+---
+
+## 🏗️ INFRASTRUCTURE STACK DECISIONS (LOCKED IN)
+
+**Status:** Decided  
+**Added:** January 23, 2026  
+**Goal:** Cloud VM + Docker + GitHub + Playwright = "Manus vibe" with minimal risk
+
+### Stack Decisions
+
+#### Deployment Architecture (DECIDED)
+- [x] **Cloud VM + Docker** (not "Docker only" or local)
+  - Rationale: Long-running jobs, browsers, file system, installs, retries need real machine persistence
+  - 1 cloud VM per agent workspace (or per project)
+  - Agent runs everything inside Docker containers on that VM
+  - Benefits:
+    - ✅ Isolation (containers)
+    - ✅ Persistence (VM disk)
+    - ✅ "Keep going" autonomy (jobs don't die when laptop sleeps)
+
+#### MVP Docker Compose Stack
+- [ ] Single VM deployment
+- [ ] Docker Compose with 3 services:
+  1. **agent-api** (tool router + approvals)
+  2. **runner** (sandbox executor)
+  3. **browser** (Playwright)
+
+#### Version Control (DECIDED)
+- [x] **GitHub** (already integrated, don't add complexity)
+  - PR-based autopilot workflow:
+    - Create branch
+    - Push commits
+    - Open PR
+    - Comment with plan + checklist
+    - Request review
+    - Run CI
+  - GitLab: defer until org requires it
+
+#### Browser Automation (DECIDED)
+- [x] **Playwright** (the "browser operator" = Manus hands)
+  - Capabilities:
+    - Log in (stored session cookies / vault)
+    - Click/type/navigate
+    - Download/upload
+    - Screenshot for verification
+    - Scrape structured data
+  - Implementation:
+    - [ ] Separate Playwright container
+    - [ ] Persistent browser context storage
+    - [ ] Video/screenshot artifacts saved to workspace
+    - [ ] Strict "allowed domains" list (safety + reliability)
+
+### What This Stack Enables
+
+**Immediate Capabilities:**
+1. User describes idea → agent creates plan + tasks
+2. Agent scaffolds repo, writes code, runs tests
+3. Agent opens PR with changes + screenshots + notes
+4. User approves merge/deploy (or agent stops)
+
+**Safety Gates:**
+- Sending emails
+- Deploying prod
+- Merging PRs
+- Spending money
+- Deleting data
+
+### Docker Compose Architecture
+
+#### Service 1: agent-api
+- [ ] FastAPI/Node tool router
+- [ ] Exposes tool functions to GPT-5.2 via aimlapi function calling
+- [ ] Handles approval gates
+- [ ] Manages agent state persistence
+- [ ] Ports: 8000 (API)
+
+#### Service 2: runner (sandbox executor)
+- [ ] Docker-in-Docker or separate worker container
+- [ ] Executes `sandbox.run` commands
+- [ ] Isolated file system per run
+- [ ] Timeout controls
+- [ ] Resource limits (CPU/memory)
+
+#### Service 3: browser (Playwright)
+- [ ] Headless Chromium
+- [ ] Persistent browser context
+- [ ] Session cookie storage
+- [ ] Screenshot/video recording
+- [ ] Allowed domains whitelist
+- [ ] VNC access for debugging (optional)
+
+### Tool Schemas to Implement
+
+#### Sandbox Tools
+- [ ] `sandbox.run(cmd, cwd, timeout_s)`
+  - Execute shell commands in isolated environment
+  - Return: stdout, stderr, exit_code, duration_ms
+
+#### Workspace Tools
+- [ ] `workspace.read(path)`
+  - Read file contents
+  - Return: content, mime_type, size_bytes
+- [ ] `workspace.write(path, content)`
+  - Create/modify files
+  - Return: success, path, size_bytes
+- [ ] `workspace.list(path, recursive)`
+  - Directory traversal
+  - Return: files[], directories[]
+
+#### Repo Tools
+- [ ] `repo.commit(message, files[])`
+  - Save changes with commit message
+  - Return: commit_hash, branch, changed_files
+- [ ] `repo.open_pr(title, description, base, head)`
+  - Submit PR for review
+  - Return: pr_number, pr_url, status
+
+#### Browser Tools
+- [ ] `browser.goto(url)`
+  - Navigate to URL
+  - Return: title, final_url, status_code
+- [ ] `browser.click(selector)`
+  - Click element
+  - Return: success, element_text
+- [ ] `browser.type(selector, text)`
+  - Fill form field
+  - Return: success
+- [ ] `browser.screenshot()`
+  - Capture viewport
+  - Return: image_path, image_base64
+- [ ] `browser.extract_text(selector)`
+  - Scrape content
+  - Return: text, html
+
+#### Approval Tool
+- [ ] `request_approval(action, preview, risk_tier)`
+  - Pause for human decision
+  - Return: approved, denied, modified_params
+
+### Next Deliverables (Ready to Generate)
+
+**User requested:** Draft exact specs for MVP
+
+- [ ] `docker-compose.yml` (3 services: agent-api, runner, browser)
+- [ ] Tool schemas for all 10+ tools listed above
+- [ ] FastAPI tool router skeleton
+- [ ] Playwright container setup
+- [ ] GitHub Actions workflow for CI
+- [ ] Approval gate UI mockup
+- [ ] Environment variables / secrets config
+
+### Notes
+- ✅ All code from user messages is being tracked in todo.md
+- ✅ Stack choice optimized for "Manus execution + GPT-5.2 reasoning"
+- ✅ Clean separation: agent-api (brain) + runner (hands) + browser (eyes)
+- ✅ GitHub PR workflow = built-in approval gate
+
+### Decision Point
+- [ ] **READY TO GENERATE:** docker-compose.yml + tool schemas + FastAPI skeleton?
+- [ ] User confirmation needed before proceeding with implementation
+
+
+---
+
+## 🎯 MISSION: BUILD AGENT STACK (READY TO EXECUTE)
+
+**Status:** Ready for implementation  
+**Added:** January 23, 2026  
+**Role Split:** Manus = Execution Worker | GPT-5.2 = Brain | User = Approver
+
+### Mission Statement
+
+**Create the repo + docker stack + router skeleton exactly as spec'd, run it locally, and return proof.**
+
+### Deliverables
+
+#### 1. agent-stack/ Repository Structure
+```
+agent-stack/
+  docker-compose.yml
+  .env.example
+  router/
+    Dockerfile
+    requirements.txt
+    app/
+      main.py
+      tools.py
+      approvals.py
+      github_tools.py
+      sandbox_tools.py
+      workspace_tools.py
+      browser_tools.py
+      tool_schemas.py
+  runner/
+    Dockerfile
+  browser/
+    Dockerfile
+```
+
+#### 2. Docker Compose Stack
+- [ ] `docker compose up -d --build` works successfully
+- [ ] 3 services running: router, runner, browser
+- [ ] Shared volumes: workspaces
+- [ ] Router exposed on port 8080
+- [ ] Browser debug port 9222 (optional)
+
+#### 3. Proof of Success
+- [ ] Screenshot or logs showing:
+  - `/health` returns `{"ok": true}`
+  - `/tools` returns tool schemas JSON
+  - All 3 containers running
+
+### Constraints (IMPORTANT - APPROVAL GATES)
+
+**Must request approval before:**
+- [ ] Namecheap actions (DNS, purchase, transfer)
+- [ ] Anything that costs money (Stripe, paid APIs, marketplace)
+- [ ] GitHub merge to default branch
+- [ ] Deploy to production
+- [ ] Accessing any authenticated web app (logins)
+
+**Autopilot allowed:**
+- ✅ File edits
+- ✅ Tests
+- ✅ PR creation (not merge)
+- ✅ Local runs
+- ✅ Branch creation/commits
+
+### Implementation Order
+
+1. [ ] **Create repo + skeleton**
+   - Initialize agent-stack/ repository
+   - Create directory structure
+   - Add .env.example with all required variables
+
+2. [ ] **Boot compose**
+   - Write docker-compose.yml (3 services)
+   - Create Dockerfiles for router, runner, browser
+   - Build and start containers
+
+3. [ ] **Smoke test endpoints**
+   - Test GET /health
+   - Test GET /tools
+   - Verify tool schemas returned
+
+4. [ ] **Add demo tool call**
+   - `sandbox_run` → create file
+   - `workspace_read` → verify file exists
+   - Confirm end-to-end flow works
+
+5. [ ] **Optional: Add repo_open_pr**
+   - If GitHub token is ready
+   - Test PR creation workflow
+   - Verify PR appears on GitHub
+
+### Environment Variables (.env.example)
+
+```bash
+# ---- core ----
+PROJECT_NAME=launchbase-agent
+WORKSPACE_ROOT=/workspaces
+
+# ---- security ----
+ROUTER_AUTH_TOKEN=change_me_router_token
+APPROVAL_SECRET=change_me_approval_secret
+
+# ---- github ----
+GITHUB_TOKEN=ghp_xxx
+GITHUB_OWNER=your-org-or-user
+GITHUB_REPO=your-repo
+GITHUB_DEFAULT_BRANCH=main
+
+# ---- optional: restrict browser ----
+BROWSER_ALLOWED_DOMAINS=aimlapi.com,github.com,namecheap.com
+
+# ---- aimlapi ----
+AIMLAPI_BASE_URL=https://api.aimlapi.com/v1
+AIMLAPI_KEY=AI_ML_API
+AIMLAPI_MODEL=gpt-5.2
+```
+
+### Tool Schemas Implemented
+
+**Approval Tools:**
+- [ ] `request_approval(action, summary, risk, artifacts)` - Returns approval_id
+- [ ] `check_approval(approval_id)` - Poll approval status
+
+**Sandbox Tools:**
+- [ ] `sandbox_run(workspace, cmd, timeout_sec)` - Execute shell commands
+
+**Workspace Tools:**
+- [ ] `workspace_list(workspace, path)` - List files/directories
+- [ ] `workspace_read(workspace, path, max_bytes)` - Read file contents
+- [ ] `workspace_write(workspace, path, content, mkdirs)` - Write/overwrite files
+
+**Repo Tools (GitHub):**
+- [ ] `repo_commit(workspace, message, add_all)` - Local commit
+- [ ] `repo_open_pr(workspace, title, body, head_branch, base_branch)` - Push + create PR
+
+**Browser Tools (Playwright):**
+- [ ] `browser_goto(workspace, session, url)` - Navigate to URL
+- [ ] `browser_click(workspace, session, selector)` - Click element
+- [ ] `browser_type(workspace, session, selector, text, clear_first)` - Type into field
+- [ ] `browser_screenshot(workspace, session, path)` - Save screenshot
+- [ ] `browser_extract_text(workspace, session, selector)` - Scrape text content
+
+### Docker Services Configuration
+
+#### Router Service
+- **Base:** Python 3.11-slim
+- **Framework:** FastAPI + Uvicorn
+- **Port:** 8080
+- **Dependencies:** fastapi, uvicorn, pydantic, python-dotenv, PyGithub, requests
+- **Volumes:** workspaces, /var/run/docker.sock
+- **Endpoints:**
+  - GET /health
+  - GET /tools
+  - POST /tool
+
+#### Runner Service
+- **Base:** Ubuntu 22.04
+- **Tools:** bash, curl, git, python3, nodejs, npm, jq, ripgrep
+- **User:** runner (non-root for safety)
+- **Volumes:** workspaces
+- **Purpose:** Isolated sandbox execution
+
+#### Browser Service
+- **Base:** mcr.microsoft.com/playwright/python:v1.44.0-jammy
+- **Tools:** Playwright + Chromium
+- **Volumes:** workspaces
+- **Port:** 9222 (debug, optional)
+- **Purpose:** Persistent browser sessions
+
+### Security Features
+
+**Path Traversal Protection:**
+- [ ] Workspace name validation (no `/` or `..`)
+- [ ] Path normalization and prefix checking
+- [ ] All file operations scoped to WORKSPACE_ROOT
+
+**Authentication:**
+- [ ] Router requires X-Router-Token header
+- [ ] Approval secret for human-in-the-loop
+- [ ] GitHub token for PR operations
+
+**Domain Allowlist:**
+- [ ] Browser restricted to BROWSER_ALLOWED_DOMAINS
+- [ ] Prevents unauthorized web access
+
+### Next Steps After MVP
+
+**User will provide:**
+- [ ] Repo link / tree structure
+- [ ] Logs showing successful boot
+- [ ] Screenshot of /health and /tools responses
+
+**Then we add:**
+- [ ] Harden security (token checks, path traversal, domain allowlist)
+- [ ] Tighten tool schemas for aimlapi
+- [ ] Add approval web UI (approve/deny from phone)
+- [ ] Connect to GPT-5.2 orchestrator loop
+- [ ] Integrate with Launchbase (when API docs available)
+
+### Success Criteria
+
+✅ All 3 containers running  
+✅ /health returns ok  
+✅ /tools returns 13 tool schemas  
+✅ sandbox_run can create file  
+✅ workspace_read can read file  
+✅ No approval gates triggered during setup  
+✅ Feature branch created (if GitHub token provided)  
+✅ PR opened with implementation (if GitHub token provided)  
+
+### Notes
+- This is MVP "hands only" - GPT-5.2 brain loop comes next
+- Approval gates protect against risky actions
+- Clean separation: router (brain) + runner (hands) + browser (eyes)
+- 30-minute swap to real Launchbase API when docs arrive
+
+
+---
+
+## 🚫 NON-GOALS (MVP)
+
+**Status:** Policy - Hard Constraints  
+**Added:** January 23, 2026  
+**Purpose:** Prevent autonomy creep and "oops" moments
+
+### Explicitly Out of Scope for MVP
+
+- [ ] ❌ **No production deploy** - Staging/local only
+- [ ] ❌ **No DNS/domain changes** - No Namecheap operations
+- [ ] ❌ **No spending money** - No Stripe, paid APIs, marketplace purchases
+- [ ] ❌ **No sending email/SMS** - Draft only, no external comms
+- [ ] ❌ **No merging PRs to main** - Open PRs only, human merges
+- [ ] ❌ **No logging into authenticated sites** - Public pages only for MVP
+
+### Why These Constraints Matter
+
+- Prevents accidental production changes
+- Eliminates financial risk
+- Ensures human review of all external-facing actions
+- Builds trust before expanding autonomy
+- Makes rollback trivial (just close PR)
+
+---
+
+## 🛡️ APPROVAL POLICY MATRIX
+
+**Status:** Policy - Enforcement Required  
+**Added:** January 23, 2026  
+**Purpose:** Explicit risk tiers with clear auto/approval rules
+
+### Risk Tier Table
+
+| Tier | Policy | Actions | Examples |
+|------|--------|---------|----------|
+| **Tier 0** | ✅ Auto | Read-only ops, local tests, file writes inside repo, create PRs | `workspace_read`, `workspace_write`, `sandbox_run` (tests), `repo_commit`, `workspace_list` |
+| **Tier 1** | ✅ Auto + Logged | Install deps, run Playwright on public pages, open issues/PR comments | `sandbox_run` (npm install), `browser_goto` (public URLs), GitHub issue/comment API |
+| **Tier 2** | ⚠️ Approval | Any auth login, web form submissions, external integration writes (Notion/Slack), staging deploy | `browser_goto` (login pages), `browser_type` (credentials), Notion API writes, staging deploy scripts |
+| **Tier 3** | 🛑 Approval + 2-step confirm | Prod deploy, DNS/Namecheap, payments, secrets rotation, merges to main | Production deploy, Namecheap API, Stripe charges, GitHub merge API, secrets manager writes |
+
+### Enforcement Rules
+
+**Tier 0 (Auto):**
+- Execute immediately
+- Log: request_id, tool_name, args_hash, result_summary
+- No human intervention required
+
+**Tier 1 (Auto + Logged):**
+- Execute immediately
+- Log: full request + response
+- Alert user after execution (async notification)
+- Rate limits: 100 calls/hour per tool
+
+**Tier 2 (Approval):**
+- Block execution
+- Call `request_approval(action, summary, risk="medium", artifacts)`
+- Wait for human approval (poll `check_approval`)
+- Timeout: 24 hours, then auto-deny
+- Log: full audit trail
+
+**Tier 3 (Approval + 2-step confirm):**
+- Block execution
+- Call `request_approval(action, summary, risk="high", artifacts)`
+- Require explicit 2-step confirmation (e.g., "type 'CONFIRM' to proceed")
+- Timeout: 1 hour, then auto-deny
+- Log: full audit trail + screenshot/diff artifacts
+- Send SMS/email alert (optional)
+
+### Tool-to-Tier Mapping
+
+**Tier 0 Tools:**
+- `workspace_read`, `workspace_write`, `workspace_list`
+- `sandbox_run` (when cmd matches: test, build, lint, format)
+- `repo_commit`
+
+**Tier 1 Tools:**
+- `sandbox_run` (when cmd matches: install, npm, pip, apt-get)
+- `browser_goto` (when URL in BROWSER_ALLOWED_DOMAINS)
+- `browser_screenshot`, `browser_extract_text`
+- `repo_open_pr`
+
+**Tier 2 Tools:**
+- `browser_click`, `browser_type` (any page)
+- `browser_goto` (when URL requires auth or not in allowlist)
+- External API writes (Notion, Slack, Launchbase)
+
+**Tier 3 Tools:**
+- GitHub merge API
+- Production deploy scripts
+- Namecheap API
+- Stripe API
+- Secrets manager writes
+
+---
+
+## 🔒 TOOL ROUTER SECURITY REQUIREMENTS
+
+**Status:** Implementation Required  
+**Added:** January 23, 2026  
+**Purpose:** Prevent "oops" moments and security incidents
+
+### Security Controls
+
+#### 1. Allowlist Tools + Domains
+- [ ] **Tool allowlist:** Only tools in `TOOL_MAP` can execute
+- [ ] **Domain allowlist:** Browser restricted to `BROWSER_ALLOWED_DOMAINS`
+- [ ] **Command allowlist (optional):** Restrict `sandbox_run` to safe commands for Tier 0
+
+#### 2. Workspace Path Sandboxing
+- [ ] **No `../` escapes:** Validate workspace name (no `/` or `..`)
+- [ ] **Path normalization:** Use `os.path.normpath` + prefix check
+- [ ] **Absolute path validation:** Ensure all paths start with `WORKSPACE_ROOT`
+- [ ] **Symlink protection:** Resolve symlinks and re-validate
+
+#### 3. Redact Secrets from Logs
+- [ ] **Environment variables:** Never log `*_TOKEN`, `*_KEY`, `*_SECRET`
+- [ ] **Tool arguments:** Redact `password`, `token`, `api_key` fields
+- [ ] **Command output:** Scrub patterns like `ghp_*`, `sk_*`, `Bearer *`
+- [ ] **Diff artifacts:** Redact `.env` file contents
+
+#### 4. Rate Limits + Timeouts
+- [ ] **Per-tool rate limits:**
+  - Tier 0: 1000 calls/hour
+  - Tier 1: 100 calls/hour
+  - Tier 2/3: 10 calls/hour
+- [ ] **Global rate limit:** 500 tool calls/hour across all tools
+- [ ] **Timeout per tool call:** 30 minutes max (configurable per tool)
+- [ ] **Workspace size limit:** 10GB per workspace
+
+#### 5. Audit Trail
+- [ ] **Every tool call stored with:**
+  - `request_id` (UUID)
+  - `user_id` (if multi-user)
+  - `tool_name`
+  - `args_hash` (SHA256 of arguments)
+  - `result_summary` (success/failure + truncated output)
+  - `timestamp`
+  - `duration_ms`
+  - `risk_tier`
+- [ ] **Retention:** 90 days minimum
+- [ ] **Export:** CSV/JSON download for compliance
+
+#### 6. Additional Hardening
+- [ ] **Input validation:** Pydantic models for all tool arguments
+- [ ] **Output sanitization:** Escape HTML/JS in browser tool responses
+- [ ] **Container isolation:** Runner + browser have no network access to router
+- [ ] **Least privilege:** Runner container runs as non-root user
+- [ ] **Secret rotation:** Rotate `ROUTER_AUTH_TOKEN` every 30 days
+
+---
+
+## 🏃 LOCAL FIRST DEV LOOP
+
+**Status:** Required for MVP  
+**Added:** January 23, 2026  
+**Purpose:** Fast iteration before VM deployment
+
+### Development Workflow
+
+#### 1. Boot Stack
+```bash
+cd agent-stack/
+cp .env.example .env
+# Edit .env with your tokens
+docker compose up --build
+```
+
+#### 2. Smoke Tests
+```bash
+# Health check
+curl http://localhost:8080/health
+# Expected: {"ok": true}
+
+# Tool schemas
+curl http://localhost:8080/tools
+# Expected: {"tools": [...13 tool schemas...]}
+
+# Single tool call (with auth)
+curl -X POST http://localhost:8080/tool \
+  -H "X-Router-Token: your_token" \
+  -H "Content-Type: application/json" \
+  -d '{"tool_call": {"name": "workspace_list", "arguments": {"workspace": "demo"}}}'
+# Expected: {"ok": true, "path": ".", "items": [...]}
+```
+
+#### 3. Golden Demo Flow
+**Scenario:** Create file → Read file → Git diff → Open PR
+
+```bash
+# Step 1: Create workspace
+mkdir -p /workspaces/demo
+cd /workspaces/demo
+git init
+git remote add origin https://github.com/your-org/demo-repo.git
+
+# Step 2: Write file via tool
+curl -X POST http://localhost:8080/tool \
+  -H "X-Router-Token: your_token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tool_call": {
+      "name": "workspace_write",
+      "arguments": {
+        "workspace": "demo",
+        "path": "hello.txt",
+        "content": "Hello from agent!"
+      }
+    }
+  }'
+
+# Step 3: Read file via tool
+curl -X POST http://localhost:8080/tool \
+  -H "X-Router-Token: your_token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tool_call": {
+      "name": "workspace_read",
+      "arguments": {
+        "workspace": "demo",
+        "path": "hello.txt"
+      }
+    }
+  }'
+
+# Step 4: Commit via tool
+curl -X POST http://localhost:8080/tool \
+  -H "X-Router-Token: your_token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tool_call": {
+      "name": "repo_commit",
+      "arguments": {
+        "workspace": "demo",
+        "message": "Add hello.txt"
+      }
+    }
+  }'
+
+# Step 5: Open PR via tool
+curl -X POST http://localhost:8080/tool \
+  -H "X-Router-Token: your_token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tool_call": {
+      "name": "repo_open_pr",
+      "arguments": {
+        "workspace": "demo",
+        "title": "Add hello.txt",
+        "body": "Demo PR from agent tool router",
+        "head_branch": "feature/hello"
+      }
+    }
+  }'
+```
+
+#### 4. Success Criteria
+- [ ] All 3 containers running (`docker ps`)
+- [ ] `/health` returns ok
+- [ ] `/tools` returns 13 tool schemas
+- [ ] `workspace_write` creates file
+- [ ] `workspace_read` reads file
+- [ ] `repo_commit` commits changes
+- [ ] `repo_open_pr` opens PR on GitHub
+- [ ] PR visible in GitHub UI
+
+---
+
+## 🧠 ORCHESTRATOR ARCHITECTURE
+
+**Status:** Renamed from "Launchbase Liaison Agent"  
+**Added:** January 23, 2026  
+**Purpose:** Clear separation of brain vs hands
+
+### Component Roles
+
+#### Orchestrator (Brain + Policy + State)
+**Responsibilities:**
+- Planning: Break user goals into subtasks
+- Decision-making: Select next tool to call
+- Memory: Track what's been done, avoid repeating work
+- Policy enforcement: Check risk tier before tool execution
+- State persistence: Save/resume across sessions
+
+**Implementation:**
+- GPT-5.2-chat-latest via aimlapi
+- Agent loop: Plan → Select tool → Execute → Observe → Update state → Continue
+- State storage: Postgres or Redis (per-run state)
+- Budget controls: Max tool calls, max cost, max time
+
+#### Executors (Hands)
+**1. Sandbox Runner:**
+- Execute shell commands
+- Install dependencies
+- Run tests/builds
+- Git operations
+
+**2. Browser Runner:**
+- Navigate web pages
+- Click/type/screenshot
+- Extract text/data
+- Persistent sessions
+
+**3. Coding Agent (Optional):**
+- Generate code patches
+- Run tests
+- Fix failures
+- Refactor code
+
+### Communication Flow
+
+```
+User Request
+    ↓
+Orchestrator (GPT-5.2)
+    ↓
+Tool Selection + Risk Check
+    ↓
+[Tier 0/1: Auto Execute] → Tool Router → Executor
+    ↓
+[Tier 2/3: Request Approval] → Human → [Approved?] → Tool Router → Executor
+    ↓
+Tool Result
+    ↓
+Orchestrator (Update State)
+    ↓
+[Done?] → Deliver Result to User
+[Not Done?] → Loop back to Tool Selection
+```
+
+### State Schema
+
+```json
+{
+  "run_id": "uuid",
+  "user_id": "string",
+  "goal": "string",
+  "status": "planning|executing|blocked|completed|failed",
+  "current_step": 3,
+  "total_steps": 10,
+  "plan": [
+    {"step": 1, "action": "create_workspace", "status": "done"},
+    {"step": 2, "action": "write_code", "status": "done"},
+    {"step": 3, "action": "run_tests", "status": "in_progress"}
+  ],
+  "tool_calls": [
+    {"tool": "workspace_write", "args_hash": "abc123", "result": "success", "timestamp": "2026-01-23T..."}
+  ],
+  "approvals_pending": ["approval_id_xyz"],
+  "created_at": "2026-01-23T...",
+  "updated_at": "2026-01-23T..."
+}
+```
+
+---
+
+## ✅ CHECKPOINT DEFINITION
+
+**Status:** Ready to build  
+**Added:** January 23, 2026  
+**Purpose:** Deliverable for first Manus execution
+
+### Checkpoint Includes
+
+#### 1. Repo Skeleton + Compose
+- [ ] `agent-stack/` repository structure
+- [ ] `docker-compose.yml` (3 services)
+- [ ] Dockerfiles for router, runner, browser
+- [ ] `.env.example` with all variables
+- [ ] `.gitignore` (exclude .env, __pycache__, etc.)
+
+#### 2. Tool Schemas JSON
+- [ ] `router/app/tool_schemas.py` with 13 tools
+- [ ] AIMLAPI function calling format
+- [ ] Risk tier annotations in comments
+
+#### 3. Approval Policy + Risk Tiers
+- [ ] `APPROVAL_POLICY.md` with tier table
+- [ ] Tool-to-tier mapping
+- [ ] Enforcement rules
+
+#### 4. README "How to Run" + "How to Approve"
+- [ ] `README.md` with:
+  - Quick start (docker compose up)
+  - Smoke tests (curl examples)
+  - Golden demo flow
+  - Approval process
+  - Troubleshooting
+
+#### 5. First Demo Tool End-to-End Working
+- [ ] `workspace_write` → create file
+- [ ] `workspace_read` → read file
+- [ ] Logs showing success
+- [ ] Screenshot of /health and /tools
+
+### Manus Instruction (Copy/Paste)
+
+> **Mission:** Implement the checkpoint exactly: repo + docker compose + FastAPI tool-router skeleton + /health and /tools endpoints + one demo tool flow. No production actions, no DNS, no payments, no logins. Open a PR with the checkpoint.
+
+### Post-Checkpoint Review
+
+**User will provide:**
+- Repo link / PR link
+- Logs showing successful boot
+- Screenshot of /health and /tools responses
+
+**Then we add:**
+- Tool schema review (function-calling friendliness)
+- Security gap analysis
+- Approval UX design (mobile-friendly)
+- GPT-5.2 orchestrator loop connection
+- Launchbase API integration (when docs available)
