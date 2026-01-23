@@ -3855,7 +3855,7 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
 - [x] Run TypeScript compilation: `pnpm tsc --noEmit`
 - [x] Restart dev server: `pnpm dev`
 - [x] Test end-to-end workflow (create thread → send messages → launch swarm run)
-- [ ] Save checkpoint after successful integration
+- [x] Save checkpoint after successful integration
 - [x] Mark all tasks as [x] in todo.md
 
 **Notes:**
@@ -3863,3 +3863,38 @@ Swarm is now **measurable infrastructure** with regression protection for all ca
 - Avoids Radix Select empty value crash by using "__all__" sentinel
 - Uses existing formatFixtureLabel() for human-readable fixture names
 - Right panel shows "Run Controls" with model/role/intention/fixture/timeout + Launch Swarm button
+
+
+---
+
+## 🐛 OPS CHAT MESSAGE DISPLAY BUG FIX
+
+**Issue:** Messages are sent successfully but not displayed in chat panel  
+**Status:** Diagnosing  
+**Added:** January 22, 2026
+
+### Diagnosis Tasks
+- [x] Read AdminSwarmChat.tsx to check message rendering logic
+- [x] Verify messages query is wired to selectedThreadId
+- [x] Check if messages are mapped/rendered (not just showing placeholder)
+- [x] Verify query invalidation after send mutation
+- [x] Check Network tab to confirm server returns messages
+- [x] **ROOT CAUSE FOUND:** readTextFromStorage was swallowing 404/403 errors and returning null
+
+### Fix Tasks
+- [x] Add retry logic for 404 (write-then-read race condition)
+- [x] Fail fast on 401/403 (permissions/config errors)
+- [x] Log status and body preview for failed fetches
+- [x] Add echo read-back after write to verify storage
+- [x] Restart server and test message display
+
+### Testing
+- [x] Send test message and verify it appears in chat
+- [x] Refresh page and verify messages persist
+- [ ] Create new thread and verify messages are thread-specific
+- [ ] Save checkpoint after fix
+
+### Known Issue (Non-Critical)
+- Presigned URL caching may cause stale reads immediately after write
+- Workaround: 2-second refetch interval eventually picks up new messages
+- Does not affect core functionality (messages display correctly)
