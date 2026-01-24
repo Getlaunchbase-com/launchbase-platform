@@ -5298,25 +5298,25 @@ curl http://AGENT_STACK_HOST:8080/tools
 ### 2.1 Create server/agent/orchestrator.ts
 
 ### Brain Loop Requirements
-- [ ] System prompt: "You are an autonomous execution agent. Use tools. Keep going until goal done."
-- [ ] Maintain runState (memory)
-- [ ] Maintain messages[] for LLM
-- [ ] Pull toolSchemas from router /tools
+- [x] System prompt: "You are an autonomous execution agent. Use tools. Keep going until goal done."
+- [x] Maintain runState (memory)
+- [x] Maintain messages[] for LLM
+- [x] Pull toolSchemas from router /tools
 
 ### Tool Execution
-- [ ] When model returns tool calls:
+- [x] When model returns tool calls:
   - POST to `http://router:8080/tool` with `{name, arguments}` and `X-Router-Token`
   - Log `tool_call` + `tool_result` events
   - Append tool result into model messages as tool role content
 
 ### Stopping Conditions
-- [ ] Model returns final answer with status=done
-- [ ] Max steps N (configurable)
-- [ ] Error count threshold
-- [ ] Approval required
+- [x] Model returns final answer with status=done
+- [x] Max steps N (configurable)
+- [x] Error count threshold
+- [x] Approval required
 
 ### Approval Gates
-- [ ] When tool router returns `approval_required`:
+- [x] When tool router returns `approval_required`:
   - Emit `approval_request` event
   - Set run status `awaiting_approval`
   - Pause loop until UI responds
