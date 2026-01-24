@@ -6,6 +6,7 @@ import { adminEmailSmokeRouter } from "./routers/admin/emailSmoke";
 import { adminEmailMetricsRouter } from "./routers/admin/emailMetrics";
 import { swarmConsoleRouter } from "./routers/admin/swarmConsole";
 import { swarmOpsChatRouter } from "./routers/admin/swarmOpsChat";
+import { agentRunsRouter, agentEventsRouter, agentArtifactsRouter } from "./routers/admin/agentRuns";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -430,6 +431,9 @@ export const appRouter = router({
   admin: router({
     swarm: swarmConsoleRouter,
     opsChat: swarmOpsChatRouter,
+    agentRuns: agentRunsRouter,
+    agentEvents: agentEventsRouter,
+    agentArtifacts: agentArtifactsRouter,
     intakes: router({
       list: protectedProcedure
         .input(z.object({

@@ -5332,6 +5332,15 @@ curl http://AGENT_STACK_HOST:8080/tools
 
 ## PHASE 3: UI - CLONE MANUS FEEL (8-14 hours)
 
+### 3.0 tRPC API Endpoints (COMPLETED)
+- [x] admin.agentRuns.list (recent runs, filter by status)
+- [x] admin.agentRuns.get (single run by id)
+- [x] admin.agentRuns.create (start a run)
+- [x] admin.agentRuns.updateStatus (pause/resume/cancel)
+- [x] admin.agentRuns.approve (approve pending action)
+- [x] admin.agentEvents.list (timeline feed)
+- [x] admin.agentArtifacts.list (filtered events)
+
 ### 3.1 Update AdminSwarmChat Layout
 
 ### 3-Column Layout
