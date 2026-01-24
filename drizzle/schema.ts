@@ -1736,6 +1736,32 @@ export const agentRuns = mysqlTable("agent_runs", {
   workspaceName: varchar("workspaceName", { length: 128 }), // sandbox workspace identifier
   finishedAt: timestamp("finishedAt"),
   errorMessage: text("errorMessage"),
+  // State persistence for resume after approval
+  stateJson: json("stateJson").$type<{
+    messages: Array<{
+      role: "system" | "user" | "assistant" | "tool";
+      content: string;
+      tool_call_id?: string;
+      tool_calls?: Array<{
+        id: string;
+        type: "function";
+        function: { name: string; arguments: string };
+      }>;
+    }>;
+    stepCount: number;
+    errorCount: number;
+    maxSteps: number;
+    maxErrors: number;
+  }>(),
+  pendingActionJson: json("pendingActionJson").$type<{
+    approvalId: string;
+    toolName: string;
+    toolArgs: Record<string, unknown>;
+    toolCallId: string;
+    requestedAt: string;
+    riskTier: number;
+  }>(),
+  approvedAt: timestamp("approvedAt"),
 }, (table) => ({
   createdByIdx: index("agent_runs_createdBy_idx").on(table.createdBy),
   statusIdx: index("agent_runs_status_idx").on(table.status),

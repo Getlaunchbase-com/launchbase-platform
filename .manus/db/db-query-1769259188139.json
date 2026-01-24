@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE agent_runs\nADD COLUMN stateJson JSON,\nADD COLUMN pendingActionJson JSON,\nADD COLUMN approvedAt TIMESTAMP NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute ALTER TABLE agent_runs\nADD COLUMN stateJson JSON,\nADD COLUMN pendingActionJson JSON,\nADD COLUMN approvedAt TIMESTAMP NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1651
+}

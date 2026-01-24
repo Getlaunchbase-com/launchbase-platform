@@ -5817,3 +5817,30 @@ curl http://AGENT_STACK_HOST:8080/tools
 - ✅ Documentation (README, APPROVAL_POLICY, CHECKPOINT)
 
 **Next:** Wire LaunchBase UI to agent-stack backend via Orchestrator service (see PHASE 2 above)
+
+## PHASE 4.5: FIX RESUME AFTER APPROVAL (CRITICAL)
+
+### 4.5.1 Add State Persistence to agent_runs
+- [x] Add `stateJson` column (text/JSON) - stores messages, stepCount, errorCount
+- [x] Add `pendingActionJson` column (text/JSON) - stores pending tool call details
+- [x] Add `approvedAt` column (timestamp nullable) - audit trail
+- [x] Run migration to add columns
+
+### 4.5.2 Update Orchestrator Pause Logic
+- [x] When Tier 2+ tool detected, persist full state to stateJson
+- [x] Store pending tool call in pendingActionJson with approvalId, toolName, toolArgs, toolCallId, riskTier
+- [x] Update agent_runs row before returning awaiting_approval
+
+### 4.5.3 Rewrite resumeAfterApproval
+- [x] Load run with stateJson and pendingActionJson
+- [x] If denied: mark failed, clear pendingActionJson, return
+- [x] If approved: execute pending tool call immediately
+- [x] Append tool result to messages in stateJson
+- [x] Clear pendingActionJson
+- [x] Continue orchestrator loop with restored state
+
+### Acceptance
+- [x] Approved run actually executes the pending tool
+- [x] Run continues with full conversation context
+- [x] Denied run stops cleanly
+- [x] Multiple approve/deny cycles work correctly (loop handles re-pausing)

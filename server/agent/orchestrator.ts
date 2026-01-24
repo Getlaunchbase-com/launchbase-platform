@@ -5,6 +5,9 @@
 
 import { ENV } from "../_core/env.js";
 import { createAgentRun, updateAgentRunStatus, appendAgentEvent, getAgentRun } from "../db/agentRuns.js";
+import { getDb } from "../db.js";
+import { agentRuns } from "../../drizzle/schema.js";
+import { eq } from "drizzle-orm";
 
 const AGENT_STACK_URL = process.env.AGENT_STACK_URL || "http://35.188.184.31:8080";
 const AGENT_STACK_TOKEN = process.env.AGENT_STACK_TOKEN || "";
@@ -283,7 +286,10 @@ export async function runOrchestrator(config: {
 
         // Check if approval required (Tier 2+)
         if (tier >= 2) {
+          const approvalId = `approval_${runId}_${Date.now()}`;
+          
           await appendAgentEvent(runId, "approval_request", {
+            approval_id: approvalId,
             tool_call_id: toolCall.id,
             name: toolName,
             arguments: toolArgs,
@@ -291,7 +297,30 @@ export async function runOrchestrator(config: {
             reason: tier === 3 ? "High-risk operation (Tier 3)" : "Approval required (Tier 2)",
           });
 
-          await updateAgentRunStatus(runId, "awaiting_approval");
+          // Persist state for resume
+          const db = await getDb();
+          if (!db) throw new Error("Database not available");
+          await db.update(agentRuns)
+            .set({
+              status: "awaiting_approval",
+              stateJson: {
+                messages: state.messages,
+                stepCount: state.stepCount,
+                errorCount: state.errorCount,
+                maxSteps: state.maxSteps,
+                maxErrors: state.maxErrors,
+              },
+              pendingActionJson: {
+                approvalId,
+                toolName,
+                toolArgs,
+                toolCallId: toolCall.id,
+                requestedAt: new Date().toISOString(),
+                riskTier: tier,
+              },
+            })
+            .where(eq(agentRuns.id, runId));
+
           return { runId, status: "awaiting_approval" };
         }
 
@@ -352,6 +381,162 @@ export async function runOrchestrator(config: {
 }
 
 /**
+ * Continue orchestrator loop with restored state
+ */
+async function continueOrchestrator(
+  runId: number,
+  restoredState: {
+    messages: Message[];
+    stepCount: number;
+    errorCount: number;
+    maxSteps: number;
+    maxErrors: number;
+  }
+): Promise<void> {
+  // Fetch tool schemas
+  const toolSchemas = await fetchToolSchemas();
+
+  const state: RunState = {
+    runId,
+    goal: "", // Not needed for continuation
+    messages: restoredState.messages,
+    toolSchemas,
+    stepCount: restoredState.stepCount,
+    errorCount: restoredState.errorCount,
+    maxSteps: restoredState.maxSteps,
+    maxErrors: restoredState.maxErrors,
+  };
+
+  // Continue main loop
+  while (state.stepCount < state.maxSteps && state.errorCount < state.maxErrors) {
+    state.stepCount++;
+
+    // Call model
+    const modelResponse = await callModel(state.messages, state.toolSchemas);
+
+    // Add assistant message
+    state.messages.push({
+      role: modelResponse.role,
+      content: modelResponse.content || "",
+      tool_calls: modelResponse.tool_calls,
+    });
+
+    await appendAgentEvent(runId, "message", {
+      role: "assistant",
+      content: modelResponse.content,
+      tool_calls: modelResponse.tool_calls,
+    });
+
+    // Check if model wants to call tools
+    if (!modelResponse.tool_calls || modelResponse.tool_calls.length === 0) {
+      // No tool calls - agent is done
+      await updateAgentRunStatus(runId, "success");
+      return;
+    }
+
+    // Execute tool calls
+    for (const toolCall of modelResponse.tool_calls) {
+      const toolName = toolCall.function.name;
+      const toolArgs = JSON.parse(toolCall.function.arguments);
+
+      // Classify tool tier
+      const tier = classifyToolTier(toolName);
+
+      // Log tool call
+      await appendAgentEvent(runId, "tool_call", {
+        tool_call_id: toolCall.id,
+        name: toolName,
+        arguments: toolArgs,
+        tier,
+      });
+
+      // Check if approval required (Tier 2+)
+      if (tier >= 2) {
+        const approvalId = `approval_${runId}_${Date.now()}`;
+        
+        await appendAgentEvent(runId, "approval_request", {
+          approval_id: approvalId,
+          tool_call_id: toolCall.id,
+          name: toolName,
+          arguments: toolArgs,
+          tier,
+          reason: tier === 3 ? "High-risk operation (Tier 3)" : "Approval required (Tier 2)",
+        });
+
+        // Persist state for resume
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        await db.update(agentRuns)
+          .set({
+            status: "awaiting_approval",
+            stateJson: {
+              messages: state.messages,
+              stepCount: state.stepCount,
+              errorCount: state.errorCount,
+              maxSteps: state.maxSteps,
+              maxErrors: state.maxErrors,
+            },
+            pendingActionJson: {
+              approvalId,
+              toolName,
+              toolArgs,
+              toolCallId: toolCall.id,
+              requestedAt: new Date().toISOString(),
+              riskTier: tier,
+            },
+          })
+          .where(eq(agentRuns.id, runId));
+
+        return; // Stop and wait for approval
+      }
+
+      // Execute tool
+      const toolResult = await executeTool(toolName, toolArgs);
+
+      // Check for approval required from router
+      if (toolResult.approval_required) {
+        await appendAgentEvent(runId, "approval_request", {
+          tool_call_id: toolCall.id,
+          name: toolName,
+          arguments: toolArgs,
+          preview: toolResult.result,
+        });
+
+        await updateAgentRunStatus(runId, "awaiting_approval");
+        return;
+      }
+
+      // Log tool result
+      await appendAgentEvent(runId, "tool_result", {
+        tool_call_id: toolCall.id,
+        success: toolResult.success,
+        result: toolResult.result,
+        error: toolResult.error,
+      });
+
+      // Handle errors
+      if (!toolResult.success) {
+        state.errorCount++;
+        if (state.errorCount >= state.maxErrors) {
+          await updateAgentRunStatus(runId, "failed", `Too many errors: ${toolResult.error}`);
+          return;
+        }
+      }
+
+      // Add tool result to messages
+      state.messages.push({
+        role: "tool",
+        tool_call_id: toolCall.id,
+        content: JSON.stringify(toolResult.success ? toolResult.result : { error: toolResult.error }),
+      });
+    }
+  }
+
+  // Max steps reached
+  await updateAgentRunStatus(runId, "failed", "Max steps reached");
+}
+
+/**
  * Resume a run after approval
  */
 export async function resumeAfterApproval(runId: number, approved: boolean): Promise<{ status: string }> {
@@ -364,6 +549,10 @@ export async function resumeAfterApproval(runId: number, approved: boolean): Pro
     throw new Error("Run is not awaiting approval");
   }
 
+  if (!run.pendingActionJson) {
+    throw new Error("No pending action found");
+  }
+
   // Log approval result
   await appendAgentEvent(runId, "approval_result", {
     approved,
@@ -371,18 +560,75 @@ export async function resumeAfterApproval(runId: number, approved: boolean): Pro
   });
 
   if (!approved) {
-    await updateAgentRunStatus(runId, "failed", "User denied approval");
+    // Clear pending action and mark as failed
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+    await db.update(agentRuns)
+      .set({
+        status: "failed",
+        errorMessage: "User denied approval",
+        pendingActionJson: null,
+        finishedAt: new Date(),
+      })
+      .where(eq(agentRuns.id, runId));
+    
     return { status: "failed" };
   }
 
-  // Mark as running and resume
-  await updateAgentRunStatus(runId, "running");
+  // APPROVED - Execute pending tool and continue
+  const { toolName, toolArgs, toolCallId } = run.pendingActionJson;
 
-  // TODO: Implement proper state restoration and loop resumption
-  // For MVP, we'll need to restart the orchestrator with the existing run context
-  // This requires storing the full RunState in the database or using a queue system
-  
-  // For now, mark as success (user will need to create a new run)
-  await updateAgentRunStatus(runId, "success", "Approved - manual continuation required");
-  return { status: "success" };
+  // Log tool call
+  await appendAgentEvent(runId, "tool_call", {
+    tool_call_id: toolCallId,
+    name: toolName,
+    arguments: toolArgs,
+  });
+
+  // Execute the tool
+  const toolResult = await executeTool(toolName, toolArgs);
+
+  // Log tool result
+  await appendAgentEvent(runId, "tool_result", {
+    tool_call_id: toolCallId,
+    success: toolResult.success,
+    result: toolResult.result,
+    error: toolResult.error,
+  });
+
+  if (!run.stateJson) {
+    throw new Error("No state found to resume");
+  }
+
+  // Append tool result to messages
+  run.stateJson.messages.push({
+    role: "tool",
+    tool_call_id: toolCallId,
+    content: JSON.stringify(toolResult.success ? toolResult.result : { error: toolResult.error }),
+  });
+
+  // Clear pending action and update state
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(agentRuns)
+    .set({
+      status: "running",
+      pendingActionJson: null,
+      stateJson: run.stateJson,
+      approvedAt: new Date(),
+    })
+    .where(eq(agentRuns.id, runId));
+
+  // Continue orchestrator loop
+  try {
+    await continueOrchestrator(runId, run.stateJson);
+    return { status: "success" };
+  } catch (error) {
+    await appendAgentEvent(runId, "error", {
+      error: String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+    await updateAgentRunStatus(runId, "failed", String(error));
+    return { status: "failed" };
+  }
 }
