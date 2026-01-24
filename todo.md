@@ -5344,20 +5344,20 @@ curl http://AGENT_STACK_HOST:8080/tools
 ### 3.1 Update AdminSwarmChat Layout
 
 ### 3-Column Layout
-- [ ] Column 1: Chat (user input + agent responses)
-- [ ] Column 2: Run Timeline (live tool calls + events)
-- [ ] Column 3: Artifacts / Files / PRs
+- [x] Column 1: Chat (user input + agent responses)
+- [x] Column 2: Run Timeline (live tool calls + events)
+- [x] Column 3: Artifacts / Files / PRs
 
 ### Timeline Items (render by event type)
-- [ ] Tool call: show name + args (collapsed)
-- [ ] Tool result: show status + snippet
+- [x] Tool call: show name + args (collapsed)
+- [x] Tool result: show status + snippet
 - [ ] Screenshot: thumbnail preview
 - [ ] Diff/PR: link card
-- [ ] Errors: red block
-- [ ] Approvals: big buttons (approve/deny)
+- [x] Errors: red block
+- [x] Approvals: big buttons (approve/deny)
 
 ### Acceptance
-- [ ] See live feed of tool usage like Manus
+- [x] See live feed of tool usage like Manus
 
 ### 3.2 Streaming Updates
 - [ ] Implement Server-Sent Events (SSE) or WebSocket

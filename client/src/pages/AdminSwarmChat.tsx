@@ -1,356 +1,352 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { AdminLayout } from "@/components/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ModelSelector } from "@/components/ModelSelector";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { formatFixtureLabel } from "@/lib/fixtureLabels";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-type Thread = {
-  id: string;
-  title: string;
-  updatedAtIso: string;
-  lastMessagePreview?: string;
+type AgentRun = {
+  id: number;
+  createdAt: Date;
+  status: "running" | "success" | "failed" | "awaiting_approval";
+  goal: string;
+  errorMessage: string | null;
+  finishedAt: Date | null;
+  createdBy: number;
+  model: string | null;
+  routerUrl: string | null;
+  workspaceName: string | null;
 };
 
-type Message = {
-  id: string;
-  role: "user" | "assistant" | "system";
-  text: string;
-  createdAtIso: string;
-  meta?: any;
+type AgentEvent = {
+  id: number;
+  runId: number;
+  ts: string;
+  type: string;
+  payload: any;
 };
 
-const ALL = "__all__";
+function StatusBadge({ status }: { status: string }) {
+  const variants: Record<string, string> = {
+    running: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    success: "bg-green-500/10 text-green-400 border-green-500/20",
+    failed: "bg-red-500/10 text-red-400 border-red-500/20",
+    awaiting_approval: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+  };
+  return (
+    <Badge className={variants[status] || ""}>{status.replace("_", " ")}</Badge>
+  );
+}
 
-function RoleBadge({ role }: { role: string }) {
-  const variant = role === "user" ? "secondary" : role === "system" ? "outline" : "default";
-  return <Badge variant={variant as any}>{role}</Badge>;
+function TimelineEvent({ event }: { event: AgentEvent }) {
+  const { type, payload, ts } = event;
+
+  // Format timestamp
+  const time = new Date(ts).toLocaleTimeString();
+
+  // Render based on event type
+  if (type === "message") {
+    return (
+      <div className="border-l-2 border-gray-700 pl-3 py-2">
+        <div className="flex items-center gap-2 mb-1">
+          <Badge variant={payload.role === "user" ? "secondary" : "default"}>
+            {payload.role}
+          </Badge>
+          <span className="text-xs text-muted-foreground">{time}</span>
+        </div>
+        <div className="text-sm whitespace-pre-wrap">{payload.content || "—"}</div>
+      </div>
+    );
+  }
+
+  if (type === "tool_call") {
+    return (
+      <div className="border-l-2 border-blue-500 pl-3 py-2">
+        <div className="flex items-center gap-2 mb-1">
+          <Badge className="bg-blue-500/10 text-blue-400">tool call</Badge>
+          <span className="text-xs text-muted-foreground">{time}</span>
+        </div>
+        <div className="text-sm font-mono">
+          <span className="text-blue-400">{payload.name}</span>
+          <span className="text-muted-foreground">(</span>
+          <details className="inline">
+            <summary className="cursor-pointer text-xs text-muted-foreground">args</summary>
+            <pre className="text-xs mt-1 p-2 bg-black/20 rounded">
+              {JSON.stringify(payload.arguments, null, 2)}
+            </pre>
+          </details>
+          <span className="text-muted-foreground">)</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (type === "tool_result") {
+    const isSuccess = payload.success;
+    return (
+      <div className={`border-l-2 ${isSuccess ? "border-green-500" : "border-red-500"} pl-3 py-2`}>
+        <div className="flex items-center gap-2 mb-1">
+          <Badge className={isSuccess ? "bg-green-500/10 text-green-400" : "bg-red-500/10 text-red-400"}>
+            {isSuccess ? "success" : "error"}
+          </Badge>
+          <span className="text-xs text-muted-foreground">{time}</span>
+        </div>
+        <details className="text-sm">
+          <summary className="cursor-pointer text-muted-foreground">result</summary>
+          <pre className="text-xs mt-1 p-2 bg-black/20 rounded overflow-auto max-h-40">
+            {JSON.stringify(payload.result || payload.error, null, 2)}
+          </pre>
+        </details>
+      </div>
+    );
+  }
+
+  if (type === "approval_request") {
+    return (
+      <div className="border-l-2 border-orange-500 pl-3 py-2">
+        <div className="flex items-center gap-2 mb-1">
+          <Badge className="bg-orange-500/10 text-orange-400">approval required</Badge>
+          <span className="text-xs text-muted-foreground">{time}</span>
+        </div>
+        <div className="text-sm mb-2">
+          <span className="font-mono text-orange-400">{payload.name}</span> needs approval
+        </div>
+        <div className="flex gap-2">
+          <Button size="sm" variant="default">Approve</Button>
+          <Button size="sm" variant="destructive">Deny</Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (type === "error") {
+    return (
+      <div className="border-l-2 border-red-500 pl-3 py-2 bg-red-500/5">
+        <div className="flex items-center gap-2 mb-1">
+          <Badge className="bg-red-500/10 text-red-400">error</Badge>
+          <span className="text-xs text-muted-foreground">{time}</span>
+        </div>
+        <pre className="text-sm text-red-400 whitespace-pre-wrap">
+          {payload.error || JSON.stringify(payload)}
+        </pre>
+      </div>
+    );
+  }
+
+  if (type === "artifact") {
+    return (
+      <div className="border-l-2 border-purple-500 pl-3 py-2">
+        <div className="flex items-center gap-2 mb-1">
+          <Badge className="bg-purple-500/10 text-purple-400">artifact</Badge>
+          <span className="text-xs text-muted-foreground">{time}</span>
+        </div>
+        <div className="text-sm">
+          {payload.type || "file"}: <span className="font-mono">{payload.name || payload.path}</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Default fallback
+  return (
+    <div className="border-l-2 border-gray-700 pl-3 py-2">
+      <div className="flex items-center gap-2 mb-1">
+        <Badge variant="outline">{type}</Badge>
+        <span className="text-xs text-muted-foreground">{time}</span>
+      </div>
+      <pre className="text-xs text-muted-foreground">
+        {JSON.stringify(payload, null, 2)}
+      </pre>
+    </div>
+  );
 }
 
 export default function AdminSwarmChat() {
   const utils = trpc.useUtils();
-  const threadsQuery = trpc.admin.opsChat.threads.list.useQuery();
-  const createThread = trpc.admin.opsChat.threads.create.useMutation({
-    onSuccess: async (t) => {
-      await threadsQuery.refetch();
-      setSelectedThreadId(t.id);
-    },
-  });
 
-  const threads = (threadsQuery.data ?? []) as Thread[];
-  const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
-  const selectedThread = useMemo(() => threads.find((t) => t.id === selectedThreadId) ?? null, [threads, selectedThreadId]);
+  // Agent runs list
+  const runsQuery = trpc.admin.agentRuns.list.useQuery({ limit: 20 });
+  const runs = (runsQuery.data ?? []) as AgentRun[];
 
-  useEffect(() => {
-    if (!selectedThreadId && threads.length > 0) {
-      setSelectedThreadId(threads[0].id);
-    }
-  }, [selectedThreadId, threads]);
-
-  const messagesQuery = trpc.admin.opsChat.messages.list.useQuery(
-    { threadId: selectedThreadId ?? "" },
-    { enabled: !!selectedThreadId, refetchInterval: 2000 }
+  // Selected run
+  const [selectedRunId, setSelectedRunId] = useState<number | null>(null);
+  const selectedRun = useMemo(
+    () => runs.find((r) => r.id === selectedRunId) ?? null,
+    [runs, selectedRunId]
   );
-  const messages = (messagesQuery.data ?? []) as Message[];
 
-  const sendMsg = trpc.admin.opsChat.messages.send.useMutation({
-    onSuccess: async () => {
-      await messagesQuery.refetch();
-      await threadsQuery.refetch();
-    },
-  });
-
-  const [draft, setDraft] = useState("");
-
-  // Run controls
-  const modelsQuery = trpc.admin.swarm.models.list.useQuery();
-  const modelOptions = useMemo(() => modelsQuery.data ?? [], [modelsQuery.data]);
-
-  const [primaryModel, setPrimaryModel] = useState<string>("");
-  const [fallbackModel, setFallbackModel] = useState<string>("");
-  const [intention, setIntention] = useState<string>("smoke_test");
-  const [fixtureName, setFixtureName] = useState<string>("f11-new-file-dep-context");
-  const [timeoutSec, setTimeoutSec] = useState<number>(180);
-  const [role, setRole] = useState<string>("owner");
-
+  // Auto-select first run
   useEffect(() => {
-    if (!primaryModel && modelOptions.length > 0) {
-      // pick first alphabetically as a safe default
-      setPrimaryModel(modelOptions[0].id);
+    if (!selectedRunId && runs.length > 0) {
+      setSelectedRunId(runs[0].id);
     }
-  }, [primaryModel, modelOptions]);
+  }, [selectedRunId, runs]);
 
-  const launchRun = trpc.admin.swarm.runs.create.useMutation({
+  // Timeline events
+  const eventsQuery = trpc.admin.agentEvents.list.useQuery(
+    { runId: selectedRunId ?? 0 },
+    { enabled: !!selectedRunId, refetchInterval: 2000 }
+  );
+  const events = (eventsQuery.data ?? []) as AgentEvent[];
+
+  // Artifacts (filtered events)
+  const artifactsQuery = trpc.admin.agentArtifacts.list.useQuery(
+    { runId: selectedRunId ?? 0 },
+    { enabled: !!selectedRunId }
+  );
+  const artifacts = (artifactsQuery.data ?? []) as AgentEvent[];
+
+  // Create new run
+  const createRun = trpc.admin.agentRuns.create.useMutation({
     onSuccess: async (res) => {
-      if (selectedThreadId) {
-        await appendSystemMessage(selectedThreadId, `Launched run ${res.repairKey}.`, {
-          repairKey: res.repairKey,
-          startedAtIso: res.startedAtIso,
-        });
-      }
+      await runsQuery.refetch();
+      setSelectedRunId(res.runId);
     },
   });
 
-  const appendSystemMessage = async (threadId: string, text: string, meta?: any) => {
-    // We don't have a dedicated server endpoint for system messages in MVP.
-    // Use a normal send + a convention marker. The server stores user messages only.
-    // So we store system events as assistant messages by writing a second user message with a prefix.
-    // (Kept simple; can be upgraded later.)
-    await sendMsg.mutateAsync({ threadId, text: `[system] ${text}${meta ? `\n\n${JSON.stringify(meta, null, 2)}` : ""}` });
-    await utils.admin.opsChat.messages.list.invalidate({ threadId });
-    await utils.admin.opsChat.threads.list.invalidate();
-  };
-
-  const isRunning = launchRun.isPending;
+  const [goalDraft, setGoalDraft] = useState("");
 
   return (
-    <AdminLayout title="Swarm Ops Chat">
+    <AdminLayout title="Agent Execution Console">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* Threads */}
-        <Card className="lg:col-span-3">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-base">Threads</CardTitle>
-            <Button
-              size="sm"
-              onClick={() => createThread.mutate({ title: `Ops Chat ${new Date().toLocaleString()}` })}
-            >
-              New
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {threadsQuery.isLoading && <div className="text-sm text-muted-foreground">Loading…</div>}
-            {threads.map((t) => (
-              <button
-                key={t.id}
-                className={`w-full text-left rounded-md border px-3 py-2 transition-colors ${
-                  t.id === selectedThreadId ? "border-orange-500 bg-orange-500/10" : "border-gray-800 hover:bg-gray-900"
-                }`}
-                onClick={() => setSelectedThreadId(t.id)}
-              >
-                <div className="text-sm font-medium truncate">{t.title}</div>
-                <div className="text-xs text-muted-foreground truncate">{t.lastMessagePreview || "—"}</div>
-              </button>
-            ))}
-            {threads.length === 0 && !threadsQuery.isLoading ? (
-              <div className="text-sm text-muted-foreground">No threads yet. Create one.</div>
-            ) : null}
-          </CardContent>
-        </Card>
-
-        {/* Chat */}
-        <Card className="lg:col-span-6">
+        {/* Column 1: Chat / Runs List */}
+        <Card className="lg:col-span-4">
           <CardHeader>
-            <CardTitle className="text-base">{selectedThread?.title ?? "Chat"}</CardTitle>
+            <CardTitle className="text-base">Agent Runs</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="h-[420px] overflow-auto rounded-md border border-gray-800 p-3 space-y-3 bg-black/20">
-              {!selectedThreadId ? (
-                <div className="text-sm text-muted-foreground">Select or create a thread.</div>
-              ) : null}
-              {messages.map((m) => (
-                <div key={m.id} className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <RoleBadge role={m.text.startsWith("[system]") ? "system" : m.role} />
-                    <div className="text-xs text-muted-foreground">{new Date(m.createdAtIso).toLocaleString()}</div>
-                  </div>
-                  <pre className="whitespace-pre-wrap text-sm leading-relaxed">{m.text.replace(/^\[system\]\s*/, "")}</pre>
-                </div>
-              ))}
-              {messages.length === 0 && selectedThreadId ? (
-                <div className="text-sm text-muted-foreground">Say hi. This is your private ops console.</div>
-              ) : null}
-            </div>
-
-            <div className="grid grid-cols-1 gap-2">
+            {/* New Run Form */}
+            <div className="space-y-2 pb-3 border-b border-gray-800">
               <Textarea
-                value={draft}
-                onChange={(e) => setDraft(e.target.value)}
-                placeholder="Describe what you want Swarm to do…"
-                className="min-h-[90px]"
+                value={goalDraft}
+                onChange={(e) => setGoalDraft(e.target.value)}
+                placeholder="What should the agent do?"
+                className="min-h-[80px]"
               />
-              <div className="flex items-center justify-between gap-2">
-                <div className="text-xs text-muted-foreground">
-                  Tip: use the Run panel to launch fixtures or manual runs.
-                </div>
-                <Button
-                  disabled={!selectedThreadId || sendMsg.isPending || draft.trim().length === 0}
-                  onClick={() => {
-                    if (!selectedThreadId) return;
-                    const text = draft.trim();
-                    setDraft("");
-                    sendMsg.mutate({ threadId: selectedThreadId, text });
-                  }}
-                >
-                  Send
-                </Button>
-              </div>
+              <Button
+                className="w-full"
+                disabled={createRun.isPending || goalDraft.trim().length === 0}
+                onClick={() => {
+                  const goal = goalDraft.trim();
+                  setGoalDraft("");
+                  createRun.mutate({ goal });
+                }}
+              >
+                {createRun.isPending ? "Starting..." : "Start New Run"}
+              </Button>
             </div>
+
+            {/* Runs List */}
+            <ScrollArea className="h-[500px]">
+              <div className="space-y-2">
+                {runsQuery.isLoading && (
+                  <div className="text-sm text-muted-foreground">Loading runs...</div>
+                )}
+                {runs.map((run) => (
+                  <button
+                    key={run.id}
+                    className={`w-full text-left rounded-md border p-3 transition-colors ${
+                      run.id === selectedRunId
+                        ? "border-orange-500 bg-orange-500/10"
+                        : "border-gray-800 hover:bg-gray-900"
+                    }`}
+                    onClick={() => setSelectedRunId(run.id)}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs text-muted-foreground">
+                        Run #{run.id}
+                      </span>
+                      <StatusBadge status={run.status} />
+                    </div>
+                    <div className="text-sm font-medium truncate">{run.goal}</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {new Date(run.createdAt).toLocaleString()}
+                    </div>
+                  </button>
+                ))}
+                {runs.length === 0 && !runsQuery.isLoading && (
+                  <div className="text-sm text-muted-foreground">
+                    No runs yet. Start one above.
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
           </CardContent>
         </Card>
 
-        {/* Run controls */}
+        {/* Column 2: Timeline */}
+        <Card className="lg:col-span-5">
+          <CardHeader>
+            <CardTitle className="text-base">
+              {selectedRun ? `Timeline: ${selectedRun.goal.slice(0, 40)}...` : "Timeline"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-[600px]">
+              {!selectedRunId ? (
+                <div className="text-sm text-muted-foreground">
+                  Select a run to see timeline
+                </div>
+              ) : eventsQuery.isLoading ? (
+                <div className="text-sm text-muted-foreground">Loading events...</div>
+              ) : events.length === 0 ? (
+                <div className="text-sm text-muted-foreground">No events yet</div>
+              ) : (
+                <div className="space-y-3">
+                  {events.map((event) => (
+                    <TimelineEvent key={event.id} event={event} />
+                  ))}
+                </div>
+              )}
+            </ScrollArea>
+          </CardContent>
+        </Card>
+
+        {/* Column 3: Artifacts */}
         <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle className="text-base">Run Controls</CardTitle>
+            <CardTitle className="text-base">Artifacts</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="rounded-md border border-gray-800 p-3 space-y-2">
-              <div className="text-xs text-muted-foreground">Selected bots</div>
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="secondary">Field General: {primaryModel || "—"}</Badge>
-                <Badge variant="secondary">Coder: {primaryModel || "—"}</Badge>
-                <Badge variant="secondary">Critic: {fallbackModel || primaryModel || "—"}</Badge>
-              </div>
-              <div className="text-xs text-muted-foreground">Status</div>
-              <div className="text-sm">
-                {isRunning ? <span className="text-orange-400">Running…</span> : <span className="text-green-400">Idle</span>}
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <div className="text-xs text-muted-foreground">Primary model</div>
-              {modelOptions.length > 0 ? (
-                <ModelSelector
-                  models={modelOptions}
-                  value={primaryModel || (modelOptions[0]?.id ?? "")}
-                  onValueChange={setPrimaryModel}
-                  placeholder="Pick a model"
-                />
+          <CardContent>
+            <ScrollArea className="h-[600px]">
+              {!selectedRunId ? (
+                <div className="text-sm text-muted-foreground">
+                  Select a run to see artifacts
+                </div>
+              ) : artifactsQuery.isLoading ? (
+                <div className="text-sm text-muted-foreground">Loading...</div>
+              ) : artifacts.length === 0 ? (
+                <div className="text-sm text-muted-foreground">No artifacts yet</div>
               ) : (
-                <Input placeholder="Loading models…" disabled />
+                <div className="space-y-2">
+                  {artifacts.map((artifact) => (
+                    <div
+                      key={artifact.id}
+                      className="rounded-md border border-gray-800 p-2 hover:bg-gray-900 transition-colors"
+                    >
+                      <div className="text-xs text-muted-foreground mb-1">
+                        {new Date(artifact.ts).toLocaleTimeString()}
+                      </div>
+                      <div className="text-sm font-mono truncate">
+                        {artifact.payload.name || artifact.payload.path || artifact.type}
+                      </div>
+                      {artifact.payload.url && (
+                        <a
+                          href={artifact.payload.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-blue-400 hover:underline"
+                        >
+                          View →
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </div>
               )}
-            </div>
-
-            <div className="space-y-1">
-              <div className="text-xs text-muted-foreground">Fallback model (optional)</div>
-              {modelOptions.length > 0 ? (
-                <ModelSelector
-                  models={[{ id: ALL, label: "None" }, ...modelOptions]}
-                  value={fallbackModel || ALL}
-                  onValueChange={(v) => setFallbackModel(v === ALL ? "" : v)}
-                  placeholder="None"
-                />
-              ) : (
-                <Input placeholder="Loading…" disabled />
-              )}
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <div className="space-y-1">
-                <div className="text-xs text-muted-foreground">Intention</div>
-                <Select value={intention} onValueChange={setIntention}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pick" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="smoke_test">Smoke</SelectItem>
-                    <SelectItem value="pressure_test">Pressure</SelectItem>
-                    <SelectItem value="improve">Improve</SelectItem>
-                    <SelectItem value="critic">Critic</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1">
-                <div className="text-xs text-muted-foreground">Role</div>
-                <Select value={role} onValueChange={setRole}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pick" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="owner">Owner</SelectItem>
-                    <SelectItem value="it">IT</SelectItem>
-                    <SelectItem value="dev">Dev</SelectItem>
-                    <SelectItem value="readonly">Read-only</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <div className="text-xs text-muted-foreground">Scenario</div>
-              <Select value={fixtureName} onValueChange={setFixtureName}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Pick a scenario" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="f1-missing-import">{formatFixtureLabel("f1-missing-import")}</SelectItem>
-                  <SelectItem value="f2-wrong-path">{formatFixtureLabel("f2-wrong-path")}</SelectItem>
-                  <SelectItem value="f3-type-mismatch">{formatFixtureLabel("f3-type-mismatch")}</SelectItem>
-                  <SelectItem value="f4-unused-import">{formatFixtureLabel("f4-unused-import")}</SelectItem>
-                  <SelectItem value="f5-type-export">{formatFixtureLabel("f5-type-export")}</SelectItem>
-                  <SelectItem value="f6-json-import">{formatFixtureLabel("f6-json-import")}</SelectItem>
-                  <SelectItem value="f7-esm-interop">{formatFixtureLabel("f7-esm-interop")}</SelectItem>
-                  <SelectItem value="f8-zod-mismatch">{formatFixtureLabel("f8-zod-mismatch")}</SelectItem>
-                  <SelectItem value="f9-drizzle-mismatch">{formatFixtureLabel("f9-drizzle-mismatch")}</SelectItem>
-                  <SelectItem value="f10-patch-corrupt">{formatFixtureLabel("f10-patch-corrupt")}</SelectItem>
-                  <SelectItem value="f11-new-file-dep-context">{formatFixtureLabel("f11-new-file-dep-context")}</SelectItem>
-                </SelectContent>
-              </Select>
-              <div className="text-xs text-muted-foreground">Fixtures are built-in scenarios to benchmark Swarm reliability.</div>
-            </div>
-
-            <div className="space-y-1">
-              <div className="text-xs text-muted-foreground">Timeout (seconds)</div>
-              <Input
-                type="number"
-                value={timeoutSec}
-                onChange={(e) => setTimeoutSec(Number(e.target.value || 180))}
-                min={30}
-                step={10}
-              />
-            </div>
-
-            <Button
-              className="w-full"
-              disabled={!selectedThreadId || !primaryModel || launchRun.isPending}
-              onClick={() => {
-                if (!selectedThreadId) return;
-                launchRun.mutate({
-                  featurePack: {
-                    name: "Ops Chat Run",
-                    intention: intention as any,
-                    sourceType: "fixture",
-                    fixtureName,
-                    primaryModel,
-                    fallbackModel: fallbackModel || undefined,
-                    role: role as any,
-                    timeoutSec,
-                    runBudgetSec: Math.max(timeoutSec, 600),
-                    toggles: {
-                      escalationRetryEnabled: true,
-                      hunkRepairEnabled: true,
-                      emptyPatchRetryEnabled: true,
-                      reviewerEnabled: true,
-                      arbiterEnabled: true,
-                    },
-                    scopePreset: "standard",
-                    maxFiles: 20,
-                    maxBytes: 200000,
-                    selectedFiles: [],
-                    logs: [],
-                    testCommands: [],
-                  },
-                });
-              }}
-            >
-              Launch Swarm
-            </Button>
-
-            {launchRun.data?.repairKey ? (
-              <div className="text-sm">
-                Run: <Link href={`/admin/swarm/runs/${launchRun.data.repairKey}`} className="text-blue-500 hover:underline">{launchRun.data.repairKey}</Link>
-              </div>
-            ) : null}
-
-            {launchRun.error ? (
-              <div className="text-sm text-red-600">{launchRun.error.message}</div>
-            ) : null}
+            </ScrollArea>
           </CardContent>
         </Card>
       </div>
