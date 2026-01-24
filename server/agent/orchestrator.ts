@@ -58,6 +58,54 @@ async function fetchToolSchemas(): Promise<ToolSchema[]> {
 }
 
 /**
+ * Classify tool into risk tier
+ * Tier 0: auto (no approval)
+ * Tier 1: auto+logged (no approval, but logged)
+ * Tier 2: approval required
+ * Tier 3: double approval (not implemented yet)
+ */
+function classifyToolTier(toolName: string): number {
+  // Tier 0: Safe local operations
+  const tier0 = [
+    "workspace_read",
+    "workspace_list",
+    "workspace_write",
+    "repo_commit",
+    "repo_open_pr",
+    "browser_screenshot",
+    "browser_extract_text",
+  ];
+
+  // Tier 1: Logged but auto-approved
+  const tier1 = [
+    "sandbox_run",
+    "browser_goto",
+  ];
+
+  // Tier 2: Requires approval
+  const tier2 = [
+    "browser_type",
+    "browser_click",
+    "browser_login",
+  ];
+
+  // Tier 3: Double approval (treat as tier 2 for now)
+  const tier3 = [
+    "deploy",
+    "dns_update",
+    "payment",
+  ];
+
+  if (tier0.includes(toolName)) return 0;
+  if (tier1.includes(toolName)) return 1;
+  if (tier2.includes(toolName)) return 2;
+  if (tier3.includes(toolName)) return 3;
+
+  // Default: require approval for unknown tools
+  return 2;
+}
+
+/**
  * Execute a tool via agent-stack router
  */
 async function executeTool(name: string, args: Record<string, unknown>): Promise<{
@@ -222,12 +270,30 @@ export async function runOrchestrator(config: {
         const toolName = toolCall.function.name;
         const toolArgs = JSON.parse(toolCall.function.arguments);
 
+        // Classify tool tier
+        const tier = classifyToolTier(toolName);
+
         // Log tool call
         await appendAgentEvent(runId, "tool_call", {
           tool_call_id: toolCall.id,
           name: toolName,
           arguments: toolArgs,
+          tier,
         });
+
+        // Check if approval required (Tier 2+)
+        if (tier >= 2) {
+          await appendAgentEvent(runId, "approval_request", {
+            tool_call_id: toolCall.id,
+            name: toolName,
+            arguments: toolArgs,
+            tier,
+            reason: tier === 3 ? "High-risk operation (Tier 3)" : "Approval required (Tier 2)",
+          });
+
+          await updateAgentRunStatus(runId, "awaiting_approval");
+          return { runId, status: "awaiting_approval" };
+        }
 
         // Execute tool
         const toolResult = await executeTool(toolName, toolArgs);
@@ -309,8 +375,14 @@ export async function resumeAfterApproval(runId: number, approved: boolean): Pro
     return { status: "failed" };
   }
 
-  // TODO: Resume execution from where it left off
-  // For now, just mark as success
-  await updateAgentRunStatus(runId, "success");
+  // Mark as running and resume
+  await updateAgentRunStatus(runId, "running");
+
+  // TODO: Implement proper state restoration and loop resumption
+  // For MVP, we'll need to restart the orchestrator with the existing run context
+  // This requires storing the full RunState in the database or using a queue system
+  
+  // For now, mark as success (user will need to create a new run)
+  await updateAgentRunStatus(runId, "success", "Approved - manual continuation required");
   return { status: "success" };
 }

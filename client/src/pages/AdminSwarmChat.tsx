@@ -40,6 +40,80 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+function ApprovalCard({ event }: { event: AgentEvent }) {
+  const utils = trpc.useUtils();
+  const { payload, ts } = event;
+  const runId = event.runId;
+  const time = new Date(ts).toLocaleTimeString();
+
+  const approveMutation = trpc.admin.agentRuns.approve.useMutation({
+    onSuccess: async () => {
+      await Promise.all([
+        utils.admin.agentRuns.get.invalidate({ runId }),
+        utils.admin.agentEvents.list.invalidate({ runId }),
+        utils.admin.agentArtifacts.list.invalidate({ runId }),
+      ]);
+    },
+  });
+
+  const onApprove = () => {
+    approveMutation.mutate({
+      runId,
+      approved: true,
+    });
+  };
+
+  const onDeny = () => {
+    approveMutation.mutate({
+      runId,
+      approved: false,
+    });
+  };
+
+  return (
+    <div className="border-l-2 border-orange-500 pl-3 py-2">
+      <div className="flex items-center gap-2 mb-1">
+        <Badge className="bg-orange-500/10 text-orange-400">approval required</Badge>
+        <span className="text-xs text-muted-foreground">{time}</span>
+      </div>
+      <div className="text-sm mb-2">
+        <span className="font-mono text-orange-400">{payload.name || payload.tool}</span> needs approval
+      </div>
+      {payload.reason && (
+        <div className="text-xs text-muted-foreground mb-2">{payload.reason}</div>
+      )}
+      <div className="flex gap-2">
+        <Button
+          size="sm"
+          variant="default"
+          disabled={approveMutation.isPending}
+          onClick={onApprove}
+        >
+          {approveMutation.isPending ? "Approving..." : "Approve"}
+        </Button>
+        <Button
+          size="sm"
+          variant="destructive"
+          disabled={approveMutation.isPending}
+          onClick={onDeny}
+        >
+          {approveMutation.isPending ? "Denying..." : "Deny"}
+        </Button>
+      </div>
+      {approveMutation.isError && (
+        <div className="text-red-500 text-sm mt-2">
+          {approveMutation.error.message}
+        </div>
+      )}
+      {approveMutation.isSuccess && (
+        <div className="text-green-400 text-sm mt-2">
+          {payload.approved ? "✅ Approved" : "⛔ Denied"}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function TimelineEvent({ event }: { event: AgentEvent }) {
   const { type, payload, ts } = event;
 
@@ -105,19 +179,7 @@ function TimelineEvent({ event }: { event: AgentEvent }) {
 
   if (type === "approval_request") {
     return (
-      <div className="border-l-2 border-orange-500 pl-3 py-2">
-        <div className="flex items-center gap-2 mb-1">
-          <Badge className="bg-orange-500/10 text-orange-400">approval required</Badge>
-          <span className="text-xs text-muted-foreground">{time}</span>
-        </div>
-        <div className="text-sm mb-2">
-          <span className="font-mono text-orange-400">{payload.name}</span> needs approval
-        </div>
-        <div className="flex gap-2">
-          <Button size="sm" variant="default">Approve</Button>
-          <Button size="sm" variant="destructive">Deny</Button>
-        </div>
-      </div>
+      <ApprovalCard event={event} />
     );
   }
 

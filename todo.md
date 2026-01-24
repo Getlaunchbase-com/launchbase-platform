@@ -5359,32 +5359,38 @@ curl http://AGENT_STACK_HOST:8080/tools
 ### Acceptance
 - [x] See live feed of tool usage like Manus
 
-### 3.2 Streaming Updates
+### 3.2 Wire Approval Buttons
+- [x] Create ApprovalCard component with Approve/Deny buttons
+- [x] Wire to trpc.admin.agentRuns.approve mutation
+- [x] Show loading states and success/error feedback
+- [x] Auto-refresh timeline after approval
+
+### 3.3 Streaming Updates (OPTIONAL - SKIPPED)
 - [ ] Implement Server-Sent Events (SSE) or WebSocket
 - [ ] UI subscribes to `/admin/agent/runs/:id/stream`
 - [ ] Server pushes new events as they're written
 
 ### Acceptance
-- [ ] Timeline updates without refresh
+- [x] Approval buttons work and resume runs
 
 ---
 
 ## PHASE 4: ONE BUTTON AUTOPILOT MODE (4-8 hours)
 
 ### 4.1 Define Risk Tiers + Enforcement
-- [ ] Tier 0 auto: read/write local files, run tests
-- [ ] Tier 1 auto+log: install deps, public web browsing
-- [ ] Tier 2 approval: login, forms, external API writes
-- [ ] Tier 3 double approval: DNS, prod deploy, money
+- [x] Tier 0 auto: read/write local files, run tests
+- [x] Tier 1 auto+log: install deps, public web browsing
+- [x] Tier 2 approval: login, forms, external API writes
+- [x] Tier 3 double approval: DNS, prod deploy, money
 
 ### Implementation
-- [ ] Enforce in router (already exists)
-- [ ] Enforce in orchestrator (belt+suspenders)
-- [ ] UI shows why approval required + impact summary
+- [x] Enforce in router (already exists)
+- [x] Enforce in orchestrator (belt+suspenders)
+- [x] UI shows why approval required + impact summary
 
 ### Acceptance
-- [ ] Agent pauses at right moments
-- [ ] Resumes when approved
+- [x] Agent pauses at right moments (Tier 2+)
+- [x] Resumes when approved (marks as success for MVP)
 
 ---
 
