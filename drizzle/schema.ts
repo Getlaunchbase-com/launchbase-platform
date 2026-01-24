@@ -1721,3 +1721,51 @@ export const repoSources = mysqlTable("repo_sources", {
 }));
 export type RepoSource = typeof repoSources.$inferSelect;
 export type InsertRepoSource = typeof repoSources.$inferInsert;
+/**
+ * Agent execution runs (Manus-like agent system)
+ * Separate from swarm_runs - this is for the autonomous agent orchestrator
+ */
+export const agentRuns = mysqlTable("agent_runs", {
+  id: int("id").autoincrement().primaryKey(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  createdBy: int("createdBy").notNull(), // user ID
+  status: mysqlEnum("status", ["running", "success", "failed", "awaiting_approval"]).default("running").notNull(),
+  goal: text("goal").notNull(), // user's original goal/prompt
+  model: varchar("model", { length: 128 }), // GPT-5.2, etc.
+  routerUrl: varchar("routerUrl", { length: 512 }), // agent-stack URL
+  workspaceName: varchar("workspaceName", { length: 128 }), // sandbox workspace identifier
+  finishedAt: timestamp("finishedAt"),
+  errorMessage: text("errorMessage"),
+}, (table) => ({
+  createdByIdx: index("agent_runs_createdBy_idx").on(table.createdBy),
+  statusIdx: index("agent_runs_status_idx").on(table.status),
+  createdAtIdx: index("agent_runs_createdAt_idx").on(table.createdAt),
+}));
+export type AgentRun = typeof agentRuns.$inferSelect;
+export type InsertAgentRun = typeof agentRuns.$inferInsert;
+
+/**
+ * Agent event timeline (messages, tool calls, artifacts, approvals)
+ * Append-only event log for each agent run
+ */
+export const agentEvents = mysqlTable("agent_events", {
+  id: int("id").autoincrement().primaryKey(),
+  runId: int("runId").notNull(), // FK to agent_runs
+  ts: timestamp("ts").defaultNow().notNull(),
+  type: mysqlEnum("type", [
+    "message",           // user or assistant message
+    "tool_call",         // agent requested tool execution
+    "tool_result",       // tool execution result
+    "approval_request",  // agent needs approval
+    "approval_result",   // user approved/denied
+    "error",             // error occurred
+    "artifact"           // file/PR/screenshot artifact
+  ]).notNull(),
+  payload: json("payload").$type<Record<string, unknown>>().notNull(), // flexible JSON payload
+}, (table) => ({
+  runIdIdx: index("agent_events_runId_idx").on(table.runId),
+  tsIdx: index("agent_events_ts_idx").on(table.ts),
+  typeIdx: index("agent_events_type_idx").on(table.type),
+}));
+export type AgentEvent = typeof agentEvents.$inferSelect;
+export type InsertAgentEvent = typeof agentEvents.$inferInsert;

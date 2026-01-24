@@ -5197,3 +5197,608 @@ Orchestrator (Update State)
 - Approval UX design (mobile-friendly)
 - GPT-5.2 orchestrator loop connection
 - Launchbase API integration (when docs available)
+
+
+---
+
+## 🎯 MANUS-LIKE AGENT IMPLEMENTATION (COMPLETE PLAN)
+
+**Goal:** Create world-class Manus-style agent experience inside LaunchBase  
+**Architecture:** UI (Swarm Chat) + GPT-5.2 (brain) + agent-stack (hands) + Approval gates + Full audit trail
+
+### Current State
+- ✅ LaunchBase platform has Ops Chat (Swarm Viewer) feature
+  - server/swarm/chatStore.ts
+  - server/routers/admin/swarmOpsChat.ts
+  - client/src/pages/AdminSwarmChat.tsx
+- ✅ agent-stack running on VM with Router on :8080
+- ✅ Runner + Browser containers operational
+- ✅ Orchestrator script exists (CLI)
+- ✅ AIMLAPI tool calling works, router endpoints return 200s
+
+### Architecture Target
+```
+AdminSwarmChat (LaunchBase UI)
+  ↓ tRPC
+LaunchBase Backend
+  ↓ HTTP
+Orchestrator API (new service)
+  ↓ AIMLAPI
+GPT-5.2 (brain)
+  ↓ Tool calls
+agent-stack router tools (hands)
+  ↓ Results
+Timeline + Artifacts (streamed back to UI)
+```
+
+---
+
+## PHASE 0: INVENTORY & WIRING CHECKS (1-2 hours)
+
+### Deliverables
+- [x] Confirm agent-stack router reachable from LaunchBase server
+  - ✅ External IP: 35.188.184.31
+  - ✅ Health: http://35.188.184.31:8080/health returns {"ok":true}
+  - ✅ Tools: http://35.188.184.31:8080/tools returns 13 tool schemas
+- [x] Confirm auth header (X-Router-Token) stored in server env
+  - ✅ Configured in agent-stack .env
+- [x] Confirm Playwright browser service reachable
+  - ✅ Deployed in Docker compose (browser service)
+
+### Commands / Checks
+```bash
+# From LaunchBase server environment:
+curl http://AGENT_STACK_HOST:8080/health
+curl http://AGENT_STACK_HOST:8080/tools
+```
+
+### Acceptance
+- [ ] LaunchBase server can hit agent-stack router and list tools
+
+---
+
+## PHASE 1: AGENT RUNS DOMAIN MODEL (3-5 hours)
+
+### 1.1 Create Persistence Layer
+**Goal:** Store runs, messages, tool calls, artifacts
+
+### Database Tables
+```typescript
+// agent_runs
+{
+  id, createdAt, createdBy,
+  status: 'running' | 'success' | 'failed' | 'awaiting_approval',
+  goal: string,
+  model, routerUrl, workspaceName
+}
+
+// agent_events
+{
+  id, runId, ts,
+  type: 'message' | 'tool_call' | 'tool_result' | 'approval_request' | 'approval_result' | 'error' | 'artifact',
+  payload: JSON
+}
+```
+
+### Tasks
+- [x] Create `drizzle/schema.ts` tables for agent_runs and agent_events
+- [x] Add CRUD operations in `server/db/agentRuns.ts`
+- [x] Add event append helper `appendAgentEvent(runId, type, payload)`
+- [x] Add query helper `getRunTimeline(runId)`
+
+### Acceptance
+- [x] Can create run record
+- [x] Can append events
+- [x] Can query run timeline
+
+---
+
+## PHASE 2: ORCHESTRATOR SERVICE (CORE BRAIN LOOP) (6-10 hours)
+
+### 2.1 Create server/agent/orchestrator.ts
+
+### Brain Loop Requirements
+- [ ] System prompt: "You are an autonomous execution agent. Use tools. Keep going until goal done."
+- [ ] Maintain runState (memory)
+- [ ] Maintain messages[] for LLM
+- [ ] Pull toolSchemas from router /tools
+
+### Tool Execution
+- [ ] When model returns tool calls:
+  - POST to `http://router:8080/tool` with `{name, arguments}` and `X-Router-Token`
+  - Log `tool_call` + `tool_result` events
+  - Append tool result into model messages as tool role content
+
+### Stopping Conditions
+- [ ] Model returns final answer with status=done
+- [ ] Max steps N (configurable)
+- [ ] Error count threshold
+- [ ] Approval required
+
+### Approval Gates
+- [ ] When tool router returns `approval_required`:
+  - Emit `approval_request` event
+  - Set run status `awaiting_approval`
+  - Pause loop until UI responds
+
+### Acceptance
+- [ ] A run can list tools
+- [ ] Write a file via workspace_write
+- [ ] Read it back
+- [ ] Do browser_goto + screenshot
+- [ ] Stop and report summary
+
+---
+
+## PHASE 3: UI - CLONE MANUS FEEL (8-14 hours)
+
+### 3.1 Update AdminSwarmChat Layout
+
+### 3-Column Layout
+- [ ] Column 1: Chat (user input + agent responses)
+- [ ] Column 2: Run Timeline (live tool calls + events)
+- [ ] Column 3: Artifacts / Files / PRs
+
+### Timeline Items (render by event type)
+- [ ] Tool call: show name + args (collapsed)
+- [ ] Tool result: show status + snippet
+- [ ] Screenshot: thumbnail preview
+- [ ] Diff/PR: link card
+- [ ] Errors: red block
+- [ ] Approvals: big buttons (approve/deny)
+
+### Acceptance
+- [ ] See live feed of tool usage like Manus
+
+### 3.2 Streaming Updates
+- [ ] Implement Server-Sent Events (SSE) or WebSocket
+- [ ] UI subscribes to `/admin/agent/runs/:id/stream`
+- [ ] Server pushes new events as they're written
+
+### Acceptance
+- [ ] Timeline updates without refresh
+
+---
+
+## PHASE 4: ONE BUTTON AUTOPILOT MODE (4-8 hours)
+
+### 4.1 Define Risk Tiers + Enforcement
+- [ ] Tier 0 auto: read/write local files, run tests
+- [ ] Tier 1 auto+log: install deps, public web browsing
+- [ ] Tier 2 approval: login, forms, external API writes
+- [ ] Tier 3 double approval: DNS, prod deploy, money
+
+### Implementation
+- [ ] Enforce in router (already exists)
+- [ ] Enforce in orchestrator (belt+suspenders)
+- [ ] UI shows why approval required + impact summary
+
+### Acceptance
+- [ ] Agent pauses at right moments
+- [ ] Resumes when approved
+
+---
+
+## PHASE 5: GITHUB + BUILD.IO + REPO WORKFLOWS (6-12 hours)
+
+### 5.1 GitHub PR Workflow
+- [ ] Agent can create branch
+- [ ] Agent can commit changes
+- [ ] Agent can open PR
+- [ ] Agent posts PR link into timeline
+
+### Acceptance
+- [ ] Run "Create PR for UI tweak" → appears in GitHub
+
+### 5.2 Build.io Assist (Optional)
+- [ ] Pull build output into workspace
+- [ ] Run typecheck/tests
+- [ ] PR it
+
+### Acceptance
+- [ ] "Make this UI like Manus" → code + PR
+
+---
+
+## PHASE 6: LAUNCHBASE NATIVE TOOLS (LATER)
+
+### Replace Mock LaunchBase API
+- [ ] create task/epic
+- [ ] update status
+- [ ] attach artifacts
+- [ ] search context
+
+### Acceptance
+- [ ] Agent can create tasks and link PRs/screenshots
+
+---
+
+## GOLDEN DEMO SCENARIO
+
+### Test End-to-End
+1. [ ] In Swarm Chat type: "Create a Manus-style UI timeline panel. Add approval cards. Open a PR."
+2. [ ] Agent:
+   - Edits AdminSwarmChat.tsx
+   - Runs tests
+   - Commits + PR
+   - Posts link
+3. [ ] If risky action needed: approval card appears, click approve
+
+---
+
+## DELIVERABLES CHECKLIST
+
+- [ ] ✅ Orchestrator service in LaunchBase backend
+- [ ] ✅ Agent run + events persistence
+- [ ] ✅ SSE/WebSocket streaming
+- [ ] ✅ Manus-style UI (Chat + Timeline + Artifacts)
+- [ ] ✅ Approval gating (pause/resume)
+- [ ] ✅ GitHub PR workflow integrated
+- [ ] ✅ Working golden demo recorded in CHECKPOINT.md
+
+---
+
+## NON-NEGOTIABLE "MANUS QUALITY" FEATURES
+
+- [ ] Timeline always shows: tool name, args, result status, duration
+- [ ] Screenshot thumbnails in timeline
+- [ ] "Retry tool" button on failures
+- [ ] "Stop run" button always visible
+- [ ] "Resume after approval" instant
+- [ ] "Download artifacts" links
+- [ ] Token/cost summary per run (optional but nice)
+
+---
+
+## VM READINESS CHECKLIST
+
+### 1. Network Reachability
+- [ ] VM can be reached from wherever Manus is running
+- [ ] Test: `curl -s http://localhost:8080/health` returns `{"ok":true}`
+- [ ] Public URL or reachable private IP for router configured
+- [ ] Port exposure strategy decided:
+  - Best: Nginx/Caddy in front, expose 443 only
+  - Okay for dev: open 8080 to your IP only
+
+### 2. Router Auth Token
+- [ ] X-Router-Token exists and is required
+- [ ] Token consistently sent by orchestrator
+
+### 3. Docker Compose
+- [ ] Verify: `docker version`
+- [ ] Verify: `docker compose version`
+- [ ] Both commands work without errors
+
+### 4. Workspaces Mount
+- [ ] Verify: `docker compose exec runner ls -la /home/info/agent-stack/default`
+- [ ] Files written by agent visible on host
+
+### 5. Orchestrator AIMLAPI Integration
+- [ ] No 400 "Invalid payload" errors
+- [ ] File write succeeded in test run
+
+### 6. HTTPS Endpoint (for production)
+- [ ] Stable HTTPS endpoint for router configured
+- [ ] Options:
+  - Domain + HTTPS reverse proxy → `https://agent.yourdomain.com`
+  - Cloudflare Tunnel (easiest, no firewall pain)
+- [ ] IP allowlist configured (LaunchBase server + your own)
+- [ ] X-Router-Token required and enforced
+
+---
+
+## SECURITY ACTIONS (CRITICAL)
+
+### Immediate Actions Required
+- [ ] ⚠️ Rotate GitHub token (exposed in chat)
+- [ ] ⚠️ Rotate AIML API key (exposed in chat)
+- [ ] ⚠️ Update .env on VM with new credentials
+- [ ] ⚠️ Restart services with new credentials
+- [ ] ⚠️ Never paste secrets in chat again (use .env only)
+
+---
+
+## PHASE A: STABILIZE AGENT-STACK (2-3 fixes)
+
+### 1. Fix AIML 400 Bug
+- [ ] In orchestrator/orchestrator.py, ensure every outbound message has non-null string content
+- [ ] After tool calls, follow-up request must not include `content: null`
+- [ ] Add guard: `if content is None → content = ""`
+- [ ] Confirm tool-call loop works: "Create hello2.txt" succeeds without crash
+
+### 2. Lock Workspace Path
+- [ ] Confirm runner sees: `/home/info/agent-stack/default`
+- [ ] Update docs + default config
+- [ ] Verification command: `docker compose exec runner ls -la /home/info/agent-stack/default`
+
+### 3. Add Events Log Output
+- [ ] Every tool call emits event payload: `{run_id, step_id, tool, args, result, timestamp}`
+- [ ] Store in JSONL file per run
+
+---
+
+## PHASE B: INTEGRATE WITH LAUNCHBASE OPS CHAT
+
+### 4. Add "Swarm Run" Concept
+- [ ] Start run → create thread in Ops Chat
+- [ ] Each step → append message ("tool call: workspace_write… result: ok")
+- [ ] Approval request → create approval card in chat UI
+- [ ] Approval response → returns to orchestrator to continue
+
+### 5. UI: Clone Manus Layout
+- [ ] Left: Runs list
+- [ ] Middle: Chat
+- [ ] Right: Live "Actions / Tool calls" stream + browser screenshots
+
+---
+
+## PHASE C: MAKE IT FEEL LIKE MANUS (SWARM + AUTOPILOT)
+
+### 6. Add Worker Pool
+- [ ] Research worker (parallel web)
+- [ ] Coder worker (patch + tests)
+- [ ] Reviewer worker (diff review)
+
+### 7. Unified Reporting
+- [ ] Everything reports to same Swarm thread
+- [ ] Timestamps and artifacts included
+
+---
+
+## SUCCESS METRIC
+
+**Definition of Done:**
+> I can type one goal and watch the agent plan → execute tools → ask approvals → finish, all from the LaunchBase Swarm UI.
+
+---
+
+## NEXT STEPS DECISION
+
+**Pick one to proceed:**
+- [ ] (A) Make orchestrator rock-solid (fix the 400 + logging)
+- [ ] (B) Wire it into LaunchBase swarm chat so it feels like Manus
+- [ ] (C) Clone the Manus UI layout inside LaunchBase
+
+
+---
+
+## 🎨 LAUNCHBASE UI/UX ENHANCEMENTS (15 FEATURES)
+
+**Goal:** Transform LaunchBase Swarm Chat into world-class Manus-like experience
+
+### 🏆 TOP 3 PRIORITY FEATURES (Highest Impact)
+
+#### 1. Real-Time Agent Status Indicator ⚡
+**Impact:** Essential for transparency
+- [ ] Add persistent status badge (top-right corner)
+- [ ] Status states:
+  - 🟢 Idle / Ready
+  - 🟡 Thinking / Planning
+  - 🔵 Executing Tools
+  - 🟠 Awaiting Approval
+  - 🔴 Error / Stopped
+- [ ] Auto-update based on agent events
+- [ ] Add smooth color transitions
+
+#### 2. Approval Cards with Context ✋
+**Impact:** Critical for trust and safety
+- [ ] Design approval card component
+- [ ] Show "What it wants to do" (action description)
+- [ ] Show "Why" (rationale)
+- [ ] Show Risk level badge (Tier 2 / Tier 3)
+- [ ] Show Impact preview (diff, affected files, deployment target)
+- [ ] Add two big buttons: ✅ Approve | ❌ Deny
+- [ ] Make card sticky at top of chat
+- [ ] Add approval timeout countdown (optional)
+
+#### 3. Live Browser Preview Window 🖼️
+**Impact:** Unique differentiator, very "Manus-like"
+- [ ] Add embedded mini-browser component
+- [ ] Auto-update when agent does `browser_goto`
+- [ ] Show screenshots inline with timestamps
+- [ ] Add click-to-expand full-size view
+- [ ] Add URL bar showing current page
+- [ ] Place in right column (Artifacts panel)
+- [ ] Add loading skeleton while screenshot loads
+
+---
+
+### 💎 HIGH-VALUE FEATURES (4-10)
+
+#### 4. Collapsible Tool Call Cards 📦
+- [ ] Render each tool call as expandable card
+- [ ] Header: Tool name + status icon + duration
+- [ ] Collapsed view: Summary only (e.g., "Created file hello.txt ✓ 0.3s")
+- [ ] Expanded view: Full args + result + error details
+- [ ] Add expand/collapse animation
+- [ ] Color-code by status (success=green, error=red, pending=yellow)
+
+#### 5. Timeline Scrubber ⏱️
+- [ ] Add horizontal timeline at bottom
+- [ ] Show: Run start → current position → end
+- [ ] Add markers for: tool calls, approvals, errors
+- [ ] Implement drag-to-rewind functionality
+- [ ] Show timestamp tooltips on hover
+- [ ] Place at bottom of Timeline column
+
+#### 6. Cost Tracker 💰
+- [ ] Add live running total display
+- [ ] Show tokens used (input/output)
+- [ ] Show estimated cost ($0.XX)
+- [ ] Show model used
+- [ ] Update in real-time as agent works
+- [ ] Place in footer or top-right near status indicator
+- [ ] Add cost breakdown on hover
+
+#### 7. Quick Actions Toolbar ⚡
+- [ ] Create always-visible toolbar
+- [ ] Add buttons:
+  - 🛑 Stop Run
+  - ⏸️ Pause
+  - ▶️ Resume
+  - 🔄 Retry Last Tool
+  - 📥 Download All Artifacts
+  - 📋 Copy Timeline as Markdown
+- [ ] Place at top of Timeline column
+- [ ] Add keyboard shortcuts (Cmd+K, Cmd+R, etc.)
+
+#### 8. Diff Viewer for Code Changes 📝
+- [ ] Create side-by-side diff component
+- [ ] Add syntax highlighting
+- [ ] Show line numbers
+- [ ] Add "Accept" / "Reject" / "Edit" buttons
+- [ ] Support multiple file diffs in tabs
+- [ ] Place in Artifacts panel as expandable card
+- [ ] Add "Copy diff" button
+
+#### 9. Artifact Gallery 🖼️
+- [ ] Create visual grid view
+- [ ] Show thumbnails for screenshots
+- [ ] Show icons + names for files
+- [ ] Show link cards for PRs
+- [ ] Show previews for reports
+- [ ] Add filter/search functionality
+- [ ] Place in right column, switchable view (Timeline | Artifacts)
+
+#### 10. "Explain This" Button 🤔
+- [ ] Add button to each tool call card
+- [ ] On click, send context to GPT-5.2 with "explain why you did this"
+- [ ] Show explanation in modal or expandable section
+- [ ] Include: Why chosen, what it accomplished, alternatives considered
+- [ ] Cache explanations to avoid redundant API calls
+
+---
+
+### 🚀 POWER USER FEATURES (11-15)
+
+#### 11. Run Templates / Presets 📚
+- [ ] Create template storage system
+- [ ] Add common workflows:
+  - "Create landing page from description"
+  - "Fix bug in repo"
+  - "Research topic and create report"
+- [ ] Add template creation UI (save current run as template)
+- [ ] Add dropdown or sidebar in Swarm Chat
+- [ ] Support template variables (e.g., `{{repo_name}}`)
+
+#### 12. Agent Personality Settings 🎭
+- [ ] Add settings panel
+- [ ] Verbosity slider: Quiet | Normal | Detailed
+- [ ] Autonomy slider: Ask often | Balanced | Full autopilot
+- [ ] Risk tolerance: Conservative | Moderate | Aggressive
+- [ ] Save per-user preferences
+- [ ] Add quick toggle in chat header
+
+#### 13. Multi-Agent Collaboration View 🤝
+- [ ] Show each agent as "participant" with avatar
+- [ ] Color-code messages by agent
+- [ ] Show who did what in timeline (color-coded lanes)
+- [ ] Add agent selection dropdown
+- [ ] Support agent-to-agent communication display
+
+#### 14. Keyboard Shortcuts ⌨️
+- [ ] Implement global shortcuts:
+  - `Cmd+Enter` - Send message
+  - `Cmd+K` - Stop run
+  - `Cmd+R` - Retry last tool
+  - `Cmd+D` - Download artifacts
+  - `Cmd+/` - Show shortcuts overlay
+- [ ] Add shortcuts help modal
+- [ ] Make shortcuts customizable
+
+#### 15. Mobile-Optimized Approval Flow 📱
+- [ ] Design mobile-friendly approval cards
+- [ ] Add push notifications for approval requests
+- [ ] Optimize diff preview for mobile
+- [ ] Add one-tap approve/deny buttons
+- [ ] Test on iOS and Android
+- [ ] Consider PWA for native-like experience
+
+---
+
+### 💫 "MANUS MAGIC" BONUS FEATURES
+
+#### Instant Feedback
+- [ ] Remove loading spinners
+- [ ] Stream everything in real-time
+- [ ] Add optimistic UI updates
+
+#### Beautiful Animations
+- [ ] Tool calls slide in smoothly
+- [ ] Status changes with smooth transitions
+- [ ] Add micro-interactions on hover
+
+#### Smart Defaults
+- [ ] Agent guesses user intent
+- [ ] Pre-fill common parameters
+- [ ] Reduce confirmation dialogs
+
+#### Undo Button
+- [ ] Add "Undo last action" functionality
+- [ ] Show what will be undone
+- [ ] Support multi-level undo
+
+#### Voice Input
+- [ ] Add microphone button
+- [ ] Speech-to-text for goal input
+- [ ] Support voice commands ("stop", "approve", etc.)
+
+---
+
+## 📊 UI/UX IMPLEMENTATION PRIORITY
+
+### Phase 1: Core Experience (Week 1-2)
+- [ ] Real-Time Agent Status Indicator (#1)
+- [ ] Approval Cards with Context (#2)
+- [ ] Collapsible Tool Call Cards (#4)
+- [ ] Quick Actions Toolbar (#7)
+
+### Phase 2: Transparency & Trust (Week 3-4)
+- [ ] Live Browser Preview Window (#3)
+- [ ] Diff Viewer for Code Changes (#8)
+- [ ] Cost Tracker (#6)
+- [ ] "Explain This" Button (#10)
+
+### Phase 3: Power User Features (Week 5-6)
+- [ ] Timeline Scrubber (#5)
+- [ ] Artifact Gallery (#9)
+- [ ] Keyboard Shortcuts (#14)
+- [ ] Run Templates / Presets (#11)
+
+### Phase 4: Advanced & Polish (Week 7-8)
+- [ ] Agent Personality Settings (#12)
+- [ ] Multi-Agent Collaboration View (#13)
+- [ ] Mobile-Optimized Approval Flow (#15)
+- [ ] "Manus Magic" bonus features
+
+---
+
+## 🎯 SUCCESS METRICS
+
+### User Experience
+- [ ] Time from goal input to first agent action < 2 seconds
+- [ ] Approval decision time < 30 seconds (with context)
+- [ ] Zero "what is the agent doing?" questions from users
+
+### Performance
+- [ ] Timeline updates stream in real-time (< 100ms latency)
+- [ ] Page load time < 1 second
+- [ ] Smooth 60fps animations
+
+### Adoption
+- [ ] 80% of runs complete without user intervention (Tier 0-1 actions)
+- [ ] 90% approval rate on Tier 2-3 actions (good context = trust)
+- [ ] Users create 3+ run templates within first week
+
+---
+
+## 🔗 INTEGRATION WITH AGENT-STACK BACKEND
+
+**Backend Status:** ✅ COMPLETE (agent-stack repository)
+- ✅ FastAPI tool router on port 8080
+- ✅ 13 tool implementations
+- ✅ Docker compose (router, runner, browser)
+- ✅ Security features (auth, path sandboxing, domain allowlists)
+- ✅ Documentation (README, APPROVAL_POLICY, CHECKPOINT)
+
+**Next:** Wire LaunchBase UI to agent-stack backend via Orchestrator service (see PHASE 2 above)
