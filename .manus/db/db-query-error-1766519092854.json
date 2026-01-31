@@ -1,8 +1,0 @@
-{
-  "query": "SELECT id, decision, reason, createdAt, NOW() as current_time, TIMESTAMPDIFF(DAY, createdAt, NOW()) as days_ago FROM decision_logs ORDER BY createdAt DESC;",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute SELECT id, decision, reason, createdAt, NOW() as current_time, TIMESTAMPDIFF(DAY, createdAt, NOW()) as days_ago FROM decision_logs ORDER BY createdAt DESC;",
-  "returncode": 1,
-  "logs": [
-    "ERROR 1064 (42000) at line 1: You have an error in your SQL syntax; check the manual that corresponds to your TiDB version for the right syntax to use line 1 column 61 near \"current_time, TIMESTAMPDIFF(DAY, createdAt, NOW()) as days_ago FROM decision_logs ORDER BY createdAt DESC\""
-  ]
-}

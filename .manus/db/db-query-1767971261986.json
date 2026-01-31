@@ -1,9 +1,0 @@
-{
-  "query": "INSERT INTO __drizzle_migrations (id, hash, created_at) VALUES \n(10, '4f8e7c3b2a1d9e6f5c4b3a2d1e9f8c7b6a5d4c3b2a1f9e8d7c6b5a4d3c2b1a9', 1767886954053),\n(11, '3e7d6c5b4a3d2e1f9c8b7a6d5c4b3a2e1d9f8c7b6a5d4c3b2a1f9e8d7c6b5a', 1767887788286),\n(12, '2d6c5b4a3d2e1f9c8b7a6d5c4b3a2e1d9f8c7b6a5d4c3b2a1f9e8d7c6b5a4d', 1767888742612)",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute INSERT INTO __drizzle_migrations (id, hash, created_at) VALUES \n(10, '4f8e7c3b2a1d9e6f5c4b3a2d1e9f8c7b6a5d4c3b2a1f9e8d7c6b5a4d3c2b1a9', 1767886954053),\n(11, '3e7d6c5b4a3d2e1f9c8b7a6d5c4b3a2e1d9f8c7b6a5d4c3b2a1f9e8d7c6b5a', 1767887788286),\n(12, '2d6c5b4a3d2e1f9c8b7a6d5c4b3a2e1d9f8c7b6a5d4c3b2a1f9e8d7c6b5a4d', 1767888742612)",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 63
-}

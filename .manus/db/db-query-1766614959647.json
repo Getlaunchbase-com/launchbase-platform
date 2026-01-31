@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS referral_events (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  eventType VARCHAR(32) NOT NULL,\n  siteSlug VARCHAR(128),\n  siteId INT,\n  referralId VARCHAR(64),\n  sessionId VARCHAR(64),\n  visitorHash VARCHAR(64),\n  userAgent TEXT,\n  referrer VARCHAR(512),\n  utmSource VARCHAR(128),\n  utmMedium VARCHAR(128),\n  utmCampaign VARCHAR(128),\n  utmContent VARCHAR(128),\n  isDuplicate BOOLEAN DEFAULT FALSE NOT NULL,\n  isBot BOOLEAN DEFAULT FALSE NOT NULL,\n  metadata JSON,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL\n);",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2E4HaJUB1R41J12.fcd4ff42607d --database H86jcAdP392wwbWXRcEDMs --execute CREATE TABLE IF NOT EXISTS referral_events (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  eventType VARCHAR(32) NOT NULL,\n  siteSlug VARCHAR(128),\n  siteId INT,\n  referralId VARCHAR(64),\n  sessionId VARCHAR(64),\n  visitorHash VARCHAR(64),\n  userAgent TEXT,\n  referrer VARCHAR(512),\n  utmSource VARCHAR(128),\n  utmMedium VARCHAR(128),\n  utmCampaign VARCHAR(128),\n  utmContent VARCHAR(128),\n  isDuplicate BOOLEAN DEFAULT FALSE NOT NULL,\n  isBot BOOLEAN DEFAULT FALSE NOT NULL,\n  metadata JSON,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL\n);",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 177
-}
