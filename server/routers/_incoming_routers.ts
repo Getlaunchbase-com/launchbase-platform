@@ -1,14 +1,7 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-// Router imports - implementations needed
-// import { adminStripeWebhooksRouter } from "./admin/stripeWebhooks";
-// import { adminEmailSmokeRouter } from "./admin/emailSmoke";
-// import { adminEmailMetricsRouter } from "./admin/emailMetrics";
-// import { swarmConsoleRouter } from "./admin/swarmConsole";
-// import { swarmOpsChatRouter } from "./admin/swarmOpsChat";
-// import { agentRunsRouter, agentEventsRouter, agentArtifactsRouter } from "./admin/agentRuns";
-// import { agentStackRouter } from "./admin/agentStack";
+import { agentChatRouter } from "./admin/agentChat";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -434,12 +427,7 @@ export const appRouter = router({
 
   // Admin routes (protected)
   admin: router({
-    // swarm: swarmConsoleRouter,
-    // opsChat: swarmOpsChatRouter,
-    // agentRuns: agentRunsRouter,
-    // agentEvents: agentEventsRouter,
-    // agentArtifacts: agentArtifactsRouter,
-    // agentStack: agentStackRouter,
+    agentChat: agentChatRouter,
     intakes: router({
       list: protectedProcedure
         .input(z.object({
@@ -907,14 +895,6 @@ export const appRouter = router({
         }),
     }),
 
-    // Stripe webhook monitoring (admin-only, read-only observability)
-    // stripeWebhooks: adminStripeWebhooksRouter,
-
-    // Email delivery smoke test (admin-only)
-    // emailSmoke: adminEmailSmokeRouter,
-
-    // Email delivery metrics (admin-only)
-    // emailMetrics: adminEmailMetricsRouter,
     
     // Test checkout for Stripe integration verification
     createTestCheckout: protectedProcedure
