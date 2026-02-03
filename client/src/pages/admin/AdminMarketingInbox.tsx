@@ -14,20 +14,20 @@ export default function AdminMarketingInbox() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [noteText, setNoteText] = useState("");
 
-  const listQuery = trpc.marketingInbox.list.useQuery({
+  const listQuery = trpc.admin.marketingInbox.list.useQuery({
     status,
     search: search.trim() || undefined,
     limit: 100,
   });
 
-  const setStatusMut = trpc.marketingInbox.setStatus.useMutation({
+  const setStatusMut = trpc.admin.marketingInbox.setStatus.useMutation({
     onSuccess: () => {
       listQuery.refetch();
       setSelectedId(null);
     },
   });
 
-  const addNoteMut = trpc.marketingInbox.addNote.useMutation({
+  const addNoteMut = trpc.admin.marketingInbox.addNote.useMutation({
     onSuccess: () => {
       listQuery.refetch();
       setNoteText("");
@@ -35,7 +35,7 @@ export default function AdminMarketingInbox() {
     },
   });
 
-  const seedMut = trpc.marketingInbox.seed.useMutation({
+  const seedMut = trpc.admin.marketingInbox.seed.useMutation({
     onSuccess: () => listQuery.refetch(),
   });
 
