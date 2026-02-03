@@ -1,5 +1,5 @@
 import { AdminLayout } from "../../components/AdminLayout";
-import { Upload, Download, Eye } from "lucide-react";
+import { Upload, Download, Eye } from "../../components/Icons";
 
 export default function AdminConsoleFiles() {
   return (
