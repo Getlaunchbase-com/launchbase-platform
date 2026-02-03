@@ -1028,6 +1028,10 @@ export const appRouter = router({
 
         return alerts;
       }),
+
+    // Agent runs and events
+    agentRuns: agentRunsRouter,
+    agentEvents: agentEventsRouter,
   }),
 
   // Analytics tracking (public for frontend events)
