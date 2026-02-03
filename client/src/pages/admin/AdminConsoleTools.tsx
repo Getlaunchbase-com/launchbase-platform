@@ -1,5 +1,5 @@
 import { AdminLayout } from "../../components/AdminLayout";
-import { Shield, AlertCircle } from "lucide-react";
+import { Shield, AlertCircle } from "../../components/Icons";
 
 const TOOLS = [
   { name: "Web Search", provider: "Internal", safety: "approved", description: "Search the web for information" },
