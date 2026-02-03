@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AdminLayout } from "../../components/AdminLayout";
-import { Search, Plus, Pin, Send, Zap, Pause, Square, Settings } from "lucide-react";
+import { Search, Plus, Pin, Send, Zap, Pause, Square, Settings } from "../../components/Icons";
 
 interface Thread {
   id: string;
