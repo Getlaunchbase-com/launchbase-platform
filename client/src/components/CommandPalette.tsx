@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "wouter";
 import { Search, Zap, MessageSquare, Settings, FileText, Brain } from "./Icons";
 
 interface Command {
@@ -14,7 +13,6 @@ export function CommandPalette() {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [, navigate] = useNavigate();
 
   const commands: Command[] = [
     {
@@ -22,7 +20,7 @@ export function CommandPalette() {
       title: "Dashboard",
       icon: <Zap size={16} />,
       action: () => {
-        navigate("/admin/console");
+        window.location.href = "/admin/console";
         setIsOpen(false);
       },
       group: "Navigation",
@@ -32,7 +30,7 @@ export function CommandPalette() {
       title: "Agent Chat",
       icon: <MessageSquare size={16} />,
       action: () => {
-        navigate("/admin/console/agent-chat");
+        window.location.href = "/admin/console/agent-chat";
         setIsOpen(false);
       },
       group: "Navigation",
@@ -42,7 +40,7 @@ export function CommandPalette() {
       title: "Marketing Agents",
       icon: <Zap size={16} />,
       action: () => {
-        navigate("/admin/console/marketing-agents");
+        window.location.href = "/admin/console/marketing-agents";
         setIsOpen(false);
       },
       group: "Navigation",
@@ -52,7 +50,7 @@ export function CommandPalette() {
       title: "Runs",
       icon: <FileText size={16} />,
       action: () => {
-        navigate("/admin/console/runs");
+        window.location.href = "/admin/console/runs";
         setIsOpen(false);
       },
       group: "Navigation",
@@ -62,7 +60,7 @@ export function CommandPalette() {
       title: "Settings",
       icon: <Settings size={16} />,
       action: () => {
-        navigate("/admin/console/settings");
+        window.location.href = "/admin/console/settings";
         setIsOpen(false);
       },
       group: "Navigation",
@@ -86,12 +84,14 @@ export function CommandPalette() {
 
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setSelectedIndex((prev) => (prev + 1) % filteredCommands.length);
+        setSelectedIndex((prev) => (prev + 1) % Math.max(1, filteredCommands.length));
       }
 
       if (e.key === "ArrowUp") {
         e.preventDefault();
-        setSelectedIndex((prev) => (prev - 1 + filteredCommands.length) % filteredCommands.length);
+        setSelectedIndex((prev) =>
+          prev - 1 < 0 ? Math.max(0, filteredCommands.length - 1) : prev - 1
+        );
       }
 
       if (e.key === "Enter") {
