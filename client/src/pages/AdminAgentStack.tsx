@@ -1,1 +1,3 @@
-export default function AdminAgentStack() { return <div><h1>Agent Stack</h1></div>; }
+export default function AdminAgentStack() {
+  return <div style={{ padding: 20 }}><h1>Agent Stack</h1></div>;
+}

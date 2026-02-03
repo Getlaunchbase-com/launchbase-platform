@@ -1,1 +1,3 @@
-export default function AdminDeployments() { return <div><h1>Deployments</h1></div>; }
+export default function AdminDeployments() {
+  return <div style={{ padding: 20 }}><h1>Deployments</h1></div>;
+}

@@ -1,1 +1,3 @@
-export default function ApplySuccess() { return <div><h1>Apply Success</h1></div>; }
+export default function ApplySuccess() {
+  return <div style={{ padding: 20 }}><h1>Apply Success</h1></div>;
+}

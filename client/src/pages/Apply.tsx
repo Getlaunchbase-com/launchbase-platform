@@ -1,1 +1,3 @@
-export default function Apply() { return <div><h1>Apply</h1></div>; }
+export default function Apply() {
+  return <div style={{ padding: 20 }}><h1>Apply</h1></div>;
+}

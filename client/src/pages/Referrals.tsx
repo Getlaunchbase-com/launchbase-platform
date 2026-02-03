@@ -1,1 +1,3 @@
-export default function Referrals() { return <div><h1>Referrals</h1></div>; }
+export default function Referrals() {
+  return <div style={{ padding: 20 }}><h1>Referrals</h1></div>;
+}

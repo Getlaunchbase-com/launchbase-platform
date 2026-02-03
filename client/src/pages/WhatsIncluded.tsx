@@ -1,1 +1,3 @@
-export default function WhatsIncluded() { return <div><h1>What's Included</h1></div>; }
+export default function WhatsIncluded() {
+  return <div style={{ padding: 20 }}><h1>What's Included</h1></div>;
+}
