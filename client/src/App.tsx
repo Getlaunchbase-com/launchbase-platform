@@ -113,6 +113,8 @@ function Router() {
         <Route path="/admin/swarm/models" component={AdminSwarmModels} />
       <Route path="/admin/agent-stack" component={AdminAgentStack} />
       <Route path="/admin/agent/chat" component={AdminAgentChat} />
+      <Route path="/admin/console" component={AdminConsoleDashboard} />
+      <Route path="/admin/console/agent-chat" component={AdminAgentChat} />
       <Route path="/admin/marketing-inbox" component={AdminMarketingInbox} />
       <Route path="/admin/marketing-signals" component={AdminMarketingSignals} />
         <Route path="/admin/swarm/repo" component={AdminSwarmRepoSources} />
