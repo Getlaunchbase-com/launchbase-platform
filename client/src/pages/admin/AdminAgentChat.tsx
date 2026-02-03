@@ -77,10 +77,29 @@ export default function AdminAgentChat() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      {/* Top Navigation */}
+      <div style={{ padding: "0 20px", borderBottom: "1px solid #ddd", backgroundColor: "#f9f9f9", display: "flex", alignItems: "center", gap: "20px" }}>
+        <h2 style={{ margin: "0 0 0 0", paddingRight: "20px", borderRight: "1px solid #ddd", fontSize: "18px", fontWeight: "bold" }}>
+          LaunchBase Admin
+        </h2>
+        <a href="/admin" style={{ textDecoration: "none", color: "#666", padding: "12px 0", cursor: "pointer" }}>
+          Dashboard
+        </a>
+        <a href="/admin/agent/chat" style={{ textDecoration: "none", color: "#007bff", padding: "12px 0", borderBottom: "2px solid #007bff", fontWeight: "bold", cursor: "pointer" }}>
+          Agent Chat
+        </a>
+        <a href="/admin/agent-stack" style={{ textDecoration: "none", color: "#666", padding: "12px 0", cursor: "pointer" }}>
+          Agent Stack
+        </a>
+        <a href="/admin/swarm" style={{ textDecoration: "none", color: "#666", padding: "12px 0", cursor: "pointer" }}>
+          Swarm
+        </a>
+      </div>
+
       {/* Header */}
       <div style={{ padding: "20px", borderBottom: "1px solid #ddd", backgroundColor: "#f9f9f9" }}>
-        <h1>Agent Chat</h1>
-        <p style={{ margin: "10px 0 0 0", fontSize: "14px", color: "#666" }}>
+        <h1 style={{ margin: "0 0 8px 0" }}>Agent Chat</h1>
+        <p style={{ margin: "0", fontSize: "14px", color: "#666" }}>
           Launch real agent runs and see live responses
         </p>
       </div>
