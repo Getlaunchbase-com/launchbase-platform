@@ -122,6 +122,13 @@ function Router() {
       <Route path="/admin/agent/chat" component={AdminAgentChat} />
       <Route path="/admin/console" component={AdminConsoleDashboard} />
       <Route path="/admin/console/agent-chat" component={AdminAgentChat} />
+      <Route path="/admin/console/marketing-agents" component={AdminConsoleMarketingAgents} />
+      <Route path="/admin/console/runs" component={AdminConsoleRuns} />
+      <Route path="/admin/console/approvals" component={AdminConsoleApprovals} />
+      <Route path="/admin/console/files" component={AdminConsoleFiles} />
+      <Route path="/admin/console/tools" component={AdminConsoleTools} />
+      <Route path="/admin/console/models" component={AdminConsoleModels} />
+      <Route path="/admin/console/settings" component={AdminConsoleSettings} />
       <Route path="/admin/marketing-inbox" component={AdminMarketingInbox} />
       <Route path="/admin/marketing-signals" component={AdminMarketingSignals} />
         <Route path="/admin/swarm/repo" component={AdminSwarmRepoSources} />
