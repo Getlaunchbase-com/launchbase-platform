@@ -1,7 +1,6 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { agentChatRouter } from "./admin/agentChat";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -74,7 +73,6 @@ import { designJobsRouter } from "./routers/designJobsRouter";
 import { aiCopyRefineRouter } from "./routers/aiCopyRefineRouter";
 import { marketingInboxRouter } from "./admin/marketingInbox";
 import { marketingSignalsRouter } from "./admin/marketingSignals";
-import { agentChatRouter } from "./admin/agentChat";
 
 export const appRouter = router({
   system: systemRouter,
@@ -427,7 +425,6 @@ export const appRouter = router({
 
   // Admin routes (protected)
   admin: router({
-    agentChat: agentChatRouter,
     intakes: router({
       list: protectedProcedure
         .input(z.object({
@@ -1129,9 +1126,6 @@ export const appRouter = router({
     // Marketing management
     marketingInbox: marketingInboxRouter,
     marketingSignals: marketingSignalsRouter,
-
-    // Agent chat (VM/brain gateway)
-    agentChat: agentChatRouter,
   }),
 
   // Stripe payment routes
