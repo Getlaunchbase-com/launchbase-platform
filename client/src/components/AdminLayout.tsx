@@ -12,8 +12,7 @@ import {
   Settings,
   ChevronDown,
   Menu,
-  X,
-} from "lucide-react";
+} from "./Icons";
 
 const navItems = [
   { href: "/admin/console", label: "Dashboard", icon: LayoutDashboard },
