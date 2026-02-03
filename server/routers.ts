@@ -47,7 +47,6 @@ import { designJobsRouter } from "./routers/designJobsRouter";
 import { aiCopyRefineRouter } from "./routers/aiCopyRefineRouter";
 import { marketingInboxRouter } from "./admin/marketingInbox";
 import { marketingSignalsRouter } from "./admin/marketingSignals";
-import { agentChatRouter } from "./admin/agentChat";
 
 // App base URL for absolute links in emails
 const APP_URL = 
@@ -425,7 +424,6 @@ export const appRouter = router({
 
   // Admin routes (protected)
   admin: router({
-    agentChat: agentChatRouter,
     intakes: router({
       list: protectedProcedure
         .input(z.object({
