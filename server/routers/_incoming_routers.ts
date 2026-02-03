@@ -1,6 +1,13 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
+import { adminStripeWebhooksRouter } from "./routers/admin/stripeWebhooks";
+import { adminEmailSmokeRouter } from "./routers/admin/emailSmoke";
+import { adminEmailMetricsRouter } from "./routers/admin/emailMetrics";
+import { swarmConsoleRouter } from "./routers/admin/swarmConsole";
+import { swarmOpsChatRouter } from "./routers/admin/swarmOpsChat";
+import { agentRunsRouter, agentEventsRouter, agentArtifactsRouter } from "./routers/admin/agentRuns";
+import { agentStackRouter } from "./routers/admin/agentStack";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -71,8 +78,8 @@ function generateReferralCode(): string {
 import { actionRequestsRouter } from "./routers/actionRequestsRouter";
 import { designJobsRouter } from "./routers/designJobsRouter";
 import { aiCopyRefineRouter } from "./routers/aiCopyRefineRouter";
-import { marketingInboxRouter } from "./admin/marketingInbox";
-import { marketingSignalsRouter } from "./admin/marketingSignals";
+import { marketingInboxRouter } from "./routers/marketingInbox";
+import { marketingSignalsRouter } from "./routers/admin/marketingSignals";
 
 export const appRouter = router({
   system: systemRouter,
@@ -80,6 +87,8 @@ export const appRouter = router({
   actionRequests: actionRequestsRouter,
   designJobs: designJobsRouter,
   aiCopyRefine: aiCopyRefineRouter,
+  marketingInbox: marketingInboxRouter,
+  marketingSignals: marketingSignalsRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
@@ -425,6 +434,12 @@ export const appRouter = router({
 
   // Admin routes (protected)
   admin: router({
+    swarm: swarmConsoleRouter,
+    opsChat: swarmOpsChatRouter,
+    agentRuns: agentRunsRouter,
+    agentEvents: agentEventsRouter,
+    agentArtifacts: agentArtifactsRouter,
+    agentStack: agentStackRouter,
     intakes: router({
       list: protectedProcedure
         .input(z.object({
@@ -892,6 +907,14 @@ export const appRouter = router({
         }),
     }),
 
+    // Stripe webhook monitoring (admin-only, read-only observability)
+    stripeWebhooks: adminStripeWebhooksRouter,
+    
+    // Email delivery smoke test (admin-only)
+    emailSmoke: adminEmailSmokeRouter,
+    
+    // Email delivery metrics (admin-only)
+    emailMetrics: adminEmailMetricsRouter,
     
     // Test checkout for Stripe integration verification
     createTestCheckout: protectedProcedure
@@ -1028,42 +1051,6 @@ export const appRouter = router({
 
         return alerts;
       }),
-
-    // Agent runs and events
-    agentRuns: router({
-      create: protectedProcedure
-        .input(z.object({
-          goal: z.string(),
-          model: z.string().optional(),
-          maxSteps: z.number().optional(),
-          maxErrors: z.number().optional(),
-        }))
-        .mutation(async ({ input }) => {
-          // Generate a unique run ID
-          const runId = `run_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-
-          // In a real implementation, this would create an agent run
-          // For now, return the runId so the UI can poll for events
-          return { runId };
-        }),
-
-      list: protectedProcedure.query(async () => {
-        return [];
-      }),
-    }),
-
-    agentEvents: router({
-      list: protectedProcedure
-        .input(z.object({
-          runId: z.string(),
-          limit: z.number().optional(),
-        }))
-        .query(async ({ input }) => {
-          // In a real implementation, this would fetch events for a run
-          // For now, return an empty array
-          return [];
-        }),
-    }),
   }),
 
   // Analytics tracking (public for frontend events)
@@ -1158,10 +1145,6 @@ export const appRouter = router({
         stats: workerData.stats,
       };
     }),
-
-    // Marketing management
-    marketingInbox: marketingInboxRouter,
-    marketingSignals: marketingSignalsRouter,
   }),
 
   // Stripe payment routes
