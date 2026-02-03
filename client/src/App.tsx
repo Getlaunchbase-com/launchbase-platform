@@ -55,7 +55,7 @@ import FacebookConnect from "./pages/FacebookConnect";
 import AdminDrafts from "./pages/AdminDrafts";
 import SettingsFacebook from "./pages/SettingsFacebook";
 import AdminStripeWebhooks from "./pages/AdminStripeWebhooks";
-import { AdminEmailMonitoring } from "./pages/AdminEmailMonitoring";
+import AdminEmailMonitoring from "./pages/AdminEmailMonitoring";
 import AdminAgentStack from "./pages/AdminAgentStack";
 function Router() {
   return (
