@@ -1,4 +1,4 @@
-import { appRouter } from './routers/_incoming_routers';
+// Server entry point
+// Router setup happens elsewhere
 
-// For now, just export the router - actual HTTP server setup would go here
-export default appRouter;
+console.log('LaunchBase server starting...');
