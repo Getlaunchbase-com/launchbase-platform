@@ -1,4 +1,5 @@
 import { AdminLayout } from "../../components/AdminLayout";
+import { AdminLayout } from "../../components/AdminLayout";
 import { CheckCircle, Zap, Brain } from "../../components/Icons";
 
 const MODELS = [

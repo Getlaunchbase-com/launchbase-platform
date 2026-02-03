@@ -1,4 +1,5 @@
 import { AdminLayout } from "../../components/AdminLayout";
+import { AdminLayout } from "../../components/AdminLayout";
 import { Shield, AlertCircle } from "../../components/Icons";
 
 const TOOLS = [

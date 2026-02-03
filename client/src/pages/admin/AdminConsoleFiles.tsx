@@ -1,4 +1,5 @@
 import { AdminLayout } from "../../components/AdminLayout";
+import { AdminLayout } from "../../components/AdminLayout";
 import { Upload, Download, Eye } from "../../components/Icons";
 
 export default function AdminConsoleFiles() {
