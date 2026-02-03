@@ -1,5 +1,4 @@
 import { AdminLayout } from "../../components/AdminLayout";
-import { AdminLayout } from "../../components/AdminLayout";
 import { AlertCircle, CheckCircle, Clock, Zap, TrendingUp, Play, MessageSquare } from "../../components/Icons";
 
 export default function AdminConsoleDashboard() {
