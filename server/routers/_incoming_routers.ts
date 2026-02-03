@@ -73,7 +73,6 @@ import { designJobsRouter } from "./routers/designJobsRouter";
 import { aiCopyRefineRouter } from "./routers/aiCopyRefineRouter";
 import { marketingInboxRouter } from "./admin/marketingInbox";
 import { marketingSignalsRouter } from "./admin/marketingSignals";
-import { COOKIE_NAME } from "@shared/const";
 
 export const appRouter = router({
   system: systemRouter,
