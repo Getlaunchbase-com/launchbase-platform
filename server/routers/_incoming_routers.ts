@@ -87,8 +87,6 @@ export const appRouter = router({
   actionRequests: actionRequestsRouter,
   designJobs: designJobsRouter,
   aiCopyRefine: aiCopyRefineRouter,
-  marketingInbox: marketingInboxRouter,
-  marketingSignals: marketingSignalsRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
