@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AdminLayout } from "../../components/AdminLayout";
-import { Play, Pause, Square, FileText, ChevronDown } from "lucide-react";
+import { Play, Pause, Square, FileText, ChevronDown } from "../../components/Icons";
 
 const MARKETING_AGENTS = [
   { id: 1, name: "Signals", description: "Market signal analysis", color: "#3b82f6" },
