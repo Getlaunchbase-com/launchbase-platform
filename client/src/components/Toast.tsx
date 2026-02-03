@@ -19,6 +19,29 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined);
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
+  useEffect(() => {
+    // Add slide-in animation styles
+    const style = document.createElement("style");
+    style.textContent = `
+      @keyframes slideIn {
+        from {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+    `;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
+
   const showToast = useCallback((message: string, type: ToastType = "info", duration: number = 3000) => {
     const id = `toast_${Date.now()}`;
     const toast: Toast = { id, message, type, duration };
@@ -48,7 +71,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           display: "flex",
           flexDirection: "column",
           gap: "8px",
-        }}
+        } as React.CSSProperties}
       >
         {toasts.map((toast) => (
           <ToastItem key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
