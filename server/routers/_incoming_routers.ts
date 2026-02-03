@@ -1029,6 +1029,42 @@ export const appRouter = router({
 
         return alerts;
       }),
+
+    // Agent runs and events
+    agentRuns: router({
+      create: protectedProcedure
+        .input(z.object({
+          goal: z.string(),
+          model: z.string().optional(),
+          maxSteps: z.number().optional(),
+          maxErrors: z.number().optional(),
+        }))
+        .mutation(async ({ input }) => {
+          // Generate a unique run ID
+          const runId = `run_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+
+          // In a real implementation, this would create an agent run
+          // For now, return the runId so the UI can poll for events
+          return { runId };
+        }),
+
+      list: protectedProcedure.query(async () => {
+        return [];
+      }),
+    }),
+
+    agentEvents: router({
+      list: protectedProcedure
+        .input(z.object({
+          runId: z.string(),
+          limit: z.number().optional(),
+        }))
+        .query(async ({ input }) => {
+          // In a real implementation, this would fetch events for a run
+          // For now, return an empty array
+          return [];
+        }),
+    }),
   }),
 
   // Analytics tracking (public for frontend events)
