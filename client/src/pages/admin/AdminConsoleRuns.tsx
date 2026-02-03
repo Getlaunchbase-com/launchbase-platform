@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AdminLayout } from "../../components/AdminLayout";
-import { Search, Filter, ChevronRight } from "lucide-react";
+import { Search, Filter, ChevronRight } from "../../components/Icons";
 
 export default function AdminConsoleRuns() {
   const [searchQuery, setSearchQuery] = useState("");
