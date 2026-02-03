@@ -1145,6 +1145,10 @@ export const appRouter = router({
         stats: workerData.stats,
       };
     }),
+
+    // Marketing management
+    marketingInbox: marketingInboxRouter,
+    marketingSignals: marketingSignalsRouter,
   }),
 
   // Stripe payment routes
