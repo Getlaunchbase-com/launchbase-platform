@@ -80,6 +80,7 @@ import { designJobsRouter } from "./routers/designJobsRouter";
 import { aiCopyRefineRouter } from "./routers/aiCopyRefineRouter";
 import { marketingInboxRouter } from "./admin/marketingInbox";
 import { marketingSignalsRouter } from "./admin/marketingSignals";
+import { agentChatRouter } from "./admin/agentChat";
 
 export const appRouter = router({
   system: systemRouter,
@@ -1147,6 +1148,9 @@ export const appRouter = router({
     // Marketing management
     marketingInbox: marketingInboxRouter,
     marketingSignals: marketingSignalsRouter,
+
+    // Agent chat (VM/brain gateway)
+    agentChat: agentChatRouter,
   }),
 
   // Stripe payment routes
