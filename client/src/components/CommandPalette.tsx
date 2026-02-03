@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "wouter";
-import { Search, Zap, MessageSquare, Settings, FileText, Brain } from "lucide-react";
+import { Search, Zap, MessageSquare, Settings, FileText, Brain } from "./Icons";
 
 interface Command {
   id: string;
