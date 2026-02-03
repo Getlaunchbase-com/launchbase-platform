@@ -155,12 +155,9 @@ function App() {
     <ErrorBoundary>
       <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
-          <ToastProvider>
-            <Toaster />
-            <CommandPalette />
-            {!isAdmin && <Header />}
-            <Router />
-          </ToastProvider>
+          <Toaster />
+          {!isAdmin && <Header />}
+          <Router />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
