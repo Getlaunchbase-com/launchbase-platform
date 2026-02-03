@@ -1,0 +1,20 @@
+{
+  "name": "launchbase-platform",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "LaunchBase platform - client and server",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm -r dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint"
+  },
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "devDependencies": {
+    "typescript": "^5.3.0"
+  }
+}
