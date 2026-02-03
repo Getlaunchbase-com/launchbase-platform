@@ -29,7 +29,6 @@ export default function AdminConsoleRuns() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 style={{
                   width: "100%",
-                  paddingLeft: "28px",
                   padding: "8px",
                   paddingLeft: "28px",
                   backgroundColor: "#0f0f0f",
