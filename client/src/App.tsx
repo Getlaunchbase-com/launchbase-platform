@@ -150,14 +150,17 @@ function Router() {
 function App() {
   const [location] = useLocation();
   const isAdmin = location.startsWith("/admin");
-  
+
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
-          <Toaster />
-          {!isAdmin && <Header />}
-          <Router />
+          <ToastProvider>
+            <Toaster />
+            <CommandPalette />
+            {!isAdmin && <Header />}
+            <Router />
+          </ToastProvider>
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
