@@ -1130,9 +1130,6 @@ export const appRouter = router({
     // Marketing management
     marketingInbox: marketingInboxRouter,
     marketingSignals: marketingSignalsRouter,
-
-    // Agent chat (VM/brain gateway)
-    agentChat: agentChatRouter,
   }),
 
   // Stripe payment routes
