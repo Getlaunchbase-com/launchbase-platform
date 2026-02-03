@@ -1,10 +1,10 @@
 import { COOKIE_NAME } from "@shared/const";
-import { getSessionCookieOptions } from "./routers/_core/cookies";
-import { systemRouter } from "./routers/_core/systemRouter";
-import { publicProcedure, protectedProcedure, router } from "./routers/_core/trpc";
+import { getSessionCookieOptions } from "./_core/cookies";
+import { systemRouter } from "./_core/systemRouter";
+import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { getDb } from "./routers/db";
+import { getDb } from "./db";
 import { intakes, approvals, buildPlans, referrals, intelligenceLayers, socialPosts, moduleSetupSteps, moduleConnections, suiteApplications, deployments, emailLogs } from "./drizzle/schema";
 import { eq, desc, and, asc, sql } from "drizzle-orm";
 import { 
@@ -24,30 +24,30 @@ import {
   getDeployments,
   updateDeploymentStatus,
   runDeployment,
-} from "./routers/db";
-import { sendEmail, AdminNotifications } from "./routers/email";
-import { trackEvent, getFunnelMetrics, getBuildQualityMetrics, getVerticalMetrics, getDailyHealth } from "./routers/analytics";
-import { platformRouter } from "./routers/platform-router";
-import { createSetupCheckoutSession, getCheckoutSession, createServiceCheckoutSession } from "./routers/stripe/checkout";
-import { createSMICheckoutSession, getSMISubscriptionStatus, cancelSMISubscription } from "./routers/stripe/intelligenceCheckout";
-import { generatePlatformGuidePDF } from "./routers/pdfGuide";
-import { generatePreviewHTML, generateBuildPlan as generatePreviewBuildPlan } from "./routers/previewTemplates";
+} from "./db";
+import { sendEmail, AdminNotifications } from "./email";
+import { trackEvent, getFunnelMetrics, getBuildQualityMetrics, getVerticalMetrics, getDailyHealth } from "./analytics";
+import { platformRouter } from "./platform-router";
+import { createSetupCheckoutSession, getCheckoutSession, createServiceCheckoutSession } from "./stripe/checkout";
+import { createSMICheckoutSession, getSMISubscriptionStatus, cancelSMISubscription } from "./stripe/intelligenceCheckout";
+import { generatePlatformGuidePDF } from "./pdfGuide";
+import { generatePreviewHTML, generateBuildPlan as generatePreviewBuildPlan } from "./previewTemplates";
 import { createHash } from "crypto";
-import { getWeatherIntelligence, formatFacebookPost } from "./routers/services/weather-intelligence";
-import { postToFacebook, testFacebookConnection } from "./routers/services/facebook-poster";
-import { getTopReferringSites, getConversionFunnel, get7DayClicks, logReferralEvent } from "./routers/referral";
-import { getLastWorkerRun } from "./routers/worker/deploymentWorker";
-import { getObservabilityData, formatTimeAgo } from "./routers/observability";
-import { notifyOwner } from "./routers/_core/notification";
-import { getHealthMetrics } from "./routers/health";
-import { checkFacebookPostingPolicy } from "./routers/services/facebook-policy";
-import { absoluteUrl } from "./routers/utils/absoluteUrl";
-import { actionRequestsRouter } from "./routers/routers/actionRequestsRouter";
-import { designJobsRouter } from "./routers/routers/designJobsRouter";
-import { aiCopyRefineRouter } from "./routers/routers/aiCopyRefineRouter";
-import { marketingInboxRouter } from "./routers/admin/marketingInbox";
-import { marketingSignalsRouter } from "./routers/admin/marketingSignals";
-import { agentChatRouter } from "./routers/admin/agentChat";
+import { getWeatherIntelligence, formatFacebookPost } from "./services/weather-intelligence";
+import { postToFacebook, testFacebookConnection } from "./services/facebook-poster";
+import { getTopReferringSites, getConversionFunnel, get7DayClicks, logReferralEvent } from "./referral";
+import { getLastWorkerRun } from "./worker/deploymentWorker";
+import { getObservabilityData, formatTimeAgo } from "./observability";
+import { notifyOwner } from "./_core/notification";
+import { getHealthMetrics } from "./health";
+import { checkFacebookPostingPolicy } from "./services/facebook-policy";
+import { absoluteUrl } from "./utils/absoluteUrl";
+import { actionRequestsRouter } from "./routers/actionRequestsRouter";
+import { designJobsRouter } from "./routers/designJobsRouter";
+import { aiCopyRefineRouter } from "./routers/aiCopyRefineRouter";
+import { marketingInboxRouter } from "./admin/marketingInbox";
+import { marketingSignalsRouter } from "./admin/marketingSignals";
+import { agentChatRouter } from "./admin/agentChat";
 
 // App base URL for absolute links in emails
 const APP_URL = 
@@ -119,7 +119,7 @@ export const appRouter = router({
         
         // Handle promo code if provided
         if (input.promoCode && intake?.id) {
-          const { reservePromo } = await import("./routers/services/promoService");
+          const { reservePromo } = await import("./services/promoService");
           const promoResult = await reservePromo({
             promoCode: input.promoCode.toUpperCase(),
             intakeId: intake.id,
@@ -217,7 +217,7 @@ export const appRouter = router({
         const siteSlug = intake.businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').substring(0, 50);
         
         // Tier 1 Enhanced Presentation Pass (feature flag + tenant allowlist)
-        const { ENV } = await import("./routers/_core/env");
+        const { ENV } = await import("./_core/env");
         const isEnhanced =
           ENV.presentationTier === "enhanced" &&
           intake.tenant === "vinces"; // Start safe: only vinces first
@@ -225,7 +225,7 @@ export const appRouter = router({
         let presentation: any | undefined;
         
         if (isEnhanced) {
-          const { runPresentationPass } = await import("./routers/services/design/runPresentationPass");
+          const { runPresentationPass } = await import("./services/design/runPresentationPass");
           const pass = await runPresentationPass({
             intakeId: intake.id,
             tenant: intake.tenant,
@@ -455,7 +455,7 @@ export const appRouter = router({
           }
           
           // Enforce valid status transitions
-          const { isValidTransition } = await import("./routers/statusTransitions");
+          const { isValidTransition } = await import("./statusTransitions");
           const currentStatus = intake.status as "new" | "review" | "needs_info" | "ready_for_review" | "approved" | "paid" | "deployed";
           const targetStatus = input.status;
           
@@ -744,7 +744,7 @@ export const appRouter = router({
           reason: z.string().optional(),
         }))
         .mutation(async ({ input }) => {
-          const { rollbackToLastSuccess } = await import("./routers/rollback");
+          const { rollbackToLastSuccess } = await import("./rollback");
           const result = await rollbackToLastSuccess({
             intakeId: input.intakeId,
             reason: input.reason,
@@ -1279,7 +1279,7 @@ export const appRouter = router({
         }
         
         // Build service summary
-        const { buildServiceSummary } = await import("./routers/services/serviceSummary");
+        const { buildServiceSummary } = await import("./services/serviceSummary");
         const summary = buildServiceSummary(serviceSelections, pricingSnapshot);
         
         // Convert to UI-friendly format
