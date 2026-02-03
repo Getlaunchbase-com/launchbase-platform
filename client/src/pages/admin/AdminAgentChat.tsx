@@ -1,134 +1,236 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { trpc } from "../../lib/trpc";
 
 export default function AdminAgentChat() {
-  const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
-  const [newMessageText, setNewMessageText] = useState("");
+  const [currentRunId, setCurrentRunId] = useState<string | null>(null);
+  const [inputText, setInputText] = useState("");
+  const [chatMessages, setChatMessages] = useState<Array<{ role: string; text: string }>>([]);
+  const [model, setModel] = useState("claude");
+  const [maxSteps, setMaxSteps] = useState(10);
+  const [maxErrors, setMaxErrors] = useState(3);
 
-  const threadsQuery = trpc.admin.agentChat.threads.list.useQuery();
-  const messagesQuery = trpc.admin.agentChat.messages.list.useQuery(
-    { threadId: selectedThreadId || "" },
-    { enabled: !!selectedThreadId }
+  // Create a new agent run
+  const createRunMut = trpc.admin.agentRuns.create.useMutation({
+    onSuccess: (data) => {
+      setCurrentRunId(data.runId);
+      setChatMessages([
+        { role: "user", text: inputText },
+        { role: "assistant", text: "Agent is thinking..." },
+      ]);
+      setInputText("");
+    },
+  });
+
+  // Poll for events from the current run
+  const eventsQuery = trpc.admin.agentEvents.list.useQuery(
+    { runId: currentRunId || "", limit: 100 },
+    {
+      enabled: !!currentRunId,
+      refetchInterval: 1000, // Poll every second
+    }
   );
 
-  const createThreadMut = trpc.admin.agentChat.threads.create.useMutation({
-    onSuccess: (thread) => {
-      threadsQuery.refetch();
-      setSelectedThreadId(thread.id);
-    },
-  });
+  // Update chat messages from events
+  useEffect(() => {
+    if (eventsQuery.data) {
+      const messageEvents = eventsQuery.data.filter(
+        (event: any) => event.type === "message"
+      );
 
-  const sendMessageMut = trpc.admin.agentChat.messages.send.useMutation({
-    onSuccess: () => {
-      messagesQuery.refetch();
-      setNewMessageText("");
-    },
-  });
+      if (messageEvents.length > 0) {
+        const lastEvent = messageEvents[messageEvents.length - 1];
+        setChatMessages((prev) => {
+          // Remove "Agent is thinking..." placeholder
+          const updated = prev.filter((msg) => msg.text !== "Agent is thinking...");
 
-  const threads = threadsQuery.data || [];
-  const messages = messagesQuery.data || [];
+          // Add all message events
+          messageEvents.forEach((event: any) => {
+            if (!updated.find((msg) => msg.text === event.text)) {
+              updated.push({
+                role: event.role || "assistant",
+                text: event.text || "",
+              });
+            }
+          });
+
+          return updated;
+        });
+
+        // If the agent is done, clear the run ID
+        if (lastEvent.isComplete) {
+          setCurrentRunId(null);
+        }
+      }
+    }
+  }, [eventsQuery.data]);
+
+  const handleSend = () => {
+    if (!inputText.trim()) return;
+
+    createRunMut.mutate({
+      goal: inputText,
+      model,
+      maxSteps,
+      maxErrors,
+    });
+  };
 
   return (
-    <div style={{ display: "flex", height: "100vh" }}>
-      {/* Threads list */}
-      <div style={{ width: 250, borderRight: "1px solid #ddd", padding: 16 }}>
-        <h3>Threads</h3>
-        <button
-          onClick={() => createThreadMut.mutate()}
-          style={{ width: "100%", marginBottom: 12 }}
-        >
-          New Thread
-        </button>
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      {/* Header */}
+      <div style={{ padding: "20px", borderBottom: "1px solid #ddd", backgroundColor: "#f9f9f9" }}>
+        <h1>Agent Chat</h1>
+        <p style={{ margin: "10px 0 0 0", fontSize: "14px", color: "#666" }}>
+          Launch real agent runs and see live responses
+        </p>
+      </div>
 
-        <div style={{ overflowY: "auto", maxHeight: "calc(100% - 60px)" }}>
-          {threads.map((thread) => (
-            <div
-              key={thread.id}
-              onClick={() => setSelectedThreadId(thread.id)}
-              style={{
-                padding: 8,
-                marginBottom: 4,
-                backgroundColor: selectedThreadId === thread.id ? "#007bff" : "#f0f0f0",
-                color: selectedThreadId === thread.id ? "white" : "black",
-                borderRadius: 4,
-                cursor: "pointer",
-              }}
+      {/* Settings Panel (collapsible) */}
+      <div style={{ padding: "16px", borderBottom: "1px solid #eee", backgroundColor: "#fafafa" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
+          <div>
+            <label style={{ display: "block", marginBottom: "4px", fontSize: "12px", fontWeight: "bold" }}>
+              Model
+            </label>
+            <select
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              disabled={!!currentRunId}
+              style={{ width: "100%", padding: "6px", borderRadius: "4px", border: "1px solid #ddd" }}
             >
-              {thread.title || `Thread ${thread.id.substring(0, 8)}`}
-            </div>
-          ))}
+              <option value="claude">Claude</option>
+              <option value="gpt-4">GPT-4</option>
+              <option value="o1">O1</option>
+            </select>
+          </div>
+
+          <div>
+            <label style={{ display: "block", marginBottom: "4px", fontSize: "12px", fontWeight: "bold" }}>
+              Max Steps: {maxSteps}
+            </label>
+            <input
+              type="range"
+              min="1"
+              max="50"
+              value={maxSteps}
+              onChange={(e) => setMaxSteps(parseInt(e.target.value))}
+              disabled={!!currentRunId}
+              style={{ width: "100%", cursor: currentRunId ? "not-allowed" : "pointer" }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: "block", marginBottom: "4px", fontSize: "12px", fontWeight: "bold" }}>
+              Max Errors: {maxErrors}
+            </label>
+            <input
+              type="range"
+              min="1"
+              max="10"
+              value={maxErrors}
+              onChange={(e) => setMaxErrors(parseInt(e.target.value))}
+              disabled={!!currentRunId}
+              style={{ width: "100%", cursor: currentRunId ? "not-allowed" : "pointer" }}
+            />
+          </div>
         </div>
       </div>
 
-      {/* Messages area */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-        {selectedThreadId ? (
-          <>
-            <div
-              style={{
-                flex: 1,
-                overflowY: "auto",
-                padding: 16,
-                backgroundColor: "#fafafa",
-              }}
-            >
-              {messagesQuery.isLoading && <div>Loading messages...</div>}
-              {messages.map((msg, i) => (
-                <div
-                  key={i}
-                  style={{
-                    marginBottom: 12,
-                    padding: 8,
-                    backgroundColor: msg.role === "user" ? "#007bff" : "#e9ecef",
-                    color: msg.role === "user" ? "white" : "black",
-                    borderRadius: 4,
-                    maxWidth: "80%",
-                    marginLeft: msg.role === "user" ? "auto" : 0,
-                  }}
-                >
-                  <strong>{msg.role}:</strong> {msg.text}
-                </div>
-              ))}
-            </div>
+      {/* Chat Messages Area */}
+      <div
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          padding: "16px",
+          backgroundColor: "#ffffff",
+          display: "flex",
+          flexDirection: "column",
+          gap: "12px",
+        }}
+      >
+        {chatMessages.length === 0 && !currentRunId && (
+          <div style={{ padding: "40px 20px", textAlign: "center", color: "#999" }}>
+            <p>No messages yet. Start a conversation below.</p>
+          </div>
+        )}
 
-            <div style={{ padding: 16, borderTop: "1px solid #ddd", display: "flex", gap: 8 }}>
-              <input
-                type="text"
-                value={newMessageText}
-                onChange={(e) => setNewMessageText(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter" && newMessageText.trim()) {
-                    sendMessageMut.mutate({
-                      threadId: selectedThreadId,
-                      text: newMessageText,
-                    });
-                  }
-                }}
-                placeholder="Type a message..."
-                style={{ flex: 1, padding: 8, borderRadius: 4, border: "1px solid #ddd" }}
-              />
-              <button
-                onClick={() => {
-                  if (newMessageText.trim()) {
-                    sendMessageMut.mutate({
-                      threadId: selectedThreadId,
-                      text: newMessageText,
-                    });
-                  }
-                }}
-                disabled={sendMessageMut.isPending || !newMessageText.trim()}
-                style={{ padding: "8px 16px" }}
-              >
-                Send
-              </button>
-            </div>
-          </>
-        ) : (
-          <div style={{ padding: 20, textAlign: "center", color: "#666" }}>
-            Select or create a thread to start chatting
+        {chatMessages.map((msg, idx) => (
+          <div
+            key={idx}
+            style={{
+              padding: "12px 16px",
+              borderRadius: "8px",
+              maxWidth: "70%",
+              marginLeft: msg.role === "user" ? "auto" : 0,
+              backgroundColor: msg.role === "user" ? "#007bff" : "#e9ecef",
+              color: msg.role === "user" ? "white" : "#333",
+              wordWrap: "break-word",
+            }}
+          >
+            {msg.text}
+          </div>
+        ))}
+
+        {eventsQuery.isLoading && currentRunId && (
+          <div style={{ padding: "12px 16px", color: "#999", fontStyle: "italic" }}>
+            Waiting for agent response...
           </div>
         )}
       </div>
+
+      {/* Input Area */}
+      <div
+        style={{
+          padding: "16px",
+          borderTop: "1px solid #ddd",
+          backgroundColor: "#fafafa",
+          display: "flex",
+          gap: "8px",
+        }}
+      >
+        <input
+          type="text"
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)}
+          onKeyPress={(e) => {
+            if (e.key === "Enter" && !currentRunId && inputText.trim()) {
+              handleSend();
+            }
+          }}
+          placeholder="What do you want the agent to do?"
+          disabled={!!currentRunId || createRunMut.isPending}
+          style={{
+            flex: 1,
+            padding: "10px 12px",
+            borderRadius: "4px",
+            border: "1px solid #ddd",
+            fontSize: "14px",
+            cursor: currentRunId ? "not-allowed" : "text",
+          }}
+        />
+        <button
+          onClick={handleSend}
+          disabled={!!currentRunId || createRunMut.isPending || !inputText.trim()}
+          style={{
+            padding: "10px 20px",
+            borderRadius: "4px",
+            border: "none",
+            backgroundColor: currentRunId || !inputText.trim() ? "#ccc" : "#007bff",
+            color: "white",
+            cursor: currentRunId || !inputText.trim() ? "not-allowed" : "pointer",
+            fontWeight: "bold",
+          }}
+        >
+          {createRunMut.isPending ? "Sending..." : "Send"}
+        </button>
+      </div>
+
+      {/* Status indicator */}
+      {currentRunId && (
+        <div style={{ padding: "8px 16px", backgroundColor: "#fff3cd", fontSize: "12px", color: "#664d03" }}>
+          Run ID: {currentRunId} (listening for updates...)
+        </div>
+      )}
     </div>
   );
 }
