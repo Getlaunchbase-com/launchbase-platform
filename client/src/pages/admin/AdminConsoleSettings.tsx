@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AdminLayout } from "../../components/AdminLayout";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun } from "../../components/Icons";
 
 export default function AdminConsoleSettings() {
   const [darkMode, setDarkMode] = useState(true);
