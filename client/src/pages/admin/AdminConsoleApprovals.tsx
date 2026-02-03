@@ -1,5 +1,4 @@
 import { AdminLayout } from "../../components/AdminLayout";
-import { AdminLayout } from "../../components/AdminLayout";
 import { CheckCircle, XCircle } from "../../components/Icons";
 
 export default function AdminConsoleApprovals() {
