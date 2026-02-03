@@ -58,6 +58,7 @@ import AdminStripeWebhooks from "./pages/AdminStripeWebhooks";
 import AdminEmailMonitoring from "./pages/AdminEmailMonitoring";
 import AdminAgentStack from "./pages/AdminAgentStack";
 import AdminAgentChat from "./pages/admin/AdminAgentChat";
+import AdminConsoleDashboard from "./pages/admin/AdminConsoleDashboard";
 function Router() {
   return (
     <Switch>
