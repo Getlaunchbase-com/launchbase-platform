@@ -59,6 +59,13 @@ import AdminEmailMonitoring from "./pages/AdminEmailMonitoring";
 import AdminAgentStack from "./pages/AdminAgentStack";
 import AdminAgentChat from "./pages/admin/AdminAgentChat";
 import AdminConsoleDashboard from "./pages/admin/AdminConsoleDashboard";
+import AdminConsoleMarketingAgents from "./pages/admin/AdminConsoleMarketingAgents";
+import AdminConsoleRuns from "./pages/admin/AdminConsoleRuns";
+import AdminConsoleApprovals from "./pages/admin/AdminConsoleApprovals";
+import AdminConsoleFiles from "./pages/admin/AdminConsoleFiles";
+import AdminConsoleTools from "./pages/admin/AdminConsoleTools";
+import AdminConsoleModels from "./pages/admin/AdminConsoleModels";
+import AdminConsoleSettings from "./pages/admin/AdminConsoleSettings";
 function Router() {
   return (
     <Switch>
