@@ -8,7 +8,7 @@ import { trpc } from "../../lib/trpc";
 
 const STATUSES = ["new", "triaged", "qualified", "rejected", "converted"] as const;
 
-export function AdminMarketingSignals() {
+export default function AdminMarketingSignals() {
   const [status, setStatus] = useState<(typeof STATUSES)[number] | undefined>("new");
   const [search, setSearch] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
