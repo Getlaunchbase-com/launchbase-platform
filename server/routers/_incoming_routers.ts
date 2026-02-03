@@ -78,8 +78,8 @@ function generateReferralCode(): string {
 import { actionRequestsRouter } from "./routers/actionRequestsRouter";
 import { designJobsRouter } from "./routers/designJobsRouter";
 import { aiCopyRefineRouter } from "./routers/aiCopyRefineRouter";
-import { marketingInboxRouter } from "./routers/marketingInbox";
-import { marketingSignalsRouter } from "./routers/admin/marketingSignals";
+import { marketingInboxRouter } from "./admin/marketingInbox";
+import { marketingSignalsRouter } from "./admin/marketingSignals";
 
 export const appRouter = router({
   system: systemRouter,

@@ -8,7 +8,7 @@ import { trpc } from "../../lib/trpc";
 
 const STATUSES = ["new", "triaged", "queued", "running", "done", "archived"] as const;
 
-export function AdminMarketingInbox() {
+export default function AdminMarketingInbox() {
   const [status, setStatus] = useState<(typeof STATUSES)[number]>("new");
   const [search, setSearch] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
