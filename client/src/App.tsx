@@ -57,6 +57,7 @@ import SettingsFacebook from "./pages/SettingsFacebook";
 import AdminStripeWebhooks from "./pages/AdminStripeWebhooks";
 import AdminEmailMonitoring from "./pages/AdminEmailMonitoring";
 import AdminAgentStack from "./pages/AdminAgentStack";
+import AdminAgentChat from "./pages/admin/AdminAgentChat";
 function Router() {
   return (
     <Switch>
@@ -110,6 +111,7 @@ function Router() {
         <Route path="/admin/swarm/compare" component={AdminSwarmCompare} />
         <Route path="/admin/swarm/models" component={AdminSwarmModels} />
       <Route path="/admin/agent-stack" component={AdminAgentStack} />
+      <Route path="/admin/agent/chat" component={AdminAgentChat} />
       <Route path="/admin/marketing-inbox" component={AdminMarketingInbox} />
       <Route path="/admin/marketing-signals" component={AdminMarketingSignals} />
         <Route path="/admin/swarm/repo" component={AdminSwarmRepoSources} />
