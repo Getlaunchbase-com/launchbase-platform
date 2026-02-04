@@ -8,26 +8,26 @@ import { trpc } from "../../lib/trpc";
 
 const STATUSES = ["new", "triaged", "qualified", "rejected", "converted"] as const;
 
-export function AdminMarketingSignals() {
+export default function AdminMarketingSignals() {
   const [status, setStatus] = useState<(typeof STATUSES)[number] | undefined>("new");
   const [search, setSearch] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [noteText, setNoteText] = useState("");
 
-  const listQuery = trpc.marketingSignals.list.useQuery({
+  const listQuery = trpc.admin.marketingSignals.list.useQuery({
     status,
     search: search.trim() || undefined,
     limit: 100,
   });
 
-  const setStatusMut = trpc.marketingSignals.setStatus.useMutation({
+  const setStatusMut = trpc.admin.marketingSignals.setStatus.useMutation({
     onSuccess: () => {
       listQuery.refetch();
       setSelectedId(null);
     },
   });
 
-  const addNoteMut = trpc.marketingSignals.addNote.useMutation({
+  const addNoteMut = trpc.admin.marketingSignals.addNote.useMutation({
     onSuccess: () => {
       listQuery.refetch();
       setNoteText("");
@@ -35,7 +35,7 @@ export function AdminMarketingSignals() {
     },
   });
 
-  const seedMut = trpc.marketingSignals.seed.useMutation({
+  const seedMut = trpc.admin.marketingSignals.seed.useMutation({
     onSuccess: () => listQuery.refetch(),
   });
 

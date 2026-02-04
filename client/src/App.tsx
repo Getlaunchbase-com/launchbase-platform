@@ -5,6 +5,8 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { CommandPalette } from "./components/CommandPalette";
+import { ToastProvider } from "./components/Toast";
 import Home from "./pages/Home";
 import Onboarding from "./pages/Onboarding";
 import OnboardingSuccess from "./pages/OnboardingSuccess";
@@ -22,8 +24,8 @@ import AdminSwarmModels from "./pages/AdminSwarmModels";
 import AdminSwarmProfileDetail from "./pages/AdminSwarmProfileDetail";
 import AdminSwarmDashboard from "./pages/AdminSwarmDashboard";
 import AdminSwarmRepoSources from "./pages/AdminSwarmRepoSources";
-import { AdminMarketingInbox } from "./pages/admin/AdminMarketingInbox";
-import { AdminMarketingSignals } from "./pages/admin/AdminMarketingSignals";
+import AdminMarketingInbox from "./pages/admin/AdminMarketingInbox";
+import AdminMarketingSignals from "./pages/admin/AdminMarketingSignals";
 import AdminLogin from "./pages/AdminLogin";
 import IntakeDetail from "./pages/IntakeDetail";
 import DeploymentStatus from "./pages/DeploymentStatus";
@@ -55,8 +57,17 @@ import FacebookConnect from "./pages/FacebookConnect";
 import AdminDrafts from "./pages/AdminDrafts";
 import SettingsFacebook from "./pages/SettingsFacebook";
 import AdminStripeWebhooks from "./pages/AdminStripeWebhooks";
-import { AdminEmailMonitoring } from "./pages/AdminEmailMonitoring";
+import AdminEmailMonitoring from "./pages/AdminEmailMonitoring";
 import AdminAgentStack from "./pages/AdminAgentStack";
+import AdminAgentChat from "./pages/admin/AdminAgentChat";
+import AdminConsoleDashboard from "./pages/admin/AdminConsoleDashboard";
+import AdminConsoleMarketingAgents from "./pages/admin/AdminConsoleMarketingAgents";
+import AdminConsoleRuns from "./pages/admin/AdminConsoleRuns";
+import AdminConsoleApprovals from "./pages/admin/AdminConsoleApprovals";
+import AdminConsoleFiles from "./pages/admin/AdminConsoleFiles";
+import AdminConsoleTools from "./pages/admin/AdminConsoleTools";
+import AdminConsoleModels from "./pages/admin/AdminConsoleModels";
+import AdminConsoleSettings from "./pages/admin/AdminConsoleSettings";
 function Router() {
   return (
     <Switch>
@@ -110,6 +121,17 @@ function Router() {
         <Route path="/admin/swarm/compare" component={AdminSwarmCompare} />
         <Route path="/admin/swarm/models" component={AdminSwarmModels} />
       <Route path="/admin/agent-stack" component={AdminAgentStack} />
+      <Route path="/admin/dashboard" component={AdminConsoleDashboard} />
+      <Route path="/admin/agent/chat" component={AdminAgentChat} />
+      <Route path="/admin/console" component={AdminConsoleDashboard} />
+      <Route path="/admin/console/agent-chat" component={AdminAgentChat} />
+      <Route path="/admin/console/marketing-agents" component={AdminConsoleMarketingAgents} />
+      <Route path="/admin/console/runs" component={AdminConsoleRuns} />
+      <Route path="/admin/console/approvals" component={AdminConsoleApprovals} />
+      <Route path="/admin/console/files" component={AdminConsoleFiles} />
+      <Route path="/admin/console/tools" component={AdminConsoleTools} />
+      <Route path="/admin/console/models" component={AdminConsoleModels} />
+      <Route path="/admin/console/settings" component={AdminConsoleSettings} />
       <Route path="/admin/marketing-inbox" component={AdminMarketingInbox} />
       <Route path="/admin/marketing-signals" component={AdminMarketingSignals} />
         <Route path="/admin/swarm/repo" component={AdminSwarmRepoSources} />
@@ -129,7 +151,7 @@ function Router() {
 function App() {
   const [location] = useLocation();
   const isAdmin = location.startsWith("/admin");
-  
+
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="dark">
