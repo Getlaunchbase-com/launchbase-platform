@@ -1762,10 +1762,13 @@ export const agentRuns = mysqlTable("agent_runs", {
     riskTier: number;
   }>(),
   approvedAt: timestamp("approvedAt"),
+  // Project isolation: links this run to a project scope
+  projectId: int("projectId"), // FK to projects.id — nullable for backward compat
 }, (table) => ({
   createdByIdx: index("agent_runs_createdBy_idx").on(table.createdBy),
   statusIdx: index("agent_runs_status_idx").on(table.status),
   createdAtIdx: index("agent_runs_createdAt_idx").on(table.createdAt),
+  projectIdIdx: index("agent_runs_projectId_idx").on(table.projectId),
 }));
 export type AgentRun = typeof agentRuns.$inferSelect;
 export type InsertAgentRun = typeof agentRuns.$inferInsert;
@@ -1924,3 +1927,210 @@ export const marketingHypotheses = mysqlTable(
 
 export type MarketingHypothesis = typeof marketingHypotheses.$inferSelect;
 export type InsertMarketingHypothesis = typeof marketingHypotheses.$inferInsert;
+
+
+// ============================================================================
+// PROJECT ISOLATION TABLES
+// ============================================================================
+
+/**
+ * Projects — top-level isolation boundary for multi-tenant agent work.
+ * Each project belongs to an owner (user) and a tenant.
+ * Agent runs, artifacts, and collaborators are scoped to a project.
+ */
+export const projects = mysqlTable(
+  "projects",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    name: varchar("name", { length: 255 }).notNull(),
+    slug: varchar("slug", { length: 128 }).notNull(),
+    description: text("description"),
+    ownerId: int("ownerId").notNull(), // FK to users.id
+    tenant: mysqlEnum("tenant", ["launchbase", "vinces"]).notNull().default("launchbase"),
+    status: mysqlEnum("status", ["active", "archived", "suspended"]).notNull().default("active"),
+    settings: json("settings").$type<Record<string, unknown>>(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (t) => ({
+    slugIdx: uniqueIndex("projects_slug_idx").on(t.slug),
+    ownerIdx: index("projects_owner_idx").on(t.ownerId),
+    tenantIdx: index("projects_tenant_idx").on(t.tenant),
+    statusIdx: index("projects_status_idx").on(t.status),
+  })
+);
+
+export type Project = typeof projects.$inferSelect;
+export type InsertProject = typeof projects.$inferInsert;
+
+/**
+ * Project Collaborators — grants users access to a project with a specific role.
+ * Enforces the principle of least privilege: users only see projects they belong to.
+ */
+export const projectCollaborators = mysqlTable(
+  "project_collaborators",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    projectId: int("projectId").notNull(), // FK to projects.id
+    userId: int("userId").notNull(), // FK to users.id
+    role: mysqlEnum("role", ["owner", "editor", "viewer"]).notNull().default("viewer"),
+    invitedBy: int("invitedBy"), // FK to users.id — who added this collaborator
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    projectUserIdx: uniqueIndex("pc_project_user_idx").on(t.projectId, t.userId),
+    userIdx: index("pc_user_idx").on(t.userId),
+  })
+);
+
+export type ProjectCollaborator = typeof projectCollaborators.$inferSelect;
+export type InsertProjectCollaborator = typeof projectCollaborators.$inferInsert;
+
+/**
+ * Agent Artifacts — files, PRs, screenshots, and other outputs from agent runs.
+ * Scoped to a project + run for access control.
+ * Actual file content lives on disk (ARTIFACTS_DIR) or S3; this table stores metadata.
+ */
+export const agentArtifacts = mysqlTable(
+  "agent_artifacts",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    runId: int("runId").notNull(), // FK to agent_runs.id
+    projectId: int("projectId").notNull(), // FK to projects.id (denormalized for fast queries)
+    type: mysqlEnum("type", ["file", "screenshot", "pr", "log", "report"]).notNull(),
+    filename: varchar("filename", { length: 512 }).notNull(),
+    mimeType: varchar("mimeType", { length: 128 }),
+    sizeBytes: int("sizeBytes"),
+    storagePath: varchar("storagePath", { length: 1024 }).notNull(), // relative path in ARTIFACTS_DIR or S3 key
+    storageBackend: mysqlEnum("storageBackend", ["local", "s3"]).notNull().default("local"),
+    checksum: varchar("checksum", { length: 128 }), // SHA-256 integrity check
+    meta: json("meta").$type<Record<string, unknown>>(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    runIdx: index("aa_run_idx").on(t.runId),
+    projectIdx: index("aa_project_idx").on(t.projectId),
+    typeIdx: index("aa_type_idx").on(t.type),
+  })
+);
+
+export type AgentArtifact = typeof agentArtifacts.$inferSelect;
+export type InsertAgentArtifact = typeof agentArtifacts.$inferInsert;
+
+// ============================================================================
+// SECURITY HARDENING TABLES
+// ============================================================================
+
+/**
+ * Security Audit Log - Append-only log of security-relevant events
+ * Tracks authentication, authorization, rate limiting, and access control events
+ *
+ * DO NOT weaken this contract:
+ * - This table is append-only. Never update or delete rows.
+ * - All security-relevant actions must be logged here.
+ * - eventType + fingerprint provide dedupe capability.
+ */
+export const securityAuditLog = mysqlTable(
+  "security_audit_log",
+  {
+    id: int("id").autoincrement().primaryKey(),
+
+    // Event classification
+    eventType: mysqlEnum("eventType", [
+      "auth_success",
+      "auth_failure",
+      "access_denied",
+      "rate_limit_hit",
+      "rate_limit_warn",
+      "admin_action",
+      "project_access_granted",
+      "project_access_denied",
+      "suspicious_input",
+      "csrf_violation",
+      "session_created",
+      "session_destroyed",
+      "privilege_escalation_attempt",
+    ]).notNull(),
+
+    // Severity for alerting
+    severity: mysqlEnum("severity", ["info", "warn", "crit"]).notNull().default("info"),
+
+    // Actor identification
+    actorType: mysqlEnum("actorType", ["anonymous", "user", "admin", "system"]).notNull().default("anonymous"),
+    actorId: varchar("actorId", { length: 191 }), // user ID, IP, or system identifier
+    actorIp: varchar("actorIp", { length: 45 }), // IPv4 or IPv6
+
+    // Request context
+    requestPath: varchar("requestPath", { length: 512 }),
+    requestMethod: varchar("requestMethod", { length: 10 }),
+    userAgent: text("userAgent"),
+
+    // Tenant isolation
+    tenant: mysqlEnum("tenant", ["launchbase", "vinces"]),
+
+    // Target resource
+    resourceType: varchar("resourceType", { length: 64 }), // "intake", "deployment", "build_plan", etc.
+    resourceId: varchar("resourceId", { length: 191 }),
+
+    // Human-readable description
+    message: text("message").notNull(),
+
+    // Structured metadata
+    meta: json("meta").$type<Record<string, unknown>>(),
+
+    // Dedupe fingerprint (optional)
+    fingerprint: varchar("fingerprint", { length: 128 }),
+
+    // Timestamps
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    eventTypeIdx: index("sal_event_type_idx").on(t.eventType, t.createdAt),
+    actorIpIdx: index("sal_actor_ip_idx").on(t.actorIp, t.createdAt),
+    severityIdx: index("sal_severity_idx").on(t.severity, t.createdAt),
+    tenantIdx: index("sal_tenant_idx").on(t.tenant, t.createdAt),
+    resourceIdx: index("sal_resource_idx").on(t.resourceType, t.resourceId),
+  })
+);
+
+export type SecurityAuditLog = typeof securityAuditLog.$inferSelect;
+export type InsertSecurityAuditLog = typeof securityAuditLog.$inferInsert;
+
+/**
+ * Rate Limit Violations - Tracks rate limit enforcement for observability
+ * Aggregated by window for efficient querying
+ */
+export const rateLimitViolations = mysqlTable(
+  "rate_limit_violations",
+  {
+    id: int("id").autoincrement().primaryKey(),
+
+    // Limiter identification
+    limiterKey: varchar("limiterKey", { length: 128 }).notNull(), // e.g., "api:global", "api:auth", "api:mutation"
+    bucketKey: varchar("bucketKey", { length: 256 }).notNull(), // e.g., IP address or user ID
+
+    // Violation details
+    requestCount: int("requestCount").notNull(), // how many requests in window
+    limitMax: int("limitMax").notNull(), // what the limit was
+    windowMs: int("windowMs").notNull(), // window duration in ms
+
+    // Request context
+    actorIp: varchar("actorIp", { length: 45 }),
+    actorId: varchar("actorId", { length: 191 }),
+    requestPath: varchar("requestPath", { length: 512 }),
+
+    // Tenant
+    tenant: mysqlEnum("tenant", ["launchbase", "vinces"]),
+
+    // Timestamps
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    limiterKeyIdx: index("rlv_limiter_key_idx").on(t.limiterKey, t.createdAt),
+    actorIpIdx: index("rlv_actor_ip_idx").on(t.actorIp, t.createdAt),
+    bucketKeyIdx: index("rlv_bucket_key_idx").on(t.bucketKey, t.createdAt),
+  })
+);
+
+export type RateLimitViolation = typeof rateLimitViolations.$inferSelect;
+export type InsertRateLimitViolation = typeof rateLimitViolations.$inferInsert;
