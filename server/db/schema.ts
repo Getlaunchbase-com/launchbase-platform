@@ -2211,3 +2211,34 @@ export const agentInstanceSecrets = mysqlTable(
 
 export type AgentInstanceSecret = typeof agentInstanceSecrets.$inferSelect;
 export type InsertAgentInstanceSecret = typeof agentInstanceSecrets.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Mobile Sessions — scoped auth tokens for mobile/voice clients
+// ---------------------------------------------------------------------------
+
+export const mobileSessions = mysqlTable(
+  "mobile_sessions",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    token: varchar("token", { length: 128 }).notNull().unique(),
+    userId: int("userId").notNull(), // FK to users.id
+    projectId: int("projectId").notNull(), // FK to projects.id
+    agentInstanceId: int("agentInstanceId").notNull(), // FK to agent_instances.id
+    status: mysqlEnum("status", ["active", "revoked", "expired"]).default("active").notNull(),
+    // Optional: current active run for this session
+    activeRunId: int("activeRunId"), // FK to agent_runs.id
+    expiresAt: timestamp("expiresAt").notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    lastUsedAt: timestamp("lastUsedAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    tokenIdx: uniqueIndex("ms_token_idx").on(t.token),
+    userIdx: index("ms_user_idx").on(t.userId),
+    projectIdx: index("ms_project_idx").on(t.projectId),
+    instanceIdx: index("ms_instance_idx").on(t.agentInstanceId),
+    statusIdx: index("ms_status_idx").on(t.status, t.expiresAt),
+  })
+);
+
+export type MobileSession = typeof mobileSessions.$inferSelect;
+export type InsertMobileSession = typeof mobileSessions.$inferInsert;
