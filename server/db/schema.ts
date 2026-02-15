@@ -1764,11 +1764,14 @@ export const agentRuns = mysqlTable("agent_runs", {
   approvedAt: timestamp("approvedAt"),
   // Project isolation: links this run to a project scope
   projectId: int("projectId"), // FK to projects.id — nullable for backward compat
+  // Agent instance binding: links this run to a specific agent instance
+  agentInstanceId: int("agentInstanceId"), // FK to agent_instances.id — nullable for backward compat
 }, (table) => ({
   createdByIdx: index("agent_runs_createdBy_idx").on(table.createdBy),
   statusIdx: index("agent_runs_status_idx").on(table.status),
   createdAtIdx: index("agent_runs_createdAt_idx").on(table.createdAt),
   projectIdIdx: index("agent_runs_projectId_idx").on(table.projectId),
+  agentInstanceIdIdx: index("agent_runs_agentInstanceId_idx").on(table.agentInstanceId),
 }));
 export type AgentRun = typeof agentRuns.$inferSelect;
 export type InsertAgentRun = typeof agentRuns.$inferInsert;
@@ -2134,3 +2137,73 @@ export const rateLimitViolations = mysqlTable(
 
 export type RateLimitViolation = typeof rateLimitViolations.$inferSelect;
 export type InsertRateLimitViolation = typeof rateLimitViolations.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Vertex Profiles — reusable agent configuration templates
+// ---------------------------------------------------------------------------
+
+export const vertexProfiles = mysqlTable("vertex_profiles", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  // JSON config: model settings, system prompt, temperature, etc.
+  configJson: json("configJson").$type<Record<string, unknown>>(),
+  // JSON allowlist of tools this vertex may use
+  toolsAllowlistJson: json("toolsAllowlistJson").$type<string[]>(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type VertexProfile = typeof vertexProfiles.$inferSelect;
+export type InsertVertexProfile = typeof vertexProfiles.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Agent Instances — per-customer agent deployment bound to a project + vertex
+// ---------------------------------------------------------------------------
+
+export const agentInstances = mysqlTable(
+  "agent_instances",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    projectId: int("projectId").notNull(), // FK to projects.id
+    vertexId: int("vertexId").notNull(), // FK to vertex_profiles.id
+    displayName: varchar("displayName", { length: 255 }).notNull(),
+    status: mysqlEnum("status", ["active", "paused", "archived"]).default("active").notNull(),
+    createdBy: int("createdBy").notNull(), // FK to users.id
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (t) => ({
+    projectIdx: index("ai_project_idx").on(t.projectId),
+    vertexIdx: index("ai_vertex_idx").on(t.vertexId),
+    statusIdx: index("ai_status_idx").on(t.status),
+    createdByIdx: index("ai_createdBy_idx").on(t.createdBy),
+  })
+);
+
+export type AgentInstance = typeof agentInstances.$inferSelect;
+export type InsertAgentInstance = typeof agentInstances.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Agent Instance Secrets — encrypted key/value pairs per instance
+// Never return raw values through the API — only confirm existence.
+// ---------------------------------------------------------------------------
+
+export const agentInstanceSecrets = mysqlTable(
+  "agent_instance_secrets",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    instanceId: int("instanceId").notNull(), // FK to agent_instances.id
+    key: varchar("key", { length: 255 }).notNull(),
+    encryptedValue: text("encryptedValue").notNull(), // encrypted blob
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (t) => ({
+    instanceIdx: index("ais_instance_idx").on(t.instanceId),
+    instanceKeyUniq: uniqueIndex("ais_instance_key_uniq").on(t.instanceId, t.key),
+  })
+);
+
+export type AgentInstanceSecret = typeof agentInstanceSecrets.$inferSelect;
+export type InsertAgentInstanceSecret = typeof agentInstanceSecrets.$inferInsert;
