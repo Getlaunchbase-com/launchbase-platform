@@ -1924,3 +1924,122 @@ export const marketingHypotheses = mysqlTable(
 
 export type MarketingHypothesis = typeof marketingHypotheses.$inferSelect;
 export type InsertMarketingHypothesis = typeof marketingHypotheses.$inferInsert;
+
+
+// ============================================================================
+// SECURITY HARDENING TABLES
+// ============================================================================
+
+/**
+ * Security Audit Log - Append-only log of security-relevant events
+ * Tracks authentication, authorization, rate limiting, and access control events
+ *
+ * DO NOT weaken this contract:
+ * - This table is append-only. Never update or delete rows.
+ * - All security-relevant actions must be logged here.
+ * - eventType + fingerprint provide dedupe capability.
+ */
+export const securityAuditLog = mysqlTable(
+  "security_audit_log",
+  {
+    id: int("id").autoincrement().primaryKey(),
+
+    // Event classification
+    eventType: mysqlEnum("eventType", [
+      "auth_success",
+      "auth_failure",
+      "access_denied",
+      "rate_limit_hit",
+      "rate_limit_warn",
+      "admin_action",
+      "project_access_granted",
+      "project_access_denied",
+      "suspicious_input",
+      "csrf_violation",
+      "session_created",
+      "session_destroyed",
+      "privilege_escalation_attempt",
+    ]).notNull(),
+
+    // Severity for alerting
+    severity: mysqlEnum("severity", ["info", "warn", "crit"]).notNull().default("info"),
+
+    // Actor identification
+    actorType: mysqlEnum("actorType", ["anonymous", "user", "admin", "system"]).notNull().default("anonymous"),
+    actorId: varchar("actorId", { length: 191 }), // user ID, IP, or system identifier
+    actorIp: varchar("actorIp", { length: 45 }), // IPv4 or IPv6
+
+    // Request context
+    requestPath: varchar("requestPath", { length: 512 }),
+    requestMethod: varchar("requestMethod", { length: 10 }),
+    userAgent: text("userAgent"),
+
+    // Tenant isolation
+    tenant: mysqlEnum("tenant", ["launchbase", "vinces"]),
+
+    // Target resource
+    resourceType: varchar("resourceType", { length: 64 }), // "intake", "deployment", "build_plan", etc.
+    resourceId: varchar("resourceId", { length: 191 }),
+
+    // Human-readable description
+    message: text("message").notNull(),
+
+    // Structured metadata
+    meta: json("meta").$type<Record<string, unknown>>(),
+
+    // Dedupe fingerprint (optional)
+    fingerprint: varchar("fingerprint", { length: 128 }),
+
+    // Timestamps
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    eventTypeIdx: index("sal_event_type_idx").on(t.eventType, t.createdAt),
+    actorIpIdx: index("sal_actor_ip_idx").on(t.actorIp, t.createdAt),
+    severityIdx: index("sal_severity_idx").on(t.severity, t.createdAt),
+    tenantIdx: index("sal_tenant_idx").on(t.tenant, t.createdAt),
+    resourceIdx: index("sal_resource_idx").on(t.resourceType, t.resourceId),
+  })
+);
+
+export type SecurityAuditLog = typeof securityAuditLog.$inferSelect;
+export type InsertSecurityAuditLog = typeof securityAuditLog.$inferInsert;
+
+/**
+ * Rate Limit Violations - Tracks rate limit enforcement for observability
+ * Aggregated by window for efficient querying
+ */
+export const rateLimitViolations = mysqlTable(
+  "rate_limit_violations",
+  {
+    id: int("id").autoincrement().primaryKey(),
+
+    // Limiter identification
+    limiterKey: varchar("limiterKey", { length: 128 }).notNull(), // e.g., "api:global", "api:auth", "api:mutation"
+    bucketKey: varchar("bucketKey", { length: 256 }).notNull(), // e.g., IP address or user ID
+
+    // Violation details
+    requestCount: int("requestCount").notNull(), // how many requests in window
+    limitMax: int("limitMax").notNull(), // what the limit was
+    windowMs: int("windowMs").notNull(), // window duration in ms
+
+    // Request context
+    actorIp: varchar("actorIp", { length: 45 }),
+    actorId: varchar("actorId", { length: 191 }),
+    requestPath: varchar("requestPath", { length: 512 }),
+
+    // Tenant
+    tenant: mysqlEnum("tenant", ["launchbase", "vinces"]),
+
+    // Timestamps
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    limiterKeyIdx: index("rlv_limiter_key_idx").on(t.limiterKey, t.createdAt),
+    actorIpIdx: index("rlv_actor_ip_idx").on(t.actorIp, t.createdAt),
+    bucketKeyIdx: index("rlv_bucket_key_idx").on(t.bucketKey, t.createdAt),
+  })
+);
+
+export type RateLimitViolation = typeof rateLimitViolations.$inferSelect;
+export type InsertRateLimitViolation = typeof rateLimitViolations.$inferInsert;

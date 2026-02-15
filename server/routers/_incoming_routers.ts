@@ -14,6 +14,15 @@ import { z } from "zod";
 import { getDb } from "./db";
 import { intakes, approvals, buildPlans, referrals, intelligenceLayers, socialPosts, moduleSetupSteps, moduleConnections, suiteApplications, deployments, emailLogs } from "../drizzle/schema";
 import { eq, desc, and, asc, sql } from "drizzle-orm";
+// Security hardening imports
+import {
+  enforceRateLimit,
+  RATE_LIMITS,
+  getClientIp,
+  auditLog,
+  enforceInputSecurity,
+  scanInput,
+} from "./security";
 import { 
   createIntake, 
   getIntakes, 
@@ -92,6 +101,10 @@ export const appRouter = router({
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
+      // Security: audit session destruction
+      auditLog.sessionDestroyed(ctx, {
+        message: `User session destroyed${ctx.user ? ` (userId: ${ctx.user.id})` : ""}`,
+      });
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       return { success: true } as const;
@@ -120,7 +133,20 @@ export const appRouter = router({
         referralCode: z.string().optional(),
         promoCode: z.string().optional(),
       }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
+        // Security: rate limit public form submissions (5/min per IP)
+        const clientIp = getClientIp(ctx.req);
+        enforceRateLimit(RATE_LIMITS.publicForm, clientIp);
+
+        // Security: scan input for suspicious patterns (defense-in-depth)
+        const findings = scanInput(input);
+        if (findings.length > 0) {
+          auditLog.suspiciousInput({ req: ctx.req }, {
+            message: `Suspicious input detected in intake submission: ${findings.map(f => f.type).join(", ")}`,
+            meta: { findings, email: input.email },
+          });
+        }
+
         const db = await getDb();
         if (!db) throw new Error("Database not available");
         
@@ -262,10 +288,25 @@ export const appRouter = router({
         intakeId: z.number(),
         feedback: z.string(),
       }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
+        // Security: rate limit feedback submissions
+        const clientIp = getClientIp(ctx.req);
+        enforceRateLimit(RATE_LIMITS.publicForm, clientIp);
+
+        // Security: scan feedback for suspicious patterns
+        const findings = scanInput(input);
+        if (findings.length > 0) {
+          auditLog.suspiciousInput({ req: ctx.req }, {
+            message: `Suspicious input in feedback: ${findings.map(f => f.type).join(", ")}`,
+            resourceType: "intake",
+            resourceId: input.intakeId,
+            meta: { findings },
+          });
+        }
+
         const db = await getDb();
         if (!db) throw new Error("Database not available");
-        
+
         // Update intake with feedback and set status back to needs_info
         await db
           .update(intakes)
@@ -289,6 +330,10 @@ export const appRouter = router({
         userAgent: z.string(),
       }))
       .mutation(async ({ input, ctx }) => {
+        // Security: rate limit approval submissions
+        const clientIp = getClientIp(ctx.req);
+        enforceRateLimit(RATE_LIMITS.publicForm, clientIp);
+
         const db = await getDb();
         if (!db) throw new Error("Database not available");
         
@@ -461,7 +506,15 @@ export const appRouter = router({
           id: z.number(),
           status: z.enum(["new", "review", "needs_info", "ready_for_review", "approved", "paid", "deployed"]),
         }))
-        .mutation(async ({ input }) => {
+        .mutation(async ({ input, ctx }) => {
+          // Security: audit admin status changes
+          auditLog.adminAction(ctx, {
+            message: `Admin updating intake ${input.id} status to ${input.status}`,
+            resourceType: "intake",
+            resourceId: input.id,
+            meta: { targetStatus: input.status },
+          });
+
           // Get current intake to validate transition
           const intake = await getIntakeById(input.id);
           if (!intake) {
@@ -517,10 +570,17 @@ export const appRouter = router({
           ids: z.array(z.number()),
           status: z.enum(["new", "review", "needs_info", "ready_for_review", "approved", "paid", "deployed"]),
         }))
-        .mutation(async ({ input }) => {
+        .mutation(async ({ input, ctx }) => {
+          // Security: audit bulk admin actions
+          auditLog.adminAction(ctx, {
+            message: `Admin bulk-updating ${input.ids.length} intakes to ${input.status}`,
+            resourceType: "intake",
+            meta: { ids: input.ids, targetStatus: input.status },
+          });
+
           const db = await getDb();
           if (!db) throw new Error("Database not available");
-          
+
           let updated = 0;
           for (const id of input.ids) {
             await db.update(intakes)
@@ -757,7 +817,15 @@ export const appRouter = router({
           intakeId: z.number(),
           reason: z.string().optional(),
         }))
-        .mutation(async ({ input }) => {
+        .mutation(async ({ input, ctx }) => {
+          // Security: audit rollback actions (high-severity admin operation)
+          auditLog.adminAction(ctx, {
+            message: `Admin triggered rollback for intake ${input.intakeId}`,
+            resourceType: "deployment",
+            resourceId: input.intakeId,
+            meta: { reason: input.reason },
+          });
+
           const { rollbackToLastSuccess } = await import("./rollback");
           const result = await rollbackToLastSuccess({
             intakeId: input.intakeId,
@@ -1064,7 +1132,11 @@ export const appRouter = router({
         stepNumber: z.number().optional(),
         metadata: z.record(z.string(), z.unknown()).optional(),
       }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
+        // Security: rate limit analytics tracking (global tier, 100/min per IP)
+        const clientIp = getClientIp(ctx.req);
+        enforceRateLimit(RATE_LIMITS.global, clientIp);
+
         await trackEvent(input as any);
         return { success: true };
       }),
@@ -1157,6 +1229,10 @@ export const appRouter = router({
         modules: z.array(z.enum(["google_ads", "quickbooks"])).optional(),
       }))
       .mutation(async ({ input, ctx }) => {
+        // Security: rate limit checkout creation (5/min per IP)
+        const clientIp = getClientIp(ctx.req);
+        enforceRateLimit(RATE_LIMITS.publicForm, clientIp);
+
         const origin = ctx.req.headers.origin || "http://localhost:3000";
         const { url, sessionId } = await createSetupCheckoutSession({
           intakeId: input.intakeId,
@@ -1984,7 +2060,20 @@ export const appRouter = router({
         tier: z.enum(["standard", "growth", "premium"]).optional(),
         enginesSelected: z.array(z.string()).optional(),
       }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
+        // Security: rate limit suite application submissions (5/min per IP)
+        const clientIp = getClientIp(ctx.req);
+        enforceRateLimit(RATE_LIMITS.publicForm, clientIp);
+
+        // Security: scan input for suspicious patterns
+        const findings = scanInput(input);
+        if (findings.length > 0) {
+          auditLog.suspiciousInput({ req: ctx.req }, {
+            message: `Suspicious input in suite application: ${findings.map(f => f.type).join(", ")}`,
+            meta: { findings, email: input.contact.email },
+          });
+        }
+
         const db = await getDb();
         if (!db) throw new Error("Database not available");
 
