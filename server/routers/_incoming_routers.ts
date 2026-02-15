@@ -8,6 +8,7 @@ import { swarmConsoleRouter } from "./routers/admin/swarmConsole";
 import { swarmOpsChatRouter } from "./routers/admin/swarmOpsChat";
 import { agentRunsRouter, agentEventsRouter, agentArtifactsRouter } from "./routers/admin/agentRuns";
 import { agentStackRouter } from "./routers/admin/agentStack";
+import { operatorOSRouter } from "./routers/admin/operatorOS";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -485,6 +486,7 @@ export const appRouter = router({
     agentEvents: agentEventsRouter,
     agentArtifacts: agentArtifactsRouter,
     agentStack: agentStackRouter,
+    operatorOS: operatorOSRouter,
     intakes: router({
       list: protectedProcedure
         .input(z.object({

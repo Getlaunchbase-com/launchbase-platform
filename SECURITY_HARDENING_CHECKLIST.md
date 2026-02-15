@@ -8,29 +8,36 @@
 
 ## Architecture Overview
 
-This security hardening layer adds five defense-in-depth components to the LaunchBase platform:
+This security hardening layer adds eight defense-in-depth components to the LaunchBase platform:
 
-1. **Rate Limiting** — In-memory sliding-window limiter per IP/user
-2. **Project Access Verification** — Tenant-scoped RBAC for resource access
-3. **Audit Logging** — Append-only security event log with buffered writes
-4. **Input Sanitization** — XSS/SQLi pattern detection (defense-in-depth)
-5. **CSRF Protection** — Origin/Referer validation for mutations
+1. **Rate Limiting (tRPC)** — In-memory sliding-window limiter per IP/user on tRPC procedures
+2. **Rate Limiting (Express)** — HTTP-level rate limiter middleware for artifact routes and APIs
+3. **Project Access Verification** — Tenant-scoped RBAC for resource access
+4. **Project Isolation** — Per-project collaborator-based access control (owner/editor/viewer)
+5. **Audit Logging** — Append-only security event log with buffered writes
+6. **Input Sanitization** — XSS/SQLi pattern detection (defense-in-depth)
+7. **CSRF Protection** — Origin/Referer validation for mutations
+8. **Artifact Protection** — Authenticated downloads with directory traversal prevention + S3 presigned URLs
 
 ### File Inventory
 
 | File | Purpose |
 |------|---------|
 | `server/security/index.ts` | Re-exports all security modules |
-| `server/security/rateLimit.ts` | Sliding-window rate limiter |
+| `server/security/rateLimit.ts` | Sliding-window rate limiter (tRPC-level) |
 | `server/security/verifyProjectAccess.ts` | Tenant-scoped RBAC |
 | `server/security/auditLog.ts` | Buffered audit event writer |
 | `server/security/inputSanitizer.ts` | XSS/SQLi detection + CSRF |
-| `server/db/schema.ts` | `security_audit_log` + `rate_limit_violations` tables |
+| `server/middleware/rateLimiter.ts` | Express-level rate limiter middleware |
+| `server/auth/verifyProjectAccess.ts` | Project-level access control (per-project RBAC) |
+| `server/routes/artifactsRouter.ts` | Secure artifact download router (auth + traversal prevention) |
+| `server/routers/admin/operatorOS.ts` | Operator OS admin dashboard tRPC router |
+| `server/db/schema.ts` | `projects`, `project_collaborators`, `agent_artifacts`, `security_audit_log`, `rate_limit_violations` tables |
 | `SECURITY_HARDENING_CHECKLIST.md` | This file |
 
 ---
 
-## Security Tests (5 checks)
+## Security Tests (8 checks)
 
 ### Test 1: Rate Limiting — Public Form Submission
 
@@ -120,16 +127,63 @@ verifyProjectAccess(
 
 ---
 
+### Test 6: Artifact Auth — Unauthenticated Denied
+
+**What:** Unauthenticated requests to `/api/artifacts/:id` return 401.
+
+**How to verify:**
+```bash
+curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/api/artifacts/1
+```
+
+**Expected:** HTTP 401 with `{"error":{"code":"UNAUTHORIZED",...}}`.
+
+---
+
+### Test 7: Artifact Auth — Wrong Project Returns 403
+
+**What:** Authenticated user without project access gets 403.
+
+**How to verify:**
+1. Log in as a user who is NOT a collaborator on the artifact's project
+2. Request `GET /api/artifacts/:id`
+3. Should return 403
+
+**Expected:** HTTP 403 with `{"error":{"code":"FORBIDDEN",...}}`.
+
+---
+
+### Test 8: Express Rate Limiter — Artifact Downloads
+
+**What:** Artifact download endpoint enforces 30 requests/minute per IP.
+
+**How to verify:**
+```bash
+# Requires auth cookie — replace with valid session
+for i in $(seq 1 31); do
+  curl -s -o /dev/null -w "%{http_code}\n" \
+    -H "Cookie: session=YOUR_SESSION_COOKIE" \
+    http://localhost:3000/api/artifacts/1
+done
+```
+
+**Expected:** First 30 return 401/403/200 (depending on auth/access). 31st returns 429.
+
+---
+
 ## Pre-Production Checklist
 
-- [ ] **Remove staging escape hatch** — Delete or disable `ALLOW_STAGING_BYPASS` in `server/security/verifyProjectAccess.ts`
+- [ ] **Remove staging escape hatch** — Delete `ALLOW_STAGING_BYPASS` in both `server/security/verifyProjectAccess.ts` and `server/auth/verifyProjectAccess.ts`
 - [ ] **Register audit writer** — Call `registerAuditWriter()` in server startup to connect audit buffer to database
-- [ ] **Run `pnpm db:push`** — Apply `security_audit_log` and `rate_limit_violations` table migrations
-- [ ] **Verify rate limit thresholds** — Adjust `RATE_LIMITS` constants based on actual traffic patterns
+- [ ] **Run `pnpm db:push`** — Apply `projects`, `project_collaborators`, `agent_artifacts`, `security_audit_log`, and `rate_limit_violations` table migrations
+- [ ] **Mount artifacts router** — In Express app setup: `app.use("/api/artifacts", RATE_LIMITERS.artifacts(), artifactsRouter)`
+- [ ] **Set `ARTIFACTS_DIR`** — Configure local artifact storage path (or set `ARTIFACTS_S3_BUCKET` for S3)
+- [ ] **Verify rate limit thresholds** — Adjust `RATE_LIMITS` and `RATE_LIMITERS` constants based on actual traffic patterns
 - [ ] **Enable CSRF validation** — Add `enforceInputSecurity(ctx.req, input)` to tRPC middleware for all mutations
 - [ ] **Review allowed origins** — Update `getAllowedOrigins()` with production domain(s)
-- [ ] **Set up alerting** — Monitor `security_audit_log` for `severity = 'crit'` events
+- [ ] **Set up alerting** — Monitor `security_audit_log` for `severity = 'crit'` events via Operator OS dashboard
 - [ ] **Load test rate limiter** — Verify memory footprint under sustained load (cleanup runs every 5 min)
+- [ ] **Configure Redis** — When `REDIS_URL` is set, migrate rate limiter from in-memory to Redis-backed store
 
 ---
 
@@ -163,12 +217,13 @@ verifyProjectAccess(
 
 ---
 
-## Remaining Soft Spot
+## Remaining Soft Spots
 
-> **Before production: Remove the staging escape hatch in `verifyProjectAccess`.**
+> **Before production: Remove the staging escape hatch in BOTH `verifyProjectAccess` modules.**
 >
-> This is the only remaining soft spot. When `ALLOW_STAGING_BYPASS=true`,
-> unauthenticated users bypass access checks. This is acceptable for
-> staging/development but MUST be removed for production.
+> When `ALLOW_STAGING_BYPASS=true`, unauthenticated users bypass access checks.
+> This is acceptable for staging/development but MUST be removed for production.
 >
-> Location: `server/security/verifyProjectAccess.ts`, lines 59-65
+> Locations:
+> - `server/security/verifyProjectAccess.ts` — tenant-scoped RBAC bypass
+> - `server/auth/verifyProjectAccess.ts` — project-level access bypass
