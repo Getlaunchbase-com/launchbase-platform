@@ -10,6 +10,7 @@ import { agentRunsRouter, agentEventsRouter, agentArtifactsRouter } from "./rout
 import { agentStackRouter } from "./routers/admin/agentStack";
 import { operatorOSRouter } from "./routers/admin/operatorOS";
 import { agentInstancesRouter, vertexProfilesRouter } from "./routers/admin/agentInstances";
+import { blueprintsRouter } from "./routers/admin/blueprints";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -490,6 +491,7 @@ export const appRouter = router({
     operatorOS: operatorOSRouter,
     agentInstances: agentInstancesRouter,
     vertexProfiles: vertexProfilesRouter,
+    blueprints: blueprintsRouter,
     intakes: router({
       list: protectedProcedure
         .input(z.object({

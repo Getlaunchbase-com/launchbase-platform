@@ -1998,9 +1998,13 @@ export const agentArtifacts = mysqlTable(
   "agent_artifacts",
   {
     id: int("id").autoincrement().primaryKey(),
-    runId: int("runId").notNull(), // FK to agent_runs.id
+    runId: int("runId"), // FK to agent_runs.id — nullable for pre-run uploads (e.g. blueprints)
     projectId: int("projectId").notNull(), // FK to projects.id (denormalized for fast queries)
-    type: mysqlEnum("type", ["file", "screenshot", "pr", "log", "report"]).notNull(),
+    type: mysqlEnum("type", [
+      "file", "screenshot", "pr", "log", "report",
+      // Blueprint intake + takeoff outputs
+      "blueprint_input", "takeoff_json", "takeoff_xlsx", "takeoff_docx",
+    ]).notNull(),
     filename: varchar("filename", { length: 512 }).notNull(),
     mimeType: varchar("mimeType", { length: 128 }),
     sizeBytes: int("sizeBytes"),
