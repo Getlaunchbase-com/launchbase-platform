@@ -16,6 +16,8 @@ import {
   projectCollaborators,
   agentRuns,
   agentArtifacts,
+  agentInstances,
+  vertexProfiles,
   securityAuditLog,
   rateLimitViolations,
   users,
@@ -302,6 +304,102 @@ export const operatorOSRouter = router({
         .where(where);
 
       return { artifacts: rows, total: countResult?.total ?? 0 };
+    }),
+
+  // =========================================================================
+  // Instances panel — pick project → pick instance → launch run
+  // =========================================================================
+
+  /** List instances for a project (Instances panel) */
+  listInstances: adminProcedure
+    .input(
+      z.object({
+        projectId: z.number().int(),
+        status: z.enum(["active", "paused", "archived"]).optional(),
+        limit: z.number().int().min(1).max(100).default(50),
+        offset: z.number().int().min(0).default(0),
+      })
+    )
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return { instances: [], total: 0 };
+
+      const conditions: any[] = [eq(agentInstances.projectId, input.projectId)];
+      if (input.status) conditions.push(eq(agentInstances.status, input.status));
+
+      const where = and(...conditions);
+
+      const rows = await db
+        .select({
+          id: agentInstances.id,
+          projectId: agentInstances.projectId,
+          vertexId: agentInstances.vertexId,
+          displayName: agentInstances.displayName,
+          status: agentInstances.status,
+          createdBy: agentInstances.createdBy,
+          createdAt: agentInstances.createdAt,
+          vertexName: vertexProfiles.name,
+        })
+        .from(agentInstances)
+        .leftJoin(vertexProfiles, eq(agentInstances.vertexId, vertexProfiles.id))
+        .where(where)
+        .orderBy(desc(agentInstances.createdAt))
+        .limit(input.limit)
+        .offset(input.offset);
+
+      const [countResult] = await db
+        .select({ total: count() })
+        .from(agentInstances)
+        .where(where);
+
+      return { instances: rows, total: countResult?.total ?? 0 };
+    }),
+
+  /** Launch a new agent run bound to a specific instance */
+  launchInstanceRun: adminProcedure
+    .input(
+      z.object({
+        projectId: z.number().int(),
+        agentInstanceId: z.number().int(),
+        goal: z.string().min(1),
+        model: z.string().max(128).optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database unavailable");
+
+      // Verify instance exists, is active, and belongs to the project
+      const [instance] = await db
+        .select()
+        .from(agentInstances)
+        .where(
+          and(
+            eq(agentInstances.id, input.agentInstanceId),
+            eq(agentInstances.projectId, input.projectId)
+          )
+        )
+        .limit(1);
+
+      if (!instance) throw new Error("Instance not found or does not belong to project");
+      if (instance.status !== "active") throw new Error("Instance is not active");
+
+      const userId = (ctx as any).user?.id ?? 0;
+
+      const [result] = await db.insert(agentRuns).values({
+        createdBy: userId,
+        status: "running",
+        goal: input.goal,
+        model: input.model ?? null,
+        projectId: input.projectId,
+        agentInstanceId: input.agentInstanceId,
+      });
+
+      return {
+        runId: result.insertId,
+        projectId: input.projectId,
+        agentInstanceId: input.agentInstanceId,
+      };
     }),
 });
 
