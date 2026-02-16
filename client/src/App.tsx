@@ -69,6 +69,8 @@ import AdminConsoleTools from "./pages/admin/AdminConsoleTools";
 import AdminConsoleModels from "./pages/admin/AdminConsoleModels";
 import AdminConsoleSettings from "./pages/admin/AdminConsoleSettings";
 import AdminFeedbackLoop from "./pages/admin/AdminFeedbackLoop";
+import AdminBlueprintViewer from "./pages/admin/AdminBlueprintViewer";
+import AdminSymbolMapping from "./pages/admin/AdminSymbolMapping";
 function Router() {
   return (
     <Switch>
@@ -139,6 +141,8 @@ function Router() {
  <Route path="/admin/swarm/runs/:repairKey" component={AdminSwarmRunDetail} />
 
       <Route path="/admin/feedback" component={AdminFeedbackLoop} />
+      <Route path="/admin/blueprint-viewer" component={AdminBlueprintViewer} />
+      <Route path="/admin/symbol-mapping" component={AdminSymbolMapping} />
       <Route path="/admin/alerts" component={AdminAlerts} />
       <Route path="/admin/test-checkout" component={AdminTestCheckout} />
       

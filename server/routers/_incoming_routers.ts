@@ -12,6 +12,8 @@ import { operatorOSRouter } from "./routers/admin/operatorOS";
 import { agentInstancesRouter, vertexProfilesRouter } from "./routers/admin/agentInstances";
 import { blueprintsRouter } from "./routers/admin/blueprints";
 import { feedbackRouter } from "./routers/admin/feedback";
+import { blueprintIngestionRouter } from "./routers/admin/blueprintIngestion";
+import { blueprintLegendResolverRouter } from "./routers/admin/blueprintLegendResolver";
 import { mobileSessionRouter, mobileVoiceRouter, mobileChatRouter, mobileFeedbackRouter } from "./routers/mobile";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
@@ -502,6 +504,8 @@ export const appRouter = router({
     agentInstances: agentInstancesRouter,
     vertexProfiles: vertexProfilesRouter,
     blueprints: blueprintsRouter,
+    blueprintIngestion: blueprintIngestionRouter,
+    blueprintLegend: blueprintLegendResolverRouter,
     feedback: feedbackRouter,
     intakes: router({
       list: protectedProcedure

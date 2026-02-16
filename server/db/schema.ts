@@ -2349,3 +2349,217 @@ export const feedbackImprovementProposals = mysqlTable(
 
 export type FeedbackImprovementProposal = typeof feedbackImprovementProposals.$inferSelect;
 export type InsertFeedbackImprovementProposal = typeof feedbackImprovementProposals.$inferInsert;
+
+// ===========================================================================
+// Blueprint Ingestion Pipeline — structured document → pages → detections
+// ===========================================================================
+
+// ---------------------------------------------------------------------------
+// Blueprint Documents — top-level container for an uploaded blueprint set
+// ---------------------------------------------------------------------------
+
+export const blueprintDocuments = mysqlTable(
+  "blueprint_documents",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    projectId: int("projectId").notNull(), // FK to projects.id
+    artifactId: int("artifactId"), // FK to agent_artifacts.id (the uploaded file)
+    filename: varchar("filename", { length: 512 }).notNull(),
+    mimeType: varchar("mimeType", { length: 128 }),
+    pageCount: int("pageCount").default(0).notNull(),
+    status: mysqlEnum("status", [
+      "uploaded",
+      "parsing",
+      "parsed",
+      "detection_running",
+      "detection_complete",
+      "failed",
+    ]).default("uploaded").notNull(),
+    errorMessage: text("errorMessage"),
+    uploadedBy: int("uploadedBy").notNull(), // FK to users.id
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (t) => ({
+    projectIdx: index("bd_project_idx").on(t.projectId),
+    artifactIdx: index("bd_artifact_idx").on(t.artifactId),
+    statusIdx: index("bd_status_idx").on(t.status),
+  })
+);
+
+export type BlueprintDocument = typeof blueprintDocuments.$inferSelect;
+export type InsertBlueprintDocument = typeof blueprintDocuments.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Blueprint Pages — one row per page/sheet in the blueprint
+// ---------------------------------------------------------------------------
+
+export const blueprintPages = mysqlTable(
+  "blueprint_pages",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    documentId: int("documentId").notNull(), // FK to blueprint_documents.id
+    pageNumber: int("pageNumber").notNull(), // 1-indexed
+    label: varchar("label", { length: 255 }), // e.g. "Sheet E-101", "Floor Plan 2"
+    // Rendered image of this page (stored in artifacts dir / S3)
+    imageStoragePath: varchar("imageStoragePath", { length: 1024 }),
+    imageWidth: int("imageWidth"), // pixels
+    imageHeight: int("imageHeight"), // pixels
+    // OCR / text extraction status
+    textExtracted: boolean("textExtracted").default(false).notNull(),
+    // Page-level metadata (scale, orientation, etc.)
+    meta: json("meta").$type<Record<string, unknown>>(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    documentIdx: index("bp_document_idx").on(t.documentId),
+    pageNumIdx: index("bp_page_num_idx").on(t.documentId, t.pageNumber),
+  })
+);
+
+export type BlueprintPage = typeof blueprintPages.$inferSelect;
+export type InsertBlueprintPage = typeof blueprintPages.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Blueprint Text Blocks — extracted text regions per page (OCR / PDF text)
+// ---------------------------------------------------------------------------
+
+export const blueprintTextBlocks = mysqlTable(
+  "blueprint_text_blocks",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    pageId: int("pageId").notNull(), // FK to blueprint_pages.id
+    // Bounding box (normalized 0-1 relative to page dimensions)
+    x: float("x").notNull(),
+    y: float("y").notNull(),
+    w: float("w").notNull(),
+    h: float("h").notNull(),
+    text: text("text").notNull(),
+    confidence: float("confidence"), // OCR confidence 0-1
+    blockType: mysqlEnum("blockType", ["title", "label", "dimension", "note", "legend_text", "other"])
+      .default("other")
+      .notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    pageIdx: index("btb_page_idx").on(t.pageId),
+    typeIdx: index("btb_type_idx").on(t.blockType),
+  })
+);
+
+export type BlueprintTextBlock = typeof blueprintTextBlocks.$inferSelect;
+export type InsertBlueprintTextBlock = typeof blueprintTextBlocks.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Blueprint Legend Entries — legend/key items found on the blueprint
+// ---------------------------------------------------------------------------
+
+export const blueprintLegendEntries = mysqlTable(
+  "blueprint_legend_entries",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    documentId: int("documentId").notNull(), // FK to blueprint_documents.id
+    pageId: int("pageId"), // FK to blueprint_pages.id (which page the legend is on)
+    // Raw detected symbol description (e.g. "circle with X", "filled triangle")
+    symbolDescription: varchar("symbolDescription", { length: 512 }).notNull(),
+    // Raw label from the legend (e.g. "smoke detector", "120V outlet")
+    rawLabel: varchar("rawLabel", { length: 512 }).notNull(),
+    // Symbol image crop path (if extracted)
+    symbolImagePath: varchar("symbolImagePath", { length: 1024 }),
+    // Bounding box of the legend entry on the page (normalized 0-1)
+    x: float("x"),
+    y: float("y"),
+    w: float("w"),
+    h: float("h"),
+    // Mapped canonical device type (set after operator approval in PR-B2)
+    canonicalType: varchar("canonicalType", { length: 255 }),
+    // Symbol pack reference (set after mapping)
+    symbolPackId: int("symbolPackId"), // FK to blueprint_symbol_packs.id
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (t) => ({
+    documentIdx: index("ble_document_idx").on(t.documentId),
+    pageIdx: index("ble_page_idx").on(t.pageId),
+    canonicalIdx: index("ble_canonical_idx").on(t.canonicalType),
+    symbolPackIdx: index("ble_symbol_pack_idx").on(t.symbolPackId),
+  })
+);
+
+export type BlueprintLegendEntry = typeof blueprintLegendEntries.$inferSelect;
+export type InsertBlueprintLegendEntry = typeof blueprintLegendEntries.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Blueprint Detections Raw — every symbol/device instance found on pages
+// ---------------------------------------------------------------------------
+
+export const blueprintDetectionsRaw = mysqlTable(
+  "blueprint_detections_raw",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    pageId: int("pageId").notNull(), // FK to blueprint_pages.id
+    documentId: int("documentId").notNull(), // FK to blueprint_documents.id (denormalized)
+    // Bounding box (normalized 0-1 relative to page dimensions)
+    x: float("x").notNull(),
+    y: float("y").notNull(),
+    w: float("w").notNull(),
+    h: float("h").notNull(),
+    // Raw class label from vision model (e.g. "smoke_detector", "outlet_120v")
+    rawClass: varchar("rawClass", { length: 255 }).notNull(),
+    // Confidence score from detection model (0-1)
+    confidence: float("confidence").notNull(),
+    // Matched legend entry (if resolved)
+    legendEntryId: int("legendEntryId"), // FK to blueprint_legend_entries.id
+    // Canonical device type (resolved via legend mapping)
+    canonicalType: varchar("canonicalType", { length: 255 }),
+    // Status of this detection
+    status: mysqlEnum("status", ["raw", "mapped", "verified", "rejected"]).default("raw").notNull(),
+    // Operator notes / corrections
+    operatorNote: text("operatorNote"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    pageIdx: index("bdr_page_idx").on(t.pageId),
+    documentIdx: index("bdr_document_idx").on(t.documentId),
+    rawClassIdx: index("bdr_raw_class_idx").on(t.rawClass),
+    canonicalIdx: index("bdr_canonical_idx").on(t.canonicalType),
+    legendIdx: index("bdr_legend_idx").on(t.legendEntryId),
+    statusIdx: index("bdr_status_idx").on(t.status),
+  })
+);
+
+export type BlueprintDetectionRaw = typeof blueprintDetectionsRaw.$inferSelect;
+export type InsertBlueprintDetectionRaw = typeof blueprintDetectionsRaw.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Blueprint Symbol Packs — reusable symbol→device type mappings
+// ---------------------------------------------------------------------------
+
+export const blueprintSymbolPacks = mysqlTable(
+  "blueprint_symbol_packs",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    name: varchar("name", { length: 255 }).notNull(),
+    description: text("description"),
+    // The mapping: rawClass → canonicalType
+    mappings: json("mappings").$type<
+      Array<{
+        rawClass: string;
+        canonicalType: string;
+        symbolDescription?: string;
+      }>
+    >(),
+    // Who created/approved this pack
+    createdBy: int("createdBy").notNull(), // FK to users.id
+    isDefault: boolean("isDefault").default(false).notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (t) => ({
+    nameIdx: index("bsp_name_idx").on(t.name),
+    defaultIdx: index("bsp_default_idx").on(t.isDefault),
+  })
+);
+
+export type BlueprintSymbolPack = typeof blueprintSymbolPacks.$inferSelect;
+export type InsertBlueprintSymbolPack = typeof blueprintSymbolPacks.$inferInsert;
