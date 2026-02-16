@@ -50,6 +50,14 @@ interface ContractInfo {
   parsedAt: string;
 }
 
+interface VertexFreezeInfo {
+  vertex: string;
+  version: string;
+  status: "frozen" | "deprecated" | "superseded";
+  frozenAt: string;
+  contracts: string[];
+}
+
 type OverlayMode = "detections" | "text" | "both" | "none";
 
 // ---------------------------------------------------------------------------
@@ -126,6 +134,14 @@ const MOCK_CONTRACT_INFO: ContractInfo = {
     model_version: null,
   },
   parsedAt: new Date(Date.now() - 3600000).toISOString(),
+};
+
+const MOCK_FREEZE_INFO: VertexFreezeInfo = {
+  vertex: "IBEW_LV",
+  version: "1.0.0",
+  status: "frozen",
+  frozenAt: "2026-02-15",
+  contracts: ["BlueprintParseV1", "EstimateChainV1"],
 };
 
 // ---------------------------------------------------------------------------
@@ -636,6 +652,66 @@ export default function AdminBlueprintViewer() {
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* Vertex Freeze Status */}
+            <div
+              style={{
+                marginTop: 12,
+                background: "#18181b",
+                border: "1px solid #3b82f633",
+                borderRadius: 12,
+                padding: 16,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                <span style={{ fontSize: 14, fontWeight: 600, color: "#e4e4e7" }}>
+                  Vertex Status
+                </span>
+                <span
+                  style={{
+                    display: "inline-block",
+                    padding: "2px 8px",
+                    borderRadius: 4,
+                    fontSize: 10,
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    color: "#93c5fd",
+                    backgroundColor: "#1e3a5f",
+                    letterSpacing: "0.05em",
+                  }}
+                >
+                  {MOCK_FREEZE_INFO.status}
+                </span>
+              </div>
+              <table style={{ width: "100%", fontSize: 12, borderCollapse: "collapse" }}>
+                <tbody>
+                  {[
+                    ["Vertex", MOCK_FREEZE_INFO.vertex],
+                    ["Version", `v${MOCK_FREEZE_INFO.version}`],
+                    ["Frozen", new Date(MOCK_FREEZE_INFO.frozenAt).toLocaleDateString()],
+                    ["Contracts", MOCK_FREEZE_INFO.contracts.join(", ")],
+                  ].map(([label, value]) => (
+                    <tr key={label} style={{ borderBottom: "1px solid #27272a22" }}>
+                      <td style={{ color: "#888", padding: "4px 8px 4px 0", whiteSpace: "nowrap" }}>{label}</td>
+                      <td style={{ color: "#e4e4e7", fontWeight: 500, padding: "4px 0", fontSize: 12 }}>{value}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div
+                style={{
+                  marginTop: 10,
+                  padding: "6px 10px",
+                  background: "#1e3a5f22",
+                  border: "1px solid #3b82f633",
+                  borderRadius: 8,
+                  fontSize: 11,
+                  color: "#93c5fd",
+                }}
+              >
+                Schema locked. Changes require new contract version or feedback proposal.
+              </div>
             </div>
           </div>
         </div>

@@ -28,6 +28,7 @@ import { TRPCError } from "@trpc/server";
 import { createHash } from "crypto";
 import fs from "node:fs";
 import path from "node:path";
+import { getFreezeStatus } from "../../contracts/freeze_governance";
 
 // ---------------------------------------------------------------------------
 // Task library loader
@@ -651,11 +652,18 @@ export const estimateChainRouter = router({
    * Get schema hash for EstimateChainV1
    */
   getContractInfo: adminProcedure.query(async () => {
+    const freeze = getFreezeStatus();
     return {
       contractName: "EstimateChainV1",
       contractVersion: "1.0.0",
       schemaHash: getEstimateSchemaHash(),
       taskLibrary: loadTaskLibrary().library,
+      freeze: {
+        frozen: freeze.frozen,
+        vertex: freeze.vertex,
+        version: freeze.version,
+        frozenAt: freeze.frozenAt,
+      },
     };
   }),
 

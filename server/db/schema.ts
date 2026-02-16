@@ -2654,3 +2654,34 @@ export const projectTaskOverrides = mysqlTable(
 
 export type ProjectTaskOverride = typeof projectTaskOverrides.$inferSelect;
 export type InsertProjectTaskOverride = typeof projectTaskOverrides.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Vertex Freeze Registry — immutable record of frozen vertex versions
+// ---------------------------------------------------------------------------
+
+export const vertexFreezes = mysqlTable(
+  "vertex_freezes",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    vertex: varchar("vertex", { length: 128 }).notNull(), // e.g. "IBEW_LV"
+    version: varchar("version", { length: 32 }).notNull(), // e.g. "1.0.0"
+    status: mysqlEnum("status", ["frozen", "deprecated", "superseded"]).default("frozen").notNull(),
+    frozenAt: timestamp("frozenAt").notNull(),
+    // JSON snapshot of the full freeze declaration
+    registryJson: json("registryJson").$type<Record<string, unknown>>(),
+    // Contract names locked by this freeze
+    lockedContracts: json("lockedContracts").$type<string[]>(),
+    // Who froze it
+    frozenBy: int("frozenBy"), // FK to users.id
+    notes: text("notes"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    vertexIdx: index("vf_vertex_idx").on(t.vertex),
+    versionIdx: index("vf_version_idx").on(t.vertex, t.version),
+    statusIdx: index("vf_status_idx").on(t.status),
+  })
+);
+
+export type VertexFreeze = typeof vertexFreezes.$inferSelect;
+export type InsertVertexFreeze = typeof vertexFreezes.$inferInsert;
