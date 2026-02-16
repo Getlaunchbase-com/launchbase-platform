@@ -2242,3 +2242,110 @@ export const mobileSessions = mysqlTable(
 
 export type MobileSession = typeof mobileSessions.$inferSelect;
 export type InsertMobileSession = typeof mobileSessions.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Agent Feedback — per-instance feedback items from operators & mobile users
+// ---------------------------------------------------------------------------
+
+export const agentFeedback = mysqlTable(
+  "agent_feedback",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    instanceId: int("instanceId").notNull(), // FK to agent_instances.id
+    runId: int("runId"), // FK to agent_runs.id (optional — may be general)
+    projectId: int("projectId").notNull(), // FK to projects.id (denormalised for fast queries)
+    submittedBy: int("submittedBy").notNull(), // FK to users.id
+    source: mysqlEnum("source", ["operator_os", "mobile", "api"]).default("operator_os").notNull(),
+    message: text("message").notNull(),
+    category: mysqlEnum("category", [
+      "wrong_output",
+      "slow_response",
+      "missing_capability",
+      "config_issue",
+      "tone_style",
+      "hallucination",
+      "other",
+    ]).notNull(),
+    severity: mysqlEnum("severity", ["low", "medium", "high", "critical"]).default("medium").notNull(),
+    status: mysqlEnum("status", ["open", "triaged", "in_review", "resolved", "wont_fix"]).default("open").notNull(),
+    resolvedAt: timestamp("resolvedAt"),
+    resolvedBy: int("resolvedBy"), // FK to users.id
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (t) => ({
+    instanceIdx: index("af_instance_idx").on(t.instanceId),
+    runIdx: index("af_run_idx").on(t.runId),
+    projectIdx: index("af_project_idx").on(t.projectId),
+    statusIdx: index("af_status_idx").on(t.status),
+    severityIdx: index("af_severity_idx").on(t.severity),
+    categoryIdx: index("af_category_idx").on(t.category),
+    createdAtIdx: index("af_created_idx").on(t.createdAt),
+  })
+);
+
+export type AgentFeedback = typeof agentFeedback.$inferSelect;
+export type InsertAgentFeedback = typeof agentFeedback.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Feedback Improvement Proposals — swarm-generated improvement recommendations
+// ---------------------------------------------------------------------------
+
+export const feedbackImprovementProposals = mysqlTable(
+  "feedback_improvement_proposals",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    // Swarm run that generated this proposal
+    swarmRunId: int("swarmRunId"), // FK to swarm_runs.id
+    title: varchar("title", { length: 512 }).notNull(),
+    description: text("description").notNull(),
+    // What kind of change: config tweak, prompt edit, tool add, code patch
+    changeType: mysqlEnum("changeType", [
+      "config_update",
+      "prompt_edit",
+      "tool_change",
+      "code_patch",
+      "workflow_change",
+    ]).notNull(),
+    // Structured patch payload (e.g. JSON diff, config delta, prompt text)
+    patchPayload: json("patchPayload").$type<Record<string, unknown>>(),
+    // Which feedback items drove this proposal
+    feedbackIds: json("feedbackIds").$type<number[]>(),
+    // Cluster summary — how many feedback items, top categories
+    clusterSummary: json("clusterSummary").$type<{
+      totalItems: number;
+      topCategories: string[];
+      severityBreakdown: Record<string, number>;
+    }>(),
+    // Approval gate
+    status: mysqlEnum("status", [
+      "proposed",
+      "under_review",
+      "approved",
+      "rejected",
+      "applied",
+      "rolled_back",
+    ]).default("proposed").notNull(),
+    reviewedBy: int("reviewedBy"), // FK to users.id
+    reviewedAt: timestamp("reviewedAt"),
+    reviewNote: text("reviewNote"),
+    appliedAt: timestamp("appliedAt"),
+    appliedBy: int("appliedBy"), // FK to users.id
+    // Target: which instance/vertex/project this applies to
+    targetInstanceId: int("targetInstanceId"), // FK to agent_instances.id
+    targetVertexId: int("targetVertexId"), // FK to vertex_profiles.id
+    targetProjectId: int("targetProjectId"), // FK to projects.id
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (t) => ({
+    swarmRunIdx: index("fip_swarm_run_idx").on(t.swarmRunId),
+    statusIdx: index("fip_status_idx").on(t.status),
+    changeTypeIdx: index("fip_change_type_idx").on(t.changeType),
+    targetInstanceIdx: index("fip_target_instance_idx").on(t.targetInstanceId),
+    createdAtIdx: index("fip_created_idx").on(t.createdAt),
+  })
+);
+
+export type FeedbackImprovementProposal = typeof feedbackImprovementProposals.$inferSelect;
+export type InsertFeedbackImprovementProposal = typeof feedbackImprovementProposals.$inferInsert;

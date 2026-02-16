@@ -20,6 +20,8 @@ import {
   vertexProfiles,
   securityAuditLog,
   rateLimitViolations,
+  agentFeedback,
+  feedbackImprovementProposals,
   users,
 } from "../../../drizzle/schema";
 import { desc, eq, and, gte, sql, count, inArray } from "drizzle-orm";
@@ -537,6 +539,102 @@ export const operatorOSRouter = router({
         .where(where);
 
       return { artifacts: rows, total: countResult?.total ?? 0 };
+    }),
+
+  // =========================================================================
+  // Feedback panel — quick-glance feedback + proposals for Operator OS
+  // =========================================================================
+
+  /** Feedback overview: recent items + summary stats */
+  feedbackOverview: adminProcedure
+    .input(
+      z.object({
+        sinceDaysAgo: z.number().int().min(1).max(90).default(7),
+        limit: z.number().int().min(1).max(50).default(10),
+      })
+    )
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return { recent: [], byStatus: [], bySeverity: [], total: 0, pendingProposals: 0 };
+
+      const sinceDate = new Date(Date.now() - input.sinceDaysAgo * 24 * 60 * 60 * 1000);
+      const sinceCond = gte(agentFeedback.createdAt, sinceDate);
+
+      const [recent, byStatus, bySeverity, pendingProposals] = await Promise.all([
+        db
+          .select({
+            id: agentFeedback.id,
+            instanceId: agentFeedback.instanceId,
+            message: agentFeedback.message,
+            category: agentFeedback.category,
+            severity: agentFeedback.severity,
+            status: agentFeedback.status,
+            source: agentFeedback.source,
+            createdAt: agentFeedback.createdAt,
+            instanceName: agentInstances.displayName,
+          })
+          .from(agentFeedback)
+          .leftJoin(agentInstances, eq(agentFeedback.instanceId, agentInstances.id))
+          .where(sinceCond)
+          .orderBy(desc(agentFeedback.createdAt))
+          .limit(input.limit),
+        db
+          .select({ status: agentFeedback.status, count: count() })
+          .from(agentFeedback)
+          .where(sinceCond)
+          .groupBy(agentFeedback.status),
+        db
+          .select({ severity: agentFeedback.severity, count: count() })
+          .from(agentFeedback)
+          .where(sinceCond)
+          .groupBy(agentFeedback.severity),
+        db
+          .select({ total: count() })
+          .from(feedbackImprovementProposals)
+          .where(eq(feedbackImprovementProposals.status, "proposed")),
+      ]);
+
+      const total = byStatus.reduce((sum, r) => sum + (r.count as number), 0);
+
+      return {
+        recent,
+        byStatus,
+        bySeverity,
+        total,
+        pendingProposals: pendingProposals[0]?.total ?? 0,
+      };
+    }),
+
+  /** List proposals awaiting review (promotion gate queue) */
+  pendingProposals: adminProcedure
+    .input(
+      z.object({
+        limit: z.number().int().min(1).max(50).default(20),
+        offset: z.number().int().min(0).default(0),
+      })
+    )
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return { proposals: [], total: 0 };
+
+      const rows = await db
+        .select()
+        .from(feedbackImprovementProposals)
+        .where(
+          inArray(feedbackImprovementProposals.status, ["proposed", "under_review"])
+        )
+        .orderBy(desc(feedbackImprovementProposals.createdAt))
+        .limit(input.limit)
+        .offset(input.offset);
+
+      const [countResult] = await db
+        .select({ total: count() })
+        .from(feedbackImprovementProposals)
+        .where(
+          inArray(feedbackImprovementProposals.status, ["proposed", "under_review"])
+        );
+
+      return { proposals: rows, total: countResult?.total ?? 0 };
     }),
 });
 

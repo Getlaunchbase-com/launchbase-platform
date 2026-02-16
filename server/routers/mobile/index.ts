@@ -31,6 +31,7 @@ import {
   agentRuns,
   agentEvents,
   agentArtifacts,
+  agentFeedback,
   projects,
   users,
   vertexProfiles,
@@ -685,5 +686,95 @@ export const mobileChatRouter = router({
         activeRun: runInfo,
         expiresAt: session.expiresAt,
       };
+    }),
+});
+
+// ---------------------------------------------------------------------------
+// Mobile Feedback Router — "this was wrong because…"
+// ---------------------------------------------------------------------------
+
+export const mobileFeedbackRouter = router({
+  /**
+   * Submit feedback from mobile client.
+   * Captures "this was wrong because…" style feedback from end users.
+   * Requires a valid mobile session token.
+   */
+  submit: publicProcedure
+    .input(
+      z.object({
+        token: z.string().min(1),
+        runId: z.number().int().optional(),
+        message: z.string().min(1).max(4000),
+        category: z.enum([
+          "wrong_output",
+          "slow_response",
+          "missing_capability",
+          "config_issue",
+          "tone_style",
+          "hallucination",
+          "other",
+        ]).default("other"),
+        severity: z.enum(["low", "medium", "high", "critical"]).default("medium"),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const session = await validateMobileToken(input.token);
+      enforceMobileRateLimit(`feedback:${session.userId}`);
+
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable." });
+
+      const [result] = await db.insert(agentFeedback).values({
+        instanceId: session.agentInstanceId,
+        runId: input.runId ?? session.activeRunId ?? null,
+        projectId: session.projectId,
+        submittedBy: session.userId,
+        source: "mobile",
+        message: input.message,
+        category: input.category,
+        severity: input.severity,
+        status: "open",
+      });
+
+      return { feedbackId: result.insertId };
+    }),
+
+  /** List feedback submitted by the current mobile session's user */
+  mine: publicProcedure
+    .input(
+      z.object({
+        token: z.string().min(1),
+        limit: z.number().int().min(1).max(50).default(20),
+        offset: z.number().int().min(0).default(0),
+      })
+    )
+    .query(async ({ input }) => {
+      const session = await validateMobileToken(input.token);
+
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable." });
+
+      const rows = await db
+        .select({
+          id: agentFeedback.id,
+          runId: agentFeedback.runId,
+          message: agentFeedback.message,
+          category: agentFeedback.category,
+          severity: agentFeedback.severity,
+          status: agentFeedback.status,
+          createdAt: agentFeedback.createdAt,
+        })
+        .from(agentFeedback)
+        .where(
+          and(
+            eq(agentFeedback.submittedBy, session.userId),
+            eq(agentFeedback.instanceId, session.agentInstanceId)
+          )
+        )
+        .orderBy(desc(agentFeedback.createdAt))
+        .limit(input.limit)
+        .offset(input.offset);
+
+      return { items: rows };
     }),
 });

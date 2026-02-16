@@ -68,6 +68,7 @@ import AdminConsoleFiles from "./pages/admin/AdminConsoleFiles";
 import AdminConsoleTools from "./pages/admin/AdminConsoleTools";
 import AdminConsoleModels from "./pages/admin/AdminConsoleModels";
 import AdminConsoleSettings from "./pages/admin/AdminConsoleSettings";
+import AdminFeedbackLoop from "./pages/admin/AdminFeedbackLoop";
 function Router() {
   return (
     <Switch>
@@ -137,6 +138,7 @@ function Router() {
         <Route path="/admin/swarm/repo" component={AdminSwarmRepoSources} />
  <Route path="/admin/swarm/runs/:repairKey" component={AdminSwarmRunDetail} />
 
+      <Route path="/admin/feedback" component={AdminFeedbackLoop} />
       <Route path="/admin/alerts" component={AdminAlerts} />
       <Route path="/admin/test-checkout" component={AdminTestCheckout} />
       
