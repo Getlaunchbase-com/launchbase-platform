@@ -37,6 +37,19 @@ interface Page {
   detectionCount: number;
 }
 
+interface ContractInfo {
+  contractName: string;
+  contractVersion: string;
+  schemaHash: string;
+  producer: {
+    tool: string;
+    tool_version: string;
+    runtime: string;
+    model_version: string | null;
+  };
+  parsedAt: string;
+}
+
 type OverlayMode = "detections" | "text" | "both" | "none";
 
 // ---------------------------------------------------------------------------
@@ -101,6 +114,19 @@ const MOCK_TEXT_BLOCKS: TextBlock[] = [
   { id: 2, x: 0.15, y: 0.28, w: 0.08, h: 0.02, text: "20A/120V", blockType: "label", confidence: 0.95 },
   { id: 3, x: 0.50, y: 0.15, w: 0.06, h: 0.02, text: "3-WAY", blockType: "label", confidence: 0.93 },
 ];
+
+const MOCK_CONTRACT_INFO: ContractInfo = {
+  contractName: "BlueprintParseV1",
+  contractVersion: "1.0.0",
+  schemaHash: "a3f2c8d1e9b4567890abcdef12345678abcdef9876543210fedcba0987654321",
+  producer: {
+    tool: "blueprint_parse_document",
+    tool_version: "0.4.2",
+    runtime: "agent-stack",
+    model_version: null,
+  },
+  parsedAt: new Date(Date.now() - 3600000).toISOString(),
+};
 
 // ---------------------------------------------------------------------------
 // Sub-components
@@ -185,6 +211,7 @@ export default function AdminBlueprintViewer() {
   const [overlayMode, setOverlayMode] = useState<OverlayMode>("detections");
   const [selectedDetection, setSelectedDetection] = useState<number | null>(null);
   const [minConfidence, setMinConfidence] = useState(0.5);
+  const [showContractInfo, setShowContractInfo] = useState(false);
 
   const page = MOCK_PAGES[currentPage];
   const filteredDetections = MOCK_DETECTIONS.filter((d) => d.confidence >= minConfidence);
@@ -524,6 +551,91 @@ export default function AdminBlueprintViewer() {
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Contract info toggle + panel */}
+            <div style={{ marginTop: 12 }}>
+              <button
+                onClick={() => setShowContractInfo(!showContractInfo)}
+                style={{
+                  width: "100%",
+                  background: "#18181b",
+                  border: "1px solid #27272a",
+                  borderRadius: showContractInfo ? "12px 12px 0 0" : 12,
+                  padding: "10px 16px",
+                  color: "#a1a1aa",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  textAlign: "left",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <span>Contract Info</span>
+                <span style={{ fontSize: 11, color: "#555" }}>
+                  {showContractInfo ? "\u25B2" : "\u25BC"}
+                </span>
+              </button>
+              {showContractInfo && (
+                <div
+                  style={{
+                    background: "#18181b",
+                    border: "1px solid #27272a",
+                    borderTop: "none",
+                    borderRadius: "0 0 12px 12px",
+                    padding: 16,
+                  }}
+                >
+                  <table style={{ width: "100%", fontSize: 12, borderCollapse: "collapse" }}>
+                    <tbody>
+                      {[
+                        ["Contract", `${MOCK_CONTRACT_INFO.contractName} ${MOCK_CONTRACT_INFO.contractVersion}`],
+                        ["Schema Hash", MOCK_CONTRACT_INFO.schemaHash.slice(0, 16) + "..."],
+                        ["Parse Tool", MOCK_CONTRACT_INFO.producer.tool],
+                        ["Tool Version", MOCK_CONTRACT_INFO.producer.tool_version],
+                        ["Runtime", MOCK_CONTRACT_INFO.producer.runtime],
+                        ["Model Version", MOCK_CONTRACT_INFO.producer.model_version ?? "N/A (algorithmic)"],
+                        ["Parsed At", new Date(MOCK_CONTRACT_INFO.parsedAt).toLocaleString()],
+                      ].map(([label, value]) => (
+                        <tr key={label} style={{ borderBottom: "1px solid #27272a22" }}>
+                          <td style={{ color: "#888", padding: "4px 8px 4px 0", whiteSpace: "nowrap" }}>
+                            {label}
+                          </td>
+                          <td
+                            style={{
+                              color: "#e4e4e7",
+                              fontWeight: 500,
+                              padding: "4px 0",
+                              fontFamily: label === "Schema Hash" ? "monospace" : "inherit",
+                              fontSize: label === "Schema Hash" ? 11 : 12,
+                              wordBreak: "break-all",
+                            }}
+                            title={label === "Schema Hash" ? MOCK_CONTRACT_INFO.schemaHash : undefined}
+                          >
+                            {value}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <div
+                    style={{
+                      marginTop: 8,
+                      padding: "6px 10px",
+                      background: "#10b98111",
+                      border: "1px solid #10b98133",
+                      borderRadius: 8,
+                      fontSize: 11,
+                      color: "#10b981",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Contract validated
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

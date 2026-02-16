@@ -26,6 +26,12 @@ import { desc, eq, and, count, sql } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import path from "node:path";
 import fs from "node:fs";
+import { TRPCError } from "@trpc/server";
+import {
+  validateBlueprintParseV1,
+  getSchemaHash,
+  type BlueprintParseV1Output,
+} from "../../contracts/validateBlueprintParse";
 
 // Storage config
 const ARTIFACTS_DIR =
@@ -502,7 +508,182 @@ export const blueprintIngestionRouter = router({
     }),
 
   // =========================================================================
-  // 6. Legend entries
+  // 6. Contract-validated ingest — accept VM parse output as BlueprintParseV1
+  // =========================================================================
+
+  /**
+   * Ingest a complete VM parse output, validated against BlueprintParseV1.
+   *
+   * This is the primary ingestion endpoint. It:
+   *   1. Validates the JSON against BlueprintParseV1 schema
+   *   2. Enforces contract name = BlueprintParseV1, version = ^1.x.x
+   *   3. Rejects invalid payloads with structured error (BAD_REQUEST)
+   *   4. Stores pages, text blocks, legend candidates
+   *   5. Persists contract metadata on the document for audit trail
+   */
+  ingestParseOutput: adminProcedure
+    .input(
+      z.object({
+        documentId: z.number().int(),
+        parseOutput: z.unknown(), // raw JSON from VM — validated at runtime
+      })
+    )
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database unavailable");
+
+      // --- 1. Validate against BlueprintParseV1 ---
+      const validation = validateBlueprintParseV1(input.parseOutput);
+
+      if (!validation.valid) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `BlueprintParseV1 contract validation failed: ${validation.errors.length} error(s)`,
+          cause: {
+            contractName: validation.contractName ?? "unknown",
+            contractVersion: validation.contractVersion ?? "unknown",
+            errors: validation.errors.slice(0, 20), // cap to prevent oversize responses
+          },
+        });
+      }
+
+      // --- 2. Enforce contract identity ---
+      const parsed = input.parseOutput as BlueprintParseV1Output;
+
+      if (parsed.contract.name !== "BlueprintParseV1") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `Expected contract "BlueprintParseV1", got "${parsed.contract.name}"`,
+        });
+      }
+
+      if (!/^1\.\d+\.\d+$/.test(parsed.contract.version)) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `Contract version must match ^1.x.x, got "${parsed.contract.version}"`,
+        });
+      }
+
+      if (!parsed.contract.schema_hash) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Contract schema_hash is required",
+        });
+      }
+
+      // --- 3. Verify document exists ---
+      const [doc] = await db
+        .select()
+        .from(blueprintDocuments)
+        .where(eq(blueprintDocuments.id, input.documentId))
+        .limit(1);
+
+      if (!doc) throw new Error("Document not found");
+
+      // --- 4. Store pages ---
+      const pageIdMap = new Map<number, number>(); // page_number → DB id
+
+      for (const page of parsed.pages) {
+        let imageStoragePath: string | null = null;
+
+        if (page.image_artifact_path) {
+          imageStoragePath = page.image_artifact_path;
+        }
+
+        const [result] = await db.insert(blueprintPages).values({
+          documentId: input.documentId,
+          pageNumber: page.page_number,
+          label: page.label ?? null,
+          imageStoragePath,
+          imageWidth: page.width_px,
+          imageHeight: page.height_px,
+          meta: null,
+        });
+        pageIdMap.set(page.page_number, result.insertId);
+      }
+
+      // --- 5. Store text blocks ---
+      if (parsed.text_blocks.length > 0) {
+        const textBlockValues = parsed.text_blocks.map((tb) => ({
+          pageId: pageIdMap.get(tb.page) ?? 0,
+          x: tb.bbox.x,
+          y: tb.bbox.y,
+          w: tb.bbox.w,
+          h: tb.bbox.h,
+          text: tb.text,
+          confidence: tb.confidence,
+          blockType: tb.type as "title" | "label" | "dimension" | "note" | "legend_text" | "other",
+        }));
+
+        // Insert in batches of 100 to avoid query size limits
+        for (let i = 0; i < textBlockValues.length; i += 100) {
+          await db.insert(blueprintTextBlocks).values(textBlockValues.slice(i, i + 100));
+        }
+
+        // Mark pages as text-extracted
+        for (const pageId of pageIdMap.values()) {
+          await db
+            .update(blueprintPages)
+            .set({ textExtracted: true })
+            .where(eq(blueprintPages.id, pageId));
+        }
+      }
+
+      // --- 6. Store legend candidates ---
+      if (parsed.legend_candidates.length > 0) {
+        await db.insert(blueprintLegendEntries).values(
+          parsed.legend_candidates.map((lc) => ({
+            documentId: input.documentId,
+            pageId: pageIdMap.get(lc.page) ?? null,
+            symbolDescription: lc.symbol_description ?? lc.method,
+            rawLabel: lc.raw_label ?? "unknown",
+            x: lc.bbox.x,
+            y: lc.bbox.y,
+            w: lc.bbox.w,
+            h: lc.bbox.h,
+          }))
+        );
+      }
+
+      // --- 7. Store contract metadata on document ---
+      await db
+        .update(blueprintDocuments)
+        .set({
+          pageCount: parsed.document.page_count,
+          status: "parsed",
+          parseContractName: parsed.contract.name,
+          parseContractVersion: parsed.contract.version,
+          parseSchemaHash: parsed.contract.schema_hash,
+          parseProducerJson: parsed.contract.producer as any,
+          parsedAt: new Date(),
+        })
+        .where(eq(blueprintDocuments.id, input.documentId));
+
+      return {
+        documentId: input.documentId,
+        contractName: parsed.contract.name,
+        contractVersion: parsed.contract.version,
+        schemaHash: parsed.contract.schema_hash,
+        pagesIngested: parsed.pages.length,
+        textBlocksIngested: parsed.text_blocks.length,
+        legendCandidatesIngested: parsed.legend_candidates.length,
+        scaleCandidatesFound: parsed.scale_candidates.length,
+        parseErrors: parsed.errors.length,
+        platformSchemaHash: getSchemaHash(),
+      };
+    }),
+
+  /** Get the platform's current schema hash (for VM to compare) */
+  getContractInfo: adminProcedure.query(async () => {
+    return {
+      contractName: "BlueprintParseV1",
+      supportedVersions: "^1.0.0",
+      platformSchemaHash: getSchemaHash(),
+    };
+  }),
+
+  // =========================================================================
+  // 7. Legend entries
   // =========================================================================
 
   /** Add legend entries for a document */

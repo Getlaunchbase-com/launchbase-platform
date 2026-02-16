@@ -2377,6 +2377,17 @@ export const blueprintDocuments = mysqlTable(
     ]).default("uploaded").notNull(),
     errorMessage: text("errorMessage"),
     uploadedBy: int("uploadedBy").notNull(), // FK to users.id
+    // --- BlueprintParseV1 contract metadata ---
+    parseContractName: varchar("parseContractName", { length: 64 }),
+    parseContractVersion: varchar("parseContractVersion", { length: 32 }),
+    parseSchemaHash: varchar("parseSchemaHash", { length: 128 }),
+    parseProducerJson: json("parseProducerJson").$type<{
+      tool: string;
+      tool_version: string;
+      runtime: string;
+      model_version: string | null;
+    }>(),
+    parsedAt: timestamp("parsedAt"),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
     updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   },
@@ -2384,6 +2395,7 @@ export const blueprintDocuments = mysqlTable(
     projectIdx: index("bd_project_idx").on(t.projectId),
     artifactIdx: index("bd_artifact_idx").on(t.artifactId),
     statusIdx: index("bd_status_idx").on(t.status),
+    contractIdx: index("bd_contract_idx").on(t.parseContractName, t.parseContractVersion),
   })
 );
 
