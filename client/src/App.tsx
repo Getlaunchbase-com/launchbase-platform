@@ -71,6 +71,7 @@ import AdminConsoleSettings from "./pages/admin/AdminConsoleSettings";
 import AdminFeedbackLoop from "./pages/admin/AdminFeedbackLoop";
 import AdminBlueprintViewer from "./pages/admin/AdminBlueprintViewer";
 import AdminSymbolMapping from "./pages/admin/AdminSymbolMapping";
+import AdminBlueprintGaps from "./pages/admin/AdminBlueprintGaps";
 function Router() {
   return (
     <Switch>
@@ -143,6 +144,7 @@ function Router() {
       <Route path="/admin/feedback" component={AdminFeedbackLoop} />
       <Route path="/admin/blueprint-viewer" component={AdminBlueprintViewer} />
       <Route path="/admin/symbol-mapping" component={AdminSymbolMapping} />
+      <Route path="/admin/blueprint-gaps" component={AdminBlueprintGaps} />
       <Route path="/admin/alerts" component={AdminAlerts} />
       <Route path="/admin/test-checkout" component={AdminTestCheckout} />
       

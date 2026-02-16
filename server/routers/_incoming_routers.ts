@@ -14,6 +14,8 @@ import { blueprintsRouter } from "./routers/admin/blueprints";
 import { feedbackRouter } from "./routers/admin/feedback";
 import { blueprintIngestionRouter } from "./routers/admin/blueprintIngestion";
 import { blueprintLegendResolverRouter } from "./routers/admin/blueprintLegendResolver";
+import { estimateChainRouter } from "./routers/admin/estimateChain";
+import { gapDetectionRouter } from "./routers/admin/gapDetection";
 import { mobileSessionRouter, mobileVoiceRouter, mobileChatRouter, mobileFeedbackRouter } from "./routers/mobile";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
@@ -506,6 +508,8 @@ export const appRouter = router({
     blueprints: blueprintsRouter,
     blueprintIngestion: blueprintIngestionRouter,
     blueprintLegend: blueprintLegendResolverRouter,
+    estimateChain: estimateChainRouter,
+    gapDetection: gapDetectionRouter,
     feedback: feedbackRouter,
     intakes: router({
       list: protectedProcedure
