@@ -1,0 +1,330 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "EstimateChainV1",
+  "title": "EstimateChainV1",
+  "description": "Deterministic transformation from mapped detections → takeoff → estimate rows → exports, with full provenance and confidence propagation. Additive-only: V2 must not break V1.",
+  "type": "object",
+  "required": ["contract", "context", "assumptions", "line_items", "rollups", "quality", "errors"],
+  "additionalProperties": false,
+  "properties": {
+    "contract": {
+      "type": "object",
+      "description": "Protocol contract metadata.",
+      "required": ["name", "version", "schema_hash", "producer"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "const": "EstimateChainV1"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^1\\.[0-9]+\\.[0-9]+$",
+          "description": "Semver pinned to ^1.0.0."
+        },
+        "schema_hash": {
+          "type": "string",
+          "minLength": 16,
+          "maxLength": 128,
+          "description": "SHA-256 hex of this schema file."
+        },
+        "producer": {
+          "type": "object",
+          "required": ["runtime", "tool", "tool_version"],
+          "additionalProperties": false,
+          "properties": {
+            "runtime": {
+              "type": "string",
+              "description": "Runtime environment, e.g. 'launchbase-platform'"
+            },
+            "tool": {
+              "type": "string",
+              "description": "Tool name, e.g. 'estimate_chain_run'"
+            },
+            "tool_version": {
+              "type": "string",
+              "description": "Git SHA or semver of the tool."
+            }
+          }
+        }
+      }
+    },
+
+    "context": {
+      "type": "object",
+      "description": "Run context: which project, document, packs, and units were used.",
+      "required": ["project_id", "document_id", "symbol_pack_id", "task_library_id", "currency", "units"],
+      "additionalProperties": true,
+      "properties": {
+        "project_id": {
+          "type": "string"
+        },
+        "document_id": {
+          "type": "string"
+        },
+        "symbol_pack_id": {
+          "type": "string"
+        },
+        "task_library_id": {
+          "type": "string",
+          "description": "Identifies the task library version, e.g. 'IBEW_LV_TaskLibrary_v1'"
+        },
+        "currency": {
+          "type": "string",
+          "default": "USD"
+        },
+        "units": {
+          "type": "object",
+          "required": ["length", "time"],
+          "additionalProperties": false,
+          "properties": {
+            "length": { "type": "string", "default": "ft" },
+            "time": { "type": "string", "default": "hr" }
+          }
+        }
+      }
+    },
+
+    "assumptions": {
+      "type": "array",
+      "description": "All assumptions used in the estimate chain run. Transparent and auditable.",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "value", "source", "locked"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable assumption ID, e.g. 'A-001'"
+          },
+          "title": {
+            "type": "string"
+          },
+          "value": {
+            "description": "The assumption value (number, string, or boolean)"
+          },
+          "source": {
+            "type": "string",
+            "description": "Where this value comes from, e.g. 'task_library.default_waste', 'operator_override'"
+          },
+          "locked": {
+            "type": "boolean",
+            "description": "If true, value cannot be changed by operator overrides."
+          }
+        }
+      }
+    },
+
+    "line_items": {
+      "type": "array",
+      "description": "One entry per detected device instance with full takeoff, labor, material, and provenance.",
+      "items": {
+        "type": "object",
+        "required": ["line_id", "canonical_type", "task_code", "location", "quantity", "labor", "materials", "pricing", "confidence", "provenance"],
+        "additionalProperties": true,
+        "properties": {
+          "line_id": {
+            "type": "string",
+            "description": "Unique line item ID, e.g. 'LI-000123'"
+          },
+          "canonical_type": {
+            "type": "string",
+            "description": "Canonical device type from symbol pack, e.g. 'WAP'"
+          },
+          "task_code": {
+            "type": "string",
+            "description": "Task code from task library, e.g. 'LV-WAP-INSTALL'"
+          },
+          "location": {
+            "type": "object",
+            "required": ["page_number"],
+            "additionalProperties": true,
+            "properties": {
+              "sheet": { "type": ["string", "null"] },
+              "page_number": { "type": "integer", "minimum": 1 },
+              "zone": { "type": ["string", "null"] },
+              "bbox_norm": { "$ref": "#/$defs/normalized_bbox" }
+            }
+          },
+          "quantity": {
+            "type": "object",
+            "required": ["count", "uom"],
+            "additionalProperties": false,
+            "properties": {
+              "count": { "type": "number", "minimum": 0 },
+              "uom": { "type": "string" }
+            }
+          },
+          "labor": {
+            "type": "object",
+            "required": ["base_hours", "factor", "hours", "crew", "basis"],
+            "additionalProperties": true,
+            "properties": {
+              "base_hours": { "type": "number", "minimum": 0 },
+              "factor": { "type": "number", "minimum": 0 },
+              "hours": { "type": "number", "minimum": 0 },
+              "crew": { "type": "string" },
+              "basis": { "type": "string" }
+            }
+          },
+          "materials": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["material_code", "qty", "uom", "waste_factor", "qty_with_waste"],
+              "additionalProperties": true,
+              "properties": {
+                "material_code": { "type": "string" },
+                "qty": { "type": "number", "minimum": 0 },
+                "uom": { "type": "string" },
+                "waste_factor": { "type": "number", "minimum": 0, "maximum": 1 },
+                "qty_with_waste": { "type": "number", "minimum": 0 }
+              }
+            }
+          },
+          "pricing": {
+            "type": "object",
+            "description": "Pricing fields are nullable — filled in when unit costs are provided.",
+            "additionalProperties": true,
+            "properties": {
+              "material_cost": { "type": ["number", "null"] },
+              "labor_rate": { "type": ["number", "null"] },
+              "total": { "type": ["number", "null"] }
+            }
+          },
+          "confidence": {
+            "$ref": "#/$defs/confidence_chain"
+          },
+          "provenance": {
+            "type": "object",
+            "required": ["raw_detection_id", "raw_class", "detection_model_version", "mapping_version", "rule_version"],
+            "additionalProperties": true,
+            "properties": {
+              "raw_detection_id": { "type": "integer" },
+              "raw_class": { "type": "string" },
+              "detection_model_version": { "type": "string" },
+              "mapping_version": { "type": "string" },
+              "rule_version": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+
+    "rollups": {
+      "type": "object",
+      "description": "Aggregated summaries.",
+      "required": ["by_canonical_type", "labor_total_hours", "material_totals"],
+      "additionalProperties": true,
+      "properties": {
+        "by_canonical_type": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["canonical_type", "count", "labor_hours"],
+            "additionalProperties": true,
+            "properties": {
+              "canonical_type": { "type": "string" },
+              "count": { "type": "integer", "minimum": 0 },
+              "labor_hours": { "type": "number", "minimum": 0 }
+            }
+          }
+        },
+        "labor_total_hours": {
+          "type": "number",
+          "minimum": 0
+        },
+        "material_totals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["material_code", "qty_with_waste", "uom"],
+            "additionalProperties": true,
+            "properties": {
+              "material_code": { "type": "string" },
+              "qty_with_waste": { "type": "number", "minimum": 0 },
+              "uom": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+
+    "quality": {
+      "type": "object",
+      "description": "Quality report: unmapped classes, low-confidence items, gap flags.",
+      "required": ["unmapped_classes", "low_confidence_items", "gap_flags"],
+      "additionalProperties": true,
+      "properties": {
+        "unmapped_classes": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "low_confidence_items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["line_id", "overall", "reason"],
+            "additionalProperties": true,
+            "properties": {
+              "line_id": { "type": "string" },
+              "overall": { "type": "number", "minimum": 0, "maximum": 1 },
+              "reason": { "type": "string" }
+            }
+          }
+        },
+        "gap_flags": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+
+    "errors": {
+      "type": "array",
+      "description": "Runtime errors during estimate chain execution. Empty means clean run.",
+      "items": {
+        "type": "object",
+        "required": ["code", "message"],
+        "additionalProperties": true,
+        "properties": {
+          "code": { "type": "string" },
+          "message": { "type": "string" },
+          "details": { "type": ["object", "null"] }
+        }
+      }
+    }
+  },
+
+  "$defs": {
+    "normalized_bbox": {
+      "type": "object",
+      "description": "Bounding box with coordinates normalized to 0..1 relative to page dimensions.",
+      "required": ["x", "y", "w", "h"],
+      "additionalProperties": false,
+      "properties": {
+        "x": { "type": "number", "minimum": 0, "maximum": 1 },
+        "y": { "type": "number", "minimum": 0, "maximum": 1 },
+        "w": { "type": "number", "minimum": 0, "maximum": 1 },
+        "h": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "confidence_chain": {
+      "type": "object",
+      "description": "Confidence propagation: overall = clamp01(detection * mapping * rules * location_quality).",
+      "required": ["detection", "mapping", "rules", "overall", "reasons"],
+      "additionalProperties": true,
+      "properties": {
+        "detection": { "type": "number", "minimum": 0, "maximum": 1 },
+        "mapping": { "type": "number", "minimum": 0, "maximum": 1 },
+        "rules": { "type": "number", "minimum": 0, "maximum": 1 },
+        "location_quality": { "type": "number", "minimum": 0, "maximum": 1 },
+        "overall": { "type": "number", "minimum": 0, "maximum": 1 },
+        "reasons": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

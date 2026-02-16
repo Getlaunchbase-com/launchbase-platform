@@ -2575,3 +2575,82 @@ export const blueprintSymbolPacks = mysqlTable(
 
 export type BlueprintSymbolPack = typeof blueprintSymbolPacks.$inferSelect;
 export type InsertBlueprintSymbolPack = typeof blueprintSymbolPacks.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Estimate Chain Runs — deterministic estimate outputs per document
+// ---------------------------------------------------------------------------
+
+export const estimateChainRuns = mysqlTable(
+  "estimate_chain_runs",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    documentId: int("documentId").notNull(), // FK to blueprint_documents.id
+    projectId: int("projectId"), // FK to projects.id (denormalized)
+    symbolPackId: int("symbolPackId").notNull(), // FK to blueprint_symbol_packs.id
+    taskLibraryId: varchar("taskLibraryId", { length: 128 }).notNull(), // e.g. "IBEW_LV_TaskLibrary_v1"
+    // Contract metadata
+    contractName: varchar("contractName", { length: 64 }).default("EstimateChainV1").notNull(),
+    contractVersion: varchar("contractVersion", { length: 32 }).notNull(),
+    schemaHash: varchar("schemaHash", { length: 128 }).notNull(),
+    // Full output JSON (EstimateChainV1 shape)
+    outputJson: json("outputJson").$type<Record<string, unknown>>(),
+    // Summary fields for quick queries
+    totalLineItems: int("totalLineItems").default(0).notNull(),
+    totalLaborHours: float("totalLaborHours").default(0).notNull(),
+    unmappedClassCount: int("unmappedClassCount").default(0).notNull(),
+    lowConfidenceCount: int("lowConfidenceCount").default(0).notNull(),
+    gapFlagCount: int("gapFlagCount").default(0).notNull(),
+    // Run metadata
+    status: mysqlEnum("status", ["running", "completed", "failed"]).default("running").notNull(),
+    errorMessage: text("errorMessage"),
+    runByUserId: int("runByUserId"), // FK to users.id
+    startedAt: timestamp("startedAt").defaultNow().notNull(),
+    completedAt: timestamp("completedAt"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    documentIdx: index("ecr_document_idx").on(t.documentId),
+    projectIdx: index("ecr_project_idx").on(t.projectId),
+    statusIdx: index("ecr_status_idx").on(t.status),
+  })
+);
+
+export type EstimateChainRun = typeof estimateChainRuns.$inferSelect;
+export type InsertEstimateChainRun = typeof estimateChainRuns.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Project Task Overrides — operator-scoped overrides to task library defaults
+// ---------------------------------------------------------------------------
+
+export const projectTaskOverrides = mysqlTable(
+  "project_task_overrides",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    projectId: int("projectId").notNull(), // FK to projects.id
+    documentId: int("documentId"), // optional scope to specific document
+    // Which canonical type / task this overrides
+    canonicalType: varchar("canonicalType", { length: 255 }).notNull(),
+    taskCode: varchar("taskCode", { length: 255 }).notNull(),
+    // Override values (null = use library default)
+    laborFactorOverride: float("laborFactorOverride"),
+    wasteFractorOverride: float("wasteFractorOverride"),
+    crewOverride: varchar("crewOverride", { length: 64 }),
+    // Material unit cost overrides (JSON map: materialCode → unitCost)
+    materialCostOverrides: json("materialCostOverrides").$type<
+      Record<string, number>
+    >(),
+    laborRateOverride: float("laborRateOverride"), // $/hr
+    notes: text("notes"),
+    createdBy: int("createdBy").notNull(), // FK to users.id
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (t) => ({
+    projectIdx: index("pto_project_idx").on(t.projectId),
+    canonicalIdx: index("pto_canonical_idx").on(t.canonicalType),
+    taskIdx: index("pto_task_idx").on(t.taskCode),
+  })
+);
+
+export type ProjectTaskOverride = typeof projectTaskOverrides.$inferSelect;
+export type InsertProjectTaskOverride = typeof projectTaskOverrides.$inferInsert;
