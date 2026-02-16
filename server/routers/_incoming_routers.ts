@@ -10,6 +10,8 @@ import { agentRunsRouter, agentEventsRouter, agentArtifactsRouter } from "./rout
 import { agentStackRouter } from "./routers/admin/agentStack";
 import { operatorOSRouter } from "./routers/admin/operatorOS";
 import { agentInstancesRouter, vertexProfilesRouter } from "./routers/admin/agentInstances";
+import { blueprintsRouter } from "./routers/admin/blueprints";
+import { mobileSessionRouter, mobileVoiceRouter, mobileChatRouter } from "./routers/mobile";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -479,6 +481,13 @@ export const appRouter = router({
       }),
   }),
 
+  // Mobile voice API (token-scoped, rate-limited)
+  mobile: router({
+    session: mobileSessionRouter,
+    voice: mobileVoiceRouter,
+    chat: mobileChatRouter,
+  }),
+
   // Admin routes (protected)
   admin: router({
     swarm: swarmConsoleRouter,
@@ -490,6 +499,7 @@ export const appRouter = router({
     operatorOS: operatorOSRouter,
     agentInstances: agentInstancesRouter,
     vertexProfiles: vertexProfilesRouter,
+    blueprints: blueprintsRouter,
     intakes: router({
       list: protectedProcedure
         .input(z.object({

@@ -22,7 +22,7 @@ import {
   rateLimitViolations,
   users,
 } from "../../../drizzle/schema";
-import { desc, eq, and, gte, sql, count } from "drizzle-orm";
+import { desc, eq, and, gte, sql, count, inArray } from "drizzle-orm";
 
 // ---------------------------------------------------------------------------
 // Operator OS Router
@@ -274,7 +274,10 @@ export const operatorOSRouter = router({
       z.object({
         projectId: z.number().int().optional(),
         runId: z.number().int().optional(),
-        type: z.enum(["file", "screenshot", "pr", "log", "report"]).optional(),
+        type: z.enum([
+          "file", "screenshot", "pr", "log", "report",
+          "blueprint_input", "takeoff_json", "takeoff_xlsx", "takeoff_docx",
+        ]).optional(),
         limit: z.number().int().min(1).max(100).default(50),
         offset: z.number().int().min(0).default(0),
       })
@@ -400,6 +403,140 @@ export const operatorOSRouter = router({
         projectId: input.projectId,
         agentInstanceId: input.agentInstanceId,
       };
+    }),
+
+  // =========================================================================
+  // Blueprint takeoff — upload → run takeoff → view outputs
+  // =========================================================================
+
+  /** Run Takeoff: start an agent run that parses a blueprint artifact */
+  runTakeoff: adminProcedure
+    .input(
+      z.object({
+        projectId: z.number().int(),
+        agentInstanceId: z.number().int(),
+        blueprintArtifactId: z.number().int(),
+        model: z.string().max(128).optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database unavailable");
+
+      // Verify instance belongs to project and is active
+      const [instance] = await db
+        .select()
+        .from(agentInstances)
+        .where(
+          and(
+            eq(agentInstances.id, input.agentInstanceId),
+            eq(agentInstances.projectId, input.projectId)
+          )
+        )
+        .limit(1);
+
+      if (!instance) throw new Error("Instance not found or does not belong to project");
+      if (instance.status !== "active") throw new Error("Instance is not active");
+
+      // Verify blueprint artifact exists and belongs to project
+      const [blueprint] = await db
+        .select()
+        .from(agentArtifacts)
+        .where(
+          and(
+            eq(agentArtifacts.id, input.blueprintArtifactId),
+            eq(agentArtifacts.projectId, input.projectId),
+            eq(agentArtifacts.type, "blueprint_input")
+          )
+        )
+        .limit(1);
+
+      if (!blueprint) throw new Error("Blueprint artifact not found or does not belong to project");
+
+      const userId = (ctx as any).user?.id ?? 0;
+
+      // Create the run with blueprint context in stateJson
+      const goal =
+        `Parse blueprint "${blueprint.filename}" and generate material takeoff. ` +
+        `Blueprint artifact id: ${blueprint.id}. ` +
+        `Produce outputs: takeoff_json, takeoff_xlsx, takeoff_docx.`;
+
+      const [result] = await db.insert(agentRuns).values({
+        createdBy: userId,
+        status: "running",
+        goal,
+        model: input.model ?? null,
+        projectId: input.projectId,
+        agentInstanceId: input.agentInstanceId,
+        stateJson: {
+          messages: [],
+          stepCount: 0,
+          errorCount: 0,
+          maxSteps: 30,
+          maxErrors: 3,
+        } as any,
+        pendingActionJson: null,
+      });
+
+      const runId = result.insertId;
+
+      // Link the blueprint artifact to this run
+      await db
+        .update(agentArtifacts)
+        .set({ runId, meta: { ...((blueprint.meta as any) ?? {}), linkedToRunId: runId } })
+        .where(eq(agentArtifacts.id, blueprint.id));
+
+      return {
+        runId,
+        projectId: input.projectId,
+        agentInstanceId: input.agentInstanceId,
+        blueprintArtifactId: blueprint.id,
+        goal,
+      };
+    }),
+
+  /** List artifacts for a specific run, grouped by takeoff output types */
+  runArtifacts: adminProcedure
+    .input(
+      z.object({
+        runId: z.number().int(),
+        types: z
+          .array(
+            z.enum([
+              "file", "screenshot", "pr", "log", "report",
+              "blueprint_input", "takeoff_json", "takeoff_xlsx", "takeoff_docx",
+            ])
+          )
+          .optional(),
+        limit: z.number().int().min(1).max(100).default(50),
+        offset: z.number().int().min(0).default(0),
+      })
+    )
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return { artifacts: [], total: 0 };
+
+      const conditions: any[] = [eq(agentArtifacts.runId, input.runId)];
+      if (input.types && input.types.length > 0) {
+        conditions.push(inArray(agentArtifacts.type, input.types));
+      }
+
+      const where = and(...conditions);
+
+      const rows = await db
+        .select()
+        .from(agentArtifacts)
+        .where(where)
+        .orderBy(desc(agentArtifacts.createdAt))
+        .limit(input.limit)
+        .offset(input.offset);
+
+      const [countResult] = await db
+        .select({ total: count() })
+        .from(agentArtifacts)
+        .where(where);
+
+      return { artifacts: rows, total: countResult?.total ?? 0 };
     }),
 });
 
