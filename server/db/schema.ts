@@ -2242,3 +2242,446 @@ export const mobileSessions = mysqlTable(
 
 export type MobileSession = typeof mobileSessions.$inferSelect;
 export type InsertMobileSession = typeof mobileSessions.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Agent Feedback — per-instance feedback items from operators & mobile users
+// ---------------------------------------------------------------------------
+
+export const agentFeedback = mysqlTable(
+  "agent_feedback",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    instanceId: int("instanceId").notNull(), // FK to agent_instances.id
+    runId: int("runId"), // FK to agent_runs.id (optional — may be general)
+    projectId: int("projectId").notNull(), // FK to projects.id (denormalised for fast queries)
+    submittedBy: int("submittedBy").notNull(), // FK to users.id
+    source: mysqlEnum("source", ["operator_os", "mobile", "api"]).default("operator_os").notNull(),
+    message: text("message").notNull(),
+    category: mysqlEnum("category", [
+      "wrong_output",
+      "slow_response",
+      "missing_capability",
+      "config_issue",
+      "tone_style",
+      "hallucination",
+      "other",
+    ]).notNull(),
+    severity: mysqlEnum("severity", ["low", "medium", "high", "critical"]).default("medium").notNull(),
+    status: mysqlEnum("status", ["open", "triaged", "in_review", "resolved", "wont_fix"]).default("open").notNull(),
+    resolvedAt: timestamp("resolvedAt"),
+    resolvedBy: int("resolvedBy"), // FK to users.id
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (t) => ({
+    instanceIdx: index("af_instance_idx").on(t.instanceId),
+    runIdx: index("af_run_idx").on(t.runId),
+    projectIdx: index("af_project_idx").on(t.projectId),
+    statusIdx: index("af_status_idx").on(t.status),
+    severityIdx: index("af_severity_idx").on(t.severity),
+    categoryIdx: index("af_category_idx").on(t.category),
+    createdAtIdx: index("af_created_idx").on(t.createdAt),
+  })
+);
+
+export type AgentFeedback = typeof agentFeedback.$inferSelect;
+export type InsertAgentFeedback = typeof agentFeedback.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Feedback Improvement Proposals — swarm-generated improvement recommendations
+// ---------------------------------------------------------------------------
+
+export const feedbackImprovementProposals = mysqlTable(
+  "feedback_improvement_proposals",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    // Swarm run that generated this proposal
+    swarmRunId: int("swarmRunId"), // FK to swarm_runs.id
+    title: varchar("title", { length: 512 }).notNull(),
+    description: text("description").notNull(),
+    // What kind of change: config tweak, prompt edit, tool add, code patch
+    changeType: mysqlEnum("changeType", [
+      "config_update",
+      "prompt_edit",
+      "tool_change",
+      "code_patch",
+      "workflow_change",
+    ]).notNull(),
+    // Structured patch payload (e.g. JSON diff, config delta, prompt text)
+    patchPayload: json("patchPayload").$type<Record<string, unknown>>(),
+    // Which feedback items drove this proposal
+    feedbackIds: json("feedbackIds").$type<number[]>(),
+    // Cluster summary — how many feedback items, top categories
+    clusterSummary: json("clusterSummary").$type<{
+      totalItems: number;
+      topCategories: string[];
+      severityBreakdown: Record<string, number>;
+    }>(),
+    // Approval gate
+    status: mysqlEnum("status", [
+      "proposed",
+      "under_review",
+      "approved",
+      "rejected",
+      "applied",
+      "rolled_back",
+    ]).default("proposed").notNull(),
+    reviewedBy: int("reviewedBy"), // FK to users.id
+    reviewedAt: timestamp("reviewedAt"),
+    reviewNote: text("reviewNote"),
+    appliedAt: timestamp("appliedAt"),
+    appliedBy: int("appliedBy"), // FK to users.id
+    // Target: which instance/vertex/project this applies to
+    targetInstanceId: int("targetInstanceId"), // FK to agent_instances.id
+    targetVertexId: int("targetVertexId"), // FK to vertex_profiles.id
+    targetProjectId: int("targetProjectId"), // FK to projects.id
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (t) => ({
+    swarmRunIdx: index("fip_swarm_run_idx").on(t.swarmRunId),
+    statusIdx: index("fip_status_idx").on(t.status),
+    changeTypeIdx: index("fip_change_type_idx").on(t.changeType),
+    targetInstanceIdx: index("fip_target_instance_idx").on(t.targetInstanceId),
+    createdAtIdx: index("fip_created_idx").on(t.createdAt),
+  })
+);
+
+export type FeedbackImprovementProposal = typeof feedbackImprovementProposals.$inferSelect;
+export type InsertFeedbackImprovementProposal = typeof feedbackImprovementProposals.$inferInsert;
+
+// ===========================================================================
+// Blueprint Ingestion Pipeline — structured document → pages → detections
+// ===========================================================================
+
+// ---------------------------------------------------------------------------
+// Blueprint Documents — top-level container for an uploaded blueprint set
+// ---------------------------------------------------------------------------
+
+export const blueprintDocuments = mysqlTable(
+  "blueprint_documents",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    projectId: int("projectId").notNull(), // FK to projects.id
+    artifactId: int("artifactId"), // FK to agent_artifacts.id (the uploaded file)
+    filename: varchar("filename", { length: 512 }).notNull(),
+    mimeType: varchar("mimeType", { length: 128 }),
+    pageCount: int("pageCount").default(0).notNull(),
+    status: mysqlEnum("status", [
+      "uploaded",
+      "parsing",
+      "parsed",
+      "detection_running",
+      "detection_complete",
+      "failed",
+    ]).default("uploaded").notNull(),
+    errorMessage: text("errorMessage"),
+    uploadedBy: int("uploadedBy").notNull(), // FK to users.id
+    // --- BlueprintParseV1 contract metadata ---
+    parseContractName: varchar("parseContractName", { length: 64 }),
+    parseContractVersion: varchar("parseContractVersion", { length: 32 }),
+    parseSchemaHash: varchar("parseSchemaHash", { length: 128 }),
+    parseProducerJson: json("parseProducerJson").$type<{
+      tool: string;
+      tool_version: string;
+      runtime: string;
+      model_version: string | null;
+    }>(),
+    parsedAt: timestamp("parsedAt"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (t) => ({
+    projectIdx: index("bd_project_idx").on(t.projectId),
+    artifactIdx: index("bd_artifact_idx").on(t.artifactId),
+    statusIdx: index("bd_status_idx").on(t.status),
+    contractIdx: index("bd_contract_idx").on(t.parseContractName, t.parseContractVersion),
+  })
+);
+
+export type BlueprintDocument = typeof blueprintDocuments.$inferSelect;
+export type InsertBlueprintDocument = typeof blueprintDocuments.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Blueprint Pages — one row per page/sheet in the blueprint
+// ---------------------------------------------------------------------------
+
+export const blueprintPages = mysqlTable(
+  "blueprint_pages",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    documentId: int("documentId").notNull(), // FK to blueprint_documents.id
+    pageNumber: int("pageNumber").notNull(), // 1-indexed
+    label: varchar("label", { length: 255 }), // e.g. "Sheet E-101", "Floor Plan 2"
+    // Rendered image of this page (stored in artifacts dir / S3)
+    imageStoragePath: varchar("imageStoragePath", { length: 1024 }),
+    imageWidth: int("imageWidth"), // pixels
+    imageHeight: int("imageHeight"), // pixels
+    // OCR / text extraction status
+    textExtracted: boolean("textExtracted").default(false).notNull(),
+    // Page-level metadata (scale, orientation, etc.)
+    meta: json("meta").$type<Record<string, unknown>>(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    documentIdx: index("bp_document_idx").on(t.documentId),
+    pageNumIdx: index("bp_page_num_idx").on(t.documentId, t.pageNumber),
+  })
+);
+
+export type BlueprintPage = typeof blueprintPages.$inferSelect;
+export type InsertBlueprintPage = typeof blueprintPages.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Blueprint Text Blocks — extracted text regions per page (OCR / PDF text)
+// ---------------------------------------------------------------------------
+
+export const blueprintTextBlocks = mysqlTable(
+  "blueprint_text_blocks",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    pageId: int("pageId").notNull(), // FK to blueprint_pages.id
+    // Bounding box (normalized 0-1 relative to page dimensions)
+    x: float("x").notNull(),
+    y: float("y").notNull(),
+    w: float("w").notNull(),
+    h: float("h").notNull(),
+    text: text("text").notNull(),
+    confidence: float("confidence"), // OCR confidence 0-1
+    blockType: mysqlEnum("blockType", ["title", "label", "dimension", "note", "legend_text", "other"])
+      .default("other")
+      .notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    pageIdx: index("btb_page_idx").on(t.pageId),
+    typeIdx: index("btb_type_idx").on(t.blockType),
+  })
+);
+
+export type BlueprintTextBlock = typeof blueprintTextBlocks.$inferSelect;
+export type InsertBlueprintTextBlock = typeof blueprintTextBlocks.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Blueprint Legend Entries — legend/key items found on the blueprint
+// ---------------------------------------------------------------------------
+
+export const blueprintLegendEntries = mysqlTable(
+  "blueprint_legend_entries",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    documentId: int("documentId").notNull(), // FK to blueprint_documents.id
+    pageId: int("pageId"), // FK to blueprint_pages.id (which page the legend is on)
+    // Raw detected symbol description (e.g. "circle with X", "filled triangle")
+    symbolDescription: varchar("symbolDescription", { length: 512 }).notNull(),
+    // Raw label from the legend (e.g. "smoke detector", "120V outlet")
+    rawLabel: varchar("rawLabel", { length: 512 }).notNull(),
+    // Symbol image crop path (if extracted)
+    symbolImagePath: varchar("symbolImagePath", { length: 1024 }),
+    // Bounding box of the legend entry on the page (normalized 0-1)
+    x: float("x"),
+    y: float("y"),
+    w: float("w"),
+    h: float("h"),
+    // Mapped canonical device type (set after operator approval in PR-B2)
+    canonicalType: varchar("canonicalType", { length: 255 }),
+    // Symbol pack reference (set after mapping)
+    symbolPackId: int("symbolPackId"), // FK to blueprint_symbol_packs.id
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (t) => ({
+    documentIdx: index("ble_document_idx").on(t.documentId),
+    pageIdx: index("ble_page_idx").on(t.pageId),
+    canonicalIdx: index("ble_canonical_idx").on(t.canonicalType),
+    symbolPackIdx: index("ble_symbol_pack_idx").on(t.symbolPackId),
+  })
+);
+
+export type BlueprintLegendEntry = typeof blueprintLegendEntries.$inferSelect;
+export type InsertBlueprintLegendEntry = typeof blueprintLegendEntries.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Blueprint Detections Raw — every symbol/device instance found on pages
+// ---------------------------------------------------------------------------
+
+export const blueprintDetectionsRaw = mysqlTable(
+  "blueprint_detections_raw",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    pageId: int("pageId").notNull(), // FK to blueprint_pages.id
+    documentId: int("documentId").notNull(), // FK to blueprint_documents.id (denormalized)
+    // Bounding box (normalized 0-1 relative to page dimensions)
+    x: float("x").notNull(),
+    y: float("y").notNull(),
+    w: float("w").notNull(),
+    h: float("h").notNull(),
+    // Raw class label from vision model (e.g. "smoke_detector", "outlet_120v")
+    rawClass: varchar("rawClass", { length: 255 }).notNull(),
+    // Confidence score from detection model (0-1)
+    confidence: float("confidence").notNull(),
+    // Matched legend entry (if resolved)
+    legendEntryId: int("legendEntryId"), // FK to blueprint_legend_entries.id
+    // Canonical device type (resolved via legend mapping)
+    canonicalType: varchar("canonicalType", { length: 255 }),
+    // Status of this detection
+    status: mysqlEnum("status", ["raw", "mapped", "verified", "rejected"]).default("raw").notNull(),
+    // Operator notes / corrections
+    operatorNote: text("operatorNote"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    pageIdx: index("bdr_page_idx").on(t.pageId),
+    documentIdx: index("bdr_document_idx").on(t.documentId),
+    rawClassIdx: index("bdr_raw_class_idx").on(t.rawClass),
+    canonicalIdx: index("bdr_canonical_idx").on(t.canonicalType),
+    legendIdx: index("bdr_legend_idx").on(t.legendEntryId),
+    statusIdx: index("bdr_status_idx").on(t.status),
+  })
+);
+
+export type BlueprintDetectionRaw = typeof blueprintDetectionsRaw.$inferSelect;
+export type InsertBlueprintDetectionRaw = typeof blueprintDetectionsRaw.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Blueprint Symbol Packs — reusable symbol→device type mappings
+// ---------------------------------------------------------------------------
+
+export const blueprintSymbolPacks = mysqlTable(
+  "blueprint_symbol_packs",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    name: varchar("name", { length: 255 }).notNull(),
+    description: text("description"),
+    // The mapping: rawClass → canonicalType
+    mappings: json("mappings").$type<
+      Array<{
+        rawClass: string;
+        canonicalType: string;
+        symbolDescription?: string;
+      }>
+    >(),
+    // Who created/approved this pack
+    createdBy: int("createdBy").notNull(), // FK to users.id
+    isDefault: boolean("isDefault").default(false).notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (t) => ({
+    nameIdx: index("bsp_name_idx").on(t.name),
+    defaultIdx: index("bsp_default_idx").on(t.isDefault),
+  })
+);
+
+export type BlueprintSymbolPack = typeof blueprintSymbolPacks.$inferSelect;
+export type InsertBlueprintSymbolPack = typeof blueprintSymbolPacks.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Estimate Chain Runs — deterministic estimate outputs per document
+// ---------------------------------------------------------------------------
+
+export const estimateChainRuns = mysqlTable(
+  "estimate_chain_runs",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    documentId: int("documentId").notNull(), // FK to blueprint_documents.id
+    projectId: int("projectId"), // FK to projects.id (denormalized)
+    symbolPackId: int("symbolPackId").notNull(), // FK to blueprint_symbol_packs.id
+    taskLibraryId: varchar("taskLibraryId", { length: 128 }).notNull(), // e.g. "IBEW_LV_TaskLibrary_v1"
+    // Contract metadata
+    contractName: varchar("contractName", { length: 64 }).default("EstimateChainV1").notNull(),
+    contractVersion: varchar("contractVersion", { length: 32 }).notNull(),
+    schemaHash: varchar("schemaHash", { length: 128 }).notNull(),
+    // Full output JSON (EstimateChainV1 shape)
+    outputJson: json("outputJson").$type<Record<string, unknown>>(),
+    // Summary fields for quick queries
+    totalLineItems: int("totalLineItems").default(0).notNull(),
+    totalLaborHours: float("totalLaborHours").default(0).notNull(),
+    unmappedClassCount: int("unmappedClassCount").default(0).notNull(),
+    lowConfidenceCount: int("lowConfidenceCount").default(0).notNull(),
+    gapFlagCount: int("gapFlagCount").default(0).notNull(),
+    // Run metadata
+    status: mysqlEnum("status", ["running", "completed", "failed"]).default("running").notNull(),
+    errorMessage: text("errorMessage"),
+    runByUserId: int("runByUserId"), // FK to users.id
+    startedAt: timestamp("startedAt").defaultNow().notNull(),
+    completedAt: timestamp("completedAt"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    documentIdx: index("ecr_document_idx").on(t.documentId),
+    projectIdx: index("ecr_project_idx").on(t.projectId),
+    statusIdx: index("ecr_status_idx").on(t.status),
+  })
+);
+
+export type EstimateChainRun = typeof estimateChainRuns.$inferSelect;
+export type InsertEstimateChainRun = typeof estimateChainRuns.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Project Task Overrides — operator-scoped overrides to task library defaults
+// ---------------------------------------------------------------------------
+
+export const projectTaskOverrides = mysqlTable(
+  "project_task_overrides",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    projectId: int("projectId").notNull(), // FK to projects.id
+    documentId: int("documentId"), // optional scope to specific document
+    // Which canonical type / task this overrides
+    canonicalType: varchar("canonicalType", { length: 255 }).notNull(),
+    taskCode: varchar("taskCode", { length: 255 }).notNull(),
+    // Override values (null = use library default)
+    laborFactorOverride: float("laborFactorOverride"),
+    wasteFractorOverride: float("wasteFractorOverride"),
+    crewOverride: varchar("crewOverride", { length: 64 }),
+    // Material unit cost overrides (JSON map: materialCode → unitCost)
+    materialCostOverrides: json("materialCostOverrides").$type<
+      Record<string, number>
+    >(),
+    laborRateOverride: float("laborRateOverride"), // $/hr
+    notes: text("notes"),
+    createdBy: int("createdBy").notNull(), // FK to users.id
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (t) => ({
+    projectIdx: index("pto_project_idx").on(t.projectId),
+    canonicalIdx: index("pto_canonical_idx").on(t.canonicalType),
+    taskIdx: index("pto_task_idx").on(t.taskCode),
+  })
+);
+
+export type ProjectTaskOverride = typeof projectTaskOverrides.$inferSelect;
+export type InsertProjectTaskOverride = typeof projectTaskOverrides.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Vertex Freeze Registry — immutable record of frozen vertex versions
+// ---------------------------------------------------------------------------
+
+export const vertexFreezes = mysqlTable(
+  "vertex_freezes",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    vertex: varchar("vertex", { length: 128 }).notNull(), // e.g. "IBEW_LV"
+    version: varchar("version", { length: 32 }).notNull(), // e.g. "1.0.0"
+    status: mysqlEnum("status", ["frozen", "deprecated", "superseded"]).default("frozen").notNull(),
+    frozenAt: timestamp("frozenAt").notNull(),
+    // JSON snapshot of the full freeze declaration
+    registryJson: json("registryJson").$type<Record<string, unknown>>(),
+    // Contract names locked by this freeze
+    lockedContracts: json("lockedContracts").$type<string[]>(),
+    // Who froze it
+    frozenBy: int("frozenBy"), // FK to users.id
+    notes: text("notes"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    vertexIdx: index("vf_vertex_idx").on(t.vertex),
+    versionIdx: index("vf_version_idx").on(t.vertex, t.version),
+    statusIdx: index("vf_status_idx").on(t.status),
+  })
+);
+
+export type VertexFreeze = typeof vertexFreezes.$inferSelect;
+export type InsertVertexFreeze = typeof vertexFreezes.$inferInsert;

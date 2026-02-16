@@ -20,9 +20,28 @@ import {
   vertexProfiles,
   securityAuditLog,
   rateLimitViolations,
+  agentFeedback,
+  feedbackImprovementProposals,
+  vertexFreezes,
   users,
 } from "../../../drizzle/schema";
 import { desc, eq, and, gte, sql, count, inArray } from "drizzle-orm";
+import fs from "node:fs";
+import path from "node:path";
+
+// ---------------------------------------------------------------------------
+// Freeze registry loader
+// ---------------------------------------------------------------------------
+
+let _cachedFreezeRegistry: Record<string, unknown> | null = null;
+
+function loadFreezeRegistry(): Record<string, unknown> {
+  if (_cachedFreezeRegistry) return _cachedFreezeRegistry;
+  const registryPath = path.resolve(__dirname, "../../contracts/vertex_freeze_registry.json");
+  const content = fs.readFileSync(registryPath, "utf-8");
+  _cachedFreezeRegistry = JSON.parse(content);
+  return _cachedFreezeRegistry!;
+}
 
 // ---------------------------------------------------------------------------
 // Operator OS Router
@@ -537,6 +556,189 @@ export const operatorOSRouter = router({
         .where(where);
 
       return { artifacts: rows, total: countResult?.total ?? 0 };
+    }),
+
+  // =========================================================================
+  // Feedback panel — quick-glance feedback + proposals for Operator OS
+  // =========================================================================
+
+  /** Feedback overview: recent items + summary stats */
+  feedbackOverview: adminProcedure
+    .input(
+      z.object({
+        sinceDaysAgo: z.number().int().min(1).max(90).default(7),
+        limit: z.number().int().min(1).max(50).default(10),
+      })
+    )
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return { recent: [], byStatus: [], bySeverity: [], total: 0, pendingProposals: 0 };
+
+      const sinceDate = new Date(Date.now() - input.sinceDaysAgo * 24 * 60 * 60 * 1000);
+      const sinceCond = gte(agentFeedback.createdAt, sinceDate);
+
+      const [recent, byStatus, bySeverity, pendingProposals] = await Promise.all([
+        db
+          .select({
+            id: agentFeedback.id,
+            instanceId: agentFeedback.instanceId,
+            message: agentFeedback.message,
+            category: agentFeedback.category,
+            severity: agentFeedback.severity,
+            status: agentFeedback.status,
+            source: agentFeedback.source,
+            createdAt: agentFeedback.createdAt,
+            instanceName: agentInstances.displayName,
+          })
+          .from(agentFeedback)
+          .leftJoin(agentInstances, eq(agentFeedback.instanceId, agentInstances.id))
+          .where(sinceCond)
+          .orderBy(desc(agentFeedback.createdAt))
+          .limit(input.limit),
+        db
+          .select({ status: agentFeedback.status, count: count() })
+          .from(agentFeedback)
+          .where(sinceCond)
+          .groupBy(agentFeedback.status),
+        db
+          .select({ severity: agentFeedback.severity, count: count() })
+          .from(agentFeedback)
+          .where(sinceCond)
+          .groupBy(agentFeedback.severity),
+        db
+          .select({ total: count() })
+          .from(feedbackImprovementProposals)
+          .where(eq(feedbackImprovementProposals.status, "proposed")),
+      ]);
+
+      const total = byStatus.reduce((sum, r) => sum + (r.count as number), 0);
+
+      return {
+        recent,
+        byStatus,
+        bySeverity,
+        total,
+        pendingProposals: pendingProposals[0]?.total ?? 0,
+      };
+    }),
+
+  /** List proposals awaiting review (promotion gate queue) */
+  pendingProposals: adminProcedure
+    .input(
+      z.object({
+        limit: z.number().int().min(1).max(50).default(20),
+        offset: z.number().int().min(0).default(0),
+      })
+    )
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return { proposals: [], total: 0 };
+
+      const rows = await db
+        .select()
+        .from(feedbackImprovementProposals)
+        .where(
+          inArray(feedbackImprovementProposals.status, ["proposed", "under_review"])
+        )
+        .orderBy(desc(feedbackImprovementProposals.createdAt))
+        .limit(input.limit)
+        .offset(input.offset);
+
+      const [countResult] = await db
+        .select({ total: count() })
+        .from(feedbackImprovementProposals)
+        .where(
+          inArray(feedbackImprovementProposals.status, ["proposed", "under_review"])
+        );
+
+      return { proposals: rows, total: countResult?.total ?? 0 };
+    }),
+
+  // =========================================================================
+  // Vertex Freeze Protocol
+  // =========================================================================
+
+  /** Get the current freeze registry (from file) */
+  getFreezeRegistry: adminProcedure.query(async () => {
+    return loadFreezeRegistry();
+  }),
+
+  /** List all vertex freezes from DB */
+  listVertexFreezes: adminProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return [];
+    return db
+      .select()
+      .from(vertexFreezes)
+      .orderBy(desc(vertexFreezes.createdAt));
+  }),
+
+  /** Get a specific vertex freeze */
+  getVertexFreeze: adminProcedure
+    .input(z.object({ vertex: z.string(), version: z.string() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return null;
+      const [freeze] = await db
+        .select()
+        .from(vertexFreezes)
+        .where(
+          and(
+            eq(vertexFreezes.vertex, input.vertex),
+            eq(vertexFreezes.version, input.version)
+          )
+        )
+        .limit(1);
+      return freeze ?? null;
+    }),
+
+  /** Persist a vertex freeze to the database */
+  createVertexFreeze: adminProcedure
+    .input(
+      z.object({
+        vertex: z.string(),
+        version: z.string(),
+        frozenAt: z.string(),
+        notes: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("DB unavailable");
+
+      // Load the full registry as the snapshot
+      const registry = loadFreezeRegistry();
+
+      const [result] = await db.insert(vertexFreezes).values({
+        vertex: input.vertex,
+        version: input.version,
+        status: "frozen",
+        frozenAt: new Date(input.frozenAt),
+        registryJson: registry,
+        lockedContracts: (registry as any).contracts?.map((c: any) => c.name) ?? [],
+        frozenBy: (ctx as any).user?.id ?? null,
+        notes: input.notes ?? null,
+      });
+
+      return { id: Number(result.insertId) };
+    }),
+
+  /** Check if a contract is frozen (governance gate) */
+  isContractFrozen: adminProcedure
+    .input(z.object({ contractName: z.string() }))
+    .query(async ({ input }) => {
+      const registry = loadFreezeRegistry();
+      const contracts = (registry as any).contracts ?? [];
+      const found = contracts.find(
+        (c: any) => c.name === input.contractName && c.status === "locked"
+      );
+      return {
+        frozen: !!found,
+        vertex: (registry as any).vertex ?? null,
+        version: (registry as any).version ?? null,
+        frozenAt: (registry as any).frozen_at ?? null,
+        governance: (registry as any).governance ?? null,
+      };
     }),
 });
 

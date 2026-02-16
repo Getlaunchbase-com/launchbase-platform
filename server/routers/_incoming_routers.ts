@@ -11,7 +11,12 @@ import { agentStackRouter } from "./routers/admin/agentStack";
 import { operatorOSRouter } from "./routers/admin/operatorOS";
 import { agentInstancesRouter, vertexProfilesRouter } from "./routers/admin/agentInstances";
 import { blueprintsRouter } from "./routers/admin/blueprints";
-import { mobileSessionRouter, mobileVoiceRouter, mobileChatRouter } from "./routers/mobile";
+import { feedbackRouter } from "./routers/admin/feedback";
+import { blueprintIngestionRouter } from "./routers/admin/blueprintIngestion";
+import { blueprintLegendResolverRouter } from "./routers/admin/blueprintLegendResolver";
+import { estimateChainRouter } from "./routers/admin/estimateChain";
+import { gapDetectionRouter } from "./routers/admin/gapDetection";
+import { mobileSessionRouter, mobileVoiceRouter, mobileChatRouter, mobileFeedbackRouter } from "./routers/mobile";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -486,6 +491,7 @@ export const appRouter = router({
     session: mobileSessionRouter,
     voice: mobileVoiceRouter,
     chat: mobileChatRouter,
+    feedback: mobileFeedbackRouter,
   }),
 
   // Admin routes (protected)
@@ -500,6 +506,11 @@ export const appRouter = router({
     agentInstances: agentInstancesRouter,
     vertexProfiles: vertexProfilesRouter,
     blueprints: blueprintsRouter,
+    blueprintIngestion: blueprintIngestionRouter,
+    blueprintLegend: blueprintLegendResolverRouter,
+    estimateChain: estimateChainRouter,
+    gapDetection: gapDetectionRouter,
+    feedback: feedbackRouter,
     intakes: router({
       list: protectedProcedure
         .input(z.object({

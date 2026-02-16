@@ -1,0 +1,67 @@
+{
+  "vertex": "IBEW_LV",
+  "version": "1.0.0",
+  "status": "frozen",
+  "frozen_at": "2026-02-15",
+  "contracts": [
+    {
+      "name": "BlueprintParseV1",
+      "version": "1.0.0",
+      "schema_file": "BlueprintParseV1.schema.json",
+      "status": "locked"
+    },
+    {
+      "name": "EstimateChainV1",
+      "version": "1.0.0",
+      "schema_file": "EstimateChainV1.schema.json",
+      "status": "locked"
+    }
+  ],
+  "intelligence": {
+    "task_library": {
+      "name": "IBEW_LV_TaskLibrary_v1",
+      "version": "1.0.0",
+      "status": "locked"
+    },
+    "gap_detection_rules": {
+      "version": "1.0.0",
+      "rules": ["G1", "G2", "G3", "G4", "G5", "G6"],
+      "status": "locked"
+    },
+    "confidence_propagation": {
+      "formula": "overall = clamp01(detection * mapping * rules * location_quality)",
+      "status": "locked"
+    }
+  },
+  "outputs": {
+    "excel_export": { "sheets": ["Takeoff_Summary", "Line_Items", "Assumptions"], "status": "locked" },
+    "bluebeam_csv": { "files": ["bluebeam_markups.csv", "bluebeam_takeoff.csv"], "status": "locked" }
+  },
+  "ux": {
+    "blueprint_viewer": "locked",
+    "symbol_mapping": "locked",
+    "gap_viewer": "locked",
+    "estimate_export_flow": "locked"
+  },
+  "not_allowed_until_v2": [
+    "auto-learning of labor",
+    "silent overrides",
+    "vendor auto-purchasing",
+    "voice-driven state mutation",
+    "cross-project inference",
+    "contract loosening"
+  ],
+  "allowed_after_freeze": [
+    "bug fixes (no behavior change)",
+    "performance improvements",
+    "logging / observability",
+    "UI clarity improvements",
+    "new vertices (HVAC, Fire, AV)",
+    "feedback collection",
+    "new contracts (V2 only)"
+  ],
+  "governance": {
+    "change_routes": ["feedback_item", "improvement_proposal", "new_contract_version"],
+    "hot_patches": "never"
+  }
+}

@@ -1,0 +1,280 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "BlueprintParseV1",
+  "title": "BlueprintParseV1",
+  "description": "Versioned protocol schema for blueprint_parse_document tool output. All VM parse results must validate against this schema before the platform ingests them. Additive-only evolution: V2 must not break V1.",
+  "type": "object",
+  "required": ["contract", "document", "pages", "text_blocks", "legend_candidates", "scale_candidates", "errors"],
+  "additionalProperties": false,
+  "properties": {
+    "contract": {
+      "type": "object",
+      "description": "Protocol contract metadata — always present, validated on both sides.",
+      "required": ["name", "version", "schema_hash", "producer"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "const": "BlueprintParseV1"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^1\\.[0-9]+\\.[0-9]+$",
+          "description": "Semver pinned to ^1.0.0. Breaking changes require a new contract name."
+        },
+        "schema_hash": {
+          "type": "string",
+          "minLength": 16,
+          "maxLength": 128,
+          "description": "SHA-256 hex of the schema file content, for integrity verification."
+        },
+        "producer": {
+          "type": "object",
+          "required": ["tool", "tool_version", "runtime"],
+          "additionalProperties": false,
+          "properties": {
+            "tool": {
+              "type": "string",
+              "description": "Tool name, e.g. 'blueprint_parse_document'"
+            },
+            "tool_version": {
+              "type": "string",
+              "description": "Git SHA or semver of the tool."
+            },
+            "runtime": {
+              "type": "string",
+              "description": "Runtime environment, e.g. 'agent-stack'"
+            },
+            "model_version": {
+              "type": ["string", "null"],
+              "description": "Vision/LLM model version if applicable, null if pure algorithmic."
+            }
+          }
+        }
+      }
+    },
+
+    "document": {
+      "type": "object",
+      "description": "Top-level document metadata.",
+      "required": ["page_count", "dpi", "is_vector"],
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "type": ["string", "null"],
+          "description": "Optional external document identifier."
+        },
+        "page_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "dpi": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Resolution of rendered page images."
+        },
+        "is_vector": {
+          "type": "boolean",
+          "description": "True if source is vector (PDF/DWG), false if raster (scanned image)."
+        },
+        "filename": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+
+    "pages": {
+      "type": "array",
+      "description": "One entry per page/sheet in the blueprint. Never null — always [].",
+      "items": {
+        "type": "object",
+        "required": ["page_number", "width_px", "height_px"],
+        "additionalProperties": true,
+        "properties": {
+          "page_number": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "image_artifact_path": {
+            "type": ["string", "null"],
+            "description": "Storage path to the rendered page image."
+          },
+          "width_px": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "height_px": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "label": {
+            "type": ["string", "null"],
+            "description": "Sheet label extracted from the page, e.g. 'Sheet E-101'."
+          }
+        }
+      }
+    },
+
+    "text_blocks": {
+      "type": "array",
+      "description": "Extracted text regions per page (OCR or PDF text). Never null — always [].",
+      "items": {
+        "type": "object",
+        "required": ["page", "bbox", "text", "confidence", "type"],
+        "additionalProperties": true,
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "1-indexed page number."
+          },
+          "bbox": {
+            "$ref": "#/$defs/normalized_bbox"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "confidence": {
+            "$ref": "#/$defs/confidence_score"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["title", "label", "dimension", "note", "legend_text", "other"]
+          }
+        }
+      }
+    },
+
+    "legend_candidates": {
+      "type": "array",
+      "description": "Detected legend/key entries. Never null — always [].",
+      "items": {
+        "type": "object",
+        "required": ["page", "bbox", "confidence", "method"],
+        "additionalProperties": true,
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "bbox": {
+            "$ref": "#/$defs/normalized_bbox"
+          },
+          "confidence": {
+            "$ref": "#/$defs/confidence_score"
+          },
+          "method": {
+            "type": "string",
+            "description": "How this was detected, e.g. 'ocr_heuristic', 'vision_model', 'pdf_structure'."
+          },
+          "raw_label": {
+            "type": ["string", "null"]
+          },
+          "symbol_description": {
+            "type": ["string", "null"]
+          }
+        }
+      }
+    },
+
+    "scale_candidates": {
+      "type": "array",
+      "description": "Detected drawing scale annotations. Never null — always [].",
+      "items": {
+        "type": "object",
+        "required": ["page", "raw", "confidence", "method"],
+        "additionalProperties": true,
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "raw": {
+            "type": "string",
+            "description": "Raw scale text, e.g. '1/4\" = 1'-0\"'."
+          },
+          "confidence": {
+            "$ref": "#/$defs/confidence_score"
+          },
+          "method": {
+            "type": "string"
+          }
+        }
+      }
+    },
+
+    "title_block_candidates": {
+      "type": "array",
+      "description": "Optional. Detected title block regions. Never null if present — always [].",
+      "items": {
+        "type": "object",
+        "required": ["page", "bbox", "confidence", "method"],
+        "additionalProperties": true,
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "bbox": {
+            "$ref": "#/$defs/normalized_bbox"
+          },
+          "confidence": {
+            "$ref": "#/$defs/confidence_score"
+          },
+          "method": {
+            "type": "string"
+          }
+        }
+      }
+    },
+
+    "errors": {
+      "type": "array",
+      "description": "Parse-time errors/warnings. Never null — always []. Empty means clean parse.",
+      "items": {
+        "type": "object",
+        "required": ["code", "message"],
+        "additionalProperties": true,
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Machine-readable error code, e.g. 'OCR_LOW_CONFIDENCE', 'PAGE_RENDER_FAILED'."
+          },
+          "message": {
+            "type": "string"
+          },
+          "page": {
+            "type": ["integer", "null"],
+            "description": "Page number where error occurred, if applicable."
+          },
+          "details": {
+            "type": ["object", "null"],
+            "description": "Additional structured error details."
+          }
+        }
+      }
+    }
+  },
+
+  "$defs": {
+    "normalized_bbox": {
+      "type": "object",
+      "description": "Bounding box with coordinates normalized to 0..1 relative to page dimensions.",
+      "required": ["x", "y", "w", "h"],
+      "additionalProperties": false,
+      "properties": {
+        "x": { "type": "number", "minimum": 0, "maximum": 1 },
+        "y": { "type": "number", "minimum": 0, "maximum": 1 },
+        "w": { "type": "number", "minimum": 0, "maximum": 1 },
+        "h": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "confidence_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Confidence score normalized to 0..1."
+    }
+  }
+}

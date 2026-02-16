@@ -1,0 +1,311 @@
+{
+  "library": {
+    "name": "IBEW_LV_TaskLibrary_v1",
+    "version": "1.0.0",
+    "description": "IBEW Low Voltage symbol taxonomy and task library. Maps canonical device types to install tasks with labor/material defaults."
+  },
+  "defaults": {
+    "waste_factor": 0.1,
+    "labor_factor": 1.0,
+    "crew_profiles": {
+      "LV-1": { "description": "1 tech", "multiplier": 1.0 },
+      "LV-2": { "description": "2 techs", "multiplier": 1.9 }
+    }
+  },
+  "canonical": {
+    "CAT6_DROP": {
+      "category": "Data/Network",
+      "description": "Cat6 data drop",
+      "tasks": [
+        {
+          "task_code": "LV-CAT6-INSTALL",
+          "basis": "per_ea",
+          "base_hours": 0.75,
+          "crew": "LV-1",
+          "materials": [
+            { "material_code": "CAT6-PLENUM-1000FT", "qty_per_ea": 0.08, "uom": "box" },
+            { "material_code": "RJ45-JACK", "qty_per_ea": 1, "uom": "ea" },
+            { "material_code": "1G-FACEPLATE", "qty_per_ea": 1, "uom": "ea" }
+          ],
+          "waste_factor": 0.1,
+          "notes": ["Standard single drop. Assumes home-run to nearest IDF."]
+        }
+      ]
+    },
+    "WAP": {
+      "category": "Data/Network",
+      "description": "Wireless access point",
+      "tasks": [
+        {
+          "task_code": "LV-WAP-INSTALL",
+          "basis": "per_ea",
+          "base_hours": 1.25,
+          "crew": "LV-1",
+          "materials": [
+            { "material_code": "CAT6-PLENUM-1000FT", "qty_per_ea": 0.12, "uom": "box" },
+            { "material_code": "WAP-BRACKET", "qty_per_ea": 1, "uom": "ea" }
+          ],
+          "waste_factor": 0.1,
+          "notes": ["Assumes single drop to IDF, final length resolved in v2 pathing."]
+        }
+      ]
+    },
+    "IDF_RACK": {
+      "category": "Data/Network",
+      "description": "Intermediate distribution frame / rack",
+      "tasks": [
+        {
+          "task_code": "LV-IDF-INSTALL",
+          "basis": "per_ea",
+          "base_hours": 8.0,
+          "crew": "LV-2",
+          "materials": [
+            { "material_code": "IDF-RACK-2POST", "qty_per_ea": 1, "uom": "ea" },
+            { "material_code": "RACK-SHELF", "qty_per_ea": 2, "uom": "ea" },
+            { "material_code": "PATCH-PANEL-24", "qty_per_ea": 1, "uom": "ea" }
+          ],
+          "waste_factor": 0.05,
+          "notes": ["Includes basic rack build-out. UPS and switch mounting separate."]
+        }
+      ]
+    },
+    "PATCH_PANEL": {
+      "category": "Data/Network",
+      "description": "Patch panel (24 or 48 port)",
+      "tasks": [
+        {
+          "task_code": "LV-PP-INSTALL",
+          "basis": "per_ea",
+          "base_hours": 2.0,
+          "crew": "LV-1",
+          "materials": [
+            { "material_code": "PATCH-PANEL-24", "qty_per_ea": 1, "uom": "ea" }
+          ],
+          "waste_factor": 0.0,
+          "notes": ["Terminate and label. Does not include cable pulls."]
+        }
+      ]
+    },
+    "FIBER_DROP": {
+      "category": "Data/Network",
+      "description": "Fiber optic drop",
+      "tasks": [
+        {
+          "task_code": "LV-FIBER-INSTALL",
+          "basis": "per_ea",
+          "base_hours": 2.5,
+          "crew": "LV-1",
+          "materials": [
+            { "material_code": "SM-FIBER-1000FT", "qty_per_ea": 0.1, "uom": "box" },
+            { "material_code": "FIBER-TERM-KIT", "qty_per_ea": 1, "uom": "ea" }
+          ],
+          "waste_factor": 0.1,
+          "notes": ["Single-mode, splice or connector. Assumes OTDR test."]
+        }
+      ]
+    },
+    "CCTV_CAMERA": {
+      "category": "Security",
+      "description": "Camera device",
+      "tasks": [
+        {
+          "task_code": "SEC-CAM-INSTALL",
+          "basis": "per_ea",
+          "base_hours": 1.75,
+          "crew": "LV-1",
+          "materials": [
+            { "material_code": "CAT6-PLENUM-1000FT", "qty_per_ea": 0.18, "uom": "box" },
+            { "material_code": "JBOX-4S", "qty_per_ea": 1, "uom": "ea" }
+          ],
+          "waste_factor": 0.12,
+          "notes": ["Includes mount, j-box, and cable pull. PoE assumed."]
+        }
+      ]
+    },
+    "CARD_READER": {
+      "category": "Security",
+      "description": "Access control card reader",
+      "tasks": [
+        {
+          "task_code": "SEC-CR-INSTALL",
+          "basis": "per_ea",
+          "base_hours": 2.0,
+          "crew": "LV-1",
+          "materials": [
+            { "material_code": "18-4-SHIELDED-1000FT", "qty_per_ea": 0.08, "uom": "box" },
+            { "material_code": "BACK-BOX-1G", "qty_per_ea": 1, "uom": "ea" }
+          ],
+          "waste_factor": 0.1,
+          "notes": ["Wiegand or OSDP. Includes back-box and cable."]
+        }
+      ]
+    },
+    "DOOR_CONTACT": {
+      "category": "Security",
+      "description": "Door contact / position switch",
+      "tasks": [
+        {
+          "task_code": "SEC-DC-INSTALL",
+          "basis": "per_ea",
+          "base_hours": 0.75,
+          "crew": "LV-1",
+          "materials": [
+            { "material_code": "18-4-SHIELDED-1000FT", "qty_per_ea": 0.06, "uom": "box" },
+            { "material_code": "DOOR-CONTACT-RECESSED", "qty_per_ea": 1, "uom": "ea" }
+          ],
+          "waste_factor": 0.1,
+          "notes": ["Recessed mount, standard. Coordinate with door hardware."]
+        }
+      ]
+    },
+    "REX_BUTTON": {
+      "category": "Security",
+      "description": "Request-to-exit button",
+      "tasks": [
+        {
+          "task_code": "SEC-REX-INSTALL",
+          "basis": "per_ea",
+          "base_hours": 0.5,
+          "crew": "LV-1",
+          "materials": [
+            { "material_code": "18-2-1000FT", "qty_per_ea": 0.04, "uom": "box" },
+            { "material_code": "REX-BUTTON-SS", "qty_per_ea": 1, "uom": "ea" }
+          ],
+          "waste_factor": 0.1,
+          "notes": ["Standard stainless REX. Includes back-box."]
+        }
+      ]
+    },
+    "MAGLOCK": {
+      "category": "Security",
+      "description": "Electromagnetic lock",
+      "tasks": [
+        {
+          "task_code": "SEC-MAG-INSTALL",
+          "basis": "per_ea",
+          "base_hours": 1.5,
+          "crew": "LV-1",
+          "materials": [
+            { "material_code": "12-2-1000FT", "qty_per_ea": 0.06, "uom": "box" },
+            { "material_code": "MAGLOCK-600LB", "qty_per_ea": 1, "uom": "ea" },
+            { "material_code": "Z-BRACKET", "qty_per_ea": 1, "uom": "ea" }
+          ],
+          "waste_factor": 0.08,
+          "notes": ["600lb holding force. Includes Z or L bracket. Coordinate with door closer."]
+        }
+      ]
+    },
+    "SMOKE_DETECTOR": {
+      "category": "Fire/LifeSafety",
+      "description": "Smoke detector (addressable)",
+      "tasks": [
+        {
+          "task_code": "FA-SMOKE-INSTALL",
+          "basis": "per_ea",
+          "base_hours": 0.75,
+          "crew": "LV-1",
+          "materials": [
+            { "material_code": "14-2-FPLP-1000FT", "qty_per_ea": 0.06, "uom": "box" },
+            { "material_code": "SMOKE-DET-ADDR", "qty_per_ea": 1, "uom": "ea" },
+            { "material_code": "SMOKE-BASE", "qty_per_ea": 1, "uom": "ea" }
+          ],
+          "waste_factor": 0.1,
+          "notes": ["Addressable SLC loop. Base and head. Per NFPA 72."]
+        }
+      ]
+    },
+    "HORN_STROBE": {
+      "category": "Fire/LifeSafety",
+      "description": "Horn/strobe notification appliance",
+      "tasks": [
+        {
+          "task_code": "FA-HS-INSTALL",
+          "basis": "per_ea",
+          "base_hours": 1.0,
+          "crew": "LV-1",
+          "materials": [
+            { "material_code": "14-2-FPLP-1000FT", "qty_per_ea": 0.08, "uom": "box" },
+            { "material_code": "HORN-STROBE-WALL", "qty_per_ea": 1, "uom": "ea" },
+            { "material_code": "JBOX-4S-RED", "qty_per_ea": 1, "uom": "ea" }
+          ],
+          "waste_factor": 0.1,
+          "notes": ["Wall mount. Red back-box per AHJ. NAC circuit."]
+        }
+      ]
+    },
+    "PULL_STATION": {
+      "category": "Fire/LifeSafety",
+      "description": "Manual pull station",
+      "tasks": [
+        {
+          "task_code": "FA-PULL-INSTALL",
+          "basis": "per_ea",
+          "base_hours": 0.75,
+          "crew": "LV-1",
+          "materials": [
+            { "material_code": "14-2-FPLP-1000FT", "qty_per_ea": 0.05, "uom": "box" },
+            { "material_code": "PULL-STATION-ADDR", "qty_per_ea": 1, "uom": "ea" },
+            { "material_code": "JBOX-4S-RED", "qty_per_ea": 1, "uom": "ea" }
+          ],
+          "waste_factor": 0.1,
+          "notes": ["Addressable. Mount at 48\" AFF per ADA/NFPA."]
+        }
+      ]
+    },
+    "FACP_PANEL": {
+      "category": "Fire/LifeSafety",
+      "description": "Fire alarm control panel",
+      "tasks": [
+        {
+          "task_code": "FA-FACP-INSTALL",
+          "basis": "per_ea",
+          "base_hours": 16.0,
+          "crew": "LV-2",
+          "materials": [
+            { "material_code": "FACP-PANEL", "qty_per_ea": 1, "uom": "ea" },
+            { "material_code": "BATTERY-12V-7AH", "qty_per_ea": 2, "uom": "ea" }
+          ],
+          "waste_factor": 0.0,
+          "notes": ["Addressable FACP. Includes programming, battery, and initial test."]
+        }
+      ]
+    },
+    "CONDUIT_RUN": {
+      "category": "Pathway",
+      "description": "Conduit pathway (per 100ft)",
+      "tasks": [
+        {
+          "task_code": "PATH-CONDUIT-INSTALL",
+          "basis": "per_100ft",
+          "base_hours": 4.0,
+          "crew": "LV-1",
+          "materials": [
+            { "material_code": "EMT-3/4-10FT", "qty_per_ea": 10, "uom": "stick" },
+            { "material_code": "EMT-CONN-3/4", "qty_per_ea": 6, "uom": "ea" },
+            { "material_code": "EMT-STRAP-3/4", "qty_per_ea": 12, "uom": "ea" }
+          ],
+          "waste_factor": 0.15,
+          "notes": ["3/4\" EMT. Includes connectors and straps per NEC 358."]
+        }
+      ]
+    },
+    "JHOOK_RUN": {
+      "category": "Pathway",
+      "description": "J-hook cable support pathway (per 100ft)",
+      "tasks": [
+        {
+          "task_code": "PATH-JHOOK-INSTALL",
+          "basis": "per_100ft",
+          "base_hours": 1.5,
+          "crew": "LV-1",
+          "materials": [
+            { "material_code": "JHOOK-3/4", "qty_per_ea": 20, "uom": "ea" },
+            { "material_code": "BEAM-CLAMP", "qty_per_ea": 20, "uom": "ea" }
+          ],
+          "waste_factor": 0.1,
+          "notes": ["J-hooks at 4-5ft spacing per BICSI. Open ceiling."]
+        }
+      ]
+    }
+  }
+}
