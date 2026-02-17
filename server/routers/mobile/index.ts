@@ -59,6 +59,20 @@ const MAX_AUDIO_BASE64_LENGTH = 25 * 1024 * 1024;
 const ARTIFACTS_DIR =
   process.env.ARTIFACTS_DIR || path.resolve(process.cwd(), "artifacts");
 
+/** S3 config for attachment uploads */
+const S3_ENABLED = !!process.env.ARTIFACTS_S3_BUCKET;
+const S3_BUCKET = process.env.ARTIFACTS_S3_BUCKET || "launchbase-artifacts";
+
+/** Max attachment size: 10 MB */
+const MAX_ATTACHMENT_SIZE = 10 * 1024 * 1024;
+
+/** Allowed MIME types for feedback attachments */
+const ATTACHMENT_MIME_ALLOWLIST = new Set([
+  "image/png",
+  "image/jpeg",
+  "application/pdf",
+]);
+
 // ---------------------------------------------------------------------------
 // Token helpers
 // ---------------------------------------------------------------------------
@@ -875,5 +889,234 @@ export const mobileFeedbackRouter = router({
         .offset(input.offset);
 
       return { items: rows };
+    }),
+});
+
+// =========================================================================
+// Attachment Upload Router — screenshots/photos for feedback
+// =========================================================================
+
+export const mobileAttachmentRouter = router({
+  /**
+   * Upload a feedback attachment (screenshot, photo, PDF).
+   *
+   * Returns a presigned S3 upload URL (or local fallback URL) and the
+   * eventual attachment URL. Mobile uploads directly to S3.
+   *
+   * Max size: 10 MB
+   * MIME allowlist: image/png, image/jpeg, application/pdf
+   */
+  upload: publicProcedure
+    .input(
+      z.object({
+        token: z.string().min(1),
+        filename: z.string().min(1).max(512),
+        contentType: z.string().min(1).max(128),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const session = await validateMobileToken(input.token);
+      enforceMobileRateLimit(`attachment:upload:${session.userId}`);
+
+      // Validate MIME type
+      if (!ATTACHMENT_MIME_ALLOWLIST.has(input.contentType)) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `File type "${input.contentType}" not allowed. Allowed: image/png, image/jpeg, application/pdf.`,
+        });
+      }
+
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable." });
+
+      const ext = path.extname(input.filename) || ".bin";
+      const uniqueKey = `feedback-attachments/${session.projectId}/${Date.now()}_${randomBytes(4).toString("hex")}${ext}`;
+
+      if (S3_ENABLED) {
+        // Generate presigned PUT URL for direct client upload
+        const { S3Client, PutObjectCommand } = await import("@aws-sdk/client-s3");
+        const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
+
+        const s3 = new S3Client({});
+        const command = new PutObjectCommand({
+          Bucket: S3_BUCKET,
+          Key: uniqueKey,
+          ContentType: input.contentType,
+          ContentLength: MAX_ATTACHMENT_SIZE, // max size hint
+        });
+
+        const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 600 });
+        const attachmentUrl = `https://${S3_BUCKET}.s3.amazonaws.com/${uniqueKey}`;
+
+        // Create artifact record (pending upload)
+        await db.insert(agentArtifacts).values({
+          runId: session.activeRunId ?? null,
+          projectId: session.projectId,
+          type: "file",
+          filename: input.filename,
+          mimeType: input.contentType,
+          sizeBytes: 0, // Updated after upload
+          storagePath: uniqueKey,
+          storageBackend: "s3",
+          meta: {
+            source: "mobile_feedback_attachment",
+            sessionId: session.id,
+            userId: session.userId,
+          },
+        });
+
+        await mobileAudit(
+          "admin_action",
+          session as any,
+          `Feedback attachment upload URL generated: ${input.filename}`,
+          { key: uniqueKey }
+        );
+
+        return { uploadUrl, attachmentUrl };
+      } else {
+        // Local storage fallback — client sends base64 in a follow-up call
+        const subdir = path.join("feedback-attachments", String(session.projectId));
+        const fullDir = path.join(ARTIFACTS_DIR, subdir);
+        if (!fs.existsSync(fullDir)) fs.mkdirSync(fullDir, { recursive: true });
+
+        const localPath = path.join(subdir, path.basename(uniqueKey));
+        const uploadUrl = `/api/artifacts/upload-local?path=${encodeURIComponent(localPath)}`;
+        const attachmentUrl = `/api/artifacts/${encodeURIComponent(localPath)}`;
+
+        await db.insert(agentArtifacts).values({
+          runId: session.activeRunId ?? null,
+          projectId: session.projectId,
+          type: "file",
+          filename: input.filename,
+          mimeType: input.contentType,
+          sizeBytes: 0,
+          storagePath: localPath,
+          storageBackend: "local",
+          meta: {
+            source: "mobile_feedback_attachment",
+            sessionId: session.id,
+            userId: session.userId,
+          },
+        });
+
+        return { uploadUrl, attachmentUrl };
+      }
+    }),
+});
+
+// =========================================================================
+// Voice Transcription Router — field voice notes → structured text
+// =========================================================================
+
+export const mobileTranscribeRouter = router({
+  /**
+   * Transcribe a voice note from a URL.
+   *
+   * Fetches audio from audioUrl, sends to transcription service,
+   * returns text + confidence. Falls back gracefully — never blocks
+   * feedback submission if transcription fails.
+   *
+   * Implementation: OpenAI Whisper if OPENAI_API_KEY configured,
+   * otherwise returns empty text + low confidence.
+   */
+  transcribe: publicProcedure
+    .input(
+      z.object({
+        token: z.string().min(1),
+        audioUrl: z.string().url(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const session = await validateMobileToken(input.token);
+      enforceMobileRateLimit(`transcribe:${session.userId}`);
+
+      // Attempt transcription — NEVER throw on failure, return degraded result
+      if (!process.env.OPENAI_API_KEY) {
+        return {
+          text: "",
+          confidence: 0,
+        };
+      }
+
+      try {
+        // Fetch audio from URL
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 30_000);
+
+        const audioResp = await fetch(input.audioUrl, {
+          signal: controller.signal,
+        });
+        clearTimeout(timeout);
+
+        if (!audioResp.ok) {
+          console.error(`[mobile:transcribe] Failed to fetch audio: HTTP ${audioResp.status}`);
+          return { text: "", confidence: 0 };
+        }
+
+        const audioBuffer = await audioResp.arrayBuffer();
+
+        // Enforce 10 MB limit
+        if (audioBuffer.byteLength > MAX_ATTACHMENT_SIZE) {
+          return { text: "", confidence: 0 };
+        }
+
+        // Call OpenAI Whisper API
+        const formData = new FormData();
+        formData.append(
+          "file",
+          new Blob([audioBuffer], { type: "audio/webm" }),
+          "voice_note.webm"
+        );
+        formData.append("model", "whisper-1");
+        formData.append("response_format", "verbose_json");
+
+        const whisperResp = await fetch(
+          "https://api.openai.com/v1/audio/transcriptions",
+          {
+            method: "POST",
+            headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
+            body: formData,
+          }
+        );
+
+        if (!whisperResp.ok) {
+          console.error(`[mobile:transcribe] Whisper error: HTTP ${whisperResp.status}`);
+          return { text: "", confidence: 0 };
+        }
+
+        const result = (await whisperResp.json()) as {
+          text: string;
+          language?: string;
+          duration?: number;
+          segments?: Array<{ avg_logprob?: number }>;
+        };
+
+        // Compute confidence from average log-probability of segments
+        let confidence = 0.85; // default if segments not available
+        if (result.segments && result.segments.length > 0) {
+          const avgLogProb =
+            result.segments.reduce((sum, s) => sum + (s.avg_logprob ?? -0.5), 0) /
+            result.segments.length;
+          // Convert log-prob to 0-1 scale (logprob of 0 = 1.0, -1 ≈ 0.37)
+          confidence = Math.round(Math.exp(avgLogProb) * 100) / 100;
+          confidence = Math.max(0, Math.min(1, confidence));
+        }
+
+        await mobileAudit(
+          "admin_action",
+          session as any,
+          `Voice transcribed from URL (${result.text.length} chars)`,
+          { audioUrl: input.audioUrl, confidence }
+        );
+
+        return {
+          text: result.text,
+          confidence,
+        };
+      } catch (err) {
+        console.error("[mobile:transcribe] Error:", err);
+        // Hard rule: NEVER block feedback if transcription fails
+        return { text: "", confidence: 0 };
+      }
     }),
 });

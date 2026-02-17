@@ -16,7 +16,8 @@ import { blueprintIngestionRouter } from "./admin/blueprintIngestion";
 import { blueprintLegendResolverRouter } from "./admin/blueprintLegendResolver";
 import { estimateChainRouter } from "./admin/estimateChain";
 import { gapDetectionRouter } from "./admin/gapDetection";
-import { mobileSessionRouter, mobileVoiceRouter, mobileChatRouter, mobileFeedbackRouter } from "./mobile";
+import { projectsRouter } from "./admin/projects";
+import { mobileSessionRouter, mobileVoiceRouter, mobileChatRouter, mobileFeedbackRouter, mobileAttachmentRouter, mobileTranscribeRouter } from "./mobile";
 import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -492,6 +493,8 @@ export const appRouter = router({
     voice: mobileVoiceRouter,
     chat: mobileChatRouter,
     feedback: mobileFeedbackRouter,
+    uploadAttachment: mobileAttachmentRouter,
+    transcribeVoice: mobileTranscribeRouter,
   }),
 
   // Admin routes (protected)
@@ -511,6 +514,7 @@ export const appRouter = router({
     estimateChain: estimateChainRouter,
     gapDetection: gapDetectionRouter,
     feedback: feedbackRouter,
+    projects: projectsRouter,
     intakes: router({
       list: protectedProcedure
         .input(z.object({
