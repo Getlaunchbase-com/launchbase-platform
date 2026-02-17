@@ -26,6 +26,7 @@ import { router, publicProcedure } from "../../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getDb } from "../../db";
 import { getFreezeStatus, isContractFrozen } from "../../contracts/freeze_governance";
+import { getExecutionGate } from "../../services/agentHealthMonitor";
 import {
   mobileSessions,
   agentInstances,
@@ -194,46 +195,80 @@ async function mobileAudit(
  *     the agent instance targets a frozen vertex
  *   - Chat poll/status: ALLOWED (read-only)
  */
+// ---------------------------------------------------------------------------
+// Blocked mutation types — mobile MUST NEVER perform these actions
+// ---------------------------------------------------------------------------
+
+const BLOCKED_MOBILE_ACTIONS = new Set([
+  "symbol_mapping",
+  "symbol.override",
+  "task.edit",
+  "task.delete",
+  "rule.change",
+  "rule.create",
+  "rule.delete",
+  "config.override",
+  "contract.modify",
+  "vertex.modify",
+]);
+
 async function enforceMobileFreezeGate(
   session: { agentInstanceId: number; projectId: number },
   action: string
 ): Promise<void> {
-  const freeze = getFreezeStatus();
-  if (!freeze.frozen) return; // No active freeze — allow everything
+  // Hard-block permanently forbidden mobile actions
+  if (BLOCKED_MOBILE_ACTIONS.has(action)) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message:
+        `Mobile action "${action}" is permanently blocked. ` +
+        `Mobile clients are restricted to: upload blueprint, view parse status, ` +
+        `view estimates, export files, submit feedback, and voice intent queries.`,
+    });
+  }
 
+  // Runtime health gate — if agent-stack is offline/mismatch, block all runs
   const db = await getDb();
-  if (!db) return; // Can't check — fail open for reads, but this is a mutation path
+  if (!db) return;
 
-  // Check if the agent instance is bound to a frozen vertex
   const [instance] = await db
-    .select({
-      vertexId: agentInstances.vertexId,
-    })
+    .select({ vertexId: agentInstances.vertexId })
     .from(agentInstances)
     .where(eq(agentInstances.id, session.agentInstanceId))
     .limit(1);
 
-  if (!instance?.vertexId) return; // No vertex binding — allow
+  if (instance?.vertexId) {
+    const [vertex] = await db
+      .select({ name: vertexProfiles.name })
+      .from(vertexProfiles)
+      .where(eq(vertexProfiles.id, instance.vertexId))
+      .limit(1);
 
-  const [vertex] = await db
-    .select({
-      slug: vertexProfiles.name,
-    })
-    .from(vertexProfiles)
-    .where(eq(vertexProfiles.id, instance.vertexId))
-    .limit(1);
+    if (vertex?.name) {
+      // Check runtime execution gate
+      const gate = await getExecutionGate(vertex.name);
+      if (gate === "blocked") {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message:
+            `Mobile ${action} blocked: agent runtime for vertex "${vertex.name}" ` +
+            `is offline or has a schema mismatch. Runs are disabled until the ` +
+            `agent-stack is healthy and passes handshake validation.`,
+        });
+      }
 
-  if (!vertex) return;
-
-  // If the vertex matches the frozen vertex, block the mutation
-  if (vertex.slug === freeze.vertex) {
-    throw new TRPCError({
-      code: "FORBIDDEN",
-      message:
-        `Mobile ${action} blocked: vertex "${freeze.vertex}" is frozen ` +
-        `(${freeze.version}). Mobile clients may not dispatch runs against ` +
-        `frozen vertices. Submit feedback instead.`,
-    });
+      // Freeze enforcement — block mutations against frozen vertices
+      const freeze = getFreezeStatus();
+      if (freeze.frozen && vertex.name === freeze.vertex) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message:
+            `Mobile ${action} blocked: vertex "${freeze.vertex}" is frozen ` +
+            `(${freeze.version}). Mobile clients may not dispatch runs against ` +
+            `frozen vertices. Submit feedback instead.`,
+        });
+      }
+    }
   }
 }
 

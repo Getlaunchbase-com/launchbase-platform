@@ -22,6 +22,10 @@ import {
   getAllContractInfo,
   type HandshakeRequest,
 } from "../contracts/handshake";
+import {
+  startHealthMonitor,
+  stopHealthMonitor,
+} from "../services/agentHealthMonitor";
 
 // ---------------------------------------------------------------------------
 // Express app
@@ -139,6 +143,9 @@ const server = app.listen(PORT, () => {
   console.log(
     `[server] Handshake: http://localhost:${PORT}/api/contracts/handshake`
   );
+
+  // Start agent runtime health monitor (polls agent-stack /health every 60s)
+  startHealthMonitor();
 });
 
 // ---------------------------------------------------------------------------
@@ -147,6 +154,9 @@ const server = app.listen(PORT, () => {
 
 async function shutdown(signal: string) {
   console.log(`[server] ${signal} received — shutting down gracefully`);
+
+  // Stop health monitor polling
+  stopHealthMonitor();
 
   server.close(async () => {
     await closeDb();

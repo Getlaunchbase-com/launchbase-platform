@@ -2685,3 +2685,34 @@ export const vertexFreezes = mysqlTable(
 
 export type VertexFreeze = typeof vertexFreezes.$inferSelect;
 export type InsertVertexFreeze = typeof vertexFreezes.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Agent Runtime Status — health monitor for the agent-stack control plane
+// ---------------------------------------------------------------------------
+
+export const agentRuntimeStatus = mysqlTable(
+  "agent_runtime_status",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    vertex: varchar("vertex", { length: 128 }).notNull(),
+    version: varchar("version", { length: 32 }).notNull(),
+    schemaHash: varchar("schema_hash", { length: 128 }),
+    handshakeOk: boolean("handshake_ok").default(false).notNull(),
+    status: mysqlEnum("status", ["healthy", "warning", "offline", "mismatch"]).default("offline").notNull(),
+    lastSeen: timestamp("last_seen"),
+    violations: json("violations").$type<Array<{ type: string; message: string; detectedAt: string }>>(),
+    endpointUrl: varchar("endpoint_url", { length: 512 }),
+    responseTimeMs: int("response_time_ms"),
+    metadata: json("metadata").$type<Record<string, unknown>>(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (t) => ({
+    vertexIdx: index("ars_vertex_idx").on(t.vertex),
+    statusIdx: index("ars_status_idx").on(t.status),
+    lastSeenIdx: index("ars_last_seen_idx").on(t.lastSeen),
+  })
+);
+
+export type AgentRuntimeStatus = typeof agentRuntimeStatus.$inferSelect;
+export type InsertAgentRuntimeStatus = typeof agentRuntimeStatus.$inferInsert;
