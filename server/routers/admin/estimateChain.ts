@@ -22,7 +22,7 @@ import {
   blueprintSymbolPacks,
   estimateChainRuns,
   projectTaskOverrides,
-} from "../../../drizzle/schema";
+} from "../../db/schema";
 import { desc, eq, and, count, sql, inArray } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { createHash } from "crypto";

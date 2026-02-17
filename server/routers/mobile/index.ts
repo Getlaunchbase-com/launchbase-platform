@@ -35,7 +35,7 @@ import {
   projects,
   users,
   vertexProfiles,
-} from "../../../drizzle/schema";
+} from "../../db/schema";
 import { desc, eq, and, gt, gte, count } from "drizzle-orm";
 import { randomBytes, createHash } from "crypto";
 import path from "node:path";

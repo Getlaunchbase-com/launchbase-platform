@@ -24,7 +24,7 @@ import {
   feedbackImprovementProposals,
   vertexFreezes,
   users,
-} from "../../../drizzle/schema";
+} from "../../db/schema";
 import { desc, eq, and, gte, sql, count, inArray } from "drizzle-orm";
 import fs from "node:fs";
 import path from "node:path";

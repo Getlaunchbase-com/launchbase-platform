@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "../_core/trpc";
-import { marketingInboxItem } from "../../drizzle/schema";
+import { marketingInboxItem } from "../../db/schema";
 import { and, desc, eq, like, or } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { getDb } from "../db";

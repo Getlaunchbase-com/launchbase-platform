@@ -21,7 +21,7 @@ import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { getDb } from "./db";
-import { intakes, approvals, buildPlans, referrals, intelligenceLayers, socialPosts, moduleSetupSteps, moduleConnections, suiteApplications, deployments, emailLogs } from "../drizzle/schema";
+import { intakes, approvals, buildPlans, referrals, intelligenceLayers, socialPosts, moduleSetupSteps, moduleConnections, suiteApplications, deployments, emailLogs } from "../db/schema";
 import { eq, desc, and, asc, sql } from "drizzle-orm";
 // Security hardening imports
 import {
@@ -1119,7 +1119,7 @@ export const appRouter = router({
         const db = await getDb();
         if (!db) throw new Error("Database not available");
 
-        const { alertEvents } = await import("../drizzle/schema");
+        const { alertEvents } = await import("../db/schema");
         const { and, eq, gte } = await import("drizzle-orm");
 
         // Build where conditions

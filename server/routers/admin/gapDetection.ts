@@ -18,7 +18,7 @@ import {
   blueprintLegendEntries,
   blueprintSymbolPacks,
   estimateChainRuns,
-} from "../../../drizzle/schema";
+} from "../../db/schema";
 import { desc, eq, and } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { runGapDetection, type GapDetectionInput, type GapFlag } from "../../contracts/gap_detection_rules";

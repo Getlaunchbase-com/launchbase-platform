@@ -19,7 +19,7 @@ import {
   swarmRuns,
   vertexProfiles,
   users,
-} from "../../../drizzle/schema";
+} from "../../db/schema";
 import { desc, eq, and, gte, sql, count, inArray, isNull } from "drizzle-orm";
 
 // ---------------------------------------------------------------------------

@@ -21,7 +21,7 @@ import {
   blueprintLegendEntries,
   agentArtifacts,
   projects,
-} from "../../../drizzle/schema";
+} from "../../db/schema";
 import { desc, eq, and, count, sql } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import path from "node:path";

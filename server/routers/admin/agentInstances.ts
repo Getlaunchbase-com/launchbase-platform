@@ -14,7 +14,7 @@ import {
   agentInstances,
   agentInstanceSecrets,
   projects,
-} from "../../../drizzle/schema";
+} from "../../db/schema";
 import { desc, eq, and, count } from "drizzle-orm";
 import { createCipheriv, createDecipheriv, randomBytes, createHash } from "crypto";
 
