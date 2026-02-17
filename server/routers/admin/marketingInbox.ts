@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { router, protectedProcedure } from "../_core/trpc";
+import { router, protectedProcedure } from "../../_core/trpc";
 import { marketingInboxItem } from "../../db/schema";
 import { and, desc, eq, like, or } from "drizzle-orm";
 import { nanoid } from "nanoid";
-import { getDb } from "../db";
+import { getDb } from "../../db";
 
 const Status = z.enum(["new", "triaged", "queued", "running", "done", "archived"]);
 

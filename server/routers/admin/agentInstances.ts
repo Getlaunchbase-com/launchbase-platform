@@ -99,7 +99,7 @@ export const vertexProfilesRouter = router({
       z.object({
         name: z.string().min(1).max(255),
         description: z.string().optional(),
-        configJson: z.record(z.unknown()).optional(),
+        configJson: z.record(z.string(), z.unknown()).optional(),
         toolsAllowlistJson: z.array(z.string()).optional(),
       })
     )
@@ -124,7 +124,7 @@ export const vertexProfilesRouter = router({
         id: z.number().int(),
         name: z.string().min(1).max(255).optional(),
         description: z.string().optional(),
-        configJson: z.record(z.unknown()).optional(),
+        configJson: z.record(z.string(), z.unknown()).optional(),
         toolsAllowlistJson: z.array(z.string()).optional(),
       })
     )

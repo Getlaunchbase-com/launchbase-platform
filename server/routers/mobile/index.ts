@@ -25,6 +25,7 @@ import { z } from "zod";
 import { router, publicProcedure } from "../../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getDb } from "../../db";
+import { getFreezeStatus, isContractFrozen } from "../../contracts/freeze_governance";
 import {
   mobileSessions,
   agentInstances,
@@ -173,6 +174,66 @@ async function mobileAudit(
     );
   } catch {
     // best-effort
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Freeze enforcement — mobile is a read/feedback terminal, not a mutation brain
+// ---------------------------------------------------------------------------
+
+/**
+ * Enforce that the mobile client is not attempting to mutate frozen contract
+ * state. Voice uploads and feedback are always allowed; run creation and
+ * chat messages that dispatch tools against frozen vertices are blocked.
+ *
+ * Rules:
+ *   - Session create/validate/revoke: ALLOWED (session management)
+ *   - Voice upload/transcribe: ALLOWED (input capture, no state change)
+ *   - Feedback submit/mine: ALLOWED (feedback collection is post-freeze OK)
+ *   - Chat send (creates runs): GATED — blocked if vertex is frozen AND
+ *     the agent instance targets a frozen vertex
+ *   - Chat poll/status: ALLOWED (read-only)
+ */
+async function enforceMobileFreezeGate(
+  session: { agentInstanceId: number; projectId: number },
+  action: string
+): Promise<void> {
+  const freeze = getFreezeStatus();
+  if (!freeze.frozen) return; // No active freeze — allow everything
+
+  const db = await getDb();
+  if (!db) return; // Can't check — fail open for reads, but this is a mutation path
+
+  // Check if the agent instance is bound to a frozen vertex
+  const [instance] = await db
+    .select({
+      vertexId: agentInstances.vertexId,
+    })
+    .from(agentInstances)
+    .where(eq(agentInstances.id, session.agentInstanceId))
+    .limit(1);
+
+  if (!instance?.vertexId) return; // No vertex binding — allow
+
+  const [vertex] = await db
+    .select({
+      slug: vertexProfiles.name,
+    })
+    .from(vertexProfiles)
+    .where(eq(vertexProfiles.id, instance.vertexId))
+    .limit(1);
+
+  if (!vertex) return;
+
+  // If the vertex matches the frozen vertex, block the mutation
+  if (vertex.slug === freeze.vertex) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message:
+        `Mobile ${action} blocked: vertex "${freeze.vertex}" is frozen ` +
+        `(${freeze.version}). Mobile clients may not dispatch runs against ` +
+        `frozen vertices. Submit feedback instead.`,
+    });
   }
 }
 
@@ -522,6 +583,9 @@ export const mobileChatRouter = router({
     .mutation(async ({ input }) => {
       const session = await validateMobileToken(input.token);
       enforceMobileRateLimit(`chat:send:${session.userId}`);
+
+      // Freeze enforcement: mobile must not dispatch runs against frozen vertices
+      await enforceMobileFreezeGate(session, "chat.send");
 
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable." });

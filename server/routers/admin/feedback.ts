@@ -312,11 +312,9 @@ export const feedbackRouter = router({
 
       // 2. Create a swarm run to track this improvement analysis
       const [swarmResult] = await db.insert(swarmRuns).values({
-        repairId: `feedback-improvement-${Date.now()}`,
+        repairKey: `feedback-improvement-${Date.now()}`,
         status: "running",
-        model: "gpt-4o",
-        promptTokens: 0,
-        completionTokens: 0,
+        modelPrimary: "gpt-4o",
         costUsd: "0",
         latencyMs: 0,
       });
@@ -422,7 +420,7 @@ export const feedbackRouter = router({
       await db
         .update(swarmRuns)
         .set({ status: "completed" })
-        .where(eq(swarmRuns.id, swarmRunId));
+        .where(eq(swarmRuns.repairId, swarmRunId));
 
       return {
         swarmRunId,
