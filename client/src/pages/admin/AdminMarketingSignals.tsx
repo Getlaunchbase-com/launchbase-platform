@@ -14,20 +14,20 @@ export default function AdminMarketingSignals() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [noteText, setNoteText] = useState("");
 
-  const listQuery = trpc.admin.marketingSignals.list.useQuery({
+  const listQuery = trpc.marketingSignals.list.useQuery({
     status,
     search: search.trim() || undefined,
     limit: 100,
   });
 
-  const setStatusMut = trpc.admin.marketingSignals.setStatus.useMutation({
+  const setStatusMut = trpc.marketingSignals.setStatus.useMutation({
     onSuccess: () => {
       listQuery.refetch();
       setSelectedId(null);
     },
   });
 
-  const addNoteMut = trpc.admin.marketingSignals.addNote.useMutation({
+  const addNoteMut = trpc.marketingSignals.addNote.useMutation({
     onSuccess: () => {
       listQuery.refetch();
       setNoteText("");
@@ -35,12 +35,12 @@ export default function AdminMarketingSignals() {
     },
   });
 
-  const seedMut = trpc.admin.marketingSignals.seed.useMutation({
+  const seedMut = trpc.marketingSignals.seed.useMutation({
     onSuccess: () => listQuery.refetch(),
   });
 
   const rows = listQuery.data?.rows ?? [];
-  const selectedRow = rows.find((r) => r.id === selectedId);
+  const selectedRow = rows.find((r: any) => r.id === selectedId);
 
   return (
     <div style={{ padding: 16, maxWidth: 1400 }}>
@@ -105,7 +105,7 @@ export default function AdminMarketingSignals() {
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
+            {rows.map((row: any) => (
               <tr
                 key={row.id}
                 style={{
@@ -251,7 +251,7 @@ export default function AdminMarketingSignals() {
             <div style={{ marginTop: 12 }}>
               <strong>Score Reasons:</strong>
               <ul style={{ marginTop: 8 }}>
-                {selectedRow.reasons.map((reason, i) => (
+                {selectedRow.reasons.map((reason: any, i: number) => (
                   <li key={i} style={{ fontSize: 14 }}>
                     {reason}
                   </li>

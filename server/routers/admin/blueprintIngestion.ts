@@ -21,7 +21,7 @@ import {
   blueprintLegendEntries,
   agentArtifacts,
   projects,
-} from "../../../drizzle/schema";
+} from "../../db/schema";
 import { desc, eq, and, count, sql } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import path from "node:path";
@@ -199,7 +199,7 @@ export const blueprintIngestionRouter = router({
             imageBase64: z.string().optional(), // base64 rendered page image
             imageWidth: z.number().int().optional(),
             imageHeight: z.number().int().optional(),
-            meta: z.record(z.unknown()).optional(),
+            meta: z.record(z.string(), z.unknown()).optional(),
           })
         ),
       })

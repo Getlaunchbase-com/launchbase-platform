@@ -1,27 +1,28 @@
 import { COOKIE_NAME } from "@shared/const";
-import { getSessionCookieOptions } from "./_core/cookies";
-import { systemRouter } from "./_core/systemRouter";
-import { adminStripeWebhooksRouter } from "./routers/admin/stripeWebhooks";
-import { adminEmailSmokeRouter } from "./routers/admin/emailSmoke";
-import { adminEmailMetricsRouter } from "./routers/admin/emailMetrics";
-import { swarmConsoleRouter } from "./routers/admin/swarmConsole";
-import { swarmOpsChatRouter } from "./routers/admin/swarmOpsChat";
-import { agentRunsRouter, agentEventsRouter, agentArtifactsRouter } from "./routers/admin/agentRuns";
-import { agentStackRouter } from "./routers/admin/agentStack";
-import { operatorOSRouter } from "./routers/admin/operatorOS";
-import { agentInstancesRouter, vertexProfilesRouter } from "./routers/admin/agentInstances";
-import { blueprintsRouter } from "./routers/admin/blueprints";
-import { feedbackRouter } from "./routers/admin/feedback";
-import { blueprintIngestionRouter } from "./routers/admin/blueprintIngestion";
-import { blueprintLegendResolverRouter } from "./routers/admin/blueprintLegendResolver";
-import { estimateChainRouter } from "./routers/admin/estimateChain";
-import { gapDetectionRouter } from "./routers/admin/gapDetection";
-import { mobileSessionRouter, mobileVoiceRouter, mobileChatRouter, mobileFeedbackRouter } from "./routers/mobile";
-import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import { getSessionCookieOptions } from "../_core/cookies";
+import { systemRouter } from "../_core/systemRouter";
+import { adminStripeWebhooksRouter } from "./admin/stripeWebhooks";
+import { adminEmailSmokeRouter } from "./admin/emailSmoke";
+import { adminEmailMetricsRouter } from "./admin/emailMetrics";
+import { swarmConsoleRouter } from "./admin/swarmConsole";
+import { swarmOpsChatRouter } from "./admin/swarmOpsChat";
+import { agentRunsRouter, agentEventsRouter, agentArtifactsRouter } from "./admin/agentRuns";
+import { agentStackRouter } from "./admin/agentStack";
+import { operatorOSRouter } from "./admin/operatorOS";
+import { agentInstancesRouter, vertexProfilesRouter } from "./admin/agentInstances";
+import { blueprintsRouter } from "./admin/blueprints";
+import { feedbackRouter } from "./admin/feedback";
+import { blueprintIngestionRouter } from "./admin/blueprintIngestion";
+import { blueprintLegendResolverRouter } from "./admin/blueprintLegendResolver";
+import { estimateChainRouter } from "./admin/estimateChain";
+import { gapDetectionRouter } from "./admin/gapDetection";
+import { projectsRouter } from "./admin/projects";
+import { mobileSessionRouter, mobileVoiceRouter, mobileChatRouter, mobileFeedbackRouter, mobileAttachmentRouter, mobileTranscribeRouter } from "./mobile";
+import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { getDb } from "./db";
-import { intakes, approvals, buildPlans, referrals, intelligenceLayers, socialPosts, moduleSetupSteps, moduleConnections, suiteApplications, deployments, emailLogs } from "../drizzle/schema";
+import { getDb } from "../db";
+import { intakes, approvals, buildPlans, referrals, intelligenceLayers, socialPosts, moduleSetupSteps, moduleConnections, suiteApplications, deployments, emailLogs } from "../db/schema";
 import { eq, desc, and, asc, sql } from "drizzle-orm";
 // Security hardening imports
 import {
@@ -31,7 +32,7 @@ import {
   auditLog,
   enforceInputSecurity,
   scanInput,
-} from "./security";
+} from "../security";
 import { 
   createIntake, 
   getIntakes, 
@@ -49,24 +50,24 @@ import {
   getDeployments,
   updateDeploymentStatus,
   runDeployment,
-} from "./db";
-import { sendEmail, AdminNotifications } from "./email";
-import { trackEvent, getFunnelMetrics, getBuildQualityMetrics, getVerticalMetrics, getDailyHealth } from "./analytics";
-import { platformRouter } from "./platform-router";
-import { createSetupCheckoutSession, getCheckoutSession, createServiceCheckoutSession } from "./stripe/checkout";
-import { createSMICheckoutSession, getSMISubscriptionStatus, cancelSMISubscription } from "./stripe/intelligenceCheckout";
-import { generatePlatformGuidePDF } from "./pdfGuide";
-import { generatePreviewHTML, generateBuildPlan as generatePreviewBuildPlan } from "./previewTemplates";
+} from "../db";
+import { sendEmail, AdminNotifications } from "../email";
+import { trackEvent, getFunnelMetrics, getBuildQualityMetrics, getVerticalMetrics, getDailyHealth } from "../analytics";
+import { platformRouter } from "../platform-router";
+import { createSetupCheckoutSession, getCheckoutSession, createServiceCheckoutSession } from "../stripe/checkout";
+import { createSMICheckoutSession, getSMISubscriptionStatus, cancelSMISubscription } from "../stripe/intelligenceCheckout";
+import { generatePlatformGuidePDF } from "../pdfGuide";
+import { generatePreviewHTML, generateBuildPlan as generatePreviewBuildPlan } from "../previewTemplates";
 import { createHash } from "crypto";
-import { getWeatherIntelligence, formatFacebookPost } from "./services/weather-intelligence";
-import { postToFacebook, testFacebookConnection } from "./services/facebook-poster";
-import { getTopReferringSites, getConversionFunnel, get7DayClicks, logReferralEvent } from "./referral";
-import { getLastWorkerRun } from "./worker/deploymentWorker";
-import { getObservabilityData, formatTimeAgo } from "./observability";
-import { notifyOwner } from "./_core/notification";
-import { getHealthMetrics } from "./health";
-import { checkFacebookPostingPolicy } from "./services/facebook-policy";
-import { absoluteUrl } from "./utils/absoluteUrl";
+import { getWeatherIntelligence, formatFacebookPost } from "../services/weather-intelligence";
+import { postToFacebook, testFacebookConnection } from "../services/facebook-poster";
+import { getTopReferringSites, getConversionFunnel, get7DayClicks, logReferralEvent } from "../referral";
+import { getLastWorkerRun } from "../worker/deploymentWorker";
+import { getObservabilityData, formatTimeAgo } from "../observability";
+import { notifyOwner } from "../_core/notification";
+import { getHealthMetrics } from "../health";
+import { checkFacebookPostingPolicy } from "../services/facebook-policy";
+import { absoluteUrl } from "../utils/absoluteUrl";
 
 // App base URL for absolute links in emails
 const APP_URL = 
@@ -93,11 +94,11 @@ function generateReferralCode(): string {
   return code;
 }
 
-import { actionRequestsRouter } from "./routers/actionRequestsRouter";
-import { designJobsRouter } from "./routers/designJobsRouter";
-import { aiCopyRefineRouter } from "./routers/aiCopyRefineRouter";
-import { marketingInboxRouter } from "./routers/marketingInbox";
-import { marketingSignalsRouter } from "./routers/admin/marketingSignals";
+import { actionRequestsRouter } from "./actionRequestsRouter";
+import { designJobsRouter } from "./designJobsRouter";
+import { aiCopyRefineRouter } from "./aiCopyRefineRouter";
+import { marketingInboxRouter } from "./marketingInbox";
+import { marketingSignalsRouter } from "./admin/marketingSignals";
 
 export const appRouter = router({
   system: systemRouter,
@@ -163,7 +164,7 @@ export const appRouter = router({
         
         // Handle promo code if provided
         if (input.promoCode && intake?.id) {
-          const { reservePromo } = await import("./services/promoService");
+          const { reservePromo } = await import("../services/promoService");
           const promoResult = await reservePromo({
             promoCode: input.promoCode.toUpperCase(),
             intakeId: intake.id,
@@ -261,7 +262,7 @@ export const appRouter = router({
         const siteSlug = intake.businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').substring(0, 50);
         
         // Tier 1 Enhanced Presentation Pass (feature flag + tenant allowlist)
-        const { ENV } = await import("./_core/env");
+        const { ENV } = await import("../_core/env");
         const isEnhanced =
           ENV.presentationTier === "enhanced" &&
           intake.tenant === "vinces"; // Start safe: only vinces first
@@ -269,7 +270,7 @@ export const appRouter = router({
         let presentation: any | undefined;
         
         if (isEnhanced) {
-          const { runPresentationPass } = await import("./services/design/runPresentationPass");
+          const { runPresentationPass } = await import("../services/design/runPresentationPass");
           const pass = await runPresentationPass({
             intakeId: intake.id,
             tenant: intake.tenant,
@@ -492,6 +493,8 @@ export const appRouter = router({
     voice: mobileVoiceRouter,
     chat: mobileChatRouter,
     feedback: mobileFeedbackRouter,
+    uploadAttachment: mobileAttachmentRouter,
+    transcribeVoice: mobileTranscribeRouter,
   }),
 
   // Admin routes (protected)
@@ -511,6 +514,7 @@ export const appRouter = router({
     estimateChain: estimateChainRouter,
     gapDetection: gapDetectionRouter,
     feedback: feedbackRouter,
+    projects: projectsRouter,
     intakes: router({
       list: protectedProcedure
         .input(z.object({
@@ -548,7 +552,7 @@ export const appRouter = router({
           }
           
           // Enforce valid status transitions
-          const { isValidTransition } = await import("./statusTransitions");
+          const { isValidTransition } = await import("../statusTransitions");
           const currentStatus = intake.status as "new" | "review" | "needs_info" | "ready_for_review" | "approved" | "paid" | "deployed";
           const targetStatus = input.status;
           
@@ -852,7 +856,7 @@ export const appRouter = router({
             meta: { reason: input.reason },
           });
 
-          const { rollbackToLastSuccess } = await import("./rollback");
+          const { rollbackToLastSuccess } = await import("../rollback");
           const result = await rollbackToLastSuccess({
             intakeId: input.intakeId,
             reason: input.reason,
@@ -1016,7 +1020,7 @@ export const appRouter = router({
         scenario: z.enum(["canonical", "website_only", "founder"]),
       }))
       .mutation(async ({ input }) => {
-        const { computePricing } = await import("../client/src/lib/computePricing");
+        const { computePricing } = await import("../../client/src/lib/computePricing");
         
         // Define service selections for each scenario
         const scenarios = {
@@ -1073,7 +1077,7 @@ export const appRouter = router({
         if (!intake) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Insert succeeded but row not found" });
         
         // Compute pricing
-        const pricing = computePricing(selections);
+        const pricing = computePricing(selections as any);
         
         // Create checkout session (this will store pricingSnapshot)
         const session = await createServiceCheckoutSession({
@@ -1082,10 +1086,10 @@ export const appRouter = router({
           customerName: intake.contactName,
           origin: "http://localhost:3000",
           tenant: "launchbase",
-          promoCode: selections.promoCode,
+          promoCode: selections.promoCode ?? undefined,
           serviceSelections: selections,
         });
-        
+
         return {
           intakeId: intake.id,
           checkoutUrl: session.url!,
@@ -1119,7 +1123,7 @@ export const appRouter = router({
         const db = await getDb();
         if (!db) throw new Error("Database not available");
 
-        const { alertEvents } = await import("../drizzle/schema");
+        const { alertEvents } = await import("../db/schema");
         const { and, eq, gte } = await import("drizzle-orm");
 
         // Build where conditions
@@ -1359,6 +1363,9 @@ export const appRouter = router({
       .input(z.object({ sessionId: z.string() }))
       .query(async ({ input }) => {
         const session = await getCheckoutSession(input.sessionId);
+        if (!session) {
+          return { status: "unknown", customerEmail: null, amountTotal: 0, intakeId: null };
+        }
         return {
           status: session.payment_status,
           customerEmail: session.customer_email,
@@ -1396,7 +1403,7 @@ export const appRouter = router({
         }
         
         // Build service summary
-        const { buildServiceSummary } = await import("./services/serviceSummary");
+        const { buildServiceSummary } = await import("../services/serviceSummary");
         const summary = buildServiceSummary(serviceSelections, pricingSnapshot);
         
         // Convert to UI-friendly format
@@ -1933,8 +1940,8 @@ export const appRouter = router({
         if (!db) throw new Error("Database not available");
 
         // Import module config
-        const { moduleConfigs } = await import("../shared/moduleSetupConfig");
-        const config = moduleConfigs[input.moduleKey];
+        const { moduleConfigs } = await import("../../shared/moduleSetupConfig");
+        const config = (moduleConfigs as any[]).find((c: any) => c.id === input.moduleKey);
 
         if (!config) {
           throw new Error(`Unknown module: ${input.moduleKey}`);
@@ -2760,7 +2767,7 @@ export const appRouter = router({
         intakeId: z.number(),
       }))
       .mutation(async ({ input }) => {
-        const { generateAllPackets } = await import("./services/setupPacketGenerator");
+        const { generateAllPackets } = await import("../services/setupPacketGenerator");
         const packets = await generateAllPackets(input.intakeId);
         
         if (!packets.google && !packets.meta && !packets.quickbooks) {
@@ -2782,7 +2789,7 @@ export const appRouter = router({
         intakeId: z.number(),
       }))
       .query(async ({ input }) => {
-        const { generateAllPackets } = await import("./services/setupPacketGenerator");
+        const { generateAllPackets } = await import("../services/setupPacketGenerator");
         const packets = await generateAllPackets(input.intakeId);
         
         return {
@@ -2799,7 +2806,7 @@ export const appRouter = router({
         integration: z.enum(["google_business", "meta", "quickbooks"]),
       }))
       .query(async ({ input }) => {
-        const { generateSetupPacket } = await import("./services/setupPacketGenerator");
+        const { generateSetupPacket } = await import("../services/setupPacketGenerator");
         const packet = await generateSetupPacket(input.intakeId, input.integration);
         
         if (!packet) {
@@ -2860,7 +2867,7 @@ export const appRouter = router({
         intakeId: z.number(),
       }))
       .query(async ({ input }) => {
-        const engine = await import("./services/checklistEngine");
+        const engine = await import("../services/checklistEngine");
         const intake = await getIntakeById(input.intakeId);
         
         if (!intake) {
@@ -2892,7 +2899,7 @@ export const appRouter = router({
         mode: z.enum(["safe", "full"]).optional().default("safe"),
       }))
       .mutation(async ({ input }) => {
-        const engine = await import("./services/checklistEngine");
+        const engine = await import("../services/checklistEngine");
         const intake = await getIntakeById(input.intakeId);
         
         if (!intake) {
@@ -2932,7 +2939,7 @@ export const appRouter = router({
         stepId: z.string(),
       }))
       .mutation(async ({ input, ctx }) => {
-        const engine = await import("./services/checklistEngine");
+        const engine = await import("../services/checklistEngine");
         const intake = await getIntakeById(input.intakeId);
         
         if (!intake) {
@@ -2969,7 +2976,7 @@ export const appRouter = router({
         reason: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
-        const engine = await import("./services/checklistEngine");
+        const engine = await import("../services/checklistEngine");
         const intake = await getIntakeById(input.intakeId);
         
         if (!intake) {
@@ -3004,7 +3011,7 @@ export const appRouter = router({
         fieldKey: z.string(),
       }))
       .mutation(async ({ input, ctx }) => {
-        const engine = await import("./services/checklistEngine");
+        const engine = await import("../services/checklistEngine");
         const intake = await getIntakeById(input.intakeId);
         
         if (!intake) {
@@ -3040,7 +3047,7 @@ export const appRouter = router({
         value: z.any(),
       }))
       .mutation(async ({ input, ctx }) => {
-        const engine = await import("./services/checklistEngine");
+        const engine = await import("../services/checklistEngine");
         const intake = await getIntakeById(input.intakeId);
         
         if (!intake) {
@@ -3075,7 +3082,7 @@ export const appRouter = router({
         platform: z.enum(["gbp", "meta", "qbo", "all"]),
       }))
       .mutation(async ({ input }) => {
-        const engine = await import("./services/checklistEngine");
+        const engine = await import("../services/checklistEngine");
         const intake = await getIntakeById(input.intakeId);
         
         if (!intake) {

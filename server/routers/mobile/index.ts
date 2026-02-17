@@ -25,6 +25,8 @@ import { z } from "zod";
 import { router, publicProcedure } from "../../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getDb } from "../../db";
+import { getFreezeStatus, isContractFrozen } from "../../contracts/freeze_governance";
+import { getExecutionGate } from "../../services/agentHealthMonitor";
 import {
   mobileSessions,
   agentInstances,
@@ -35,7 +37,7 @@ import {
   projects,
   users,
   vertexProfiles,
-} from "../../../drizzle/schema";
+} from "../../db/schema";
 import { desc, eq, and, gt, gte, count } from "drizzle-orm";
 import { randomBytes, createHash } from "crypto";
 import path from "node:path";
@@ -56,6 +58,20 @@ const MAX_AUDIO_BASE64_LENGTH = 25 * 1024 * 1024;
 
 const ARTIFACTS_DIR =
   process.env.ARTIFACTS_DIR || path.resolve(process.cwd(), "artifacts");
+
+/** S3 config for attachment uploads */
+const S3_ENABLED = !!process.env.ARTIFACTS_S3_BUCKET;
+const S3_BUCKET = process.env.ARTIFACTS_S3_BUCKET || "launchbase-artifacts";
+
+/** Max attachment size: 10 MB */
+const MAX_ATTACHMENT_SIZE = 10 * 1024 * 1024;
+
+/** Allowed MIME types for feedback attachments */
+const ATTACHMENT_MIME_ALLOWLIST = new Set([
+  "image/png",
+  "image/jpeg",
+  "application/pdf",
+]);
 
 // ---------------------------------------------------------------------------
 // Token helpers
@@ -173,6 +189,100 @@ async function mobileAudit(
     );
   } catch {
     // best-effort
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Freeze enforcement — mobile is a read/feedback terminal, not a mutation brain
+// ---------------------------------------------------------------------------
+
+/**
+ * Enforce that the mobile client is not attempting to mutate frozen contract
+ * state. Voice uploads and feedback are always allowed; run creation and
+ * chat messages that dispatch tools against frozen vertices are blocked.
+ *
+ * Rules:
+ *   - Session create/validate/revoke: ALLOWED (session management)
+ *   - Voice upload/transcribe: ALLOWED (input capture, no state change)
+ *   - Feedback submit/mine: ALLOWED (feedback collection is post-freeze OK)
+ *   - Chat send (creates runs): GATED — blocked if vertex is frozen AND
+ *     the agent instance targets a frozen vertex
+ *   - Chat poll/status: ALLOWED (read-only)
+ */
+// ---------------------------------------------------------------------------
+// Blocked mutation types — mobile MUST NEVER perform these actions
+// ---------------------------------------------------------------------------
+
+const BLOCKED_MOBILE_ACTIONS = new Set([
+  "symbol_mapping",
+  "symbol.override",
+  "task.edit",
+  "task.delete",
+  "rule.change",
+  "rule.create",
+  "rule.delete",
+  "config.override",
+  "contract.modify",
+  "vertex.modify",
+]);
+
+async function enforceMobileFreezeGate(
+  session: { agentInstanceId: number; projectId: number },
+  action: string
+): Promise<void> {
+  // Hard-block permanently forbidden mobile actions
+  if (BLOCKED_MOBILE_ACTIONS.has(action)) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message:
+        `Mobile action "${action}" is permanently blocked. ` +
+        `Mobile clients are restricted to: upload blueprint, view parse status, ` +
+        `view estimates, export files, submit feedback, and voice intent queries.`,
+    });
+  }
+
+  // Runtime health gate — if agent-stack is offline/mismatch, block all runs
+  const db = await getDb();
+  if (!db) return;
+
+  const [instance] = await db
+    .select({ vertexId: agentInstances.vertexId })
+    .from(agentInstances)
+    .where(eq(agentInstances.id, session.agentInstanceId))
+    .limit(1);
+
+  if (instance?.vertexId) {
+    const [vertex] = await db
+      .select({ name: vertexProfiles.name })
+      .from(vertexProfiles)
+      .where(eq(vertexProfiles.id, instance.vertexId))
+      .limit(1);
+
+    if (vertex?.name) {
+      // Check runtime execution gate
+      const gate = await getExecutionGate(vertex.name);
+      if (gate === "blocked") {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message:
+            `Mobile ${action} blocked: agent runtime for vertex "${vertex.name}" ` +
+            `is offline or has a schema mismatch. Runs are disabled until the ` +
+            `agent-stack is healthy and passes handshake validation.`,
+        });
+      }
+
+      // Freeze enforcement — block mutations against frozen vertices
+      const freeze = getFreezeStatus();
+      if (freeze.frozen && vertex.name === freeze.vertex) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message:
+            `Mobile ${action} blocked: vertex "${freeze.vertex}" is frozen ` +
+            `(${freeze.version}). Mobile clients may not dispatch runs against ` +
+            `frozen vertices. Submit feedback instead.`,
+        });
+      }
+    }
   }
 }
 
@@ -523,6 +633,9 @@ export const mobileChatRouter = router({
       const session = await validateMobileToken(input.token);
       enforceMobileRateLimit(`chat:send:${session.userId}`);
 
+      // Freeze enforcement: mobile must not dispatch runs against frozen vertices
+      await enforceMobileFreezeGate(session, "chat.send");
+
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable." });
 
@@ -776,5 +889,234 @@ export const mobileFeedbackRouter = router({
         .offset(input.offset);
 
       return { items: rows };
+    }),
+});
+
+// =========================================================================
+// Attachment Upload Router — screenshots/photos for feedback
+// =========================================================================
+
+export const mobileAttachmentRouter = router({
+  /**
+   * Upload a feedback attachment (screenshot, photo, PDF).
+   *
+   * Returns a presigned S3 upload URL (or local fallback URL) and the
+   * eventual attachment URL. Mobile uploads directly to S3.
+   *
+   * Max size: 10 MB
+   * MIME allowlist: image/png, image/jpeg, application/pdf
+   */
+  upload: publicProcedure
+    .input(
+      z.object({
+        token: z.string().min(1),
+        filename: z.string().min(1).max(512),
+        contentType: z.string().min(1).max(128),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const session = await validateMobileToken(input.token);
+      enforceMobileRateLimit(`attachment:upload:${session.userId}`);
+
+      // Validate MIME type
+      if (!ATTACHMENT_MIME_ALLOWLIST.has(input.contentType)) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `File type "${input.contentType}" not allowed. Allowed: image/png, image/jpeg, application/pdf.`,
+        });
+      }
+
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable." });
+
+      const ext = path.extname(input.filename) || ".bin";
+      const uniqueKey = `feedback-attachments/${session.projectId}/${Date.now()}_${randomBytes(4).toString("hex")}${ext}`;
+
+      if (S3_ENABLED) {
+        // Generate presigned PUT URL for direct client upload
+        const { S3Client, PutObjectCommand } = await import("@aws-sdk/client-s3");
+        const { getSignedUrl } = await import("@aws-sdk/s3-request-presigner");
+
+        const s3 = new S3Client({});
+        const command = new PutObjectCommand({
+          Bucket: S3_BUCKET,
+          Key: uniqueKey,
+          ContentType: input.contentType,
+          ContentLength: MAX_ATTACHMENT_SIZE, // max size hint
+        });
+
+        const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 600 });
+        const attachmentUrl = `https://${S3_BUCKET}.s3.amazonaws.com/${uniqueKey}`;
+
+        // Create artifact record (pending upload)
+        await db.insert(agentArtifacts).values({
+          runId: session.activeRunId ?? null,
+          projectId: session.projectId,
+          type: "file",
+          filename: input.filename,
+          mimeType: input.contentType,
+          sizeBytes: 0, // Updated after upload
+          storagePath: uniqueKey,
+          storageBackend: "s3",
+          meta: {
+            source: "mobile_feedback_attachment",
+            sessionId: session.id,
+            userId: session.userId,
+          },
+        });
+
+        await mobileAudit(
+          "admin_action",
+          session as any,
+          `Feedback attachment upload URL generated: ${input.filename}`,
+          { key: uniqueKey }
+        );
+
+        return { uploadUrl, attachmentUrl };
+      } else {
+        // Local storage fallback — client sends base64 in a follow-up call
+        const subdir = path.join("feedback-attachments", String(session.projectId));
+        const fullDir = path.join(ARTIFACTS_DIR, subdir);
+        if (!fs.existsSync(fullDir)) fs.mkdirSync(fullDir, { recursive: true });
+
+        const localPath = path.join(subdir, path.basename(uniqueKey));
+        const uploadUrl = `/api/artifacts/upload-local?path=${encodeURIComponent(localPath)}`;
+        const attachmentUrl = `/api/artifacts/${encodeURIComponent(localPath)}`;
+
+        await db.insert(agentArtifacts).values({
+          runId: session.activeRunId ?? null,
+          projectId: session.projectId,
+          type: "file",
+          filename: input.filename,
+          mimeType: input.contentType,
+          sizeBytes: 0,
+          storagePath: localPath,
+          storageBackend: "local",
+          meta: {
+            source: "mobile_feedback_attachment",
+            sessionId: session.id,
+            userId: session.userId,
+          },
+        });
+
+        return { uploadUrl, attachmentUrl };
+      }
+    }),
+});
+
+// =========================================================================
+// Voice Transcription Router — field voice notes → structured text
+// =========================================================================
+
+export const mobileTranscribeRouter = router({
+  /**
+   * Transcribe a voice note from a URL.
+   *
+   * Fetches audio from audioUrl, sends to transcription service,
+   * returns text + confidence. Falls back gracefully — never blocks
+   * feedback submission if transcription fails.
+   *
+   * Implementation: OpenAI Whisper if OPENAI_API_KEY configured,
+   * otherwise returns empty text + low confidence.
+   */
+  transcribe: publicProcedure
+    .input(
+      z.object({
+        token: z.string().min(1),
+        audioUrl: z.string().url(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const session = await validateMobileToken(input.token);
+      enforceMobileRateLimit(`transcribe:${session.userId}`);
+
+      // Attempt transcription — NEVER throw on failure, return degraded result
+      if (!process.env.OPENAI_API_KEY) {
+        return {
+          text: "",
+          confidence: 0,
+        };
+      }
+
+      try {
+        // Fetch audio from URL
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 30_000);
+
+        const audioResp = await fetch(input.audioUrl, {
+          signal: controller.signal,
+        });
+        clearTimeout(timeout);
+
+        if (!audioResp.ok) {
+          console.error(`[mobile:transcribe] Failed to fetch audio: HTTP ${audioResp.status}`);
+          return { text: "", confidence: 0 };
+        }
+
+        const audioBuffer = await audioResp.arrayBuffer();
+
+        // Enforce 10 MB limit
+        if (audioBuffer.byteLength > MAX_ATTACHMENT_SIZE) {
+          return { text: "", confidence: 0 };
+        }
+
+        // Call OpenAI Whisper API
+        const formData = new FormData();
+        formData.append(
+          "file",
+          new Blob([audioBuffer], { type: "audio/webm" }),
+          "voice_note.webm"
+        );
+        formData.append("model", "whisper-1");
+        formData.append("response_format", "verbose_json");
+
+        const whisperResp = await fetch(
+          "https://api.openai.com/v1/audio/transcriptions",
+          {
+            method: "POST",
+            headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
+            body: formData,
+          }
+        );
+
+        if (!whisperResp.ok) {
+          console.error(`[mobile:transcribe] Whisper error: HTTP ${whisperResp.status}`);
+          return { text: "", confidence: 0 };
+        }
+
+        const result = (await whisperResp.json()) as {
+          text: string;
+          language?: string;
+          duration?: number;
+          segments?: Array<{ avg_logprob?: number }>;
+        };
+
+        // Compute confidence from average log-probability of segments
+        let confidence = 0.85; // default if segments not available
+        if (result.segments && result.segments.length > 0) {
+          const avgLogProb =
+            result.segments.reduce((sum, s) => sum + (s.avg_logprob ?? -0.5), 0) /
+            result.segments.length;
+          // Convert log-prob to 0-1 scale (logprob of 0 = 1.0, -1 ≈ 0.37)
+          confidence = Math.round(Math.exp(avgLogProb) * 100) / 100;
+          confidence = Math.max(0, Math.min(1, confidence));
+        }
+
+        await mobileAudit(
+          "admin_action",
+          session as any,
+          `Voice transcribed from URL (${result.text.length} chars)`,
+          { audioUrl: input.audioUrl, confidence }
+        );
+
+        return {
+          text: result.text,
+          confidence,
+        };
+      } catch (err) {
+        console.error("[mobile:transcribe] Error:", err);
+        // Hard rule: NEVER block feedback if transcription fails
+        return { text: "", confidence: 0 };
+      }
     }),
 });

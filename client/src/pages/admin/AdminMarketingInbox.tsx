@@ -14,20 +14,20 @@ export default function AdminMarketingInbox() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [noteText, setNoteText] = useState("");
 
-  const listQuery = trpc.admin.marketingInbox.list.useQuery({
+  const listQuery = trpc.marketingInbox.list.useQuery({
     status,
-    search: search.trim() || undefined,
+    q: search.trim() || undefined,
     limit: 100,
   });
 
-  const setStatusMut = trpc.admin.marketingInbox.setStatus.useMutation({
+  const setStatusMut = trpc.marketingInbox.setStatus.useMutation({
     onSuccess: () => {
       listQuery.refetch();
       setSelectedId(null);
     },
   });
 
-  const addNoteMut = trpc.admin.marketingInbox.addNote.useMutation({
+  const addNoteMut = trpc.marketingInbox.updateNotes.useMutation({
     onSuccess: () => {
       listQuery.refetch();
       setNoteText("");
@@ -35,12 +35,12 @@ export default function AdminMarketingInbox() {
     },
   });
 
-  const seedMut = trpc.admin.marketingInbox.seed.useMutation({
+  const seedMut = trpc.marketingInbox.create.useMutation({
     onSuccess: () => listQuery.refetch(),
   });
 
   const rows = listQuery.data?.rows ?? [];
-  const selectedRow = rows.find((r) => r.id === selectedId);
+  const selectedRow = rows.find((r: any) => r.id === selectedId);
 
   return (
     <div style={{ padding: 16, maxWidth: 1100 }}>
@@ -72,7 +72,7 @@ export default function AdminMarketingInbox() {
         <button onClick={() => listQuery.refetch()}>Refresh</button>
 
         <button
-          onClick={() => seedMut.mutate({ count: 10 })}
+          onClick={() => seedMut.mutate({ title: "Test Signal", source: "seed" })}
           disabled={seedMut.isPending}
           style={{ marginLeft: "auto" }}
         >
@@ -103,7 +103,7 @@ export default function AdminMarketingInbox() {
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
+            {rows.map((row: any) => (
               <tr
                 key={row.id}
                 style={{
@@ -197,7 +197,7 @@ export default function AdminMarketingInbox() {
               <button
                 onClick={() => {
                   if (noteText.trim()) {
-                    addNoteMut.mutate({ id: selectedRow.id, note: noteText.trim() });
+                    addNoteMut.mutate({ id: selectedRow.id, notes: noteText.trim() });
                   }
                 }}
                 disabled={addNoteMut.isPending || !noteText.trim()}

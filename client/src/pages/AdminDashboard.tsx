@@ -1,3 +1,12 @@
+import { useEffect } from "react";
+import { useLocation } from "wouter";
+
 export default function AdminDashboard() {
-  return <div style={{ padding: 20 }}><h1>Admin Dashboard</h1></div>;
+  const [, setLocation] = useLocation();
+
+  useEffect(() => {
+    setLocation("/admin/console");
+  }, [setLocation]);
+
+  return null;
 }

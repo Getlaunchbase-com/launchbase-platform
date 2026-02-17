@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 import { router, adminProcedure } from "../../_core/trpc";
-import { marketingSignals } from "../../../drizzle/schema";
+import { marketingSignals } from "../../db/schema";
 import { getDb } from "../../db";
 import { desc, eq, and, gte, lte, like, or } from "drizzle-orm";
 import { seedTestDelawareLLCs } from "../../ingestors/llc/de_test_seeder";

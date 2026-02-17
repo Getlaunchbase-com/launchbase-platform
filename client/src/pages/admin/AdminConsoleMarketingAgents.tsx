@@ -12,7 +12,7 @@ const MARKETING_AGENTS = [
 ];
 
 interface AgentStatus {
-  [key: number]: "idle" | "running" | "blocked" | "needs_approval";
+  [key: number]: "idle" | "running" | "paused" | "blocked" | "needs_approval";
 }
 
 export default function AdminConsoleMarketingAgents() {

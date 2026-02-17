@@ -18,7 +18,7 @@ import {
   blueprintLegendEntries,
   blueprintDetectionsRaw,
   blueprintDocuments,
-} from "../../../drizzle/schema";
+} from "../../db/schema";
 import { desc, eq, and, count, sql, inArray } from "drizzle-orm";
 
 // ---------------------------------------------------------------------------

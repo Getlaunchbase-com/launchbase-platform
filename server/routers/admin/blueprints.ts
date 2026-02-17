@@ -19,7 +19,7 @@ import {
   agentArtifacts,
   agentInstances,
   projects,
-} from "../../../drizzle/schema";
+} from "../../db/schema";
 import { desc, eq, and, count, inArray } from "drizzle-orm";
 import { createHash, randomUUID } from "crypto";
 import path from "node:path";

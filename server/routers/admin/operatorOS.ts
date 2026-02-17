@@ -24,10 +24,17 @@ import {
   feedbackImprovementProposals,
   vertexFreezes,
   users,
-} from "../../../drizzle/schema";
+} from "../../db/schema";
 import { desc, eq, and, gte, sql, count, inArray } from "drizzle-orm";
 import fs from "node:fs";
 import path from "node:path";
+import {
+  getLatestRuntimeStatus,
+  getAllRuntimeStatuses,
+  getExecutionGate,
+  runHealthCheck,
+} from "../../services/agentHealthMonitor";
+import { getFreezeStatus } from "../../contracts/freeze_governance";
 
 // ---------------------------------------------------------------------------
 // Freeze registry loader
@@ -740,6 +747,108 @@ export const operatorOSRouter = router({
         governance: (registry as any).governance ?? null,
       };
     }),
+
+  // =========================================================================
+  // Runtime Monitoring (Agent Health)
+  // =========================================================================
+
+  /** Get the latest runtime status for the agent-stack */
+  getRuntimeStatus: adminProcedure.query(async () => {
+    const latest = await getLatestRuntimeStatus();
+    if (!latest) {
+      return {
+        status: "offline" as const,
+        vertex: null,
+        version: null,
+        handshakeOk: false,
+        lastSeen: null,
+        violations: [],
+        responseTimeMs: null,
+        executionAllowed: false,
+      };
+    }
+    return {
+      ...latest,
+      executionAllowed: latest.status === "healthy",
+    };
+  }),
+
+  /** Get all runtime status entries (multi-vertex view) */
+  listRuntimeStatuses: adminProcedure.query(async () => {
+    return getAllRuntimeStatuses();
+  }),
+
+  /** Check if execution is allowed for a vertex */
+  getExecutionGate: adminProcedure
+    .input(z.object({ vertex: z.string() }))
+    .query(async ({ input }) => {
+      const gate = await getExecutionGate(input.vertex);
+      return {
+        vertex: input.vertex,
+        gate,
+        executionAllowed: gate === "allow",
+        viewOnly: gate === "view_only",
+        blocked: gate === "blocked",
+      };
+    }),
+
+  /** Trigger an immediate health check (admin-initiated) */
+  triggerHealthCheck: adminProcedure.mutation(async () => {
+    const result = await runHealthCheck();
+    return {
+      ...result,
+      executionAllowed: result.status === "healthy",
+    };
+  }),
+
+  // =========================================================================
+  // Read-Only Observability
+  // =========================================================================
+
+  /** Get the last 20 audit events (quick-glance observability) */
+  recentAuditSnapshot: adminProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return { events: [] };
+
+    const events = await db
+      .select({
+        id: securityAuditLog.id,
+        eventType: securityAuditLog.eventType,
+        severity: securityAuditLog.severity,
+        actorType: securityAuditLog.actorType,
+        actorId: securityAuditLog.actorId,
+        message: securityAuditLog.message,
+        resourceType: securityAuditLog.resourceType,
+        resourceId: securityAuditLog.resourceId,
+        createdAt: securityAuditLog.createdAt,
+      })
+      .from(securityAuditLog)
+      .orderBy(desc(securityAuditLog.createdAt))
+      .limit(20);
+
+    return { events };
+  }),
+
+  /** Get freeze status banner data (for dashboard display) */
+  freezeStatusBanner: adminProcedure.query(async () => {
+    const freeze = getFreezeStatus();
+    const registry = loadFreezeRegistry();
+    const contracts = (registry as any).contracts ?? [];
+
+    return {
+      frozen: freeze.frozen,
+      vertex: freeze.vertex,
+      version: freeze.version,
+      frozenAt: freeze.frozenAt,
+      allowedActions: freeze.allowedActions,
+      blockedActions: freeze.blockedActions,
+      changeRoutes: freeze.changeRoutes,
+      contractCount: contracts.length,
+      lockedContractCount: contracts.filter(
+        (c: any) => c.status === "locked"
+      ).length,
+    };
+  }),
 });
 
 export type OperatorOSRouter = typeof operatorOSRouter;

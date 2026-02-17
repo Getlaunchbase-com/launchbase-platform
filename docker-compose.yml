@@ -1,0 +1,54 @@
+version: "3.9"
+
+services:
+  # ──────────────────────────────────────────
+  # MySQL Database
+  # ──────────────────────────────────────────
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-launchbase_root}
+      MYSQL_DATABASE: ${DB_NAME:-launchbase}
+      MYSQL_USER: ${DB_USER:-launchbase}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-launchbase_dev}
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ──────────────────────────────────────────
+  # LaunchBase Platform
+  # ──────────────────────────────────────────
+  platform:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: mysql://${DB_USER:-launchbase}:${DB_PASSWORD:-launchbase_dev}@db:3306/${DB_NAME:-launchbase}
+      JWT_SECRET: ${JWT_SECRET}
+      SESSION_SECRET: ${SESSION_SECRET}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      MOBILE_ADMIN_SECRET: ${MOBILE_ADMIN_SECRET:-}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:3000}
+      ARTIFACTS_DIR: /app/artifacts
+    volumes:
+      - artifacts_data:/app/artifacts
+
+volumes:
+  mysql_data:
+  artifacts_data:
