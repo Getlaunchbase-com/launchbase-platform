@@ -28,6 +28,21 @@ import {
 } from "../services/agentHealthMonitor";
 
 // ---------------------------------------------------------------------------
+// Build info (deploy drift detection)
+// ---------------------------------------------------------------------------
+
+const BUILD_INFO = {
+  gitSha:
+    process.env.GIT_SHA ??
+    process.env.VERCEL_GIT_COMMIT_SHA ??
+    process.env.RENDER_GIT_COMMIT ??
+    process.env.RAILWAY_GIT_COMMIT_SHA ??
+    "unknown",
+  buildTime: process.env.BUILD_TIME ?? new Date().toISOString(),
+  nodeEnv: env.NODE_ENV,
+};
+
+// ---------------------------------------------------------------------------
 // Express app
 // ---------------------------------------------------------------------------
 
@@ -46,12 +61,19 @@ app.get("/healthz", (_req, res) => {
     status: "ok",
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
+    gitSha: BUILD_INFO.gitSha,
+    buildTime: BUILD_INFO.buildTime,
   });
 });
 
 app.get("/readyz", (_req, res) => {
   // Future: check DB connectivity, external deps
   res.json({ status: "ready" });
+});
+
+/** Build info endpoint — shows deployed commit SHA + build time */
+app.get("/api/build-info", (_req, res) => {
+  res.json(BUILD_INFO);
 });
 
 // ---------------------------------------------------------------------------
@@ -137,9 +159,16 @@ app.get("*", (_req, res) => {
 const PORT = env.PORT;
 
 const server = app.listen(PORT, () => {
-  console.log(`[server] Running on port ${PORT} (${env.NODE_ENV})`);
-  console.log(`[server] Health: http://localhost:${PORT}/healthz`);
-  console.log(`[server] API:    http://localhost:${PORT}/api/trpc`);
+  console.log(`[server] ====================================`);
+  console.log(`[server] LaunchBase Platform`);
+  console.log(`[server] Commit:  ${BUILD_INFO.gitSha}`);
+  console.log(`[server] Built:   ${BUILD_INFO.buildTime}`);
+  console.log(`[server] Env:     ${env.NODE_ENV}`);
+  console.log(`[server] Port:    ${PORT}`);
+  console.log(`[server] ====================================`);
+  console.log(`[server] Health:    http://localhost:${PORT}/healthz`);
+  console.log(`[server] API:       http://localhost:${PORT}/api/trpc`);
+  console.log(`[server] Build:     http://localhost:${PORT}/api/build-info`);
   console.log(
     `[server] Handshake: http://localhost:${PORT}/api/contracts/handshake`
   );

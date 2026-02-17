@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import {
   LayoutDashboard,
@@ -33,6 +33,14 @@ interface AdminLayoutProps {
 export function AdminLayout({ children }: AdminLayoutProps) {
   const [location] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [buildInfo, setBuildInfo] = useState<{ gitSha: string; buildTime: string } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/build-info")
+      .then((r) => r.json())
+      .then((data) => setBuildInfo(data))
+      .catch(() => {});
+  }, []);
 
   const isActive = (href: string) => location === href || location.startsWith(href + "/");
 
@@ -120,12 +128,27 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             style={{
               padding: "16px",
               borderTop: "1px solid #333",
-              fontSize: "12px",
-              color: "#666",
+              fontSize: "11px",
+              color: "#555",
             }}
           >
-            <div>LaunchBase Console</div>
-            <div style={{ marginTop: "4px" }}>Ready to operate</div>
+            <div style={{ fontWeight: 600, color: "#666" }}>LaunchBase Console</div>
+            {buildInfo ? (
+              <>
+                <div style={{ marginTop: "4px", fontFamily: "monospace" }}>
+                  {buildInfo.gitSha !== "unknown"
+                    ? buildInfo.gitSha.slice(0, 7)
+                    : "dev"}
+                </div>
+                <div style={{ marginTop: "2px" }}>
+                  {buildInfo.buildTime !== "unknown"
+                    ? new Date(buildInfo.buildTime).toLocaleDateString()
+                    : ""}
+                </div>
+              </>
+            ) : (
+              <div style={{ marginTop: "4px" }}>Loading...</div>
+            )}
           </div>
         )}
       </aside>
