@@ -2716,3 +2716,35 @@ export const agentRuntimeStatus = mysqlTable(
 
 export type AgentRuntimeStatus = typeof agentRuntimeStatus.$inferSelect;
 export type InsertAgentRuntimeStatus = typeof agentRuntimeStatus.$inferInsert;
+
+// ---------------------------------------------------------------------------
+// Pipeline Approvals — durable tier-gated approval records
+// ---------------------------------------------------------------------------
+
+export const pipelineApprovals = mysqlTable(
+  "pipeline_approvals",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    operation: varchar("operation", { length: 128 }).notNull(),
+    resourceType: varchar("resource_type", { length: 128 }).notNull(),
+    resourceId: int("resource_id").notNull(),
+    tier: mysqlEnum("tier", ["tier_0", "tier_1", "tier_2", "tier_3"]).notNull(),
+    status: mysqlEnum("status", ["pending", "approved", "denied", "expired"]).default("pending").notNull(),
+    requestedBy: int("requested_by").notNull(),
+    approvedBy: int("approved_by"),
+    reason: text("reason").notNull(),
+    notes: text("notes"),
+    metadata: json("metadata").$type<Record<string, unknown>>(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    resolvedAt: timestamp("resolved_at"),
+  },
+  (t) => ({
+    operationIdx: index("pa_operation_idx").on(t.operation),
+    resourceIdx: index("pa_resource_idx").on(t.resourceType, t.resourceId),
+    statusIdx: index("pa_status_idx").on(t.status),
+    requestedByIdx: index("pa_requested_by_idx").on(t.requestedBy),
+  })
+);
+
+export type PipelineApproval = typeof pipelineApprovals.$inferSelect;
+export type InsertPipelineApproval = typeof pipelineApprovals.$inferInsert;

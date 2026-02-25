@@ -16,6 +16,7 @@ import { blueprintIngestionRouter } from "./admin/blueprintIngestion";
 import { blueprintLegendResolverRouter } from "./admin/blueprintLegendResolver";
 import { estimateChainRouter } from "./admin/estimateChain";
 import { gapDetectionRouter } from "./admin/gapDetection";
+import { pipelineApprovalsRouter } from "./admin/pipelineApprovals";
 import { projectsRouter } from "./admin/projects";
 import { mobileSessionRouter, mobileVoiceRouter, mobileChatRouter, mobileFeedbackRouter, mobileAttachmentRouter, mobileTranscribeRouter } from "./mobile";
 import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
@@ -513,6 +514,7 @@ export const appRouter = router({
     blueprintLegend: blueprintLegendResolverRouter,
     estimateChain: estimateChainRouter,
     gapDetection: gapDetectionRouter,
+    pipelineApprovals: pipelineApprovalsRouter,
     feedback: feedbackRouter,
     projects: projectsRouter,
     intakes: router({
