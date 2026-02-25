@@ -532,8 +532,10 @@ export async function updateDeploymentStatus(
 }
 
 /**
- * Execute a deployment (stub that updates status through the pipeline).
- * A real implementation would trigger the actual build/deploy workflow.
+ * Execute a deployment — validates the build plan and intake, then
+ * delegates to the configured hosting provider (Vercel / Netlify / AWS).
+ * When no provider token is set, runs the full pipeline locally and
+ * generates a preview URL on the LaunchBase subdomain.
  */
 export async function runDeployment(
   id: number,

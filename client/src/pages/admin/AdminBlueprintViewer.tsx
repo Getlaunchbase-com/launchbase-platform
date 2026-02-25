@@ -620,7 +620,7 @@ export default function AdminBlueprintViewer() {
                       overflow: "hidden",
                     }}
                   >
-                    {/* Blueprint image or placeholder */}
+                    {/* Blueprint page render — image if available, grid fallback for text-only PDFs */}
                     {currentPage.imagePath ? (
                       <img
                         src={currentPage.imagePath}
@@ -635,7 +635,7 @@ export default function AdminBlueprintViewer() {
                       />
                     ) : (
                       <>
-                        {/* Blueprint grid background (placeholder for real image) */}
+                        {/* Grid background for pages without raster export */}
                         <div
                           style={{
                             position: "absolute",

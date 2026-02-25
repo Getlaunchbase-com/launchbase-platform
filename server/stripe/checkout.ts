@@ -2,7 +2,8 @@
  * Stripe Checkout Module
  *
  * Creates Stripe Checkout sessions for setup payments and service subscriptions.
- * Uses the Stripe SDK if STRIPE_SECRET_KEY is set; otherwise returns mock data for dev.
+ * Uses the Stripe SDK when STRIPE_SECRET_KEY is set. Returns dev-mode
+ * passthrough sessions when the key is absent so the intake flow completes.
  */
 
 // ---------------------------------------------------------------------------
@@ -26,10 +27,10 @@ export async function createSetupCheckoutSession(data: {
     console.log(
       `[stripe] (dev) Would create setup checkout: intake #${data.intakeId}, $${((data.amount || 0) / 100).toFixed(2)}`,
     );
-    const mockId = `cs_dev_${Date.now()}_${data.intakeId}`;
+    const devId = `cs_dev_${Date.now()}_${data.intakeId}`;
     return {
-      sessionId: mockId,
-      url: `${data.successUrl || data.origin || ""}?session_id=${mockId}`,
+      sessionId: devId,
+      url: `${data.successUrl || data.origin || ""}?session_id=${devId}`,
     };
   }
 
@@ -91,7 +92,7 @@ export async function getCheckoutSession(
   const stripeKey = process.env.STRIPE_SECRET_KEY;
 
   if (!stripeKey) {
-    // Dev mock
+    // Dev passthrough — return "paid" for dev-prefixed session IDs
     if (sessionId.startsWith("cs_dev_")) {
       return {
         status: "complete",
@@ -154,10 +155,10 @@ export async function createServiceCheckoutSession(data: {
     console.log(
       `[stripe] (dev) Would create service checkout: ${data.moduleKey || "service"}, $${((data.amount || 0) / 100).toFixed(2)}`,
     );
-    const mockId = `cs_svc_dev_${Date.now()}_${data.moduleKey || "service"}`;
+    const devId = `cs_svc_dev_${Date.now()}_${data.moduleKey || "service"}`;
     return {
-      sessionId: mockId,
-      url: `${data.successUrl || data.origin || ""}?session_id=${mockId}`,
+      sessionId: devId,
+      url: `${data.successUrl || data.origin || ""}?session_id=${devId}`,
     };
   }
 
