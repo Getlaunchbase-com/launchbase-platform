@@ -31,7 +31,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/package.json ./
 COPY --from=build /app/server/contracts/*.json ./server/contracts/
-COPY --from=build /app/server/ai/promptPacks/ ./server/ai/promptPacks/
+COPY --from=build /app/server/contracts/*.json ./dist/
 
 # Create artifacts directory
 RUN mkdir -p /app/artifacts && chown -R appuser:appuser /app

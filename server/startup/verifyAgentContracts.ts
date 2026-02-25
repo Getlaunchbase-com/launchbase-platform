@@ -1,174 +1,167 @@
-/**
- * Startup Contract Verification
- *
- * On platform boot (before Express listen), fetches agent-stack /health
- * and compares manifest_hash + all schema_hash values against the freeze
- * registry. If any mismatch is detected, logs a structured error and exits.
- *
- * This guarantees the platform never starts serving traffic while the
- * agent-stack is running a different contract version.
- *
- * Behavior:
- *   - Agent unreachable → warn + continue (agent may start later; health monitor will catch it)
- *   - Agent reachable, contracts match → proceed
- *   - Agent reachable, contracts mismatch → fatal exit
- */
+import { createHash } from "node:crypto";
+import { getAllContractInfo } from "../contracts/handshake";
 
-import {
-  validateHandshake,
-  getManifestHash,
-  getAllContractInfo,
-} from "../contracts/handshake";
-
-// ---------------------------------------------------------------------------
-// Config
-// ---------------------------------------------------------------------------
-
-const AGENT_STACK_URL =
-  process.env.AGENT_STACK_URL ?? "http://localhost:4100";
-const VERIFY_TIMEOUT_MS = 10_000;
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-interface AgentHealthResponse {
-  status: string;
-  vertex: string;
-  version: string;
-  schema_hash: string;
-  contracts: Array<{ name: string; version: string; schema_hash: string }>;
-  uptime_seconds?: number;
+interface AgentHealthContract {
+  name: string;
+  version?: string;
+  schema_hash?: string;
 }
 
-export interface VerificationResult {
+interface AgentHealthPayload {
+  manifest_hash?: string;
+  contracts?: AgentHealthContract[];
+}
+
+export interface AgentContractVerificationStatus {
   ok: boolean;
-  agentReachable: boolean;
-  manifestMatch: boolean;
-  mismatches: Array<{
-    name: string;
-    field: string;
-    expected: string;
-    received: string;
-  }>;
-  agentVersion?: string;
-  agentVertex?: string;
+  checkedAt: string | null;
+  errors: string[];
 }
 
-// ---------------------------------------------------------------------------
-// Core verification
-// ---------------------------------------------------------------------------
+let _status: AgentContractVerificationStatus = {
+  ok: false,
+  checkedAt: null,
+  errors: ["verification_not_run"],
+};
 
-/**
- * Verify agent-stack contracts at startup.
- *
- * Returns a VerificationResult. Does NOT exit the process — the caller
- * decides what to do with a mismatch.
- */
-export async function verifyAgentContracts(): Promise<VerificationResult> {
-  let healthData: AgentHealthResponse;
+function stableStringify(value: unknown): string {
+  const canonicalize = (input: unknown): unknown => {
+    if (Array.isArray(input)) {
+      return input.map((v) => canonicalize(v));
+    }
+    if (input && typeof input === "object") {
+      const out: Record<string, unknown> = {};
+      for (const key of Object.keys(input as Record<string, unknown>).sort()) {
+        out[key] = canonicalize((input as Record<string, unknown>)[key]);
+      }
+      return out;
+    }
+    return input;
+  };
+
+  const json = JSON.stringify(canonicalize(value));
+  return json.replace(/[^\x00-\x7F]/g, (ch) =>
+    `\\u${ch.charCodeAt(0).toString(16).padStart(4, "0")}`
+  );
+}
+
+function computeExpectedManifestHash(): string {
+  if (process.env.AGENT_MANIFEST_HASH) {
+    return process.env.AGENT_MANIFEST_HASH;
+  }
+
+  const info = getAllContractInfo();
+  const normalized = stableStringify({
+    vertex: info.vertex,
+    vertex_version: info.vertex_version,
+    contracts: [...info.contracts]
+      .map((c) => ({
+        name: c.name,
+        version: c.version,
+        schema_hash: c.schema_hash,
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name)),
+  });
+
+  return createHash("sha256").update(normalized).digest("hex");
+}
+
+function expectedSchemaHashes(): Record<string, string> {
+  const info = getAllContractInfo();
+  const out: Record<string, string> = {};
+  for (const c of info.contracts) {
+    out[c.name] = c.schema_hash;
+  }
+  return out;
+}
+
+async function fetchAgentHealth(agentUrl: string): Promise<AgentHealthPayload> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10_000);
 
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), VERIFY_TIMEOUT_MS);
-
-    const resp = await fetch(`${AGENT_STACK_URL}/health`, {
+    const resp = await fetch(`${agentUrl}/health`, {
       method: "GET",
       signal: controller.signal,
       headers: { Accept: "application/json" },
     });
-    clearTimeout(timeout);
 
     if (!resp.ok) {
-      return {
-        ok: true, // Agent unreachable is not a startup blocker
-        agentReachable: false,
-        manifestMatch: false,
-        mismatches: [],
-      };
+      throw new Error(`agent /health returned HTTP ${resp.status}`);
     }
 
-    healthData = (await resp.json()) as AgentHealthResponse;
-  } catch {
-    // Agent not running yet — warn but don't block startup
-    return {
-      ok: true,
-      agentReachable: false,
-      manifestMatch: false,
-      mismatches: [],
-    };
+    return (await resp.json()) as AgentHealthPayload;
+  } finally {
+    clearTimeout(timeout);
   }
-
-  // --- Compare manifest hash ---
-  const platformManifest = getManifestHash();
-  const agentManifest = healthData.schema_hash ?? "";
-  const manifestMatch = platformManifest === agentManifest;
-
-  // --- Compare individual contract schema hashes ---
-  const handshakeResult = validateHandshake({
-    agent_id: "startup-verify",
-    agent_version: healthData.version ?? "unknown",
-    contracts: healthData.contracts ?? [],
-  });
-
-  const hasMismatch = !handshakeResult.ok;
-
-  return {
-    ok: !hasMismatch,
-    agentReachable: true,
-    manifestMatch,
-    mismatches: handshakeResult.mismatches,
-    agentVersion: healthData.version,
-    agentVertex: healthData.vertex,
-  };
 }
 
-/**
- * Run contract verification and exit on mismatch.
- *
- * Call this before Express listen() in the server entry point.
- * Logs structured JSON for observability.
- */
-export async function verifyAgentContractsOrExit(): Promise<void> {
-  console.log("[startup] Verifying agent-stack contracts...");
-
-  const result = await verifyAgentContracts();
-
-  if (!result.agentReachable) {
-    console.warn(
-      "[startup] Agent-stack unreachable at %s — skipping contract verification (health monitor will verify later)",
-      AGENT_STACK_URL
-    );
+export async function verifyAgentContracts(): Promise<void> {
+  if (process.env.SKIP_AGENT_CONTRACT_VERIFICATION === "true") {
+    _status = {
+      ok: true,
+      checkedAt: new Date().toISOString(),
+      errors: [],
+    };
+    console.warn("[startup] Agent contract verification skipped by env flag");
     return;
   }
 
-  if (result.ok) {
-    console.log(
-      "[startup] Contract verification passed — agent=%s vertex=%s manifest_match=%s",
-      result.agentVersion,
-      result.agentVertex,
-      result.manifestMatch
-    );
-    return;
+  const errors: string[] = [];
+  const agentUrl = process.env.AGENT_STACK_URL ?? "http://localhost:4100";
+
+  try {
+    const health = await fetchAgentHealth(agentUrl);
+
+    const expectedManifest = computeExpectedManifestHash();
+    if (!health.manifest_hash) {
+      errors.push("missing manifest_hash in agent /health response");
+    } else if (health.manifest_hash !== expectedManifest) {
+      errors.push(
+        `manifest_hash mismatch: expected=${expectedManifest} received=${health.manifest_hash}`
+      );
+    }
+
+    const expectedSchemas = expectedSchemaHashes();
+    const remoteSchemas: Record<string, string> = {};
+    for (const c of health.contracts ?? []) {
+      if (c.name && c.schema_hash) {
+        remoteSchemas[c.name] = c.schema_hash;
+      }
+    }
+
+    for (const [name, expectedHash] of Object.entries(expectedSchemas)) {
+      const receivedHash = remoteSchemas[name];
+      if (!receivedHash) {
+        errors.push(`missing schema_hash for contract "${name}"`);
+        continue;
+      }
+      if (receivedHash !== expectedHash) {
+        errors.push(
+          `schema_hash mismatch for "${name}": expected=${expectedHash} received=${receivedHash}`
+        );
+      }
+    }
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    errors.push(`agent contract verification error: ${msg}`);
   }
 
-  // --- Mismatch detected: structured error + fatal exit ---
-  const platformInfo = getAllContractInfo();
+  _status = {
+    ok: errors.length === 0,
+    checkedAt: new Date().toISOString(),
+    errors,
+  };
 
-  console.error(
-    JSON.stringify({
-      level: "fatal",
-      event: "contract_mismatch_at_startup",
-      agentVersion: result.agentVersion,
-      agentVertex: result.agentVertex,
-      manifestMatch: result.manifestMatch,
-      platformManifestHash: platformInfo.manifest_hash,
-      platformContracts: platformInfo.contracts,
-      mismatches: result.mismatches,
-      message:
-        "Agent-stack contract mismatch detected at startup. Platform cannot serve traffic with mismatched contracts. Exiting.",
-    })
-  );
+  if (!_status.ok) {
+    console.error("[startup] Agent contract verification failed:");
+    for (const error of _status.errors) {
+      console.error(`[startup] - ${error}`);
+    }
+    process.exit(1);
+  }
+}
 
-  process.exit(1);
+export function getAgentContractVerificationStatus(): AgentContractVerificationStatus {
+  return _status;
 }

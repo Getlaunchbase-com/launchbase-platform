@@ -28,6 +28,7 @@ import {
 import { desc, eq, and, gte, sql, count, inArray } from "drizzle-orm";
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   getLatestRuntimeStatus,
   getAllRuntimeStatuses,
@@ -35,6 +36,9 @@ import {
   runHealthCheck,
 } from "../../services/agentHealthMonitor";
 import { getFreezeStatus } from "../../contracts/freeze_governance";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // ---------------------------------------------------------------------------
 // Freeze registry loader

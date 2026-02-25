@@ -1,19 +1,15 @@
 /**
  * EstimateChainV1 — tRPC Router
  *
- * Agent-delegated pipeline: platform sends context to agent-stack,
- * agent computes estimates, platform validates + stores result.
+ * Deterministic pipeline: mapped detections → takeoff → estimate line items → exports.
  *
- *   - runEstimateChain: dispatch to agent-stack POST /tools/estimate-chain
+ *   - runEstimateChain: execute full chain for a document + symbol pack
  *   - listRuns / getRun: query stored runs
  *   - exportExcel: 3-sheet Excel (Takeoff_Summary, Line_Items, Assumptions)
  *   - exportBluebeamMarkups / exportBluebeamTakeoff: Bluebeam CSVs
  *   - overrides CRUD: project-scoped task library overrides
  *
  * All procedures use adminProcedure — requires authenticated admin role.
- *
- * IMPORTANT: The platform NEVER computes estimates. All math lives in the
- * agent-stack. Platform is control plane: route, validate, store, export.
  */
 
 import { z } from "zod";
@@ -21,22 +17,22 @@ import { router, adminProcedure } from "../../_core/trpc";
 import { getDb } from "../../db";
 import {
   blueprintDocuments,
+  blueprintPages,
   blueprintDetectionsRaw,
   blueprintSymbolPacks,
   estimateChainRuns,
   projectTaskOverrides,
 } from "../../db/schema";
-import { desc, eq, and, inArray } from "drizzle-orm";
+import { desc, eq, and, count, sql, inArray } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
+import { createHash } from "crypto";
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { getFreezeStatus } from "../../contracts/freeze_governance";
-import { computeSchemaHash } from "../../contracts/handshake";
-import {
-  validateEstimateChainV1,
-  getEstimateSchemaHash as getEstimateSchemaHashFromValidator,
-} from "../../contracts/validateEstimateChainV1";
-import { env } from "../../_core/env";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // ---------------------------------------------------------------------------
 // Task library loader
@@ -81,19 +77,44 @@ function loadTaskLibrary(): TaskLibrary {
 }
 
 // ---------------------------------------------------------------------------
-// Schema hash for EstimateChainV1 (uses stable hash from handshake module)
+// Schema hash for EstimateChainV1
 // ---------------------------------------------------------------------------
 
+let _cachedEstimateSchemaHash: string | null = null;
+
 function getEstimateSchemaHash(): string {
-  return computeSchemaHash("EstimateChainV1.schema.json");
+  if (_cachedEstimateSchemaHash) return _cachedEstimateSchemaHash;
+  const schemaPath = path.resolve(__dirname, "../../contracts/EstimateChainV1.schema.json");
+  const content = fs.readFileSync(schemaPath, "utf-8");
+  _cachedEstimateSchemaHash = createHash("sha256").update(content).digest("hex");
+  return _cachedEstimateSchemaHash;
 }
 
 // ---------------------------------------------------------------------------
-// Agent-stack URL
+// Confidence propagation
 // ---------------------------------------------------------------------------
 
-const AGENT_URL = env.AGENT_STACK_URL;
-const AGENT_TIMEOUT_MS = 180_000; // 3 minutes for full estimate chain
+function clamp01(v: number): number {
+  return Math.max(0, Math.min(1, v));
+}
+
+function computeConfidence(detectionConf: number, mappingApproved: boolean, isStandardTask: boolean): {
+  detection: number;
+  mapping: number;
+  rules: number;
+  overall: number;
+  reasons: string[];
+} {
+  const mapping = mappingApproved ? 0.95 : 0.6;
+  const rules = isStandardTask ? 0.98 : 0.85;
+  const overall = clamp01(detectionConf * mapping * rules);
+  const reasons: string[] = [];
+  if (overall >= 0.8) reasons.push("OK");
+  if (detectionConf < 0.6) reasons.push("LOW_DETECTION_CONF");
+  if (!mappingApproved) reasons.push("MAPPING_NOT_APPROVED");
+  if (!isStandardTask) reasons.push("NON_STANDARD_TASK");
+  return { detection: detectionConf, mapping, rules, overall, reasons };
+}
 
 // ---------------------------------------------------------------------------
 // CSV helpers
@@ -118,11 +139,7 @@ function toCSVRow(values: unknown[]): string {
 
 export const estimateChainRouter = router({
   /**
-   * Run full estimate chain for a document.
-   *
-   * PLATFORM = CONTROL PLANE. All estimate computation is delegated to
-   * agent-stack via POST /tools/estimate-chain. Platform validates the
-   * response against EstimateChainV1 schema and stores the result.
+   * Run full estimate chain for a document
    */
   runEstimateChain: adminProcedure
     .input(
@@ -146,7 +163,24 @@ export const estimateChainRouter = router({
       const [pack] = await db.select().from(blueprintSymbolPacks).where(eq(blueprintSymbolPacks.id, input.symbolPackId)).limit(1);
       if (!pack) throw new TRPCError({ code: "NOT_FOUND", message: "Symbol pack not found" });
 
-      // 3. Load all mapped/verified detections for this document
+      const mappings = (pack.mappings ?? []) as Array<{ rawClass: string; canonicalType: string }>;
+      const rawToCanonical = new Map(mappings.map((m) => [m.rawClass, m.canonicalType]));
+
+      // 3. Load task library
+      const taskLib = loadTaskLibrary();
+
+      // 4. Load project overrides if applicable
+      const projectId = input.projectId ?? (doc as any).projectId;
+      let overrides: Array<{ canonicalType: string; taskCode: string; laborFactorOverride: number | null; wasteFractorOverride: number | null; crewOverride: string | null; materialCostOverrides: Record<string, number> | null; laborRateOverride: number | null }> = [];
+      if (projectId) {
+        overrides = await db
+          .select()
+          .from(projectTaskOverrides)
+          .where(eq(projectTaskOverrides.projectId, projectId));
+      }
+      const overrideMap = new Map(overrides.map((o) => [`${o.canonicalType}::${o.taskCode}`, o]));
+
+      // 5. Load all mapped detections for this document
       const detections = await db
         .select()
         .from(blueprintDetectionsRaw)
@@ -157,19 +191,15 @@ export const estimateChainRouter = router({
           )
         );
 
-      // 4. Load project overrides if applicable
-      const projectId = input.projectId ?? (doc as any).projectId;
-      let overrides: Array<Record<string, unknown>> = [];
-      if (projectId) {
-        overrides = await db
-          .select()
-          .from(projectTaskOverrides)
-          .where(eq(projectTaskOverrides.projectId, projectId));
-      }
+      // 6. Load pages for sheet labels
+      const pages = await db
+        .select()
+        .from(blueprintPages)
+        .where(eq(blueprintPages.documentId, input.documentId));
+      const pageMap = new Map(pages.map((p) => [p.id, p]));
 
-      // 5. Create run record (status: running)
+      // 7. Create run record
       const schemaHash = getEstimateSchemaHash();
-      const taskLib = loadTaskLibrary();
       const [runResult] = await db.insert(estimateChainRuns).values({
         documentId: input.documentId,
         projectId: projectId ?? null,
@@ -183,117 +213,229 @@ export const estimateChainRouter = router({
       });
       const runId = runResult.insertId;
 
-      // 6. Dispatch to agent-stack — ALL math lives there
-      const agentPayload = {
-        document_id: input.documentId,
-        project_id: projectId ?? null,
-        symbol_pack_id: input.symbolPackId,
-        symbol_pack_mappings: pack.mappings ?? [],
-        detections: detections.map((d) => ({
-          id: d.id,
-          raw_class: d.rawClass,
-          canonical_type: d.canonicalType ?? null,
-          status: d.status,
-          confidence: d.confidence,
-          page_id: d.pageId,
-          bbox: { x: d.x, y: d.y, w: d.w, h: d.h },
-        })),
-        overrides,
-        params: {
-          labor_factor: input.laborFactor ?? null,
-          waste_factor: input.wasteFactor ?? null,
-        },
-        run_id: Number(runId),
-      };
+      // 8. Build line items
+      const lineItems: any[] = [];
+      const unmappedClasses = new Set<string>();
+      const lowConfItems: any[] = [];
+      const errors: any[] = [];
+      let lineCounter = 0;
 
-      let agentOutput: any;
-      try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), AGENT_TIMEOUT_MS);
+      const globalLaborFactor = input.laborFactor ?? taskLib.defaults.labor_factor;
 
-        const resp = await fetch(`${AGENT_URL}/tools/estimate-chain`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(agentPayload),
-          signal: controller.signal,
-        });
-        clearTimeout(timeout);
-
-        if (!resp.ok) {
-          const errBody = await resp.text().catch(() => "");
-          throw new Error(`Agent returned HTTP ${resp.status}: ${errBody.slice(0, 500)}`);
+      for (const det of detections) {
+        const canonicalType = det.canonicalType ?? rawToCanonical.get(det.rawClass);
+        if (!canonicalType) {
+          unmappedClasses.add(det.rawClass);
+          continue;
         }
 
-        agentOutput = await resp.json();
-      } catch (err) {
-        // Mark run as failed
-        await db
-          .update(estimateChainRuns)
-          .set({ status: "failed", completedAt: new Date() })
-          .where(eq(estimateChainRuns.id, Number(runId)));
+        const canonDef = taskLib.canonical[canonicalType];
+        if (!canonDef || canonDef.tasks.length === 0) {
+          errors.push({
+            code: "NO_TASK_DEF",
+            message: `No task definition for canonical type '${canonicalType}'`,
+            details: { rawClass: det.rawClass, canonicalType },
+          });
+          continue;
+        }
 
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: `Agent estimate-chain call failed: ${(err as Error).message}`,
+        const task = canonDef.tasks[0]; // Use first/primary task
+        const overrideKey = `${canonicalType}::${task.task_code}`;
+        const override = overrideMap.get(overrideKey);
+
+        const laborFactor = override?.laborFactorOverride ?? globalLaborFactor;
+        const wasteFactor = override?.wasteFractorOverride ?? input.wasteFactor ?? task.waste_factor;
+        const crew = override?.crewOverride ?? task.crew;
+        const laborHours = task.base_hours * laborFactor;
+
+        const mappingApproved = det.status === "verified";
+        const conf = computeConfidence(det.confidence, mappingApproved, true);
+
+        const page = pageMap.get(det.pageId);
+        const lineId = `LI-${String(++lineCounter).padStart(6, "0")}`;
+
+        const materials = task.materials.map((mat) => {
+          const qty = mat.qty_per_ea * 1; // count = 1 per detection
+          const qtyWithWaste = qty * (1 + wasteFactor);
+          return {
+            material_code: mat.material_code,
+            qty: parseFloat(qty.toFixed(4)),
+            uom: mat.uom,
+            waste_factor: wasteFactor,
+            qty_with_waste: parseFloat(qtyWithWaste.toFixed(4)),
+          };
         });
+
+        // Pricing (null unless overrides provide costs)
+        const laborRate = override?.laborRateOverride ?? null;
+        const materialCostOverrides = override?.materialCostOverrides ?? {};
+        let materialCost: number | null = null;
+        const hasMaterialCosts = Object.keys(materialCostOverrides).length > 0;
+        if (hasMaterialCosts) {
+          materialCost = materials.reduce((sum, m) => {
+            const unitCost = materialCostOverrides[m.material_code] ?? 0;
+            return sum + m.qty_with_waste * unitCost;
+          }, 0);
+          materialCost = parseFloat(materialCost.toFixed(2));
+        }
+        const laborCost = laborRate ? parseFloat((laborHours * laborRate).toFixed(2)) : null;
+        const total = materialCost !== null && laborCost !== null ? parseFloat((materialCost + laborCost).toFixed(2)) : null;
+
+        const lineItem = {
+          line_id: lineId,
+          canonical_type: canonicalType,
+          task_code: task.task_code,
+          location: {
+            sheet: (page as any)?.label ?? null,
+            page_number: (page as any)?.pageNumber ?? 1,
+            zone: null,
+            bbox_norm: { x: det.x, y: det.y, w: det.w, h: det.h },
+          },
+          quantity: { count: 1, uom: "ea" },
+          labor: {
+            base_hours: task.base_hours,
+            factor: laborFactor,
+            hours: parseFloat(laborHours.toFixed(4)),
+            crew,
+            basis: task.basis,
+          },
+          materials,
+          pricing: {
+            material_cost: materialCost,
+            labor_rate: laborRate,
+            total,
+          },
+          confidence: conf,
+          provenance: {
+            raw_detection_id: det.id,
+            raw_class: det.rawClass,
+            detection_model_version: "unknown",
+            mapping_version: `symbol_pack:${input.symbolPackId}`,
+            rule_version: `${taskLib.library.name}@${taskLib.library.version}`,
+          },
+        };
+
+        lineItems.push(lineItem);
+
+        if (conf.overall < 0.6) {
+          lowConfItems.push({
+            line_id: lineId,
+            overall: conf.overall,
+            reason: conf.reasons.filter((r) => r !== "OK").join(", ") || "LOW_OVERALL",
+          });
+        }
       }
 
-      // 7. Validate agent output against EstimateChainV1 schema
-      const validation = validateEstimateChainV1(agentOutput);
-      if (!validation.valid) {
-        await db
-          .update(estimateChainRuns)
-          .set({ status: "failed", completedAt: new Date() })
-          .where(eq(estimateChainRuns.id, Number(runId)));
+      // 9. Build rollups
+      const byCanonical = new Map<string, { count: number; labor_hours: number }>();
+      const materialTotals = new Map<string, { qty_with_waste: number; uom: string }>();
 
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: `EstimateChainV1 validation failed: ${validation.errors.length} error(s) — ${validation.errors.slice(0, 5).map((e) => e.message).join("; ")}`,
-        });
+      for (const li of lineItems) {
+        const key = li.canonical_type;
+        const existing = byCanonical.get(key) ?? { count: 0, labor_hours: 0 };
+        existing.count += li.quantity.count;
+        existing.labor_hours += li.labor.hours;
+        byCanonical.set(key, existing);
+
+        for (const mat of li.materials) {
+          const mk = mat.material_code;
+          const existingMat = materialTotals.get(mk) ?? { qty_with_waste: 0, uom: mat.uom };
+          existingMat.qty_with_waste += mat.qty_with_waste;
+          materialTotals.set(mk, existingMat);
+        }
       }
 
-      // 7b. Verify schema hash matches platform (drift detection)
-      const agentHash = agentOutput?.contract?.schema_hash;
-      const platformEstimateHash = getEstimateSchemaHashFromValidator();
-      if (agentHash && agentHash !== platformEstimateHash) {
-        await db
-          .update(estimateChainRuns)
-          .set({ status: "failed", completedAt: new Date() })
-          .where(eq(estimateChainRuns.id, Number(runId)));
+      const laborTotalHours = lineItems.reduce((s, li) => s + li.labor.hours, 0);
 
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "EstimateChainV1 schema hash mismatch — agent and platform have drifted",
-        });
-      }
+      // 10. Build gap flags
+      const gapFlags: string[] = [];
+      if (unmappedClasses.size > 0) gapFlags.push("LEGEND_HAS_UNMAPPED");
+      if (lowConfItems.length > lineItems.length * 0.2) gapFlags.push("HIGH_LOW_CONFIDENCE_RATIO");
 
-      // 8. Extract summary metrics from agent output
-      const lineItems = agentOutput.line_items ?? [];
-      const rollups = agentOutput.rollups ?? {};
-      const quality = agentOutput.quality ?? {};
+      // 11. Build assumptions
+      const assumptions = [
+        {
+          id: "A-001",
+          title: "Default waste factor",
+          value: input.wasteFactor ?? taskLib.defaults.waste_factor,
+          source: input.wasteFactor ? "operator_override" : "task_library.default_waste",
+          locked: !input.wasteFactor,
+        },
+        {
+          id: "A-002",
+          title: "Global labor factor",
+          value: globalLaborFactor,
+          source: input.laborFactor ? "operator_override" : "task_library.default_labor_factor",
+          locked: !input.laborFactor,
+        },
+        {
+          id: "A-003",
+          title: "Task library version",
+          value: `${taskLib.library.name}@${taskLib.library.version}`,
+          source: "system",
+          locked: true,
+        },
+      ];
 
-      const totalLineItems = lineItems.length;
-      const totalLaborHours = rollups.labor_total_hours ?? 0;
-      const unmappedClassCount = (quality.unmapped_classes ?? []).length;
-      const lowConfidenceCount = (quality.low_confidence_items ?? []).length;
-      const gapFlagCount = (quality.gap_flags ?? []).length;
+      // 12. Assemble output
+      const output = {
+        contract: {
+          name: "EstimateChainV1",
+          version: "1.0.0",
+          schema_hash: schemaHash,
+          producer: {
+            runtime: "launchbase-platform",
+            tool: "estimate_chain_run",
+            tool_version: `run:${runId}`,
+          },
+        },
+        context: {
+          project_id: String(projectId ?? ""),
+          document_id: String(input.documentId),
+          symbol_pack_id: String(input.symbolPackId),
+          task_library_id: taskLib.library.name,
+          currency: "USD",
+          units: { length: "ft", time: "hr" },
+        },
+        assumptions,
+        line_items: lineItems,
+        rollups: {
+          by_canonical_type: Array.from(byCanonical.entries()).map(([k, v]) => ({
+            canonical_type: k,
+            count: v.count,
+            labor_hours: parseFloat(v.labor_hours.toFixed(4)),
+          })),
+          labor_total_hours: parseFloat(laborTotalHours.toFixed(4)),
+          material_totals: Array.from(materialTotals.entries()).map(([k, v]) => ({
+            material_code: k,
+            qty_with_waste: parseFloat(v.qty_with_waste.toFixed(4)),
+            uom: v.uom,
+          })),
+        },
+        quality: {
+          unmapped_classes: Array.from(unmappedClasses),
+          low_confidence_items: lowConfItems,
+          gap_flags: gapFlags,
+        },
+        errors,
+      };
 
-      // 9. Store validated output
+      // 13. Update run record
       await db
         .update(estimateChainRuns)
         .set({
-          outputJson: agentOutput as any,
-          totalLineItems,
-          totalLaborHours: parseFloat(totalLaborHours.toFixed(2)),
-          unmappedClassCount,
-          lowConfidenceCount,
-          gapFlagCount,
+          outputJson: output as any,
+          totalLineItems: lineItems.length,
+          totalLaborHours: parseFloat(laborTotalHours.toFixed(2)),
+          unmappedClassCount: unmappedClasses.size,
+          lowConfidenceCount: lowConfItems.length,
+          gapFlagCount: gapFlags.length,
           status: "completed",
           completedAt: new Date(),
         })
         .where(eq(estimateChainRuns.id, Number(runId)));
 
-      return { runId: Number(runId), output: agentOutput };
+      return { runId: Number(runId), output };
     }),
 
   /**

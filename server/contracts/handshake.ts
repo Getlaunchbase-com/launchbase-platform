@@ -17,9 +17,10 @@
 import { createHash } from "crypto";
 import fs from "node:fs";
 import path from "node:path";
-import { getDb } from "../db";
-import { agentRuntimeStatus } from "../db/schema";
-import { eq } from "drizzle-orm";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // ---------------------------------------------------------------------------
 // Types
@@ -58,33 +59,29 @@ export interface HandshakeResult {
 
 const _hashCache = new Map<string, string>();
 
-/**
- * Deep-sort an object's keys for stable JSON serialization.
- * Arrays preserve order; objects get sorted keys recursively.
- */
-function sortDeep(obj: unknown): unknown {
-  if (obj === null || obj === undefined || typeof obj !== "object") return obj;
-  if (Array.isArray(obj)) return obj.map(sortDeep);
-  const sorted: Record<string, unknown> = {};
-  for (const key of Object.keys(obj as Record<string, unknown>).sort()) {
-    sorted[key] = sortDeep((obj as Record<string, unknown>)[key]);
-  }
-  return sorted;
-}
+function stableStringify(value: unknown): string {
+  const canonicalize = (input: unknown): unknown => {
+    if (Array.isArray(input)) {
+      return input.map((v) => canonicalize(v));
+    }
+    if (input && typeof input === "object") {
+      const out: Record<string, unknown> = {};
+      for (const key of Object.keys(input as Record<string, unknown>).sort()) {
+        out[key] = canonicalize((input as Record<string, unknown>)[key]);
+      }
+      return out;
+    }
+    return input;
+  };
 
-/**
- * Stable SHA-256 hash of any JSON-serializable object.
- * Keys are deep-sorted to ensure deterministic output regardless of
- * insertion order. This is the canonical hash function for all contracts.
- */
-export function stableHash(obj: unknown): string {
-  return createHash("sha256").update(JSON.stringify(sortDeep(obj))).digest("hex");
+  const json = JSON.stringify(canonicalize(value));
+  return json.replace(/[^\x00-\x7F]/g, (ch) =>
+    `\\u${ch.charCodeAt(0).toString(16).padStart(4, "0")}`
+  );
 }
 
 /**
  * Compute SHA-256 hash of a contract schema file.
- * Uses stableHash (sorted-key JSON) to guarantee deterministic output
- * regardless of JSON formatting or key order in the file.
  * Cached per filename for the lifetime of the process.
  */
 export function computeSchemaHash(schemaFilename: string): string {
@@ -97,9 +94,21 @@ export function computeSchemaHash(schemaFilename: string): string {
     throw new Error(`Contract schema file not found: ${schemaPath}`);
   }
 
-  const content = fs.readFileSync(schemaPath, "utf-8");
-  const parsed = JSON.parse(content);
-  const hash = stableHash(parsed);
+  const raw = fs.readFileSync(schemaPath);
+  const content = raw.toString("utf-8");
+
+  // Match agent-stack hashing behavior per contract:
+  // - BlueprintParseV1: hash raw schema bytes
+  // - EstimateChainV1: hash canonical sorted-key JSON
+  let hash: string;
+  if (schemaFilename.includes("BlueprintParseV1")) {
+    hash = createHash("sha256").update(raw).digest("hex");
+  } else if (schemaFilename.includes("EstimateChainV1")) {
+    const normalized = stableStringify(JSON.parse(content));
+    hash = createHash("sha256").update(normalized, "utf-8").digest("hex");
+  } else {
+    hash = createHash("sha256").update(raw).digest("hex");
+  }
 
   _hashCache.set(schemaFilename, hash);
   return hash;
@@ -233,7 +242,6 @@ export function getAllContractInfo() {
     vertex: registry.vertex,
     vertex_version: registry.version,
     status: registry.status,
-    manifest_hash: getManifestHash(),
     contracts: registry.contracts.map((c) => ({
       name: c.name,
       version: c.version,
@@ -241,66 +249,4 @@ export function getAllContractInfo() {
       schema_hash: computeSchemaHash(c.schema_file),
     })),
   };
-}
-
-/**
- * Compute a stable hash of the full contract manifest (registry + all schema hashes).
- * This is the single authoritative fingerprint for the entire contract surface.
- */
-export function getManifestHash(): string {
-  const registry = loadRegistry();
-  const manifest = {
-    vertex: registry.vertex,
-    version: registry.version,
-    contracts: registry.contracts.map((c) => ({
-      name: c.name,
-      version: c.version,
-      schema_hash: computeSchemaHash(c.schema_file),
-    })),
-  };
-  return stableHash(manifest);
-}
-
-/**
- * Log a handshake mismatch to the database (best-effort, never throws).
- */
-export async function logHandshakeMismatch(
-  agentId: string,
-  agentVersion: string,
-  result: HandshakeResult
-): Promise<void> {
-  try {
-    const db = await getDb();
-    if (!db) return;
-
-    // Upsert agent runtime status to "mismatch"
-    const [existing] = await db
-      .select({ id: agentRuntimeStatus.id })
-      .from(agentRuntimeStatus)
-      .where(eq(agentRuntimeStatus.vertex, result.vertex))
-      .limit(1);
-
-    const data = {
-      vertex: result.vertex,
-      version: result.vertex_version,
-      schemaHash: getManifestHash(),
-      handshakeOk: false,
-      status: "mismatch" as const,
-      lastSeen: new Date(),
-      violations: result.mismatches.map((m) => ({
-        type: "contract_mismatch",
-        message: `${m.name} [${m.field}]: expected "${m.expected}", received "${m.received}"`,
-        detectedAt: new Date().toISOString(),
-      })),
-      metadata: { agentId, agentVersion } as Record<string, unknown>,
-    };
-
-    if (existing) {
-      await db.update(agentRuntimeStatus).set(data).where(eq(agentRuntimeStatus.id, existing.id));
-    } else {
-      await db.insert(agentRuntimeStatus).values(data);
-    }
-  } catch {
-    // best-effort logging
-  }
 }
