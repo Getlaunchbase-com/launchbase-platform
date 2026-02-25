@@ -32,6 +32,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { getFreezeStatus } from "../../contracts/freeze_governance";
 import { computeSchemaHash } from "../../contracts/handshake";
+import {
+  validateEstimateChainV1,
+  getEstimateSchemaHash as getEstimateSchemaHashFromValidator,
+} from "../../contracts/validateEstimateChainV1";
 import { env } from "../../_core/env";
 
 // ---------------------------------------------------------------------------
@@ -234,9 +238,9 @@ export const estimateChainRouter = router({
         });
       }
 
-      // 7. Validate contract identity from agent response
-      const contract = agentOutput?.contract;
-      if (!contract || contract.name !== "EstimateChainV1") {
+      // 7. Validate agent output against EstimateChainV1 schema
+      const validation = validateEstimateChainV1(agentOutput);
+      if (!validation.valid) {
         await db
           .update(estimateChainRuns)
           .set({ status: "failed", completedAt: new Date() })
@@ -244,7 +248,22 @@ export const estimateChainRouter = router({
 
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: `Agent returned invalid contract: expected EstimateChainV1, got ${contract?.name ?? "none"}`,
+          message: `EstimateChainV1 validation failed: ${validation.errors.length} error(s) — ${validation.errors.slice(0, 5).map((e) => e.message).join("; ")}`,
+        });
+      }
+
+      // 7b. Verify schema hash matches platform (drift detection)
+      const agentHash = agentOutput?.contract?.schema_hash;
+      const platformEstimateHash = getEstimateSchemaHashFromValidator();
+      if (agentHash && agentHash !== platformEstimateHash) {
+        await db
+          .update(estimateChainRuns)
+          .set({ status: "failed", completedAt: new Date() })
+          .where(eq(estimateChainRuns.id, Number(runId)));
+
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "EstimateChainV1 schema hash mismatch — agent and platform have drifted",
         });
       }
 

@@ -143,7 +143,41 @@ export function rateLimiter(opts: RateLimiterOptions) {
 }
 
 /**
+ * Per-token (authenticated user) rate limiter.
+ * Extracts user ID from JWT in Authorization header for per-user limiting.
+ * Falls back to IP-based limiting for unauthenticated requests.
+ */
+export function perTokenKeyExtractor(req: Request): string {
+  // Try to extract user ID from JWT bearer token
+  const auth = req.headers.authorization;
+  if (auth && auth.startsWith("Bearer ")) {
+    try {
+      // Decode JWT payload (middle segment) to extract user ID
+      const payload = auth.split(".")[1];
+      if (payload) {
+        const decoded = JSON.parse(Buffer.from(payload, "base64url").toString());
+        if (decoded.sub || decoded.userId || decoded.id) {
+          return `user:${decoded.sub ?? decoded.userId ?? decoded.id}`;
+        }
+      }
+    } catch {
+      // Fall through to IP-based
+    }
+  }
+  return `ip:${getClientIp(req)}`;
+}
+
+/**
  * Pre-configured rate limiters for common use cases.
+ *
+ * Tiers:
+ *   api        — 100 req/min per IP (global baseline)
+ *   artifacts  — 30 req/min per IP (file downloads)
+ *   auth       — 10 req/min per IP (brute-force prevention)
+ *   polling    — 60 req/min per IP (agent run status)
+ *   upload     — 10 req/min per IP (file uploads — large payloads)
+ *   pipeline   — 5 req/min per user (blueprint parse/detect — expensive)
+ *   swarm      — 5 req/min per user (swarm dispatch — expensive)
  */
 export const RATE_LIMITERS = {
   /** General API: 100 req/min per IP */
@@ -157,4 +191,25 @@ export const RATE_LIMITERS = {
 
   /** Polling endpoints (agent runs, events): 60 req/min per IP */
   polling: () => rateLimiter({ max: 60, windowMs: 60_000, keyPrefix: "poll" }),
+
+  /** File uploads: 10 req/min per IP (large payload protection) */
+  upload: () => rateLimiter({ max: 10, windowMs: 60_000, keyPrefix: "upload" }),
+
+  /** Pipeline operations: 5 req/min per user (blueprint parse + detect) */
+  pipeline: () =>
+    rateLimiter({
+      max: 5,
+      windowMs: 60_000,
+      keyPrefix: "pipeline",
+      keyExtractor: perTokenKeyExtractor,
+    }),
+
+  /** Swarm dispatch: 5 req/min per user (agent orchestration) */
+  swarm: () =>
+    rateLimiter({
+      max: 5,
+      windowMs: 60_000,
+      keyPrefix: "swarm",
+      keyExtractor: perTokenKeyExtractor,
+    }),
 } as const;

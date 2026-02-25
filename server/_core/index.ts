@@ -22,7 +22,7 @@ import compression from "compression";
 import pinoHttp from "pino-http";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import path from "node:path";
-import { env } from "./env";
+import { env, logBootConfig } from "./env";
 import log from "./logger";
 import { createContext } from "./trpc";
 import { appRouter } from "../routers/_incoming_routers";
@@ -336,6 +336,9 @@ const server = app.listen(PORT, () => {
     },
     "LaunchBase Platform started"
   );
+
+  // Log sanitized config at boot for operational visibility
+  logBootConfig();
 
   startHealthMonitor();
 });

@@ -24,6 +24,11 @@ import { desc, eq, and, count, inArray } from "drizzle-orm";
 import { createHash, randomUUID } from "crypto";
 import path from "node:path";
 import fs from "node:fs";
+import {
+  validateUploadedFile,
+  cleanupTemp,
+  moveFromTemp,
+} from "../../security/fileValidation";
 
 // ---------------------------------------------------------------------------
 // Storage config
@@ -152,13 +157,38 @@ export const blueprintsRouter = router({
 
       // Decode file
       const fileBuffer = Buffer.from(input.base64Data, "base64");
+
+      // --- Full file validation pipeline ---
+      // 1. MIME whitelist  2. Size cap  3. Magic bytes  4. Temp isolation  5. Malware scan
+      const fileValidation = await validateUploadedFile(fileBuffer, input.mimeType, input.filename);
+      if (!fileValidation.valid) {
+        throw new Error(`File validation failed: ${fileValidation.errors.join("; ")}`);
+      }
+
       const sizeBytes = fileBuffer.length;
       const checksum = createHash("sha256").update(fileBuffer).digest("hex");
 
-      // Store file
-      const { storagePath, storageBackend } = S3_ENABLED
-        ? await storeS3(input.projectId, input.filename, fileBuffer, input.mimeType)
-        : await storeLocal(input.projectId, input.filename, fileBuffer);
+      // Store file (move from temp to final storage)
+      let storagePath: string;
+      let storageBackend: "local" | "s3";
+
+      if (S3_ENABLED) {
+        // For S3, upload directly (temp file was for local validation/scan)
+        const s3Result = await storeS3(input.projectId, input.filename, fileBuffer, input.mimeType);
+        storagePath = s3Result.storagePath;
+        storageBackend = s3Result.storageBackend;
+        // Clean up temp file after S3 upload
+        if (fileValidation.tempPath) cleanupTemp(fileValidation.tempPath);
+      } else {
+        // For local, move from temp isolation to final storage
+        const localResult = await storeLocal(input.projectId, input.filename, fileBuffer);
+        if (fileValidation.tempPath) {
+          // Move validated temp file to final location (avoids re-write)
+          moveFromTemp(fileValidation.tempPath, path.join(ARTIFACTS_DIR, localResult.storagePath));
+        }
+        storagePath = localResult.storagePath;
+        storageBackend = localResult.storageBackend;
+      }
 
       // Create artifact row
       const [result] = await db.insert(agentArtifacts).values({

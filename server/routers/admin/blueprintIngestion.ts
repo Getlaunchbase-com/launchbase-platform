@@ -608,6 +608,17 @@ export const blueprintIngestionRouter = router({
           });
         }
 
+        // --- 4b. Verify schema hash matches platform (drift detection) ---
+        const platformHash = getSchemaHash();
+        if (parsed.contract.schema_hash !== platformHash) {
+          await markFailed(db, input.documentId,
+            `Schema hash mismatch: agent=${parsed.contract.schema_hash.slice(0, 16)}… platform=${platformHash.slice(0, 16)}…`);
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Contract schema hash mismatch — agent and platform schemas have drifted. Redeploy or update contracts.",
+          });
+        }
+
         // --- 5. Store pages ---
         const pageIdMap = new Map<number, number>();
 
@@ -696,8 +707,9 @@ export const blueprintIngestionRouter = router({
           confidence: number;
         }> = [];
 
+        let detectResp: Response;
         try {
-          const detectResp = await fetch(`${AGENT_URL}/tools/blueprint-detect`, {
+          detectResp = await fetch(`${AGENT_URL}/tools/blueprint-detect`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -713,19 +725,51 @@ export const blueprintIngestionRouter = router({
             signal: detectController.signal,
           });
           clearTimeout(detectTimeout);
-
-          if (detectResp.ok) {
-            const detectData = await detectResp.json();
-            detections = Array.isArray(detectData?.detections) ? detectData.detections : [];
-          } else {
-            // Detection is non-fatal — document is still parsed, just not detected
-            console.error(`[runPipeline] Detection call failed: HTTP ${detectResp.status}`);
-          }
         } catch (detectErr) {
           clearTimeout(detectTimeout);
-          console.error("[runPipeline] Detection call error:", detectErr);
-          // Non-fatal — continue with parsed-only status
+          await markFailed(db, input.documentId, `Detection call failed: ${(detectErr as Error).message}`);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: `Agent blueprint-detect call failed: ${(detectErr as Error).message}`,
+          });
         }
+
+        if (!detectResp.ok) {
+          const errBody = await detectResp.text().catch(() => "");
+          await markFailed(db, input.documentId, `Detection failed: HTTP ${detectResp.status} — ${errBody}`);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: `Agent blueprint-detect returned ${detectResp.status}`,
+          });
+        }
+
+        const detectData = await detectResp.json();
+
+        // --- 9b. Validate detection output structure ---
+        if (!detectData || !Array.isArray(detectData.detections)) {
+          await markFailed(db, input.documentId, "Detection output missing 'detections' array");
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Agent detection output is invalid — missing 'detections' array",
+          });
+        }
+
+        for (let i = 0; i < Math.min(detectData.detections.length, 10); i++) {
+          const d = detectData.detections[i];
+          if (typeof d.page_number !== "number" || typeof d.x !== "number" ||
+              typeof d.y !== "number" || typeof d.w !== "number" ||
+              typeof d.h !== "number" || typeof d.raw_class !== "string" ||
+              typeof d.confidence !== "number") {
+            await markFailed(db, input.documentId,
+              `Detection[${i}] has invalid structure — missing required fields`);
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: `Agent detection output[${i}] is malformed — required: page_number, x, y, w, h, raw_class, confidence`,
+            });
+          }
+        }
+
+        detections = detectData.detections;
 
         // --- 10. Store raw detections with normalized bboxes ---
         if (detections.length > 0) {
@@ -756,7 +800,19 @@ export const blueprintIngestionRouter = router({
             .where(eq(blueprintDocuments.id, input.documentId));
         }
 
-        const finalStatus = detections.length > 0 ? "detection_complete" : "parsed";
+        // --- 11. Mark document ready — verify completeness ---
+        const finalPageCount = pageIdMap.size;
+        const finalDetectionCount = detections.length;
+        const finalStatus = finalDetectionCount > 0 ? "detection_complete" : "parsed";
+
+        // Readiness check: pages must exist, contract metadata must be set
+        if (finalPageCount === 0) {
+          await markFailed(db, input.documentId, "Pipeline completed but no pages were stored");
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Pipeline integrity check failed: zero pages stored",
+          });
+        }
 
         return {
           documentId: input.documentId,
