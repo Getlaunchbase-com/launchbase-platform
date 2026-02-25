@@ -28,17 +28,21 @@ import { createContext } from "./trpc";
 import { appRouter } from "../routers/_incoming_routers";
 import { getDb, closeDb } from "../db";
 import { createArtifactsRouter } from "../routes/artifactsRouter";
-import { rateLimiter, RATE_LIMITERS } from "../middleware/rateLimiter";
+import { rateLimiter, RATE_LIMITERS, isRedisHealthy } from "../middleware/rateLimiter";
 import {
   validateHandshake,
   getAllContractInfo,
   logHandshakeMismatch,
+  getManifestHash,
   type HandshakeRequest,
 } from "../contracts/handshake";
 import {
   startHealthMonitor,
   stopHealthMonitor,
 } from "../services/agentHealthMonitor";
+import { verifyAgentContractsOrExit } from "../startup/verifyAgentContracts";
+import { startPipelineWorker, stopPipelineWorker } from "../workers/pipelineWorker";
+import { closeQueue } from "../queues/pipelineQueue";
 
 // ---------------------------------------------------------------------------
 // Unhandled rejection / exception handlers (must be first)
@@ -172,20 +176,71 @@ app.get("/healthz", (_req, res) => {
 });
 
 app.get("/readyz", async (_req, res) => {
+  const checks: Record<string, { ok: boolean; detail?: string }> = {};
+  let allOk = true;
+
+  // 1. Database connectivity
   try {
     const db = await getDb();
     if (!db) {
-      res.status(503).json({ status: "not_ready", reason: "database_unavailable" });
-      return;
+      checks.database = { ok: false, detail: "database_unavailable" };
+      allOk = false;
+    } else {
+      const { sql } = await import("drizzle-orm");
+      await db.execute(sql`SELECT 1`);
+      checks.database = { ok: true };
     }
-    // Verify DB connectivity with a lightweight query
-    const { sql } = await import("drizzle-orm");
-    await db.execute(sql`SELECT 1`);
-    res.json({ status: "ready" });
   } catch (err) {
-    log.error(err, "Readiness check failed");
-    res.status(503).json({ status: "not_ready", reason: "database_error" });
+    checks.database = { ok: false, detail: (err as Error).message };
+    allOk = false;
   }
+
+  // 2. Redis connectivity (only if configured)
+  if (process.env.REDIS_URL) {
+    try {
+      const redisOk = await isRedisHealthy();
+      checks.redis = redisOk
+        ? { ok: true }
+        : { ok: false, detail: "redis_unreachable" };
+      if (!redisOk) allOk = false;
+    } catch {
+      checks.redis = { ok: false, detail: "redis_check_failed" };
+      allOk = false;
+    }
+  }
+
+  // 3. Agent contract integrity (best-effort, non-blocking on unreachable)
+  try {
+    const { getLatestRuntimeStatus } = await import("../services/agentHealthMonitor");
+    const status = await getLatestRuntimeStatus();
+    if (status) {
+      if (status.status === "mismatch") {
+        checks.agent_contracts = {
+          ok: false,
+          detail: `contract_mismatch: ${status.violations.map((v) => v.message).join("; ").slice(0, 200)}`,
+        };
+        allOk = false;
+      } else if (status.status === "offline") {
+        // Agent offline is a warning, not a readiness failure —
+        // the agent might not be started yet
+        checks.agent_contracts = { ok: true, detail: "agent_offline_warning" };
+      } else {
+        checks.agent_contracts = { ok: true };
+      }
+    } else {
+      // No status yet (first boot) — not a failure
+      checks.agent_contracts = { ok: true, detail: "no_status_yet" };
+    }
+  } catch {
+    checks.agent_contracts = { ok: true, detail: "check_skipped" };
+  }
+
+  const status = allOk ? 200 : 503;
+  res.status(status).json({
+    status: allOk ? "ready" : "not_ready",
+    checks,
+    timestamp: new Date().toISOString(),
+  });
 });
 
 /** Build info endpoint — shows deployed commit SHA + build time */
@@ -326,22 +381,39 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
 
 const PORT = env.PORT;
 
-const server = app.listen(PORT, () => {
-  log.info(
-    {
-      port: PORT,
-      env: env.NODE_ENV,
-      gitSha: BUILD_INFO.gitSha,
-      buildTime: BUILD_INFO.buildTime,
-    },
-    "LaunchBase Platform started"
-  );
+// Contract verification runs before listen — if agent is reachable and
+// contracts mismatch, the process exits before accepting traffic.
+let server: ReturnType<typeof app.listen>;
 
-  // Log sanitized config at boot for operational visibility
-  logBootConfig();
+(async () => {
+  await verifyAgentContractsOrExit();
 
-  startHealthMonitor();
-});
+  server = app.listen(PORT, () => {
+    log.info(
+      {
+        port: PORT,
+        env: env.NODE_ENV,
+        gitSha: BUILD_INFO.gitSha,
+        buildTime: BUILD_INFO.buildTime,
+      },
+      "LaunchBase Platform started"
+    );
+
+    // Log sanitized config at boot for operational visibility
+    logBootConfig();
+
+    startHealthMonitor();
+
+    // Start BullMQ pipeline worker (no-op if REDIS_URL not set)
+    startPipelineWorker().catch((err) => {
+      log.error(err, "Failed to start pipeline worker");
+    });
+  });
+
+  // Attach shutdown handlers after server is created
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
+  process.on("SIGINT", () => shutdown("SIGINT"));
+})();
 
 // ---------------------------------------------------------------------------
 // Graceful shutdown — drain in-flight requests before closing
@@ -356,6 +428,10 @@ async function shutdown(signal: string) {
   log.info({ signal }, "Shutting down gracefully");
 
   stopHealthMonitor();
+
+  // Stop pipeline worker + queue before closing connections
+  await stopPipelineWorker().catch((err) => log.error(err, "Error stopping pipeline worker"));
+  await closeQueue().catch((err) => log.error(err, "Error closing pipeline queue"));
 
   // Stop accepting new connections and wait for in-flight to finish
   server.close(async () => {
@@ -374,8 +450,5 @@ async function shutdown(signal: string) {
     process.exit(1);
   }, 30_000).unref();
 }
-
-process.on("SIGTERM", () => shutdown("SIGTERM"));
-process.on("SIGINT", () => shutdown("SIGINT"));
 
 export { app, server };

@@ -31,6 +31,9 @@ const envSchema = z.object({
   // Agent stack
   AGENT_STACK_URL: z.string().url().default("http://localhost:4100"),
 
+  // Redis (optional — enables distributed rate limiting + BullMQ queues)
+  REDIS_URL: z.string().optional(),
+
   // External services
   OPENAI_API_KEY: z.string().default(""),
   STRIPE_SECRET_KEY: z.string().default(""),
@@ -169,6 +172,7 @@ export function logBootConfig(): void {
     ALLOW_STAGING_BYPASS: parsed.ALLOW_STAGING_BYPASS,
     ARTIFACTS_DIR: parsed.ARTIFACTS_DIR ?? "(default: ./artifacts)",
     ARTIFACTS_S3_BUCKET: parsed.ARTIFACTS_S3_BUCKET ?? "(not set — local storage)",
+    REDIS_URL: parsed.REDIS_URL ? maskSecret(parsed.REDIS_URL) : "(not set — in-memory rate limiting)",
     MALWARE_SCANNER_CMD: parsed.MALWARE_SCANNER_CMD ?? "(not configured)",
     PRESENTATION_TIER: parsed.PRESENTATION_TIER,
   };
