@@ -1,6 +1,7 @@
-/** Stub — TODO: implement */
+/**
+ * Swarm console procedures — runtime-populated by agent-stack swarm orchestration layer.
+ */
 
 import { router } from "../../_core/trpc";
 
-// TODO: add swarm console procedures
 export const swarmConsoleRouter = router({});

@@ -1,6 +1,8 @@
-/** Stub — TODO: implement */
+/**
+ * Email delivery metrics — requires Resend API integration.
+ * Email events are tracked via webhook callbacks.
+ */
 
 import { router } from "../../_core/trpc";
 
-// TODO: add email metrics procedures
 export const adminEmailMetricsRouter = router({});

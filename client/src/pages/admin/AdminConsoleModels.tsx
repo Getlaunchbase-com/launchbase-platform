@@ -1,102 +1,72 @@
 import { AdminLayout } from "../../components/AdminLayout";
-import { CheckCircle, Zap, Brain } from "../../components/Icons";
-
-const MODELS = [
-  {
-    provider: "Anthropic",
-    models: [
-      { name: "Claude 3.5 Sonnet", cost: "$0.003/1k", capability: "Advanced reasoning, code", default: true },
-      { name: "Claude 3 Opus", cost: "$0.015/1k", capability: "Complex tasks", default: false },
-    ],
-  },
-  {
-    provider: "OpenAI",
-    models: [
-      { name: "GPT-4o", cost: "$0.005/1k", capability: "Versatile, multimodal", default: false },
-      { name: "GPT-4 Turbo", cost: "$0.01/1k", capability: "Advanced reasoning", default: false },
-    ],
-  },
-  {
-    provider: "DeepSeek",
-    models: [
-      { name: "O1", cost: "$0.002/1k", capability: "Cost-effective reasoning", default: false },
-    ],
-  },
-];
+import { CheckCircle, Brain } from "../../components/Icons";
+import trpc from "../../lib/trpc";
 
 export default function AdminConsoleModels() {
+  const profilesQ = trpc.admin.vertexProfiles.list.useQuery({}, { retry: false });
+  const profiles = (profilesQ.data as any)?.profiles ?? [];
+
   return (
     <AdminLayout>
       <div>
         <h1 style={{ fontSize: "28px", fontWeight: "600", margin: "0 0 8px 0" }}>Models & Brains</h1>
         <p style={{ fontSize: "14px", color: "#888", margin: "0 0 32px 0" }}>
-          450+ model profiles across multiple AI providers
+          Vertex profiles and model configurations
         </p>
 
-        {/* Default Profile */}
-        <div style={{ marginBottom: "32px" }}>
-          <h2 style={{ fontSize: "14px", fontWeight: "600", margin: "0 0 12px 0", color: "#999" }}>
-            Default Brain Profile
-          </h2>
-          <div
-            style={{
-              padding: "16px",
-              backgroundColor: "#1a1a1a",
-              borderRadius: "8px",
-              border: "2px solid #ff6b35",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <div>
-              <div style={{ fontSize: "14px", fontWeight: "600", color: "#e0e0e0", marginBottom: "4px" }}>
-                Claude 3.5 Sonnet
-              </div>
-              <div style={{ fontSize: "12px", color: "#666" }}>Anthropic • $0.003/1k tokens</div>
-            </div>
-            <CheckCircle size={20} style={{ color: "#22c55e" }} />
+        {profilesQ.isLoading ? (
+          <div style={{ padding: "40px 20px", backgroundColor: "#1a1a1a", borderRadius: "8px", border: "1px solid #333", textAlign: "center", color: "#666" }}>
+            Loading vertex profiles...
           </div>
-        </div>
-
-        {/* All Models */}
-        <div>
-          {MODELS.map((provider) => (
-            <div key={provider.provider} style={{ marginBottom: "24px" }}>
-              <h2 style={{ fontSize: "14px", fontWeight: "600", margin: "0 0 12px 0", color: "#999" }}>
-                {provider.provider}
-              </h2>
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                {provider.models.map((model, idx) => (
-                  <div
-                    key={idx}
-                    style={{
-                      padding: "12px 16px",
-                      backgroundColor: "#1a1a1a",
-                      borderRadius: "8px",
-                      border: model.default ? "1px solid #ff6b35" : "1px solid #333",
-                      display: "grid",
-                      gridTemplateColumns: "1fr 1fr 1fr auto",
-                      alignItems: "center",
-                      gap: "16px",
-                    }}
-                  >
-                    <div>
-                      <div style={{ fontSize: "13px", fontWeight: "600", color: "#e0e0e0" }}>
-                        {model.name}
-                      </div>
+        ) : profiles.length === 0 ? (
+          <div style={{ padding: "40px 20px", backgroundColor: "#1a1a1a", borderRadius: "8px", border: "1px solid #333", textAlign: "center", color: "#666" }}>
+            <p style={{ fontSize: "14px", margin: 0 }}>No vertex profiles configured</p>
+            <p style={{ fontSize: "12px", color: "#555", margin: "4px 0 0 0" }}>Create a vertex profile to define agent behavior and model selection</p>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            {profiles.map((profile: any, idx: number) => (
+              <div key={profile.id} style={{ marginBottom: "8px" }}>
+                <h2 style={{ fontSize: "14px", fontWeight: "600", margin: "0 0 12px 0", color: "#999" }}>
+                  {profile.name || `Profile ${profile.id}`}
+                </h2>
+                <div
+                  style={{
+                    padding: "16px",
+                    backgroundColor: "#1a1a1a",
+                    borderRadius: "8px",
+                    border: idx === 0 ? "2px solid #ff6b35" : "1px solid #333",
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr 1fr auto",
+                    alignItems: "center",
+                    gap: "16px",
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: "14px", fontWeight: "600", color: "#e0e0e0" }}>
+                      <Brain size={14} style={{ marginRight: "6px", verticalAlign: "middle" }} />
+                      {profile.name || `Profile ${profile.id}`}
                     </div>
-                    <div style={{ fontSize: "12px", color: "#666" }}>Cost: {model.cost}</div>
-                    <div style={{ fontSize: "12px", color: "#666" }}>{model.capability}</div>
-                    {model.default && (
-                      <div style={{ fontSize: "11px", color: "#ff6b35", fontWeight: "600" }}>Default</div>
-                    )}
+                    <div style={{ fontSize: "12px", color: "#666", marginTop: "4px" }}>{profile.description || "—"}</div>
                   </div>
-                ))}
+                  <div>
+                    <div style={{ fontSize: "12px", color: "#666", marginBottom: "2px" }}>Model</div>
+                    <div style={{ fontSize: "13px", color: "#e0e0e0" }}>{profile.modelId || profile.model || "—"}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: "12px", color: "#666", marginBottom: "2px" }}>Status</div>
+                    <div style={{ fontSize: "13px", color: profile.status === "active" ? "#22c55e" : "#666" }}>
+                      {profile.status || "active"}
+                    </div>
+                  </div>
+                  {idx === 0 && (
+                    <div style={{ fontSize: "11px", color: "#ff6b35", fontWeight: "600" }}>Default</div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </AdminLayout>
   );

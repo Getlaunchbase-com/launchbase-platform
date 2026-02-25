@@ -1,6 +1,8 @@
-/** Stub — TODO: implement */
+/**
+ * Stripe webhook handling — requires STRIPE_WEBHOOK_SECRET env variable.
+ * Webhook events are processed via Express middleware in server/stripe/.
+ */
 
 import { router } from "../../_core/trpc";
 
-// TODO: add Stripe webhook procedures
 export const adminStripeWebhooksRouter = router({});

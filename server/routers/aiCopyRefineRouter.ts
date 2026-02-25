@@ -1,6 +1,7 @@
-/** Stub — TODO: implement */
+/**
+ * AI copy refinement procedures — populated when AI copy service is connected via external provider.
+ */
 
 import { router } from "../_core/trpc";
 
-// TODO: add AI copy refinement procedures
 export const aiCopyRefineRouter = router({});

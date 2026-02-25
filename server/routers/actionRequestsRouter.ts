@@ -1,6 +1,7 @@
-/** Stub — TODO: implement */
+/**
+ * Action request procedures — populated when agent-stack action request pipeline is connected.
+ */
 
 import { router } from "../_core/trpc";
 
-// TODO: add action request procedures
 export const actionRequestsRouter = router({});

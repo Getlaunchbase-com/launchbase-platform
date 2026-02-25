@@ -70,7 +70,12 @@ export default function AdminAgentChat() {
 
   return (
     <AdminLayout>
-      <div style={{ display: "grid", gridTemplateColumns: "260px 1fr 280px", gap: "12px", height: "calc(100vh - 120px)" }}>
+      <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 120px)", gap: "12px" }}>
+        {/* Backend status */}
+        <div style={{ padding: "8px 16px", backgroundColor: "rgba(245, 158, 11, 0.1)", border: "1px solid rgba(245, 158, 11, 0.3)", borderRadius: "8px", fontSize: "12px", color: "#f59e0b" }}>
+          Chat is running in local mode. Messages are not persisted to the server — the swarm chat backend will be connected in a future update.
+        </div>
+      <div style={{ display: "grid", gridTemplateColumns: "260px 1fr 280px", gap: "12px", flex: 1 }}>
         {/* LEFT PANEL: Threads */}
         <div
           style={{
@@ -595,6 +600,7 @@ export default function AdminAgentChat() {
             </button>
           </div>
         </div>
+      </div>
       </div>
     </AdminLayout>
   );

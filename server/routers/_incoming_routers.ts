@@ -22,7 +22,7 @@ import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { getDb } from "../db";
-import { intakes, approvals, buildPlans, referrals, intelligenceLayers, socialPosts, moduleSetupSteps, moduleConnections, suiteApplications, deployments, emailLogs } from "../db/schema";
+import { intakes, approvals, buildPlans, referrals, intelligenceLayers, socialPosts, moduleSetupSteps, moduleConnections, suiteApplications, deployments, emailLogs, integrationSetupPackets } from "../db/schema";
 import { eq, desc, and, asc, sql } from "drizzle-orm";
 // Security hardening imports
 import {
@@ -2829,8 +2829,26 @@ export const appRouter = router({
         integration: z.enum(["google_business", "meta", "quickbooks"]),
       }))
       .mutation(async ({ input, ctx }) => {
-        // For now, just log the action - in future, store in DB
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
         console.log(`[SetupPacket] ${ctx.user?.email} marked ${input.integration} as in progress for intake ${input.intakeId}`);
+
+        // Update the status and lastOpenedAt timestamp in the database
+        await db
+          .update(integrationSetupPackets)
+          .set({
+            status: "in_progress",
+            lastOpenedAt: new Date(),
+            updatedAt: new Date()
+          })
+          .where(
+            and(
+              eq(integrationSetupPackets.intakeId, input.intakeId),
+              eq(integrationSetupPackets.integration, input.integration)
+            )
+          );
+
         return { success: true, status: "in_progress" };
       }),
 
@@ -2842,8 +2860,33 @@ export const appRouter = router({
         externalAccountId: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
         console.log(`[SetupPacket] ${ctx.user?.email} marked ${input.integration} as connected for intake ${input.intakeId}`);
-        return { success: true, status: "connected", connectedAt: new Date() };
+
+        const connectedAt = new Date();
+
+        // Update the status and connectedAt timestamp in the database
+        // Note: externalAccountId is stored in notes field as no dedicated column exists
+        await db
+          .update(integrationSetupPackets)
+          .set({
+            status: "connected",
+            connectedAt,
+            notes: input.externalAccountId
+              ? `External Account ID: ${input.externalAccountId}`
+              : undefined,
+            updatedAt: new Date()
+          })
+          .where(
+            and(
+              eq(integrationSetupPackets.intakeId, input.intakeId),
+              eq(integrationSetupPackets.integration, input.integration)
+            )
+          );
+
+        return { success: true, status: "connected", connectedAt };
       }),
 
     // Get the current user's intake by email
