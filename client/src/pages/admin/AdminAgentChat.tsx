@@ -1,674 +1,300 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useLocation } from "wouter";
 import { AdminLayout } from "../../components/AdminLayout";
-import { Search, Plus, Pin, Send, Zap, Pause, Square, Settings } from "../../components/Icons";
+import { trpc } from "../../lib/trpc";
 
-interface Thread {
-  id: string;
-  title: string;
-  pinned: boolean;
-  lastMessage: string;
-}
+type RunStatus = "running" | "success" | "failed" | "awaiting_approval";
 
-interface ChatMessage {
-  id: string;
-  role: "user" | "agent" | "tool";
-  content: string;
-  timestamp: Date;
-  toolName?: string;
+function badgeColor(status: RunStatus | string): string {
+  if (status === "running") return "#2563eb";
+  if (status === "success") return "#16a34a";
+  if (status === "failed") return "#dc2626";
+  if (status === "awaiting_approval") return "#d97706";
+  return "#64748b";
 }
 
 export default function AdminAgentChat() {
-  const [threads, setThreads] = useState<Thread[]>([]);
-  const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [inputText, setInputText] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [mode, setMode] = useState<"agent" | "swarm" | "research">("agent");
-  const [approvalsRequired, setApprovalsRequired] = useState(false);
-  const [selectedBrain, setSelectedBrain] = useState("claude-3.5-sonnet");
-  const [budgetLimit, setBudgetLimit] = useState(100);
-  const [runningStatus, setRunningStatus] = useState<"idle" | "running" | "paused">("idle");
+  const [, setLocation] = useLocation();
+  const [composerText, setComposerText] = useState("");
+  const [selectedRunId, setSelectedRunId] = useState<number | null>(null);
 
-  const handleSendMessage = () => {
-    if (!inputText.trim()) return;
+  const runtimeQ = trpc.operatorOS.getRuntimeStatus.useQuery();
+  const runsQ = trpc.operatorOS.listRuns.useQuery({ limit: 20, offset: 0 });
+  const approvalsQ = trpc.operatorOS.pendingProposals.useQuery({ limit: 10, offset: 0 });
+  const artifactsQ = trpc.operatorOS.listArtifacts.useQuery({ limit: 20, offset: 0 });
 
-    const userMessage: ChatMessage = {
-      id: `msg_${Date.now()}`,
-      role: "user",
-      content: inputText,
-      timestamp: new Date(),
-    };
+  const launchRunMut = trpc.operatorOS.launchInstanceRun.useMutation();
 
-    setMessages([...messages, userMessage]);
-    setInputText("");
-  };
-
-  const handleNewThread = () => {
-    const newThread: Thread = {
-      id: `thread_${Date.now()}`,
-      title: "New conversation",
-      pinned: false,
-      lastMessage: new Date().toISOString(),
-    };
-    setThreads([newThread, ...threads]);
-    setSelectedThreadId(newThread.id);
-    setMessages([]);
-  };
-
-  const togglePin = (threadId: string) => {
-    setThreads(
-      threads.map((t) => (t.id === threadId ? { ...t, pinned: !t.pinned } : t))
-    );
-  };
-
-  const filteredThreads = threads.filter((t) =>
-    t.title.toLowerCase().includes(searchQuery.toLowerCase())
+  const runs = runsQ.data?.runs ?? [];
+  const selectedRun = useMemo(
+    () => runs.find((r: any) => r.id === selectedRunId) ?? null,
+    [runs, selectedRunId]
   );
 
-  const pinnedThreads = filteredThreads.filter((t) => t.pinned);
-  const unpinnedThreads = filteredThreads.filter((t) => !t.pinned);
+  const runtimeStatus = runtimeQ.data?.status ?? "offline";
+  const runtimeColor =
+    runtimeStatus === "healthy"
+      ? "#16a34a"
+      : runtimeStatus === "degraded"
+      ? "#d97706"
+      : "#dc2626";
+
+  async function handleStartRun() {
+    const first = runs[0] as any;
+    const projectId = first?.projectId ?? 1;
+    const instanceId = first?.agentInstanceId ?? 1;
+    await launchRunMut.mutateAsync({
+      projectId,
+      agentInstanceId: instanceId,
+      goal: "Operator-launched run from AdminAgentChat",
+    });
+    await runsQ.refetch();
+  }
+
+  function handleOpenArtifacts() {
+    setLocation("/admin/console/files");
+  }
+
+  function handleOpenApprovals() {
+    setLocation("/admin/console/approvals");
+  }
 
   return (
     <AdminLayout>
-      <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 120px)", gap: "12px" }}>
-        {/* Backend status */}
-        <div style={{ padding: "8px 16px", backgroundColor: "rgba(245, 158, 11, 0.1)", border: "1px solid rgba(245, 158, 11, 0.3)", borderRadius: "8px", fontSize: "12px", color: "#f59e0b" }}>
-          Chat is running in local mode. Messages are not persisted to the server — the swarm chat backend will be connected in a future update.
-        </div>
-      <div style={{ display: "grid", gridTemplateColumns: "260px 1fr 280px", gap: "12px", flex: 1 }}>
-        {/* LEFT PANEL: Threads */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 12, minHeight: "calc(100vh - 140px)" }}>
         <div
           style={{
-            backgroundColor: "#1a1a1a",
-            borderRadius: "8px",
-            border: "1px solid #333",
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
+            border: "1px solid #334155",
+            background: "#0f172a",
+            color: "#cbd5e1",
+            borderRadius: 10,
+            padding: "10px 12px",
+            fontSize: 12,
           }}
         >
-          {/* Search */}
-          <div style={{ padding: "12px", borderBottom: "1px solid #333" }}>
-            <div style={{ position: "relative" }}>
-              <Search size={14} style={{ position: "absolute", left: "8px", top: "8px", color: "#666" }} />
-              <input
-                type="text"
-                placeholder="Search threads..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "8px",
-                  paddingLeft: "28px",
-                  backgroundColor: "#0f0f0f",
-                  border: "1px solid #333",
-                  borderRadius: "4px",
-                  fontSize: "12px",
-                  color: "#e0e0e0",
-                  outline: "none",
-                }}
-                onFocus={(e) => (e.currentTarget.style.borderColor = "#666")}
-                onBlur={(e) => (e.currentTarget.style.borderColor = "#333")}
-              />
-            </div>
-          </div>
-
-          {/* New Thread Button */}
-          <div style={{ padding: "8px" }}>
-            <button
-              onClick={handleNewThread}
-              style={{
-                width: "100%",
-                padding: "8px",
-                backgroundColor: "#ff6b35",
-                color: "#000",
-                border: "none",
-                borderRadius: "4px",
-                fontSize: "12px",
-                fontWeight: "600",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "6px",
-                transition: "all 0.2s",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#ff7a4a")}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#ff6b35")}
-            >
-              <Plus size={14} />
-              New Thread
-            </button>
-          </div>
-
-          {/* Threads List */}
-          <div
-            style={{
-              flex: 1,
-              overflow: "auto",
-              padding: "8px",
-            }}
-          >
-            {/* Pinned Threads */}
-            {pinnedThreads.length > 0 && (
-              <div style={{ marginBottom: "16px" }}>
-                <div style={{ fontSize: "10px", color: "#666", fontWeight: "600", padding: "8px 8px 4px 8px", textTransform: "uppercase" }}>
-                  Pinned
-                </div>
-                {pinnedThreads.map((thread) => (
-                  <ThreadItem
-                    key={thread.id}
-                    thread={thread}
-                    selected={selectedThreadId === thread.id}
-                    onSelect={setSelectedThreadId}
-                    onTogglePin={togglePin}
-                  />
-                ))}
-              </div>
-            )}
-
-            {/* All Threads */}
-            {unpinnedThreads.length > 0 && (
-              <div>
-                {pinnedThreads.length > 0 && (
-                  <div style={{ fontSize: "10px", color: "#666", fontWeight: "600", padding: "8px 8px 4px 8px", textTransform: "uppercase" }}>
-                    All
-                  </div>
-                )}
-                {unpinnedThreads.map((thread) => (
-                  <ThreadItem
-                    key={thread.id}
-                    thread={thread}
-                    selected={selectedThreadId === thread.id}
-                    onSelect={setSelectedThreadId}
-                    onTogglePin={togglePin}
-                  />
-                ))}
-              </div>
-            )}
-
-            {threads.length === 0 && (
-              <div style={{ padding: "16px", textAlign: "center", color: "#666", fontSize: "12px" }}>
-                No threads yet. Create one to start.
-              </div>
-            )}
-          </div>
+          Chat transport is not wired to backend yet. This page shows real runtime/runs/artifacts/approvals data and keeps chat actions explicitly disabled until endpoints are implemented.
         </div>
 
-        {/* CENTER PANEL: Chat */}
-        <div
-          style={{
-            backgroundColor: "#1a1a1a",
-            borderRadius: "8px",
-            border: "1px solid #333",
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
-          }}
-        >
-          {/* Header */}
-          {selectedThreadId && (
-            <div
-              style={{
-                padding: "16px",
-                borderBottom: "1px solid #333",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <h2 style={{ fontSize: "14px", fontWeight: "600", margin: 0 }}>
-                {threads.find((t) => t.id === selectedThreadId)?.title}
-              </h2>
-              <div style={{ fontSize: "12px", color: "#666" }}>
-                {messages.length} message{messages.length !== 1 ? "s" : ""}
-              </div>
+        <div style={{ display: "grid", gridTemplateColumns: "280px 1fr 320px", gap: 12, flex: 1 }}>
+          <section style={{ border: "1px solid #27272a", background: "#111827", borderRadius: 10, overflow: "hidden" }}>
+            <div style={{ padding: 12, borderBottom: "1px solid #27272a", fontWeight: 700, color: "#e2e8f0", fontSize: 13 }}>
+              Recent Runs
             </div>
-          )}
-
-          {/* Messages */}
-          <div
-            style={{
-              flex: 1,
-              overflow: "auto",
-              padding: "16px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "12px",
-            }}
-          >
-            {selectedThreadId ? (
-              messages.length > 0 ? (
-                messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    style={{
-                      display: "flex",
-                      justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
-                    }}
-                  >
-                    <div
+            <div style={{ padding: 8, maxHeight: "62vh", overflow: "auto" }}>
+              {runsQ.isLoading && <div style={{ color: "#94a3b8", fontSize: 12, padding: 8 }}>Loading runs...</div>}
+              {runsQ.isError && <div style={{ color: "#fca5a5", fontSize: 12, padding: 8 }}>Failed to load runs.</div>}
+              {!runsQ.isLoading && !runsQ.isError && runs.length === 0 && (
+                <div style={{ color: "#94a3b8", fontSize: 12, padding: 8 }}>No runs found.</div>
+              )}
+              {runs.map((run: any) => (
+                <button
+                  key={run.id}
+                  onClick={() => setSelectedRunId(run.id)}
+                  style={{
+                    width: "100%",
+                    textAlign: "left",
+                    marginBottom: 8,
+                    border: selectedRunId === run.id ? "1px solid #f97316" : "1px solid #334155",
+                    borderRadius: 8,
+                    background: selectedRunId === run.id ? "#1f2937" : "#0b1220",
+                    color: "#e2e8f0",
+                    padding: 10,
+                    cursor: "pointer",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ fontWeight: 600, fontSize: 12 }}>Run #{run.id}</div>
+                    <span
                       style={{
-                        maxWidth: "70%",
-                        padding: "12px 16px",
-                        borderRadius: "8px",
-                        backgroundColor:
-                          msg.role === "user"
-                            ? "#ff6b35"
-                            : msg.role === "agent"
-                            ? "#333"
-                            : "#222",
-                        color: msg.role === "user" ? "#000" : "#e0e0e0",
-                        fontSize: "14px",
-                        lineHeight: "1.5",
+                        fontSize: 10,
+                        borderRadius: 999,
+                        padding: "2px 8px",
+                        color: "#fff",
+                        background: badgeColor(run.status),
+                        textTransform: "uppercase",
+                        fontWeight: 700,
                       }}
                     >
-                      {msg.toolName && (
-                        <div
-                          style={{
-                            fontSize: "11px",
-                            opacity: 0.8,
-                            marginBottom: "4px",
-                            fontWeight: "600",
-                          }}
-                        >
-                          {msg.toolName}
-                        </div>
-                      )}
-                      {msg.content}
-                      <div
-                        style={{
-                          fontSize: "11px",
-                          opacity: 0.6,
-                          marginTop: "6px",
-                        }}
-                      >
-                        {msg.timestamp.toLocaleTimeString()}
-                      </div>
-                    </div>
+                      {run.status}
+                    </span>
                   </div>
-                ))
-              ) : (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    height: "100%",
-                    color: "#666",
-                    fontSize: "14px",
-                  }}
-                >
-                  Start a conversation with your agent
-                </div>
-              )
-            ) : (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  height: "100%",
-                  color: "#666",
-                  fontSize: "14px",
-                }}
-              >
-                Select or create a thread
-              </div>
-            )}
-          </div>
-
-          {/* Input */}
-          {selectedThreadId && (
-            <div
-              style={{
-                padding: "16px",
-                borderTop: "1px solid #333",
-                display: "flex",
-                gap: "8px",
-              }}
-            >
-              <input
-                type="text"
-                placeholder="Message your agent..."
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSendMessage();
-                  }
-                }}
-                style={{
-                  flex: 1,
-                  padding: "10px 12px",
-                  backgroundColor: "#0f0f0f",
-                  border: "1px solid #333",
-                  borderRadius: "4px",
-                  fontSize: "14px",
-                  color: "#e0e0e0",
-                  outline: "none",
-                }}
-                onFocus={(e) => (e.currentTarget.style.borderColor = "#666")}
-                onBlur={(e) => (e.currentTarget.style.borderColor = "#333")}
-              />
-              <button
-                onClick={handleSendMessage}
-                disabled={!inputText.trim()}
-                style={{
-                  padding: "10px 16px",
-                  backgroundColor: inputText.trim() ? "#ff6b35" : "#333",
-                  color: inputText.trim() ? "#000" : "#666",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: inputText.trim() ? "pointer" : "not-allowed",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  fontSize: "13px",
-                  fontWeight: "600",
-                  transition: "all 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  if (inputText.trim()) {
-                    e.currentTarget.style.backgroundColor = "#ff7a4a";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (inputText.trim()) {
-                    e.currentTarget.style.backgroundColor = "#ff6b35";
-                  }
-                }}
-              >
-                <Send size={14} />
-                Send
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* RIGHT PANEL: Control Panel */}
-        <div
-          style={{
-            backgroundColor: "#1a1a1a",
-            borderRadius: "8px",
-            border: "1px solid #333",
-            padding: "16px",
-            display: "flex",
-            flexDirection: "column",
-            gap: "16px",
-            overflow: "auto",
-          }}
-        >
-          {/* Brain Selector */}
-          <div>
-            <label style={{ fontSize: "12px", color: "#666", fontWeight: "600", display: "block", marginBottom: "6px" }}>
-              Brain / Model
-            </label>
-            <select
-              value={selectedBrain}
-              onChange={(e) => setSelectedBrain(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "8px 10px",
-                backgroundColor: "#0f0f0f",
-                border: "1px solid #333",
-                borderRadius: "4px",
-                fontSize: "12px",
-                color: "#e0e0e0",
-                outline: "none",
-              }}
-            >
-              <option value="claude-3.5-sonnet">Claude 3.5 Sonnet</option>
-              <option value="gpt-4o">GPT-4o</option>
-              <option value="o1">O1</option>
-            </select>
-          </div>
-
-          {/* Mode Selector */}
-          <div>
-            <label style={{ fontSize: "12px", color: "#666", fontWeight: "600", display: "block", marginBottom: "6px" }}>
-              Mode
-            </label>
-            <div style={{ display: "flex", gap: "6px", flexDirection: "column" }}>
-              {(["agent", "swarm", "research"] as const).map((m) => (
-                <button
-                  key={m}
-                  onClick={() => setMode(m)}
-                  style={{
-                    padding: "8px 10px",
-                    backgroundColor: mode === m ? "#ff6b35" : "#0f0f0f",
-                    color: mode === m ? "#000" : "#e0e0e0",
-                    border: mode === m ? "none" : "1px solid #333",
-                    borderRadius: "4px",
-                    fontSize: "12px",
-                    fontWeight: "600",
-                    cursor: "pointer",
-                    textTransform: "capitalize",
-                    transition: "all 0.2s",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (mode !== m) {
-                      e.currentTarget.style.backgroundColor = "#222";
-                      e.currentTarget.style.borderColor = "#555";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (mode !== m) {
-                      e.currentTarget.style.backgroundColor = "#0f0f0f";
-                      e.currentTarget.style.borderColor = "#333";
-                    }
-                  }}
-                >
-                  {m}
+                  <div style={{ marginTop: 6, fontSize: 11, color: "#93c5fd" }}>{String(run.goal ?? "").slice(0, 90) || "No goal"}</div>
                 </button>
               ))}
             </div>
-          </div>
+          </section>
 
-          {/* Approvals Toggle */}
-          <div>
-            <label style={{ fontSize: "12px", color: "#666", fontWeight: "600", display: "block", marginBottom: "6px" }}>
-              Approvals
-            </label>
-            <button
-              onClick={() => setApprovalsRequired(!approvalsRequired)}
-              style={{
-                width: "100%",
-                padding: "8px 10px",
-                backgroundColor: approvalsRequired ? "#22c55e" : "#333",
-                color: approvalsRequired ? "#000" : "#999",
-                border: "none",
-                borderRadius: "4px",
-                fontSize: "12px",
-                fontWeight: "600",
-                cursor: "pointer",
-                transition: "all 0.2s",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.opacity = "0.9";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.opacity = "1";
-              }}
-            >
-              {approvalsRequired ? "Required" : "Disabled"}
-            </button>
-          </div>
+          <section style={{ border: "1px solid #27272a", background: "#111827", borderRadius: 10, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+            <div style={{ padding: 12, borderBottom: "1px solid #27272a", fontWeight: 700, color: "#e2e8f0", fontSize: 13 }}>
+              Agent Chat Workspace
+            </div>
 
-          {/* Budget Limit */}
-          <div>
-            <label style={{ fontSize: "12px", color: "#666", fontWeight: "600", display: "block", marginBottom: "6px" }}>
-              Budget Limit: ${budgetLimit}
-            </label>
-            <input
-              type="range"
-              min="10"
-              max="500"
-              step="10"
-              value={budgetLimit}
-              onChange={(e) => setBudgetLimit(parseInt(e.target.value))}
-              style={{
-                width: "100%",
-              }}
-            />
-            <div style={{ fontSize: "11px", color: "#666", marginTop: "4px" }}>Per run limit</div>
-          </div>
+            <div style={{ flex: 1, padding: 16, overflow: "auto" }}>
+              <div style={{ border: "1px dashed #475569", borderRadius: 10, padding: 16, color: "#94a3b8", fontSize: 13, background: "#020617" }}>
+                <div style={{ fontWeight: 700, color: "#e2e8f0", marginBottom: 8 }}>Message Transport: Not Wired</div>
+                <div>Real-time conversation endpoints are not currently available in this repo. UI is intentionally non-mock and read-only for operational safety.</div>
+                <div style={{ marginTop: 8 }}>Use the right panel and bottom controls for run operations.</div>
+              </div>
+            </div>
 
-          {/* Timeout / Safety */}
-          <div>
-            <label style={{ fontSize: "12px", color: "#666", fontWeight: "600", display: "block", marginBottom: "6px" }}>
-              Timeout
-            </label>
-            <input
-              type="number"
-              defaultValue={300}
-              min={60}
-              max={3600}
-              style={{
-                width: "100%",
-                padding: "8px 10px",
-                backgroundColor: "#0f0f0f",
-                border: "1px solid #333",
-                borderRadius: "4px",
-                fontSize: "12px",
-                color: "#e0e0e0",
-                outline: "none",
-              }}
-            />
-            <div style={{ fontSize: "11px", color: "#666", marginTop: "4px" }}>Seconds</div>
-          </div>
+            <div style={{ borderTop: "1px solid #27272a", padding: 12, display: "flex", gap: 8 }}>
+              <textarea
+                value={composerText}
+                onChange={(e) => setComposerText(e.target.value)}
+                placeholder="Chat input disabled until backend transport is wired."
+                rows={2}
+                disabled
+                style={{
+                  flex: 1,
+                  resize: "none",
+                  borderRadius: 8,
+                  border: "1px solid #334155",
+                  background: "#0f172a",
+                  color: "#64748b",
+                  padding: 10,
+                  fontSize: 13,
+                }}
+              />
+              <button
+                disabled
+                style={{
+                  border: "1px solid #334155",
+                  background: "#1f2937",
+                  color: "#64748b",
+                  borderRadius: 8,
+                  padding: "10px 14px",
+                  fontWeight: 700,
+                  cursor: "not-allowed",
+                }}
+                title="Not wired yet"
+              >
+                Send
+              </button>
+            </div>
+          </section>
 
-          {/* Control Buttons */}
-          <div style={{ display: "flex", gap: "8px", marginTop: "auto" }}>
-            <button
-              onClick={() => setRunningStatus(runningStatus === "idle" ? "running" : "idle")}
-              style={{
-                flex: 1,
-                padding: "10px",
-                backgroundColor: runningStatus === "running" ? "#ef4444" : "#ff6b35",
-                color: "#000",
-                border: "none",
-                borderRadius: "4px",
-                fontSize: "12px",
-                fontWeight: "600",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "6px",
-                transition: "all 0.2s",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-2px)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-              }}
-            >
-              {runningStatus === "running" ? (
-                <>
-                  <Square size={14} /> Stop
-                </>
-              ) : (
-                <>
-                  <Zap size={14} /> Launch
-                </>
-              )}
-            </button>
-            <button
-              onClick={() => setRunningStatus(runningStatus === "paused" ? "running" : "paused")}
-              disabled={runningStatus === "idle"}
-              style={{
-                flex: 1,
-                padding: "10px",
-                backgroundColor: "#333",
-                color: runningStatus === "idle" ? "#666" : "#e0e0e0",
-                border: "none",
-                borderRadius: "4px",
-                fontSize: "12px",
-                fontWeight: "600",
-                cursor: runningStatus === "idle" ? "not-allowed" : "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "6px",
-                transition: "all 0.2s",
-              }}
-            >
-              <Pause size={14} /> Pause
-            </button>
-          </div>
+          <section style={{ border: "1px solid #27272a", background: "#111827", borderRadius: 10, overflow: "hidden" }}>
+            <div style={{ padding: 12, borderBottom: "1px solid #27272a", fontWeight: 700, color: "#e2e8f0", fontSize: 13 }}>
+              Run Context
+            </div>
+            <div style={{ padding: 12, fontSize: 12, color: "#cbd5e1", display: "grid", gap: 12 }}>
+              <div style={{ border: "1px solid #334155", borderRadius: 8, padding: 10, background: "#0b1220" }}>
+                <div style={{ color: "#94a3b8", marginBottom: 6 }}>Runtime Status</div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ width: 10, height: 10, borderRadius: "50%", background: runtimeColor, display: "inline-block" }} />
+                  <strong style={{ color: "#e2e8f0", textTransform: "capitalize" }}>{runtimeStatus}</strong>
+                </div>
+              </div>
+
+              <div style={{ border: "1px solid #334155", borderRadius: 8, padding: 10, background: "#0b1220" }}>
+                <div style={{ color: "#94a3b8", marginBottom: 6 }}>Selected Run</div>
+                {selectedRun ? (
+                  <div>
+                    <div style={{ fontWeight: 700 }}>#{selectedRun.id}</div>
+                    <div style={{ marginTop: 4 }}>{String(selectedRun.goal ?? "").slice(0, 140)}</div>
+                  </div>
+                ) : (
+                  <div style={{ color: "#94a3b8" }}>Select a run from left panel.</div>
+                )}
+              </div>
+
+              <div style={{ border: "1px solid #334155", borderRadius: 8, padding: 10, background: "#0b1220" }}>
+                <div style={{ color: "#94a3b8", marginBottom: 6 }}>Artifacts</div>
+                {artifactsQ.isLoading && <div>Loading artifacts...</div>}
+                {!artifactsQ.isLoading && (
+                  <div>
+                    Count: <strong>{artifactsQ.data?.total ?? 0}</strong>
+                  </div>
+                )}
+              </div>
+
+              <div style={{ border: "1px solid #334155", borderRadius: 8, padding: 10, background: "#0b1220" }}>
+                <div style={{ color: "#94a3b8", marginBottom: 6 }}>Pending Approvals</div>
+                {approvalsQ.isLoading && <div>Loading approvals...</div>}
+                {!approvalsQ.isLoading && (
+                  <div>
+                    Count: <strong>{approvalsQ.data?.total ?? 0}</strong>
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
         </div>
-      </div>
+
+        <div
+          style={{
+            position: "sticky",
+            bottom: 0,
+            zIndex: 10,
+            border: "1px solid #1f2937",
+            background: "#020617",
+            borderRadius: 10,
+            padding: 10,
+            display: "flex",
+            gap: 8,
+            flexWrap: "wrap",
+          }}
+        >
+          <button
+            onClick={() => void handleStartRun()}
+            disabled={launchRunMut.isPending}
+            style={{
+              background: "#f97316",
+              color: "#fff",
+              border: "none",
+              borderRadius: 8,
+              padding: "10px 14px",
+              fontWeight: 700,
+              cursor: launchRunMut.isPending ? "wait" : "pointer",
+            }}
+          >
+            {launchRunMut.isPending ? "Starting..." : "Start Run"}
+          </button>
+          <button
+            disabled
+            title="Stop run action is not wired on this page"
+            style={{
+              background: "#334155",
+              color: "#cbd5e1",
+              border: "none",
+              borderRadius: 8,
+              padding: "10px 14px",
+              fontWeight: 700,
+              cursor: "not-allowed",
+            }}
+          >
+            Stop Run
+          </button>
+          <button
+            onClick={handleOpenArtifacts}
+            style={{
+              background: "#1e293b",
+              color: "#e2e8f0",
+              border: "1px solid #334155",
+              borderRadius: 8,
+              padding: "10px 14px",
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >
+            Open Artifacts
+          </button>
+          <button
+            onClick={handleOpenApprovals}
+            style={{
+              background: "#1e293b",
+              color: "#e2e8f0",
+              border: "1px solid #334155",
+              borderRadius: 8,
+              padding: "10px 14px",
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >
+            Open Approvals
+          </button>
+        </div>
       </div>
     </AdminLayout>
-  );
-}
-
-interface ThreadItemProps {
-  thread: Thread;
-  selected: boolean;
-  onSelect: (id: string) => void;
-  onTogglePin: (id: string) => void;
-}
-
-function ThreadItem({ thread, selected, onSelect, onTogglePin }: ThreadItemProps) {
-  return (
-    <div
-      onClick={() => onSelect(thread.id)}
-      style={{
-        padding: "10px",
-        margin: "4px 0",
-        backgroundColor: selected ? "rgba(255, 107, 53, 0.1)" : "transparent",
-        border: selected ? "1px solid #ff6b35" : "1px solid transparent",
-        borderRadius: "4px",
-        cursor: "pointer",
-        transition: "all 0.2s",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}
-      onMouseEnter={(e) => {
-        if (!selected) {
-          e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.05)";
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (!selected) {
-          e.currentTarget.style.backgroundColor = "transparent";
-        }
-      }}
-    >
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: "13px", color: "#e0e0e0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-          {thread.title}
-        </div>
-        <div style={{ fontSize: "11px", color: "#666", marginTop: "2px" }}>
-          {new Date(thread.lastMessage).toLocaleDateString()}
-        </div>
-      </div>
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onTogglePin(thread.id);
-        }}
-        style={{
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-          color: thread.pinned ? "#ff6b35" : "#666",
-          padding: "4px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          transition: "color 0.2s",
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.color = "#ff6b35")}
-        onMouseLeave={(e) => (e.currentTarget.style.color = thread.pinned ? "#ff6b35" : "#666")}
-      >
-        <Pin size={12} fill={thread.pinned ? "currentColor" : "none"} />
-      </button>
-    </div>
   );
 }
