@@ -3,9 +3,13 @@
  *
  * Displays gap analysis results for a blueprint document.
  * Shows severity-coded gap flags with evidence details and recommended actions.
+ * Wired to real tRPC endpoints: admin.gapDetection.analyze (mutation)
+ * and admin.gapDetection.quickCheck (query).
  */
 
 import React, { useState } from "react";
+import { AdminLayout } from "../../components/AdminLayout";
+import trpc from "../../lib/trpc";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -34,60 +38,6 @@ interface GapResult {
   gap_flags: GapFlag[];
   summary: GapSummary;
 }
-
-// ---------------------------------------------------------------------------
-// Mock data
-// ---------------------------------------------------------------------------
-
-const MOCK_GAP_RESULT: GapResult = {
-  documentId: 1,
-  symbolPackId: 1,
-  estimateRunId: 1,
-  analyzedAt: new Date().toISOString(),
-  gap_flags: [
-    {
-      code: "LEGEND_HAS_UNMAPPED",
-      severity: "high",
-      message: "Legend shows device types that are not mapped.",
-      evidence: { unmapped_raw_labels: ["sym_7", "sym_12"], count: 2 },
-      recommended_action: "Map remaining classes in Symbol Mapping UI.",
-    },
-    {
-      code: "DETECTIONS_UNMAPPED",
-      severity: "medium",
-      message: "3 raw class(es) with 8 total detections have no symbol mapping.",
-      evidence: {
-        unmapped_classes: { mystery_symbol_7: 4, unknown_device_3: 3, sym_99: 1 },
-        total_unmapped: 8,
-      },
-      recommended_action: "Open Symbol Mapping and assign canonical types to unmapped classes.",
-    },
-    {
-      code: "HEAD_END_MISSING",
-      severity: "medium",
-      message: "Downstream devices detected but corresponding head-end equipment not found.",
-      evidence: {
-        missing: [
-          { device_type: "CCTV_CAMERA", requires: "IDF_RACK", count: 12 },
-          { device_type: "SMOKE_DETECTOR", requires: "FACP_PANEL", count: 24 },
-        ],
-      },
-      recommended_action: "Verify that head-end equipment (IDF racks, FACP panels) are present on the blueprints.",
-    },
-    {
-      code: "LOW_CONFIDENCE_CLUSTER",
-      severity: "high",
-      message: "1 device type(s) have high ratio of low-confidence detections.",
-      evidence: {
-        clusters: [
-          { canonical_type: "CARD_READER", total: 8, low_count: 5, low_pct: 62.5 },
-        ],
-      },
-      recommended_action: "Review overlay and adjust mapping or retrain model.",
-    },
-  ],
-  summary: { total: 4, high: 2, medium: 2, low: 0 },
-};
 
 // ---------------------------------------------------------------------------
 // Styles
@@ -166,6 +116,18 @@ const styles = {
     color: severity === "high" ? "#fca5a5" : severity === "medium" ? "#fcd34d" : "#93c5fd",
     backgroundColor: severity === "high" ? "#7f1d1d" : severity === "medium" ? "#78350f" : "#1e3a5f",
   }),
+  statusBadge: (status: string) => ({
+    display: "inline-block",
+    padding: "2px 8px",
+    borderRadius: "4px",
+    fontSize: "11px",
+    fontWeight: 600,
+    textTransform: "uppercase" as const,
+    color:
+      status === "pass" ? "#86efac" : status === "fail" ? "#fca5a5" : "#fcd34d",
+    backgroundColor:
+      status === "pass" ? "#14532d" : status === "fail" ? "#7f1d1d" : "#78350f",
+  }),
   flagCode: {
     fontSize: "13px",
     fontWeight: 600,
@@ -233,6 +195,16 @@ const styles = {
     fontWeight: 600,
     cursor: "pointer",
   } as React.CSSProperties,
+  buttonDisabled: {
+    padding: "8px 16px",
+    borderRadius: "6px",
+    border: "1px solid #52525b",
+    backgroundColor: "#3f3f46",
+    color: "#71717a",
+    fontSize: "13px",
+    fontWeight: 600,
+    cursor: "not-allowed",
+  } as React.CSSProperties,
   buttonSecondary: {
     padding: "8px 16px",
     borderRadius: "6px",
@@ -248,6 +220,53 @@ const styles = {
     color: "#22c55e",
     fontSize: "18px",
   } as React.CSSProperties,
+  input: {
+    padding: "8px 12px",
+    borderRadius: "6px",
+    border: "1px solid #3f3f46",
+    backgroundColor: "#27272a",
+    color: "#e4e4e7",
+    fontSize: "13px",
+    width: "120px",
+  } as React.CSSProperties,
+  inputRow: {
+    display: "flex",
+    gap: "12px",
+    marginBottom: "20px",
+    alignItems: "center",
+    padding: "16px",
+    borderRadius: "8px",
+    border: "1px solid #27272a",
+    backgroundColor: "#18181b",
+  } as React.CSSProperties,
+  inputLabel: {
+    fontSize: "13px",
+    color: "#a1a1aa",
+    fontWeight: 500,
+  } as React.CSSProperties,
+  emptyState: {
+    textAlign: "center" as const,
+    padding: "64px 24px",
+    color: "#71717a",
+  } as React.CSSProperties,
+  spinner: {
+    display: "inline-block",
+    width: "16px",
+    height: "16px",
+    border: "2px solid #52525b",
+    borderTopColor: "#f97316",
+    borderRadius: "50%",
+    animation: "spin 0.8s linear infinite",
+  } as React.CSSProperties,
+  errorBox: {
+    padding: "16px",
+    borderRadius: "8px",
+    border: "1px solid #7f1d1d",
+    backgroundColor: "#1c0a0a",
+    color: "#fca5a5",
+    fontSize: "14px",
+    marginBottom: "20px",
+  } as React.CSSProperties,
 };
 
 // ---------------------------------------------------------------------------
@@ -255,13 +274,52 @@ const styles = {
 // ---------------------------------------------------------------------------
 
 export default function AdminBlueprintGaps() {
-  const [result, setResult] = useState<GapResult>(MOCK_GAP_RESULT);
-  const [filterSeverity, setFilterSeverity] = useState<string>("all");
-  const [expandedFlags, setExpandedFlags] = useState<Set<number>>(new Set([0, 1, 2, 3]));
+  // Input state
+  const [documentId, setDocumentId] = useState<string>("");
+  const [symbolPackId, setSymbolPackId] = useState<string>("");
+  const [estimateRunId, setEstimateRunId] = useState<string>("");
 
-  const filtered = filterSeverity === "all"
-    ? result.gap_flags
-    : result.gap_flags.filter((f) => f.severity === filterSeverity);
+  // UI state
+  const [result, setResult] = useState<GapResult | null>(null);
+  const [filterSeverity, setFilterSeverity] = useState<string>("all");
+  const [expandedFlags, setExpandedFlags] = useState<Set<number>>(new Set());
+
+  // tRPC mutation
+  const analyzeMutation = trpc.admin.gapDetection.analyze.useMutation({
+    onSuccess: (data) => {
+      setResult(data as GapResult);
+      // Expand all flags by default
+      const allIndices = new Set(
+        (data.gap_flags as GapFlag[]).map((_: GapFlag, i: number) => i)
+      );
+      setExpandedFlags(allIndices);
+    },
+  });
+
+  const handleRunAnalysis = () => {
+    const docId = parseInt(documentId, 10);
+    const packId = parseInt(symbolPackId, 10);
+    if (isNaN(docId) || docId <= 0) return;
+    if (isNaN(packId) || packId <= 0) return;
+
+    const input: { documentId: number; symbolPackId: number; estimateRunId?: number } = {
+      documentId: docId,
+      symbolPackId: packId,
+    };
+
+    const estId = parseInt(estimateRunId, 10);
+    if (!isNaN(estId) && estId > 0) {
+      input.estimateRunId = estId;
+    }
+
+    analyzeMutation.mutate(input);
+  };
+
+  const filtered = result
+    ? filterSeverity === "all"
+      ? result.gap_flags
+      : result.gap_flags.filter((f) => f.severity === filterSeverity)
+    : [];
 
   const toggleExpand = (idx: number) => {
     setExpandedFlags((prev) => {
@@ -272,107 +330,206 @@ export default function AdminBlueprintGaps() {
     });
   };
 
+  const isFormValid =
+    !isNaN(parseInt(documentId, 10)) &&
+    parseInt(documentId, 10) > 0 &&
+    !isNaN(parseInt(symbolPackId, 10)) &&
+    parseInt(symbolPackId, 10) > 0;
+
   return (
-    <div style={styles.container}>
-      {/* Header */}
-      <div style={styles.header}>
-        <div>
-          <div style={styles.title}>Gap Detection</div>
-          <div style={styles.subtitle}>
-            Analyze blueprint for missing mappings, head-end equipment, and confidence issues
+    <AdminLayout>
+      <div style={styles.container}>
+        {/* Spinner keyframe — injected once */}
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+
+        {/* Header */}
+        <div style={styles.header}>
+          <div>
+            <div style={styles.title}>Gap Detection</div>
+            <div style={styles.subtitle}>
+              Analyze blueprint for missing mappings, head-end equipment, and confidence issues
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: "8px" }}>
+            <button style={styles.buttonSecondary} onClick={() => window.history.back()}>
+              Back
+            </button>
+            <button
+              style={isFormValid && !analyzeMutation.isPending ? styles.button : styles.buttonDisabled}
+              disabled={!isFormValid || analyzeMutation.isPending}
+              onClick={handleRunAnalysis}
+            >
+              {analyzeMutation.isPending ? "Analyzing..." : result ? "Re-analyze" : "Run Analysis"}
+            </button>
           </div>
         </div>
-        <div style={{ display: "flex", gap: "8px" }}>
-          <button style={styles.buttonSecondary} onClick={() => window.history.back()}>
-            Back
-          </button>
-          <button style={styles.button}>
-            Re-analyze
-          </button>
+
+        {/* Document ID / Symbol Pack ID input row */}
+        <div style={styles.inputRow}>
+          <label style={styles.inputLabel}>Document ID</label>
+          <input
+            style={styles.input}
+            type="number"
+            min={1}
+            placeholder="e.g. 1"
+            value={documentId}
+            onChange={(e) => setDocumentId(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && isFormValid) handleRunAnalysis();
+            }}
+          />
+          <label style={styles.inputLabel}>Symbol Pack ID</label>
+          <input
+            style={styles.input}
+            type="number"
+            min={1}
+            placeholder="e.g. 1"
+            value={symbolPackId}
+            onChange={(e) => setSymbolPackId(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && isFormValid) handleRunAnalysis();
+            }}
+          />
+          <label style={styles.inputLabel}>Estimate Run ID (optional)</label>
+          <input
+            style={{ ...styles.input, width: "140px" }}
+            type="number"
+            min={1}
+            placeholder="optional"
+            value={estimateRunId}
+            onChange={(e) => setEstimateRunId(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && isFormValid) handleRunAnalysis();
+            }}
+          />
         </div>
-      </div>
 
-      {/* Summary bar */}
-      <div style={styles.summaryBar}>
-        <div style={styles.summaryCard("high")}>
-          <div style={styles.summaryCount("high")}>{result.summary.high}</div>
-          <div style={styles.summaryLabel}>High Severity</div>
-        </div>
-        <div style={styles.summaryCard("medium")}>
-          <div style={styles.summaryCount("medium")}>{result.summary.medium}</div>
-          <div style={styles.summaryLabel}>Medium Severity</div>
-        </div>
-        <div style={styles.summaryCard("low")}>
-          <div style={styles.summaryCount("low")}>{result.summary.low}</div>
-          <div style={styles.summaryLabel}>Low Severity</div>
-        </div>
-        <div style={{ ...styles.summaryCard(""), border: "1px solid #27272a", backgroundColor: "#18181b" }}>
-          <div style={{ fontSize: "32px", fontWeight: 700, color: "#e4e4e7" }}>{result.summary.total}</div>
-          <div style={styles.summaryLabel}>Total Gaps</div>
-        </div>
-      </div>
+        {/* Error state */}
+        {analyzeMutation.isError && (
+          <div style={styles.errorBox}>
+            Analysis failed:{" "}
+            {analyzeMutation.error?.message || "Unknown error occurred. Please check the document ID and try again."}
+          </div>
+        )}
 
-      {/* Control bar */}
-      <div style={styles.controlBar}>
-        <span style={{ fontSize: "13px", color: "#a1a1aa" }}>Filter:</span>
-        <select
-          style={styles.select}
-          value={filterSeverity}
-          onChange={(e) => setFilterSeverity(e.target.value)}
-        >
-          <option value="all">All severities</option>
-          <option value="high">High only</option>
-          <option value="medium">Medium only</option>
-          <option value="low">Low only</option>
-        </select>
-        <span style={{ flex: 1 }} />
-        <span style={{ fontSize: "12px", color: "#71717a" }}>
-          Analyzed: {new Date(result.analyzedAt).toLocaleString()}
-        </span>
-      </div>
-
-      {/* Gap flags */}
-      {filtered.length === 0 ? (
-        <div style={styles.noGaps}>
-          No gaps detected. Blueprint analysis looks complete.
-        </div>
-      ) : (
-        filtered.map((flag, idx) => {
-          const globalIdx = result.gap_flags.indexOf(flag);
-          const isExpanded = expandedFlags.has(globalIdx);
-
-          return (
-            <div key={globalIdx} style={styles.flagCard}>
-              <div
-                style={{ ...styles.flagHeader, cursor: "pointer" }}
-                onClick={() => toggleExpand(globalIdx)}
-              >
-                <span style={styles.severityBadge(flag.severity)}>{flag.severity}</span>
-                <span style={styles.flagCode}>{flag.code}</span>
-                <span style={{ flex: 1 }} />
-                <span style={{ color: "#71717a", fontSize: "12px" }}>
-                  {isExpanded ? "▼" : "▶"}
-                </span>
-              </div>
-
-              <div style={styles.flagMessage}>{flag.message}</div>
-
-              {isExpanded && (
-                <>
-                  <div style={styles.evidenceBlock}>
-                    {JSON.stringify(flag.evidence, null, 2)}
-                  </div>
-
-                  <div style={styles.actionBox}>
-                    <span style={styles.actionLabel}>Action</span>
-                    <span style={styles.actionText}>{flag.recommended_action}</span>
-                  </div>
-                </>
-              )}
+        {/* Loading state */}
+        {analyzeMutation.isPending && (
+          <div style={styles.emptyState}>
+            <div style={{ marginBottom: "16px" }}>
+              <div style={styles.spinner} />
             </div>
-          );
-        })
-      )}
-    </div>
+            <div style={{ fontSize: "16px", color: "#a1a1aa" }}>
+              Running gap analysis on document {documentId}...
+            </div>
+            <div style={{ fontSize: "13px", color: "#52525b", marginTop: "8px" }}>
+              Checking rules G1 through G6
+            </div>
+          </div>
+        )}
+
+        {/* Empty state — before first analysis */}
+        {!result && !analyzeMutation.isPending && !analyzeMutation.isError && (
+          <div style={styles.emptyState}>
+            <div style={{ fontSize: "48px", marginBottom: "16px", opacity: 0.3 }}>
+              ?
+            </div>
+            <div style={{ fontSize: "16px", color: "#a1a1aa", marginBottom: "8px" }}>
+              No analysis results yet
+            </div>
+            <div style={{ fontSize: "13px", color: "#52525b" }}>
+              Enter a Document ID and Symbol Pack ID above, then click <strong style={{ color: "#f97316" }}>Run Analysis</strong> to
+              detect gaps in blueprint data.
+            </div>
+          </div>
+        )}
+
+        {/* Results */}
+        {result && !analyzeMutation.isPending && (
+          <>
+            {/* Summary bar */}
+            <div style={styles.summaryBar}>
+              <div style={styles.summaryCard("high")}>
+                <div style={styles.summaryCount("high")}>{result.summary.high}</div>
+                <div style={styles.summaryLabel}>High Severity</div>
+              </div>
+              <div style={styles.summaryCard("medium")}>
+                <div style={styles.summaryCount("medium")}>{result.summary.medium}</div>
+                <div style={styles.summaryLabel}>Medium Severity</div>
+              </div>
+              <div style={styles.summaryCard("low")}>
+                <div style={styles.summaryCount("low")}>{result.summary.low}</div>
+                <div style={styles.summaryLabel}>Low Severity</div>
+              </div>
+              <div style={{ ...styles.summaryCard(""), border: "1px solid #27272a", backgroundColor: "#18181b" }}>
+                <div style={{ fontSize: "32px", fontWeight: 700, color: "#e4e4e7" }}>{result.summary.total}</div>
+                <div style={styles.summaryLabel}>Total Gaps</div>
+              </div>
+            </div>
+
+            {/* Control bar */}
+            <div style={styles.controlBar}>
+              <span style={{ fontSize: "13px", color: "#a1a1aa" }}>Filter:</span>
+              <select
+                style={styles.select}
+                value={filterSeverity}
+                onChange={(e) => setFilterSeverity(e.target.value)}
+              >
+                <option value="all">All severities</option>
+                <option value="high">High only</option>
+                <option value="medium">Medium only</option>
+                <option value="low">Low only</option>
+              </select>
+              <span style={{ flex: 1 }} />
+              <span style={{ fontSize: "12px", color: "#71717a" }}>
+                Analyzed: {new Date(result.analyzedAt).toLocaleString()}
+              </span>
+            </div>
+
+            {/* Gap flags */}
+            {filtered.length === 0 ? (
+              <div style={styles.noGaps}>
+                No gaps detected. Blueprint analysis looks complete.
+              </div>
+            ) : (
+              filtered.map((flag, idx) => {
+                const globalIdx = result.gap_flags.indexOf(flag);
+                const isExpanded = expandedFlags.has(globalIdx);
+
+                return (
+                  <div key={globalIdx} style={styles.flagCard}>
+                    <div
+                      style={{ ...styles.flagHeader, cursor: "pointer" }}
+                      onClick={() => toggleExpand(globalIdx)}
+                    >
+                      <span style={styles.severityBadge(flag.severity)}>{flag.severity}</span>
+                      <span style={styles.flagCode}>{flag.code}</span>
+                      <span style={{ flex: 1 }} />
+                      <span style={{ color: "#71717a", fontSize: "12px" }}>
+                        {isExpanded ? "\u25BC" : "\u25B6"}
+                      </span>
+                    </div>
+
+                    <div style={styles.flagMessage}>{flag.message}</div>
+
+                    {isExpanded && (
+                      <>
+                        <div style={styles.evidenceBlock}>
+                          {JSON.stringify(flag.evidence, null, 2)}
+                        </div>
+
+                        <div style={styles.actionBox}>
+                          <span style={styles.actionLabel}>Action</span>
+                          <span style={styles.actionText}>{flag.recommended_action}</span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </>
+        )}
+      </div>
+    </AdminLayout>
   );
 }

@@ -547,40 +547,43 @@ export const mobileVoiceRouter = router({
         throw new TRPCError({ code: "NOT_FOUND", message: "Audio artifact not found." });
       }
 
-      // --- Transcription ---
-      // In production, this calls Whisper/Deepgram/AssemblyAI via the agent-stack VM tool.
-      // For now, we read the file and produce a placeholder or call OpenAI Whisper if configured.
+      // --- Transcription via OpenAI Whisper ---
+      const openaiKey = process.env.OPENAI_API_KEY;
+      if (!openaiKey) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "Transcription service not configured. Set OPENAI_API_KEY.",
+        });
+      }
+
       let transcript: string;
+      try {
+        const audioPath = path.resolve(ARTIFACTS_DIR, artifact.storagePath);
+        const audioData = fs.readFileSync(audioPath);
 
-      if (process.env.OPENAI_API_KEY) {
-        // Real transcription via OpenAI Whisper API
-        try {
-          const audioPath = path.resolve(ARTIFACTS_DIR, artifact.storagePath);
-          const audioData = fs.readFileSync(audioPath);
+        const formData = new FormData();
+        formData.append("file", new Blob([audioData], { type: artifact.mimeType ?? "audio/webm" }), artifact.filename);
+        formData.append("model", "whisper-1");
 
-          const formData = new FormData();
-          formData.append("file", new Blob([audioData], { type: artifact.mimeType ?? "audio/webm" }), artifact.filename);
-          formData.append("model", "whisper-1");
+        const resp = await fetch("https://api.openai.com/v1/audio/transcriptions", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${openaiKey}` },
+          body: formData,
+        });
 
-          const resp = await fetch("https://api.openai.com/v1/audio/transcriptions", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
-            body: formData,
-          });
-
-          if (!resp.ok) {
-            throw new Error(`Whisper API error: ${resp.status}`);
-          }
-
-          const data = (await resp.json()) as { text: string };
-          transcript = data.text;
-        } catch (err) {
-          console.error("[mobile:voice:transcribe] Whisper error:", err);
-          transcript = `[transcription failed — audio artifact ${artifact.id}]`;
+        if (!resp.ok) {
+          throw new Error(`Whisper API error: ${resp.status}`);
         }
-      } else {
-        // Placeholder when no transcription service is configured
-        transcript = `[voice note from artifact ${artifact.id} — transcription service not configured]`;
+
+        const data = (await resp.json()) as { text: string };
+        transcript = data.text;
+      } catch (err) {
+        if (err instanceof TRPCError) throw err;
+        console.error("[mobile:voice:transcribe] Whisper error:", err);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Transcription failed: ${err instanceof Error ? err.message : String(err)}`,
+        });
       }
 
       // If there's an active run, append as an event

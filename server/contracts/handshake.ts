@@ -17,6 +17,9 @@
 import { createHash } from "crypto";
 import fs from "node:fs";
 import path from "node:path";
+import { getDb } from "../db";
+import { agentRuntimeStatus } from "../db/schema";
+import { eq } from "drizzle-orm";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -56,7 +59,32 @@ export interface HandshakeResult {
 const _hashCache = new Map<string, string>();
 
 /**
+ * Deep-sort an object's keys for stable JSON serialization.
+ * Arrays preserve order; objects get sorted keys recursively.
+ */
+function sortDeep(obj: unknown): unknown {
+  if (obj === null || obj === undefined || typeof obj !== "object") return obj;
+  if (Array.isArray(obj)) return obj.map(sortDeep);
+  const sorted: Record<string, unknown> = {};
+  for (const key of Object.keys(obj as Record<string, unknown>).sort()) {
+    sorted[key] = sortDeep((obj as Record<string, unknown>)[key]);
+  }
+  return sorted;
+}
+
+/**
+ * Stable SHA-256 hash of any JSON-serializable object.
+ * Keys are deep-sorted to ensure deterministic output regardless of
+ * insertion order. This is the canonical hash function for all contracts.
+ */
+export function stableHash(obj: unknown): string {
+  return createHash("sha256").update(JSON.stringify(sortDeep(obj))).digest("hex");
+}
+
+/**
  * Compute SHA-256 hash of a contract schema file.
+ * Uses stableHash (sorted-key JSON) to guarantee deterministic output
+ * regardless of JSON formatting or key order in the file.
  * Cached per filename for the lifetime of the process.
  */
 export function computeSchemaHash(schemaFilename: string): string {
@@ -70,9 +98,8 @@ export function computeSchemaHash(schemaFilename: string): string {
   }
 
   const content = fs.readFileSync(schemaPath, "utf-8");
-  // Normalize: parse and re-stringify to ignore formatting differences
-  const normalized = JSON.stringify(JSON.parse(content));
-  const hash = createHash("sha256").update(normalized).digest("hex");
+  const parsed = JSON.parse(content);
+  const hash = stableHash(parsed);
 
   _hashCache.set(schemaFilename, hash);
   return hash;
@@ -206,6 +233,7 @@ export function getAllContractInfo() {
     vertex: registry.vertex,
     vertex_version: registry.version,
     status: registry.status,
+    manifest_hash: getManifestHash(),
     contracts: registry.contracts.map((c) => ({
       name: c.name,
       version: c.version,
@@ -213,4 +241,66 @@ export function getAllContractInfo() {
       schema_hash: computeSchemaHash(c.schema_file),
     })),
   };
+}
+
+/**
+ * Compute a stable hash of the full contract manifest (registry + all schema hashes).
+ * This is the single authoritative fingerprint for the entire contract surface.
+ */
+export function getManifestHash(): string {
+  const registry = loadRegistry();
+  const manifest = {
+    vertex: registry.vertex,
+    version: registry.version,
+    contracts: registry.contracts.map((c) => ({
+      name: c.name,
+      version: c.version,
+      schema_hash: computeSchemaHash(c.schema_file),
+    })),
+  };
+  return stableHash(manifest);
+}
+
+/**
+ * Log a handshake mismatch to the database (best-effort, never throws).
+ */
+export async function logHandshakeMismatch(
+  agentId: string,
+  agentVersion: string,
+  result: HandshakeResult
+): Promise<void> {
+  try {
+    const db = await getDb();
+    if (!db) return;
+
+    // Upsert agent runtime status to "mismatch"
+    const [existing] = await db
+      .select({ id: agentRuntimeStatus.id })
+      .from(agentRuntimeStatus)
+      .where(eq(agentRuntimeStatus.vertex, result.vertex))
+      .limit(1);
+
+    const data = {
+      vertex: result.vertex,
+      version: result.vertex_version,
+      schemaHash: getManifestHash(),
+      handshakeOk: false,
+      status: "mismatch" as const,
+      lastSeen: new Date(),
+      violations: result.mismatches.map((m) => ({
+        type: "contract_mismatch",
+        message: `${m.name} [${m.field}]: expected "${m.expected}", received "${m.received}"`,
+        detectedAt: new Date().toISOString(),
+      })),
+      metadata: { agentId, agentVersion } as Record<string, unknown>,
+    };
+
+    if (existing) {
+      await db.update(agentRuntimeStatus).set(data).where(eq(agentRuntimeStatus.id, existing.id));
+    } else {
+      await db.insert(agentRuntimeStatus).values(data);
+    }
+  } catch {
+    // best-effort logging
+  }
 }

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AdminLayout } from "../../components/AdminLayout";
+import { trpc } from "../../lib/trpc";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -7,45 +8,7 @@ import { AdminLayout } from "../../components/AdminLayout";
 
 type FeedbackStatus = "open" | "triaged" | "in_review" | "resolved" | "wont_fix";
 type Severity = "low" | "medium" | "high" | "critical";
-type Category =
-  | "wrong_output"
-  | "slow_response"
-  | "missing_capability"
-  | "config_issue"
-  | "tone_style"
-  | "hallucination"
-  | "other";
 type ProposalStatus = "proposed" | "under_review" | "approved" | "rejected" | "applied" | "rolled_back";
-
-interface FeedbackItem {
-  id: number;
-  instanceId: number;
-  instanceName?: string;
-  runId?: number | null;
-  message: string;
-  category: Category;
-  severity: Severity;
-  status: FeedbackStatus;
-  source: string;
-  submitterName?: string;
-  createdAt: string;
-}
-
-interface Proposal {
-  id: number;
-  title: string;
-  description: string;
-  changeType: string;
-  status: ProposalStatus;
-  feedbackIds: number[];
-  clusterSummary?: {
-    totalItems: number;
-    topCategories: string[];
-    severityBreakdown: Record<string, number>;
-  };
-  reviewNote?: string;
-  createdAt: string;
-}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -109,8 +72,25 @@ function StatCard({ label, value, color }: { label: string; value: number; color
   );
 }
 
+/** Parse clusterSummary — it may arrive as a JSON string or an already-parsed object. */
+function parseClusterSummary(
+  raw: unknown,
+): { totalItems: number; topCategories: string[]; severityBreakdown: Record<string, number> } | null {
+  if (!raw) return null;
+  try {
+    const obj = typeof raw === "string" ? JSON.parse(raw) : raw;
+    return {
+      totalItems: obj.totalItems ?? 0,
+      topCategories: Array.isArray(obj.topCategories) ? obj.topCategories : [],
+      severityBreakdown: obj.severityBreakdown ?? {},
+    };
+  } catch {
+    return null;
+  }
+}
+
 // ---------------------------------------------------------------------------
-// Tab components
+// Tab type
 // ---------------------------------------------------------------------------
 
 type Tab = "feedback" | "proposals" | "swarm";
@@ -123,84 +103,90 @@ export default function AdminFeedbackLoop() {
   const [activeTab, setActiveTab] = useState<Tab>("feedback");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [severityFilter, setSeverityFilter] = useState<string>("all");
+  const [swarmDays, setSwarmDays] = useState<number>(7);
+  const [swarmResult, setSwarmResult] = useState<{
+    proposalsCreated: number;
+    feedbackProcessed: number;
+    clusters: number;
+    skippedNoFeedback?: boolean;
+  } | null>(null);
 
-  // Mock data — wired to tRPC in production
-  const [feedbackItems] = useState<FeedbackItem[]>([
-    {
-      id: 1,
-      instanceId: 1,
-      instanceName: "Content Writer v2",
-      runId: 42,
-      message: "The agent produced a blog post with an incorrect product name. It said 'LaunchPad' instead of 'LaunchBase'.",
-      category: "hallucination",
-      severity: "high",
-      status: "open",
-      source: "operator_os",
-      submitterName: "Admin",
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 2,
-      instanceId: 2,
-      instanceName: "Support Bot",
-      runId: 88,
-      message: "Response time was over 30 seconds for a simple FAQ question.",
-      category: "slow_response",
-      severity: "medium",
-      status: "triaged",
-      source: "mobile",
-      submitterName: "Customer",
-      createdAt: new Date(Date.now() - 86400000).toISOString(),
-    },
-    {
-      id: 3,
-      instanceId: 1,
-      instanceName: "Content Writer v2",
-      runId: null,
-      message: "Agent doesn't understand the difference between our standard and premium tiers.",
-      category: "wrong_output",
-      severity: "high",
-      status: "open",
-      source: "operator_os",
-      submitterName: "Admin",
-      createdAt: new Date(Date.now() - 172800000).toISOString(),
-    },
-  ]);
+  // -----------------------------------------------------------------------
+  // tRPC queries
+  // -----------------------------------------------------------------------
 
-  const [proposals] = useState<Proposal[]>([
-    {
-      id: 1,
-      title: "[HIGH] hallucination — 1 report(s)",
-      description: "Cluster of 1 feedback item(s) in category \"hallucination\" with severity \"high\".\n\nRecommended action: review and apply a prompt_edit to address these issues.",
-      changeType: "prompt_edit",
-      status: "proposed",
-      feedbackIds: [1],
-      clusterSummary: { totalItems: 1, topCategories: ["hallucination"], severityBreakdown: { high: 1 } },
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 2,
-      title: "[MEDIUM] slow response — 1 report(s)",
-      description: "Cluster of 1 feedback item(s) in category \"slow_response\" with severity \"medium\".\n\nRecommended action: review and apply a config_update to address these issues.",
-      changeType: "config_update",
-      status: "approved",
-      feedbackIds: [2],
-      clusterSummary: { totalItems: 1, topCategories: ["slow_response"], severityBreakdown: { medium: 1 } },
-      reviewNote: "Approved — increase timeout and add caching.",
-      createdAt: new Date(Date.now() - 43200000).toISOString(),
-    },
-  ]);
-
-  const filteredFeedback = feedbackItems.filter((item) => {
-    if (statusFilter !== "all" && item.status !== statusFilter) return false;
-    if (severityFilter !== "all" && item.severity !== severityFilter) return false;
-    return true;
+  const feedbackQuery = trpc.admin.feedback.list.useQuery({
+    status: statusFilter !== "all" ? (statusFilter as FeedbackStatus) : undefined,
+    severity: severityFilter !== "all" ? (severityFilter as Severity) : undefined,
+    limit: 50,
   });
 
-  const openCount = feedbackItems.filter((i) => i.status === "open").length;
-  const triagedCount = feedbackItems.filter((i) => i.status === "triaged").length;
-  const proposedCount = proposals.filter((p) => p.status === "proposed").length;
-  const approvedCount = proposals.filter((p) => p.status === "approved").length;
+  const summaryQuery = trpc.admin.feedback.summary.useQuery({ sinceDaysAgo: 30 });
+
+  const proposalsQuery = trpc.admin.feedback.listProposals.useQuery({ limit: 50 });
+
+  const proposalsSummaryQuery = trpc.admin.feedback.proposalsSummary.useQuery(undefined);
+
+  // -----------------------------------------------------------------------
+  // tRPC mutations
+  // -----------------------------------------------------------------------
+
+  const updateStatusMut = trpc.admin.feedback.updateStatus.useMutation({
+    onSuccess: () => {
+      feedbackQuery.refetch();
+      summaryQuery.refetch();
+    },
+  });
+
+  const reviewProposalMut = trpc.admin.feedback.reviewProposal.useMutation({
+    onSuccess: () => {
+      proposalsQuery.refetch();
+      proposalsSummaryQuery.refetch();
+    },
+  });
+
+  const applyProposalMut = trpc.admin.feedback.applyProposal.useMutation({
+    onSuccess: () => {
+      proposalsQuery.refetch();
+      proposalsSummaryQuery.refetch();
+    },
+  });
+
+  const triggerSwarmMut = trpc.admin.feedback.triggerImprovementSwarm.useMutation({
+    onSuccess: (data) => {
+      setSwarmResult({
+        proposalsCreated: (data as any).proposalCount ?? 0,
+        feedbackProcessed: (data as any).feedbackProcessed ?? 0,
+        clusters: (data as any).clusterCount ?? 0,
+        skippedNoFeedback: (data as any).swarmRunId === null,
+      });
+      feedbackQuery.refetch();
+      summaryQuery.refetch();
+      proposalsQuery.refetch();
+      proposalsSummaryQuery.refetch();
+    },
+  });
+
+  // -----------------------------------------------------------------------
+  // Derived data
+  // -----------------------------------------------------------------------
+
+  const feedbackItems = feedbackQuery.data?.items ?? [];
+
+  const proposals = proposalsQuery.data?.proposals ?? [];
+
+  // Summary-based stat cards
+  const summaryData = summaryQuery.data;
+  const openCount =
+    summaryData?.byStatus?.find((s: { status: string; count: number }) => s.status === "open")?.count ?? 0;
+  const triagedCount =
+    summaryData?.byStatus?.find((s: { status: string; count: number }) => s.status === "triaged")?.count ?? 0;
+
+  const pSummary = proposalsSummaryQuery.data;
+  const proposedCount =
+    pSummary?.byStatus?.find((s: { status: string; count: number }) => s.status === "proposed")?.count ?? 0;
+  const approvedCount =
+    pSummary?.byStatus?.find((s: { status: string; count: number }) => s.status === "approved")?.count ?? 0;
 
   const tabStyle = (tab: Tab) => ({
     padding: "8px 20px",
@@ -291,44 +277,107 @@ export default function AdminFeedbackLoop() {
             </div>
 
             {/* Feedback list */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {filteredFeedback.length === 0 && (
-                <div style={{ color: "#888", padding: 32, textAlign: "center" }}>
-                  No feedback items match the current filters.
-                </div>
-              )}
-              {filteredFeedback.map((item) => (
-                <div
-                  key={item.id}
-                  style={{
-                    background: "#18181b",
-                    border: "1px solid #27272a",
-                    borderRadius: 12,
-                    padding: 16,
-                  }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
-                    <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-                      <Badge label={item.severity} color={SEVERITY_COLORS[item.severity]} />
-                      <Badge label={item.category} color="#6366f1" />
-                      <Badge label={item.status} color={STATUS_COLORS[item.status] ?? "#888"} />
-                      <span style={{ fontSize: 12, color: "#666" }}>via {item.source.replace(/_/g, " ")}</span>
+            {feedbackQuery.isLoading ? (
+              <div style={{ color: "#888", padding: 32, textAlign: "center" }}>Loading...</div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {feedbackItems.length === 0 && (
+                  <div style={{ color: "#888", padding: 32, textAlign: "center" }}>
+                    No feedback items match the current filters.
+                  </div>
+                )}
+                {feedbackItems.map((item: any) => (
+                  <div
+                    key={item.id}
+                    style={{
+                      background: "#18181b",
+                      border: "1px solid #27272a",
+                      borderRadius: 12,
+                      padding: 16,
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+                      <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                        <Badge label={item.severity} color={SEVERITY_COLORS[item.severity as Severity] ?? "#888"} />
+                        <Badge label={item.category} color="#6366f1" />
+                        <Badge label={item.status} color={STATUS_COLORS[item.status] ?? "#888"} />
+                        <span style={{ fontSize: 12, color: "#666" }}>via {(item.source ?? "").replace(/_/g, " ")}</span>
+                      </div>
+                      <span style={{ fontSize: 12, color: "#555" }}>
+                        #{item.id} &middot; {new Date(item.createdAt).toLocaleDateString()}
+                      </span>
                     </div>
-                    <span style={{ fontSize: 12, color: "#555" }}>
-                      #{item.id} &middot; {new Date(item.createdAt).toLocaleDateString()}
-                    </span>
+                    <p style={{ margin: "0 0 8px 0", color: "#e4e4e7", fontSize: 14, lineHeight: 1.5 }}>
+                      {item.message}
+                    </p>
+                    <div style={{ fontSize: 12, color: "#666" }}>
+                      Instance: <strong style={{ color: "#a1a1aa" }}>{item.submitterName ?? `#${item.instanceId}`}</strong>
+                      {item.runId && <> &middot; Run #{item.runId}</>}
+                      {item.submitterName && <> &middot; By {item.submitterName}</>}
+                    </div>
+
+                    {/* Status update buttons */}
+                    {(item.status === "open" || item.status === "triaged") && (
+                      <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+                        {item.status === "open" && (
+                          <button
+                            onClick={() => updateStatusMut.mutate({ id: item.id, status: "triaged" })}
+                            disabled={updateStatusMut.isPending}
+                            style={{
+                              background: "#8b5cf6",
+                              color: "#fff",
+                              border: "none",
+                              borderRadius: 8,
+                              padding: "6px 16px",
+                              fontSize: 13,
+                              fontWeight: 600,
+                              cursor: "pointer",
+                              opacity: updateStatusMut.isPending ? 0.6 : 1,
+                            }}
+                          >
+                            {updateStatusMut.isPending ? "Updating..." : "Triage"}
+                          </button>
+                        )}
+                        <button
+                          onClick={() => updateStatusMut.mutate({ id: item.id, status: "in_review" })}
+                          disabled={updateStatusMut.isPending}
+                          style={{
+                            background: "#f59e0b",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: 8,
+                            padding: "6px 16px",
+                            fontSize: 13,
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            opacity: updateStatusMut.isPending ? 0.6 : 1,
+                          }}
+                        >
+                          {updateStatusMut.isPending ? "Updating..." : "Mark In Review"}
+                        </button>
+                        <button
+                          onClick={() => updateStatusMut.mutate({ id: item.id, status: "resolved" })}
+                          disabled={updateStatusMut.isPending}
+                          style={{
+                            background: "#10b981",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: 8,
+                            padding: "6px 16px",
+                            fontSize: 13,
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            opacity: updateStatusMut.isPending ? 0.6 : 1,
+                          }}
+                        >
+                          {updateStatusMut.isPending ? "Updating..." : "Resolve"}
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  <p style={{ margin: "0 0 8px 0", color: "#e4e4e7", fontSize: 14, lineHeight: 1.5 }}>
-                    {item.message}
-                  </p>
-                  <div style={{ fontSize: 12, color: "#666" }}>
-                    Instance: <strong style={{ color: "#a1a1aa" }}>{item.instanceName}</strong>
-                    {item.runId && <> &middot; Run #{item.runId}</>}
-                    {item.submitterName && <> &middot; By {item.submitterName}</>}
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -341,102 +390,118 @@ export default function AdminFeedbackLoop() {
               Proposals generated by the swarm analysis. Each must be <strong style={{ color: "#10b981" }}>reviewed and approved</strong> before it can be applied (promotion gate).
             </p>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {proposals.length === 0 && (
-                <div style={{ color: "#888", padding: 32, textAlign: "center" }}>
-                  No improvement proposals yet. Run a swarm analysis to generate proposals.
-                </div>
-              )}
-              {proposals.map((proposal) => (
-                <div
-                  key={proposal.id}
-                  style={{
-                    background: "#18181b",
-                    border: "1px solid #27272a",
-                    borderRadius: 12,
-                    padding: 16,
-                  }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
-                    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                      <Badge label={proposal.status} color={STATUS_COLORS[proposal.status] ?? "#888"} />
-                      <Badge label={proposal.changeType.replace(/_/g, " ")} color="#8b5cf6" />
-                    </div>
-                    <span style={{ fontSize: 12, color: "#555" }}>
-                      #{proposal.id} &middot; {new Date(proposal.createdAt).toLocaleDateString()}
-                    </span>
+            {proposalsQuery.isLoading ? (
+              <div style={{ color: "#888", padding: 32, textAlign: "center" }}>Loading...</div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {proposals.length === 0 && (
+                  <div style={{ color: "#888", padding: 32, textAlign: "center" }}>
+                    No improvement proposals yet. Run a swarm analysis to generate proposals.
                   </div>
-                  <h3 style={{ margin: "0 0 6px 0", fontSize: 15, fontWeight: 600, color: "#e4e4e7" }}>
-                    {proposal.title}
-                  </h3>
-                  <p style={{ margin: "0 0 8px 0", color: "#a1a1aa", fontSize: 13, lineHeight: 1.5, whiteSpace: "pre-line" }}>
-                    {proposal.description}
-                  </p>
-                  {proposal.clusterSummary && (
-                    <div style={{ fontSize: 12, color: "#666", marginBottom: 8 }}>
-                      {proposal.clusterSummary.totalItems} feedback item(s) &middot; Categories: {proposal.clusterSummary.topCategories.join(", ")}
-                    </div>
-                  )}
-                  {proposal.reviewNote && (
-                    <div style={{ fontSize: 12, color: "#10b981", fontStyle: "italic" }}>
-                      Review: {proposal.reviewNote}
-                    </div>
-                  )}
+                )}
+                {proposals.map((proposal: any) => {
+                  const cluster = parseClusterSummary(proposal.clusterSummary);
+                  return (
+                    <div
+                      key={proposal.id}
+                      style={{
+                        background: "#18181b",
+                        border: "1px solid #27272a",
+                        borderRadius: 12,
+                        padding: 16,
+                      }}
+                    >
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+                        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                          <Badge label={proposal.status} color={STATUS_COLORS[proposal.status] ?? "#888"} />
+                          <Badge label={(proposal.changeType ?? "").replace(/_/g, " ")} color="#8b5cf6" />
+                        </div>
+                        <span style={{ fontSize: 12, color: "#555" }}>
+                          #{proposal.id} &middot; {new Date(proposal.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <h3 style={{ margin: "0 0 6px 0", fontSize: 15, fontWeight: 600, color: "#e4e4e7" }}>
+                        {proposal.title}
+                      </h3>
+                      <p style={{ margin: "0 0 8px 0", color: "#a1a1aa", fontSize: 13, lineHeight: 1.5, whiteSpace: "pre-line" }}>
+                        {proposal.description}
+                      </p>
+                      {cluster && (
+                        <div style={{ fontSize: 12, color: "#666", marginBottom: 8 }}>
+                          {cluster.totalItems} feedback item(s) &middot; Categories: {cluster.topCategories.join(", ")}
+                        </div>
+                      )}
+                      {proposal.reviewNote && (
+                        <div style={{ fontSize: 12, color: "#10b981", fontStyle: "italic" }}>
+                          Review: {proposal.reviewNote}
+                        </div>
+                      )}
 
-                  {/* Action buttons (promotion gate) */}
-                  {(proposal.status === "proposed" || proposal.status === "under_review") && (
-                    <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-                      <button
-                        style={{
-                          background: "#10b981",
-                          color: "#fff",
-                          border: "none",
-                          borderRadius: 8,
-                          padding: "6px 16px",
-                          fontSize: 13,
-                          fontWeight: 600,
-                          cursor: "pointer",
-                        }}
-                      >
-                        Approve
-                      </button>
-                      <button
-                        style={{
-                          background: "#ef4444",
-                          color: "#fff",
-                          border: "none",
-                          borderRadius: 8,
-                          padding: "6px 16px",
-                          fontSize: 13,
-                          fontWeight: 600,
-                          cursor: "pointer",
-                        }}
-                      >
-                        Reject
-                      </button>
+                      {/* Action buttons (promotion gate) */}
+                      {(proposal.status === "proposed" || proposal.status === "under_review") && (
+                        <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+                          <button
+                            onClick={() => reviewProposalMut.mutate({ id: proposal.id, decision: "approved" })}
+                            disabled={reviewProposalMut.isPending}
+                            style={{
+                              background: "#10b981",
+                              color: "#fff",
+                              border: "none",
+                              borderRadius: 8,
+                              padding: "6px 16px",
+                              fontSize: 13,
+                              fontWeight: 600,
+                              cursor: "pointer",
+                              opacity: reviewProposalMut.isPending ? 0.6 : 1,
+                            }}
+                          >
+                            {reviewProposalMut.isPending ? "Saving..." : "Approve"}
+                          </button>
+                          <button
+                            onClick={() => reviewProposalMut.mutate({ id: proposal.id, decision: "rejected" })}
+                            disabled={reviewProposalMut.isPending}
+                            style={{
+                              background: "#ef4444",
+                              color: "#fff",
+                              border: "none",
+                              borderRadius: 8,
+                              padding: "6px 16px",
+                              fontSize: 13,
+                              fontWeight: 600,
+                              cursor: "pointer",
+                              opacity: reviewProposalMut.isPending ? 0.6 : 1,
+                            }}
+                          >
+                            {reviewProposalMut.isPending ? "Saving..." : "Reject"}
+                          </button>
+                        </div>
+                      )}
+                      {proposal.status === "approved" && (
+                        <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+                          <button
+                            onClick={() => applyProposalMut.mutate({ id: proposal.id })}
+                            disabled={applyProposalMut.isPending}
+                            style={{
+                              background: "#059669",
+                              color: "#fff",
+                              border: "none",
+                              borderRadius: 8,
+                              padding: "6px 16px",
+                              fontSize: 13,
+                              fontWeight: 600,
+                              cursor: "pointer",
+                              opacity: applyProposalMut.isPending ? 0.6 : 1,
+                            }}
+                          >
+                            {applyProposalMut.isPending ? "Applying..." : "Apply Patch"}
+                          </button>
+                        </div>
+                      )}
                     </div>
-                  )}
-                  {proposal.status === "approved" && (
-                    <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-                      <button
-                        style={{
-                          background: "#059669",
-                          color: "#fff",
-                          border: "none",
-                          borderRadius: 8,
-                          padding: "6px 16px",
-                          fontSize: 13,
-                          fontWeight: 600,
-                          cursor: "pointer",
-                        }}
-                      >
-                        Apply Patch
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 
@@ -472,6 +537,8 @@ export default function AdminFeedbackLoop() {
                     Time window (days)
                   </label>
                   <select
+                    value={String(swarmDays)}
+                    onChange={(e) => setSwarmDays(Number(e.target.value))}
                     style={{
                       background: "#09090b",
                       border: "1px solid #27272a",
@@ -480,7 +547,6 @@ export default function AdminFeedbackLoop() {
                       padding: "6px 12px",
                       fontSize: 13,
                     }}
-                    defaultValue="7"
                   >
                     <option value="7">Last 7 days</option>
                     <option value="14">Last 14 days</option>
@@ -490,18 +556,24 @@ export default function AdminFeedbackLoop() {
               </div>
 
               <button
+                onClick={() => {
+                  setSwarmResult(null);
+                  triggerSwarmMut.mutate({ sinceDaysAgo: swarmDays });
+                }}
+                disabled={triggerSwarmMut.isPending}
                 style={{
-                  background: "#3b82f6",
+                  background: triggerSwarmMut.isPending ? "#2563eb" : "#3b82f6",
                   color: "#fff",
                   border: "none",
                   borderRadius: 8,
                   padding: "10px 28px",
                   fontSize: 14,
                   fontWeight: 600,
-                  cursor: "pointer",
+                  cursor: triggerSwarmMut.isPending ? "wait" : "pointer",
+                  opacity: triggerSwarmMut.isPending ? 0.7 : 1,
                 }}
               >
-                Run Improvement Swarm
+                {triggerSwarmMut.isPending ? "Running Swarm..." : "Run Improvement Swarm"}
               </button>
 
               <p style={{ fontSize: 12, color: "#555", margin: "12px 0 0 0" }}>
@@ -509,14 +581,97 @@ export default function AdminFeedbackLoop() {
               </p>
             </div>
 
-            {/* Recent swarm runs */}
+            {/* Swarm result */}
+            {swarmResult && (
+              <div
+                style={{
+                  marginTop: 16,
+                  background: "#18181b",
+                  border: "1px solid #27272a",
+                  borderRadius: 12,
+                  padding: 20,
+                }}
+              >
+                <h4 style={{ fontSize: 14, fontWeight: 600, color: "#10b981", margin: "0 0 12px 0" }}>
+                  Swarm Completed
+                </h4>
+                {swarmResult.skippedNoFeedback ? (
+                  <p style={{ fontSize: 13, color: "#888", margin: 0 }}>
+                    No open feedback found in the selected time window. Nothing to process.
+                  </p>
+                ) : (
+                  <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+                    <div>
+                      <div style={{ fontSize: 12, color: "#888" }}>Feedback Processed</div>
+                      <div style={{ fontSize: 22, fontWeight: 700, color: "#fff" }}>{swarmResult.feedbackProcessed}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 12, color: "#888" }}>Clusters Found</div>
+                      <div style={{ fontSize: 22, fontWeight: 700, color: "#fff" }}>{swarmResult.clusters}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 12, color: "#888" }}>Proposals Created</div>
+                      <div style={{ fontSize: 22, fontWeight: 700, color: "#fff" }}>{swarmResult.proposalsCreated}</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Swarm error */}
+            {triggerSwarmMut.isError && (
+              <div
+                style={{
+                  marginTop: 16,
+                  background: "#18181b",
+                  border: "1px solid #ef4444",
+                  borderRadius: 12,
+                  padding: 16,
+                  color: "#ef4444",
+                  fontSize: 13,
+                }}
+              >
+                Error: {triggerSwarmMut.error?.message ?? "Failed to run improvement swarm."}
+              </div>
+            )}
+
+            {/* Recent proposals (quick view) */}
             <div style={{ marginTop: 24 }}>
               <h3 style={{ fontSize: 15, fontWeight: 600, color: "#e4e4e7", margin: "0 0 12px 0" }}>
                 Recent Swarm Runs
               </h3>
-              <div style={{ color: "#666", fontSize: 13 }}>
-                No improvement swarm runs yet. Click &quot;Run Improvement Swarm&quot; to start.
-              </div>
+              {proposalsSummaryQuery.isLoading ? (
+                <div style={{ color: "#666", fontSize: 13 }}>Loading...</div>
+              ) : (pSummary?.recentProposed ?? []).length === 0 ? (
+                <div style={{ color: "#666", fontSize: 13 }}>
+                  No improvement swarm runs yet. Click &quot;Run Improvement Swarm&quot; to start.
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {(pSummary?.recentProposed ?? []).map((p: any) => (
+                    <div
+                      key={p.id}
+                      style={{
+                        background: "#09090b",
+                        border: "1px solid #27272a",
+                        borderRadius: 8,
+                        padding: "10px 14px",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                        <Badge label={p.status} color={STATUS_COLORS[p.status] ?? "#888"} />
+                        <span style={{ fontSize: 13, color: "#e4e4e7" }}>{p.title}</span>
+                      </div>
+                      <span style={{ fontSize: 12, color: "#555" }}>
+                        {new Date(p.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}

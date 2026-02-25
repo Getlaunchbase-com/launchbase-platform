@@ -21,10 +21,10 @@ export async function createSMICheckoutSession(
 
   if (!stripeKey) {
     console.log("[stripe/smi] (dev) Would create SMI checkout session for:", email);
-    const mockId = `cs_smi_dev_${Date.now()}`;
+    const devId = `cs_smi_dev_${Date.now()}`;
     return {
-      sessionId: mockId,
-      url: `${successUrl}?session_id=${mockId}`,
+      sessionId: devId,
+      url: `${successUrl}?session_id=${devId}`,
     };
   }
 
@@ -87,7 +87,7 @@ export async function getSMISubscriptionStatus(
   const stripeKey = process.env.STRIPE_SECRET_KEY;
 
   if (!stripeKey) {
-    // Dev mode: return mock active subscription
+    // Dev passthrough — no Stripe key, report inactive
     return {
       active: false,
       currentPeriodEnd: undefined,

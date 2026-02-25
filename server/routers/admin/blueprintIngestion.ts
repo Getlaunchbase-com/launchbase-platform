@@ -37,6 +37,23 @@ import {
 const ARTIFACTS_DIR =
   process.env.ARTIFACTS_DIR || path.resolve(process.cwd(), "artifacts");
 
+/** Clamp a bbox coordinate to normalized 0-1 range */
+function clampNorm(v: number): number {
+  return Math.max(0, Math.min(1, v));
+}
+
+/** Mark a document as failed with an error message */
+async function markFailed(db: any, documentId: number, errorMessage: string) {
+  try {
+    await db
+      .update(blueprintDocuments)
+      .set({ status: "failed", errorMessage })
+      .where(eq(blueprintDocuments.id, documentId));
+  } catch {
+    // best-effort
+  }
+}
+
 function ensureDir(dir: string) {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
@@ -459,7 +476,24 @@ export const blueprintIngestionRouter = router({
   // 5. Full pipeline trigger — upload → parse → detect (orchestration)
   // =========================================================================
 
-  /** Run the full ingestion pipeline on a document */
+  /**
+   * Run the full ingestion pipeline on a document.
+   *
+   * Orchestration flow:
+   *   1. Mark document as "parsing"
+   *   2. Call agent-stack POST /tools/blueprint-parse with document artifact
+   *   3. Validate agent response against BlueprintParseV1 schema
+   *   4. Store pages (with rendered images if provided)
+   *   5. Store text blocks with normalized bboxes
+   *   6. Call agent-stack POST /tools/blueprint-detect for symbol detection
+   *   7. Store raw detections with normalized bboxes
+   *   8. Store legend candidates
+   *   9. Persist contract metadata on the document
+   *  10. Mark document as "detection_complete" (ready)
+   *
+   * Platform does NOT compute — it orchestrates agent tool calls
+   * and validates + stores the results.
+   */
   runPipeline: adminProcedure
     .input(
       z.object({
@@ -468,43 +502,341 @@ export const blueprintIngestionRouter = router({
     )
     .mutation(async ({ input }) => {
       const db = await getDb();
-      if (!db) throw new Error("Database unavailable");
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
 
-      // Verify document exists
+      const AGENT_URL = process.env.AGENT_STACK_URL ?? "http://localhost:4100";
+      const AGENT_TIMEOUT = 120_000; // 2 min per tool call
+
+      // --- 1. Load and validate document ---
       const [doc] = await db
         .select()
         .from(blueprintDocuments)
         .where(eq(blueprintDocuments.id, input.documentId))
         .limit(1);
-      if (!doc) throw new Error("Document not found");
 
-      // Mark as parsing
+      if (!doc) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Document not found" });
+      }
+
+      if (!doc.artifactId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Document has no linked artifact. Upload a file first.",
+        });
+      }
+
+      // Load artifact to get storage path
+      const [artifact] = await db
+        .select()
+        .from(agentArtifacts)
+        .where(eq(agentArtifacts.id, doc.artifactId))
+        .limit(1);
+
+      if (!artifact) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Linked artifact not found" });
+      }
+
+      // --- 2. Mark as parsing ---
       await db
         .update(blueprintDocuments)
         .set({ status: "parsing" })
         .where(eq(blueprintDocuments.id, input.documentId));
 
-      // In production, this would:
-      //   1. Call a VM parse tool (e.g. pdf2image, pdfplumber, or cloud vision API)
-      //   2. Extract pages → render images → store as blueprint_pages
-      //   3. Run OCR/text extraction → store as blueprint_text_blocks
-      //   4. Run symbol detection model → store as blueprint_detections_raw
-      //   5. Extract legend entries → store as blueprint_legend_entries
-      //
-      // For now, we create a placeholder pipeline run record and mark as parsed.
-      // The actual parse + detection calls are made through the individual
-      // addPages, addTextBlocks, addDetections endpoints.
+      try {
+        // --- 3. Call agent-stack: parse ---
+        const parseController = new AbortController();
+        const parseTimeout = setTimeout(() => parseController.abort(), AGENT_TIMEOUT);
 
-      await db
-        .update(blueprintDocuments)
-        .set({ status: "parsed" })
-        .where(eq(blueprintDocuments.id, input.documentId));
+        let parseResp: Response;
+        try {
+          parseResp = await fetch(`${AGENT_URL}/tools/blueprint-parse`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              document_id: input.documentId,
+              artifact_path: artifact.storagePath,
+              storage_backend: artifact.storageBackend,
+              filename: doc.filename,
+              mime_type: doc.mimeType,
+              project_id: doc.projectId,
+            }),
+            signal: parseController.signal,
+          });
+        } finally {
+          clearTimeout(parseTimeout);
+        }
 
-      return {
-        documentId: input.documentId,
-        status: "parsed",
-        message: "Pipeline initialized. Use addPages, addTextBlocks, and addDetections to populate data.",
-      };
+        if (!parseResp.ok) {
+          const errBody = await parseResp.text().catch(() => "");
+          await markFailed(db, input.documentId, `Agent parse failed: HTTP ${parseResp.status} — ${errBody}`);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: `Agent blueprint-parse returned ${parseResp.status}`,
+          });
+        }
+
+        const parseOutput = await parseResp.json();
+
+        // --- 4. Validate against BlueprintParseV1 schema ---
+        const validation = validateBlueprintParseV1(parseOutput);
+        if (!validation.valid) {
+          await markFailed(db, input.documentId,
+            `BlueprintParseV1 validation failed: ${validation.errors.map((e) => e.message).join("; ")}`);
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `Agent output failed BlueprintParseV1 validation: ${validation.errors.length} error(s)`,
+            cause: { errors: validation.errors.slice(0, 20) },
+          });
+        }
+
+        const parsed = parseOutput as BlueprintParseV1Output;
+
+        // Enforce contract identity
+        if (parsed.contract.name !== "BlueprintParseV1") {
+          await markFailed(db, input.documentId, `Wrong contract name: ${parsed.contract.name}`);
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `Expected contract "BlueprintParseV1", got "${parsed.contract.name}"`,
+          });
+        }
+
+        if (!/^1\.\d+\.\d+$/.test(parsed.contract.version)) {
+          await markFailed(db, input.documentId, `Bad contract version: ${parsed.contract.version}`);
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `Contract version must match ^1.x.x, got "${parsed.contract.version}"`,
+          });
+        }
+
+        // --- 4b. Verify schema hash matches platform (drift detection) ---
+        const platformHash = getSchemaHash();
+        if (parsed.contract.schema_hash !== platformHash) {
+          await markFailed(db, input.documentId,
+            `Schema hash mismatch: agent=${parsed.contract.schema_hash.slice(0, 16)}… platform=${platformHash.slice(0, 16)}…`);
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Contract schema hash mismatch — agent and platform schemas have drifted. Redeploy or update contracts.",
+          });
+        }
+
+        // --- 5. Store pages ---
+        const pageIdMap = new Map<number, number>();
+
+        for (const page of parsed.pages) {
+          let imageStoragePath: string | null = null;
+
+          if (page.image_artifact_path) {
+            imageStoragePath = page.image_artifact_path;
+          }
+
+          const [result] = await db.insert(blueprintPages).values({
+            documentId: input.documentId,
+            pageNumber: page.page_number,
+            label: page.label ?? null,
+            imageStoragePath,
+            imageWidth: page.width_px,
+            imageHeight: page.height_px,
+            meta: null,
+          });
+          pageIdMap.set(page.page_number, result.insertId);
+        }
+
+        // --- 6. Store text blocks (normalized bboxes 0-1) ---
+        if (parsed.text_blocks.length > 0) {
+          const textBlockValues = parsed.text_blocks.map((tb) => ({
+            pageId: pageIdMap.get(tb.page) ?? 0,
+            x: clampNorm(tb.bbox.x),
+            y: clampNorm(tb.bbox.y),
+            w: clampNorm(tb.bbox.w),
+            h: clampNorm(tb.bbox.h),
+            text: tb.text,
+            confidence: tb.confidence,
+            blockType: tb.type as "title" | "label" | "dimension" | "note" | "legend_text" | "other",
+          }));
+
+          for (let i = 0; i < textBlockValues.length; i += 100) {
+            await db.insert(blueprintTextBlocks).values(textBlockValues.slice(i, i + 100));
+          }
+
+          for (const pageId of pageIdMap.values()) {
+            await db
+              .update(blueprintPages)
+              .set({ textExtracted: true })
+              .where(eq(blueprintPages.id, pageId));
+          }
+        }
+
+        // --- 7. Store legend candidates ---
+        if (parsed.legend_candidates.length > 0) {
+          await db.insert(blueprintLegendEntries).values(
+            parsed.legend_candidates.map((lc) => ({
+              documentId: input.documentId,
+              pageId: pageIdMap.get(lc.page) ?? null,
+              symbolDescription: lc.symbol_description ?? lc.method,
+              rawLabel: lc.raw_label ?? "unknown",
+              x: clampNorm(lc.bbox.x),
+              y: clampNorm(lc.bbox.y),
+              w: clampNorm(lc.bbox.w),
+              h: clampNorm(lc.bbox.h),
+            }))
+          );
+        }
+
+        // --- 8. Update document status to "parsed" + store contract metadata ---
+        await db
+          .update(blueprintDocuments)
+          .set({
+            pageCount: parsed.document.page_count,
+            status: "parsed",
+            parseContractName: parsed.contract.name,
+            parseContractVersion: parsed.contract.version,
+            parseSchemaHash: parsed.contract.schema_hash,
+            parseProducerJson: parsed.contract.producer as any,
+            parsedAt: new Date(),
+          })
+          .where(eq(blueprintDocuments.id, input.documentId));
+
+        // --- 9. Call agent-stack: symbol detection ---
+        const detectController = new AbortController();
+        const detectTimeout = setTimeout(() => detectController.abort(), AGENT_TIMEOUT);
+
+        let detections: Array<{
+          page_number: number;
+          x: number; y: number; w: number; h: number;
+          raw_class: string;
+          confidence: number;
+        }> = [];
+
+        let detectResp: Response;
+        try {
+          detectResp = await fetch(`${AGENT_URL}/tools/blueprint-detect`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              document_id: input.documentId,
+              pages: parsed.pages.map((p) => ({
+                page_number: p.page_number,
+                image_path: p.image_artifact_path,
+                width_px: p.width_px,
+                height_px: p.height_px,
+              })),
+              project_id: doc.projectId,
+            }),
+            signal: detectController.signal,
+          });
+          clearTimeout(detectTimeout);
+        } catch (detectErr) {
+          clearTimeout(detectTimeout);
+          await markFailed(db, input.documentId, `Detection call failed: ${(detectErr as Error).message}`);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: `Agent blueprint-detect call failed: ${(detectErr as Error).message}`,
+          });
+        }
+
+        if (!detectResp.ok) {
+          const errBody = await detectResp.text().catch(() => "");
+          await markFailed(db, input.documentId, `Detection failed: HTTP ${detectResp.status} — ${errBody}`);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: `Agent blueprint-detect returned ${detectResp.status}`,
+          });
+        }
+
+        const detectData = await detectResp.json();
+
+        // --- 9b. Validate detection output structure ---
+        if (!detectData || !Array.isArray(detectData.detections)) {
+          await markFailed(db, input.documentId, "Detection output missing 'detections' array");
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Agent detection output is invalid — missing 'detections' array",
+          });
+        }
+
+        for (let i = 0; i < Math.min(detectData.detections.length, 10); i++) {
+          const d = detectData.detections[i];
+          if (typeof d.page_number !== "number" || typeof d.x !== "number" ||
+              typeof d.y !== "number" || typeof d.w !== "number" ||
+              typeof d.h !== "number" || typeof d.raw_class !== "string" ||
+              typeof d.confidence !== "number") {
+            await markFailed(db, input.documentId,
+              `Detection[${i}] has invalid structure — missing required fields`);
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: `Agent detection output[${i}] is malformed — required: page_number, x, y, w, h, raw_class, confidence`,
+            });
+          }
+        }
+
+        detections = detectData.detections;
+
+        // --- 10. Store raw detections with normalized bboxes ---
+        if (detections.length > 0) {
+          await db
+            .update(blueprintDocuments)
+            .set({ status: "detection_running" })
+            .where(eq(blueprintDocuments.id, input.documentId));
+
+          const detectionValues = detections.map((d) => ({
+            pageId: pageIdMap.get(d.page_number) ?? 0,
+            documentId: input.documentId,
+            x: clampNorm(d.x),
+            y: clampNorm(d.y),
+            w: clampNorm(d.w),
+            h: clampNorm(d.h),
+            rawClass: d.raw_class,
+            confidence: Math.max(0, Math.min(1, d.confidence)),
+            status: "raw" as const,
+          }));
+
+          for (let i = 0; i < detectionValues.length; i += 100) {
+            await db.insert(blueprintDetectionsRaw).values(detectionValues.slice(i, i + 100));
+          }
+
+          await db
+            .update(blueprintDocuments)
+            .set({ status: "detection_complete" })
+            .where(eq(blueprintDocuments.id, input.documentId));
+        }
+
+        // --- 11. Mark document ready — verify completeness ---
+        const finalPageCount = pageIdMap.size;
+        const finalDetectionCount = detections.length;
+        const finalStatus = finalDetectionCount > 0 ? "detection_complete" : "parsed";
+
+        // Readiness check: pages must exist, contract metadata must be set
+        if (finalPageCount === 0) {
+          await markFailed(db, input.documentId, "Pipeline completed but no pages were stored");
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Pipeline integrity check failed: zero pages stored",
+          });
+        }
+
+        return {
+          documentId: input.documentId,
+          status: finalStatus,
+          contractName: parsed.contract.name,
+          contractVersion: parsed.contract.version,
+          schemaHash: parsed.contract.schema_hash,
+          pagesIngested: parsed.pages.length,
+          textBlocksIngested: parsed.text_blocks.length,
+          legendCandidatesIngested: parsed.legend_candidates.length,
+          detectionsIngested: detections.length,
+          platformSchemaHash: getSchemaHash(),
+        };
+      } catch (err) {
+        // If it's already a TRPCError, rethrow
+        if (err instanceof TRPCError) throw err;
+
+        // Unexpected error — mark as failed
+        await markFailed(db, input.documentId, `Pipeline error: ${(err as Error).message}`);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Pipeline failed: ${(err as Error).message}`,
+        });
+      }
     }),
 
   // =========================================================================

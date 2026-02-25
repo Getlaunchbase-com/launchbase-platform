@@ -11,6 +11,9 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import type { Request, Response } from "express";
 import superjson from "superjson";
+import jwt from "jsonwebtoken";
+import { env } from "./env";
+import log from "./logger";
 
 // ---------------------------------------------------------------------------
 // Context
@@ -29,6 +32,64 @@ export interface TRPCContext {
   user: User | null;
 }
 
+/**
+ * Extract user from request.
+ *
+ * Checks in order:
+ *   1. Bearer token in Authorization header (JWT-like)
+ *   2. Session cookie (existing cookie-based auth)
+ *   3. Returns null if neither present
+ *
+ * In production, bearer tokens are validated against JWT_SECRET.
+ * In development, a dev bypass is available via x-dev-user-id header.
+ */
+function extractUser(req: Request): User | null {
+  // 1. Bearer token — cryptographically verified with JWT_SECRET
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.slice(7);
+    try {
+      const payload = jwt.verify(token, env.JWT_SECRET, {
+        algorithms: ["HS256"],
+      }) as jwt.JwtPayload;
+
+      if (payload.sub && payload.role) {
+        return {
+          id: Number(payload.sub),
+          role: payload.role === "admin" ? "admin" : "user",
+          email: (payload.email as string) ?? null,
+          name: (payload.name as string) ?? null,
+        };
+      }
+    } catch (err) {
+      log.warn({ err }, "JWT verification failed");
+    }
+  }
+
+  // 2. Session cookie (already parsed by express middleware in production)
+  const sessionUser = (req as any).session?.user ?? (req as any).user;
+  if (sessionUser?.id) {
+    return {
+      id: sessionUser.id,
+      role: sessionUser.role ?? "user",
+      email: sessionUser.email ?? null,
+      name: sessionUser.name ?? null,
+    };
+  }
+
+  // 3. Dev bypass (development only)
+  if (env.isDevelopment && req.headers["x-dev-user-id"]) {
+    return {
+      id: Number(req.headers["x-dev-user-id"]),
+      role: (req.headers["x-dev-user-role"] as string) === "admin" ? "admin" : "user",
+      email: null,
+      name: "Dev User",
+    };
+  }
+
+  return null;
+}
+
 export function createContext(opts: {
   req: Request;
   res: Response;
@@ -37,7 +98,7 @@ export function createContext(opts: {
   return {
     req: opts.req,
     res: opts.res,
-    user: opts.user ?? null,
+    user: opts.user ?? extractUser(opts.req),
   };
 }
 
