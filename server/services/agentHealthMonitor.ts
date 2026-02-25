@@ -43,14 +43,54 @@ export interface RuntimeStatusRecord {
   responseTimeMs: number | null;
 }
 
-interface HealthResponse {
-  status: string;
-  vertex?: string;
-  version?: string;
-  schema_hash?: string;
-  contracts?: Array<{ name: string; version: string; schema_hash: string }>;
-  uptime_seconds?: number;
-  [key: string]: unknown;
+/**
+ * Strict schema for agent-stack /health response.
+ * No index signature — only known fields accepted.
+ */
+interface AgentHealthResponse {
+  status: "ok" | "degraded" | "error";
+  vertex: string;
+  version: string;
+  schema_hash: string;
+  contracts: Array<{ name: string; version: string; schema_hash: string }>;
+  uptime_seconds: number;
+}
+
+/**
+ * Validate raw JSON against the strict AgentHealthResponse shape.
+ * Returns null if validation fails (caller handles as warning).
+ */
+function parseHealthResponse(raw: unknown): AgentHealthResponse | null {
+  if (!raw || typeof raw !== "object") return null;
+  const obj = raw as Record<string, unknown>;
+
+  if (typeof obj.status !== "string") return null;
+  if (!["ok", "degraded", "error"].includes(obj.status)) return null;
+  if (typeof obj.vertex !== "string") return null;
+  if (typeof obj.version !== "string") return null;
+
+  // schema_hash and contracts are required for handshake
+  const schemaHash = typeof obj.schema_hash === "string" ? obj.schema_hash : "";
+  const contracts = Array.isArray(obj.contracts) ? obj.contracts : [];
+
+  // Validate each contract claim shape
+  const validContracts = contracts.filter(
+    (c: unknown) =>
+      c &&
+      typeof c === "object" &&
+      typeof (c as any).name === "string" &&
+      typeof (c as any).version === "string" &&
+      typeof (c as any).schema_hash === "string"
+  ) as AgentHealthResponse["contracts"];
+
+  return {
+    status: obj.status as AgentHealthResponse["status"],
+    vertex: obj.vertex as string,
+    version: obj.version as string,
+    schema_hash: schemaHash,
+    contracts: validContracts,
+    uptime_seconds: typeof obj.uptime_seconds === "number" ? obj.uptime_seconds : 0,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -61,7 +101,7 @@ async function pollAgentHealth(): Promise<RuntimeStatusRecord> {
   const startMs = Date.now();
   const violations: Array<{ type: string; message: string; detectedAt: string }> = [];
 
-  let healthData: HealthResponse;
+  let healthData: AgentHealthResponse;
 
   try {
     const controller = new AbortController();
@@ -93,7 +133,27 @@ async function pollAgentHealth(): Promise<RuntimeStatusRecord> {
       };
     }
 
-    healthData = (await resp.json()) as HealthResponse;
+    const rawJson = await resp.json();
+    const parsed = parseHealthResponse(rawJson);
+    if (!parsed) {
+      return {
+        vertex: "unknown",
+        version: "unknown",
+        schemaHash: null,
+        handshakeOk: false,
+        status: "warning" as const,
+        lastSeen: new Date(),
+        violations: [
+          {
+            type: "invalid_health_schema",
+            message: `Agent /health returned unparseable response: ${JSON.stringify(rawJson).slice(0, 200)}`,
+            detectedAt: new Date().toISOString(),
+          },
+        ],
+        responseTimeMs: Date.now() - startMs,
+      };
+    }
+    healthData = parsed;
   } catch (err) {
     return {
       vertex: "unknown",
@@ -120,31 +180,38 @@ async function pollAgentHealth(): Promise<RuntimeStatusRecord> {
 
   // --- Contract handshake validation ---
   let handshakeOk = false;
-  if (healthData.contracts && Array.isArray(healthData.contracts)) {
-    try {
-      const result = validateHandshake({
-        agent_id: "agent-stack",
-        agent_version: version,
-        contracts: healthData.contracts,
-      });
-      handshakeOk = result.ok;
+  try {
+    const result = validateHandshake({
+      agent_id: "agent-stack",
+      agent_version: version,
+      contracts: healthData.contracts,
+    });
+    handshakeOk = result.ok;
 
-      if (!result.ok) {
-        for (const mismatch of result.mismatches) {
-          violations.push({
-            type: "contract_mismatch",
-            message: `Contract "${mismatch.name}" [${mismatch.field}]: expected "${mismatch.expected}", received "${mismatch.received}"`,
-            detectedAt: new Date().toISOString(),
-          });
-        }
+    if (!result.ok) {
+      for (const mismatch of result.mismatches) {
+        violations.push({
+          type: "contract_mismatch",
+          message: `Contract "${mismatch.name}" [${mismatch.field}]: expected "${mismatch.expected}", received "${mismatch.received}"`,
+          detectedAt: new Date().toISOString(),
+        });
       }
-    } catch (err) {
-      violations.push({
-        type: "handshake_error",
-        message: `Handshake validation failed: ${(err as Error).message}`,
-        detectedAt: new Date().toISOString(),
-      });
     }
+  } catch (err) {
+    violations.push({
+      type: "handshake_error",
+      message: `Handshake validation failed: ${(err as Error).message}`,
+      detectedAt: new Date().toISOString(),
+    });
+  }
+
+  // --- Agent-reported degraded status ---
+  if (healthData.status === "degraded" || healthData.status === "error") {
+    violations.push({
+      type: "agent_self_report",
+      message: `Agent reports status="${healthData.status}"`,
+      detectedAt: new Date().toISOString(),
+    });
   }
 
   // --- Determine status ---
@@ -152,7 +219,9 @@ async function pollAgentHealth(): Promise<RuntimeStatusRecord> {
 
   if (violations.some((v) => v.type === "contract_mismatch")) {
     status = "mismatch"; // HARD DISABLE
-  } else if (!handshakeOk) {
+  } else if (healthData.status === "error") {
+    status = "offline"; // Agent self-reports error = treat as offline
+  } else if (!handshakeOk || healthData.status === "degraded") {
     status = "warning"; // Allow view-only
   }
 

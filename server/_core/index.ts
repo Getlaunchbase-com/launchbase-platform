@@ -20,6 +20,7 @@ import { closeDb } from "../db";
 import {
   validateHandshake,
   getAllContractInfo,
+  logHandshakeMismatch,
   type HandshakeRequest,
 } from "../contracts/handshake";
 import {
@@ -96,16 +97,19 @@ app.post("/api/contracts/handshake", (req, res) => {
 
     if (!result.ok) {
       console.error(
-        `[handshake] FAILED for agent ${body.agent_id} (v${body.agent_version}):`,
+        `[handshake] CONTRACT_MISMATCH for agent ${body.agent_id} (v${body.agent_version}):`,
         JSON.stringify(result.mismatches, null, 2)
       );
+      // Log mismatch to DB (best-effort, async)
+      logHandshakeMismatch(body.agent_id, body.agent_version ?? "unknown", result);
     } else {
       console.log(
         `[handshake] OK for agent ${body.agent_id} (v${body.agent_version})`
       );
     }
 
-    res.status(result.ok ? 200 : 409).json(result);
+    // 503 CONTRACT_MISMATCH on failure — agent must not dispatch tools
+    res.status(result.ok ? 200 : 503).json(result);
   } catch (err) {
     console.error("[handshake] Error:", err);
     res.status(500).json({ ok: false, error: "Internal handshake error" });
