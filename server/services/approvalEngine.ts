@@ -24,7 +24,7 @@
  */
 
 import { getDb } from "../../db";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, sql } from "drizzle-orm";
 import {
   pipelineApprovals,
 } from "../../db/schema";
@@ -297,7 +297,9 @@ export async function resolveApproval(
     });
   }
 
-  await db
+  // Atomic conditional update — only resolves if still "pending".
+  // Prevents race condition where two admins approve simultaneously.
+  const [updateResult] = await db
     .update(pipelineApprovals)
     .set({
       status: decision,
@@ -305,7 +307,20 @@ export async function resolveApproval(
       resolvedAt: new Date(),
       notes: notes ?? null,
     })
-    .where(eq(pipelineApprovals.id, approvalId));
+    .where(
+      and(
+        eq(pipelineApprovals.id, approvalId),
+        eq(pipelineApprovals.status, "pending")
+      )
+    );
+
+  // If no rows updated, another request resolved it first
+  if ((updateResult as any).affectedRows === 0) {
+    throw new TRPCError({
+      code: "CONFLICT",
+      message: "Approval was already resolved by another admin (race condition prevented)",
+    });
+  }
 }
 
 // ---------------------------------------------------------------------------
