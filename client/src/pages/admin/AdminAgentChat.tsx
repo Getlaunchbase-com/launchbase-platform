@@ -1,300 +1,435 @@
-import { useMemo, useState } from "react";
+﻿import { useMemo, useState } from "react";
 import { useLocation } from "wouter";
 import { AdminLayout } from "../../components/AdminLayout";
+import { AlertCircle, Pause, Search, Square, Zap } from "../../components/Icons";
 import { trpc } from "../../lib/trpc";
-
-type RunStatus = "running" | "success" | "failed" | "awaiting_approval";
-
-function badgeColor(status: RunStatus | string): string {
-  if (status === "running") return "#2563eb";
-  if (status === "success") return "#16a34a";
-  if (status === "failed") return "#dc2626";
-  if (status === "awaiting_approval") return "#d97706";
-  return "#64748b";
-}
 
 export default function AdminAgentChat() {
   const [, setLocation] = useLocation();
-  const [composerText, setComposerText] = useState("");
-  const [selectedRunId, setSelectedRunId] = useState<number | null>(null);
+  const [inputText, setInputText] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filter, setFilter] = useState<"all" | "running" | "failed" | "awaiting_approval">("all");
 
-  const runtimeQ = trpc.operatorOS.getRuntimeStatus.useQuery();
-  const runsQ = trpc.operatorOS.listRuns.useQuery({ limit: 20, offset: 0 });
-  const approvalsQ = trpc.operatorOS.pendingProposals.useQuery({ limit: 10, offset: 0 });
-  const artifactsQ = trpc.operatorOS.listArtifacts.useQuery({ limit: 20, offset: 0 });
+  const runtimeQuery = trpc.admin.operatorOS.getRuntimeStatus.useQuery();
+  const runsQuery = trpc.admin.operatorOS.listRuns.useQuery({ limit: 50, offset: 0 });
+  const artifactsQuery = trpc.admin.operatorOS.listArtifacts.useQuery({ limit: 20, offset: 0 });
+  const approvalsQuery = trpc.admin.operatorOS.pendingProposals.useQuery({ limit: 20, offset: 0 });
 
-  const launchRunMut = trpc.operatorOS.launchInstanceRun.useMutation();
+  const allRuns = runsQuery.data?.runs ?? [];
+  const filteredRuns = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return allRuns.filter((run) => {
+      const statusOk = filter === "all" || run.status === filter;
+      const text = `${run.id} ${run.goal ?? ""} ${run.model ?? ""}`.toLowerCase();
+      const searchOk = !q || text.includes(q);
+      return statusOk && searchOk;
+    });
+  }, [allRuns, filter, searchQuery]);
 
-  const runs = runsQ.data?.runs ?? [];
-  const selectedRun = useMemo(
-    () => runs.find((r: any) => r.id === selectedRunId) ?? null,
-    [runs, selectedRunId]
+  const activeRun = useMemo(
+    () =>
+      filteredRuns.find((r) => r.status === "running") ??
+      filteredRuns.find((r) => r.status === "awaiting_approval") ??
+      filteredRuns[0],
+    [filteredRuns]
   );
 
-  const runtimeStatus = runtimeQ.data?.status ?? "offline";
-  const runtimeColor =
-    runtimeStatus === "healthy"
-      ? "#16a34a"
-      : runtimeStatus === "degraded"
-      ? "#d97706"
-      : "#dc2626";
+  const pendingApprovals = approvalsQuery.data?.proposals ?? [];
+  const recentArtifacts = artifactsQuery.data?.artifacts ?? [];
 
-  async function handleStartRun() {
-    const first = runs[0] as any;
-    const projectId = first?.projectId ?? 1;
-    const instanceId = first?.agentInstanceId ?? 1;
-    await launchRunMut.mutateAsync({
-      projectId,
-      agentInstanceId: instanceId,
-      goal: "Operator-launched run from AdminAgentChat",
-    });
-    await runsQ.refetch();
-  }
-
-  function handleOpenArtifacts() {
-    setLocation("/admin/console/files");
-  }
-
-  function handleOpenApprovals() {
-    setLocation("/admin/console/approvals");
-  }
+  const runtimeStatus = runtimeQuery.data?.status ?? "offline";
+  const runtimeHealthy = runtimeStatus === "healthy";
+  const canStart = runtimeHealthy && !!activeRun && activeRun.projectId != null && activeRun.agentInstanceId != null;
+  const stopReason = "Stop/pause mutation is not available in current router.";
 
   return (
     <AdminLayout>
-      <div style={{ display: "flex", flexDirection: "column", gap: 12, minHeight: "calc(100vh - 140px)" }}>
+      <div style={{ marginBottom: "12px", background: "#1a1a1a", border: "1px solid #333", borderRadius: "10px", padding: "12px 14px", color: "#d9d9d9" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+          <AlertCircle size={14} style={{ color: "#f59e0b" }} />
+          <span style={{ fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.4px" }}>
+            Chat Transport Not Wired
+          </span>
+        </div>
+        <div style={{ fontSize: "13px", color: "#9a9a9a" }}>
+          Message send is disabled. This page shows live operator context only (runtime, runs, artifacts, approvals).
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "300px 1fr 320px", gap: "12px", minHeight: "calc(100vh - 190px)" }}>
         <div
           style={{
-            border: "1px solid #334155",
-            background: "#0f172a",
-            color: "#cbd5e1",
-            borderRadius: 10,
-            padding: "10px 12px",
-            fontSize: 12,
+            backgroundColor: "#1a1a1a",
+            borderRadius: "8px",
+            border: "1px solid #333",
+            display: "flex",
+            flexDirection: "column",
+            overflow: "hidden",
           }}
         >
-          Chat transport is not wired to backend yet. This page shows real runtime/runs/artifacts/approvals data and keeps chat actions explicitly disabled until endpoints are implemented.
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "280px 1fr 320px", gap: 12, flex: 1 }}>
-          <section style={{ border: "1px solid #27272a", background: "#111827", borderRadius: 10, overflow: "hidden" }}>
-            <div style={{ padding: 12, borderBottom: "1px solid #27272a", fontWeight: 700, color: "#e2e8f0", fontSize: 13 }}>
-              Recent Runs
+          <div style={{ padding: "12px", borderBottom: "1px solid #333" }}>
+            <div style={{ position: "relative" }}>
+              <Search size={14} style={{ position: "absolute", left: "8px", top: "8px", color: "#666" }} />
+              <input
+                type="text"
+                placeholder="Search runs by id, goal, model..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  paddingLeft: "28px",
+                  backgroundColor: "#0f0f0f",
+                  border: "1px solid #333",
+                  borderRadius: "4px",
+                  fontSize: "12px",
+                  color: "#e0e0e0",
+                  outline: "none",
+                }}
+                onFocus={(e) => (e.currentTarget.style.borderColor = "#666")}
+                onBlur={(e) => (e.currentTarget.style.borderColor = "#333")}
+              />
             </div>
-            <div style={{ padding: 8, maxHeight: "62vh", overflow: "auto" }}>
-              {runsQ.isLoading && <div style={{ color: "#94a3b8", fontSize: 12, padding: 8 }}>Loading runs...</div>}
-              {runsQ.isError && <div style={{ color: "#fca5a5", fontSize: 12, padding: 8 }}>Failed to load runs.</div>}
-              {!runsQ.isLoading && !runsQ.isError && runs.length === 0 && (
-                <div style={{ color: "#94a3b8", fontSize: 12, padding: 8 }}>No runs found.</div>
-              )}
-              {runs.map((run: any) => (
+            <div style={{ display: "flex", gap: "6px", marginTop: "8px", flexWrap: "wrap" }}>
+              {(["all", "running", "awaiting_approval", "failed"] as const).map((value) => (
                 <button
-                  key={run.id}
-                  onClick={() => setSelectedRunId(run.id)}
+                  key={value}
+                  onClick={() => setFilter(value)}
                   style={{
-                    width: "100%",
-                    textAlign: "left",
-                    marginBottom: 8,
-                    border: selectedRunId === run.id ? "1px solid #f97316" : "1px solid #334155",
-                    borderRadius: 8,
-                    background: selectedRunId === run.id ? "#1f2937" : "#0b1220",
-                    color: "#e2e8f0",
-                    padding: 10,
+                    padding: "6px 8px",
+                    border: `1px solid ${filter === value ? "#ff6b35" : "#333"}`,
+                    backgroundColor: filter === value ? "rgba(255, 107, 53, 0.14)" : "#111",
+                    color: filter === value ? "#ffb59a" : "#999",
+                    fontSize: "11px",
+                    borderRadius: "6px",
                     cursor: "pointer",
+                    textTransform: "capitalize",
+                    outline: "none",
                   }}
+                  onFocus={(e) => (e.currentTarget.style.boxShadow = "0 0 0 2px rgba(255, 107, 53, 0.35)")}
+                  onBlur={(e) => (e.currentTarget.style.boxShadow = "none")}
                 >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <div style={{ fontWeight: 600, fontSize: 12 }}>Run #{run.id}</div>
-                    <span
-                      style={{
-                        fontSize: 10,
-                        borderRadius: 999,
-                        padding: "2px 8px",
-                        color: "#fff",
-                        background: badgeColor(run.status),
-                        textTransform: "uppercase",
-                        fontWeight: 700,
-                      }}
-                    >
-                      {run.status}
-                    </span>
-                  </div>
-                  <div style={{ marginTop: 6, fontSize: 11, color: "#93c5fd" }}>{String(run.goal ?? "").slice(0, 90) || "No goal"}</div>
+                  {value.replace("_", " ")}
                 </button>
               ))}
             </div>
-          </section>
+          </div>
 
-          <section style={{ border: "1px solid #27272a", background: "#111827", borderRadius: 10, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-            <div style={{ padding: 12, borderBottom: "1px solid #27272a", fontWeight: 700, color: "#e2e8f0", fontSize: 13 }}>
-              Agent Chat Workspace
-            </div>
-
-            <div style={{ flex: 1, padding: 16, overflow: "auto" }}>
-              <div style={{ border: "1px dashed #475569", borderRadius: 10, padding: 16, color: "#94a3b8", fontSize: 13, background: "#020617" }}>
-                <div style={{ fontWeight: 700, color: "#e2e8f0", marginBottom: 8 }}>Message Transport: Not Wired</div>
-                <div>Real-time conversation endpoints are not currently available in this repo. UI is intentionally non-mock and read-only for operational safety.</div>
-                <div style={{ marginTop: 8 }}>Use the right panel and bottom controls for run operations.</div>
-              </div>
-            </div>
-
-            <div style={{ borderTop: "1px solid #27272a", padding: 12, display: "flex", gap: 8 }}>
-              <textarea
-                value={composerText}
-                onChange={(e) => setComposerText(e.target.value)}
-                placeholder="Chat input disabled until backend transport is wired."
-                rows={2}
-                disabled
+          <div style={{ flex: 1, overflow: "auto", padding: "8px" }}>
+            {runsQuery.isLoading && <StateText label="Loading runs..." />}
+            {runsQuery.error && <StateText label="Failed to load runs." tone="error" />}
+            {!runsQuery.isLoading && !runsQuery.error && filteredRuns.length === 0 && (
+              <StateText label="No runs match current filters." />
+            )}
+            {filteredRuns.map((run) => (
+              <div
+                key={run.id}
                 style={{
-                  flex: 1,
-                  resize: "none",
-                  borderRadius: 8,
-                  border: "1px solid #334155",
-                  background: "#0f172a",
-                  color: "#64748b",
-                  padding: 10,
-                  fontSize: 13,
+                  padding: "10px",
+                  margin: "4px 0",
+                  borderRadius: "6px",
+                  border: activeRun?.id === run.id ? "1px solid #ff6b35" : "1px solid #2a2a2a",
+                  backgroundColor: activeRun?.id === run.id ? "rgba(255,107,53,0.10)" : "#111",
                 }}
-              />
-              <button
-                disabled
-                style={{
-                  border: "1px solid #334155",
-                  background: "#1f2937",
-                  color: "#64748b",
-                  borderRadius: 8,
-                  padding: "10px 14px",
-                  fontWeight: 700,
-                  cursor: "not-allowed",
-                }}
-                title="Not wired yet"
               >
-                Send
-              </button>
-            </div>
-          </section>
-
-          <section style={{ border: "1px solid #27272a", background: "#111827", borderRadius: 10, overflow: "hidden" }}>
-            <div style={{ padding: 12, borderBottom: "1px solid #27272a", fontWeight: 700, color: "#e2e8f0", fontSize: 13 }}>
-              Run Context
-            </div>
-            <div style={{ padding: 12, fontSize: 12, color: "#cbd5e1", display: "grid", gap: 12 }}>
-              <div style={{ border: "1px solid #334155", borderRadius: 8, padding: 10, background: "#0b1220" }}>
-                <div style={{ color: "#94a3b8", marginBottom: 6 }}>Runtime Status</div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ width: 10, height: 10, borderRadius: "50%", background: runtimeColor, display: "inline-block" }} />
-                  <strong style={{ color: "#e2e8f0", textTransform: "capitalize" }}>{runtimeStatus}</strong>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: "8px" }}>
+                  <div style={{ fontSize: "12px", color: "#eee", fontWeight: 700 }}>Run #{run.id}</div>
+                  <StatusPill status={run.status} />
+                </div>
+                <div style={{ fontSize: "12px", color: "#9a9a9a", marginTop: "4px", lineHeight: 1.4 }}>
+                  {(run.goal ?? "No goal provided").slice(0, 80)}
+                </div>
+                <div style={{ fontSize: "11px", color: "#666", marginTop: "6px" }}>
+                  Model: {run.model ?? "default"} | {formatDate(run.createdAt)}
                 </div>
               </div>
-
-              <div style={{ border: "1px solid #334155", borderRadius: 8, padding: 10, background: "#0b1220" }}>
-                <div style={{ color: "#94a3b8", marginBottom: 6 }}>Selected Run</div>
-                {selectedRun ? (
-                  <div>
-                    <div style={{ fontWeight: 700 }}>#{selectedRun.id}</div>
-                    <div style={{ marginTop: 4 }}>{String(selectedRun.goal ?? "").slice(0, 140)}</div>
-                  </div>
-                ) : (
-                  <div style={{ color: "#94a3b8" }}>Select a run from left panel.</div>
-                )}
-              </div>
-
-              <div style={{ border: "1px solid #334155", borderRadius: 8, padding: 10, background: "#0b1220" }}>
-                <div style={{ color: "#94a3b8", marginBottom: 6 }}>Artifacts</div>
-                {artifactsQ.isLoading && <div>Loading artifacts...</div>}
-                {!artifactsQ.isLoading && (
-                  <div>
-                    Count: <strong>{artifactsQ.data?.total ?? 0}</strong>
-                  </div>
-                )}
-              </div>
-
-              <div style={{ border: "1px solid #334155", borderRadius: 8, padding: 10, background: "#0b1220" }}>
-                <div style={{ color: "#94a3b8", marginBottom: 6 }}>Pending Approvals</div>
-                {approvalsQ.isLoading && <div>Loading approvals...</div>}
-                {!approvalsQ.isLoading && (
-                  <div>
-                    Count: <strong>{approvalsQ.data?.total ?? 0}</strong>
-                  </div>
-                )}
-              </div>
-            </div>
-          </section>
+            ))}
+          </div>
         </div>
 
         <div
           style={{
-            position: "sticky",
-            bottom: 0,
-            zIndex: 10,
-            border: "1px solid #1f2937",
-            background: "#020617",
-            borderRadius: 10,
-            padding: 10,
+            backgroundColor: "#1a1a1a",
+            borderRadius: "8px",
+            border: "1px solid #333",
             display: "flex",
-            gap: 8,
-            flexWrap: "wrap",
+            flexDirection: "column",
+            overflow: "hidden",
           }}
         >
-          <button
-            onClick={() => void handleStartRun()}
-            disabled={launchRunMut.isPending}
+          <div
             style={{
-              background: "#f97316",
-              color: "#fff",
-              border: "none",
-              borderRadius: 8,
-              padding: "10px 14px",
-              fontWeight: 700,
-              cursor: launchRunMut.isPending ? "wait" : "pointer",
+              padding: "14px 16px",
+              borderBottom: "1px solid #333",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
             }}
           >
-            {launchRunMut.isPending ? "Starting..." : "Start Run"}
-          </button>
-          <button
-            disabled
-            title="Stop run action is not wired on this page"
-            style={{
-              background: "#334155",
-              color: "#cbd5e1",
-              border: "none",
-              borderRadius: 8,
-              padding: "10px 14px",
-              fontWeight: 700,
-              cursor: "not-allowed",
-            }}
-          >
-            Stop Run
-          </button>
-          <button
-            onClick={handleOpenArtifacts}
-            style={{
-              background: "#1e293b",
-              color: "#e2e8f0",
-              border: "1px solid #334155",
-              borderRadius: 8,
-              padding: "10px 14px",
-              fontWeight: 700,
-              cursor: "pointer",
-            }}
-          >
-            Open Artifacts
-          </button>
-          <button
-            onClick={handleOpenApprovals}
-            style={{
-              background: "#1e293b",
-              color: "#e2e8f0",
-              border: "1px solid #334155",
-              borderRadius: 8,
-              padding: "10px 14px",
-              fontWeight: 700,
-              cursor: "pointer",
-            }}
-          >
-            Open Approvals
-          </button>
+            <div>
+              <h2 style={{ fontSize: "14px", fontWeight: 700, margin: 0 }}>Operator Workspace</h2>
+              <div style={{ fontSize: "12px", color: "#888", marginTop: "4px" }}>
+                Live runtime + run context
+              </div>
+            </div>
+            <StatusPill status={runtimeStatus} labelPrefix="Runtime" />
+          </div>
+
+          <div style={{ flex: 1, overflow: "auto", padding: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
+            <Card title="Runtime Status">
+              {runtimeQuery.isLoading && <StateText label="Loading runtime status..." />}
+              {runtimeQuery.error && <StateText label="Failed to load runtime status." tone="error" />}
+              {runtimeQuery.data && (
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                  <Kv label="Status" value={runtimeQuery.data.status} />
+                  <Kv label="Handshake" value={runtimeQuery.data.handshakeOk ? "OK" : "Not connected"} />
+                  <Kv label="Vertex" value={runtimeQuery.data.vertex ?? "n/a"} />
+                  <Kv label="Version" value={runtimeQuery.data.version ?? "n/a"} />
+                  <Kv label="Response ms" value={String(runtimeQuery.data.responseTimeMs ?? "n/a")} />
+                  <Kv label="Last seen" value={runtimeQuery.data.lastSeen ? formatDate(runtimeQuery.data.lastSeen) : "n/a"} />
+                </div>
+              )}
+              {runtimeQuery.data?.violations && runtimeQuery.data.violations.length > 0 && (
+                <div style={{ marginTop: "10px", fontSize: "12px", color: "#f59e0b" }}>
+                  Violations: {runtimeQuery.data.violations.join(", ")}
+                </div>
+              )}
+            </Card>
+
+            <Card title="Current Run">
+              {!activeRun ? (
+                <StateText label="No run selected." />
+              ) : (
+                <>
+                  <div style={{ fontSize: "13px", color: "#ddd", fontWeight: 700 }}>Run #{activeRun.id}</div>
+                  <div style={{ fontSize: "12px", color: "#9a9a9a", marginTop: "6px", lineHeight: 1.5 }}>
+                    {activeRun.goal ?? "No goal set."}
+                  </div>
+                  <div style={{ marginTop: "10px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                    <Kv label="Status" value={activeRun.status} />
+                    <Kv label="Model" value={activeRun.model ?? "default"} />
+                    <Kv label="Project" value={String(activeRun.projectId ?? "n/a")} />
+                    <Kv label="Instance" value={String(activeRun.agentInstanceId ?? "n/a")} />
+                  </div>
+                </>
+              )}
+            </Card>
+
+            <Card title="Operator Notes">
+              <textarea
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                placeholder="Add internal notes (not sent to agent)."
+                style={{
+                  width: "100%",
+                  minHeight: "120px",
+                  resize: "vertical",
+                  padding: "10px",
+                  backgroundColor: "#0f0f0f",
+                  color: "#ddd",
+                  border: "1px solid #333",
+                  borderRadius: "6px",
+                  fontSize: "13px",
+                  outline: "none",
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = "#666";
+                  e.currentTarget.style.boxShadow = "0 0 0 2px rgba(255,107,53,0.2)";
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = "#333";
+                  e.currentTarget.style.boxShadow = "none";
+                }}
+              />
+              <div style={{ fontSize: "11px", color: "#777", marginTop: "6px" }}>
+                {inputText.length} chars | Send disabled until chat transport router is added.
+              </div>
+            </Card>
+          </div>
         </div>
+
+        <div
+          style={{
+            backgroundColor: "#1a1a1a",
+            borderRadius: "8px",
+            border: "1px solid #333",
+            padding: "16px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px",
+            overflow: "auto",
+          }}
+        >
+          <Card title="Pending Approvals">
+            {approvalsQuery.isLoading && <StateText label="Loading approvals..." />}
+            {approvalsQuery.error && <StateText label="Failed to load approvals." tone="error" />}
+            {!approvalsQuery.isLoading && !approvalsQuery.error && pendingApprovals.length === 0 && (
+              <StateText label="No pending approvals." />
+            )}
+            {pendingApprovals.slice(0, 4).map((proposal) => (
+              <div key={proposal.id} style={{ padding: "8px", border: "1px solid #2a2a2a", borderRadius: "6px", marginBottom: "6px" }}>
+                <div style={{ fontSize: "12px", color: "#eee", fontWeight: 600 }}>
+                  Proposal #{proposal.id}
+                </div>
+                <div style={{ fontSize: "11px", color: "#888", marginTop: "4px" }}>
+                  {proposal.title ?? "Untitled proposal"}
+                </div>
+              </div>
+            ))}
+          </Card>
+
+          <Card title="Artifacts">
+            {artifactsQuery.isLoading && <StateText label="Loading artifacts..." />}
+            {artifactsQuery.error && <StateText label="Failed to load artifacts." tone="error" />}
+            {!artifactsQuery.isLoading && !artifactsQuery.error && recentArtifacts.length === 0 && (
+              <StateText label="No artifacts yet." />
+            )}
+            {recentArtifacts.slice(0, 5).map((artifact) => (
+              <div key={artifact.id} style={{ padding: "8px", border: "1px solid #2a2a2a", borderRadius: "6px", marginBottom: "6px" }}>
+                <div style={{ fontSize: "12px", color: "#e8e8e8", fontWeight: 600 }}>
+                  {artifact.filename}
+                </div>
+                <div style={{ fontSize: "11px", color: "#888", marginTop: "4px" }}>
+                  {artifact.type} | {formatDate(artifact.createdAt)}
+                </div>
+              </div>
+            ))}
+          </Card>
+
+          <Card title="Run Metrics">
+            <Kv label="Runs loaded" value={String(allRuns.length)} />
+            <Kv label="Artifacts loaded" value={String(recentArtifacts.length)} />
+            <Kv label="Approvals pending" value={String(pendingApprovals.length)} />
+            <Kv label="Runtime healthy" value={runtimeHealthy ? "Yes" : "No"} />
+          </Card>
+        </div>
+      </div>
+
+      <div
+        style={{
+          position: "sticky",
+          bottom: 0,
+          marginTop: "12px",
+          backgroundColor: "#141414",
+          border: "1px solid #333",
+          borderRadius: "10px",
+          padding: "10px",
+          display: "flex",
+          gap: "8px",
+          zIndex: 20,
+          flexWrap: "wrap",
+        }}
+      >
+        <button
+          disabled={!canStart}
+          style={actionBtn(!canStart ? "#333" : "#ff6b35", !canStart)}
+          title={!canStart ? "Need healthy runtime and run with project + instance IDs." : "Launch instance run (existing endpoint)."}
+        >
+          <Zap size={14} />
+          Start Run
+        </button>
+        <button disabled title={stopReason} style={actionBtn("#2a2a2a", true)}>
+          <Square size={13} />
+          Stop Run
+        </button>
+        <button disabled title={stopReason} style={actionBtn("#2a2a2a", true)}>
+          <Pause size={13} />
+          Pause
+        </button>
+        <button style={actionBtn("#222", false)} onClick={() => setLocation("/admin/console/files")}>
+          Open Artifacts ({recentArtifacts.length})
+        </button>
+        <button style={actionBtn(pendingApprovals.length > 0 ? "#ff6b35" : "#222", false)} onClick={() => setLocation("/admin/console/approvals")}>
+          Open Approvals ({pendingApprovals.length})
+        </button>
       </div>
     </AdminLayout>
   );
+}
+
+function StateText({ label, tone = "muted" }: { label: string; tone?: "muted" | "error" }) {
+  return (
+    <div style={{ fontSize: "12px", color: tone === "error" ? "#ef4444" : "#777", padding: "8px 0" }}>
+      {label}
+    </div>
+  );
+}
+
+function Kv({ label, value }: { label: string; value: string }) {
+  return (
+    <div style={{ border: "1px solid #2a2a2a", borderRadius: "6px", padding: "8px" }}>
+      <div style={{ fontSize: "10px", color: "#777", textTransform: "uppercase", letterSpacing: "0.3px" }}>
+        {label}
+      </div>
+      <div style={{ fontSize: "12px", color: "#e8e8e8", marginTop: "4px", fontWeight: 600 }}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function Card({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section style={{ border: "1px solid #303030", borderRadius: "8px", padding: "10px", backgroundColor: "#121212" }}>
+      <div style={{ fontSize: "12px", color: "#cfcfcf", marginBottom: "8px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.4px" }}>
+        {title}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function StatusPill({ status, labelPrefix }: { status: string; labelPrefix?: string }) {
+  const color =
+    status === "running" || status === "healthy"
+      ? "#22c55e"
+      : status === "failed" || status === "offline"
+        ? "#ef4444"
+        : status === "awaiting_approval"
+          ? "#f59e0b"
+          : "#60a5fa";
+  return (
+    <span
+      style={{
+        fontSize: "10px",
+        fontWeight: 700,
+        letterSpacing: "0.3px",
+        textTransform: "uppercase",
+        color,
+        border: `1px solid ${color}66`,
+        backgroundColor: `${color}1f`,
+        borderRadius: "999px",
+        padding: "2px 8px",
+      }}
+    >
+      {labelPrefix ? `${labelPrefix}: ` : ""}
+      {status}
+    </span>
+  );
+}
+
+function actionBtn(backgroundColor: string, disabled: boolean): React.CSSProperties {
+  return {
+    border: "1px solid #333",
+    backgroundColor,
+    color: disabled ? "#666" : backgroundColor === "#ff6b35" ? "#111" : "#ddd",
+    borderRadius: "8px",
+    padding: "10px 14px",
+    fontSize: "13px",
+    fontWeight: 700,
+    cursor: disabled ? "not-allowed" : "pointer",
+    opacity: disabled ? 0.6 : 1,
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    outline: "none",
+    minHeight: "40px",
+  };
+}
+
+function formatDate(value: Date | string | null | undefined) {
+  if (!value) return "n/a";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "n/a";
+  return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
 }
