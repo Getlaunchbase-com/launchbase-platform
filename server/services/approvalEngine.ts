@@ -23,11 +23,11 @@
  *   - Data deletion:      artifact/document deletion → tier_2
  */
 
-import { getDb } from "../../db";
+import { getDb } from "../db";
 import { eq, and, desc, sql } from "drizzle-orm";
 import {
   pipelineApprovals,
-} from "../../db/schema";
+} from "../db/schema";
 import { TRPCError } from "@trpc/server";
 
 // ---------------------------------------------------------------------------
