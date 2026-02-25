@@ -2,8 +2,11 @@
  * Server Entry Point
  *
  * Express + tRPC server with:
+ *   - Security headers (helmet) + CORS
+ *   - Structured logging (pino)
  *   - Health check endpoints (for load balancers / Docker)
  *   - tRPC API at /api/trpc
+ *   - Artifact downloads at /api/artifacts
  *   - Contract handshake at /api/contracts/handshake
  *   - Static file serving for the Vite-built client
  *   - Graceful shutdown
@@ -11,12 +14,16 @@
 
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
+import pinoHttp from "pino-http";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import path from "node:path";
 import { env } from "./env";
+import log from "./logger";
 import { createContext } from "./trpc";
 import { appRouter } from "../routers/_incoming_routers";
-import { closeDb } from "../db";
+import { getDb, closeDb } from "../db";
+import { createArtifactsRouter } from "../routes/artifactsRouter";
 import {
   validateHandshake,
   getAllContractInfo,
@@ -44,14 +51,55 @@ const BUILD_INFO = {
 };
 
 // ---------------------------------------------------------------------------
+// CORS — restrict to known origins in production
+// ---------------------------------------------------------------------------
+
+const ALLOWED_ORIGINS = env.isProduction
+  ? [env.PUBLIC_BASE_URL].filter(Boolean)
+  : true; // dev: allow all
+
+// ---------------------------------------------------------------------------
 // Express app
 // ---------------------------------------------------------------------------
 
 const app = express();
 
-// Middleware
-app.use(cors({ origin: true, credentials: true }));
+// Security headers (CSP, HSTS, X-Frame-Options, X-Content-Type-Options, etc.)
+app.use(
+  helmet({
+    contentSecurityPolicy: env.isProduction
+      ? {
+          directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            imgSrc: ["'self'", "data:", "https:"],
+            connectSrc: ["'self'", env.PUBLIC_BASE_URL, env.AGENT_STACK_URL].filter(Boolean),
+            fontSrc: ["'self'", "data:"],
+            objectSrc: ["'none'"],
+            frameAncestors: ["'none'"],
+          },
+        }
+      : false, // disable CSP in dev (Vite HMR needs inline scripts)
+    crossOriginEmbedderPolicy: false, // allow loading external images
+  })
+);
+
+app.use(cors({ origin: ALLOWED_ORIGINS, credentials: true }));
 app.use(express.json({ limit: "50mb" }));
+
+// Structured request logging (skip health checks to reduce noise)
+app.use(
+  pinoHttp({
+    logger: log,
+    autoLogging: {
+      ignore: (req) => {
+        const url = req.url || "";
+        return url === "/healthz" || url === "/readyz";
+      },
+    },
+  })
+);
 
 // ---------------------------------------------------------------------------
 // Health checks (no auth, no tRPC — for infra probes)
@@ -68,7 +116,6 @@ app.get("/healthz", (_req, res) => {
 });
 
 app.get("/readyz", (_req, res) => {
-  // Future: check DB connectivity, external deps
   res.json({ status: "ready" });
 });
 
@@ -96,22 +143,21 @@ app.post("/api/contracts/handshake", (req, res) => {
     const result = validateHandshake(body);
 
     if (!result.ok) {
-      console.error(
-        `[handshake] CONTRACT_MISMATCH for agent ${body.agent_id} (v${body.agent_version}):`,
-        JSON.stringify(result.mismatches, null, 2)
+      log.error(
+        { agentId: body.agent_id, version: body.agent_version, mismatches: result.mismatches },
+        "Contract mismatch"
       );
-      // Log mismatch to DB (best-effort, async)
       logHandshakeMismatch(body.agent_id, body.agent_version ?? "unknown", result);
     } else {
-      console.log(
-        `[handshake] OK for agent ${body.agent_id} (v${body.agent_version})`
+      log.info(
+        { agentId: body.agent_id, version: body.agent_version },
+        "Handshake OK"
       );
     }
 
-    // 503 CONTRACT_MISMATCH on failure — agent must not dispatch tools
     res.status(result.ok ? 200 : 503).json(result);
   } catch (err) {
-    console.error("[handshake] Error:", err);
+    log.error(err, "Handshake error");
     res.status(500).json({ ok: false, error: "Internal handshake error" });
   }
 });
@@ -122,10 +168,30 @@ app.get("/api/contracts/info", (_req, res) => {
     const info = getAllContractInfo();
     res.json(info);
   } catch (err) {
-    console.error("[contracts] Error:", err);
+    log.error(err, "Failed to load contract info");
     res.status(500).json({ error: "Failed to load contract info" });
   }
 });
+
+// ---------------------------------------------------------------------------
+// Artifacts download router (Express, not tRPC — serves binary files)
+// ---------------------------------------------------------------------------
+
+const artifactsRouter = createArtifactsRouter({
+  getDb: () => getDb() as Promise<any>,
+  getUserFromReq: async (req) => {
+    // Extract user from JWT or session cookie
+    // The auth check is the same one tRPC uses — reuse createContext
+    try {
+      const ctx = await createContext({ req, res: null as any });
+      if (ctx.user) return { id: ctx.user.id, role: ctx.user.role };
+    } catch {
+      // auth failed
+    }
+    return null;
+  },
+});
+app.use("/api/artifacts", artifactsRouter);
 
 // ---------------------------------------------------------------------------
 // tRPC API
@@ -163,21 +229,20 @@ app.get("*", (_req, res) => {
 const PORT = env.PORT;
 
 const server = app.listen(PORT, () => {
-  console.log(`[server] ====================================`);
-  console.log(`[server] LaunchBase Platform`);
-  console.log(`[server] Commit:  ${BUILD_INFO.gitSha}`);
-  console.log(`[server] Built:   ${BUILD_INFO.buildTime}`);
-  console.log(`[server] Env:     ${env.NODE_ENV}`);
-  console.log(`[server] Port:    ${PORT}`);
-  console.log(`[server] ====================================`);
-  console.log(`[server] Health:    http://localhost:${PORT}/healthz`);
-  console.log(`[server] API:       http://localhost:${PORT}/api/trpc`);
-  console.log(`[server] Build:     http://localhost:${PORT}/api/build-info`);
-  console.log(
-    `[server] Handshake: http://localhost:${PORT}/api/contracts/handshake`
+  log.info(
+    {
+      port: PORT,
+      env: env.NODE_ENV,
+      gitSha: BUILD_INFO.gitSha,
+      buildTime: BUILD_INFO.buildTime,
+    },
+    "LaunchBase Platform started"
   );
+  log.info({ url: `http://localhost:${PORT}/healthz` }, "Health endpoint");
+  log.info({ url: `http://localhost:${PORT}/api/trpc` }, "tRPC endpoint");
+  log.info({ url: `http://localhost:${PORT}/api/artifacts` }, "Artifacts endpoint");
+  log.info({ url: `http://localhost:${PORT}/api/contracts/handshake` }, "Handshake endpoint");
 
-  // Start agent runtime health monitor (polls agent-stack /health every 60s)
   startHealthMonitor();
 });
 
@@ -186,20 +251,18 @@ const server = app.listen(PORT, () => {
 // ---------------------------------------------------------------------------
 
 async function shutdown(signal: string) {
-  console.log(`[server] ${signal} received — shutting down gracefully`);
+  log.info({ signal }, "Shutting down gracefully");
 
-  // Stop health monitor polling
   stopHealthMonitor();
 
   server.close(async () => {
     await closeDb();
-    console.log("[server] Closed database connections");
+    log.info("Database connections closed");
     process.exit(0);
   });
 
-  // Force exit after 10s
   setTimeout(() => {
-    console.error("[server] Forced exit after 10s timeout");
+    log.fatal("Forced exit after 10s timeout");
     process.exit(1);
   }, 10_000);
 }
