@@ -2,19 +2,23 @@
  * Server Entry Point
  *
  * Express + tRPC server with:
- *   - Security headers (helmet) + CORS
+ *   - Security headers (helmet), CORS, CSRF via Origin check
+ *   - Response compression (gzip/brotli)
  *   - Structured logging (pino)
+ *   - Express-level rate limiting on all routes
  *   - Health check endpoints (for load balancers / Docker)
  *   - tRPC API at /api/trpc
  *   - Artifact downloads at /api/artifacts
  *   - Contract handshake at /api/contracts/handshake
  *   - Static file serving for the Vite-built client
- *   - Graceful shutdown
+ *   - Global error handling + graceful shutdown
  */
 
 import express from "express";
+import type { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import helmet from "helmet";
+import compression from "compression";
 import pinoHttp from "pino-http";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import path from "node:path";
@@ -24,6 +28,7 @@ import { createContext } from "./trpc";
 import { appRouter } from "../routers/_incoming_routers";
 import { getDb, closeDb } from "../db";
 import { createArtifactsRouter } from "../routes/artifactsRouter";
+import { rateLimiter, RATE_LIMITERS } from "../middleware/rateLimiter";
 import {
   validateHandshake,
   getAllContractInfo,
@@ -34,6 +39,19 @@ import {
   startHealthMonitor,
   stopHealthMonitor,
 } from "../services/agentHealthMonitor";
+
+// ---------------------------------------------------------------------------
+// Unhandled rejection / exception handlers (must be first)
+// ---------------------------------------------------------------------------
+
+process.on("unhandledRejection", (reason) => {
+  log.error({ err: reason }, "Unhandled promise rejection");
+});
+
+process.on("uncaughtException", (err) => {
+  log.fatal({ err }, "Uncaught exception — shutting down");
+  process.exit(1);
+});
 
 // ---------------------------------------------------------------------------
 // Build info (deploy drift detection)
@@ -64,6 +82,9 @@ const ALLOWED_ORIGINS = env.isProduction
 
 const app = express();
 
+// Trust first proxy (needed for correct req.ip behind reverse proxy)
+app.set("trust proxy", 1);
+
 // Security headers (CSP, HSTS, X-Frame-Options, X-Content-Type-Options, etc.)
 app.use(
   helmet({
@@ -86,7 +107,11 @@ app.use(
 );
 
 app.use(cors({ origin: ALLOWED_ORIGINS, credentials: true }));
+app.use(compression());
 app.use(express.json({ limit: "50mb" }));
+
+// Global rate limiter — 100 req/min per IP on all routes
+app.use(RATE_LIMITERS.api());
 
 // Structured request logging (skip health checks to reduce noise)
 app.use(
@@ -102,6 +127,37 @@ app.use(
 );
 
 // ---------------------------------------------------------------------------
+// CSRF protection — validate Origin header on state-changing requests
+// ---------------------------------------------------------------------------
+
+if (env.isProduction) {
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") {
+      return next();
+    }
+
+    const origin = req.headers.origin;
+    if (!origin) {
+      // Allow server-to-server calls (no Origin header)
+      return next();
+    }
+
+    // Validate origin matches allowed origins
+    const allowed = Array.isArray(ALLOWED_ORIGINS)
+      ? ALLOWED_ORIGINS.some((o) => origin === o)
+      : true;
+
+    if (!allowed) {
+      log.warn({ origin, path: req.path }, "CSRF origin rejected");
+      res.status(403).json({ error: "Forbidden — origin not allowed" });
+      return;
+    }
+
+    next();
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Health checks (no auth, no tRPC — for infra probes)
 // ---------------------------------------------------------------------------
 
@@ -115,8 +171,21 @@ app.get("/healthz", (_req, res) => {
   });
 });
 
-app.get("/readyz", (_req, res) => {
-  res.json({ status: "ready" });
+app.get("/readyz", async (_req, res) => {
+  try {
+    const db = await getDb();
+    if (!db) {
+      res.status(503).json({ status: "not_ready", reason: "database_unavailable" });
+      return;
+    }
+    // Verify DB connectivity with a lightweight query
+    const { sql } = await import("drizzle-orm");
+    await db.execute(sql`SELECT 1`);
+    res.json({ status: "ready" });
+  } catch (err) {
+    log.error(err, "Readiness check failed");
+    res.status(503).json({ status: "not_ready", reason: "database_error" });
+  }
 });
 
 /** Build info endpoint — shows deployed commit SHA + build time */
@@ -128,39 +197,44 @@ app.get("/api/build-info", (_req, res) => {
 // Contract Handshake Endpoint (for agent startup validation)
 // ---------------------------------------------------------------------------
 
-app.post("/api/contracts/handshake", (req, res) => {
-  try {
-    const body = req.body as HandshakeRequest;
+// Stricter rate limit on handshake (10 req/min per IP)
+app.post(
+  "/api/contracts/handshake",
+  rateLimiter({ max: 10, windowMs: 60_000, keyPrefix: "handshake" }),
+  (req: Request, res: Response) => {
+    try {
+      const body = req.body as HandshakeRequest;
 
-    if (!body.agent_id || !Array.isArray(body.contracts)) {
-      res.status(400).json({
-        ok: false,
-        error: "Invalid handshake request. Required: agent_id, contracts[]",
-      });
-      return;
+      if (!body.agent_id || !Array.isArray(body.contracts)) {
+        res.status(400).json({
+          ok: false,
+          error: "Invalid handshake request. Required: agent_id, contracts[]",
+        });
+        return;
+      }
+
+      const result = validateHandshake(body);
+
+      if (!result.ok) {
+        log.error(
+          { agentId: body.agent_id, version: body.agent_version, mismatches: result.mismatches },
+          "Contract mismatch"
+        );
+        logHandshakeMismatch(body.agent_id, body.agent_version ?? "unknown", result);
+      } else {
+        log.info(
+          { agentId: body.agent_id, version: body.agent_version },
+          "Handshake OK"
+        );
+      }
+
+      res.status(result.ok ? 200 : 503).json(result);
+    } catch (err) {
+      log.error(err, "Handshake error");
+      res.status(500).json({ ok: false, error: "Internal handshake error" });
     }
-
-    const result = validateHandshake(body);
-
-    if (!result.ok) {
-      log.error(
-        { agentId: body.agent_id, version: body.agent_version, mismatches: result.mismatches },
-        "Contract mismatch"
-      );
-      logHandshakeMismatch(body.agent_id, body.agent_version ?? "unknown", result);
-    } else {
-      log.info(
-        { agentId: body.agent_id, version: body.agent_version },
-        "Handshake OK"
-      );
-    }
-
-    res.status(result.ok ? 200 : 503).json(result);
-  } catch (err) {
-    log.error(err, "Handshake error");
-    res.status(500).json({ ok: false, error: "Internal handshake error" });
   }
-});
+);
 
 /** GET endpoint for agents to fetch current contract info */
 app.get("/api/contracts/info", (_req, res) => {
@@ -180,8 +254,6 @@ app.get("/api/contracts/info", (_req, res) => {
 const artifactsRouter = createArtifactsRouter({
   getDb: () => getDb() as Promise<any>,
   getUserFromReq: async (req) => {
-    // Extract user from JWT or session cookie
-    // The auth check is the same one tRPC uses — reuse createContext
     try {
       const ctx = await createContext({ req, res: null as any });
       if (ctx.user) return { id: ctx.user.id, role: ctx.user.role };
@@ -191,7 +263,7 @@ const artifactsRouter = createArtifactsRouter({
     return null;
   },
 });
-app.use("/api/artifacts", artifactsRouter);
+app.use("/api/artifacts", RATE_LIMITERS.artifacts(), artifactsRouter);
 
 // ---------------------------------------------------------------------------
 // tRPC API
@@ -206,11 +278,22 @@ app.use(
 );
 
 // ---------------------------------------------------------------------------
-// Static files (Vite client build)
+// Static files (Vite client build) — with cache headers for hashed assets
 // ---------------------------------------------------------------------------
 
 const clientDist = path.resolve(process.cwd(), "dist", "public");
-app.use(express.static(clientDist));
+
+// Vite-built assets have content hashes in filenames — cache aggressively
+app.use(
+  "/assets",
+  express.static(path.join(clientDist, "assets"), {
+    maxAge: "1y",
+    immutable: true,
+  })
+);
+
+// Other static files (index.html, favicons) — short cache
+app.use(express.static(clientDist, { maxAge: "10m" }));
 
 // SPA fallback — serve index.html for all non-API routes
 app.get("*", (_req, res) => {
@@ -220,6 +303,21 @@ app.get("*", (_req, res) => {
       res.status(404).send("Not found");
     }
   });
+});
+
+// ---------------------------------------------------------------------------
+// Global error handler (must be last middleware)
+// ---------------------------------------------------------------------------
+
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+  log.error({ err, stack: err.stack }, "Unhandled Express error");
+
+  // Never leak stack traces in production
+  const message = env.isProduction
+    ? "Internal server error"
+    : err.message;
+
+  res.status(500).json({ error: { code: "INTERNAL_SERVER_ERROR", message } });
 });
 
 // ---------------------------------------------------------------------------
@@ -238,33 +336,40 @@ const server = app.listen(PORT, () => {
     },
     "LaunchBase Platform started"
   );
-  log.info({ url: `http://localhost:${PORT}/healthz` }, "Health endpoint");
-  log.info({ url: `http://localhost:${PORT}/api/trpc` }, "tRPC endpoint");
-  log.info({ url: `http://localhost:${PORT}/api/artifacts` }, "Artifacts endpoint");
-  log.info({ url: `http://localhost:${PORT}/api/contracts/handshake` }, "Handshake endpoint");
 
   startHealthMonitor();
 });
 
 // ---------------------------------------------------------------------------
-// Graceful shutdown
+// Graceful shutdown — drain in-flight requests before closing
 // ---------------------------------------------------------------------------
 
+let isShuttingDown = false;
+
 async function shutdown(signal: string) {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+
   log.info({ signal }, "Shutting down gracefully");
 
   stopHealthMonitor();
 
+  // Stop accepting new connections and wait for in-flight to finish
   server.close(async () => {
-    await closeDb();
-    log.info("Database connections closed");
+    try {
+      await closeDb();
+      log.info("Database connections closed");
+    } catch (err) {
+      log.error(err, "Error closing database");
+    }
     process.exit(0);
   });
 
+  // Force exit after 30s (enough time for long requests to drain)
   setTimeout(() => {
-    log.fatal("Forced exit after 10s timeout");
+    log.fatal("Forced exit after 30s timeout");
     process.exit(1);
-  }, 10_000);
+  }, 30_000).unref();
 }
 
 process.on("SIGTERM", () => shutdown("SIGTERM"));

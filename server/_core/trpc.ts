@@ -11,7 +11,9 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import type { Request, Response } from "express";
 import superjson from "superjson";
+import jwt from "jsonwebtoken";
 import { env } from "./env";
+import log from "./logger";
 
 // ---------------------------------------------------------------------------
 // Context
@@ -42,28 +44,25 @@ export interface TRPCContext {
  * In development, a dev bypass is available via x-dev-user-id header.
  */
 function extractUser(req: Request): User | null {
-  // 1. Bearer token
+  // 1. Bearer token — cryptographically verified with JWT_SECRET
   const authHeader = req.headers.authorization;
   if (authHeader?.startsWith("Bearer ")) {
     const token = authHeader.slice(7);
     try {
-      // Decode JWT payload (base64url)
-      const parts = token.split(".");
-      if (parts.length === 3) {
-        const payload = JSON.parse(
-          Buffer.from(parts[1], "base64url").toString("utf-8")
-        );
-        if (payload.sub && payload.role) {
-          return {
-            id: Number(payload.sub),
-            role: payload.role === "admin" ? "admin" : "user",
-            email: payload.email ?? null,
-            name: payload.name ?? null,
-          };
-        }
+      const payload = jwt.verify(token, env.JWT_SECRET, {
+        algorithms: ["HS256"],
+      }) as jwt.JwtPayload;
+
+      if (payload.sub && payload.role) {
+        return {
+          id: Number(payload.sub),
+          role: payload.role === "admin" ? "admin" : "user",
+          email: (payload.email as string) ?? null,
+          name: (payload.name as string) ?? null,
+        };
       }
-    } catch {
-      // Invalid token format — fall through
+    } catch (err) {
+      log.warn({ err }, "JWT verification failed");
     }
   }
 
