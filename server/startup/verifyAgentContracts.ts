@@ -16,6 +16,7 @@ export interface AgentContractVerificationStatus {
   ok: boolean;
   checkedAt: string | null;
   errors: string[];
+  mode?: "warn" | "enforce";
 }
 
 let _status: AgentContractVerificationStatus = {
@@ -97,11 +98,18 @@ async function fetchAgentHealth(agentUrl: string): Promise<AgentHealthPayload> {
 }
 
 export async function verifyAgentContracts(): Promise<void> {
+  const mode =
+    (process.env.AGENT_CONTRACT_VERIFICATION_MODE ?? "warn").toLowerCase() ===
+    "enforce"
+      ? "enforce"
+      : "warn";
+
   if (process.env.SKIP_AGENT_CONTRACT_VERIFICATION === "true") {
     _status = {
       ok: true,
       checkedAt: new Date().toISOString(),
       errors: [],
+      mode,
     };
     console.warn("[startup] Agent contract verification skipped by env flag");
     return;
@@ -151,6 +159,7 @@ export async function verifyAgentContracts(): Promise<void> {
     ok: errors.length === 0,
     checkedAt: new Date().toISOString(),
     errors,
+    mode,
   };
 
   if (!_status.ok) {
@@ -158,7 +167,14 @@ export async function verifyAgentContracts(): Promise<void> {
     for (const error of _status.errors) {
       console.error(`[startup] - ${error}`);
     }
-    process.exit(1);
+    if (mode === "enforce") {
+      throw new Error(
+        `Agent contract verification failed (${_status.errors.length} error(s))`
+      );
+    }
+    console.warn(
+      "[startup] Continuing startup in warn mode (set AGENT_CONTRACT_VERIFICATION_MODE=enforce to fail closed)."
+    );
   }
 }
 
