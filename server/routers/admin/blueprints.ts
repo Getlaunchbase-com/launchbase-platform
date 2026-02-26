@@ -392,10 +392,10 @@ export const blueprintsRouter = router({
       const uploadedArtifactId = uploadedArtifact.insertId;
 
       const workspace = AGENT_WORKSPACE_ID;
-      const jobPrefix = `intake/${input.projectId}/${uploadedArtifactId}_${Date.now()}`;
-      const b64Path = `${jobPrefix}/source.b64`;
-      const pdfPath = `${jobPrefix}/source.pdf`;
-      const partDir = `${jobPrefix}/b64parts`;
+      const runKey = `${input.projectId}_${uploadedArtifactId}_${Date.now()}`;
+      const b64Path = `source_${runKey}.b64`;
+      const pdfPath = `source_${runKey}.pdf`;
+      const partDir = `b64parts_${runKey}`;
       const b64Chunks = splitIntoChunks(normalizedBase64, AGENT_B64_CHUNK_CHARS);
       if (b64Chunks.length === 1) {
         const writeResp = await callAgentTool("workspace_write", {
@@ -435,8 +435,9 @@ export const blueprintsRouter = router({
       const decodeResp = await callAgentTool("sandbox_run", {
         workspace,
         cmd:
-          `mkdir -p ${shQuote(jobPrefix)} && (` +
+          `mkdir -p ${shQuote(partDir)} && (` +
           `${composeB64Cmd}` +
+          `test -s ${shQuote(b64Path)} && ` +
           `base64 -d ${shQuote(b64Path)} > ${shQuote(pdfPath)} ` +
           `|| python3 -c "import base64,re;` +
           `src=open('${b64Path}','r',encoding='utf-8',errors='ignore').read();` +
@@ -461,7 +462,7 @@ export const blueprintsRouter = router({
       const parseResp = await callAgentTool("blueprint_parse_document", {
         workspace,
         pdf_path: pdfPath,
-        output_dir: `${jobPrefix}/parse`,
+        output_dir: `parse_${runKey}`,
         include_debug: false,
       }, 600_000);
       if (!parseResp.ok) {
@@ -486,8 +487,8 @@ export const blueprintsRouter = router({
         throw new TRPCError({ code: "BAD_REQUEST", message: takeoffResp.error || "Takeoff generation failed", cause: takeoffResp });
       }
 
-      const xlsxPath = `${jobPrefix}/outputs/takeoff.xlsx`;
-      const docxPath = `${jobPrefix}/outputs/takeoff_summary.docx`;
+      const xlsxPath = `outputs_${runKey}/takeoff.xlsx`;
+      const docxPath = `outputs_${runKey}/takeoff_summary.docx`;
       const xlsxResp = await callAgentTool("artifact_write_xlsx_takeoff", {
         workspace,
         takeoff_json: takeoffResp,
@@ -508,7 +509,7 @@ export const blueprintsRouter = router({
       const detectResp = await callAgentTool("blueprint_detect_symbols", {
         workspace,
         pdf_path: pdfPath,
-        output_dir: `${jobPrefix}/detect`,
+        output_dir: `detect_${runKey}`,
         include_overlays: false,
       }, 600_000);
 
