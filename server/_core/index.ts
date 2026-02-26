@@ -64,18 +64,20 @@ function resolveBlueprintImagePath(relPath: string): string | null {
   const artifactsRootNorm = artifactsRoot.replace(/\\/g, "/");
 
   let candidatePath: string;
-  if (normalized.startsWith("blueprints/")) {
-    candidatePath = path.resolve(ARTIFACTS_DIR, normalized);
+  if (normalized.startsWith("artifacts/")) {
+    candidatePath = path.resolve(ARTIFACTS_DIR, normalized.slice("artifacts/".length));
+  } else if (normalized.startsWith("/")) {
+    candidatePath = path.resolve(normalized);
   } else if (normalized.startsWith(`${artifactsRootNorm}/`)) {
     candidatePath = path.resolve(normalized);
   } else {
-    const marker = "/blueprints/";
+    const marker = "/artifacts/";
     const idx = normalized.indexOf(marker);
     if (idx >= 0) {
-      const rel = normalized.slice(idx + 1); // keep "blueprints/..."
+      const rel = normalized.slice(idx + marker.length);
       candidatePath = path.resolve(ARTIFACTS_DIR, rel);
     } else {
-      return null;
+      candidatePath = path.resolve(ARTIFACTS_DIR, normalized);
     }
   }
 
