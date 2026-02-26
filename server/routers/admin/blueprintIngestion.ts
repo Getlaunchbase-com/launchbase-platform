@@ -644,9 +644,21 @@ export const blueprintIngestionRouter = router({
           storagePath: artifact.storagePath,
           filename: artifact.filename,
         });
-        const jobPrefix = `ingest/${doc.projectId}/${input.documentId}_${Date.now()}`;
+        // Keep staging under runner-owned workspace tree to avoid root-owned write locks.
+        const jobPrefix = `blueprints/${doc.projectId}/ingest_${input.documentId}_${Date.now()}`;
         const b64Path = `${jobPrefix}/source.b64`;
         const pdfPath = `${jobPrefix}/source.pdf`;
+
+        await callAgentTool(
+          AGENT_URL,
+          "sandbox_run",
+          {
+            workspace: AGENT_WORKSPACE_ID,
+            cmd: `mkdir -p ${shQuote(jobPrefix)}`,
+            timeout_sec: 60,
+          },
+          120_000
+        );
 
         await callAgentTool(
           AGENT_URL,
@@ -664,7 +676,7 @@ export const blueprintIngestionRouter = router({
           "sandbox_run",
           {
             workspace: AGENT_WORKSPACE_ID,
-            cmd: `mkdir -p ${shQuote(jobPrefix)} && base64 -d ${shQuote(b64Path)} > ${shQuote(pdfPath)}`,
+            cmd: `base64 -d ${shQuote(b64Path)} > ${shQuote(pdfPath)}`,
             timeout_sec: 300,
           },
           300_000
