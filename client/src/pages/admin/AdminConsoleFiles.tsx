@@ -3,12 +3,51 @@ import { AdminLayout } from "../../components/AdminLayout";
 import { Download, Eye, Upload } from "../../components/Icons";
 import { trpc } from "../../lib/trpc";
 
+async function fileToBase64(file: File): Promise<string> {
+  return await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const data = String(reader.result || "");
+      const i = data.indexOf(",");
+      resolve(i >= 0 ? data.slice(i + 1) : data);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 export default function AdminConsoleFiles() {
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<"all" | "uploads" | "artifacts">("all");
+  const [projectId, setProjectId] = useState(1);
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadMessage, setUploadMessage] = useState<string | null>(null);
 
+  const utils = trpc.useUtils();
   const artifactsQuery = trpc.admin.operatorOS.listArtifacts.useQuery({ limit: 100, offset: 0 });
+  const uploadMut = trpc.admin.blueprints.upload.useMutation({
+    onSuccess: async (data) => {
+      setUploadMessage(`Upload complete (artifact #${data.artifactId}).`);
+      setUploadFile(null);
+      await utils.admin.operatorOS.listArtifacts.invalidate();
+    },
+    onError: (err) => {
+      setUploadMessage(err.message || "Upload failed.");
+    },
+  });
   const artifacts = artifactsQuery.data?.artifacts ?? [];
+  const canUpload = !!uploadFile && !uploadMut.isPending;
+
+  async function onUploadNow() {
+    if (!uploadFile) return;
+    const base64Data = await fileToBase64(uploadFile);
+    await uploadMut.mutateAsync({
+      projectId,
+      filename: uploadFile.name,
+      mimeType: uploadFile.type || "application/pdf",
+      base64Data,
+    });
+  }
 
   const { uploads, generated } = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -51,10 +90,50 @@ export default function AdminConsoleFiles() {
           </div>
         </div>
 
-        <section style={{ ...panelStyle, marginBottom: "12px", borderStyle: "dashed", borderWidth: "2px", textAlign: "center", cursor: "not-allowed", opacity: 0.85 }}>
+        <section style={{ ...panelStyle, marginBottom: "12px", borderStyle: "dashed", borderWidth: "2px" }}>
           <Upload size={22} style={{ margin: "0 auto 8px", color: "#888" }} />
-          <div style={{ fontSize: "14px", color: "#d5d5d5", marginBottom: "4px" }}>Upload endpoint not wired on this page</div>
-          <div style={{ fontSize: "12px", color: "#777" }}>Use blueprint viewer flow for ingestion until upload mutation is added here.</div>
+          <div style={{ fontSize: "14px", color: "#d5d5d5", marginBottom: "8px", textAlign: "center" }}>Quick Upload</div>
+          <div style={{ display: "grid", gridTemplateColumns: "160px 1fr auto", gap: "8px", alignItems: "center" }}>
+            <input
+              type="number"
+              value={projectId}
+              min={1}
+              onChange={(e) => setProjectId(Number(e.target.value || 1))}
+              style={inputStyle}
+              aria-label="Project ID"
+            />
+            <input
+              type="file"
+              accept="application/pdf,.pdf"
+              onChange={(e) => setUploadFile(e.target.files?.[0] ?? null)}
+              style={{ ...inputStyle, padding: "6px" }}
+              aria-label="Blueprint file"
+            />
+            <button
+              onClick={onUploadNow}
+              disabled={!canUpload}
+              style={{
+                ...actionStyle,
+                justifyContent: "center",
+                cursor: canUpload ? "pointer" : "not-allowed",
+                opacity: canUpload ? 1 : 0.5,
+                minWidth: "110px",
+              }}
+              title={!canUpload ? "Select a file first." : "Upload blueprint"}
+            >
+              {uploadMut.isPending ? "Uploading..." : "Upload"}
+            </button>
+          </div>
+          {uploadFile && (
+            <div style={{ marginTop: "8px", fontSize: "12px", color: "#93c5fd" }}>
+              Selected: {uploadFile.name} ({Math.max(1, Math.round(uploadFile.size / 1024))} KB)
+            </div>
+          )}
+          {uploadMessage && (
+            <div style={{ marginTop: "8px", fontSize: "12px", color: uploadMessage.includes("complete") ? "#22c55e" : "#ef4444" }}>
+              {uploadMessage}
+            </div>
+          )}
         </section>
 
         {(typeFilter === "all" || typeFilter === "uploads") && (

@@ -9,11 +9,24 @@ export default function AdminAgentChat() {
   const [inputText, setInputText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<"all" | "running" | "failed" | "awaiting_approval">("all");
+  const [runGoal, setRunGoal] = useState("");
+  const [launchMessage, setLaunchMessage] = useState<string | null>(null);
 
+  const utils = trpc.useUtils();
   const runtimeQuery = trpc.admin.operatorOS.getRuntimeStatus.useQuery();
   const runsQuery = trpc.admin.operatorOS.listRuns.useQuery({ limit: 50, offset: 0 });
   const artifactsQuery = trpc.admin.operatorOS.listArtifacts.useQuery({ limit: 20, offset: 0 });
   const approvalsQuery = trpc.admin.operatorOS.pendingProposals.useQuery({ limit: 20, offset: 0 });
+  const launchRunMut = trpc.admin.operatorOS.launchInstanceRun.useMutation({
+    onSuccess: async (data) => {
+      setLaunchMessage(`Run #${data.runId} started.`);
+      setRunGoal("");
+      await utils.admin.operatorOS.listRuns.invalidate();
+    },
+    onError: (err) => {
+      setLaunchMessage(err.message || "Failed to start run.");
+    },
+  });
 
   const allRuns = runsQuery.data?.runs ?? [];
   const filteredRuns = useMemo(() => {
@@ -41,6 +54,24 @@ export default function AdminAgentChat() {
   const runtimeHealthy = runtimeStatus === "healthy";
   const canStart = runtimeHealthy && !!activeRun && activeRun.projectId != null && activeRun.agentInstanceId != null;
   const stopReason = "Stop/pause mutation is not available in current router.";
+  const startReason = !runtimeHealthy
+    ? "Runtime is not healthy."
+    : !activeRun
+      ? "No run context selected."
+      : activeRun.projectId == null || activeRun.agentInstanceId == null
+        ? "Selected run has no project or instance."
+        : null;
+
+  async function onStartRun() {
+    if (!activeRun || activeRun.projectId == null || activeRun.agentInstanceId == null) return;
+    const goal = runGoal.trim() || activeRun.goal || `Operator run ${new Date().toISOString()}`;
+    await launchRunMut.mutateAsync({
+      projectId: activeRun.projectId,
+      agentInstanceId: activeRun.agentInstanceId,
+      goal,
+      model: activeRun.model ?? undefined,
+    });
+  }
 
   return (
     <AdminLayout>
@@ -216,6 +247,27 @@ export default function AdminAgentChat() {
             </Card>
 
             <Card title="Operator Notes">
+              <label style={{ display: "block", marginBottom: "8px" }}>
+                <span style={{ fontSize: "11px", color: "#777", textTransform: "uppercase", letterSpacing: "0.3px" }}>
+                  Run Goal Override
+                </span>
+                <input
+                  value={runGoal}
+                  onChange={(e) => setRunGoal(e.target.value)}
+                  placeholder="Optional: set goal for Start Run"
+                  style={{
+                    marginTop: "6px",
+                    width: "100%",
+                    padding: "10px",
+                    backgroundColor: "#0f0f0f",
+                    color: "#ddd",
+                    border: "1px solid #333",
+                    borderRadius: "6px",
+                    fontSize: "13px",
+                    outline: "none",
+                  }}
+                />
+              </label>
               <textarea
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
@@ -244,6 +296,11 @@ export default function AdminAgentChat() {
               <div style={{ fontSize: "11px", color: "#777", marginTop: "6px" }}>
                 {inputText.length} chars | Send disabled until chat transport router is added.
               </div>
+              {launchMessage && (
+                <div style={{ marginTop: "10px", fontSize: "12px", color: launchMessage.includes("started") ? "#22c55e" : "#ef4444" }}>
+                  {launchMessage}
+                </div>
+              )}
             </Card>
           </div>
         </div>
@@ -321,12 +378,13 @@ export default function AdminAgentChat() {
         }}
       >
         <button
-          disabled={!canStart}
-          style={actionBtn(!canStart ? "#333" : "#ff6b35", !canStart)}
-          title={!canStart ? "Need healthy runtime and run with project + instance IDs." : "Launch instance run (existing endpoint)."}
+          disabled={!canStart || launchRunMut.isPending}
+          onClick={onStartRun}
+          style={actionBtn(!canStart || launchRunMut.isPending ? "#333" : "#ff6b35", !canStart || launchRunMut.isPending)}
+          title={startReason ?? "Launch instance run (existing endpoint)."}
         >
           <Zap size={14} />
-          Start Run
+          {launchRunMut.isPending ? "Starting..." : "Start Run"}
         </button>
         <button disabled title={stopReason} style={actionBtn("#2a2a2a", true)}>
           <Square size={13} />

@@ -54,8 +54,6 @@ export {
   validateHandshake,
   computeSchemaHash,
   getAllContractInfo,
-  stableHash,
-  logHandshakeMismatch,
 } from "./handshake";
 
 // Freeze governance

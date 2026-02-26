@@ -78,7 +78,7 @@ export default function AdminBlueprintViewer() {
   const [lastResult, setLastResult] = useState<UploadResult | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
 
-  const uploadMut = trpc.blueprints.uploadAndGenerateQuotePackage.useMutation({
+  const uploadMut = trpc.admin.blueprints.uploadAndGenerateQuotePackage.useMutation({
     onSuccess: (data) => {
       setLastResult(data as UploadResult);
       setLastError(null);
