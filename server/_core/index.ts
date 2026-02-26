@@ -14,7 +14,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import path from "node:path";
 import { createHash, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { sql } from "drizzle-orm";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 import { env } from "./env";
 import { createContext } from "./trpc";
@@ -231,14 +231,26 @@ app.post("/auth/login", async (req, res) => {
       await db.update(users).set({ role: userRole }).where(eq(users.id, userId));
     }
 
-    // Bootstrap a default project/instance for first-time mobile users.
-    const existingProjects = await db
+    // Guarantee at least one ACTIVE project visible in Jobs for mobile users.
+    const activeOwnedProjects = await db
       .select({ id: projects.id })
       .from(projects)
-      .where(eq(projects.ownerId, Number(userId)))
+      .where(and(eq(projects.ownerId, Number(userId)), eq(projects.status, "active")))
       .limit(1);
 
-    if (existingProjects.length === 0) {
+    const activeCollabProjects = await db
+      .select({ projectId: projectCollaborators.projectId })
+      .from(projectCollaborators)
+      .leftJoin(projects, eq(projectCollaborators.projectId, projects.id))
+      .where(
+        and(
+          eq(projectCollaborators.userId, Number(userId)),
+          eq(projects.status, "active")
+        )
+      )
+      .limit(1);
+
+    if (activeOwnedProjects.length === 0 && activeCollabProjects.length === 0) {
       const slugBase = `ibew-134-${Number(userId)}`;
       const [newProject] = await db.insert(projects).values({
         name: "IBEW 134 Beta Project",
