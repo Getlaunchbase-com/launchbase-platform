@@ -2189,6 +2189,27 @@ export type AgentInstance = typeof agentInstances.$inferSelect;
 export type InsertAgentInstance = typeof agentInstances.$inferInsert;
 
 // ---------------------------------------------------------------------------
+// Mobile User Credentials - per-user password hashes for mobile auth
+// ---------------------------------------------------------------------------
+
+export const mobileUserCredentials = mysqlTable(
+  "mobile_user_credentials",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("userId").notNull(),
+    passwordHash: varchar("passwordHash", { length: 255 }).notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (t) => ({
+    userUniqueIdx: uniqueIndex("muc_user_unique_idx").on(t.userId),
+  })
+);
+
+export type MobileUserCredential = typeof mobileUserCredentials.$inferSelect;
+export type InsertMobileUserCredential = typeof mobileUserCredentials.$inferInsert;
+
+// ---------------------------------------------------------------------------
 // Agent Instance Secrets — encrypted key/value pairs per instance
 // Never return raw values through the API — only confirm existence.
 // ---------------------------------------------------------------------------

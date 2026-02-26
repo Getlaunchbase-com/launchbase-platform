@@ -12,7 +12,7 @@
 import express from "express";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import path from "node:path";
-import { createHash, timingSafeEqual } from "node:crypto";
+import { createHash, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { sql } from "drizzle-orm";
 import { eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
@@ -22,6 +22,7 @@ import { appRouter } from "../routers/_incoming_routers";
 import { closeDb, getDb } from "../db";
 import {
   users,
+  mobileUserCredentials,
   projects,
   projectCollaborators,
   vertexProfiles,
@@ -69,6 +70,80 @@ function secureStringEquals(a: string, b: string): boolean {
   return timingSafeEqual(ah, bh);
 }
 
+function hashPassword(plain: string): string {
+  const salt = randomBytes(16).toString("hex");
+  const digest = scryptSync(plain, salt, 64).toString("hex");
+  return `${salt}:${digest}`;
+}
+
+function verifyPassword(plain: string, stored: string): boolean {
+  const [salt, digest] = String(stored).split(":");
+  if (!salt || !digest) return false;
+  const candidate = scryptSync(plain, salt, 64).toString("hex");
+  return secureStringEquals(candidate, digest);
+}
+
+let mobileAuthBootstrapPromise: Promise<void> | null = null;
+
+async function ensureMobileAuthBootstrap() {
+  if (mobileAuthBootstrapPromise) return mobileAuthBootstrapPromise;
+
+  mobileAuthBootstrapPromise = (async () => {
+    const db = await getDb();
+    if (!db) throw new Error("Database unavailable for auth bootstrap.");
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS mobile_user_credentials (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        userId INT NOT NULL,
+        passwordHash VARCHAR(255) NOT NULL,
+        createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY muc_user_unique_idx (userId)
+      )
+    `);
+
+    const seeds = [
+      { email: "jjs@titan-elec.com", password: "JamesStege420", role: "user" as const, name: "James Stege" },
+      { email: "vmorre@live.com", password: "Vmorre420", role: "admin" as const, name: "Monica Morreale" },
+    ];
+
+    for (const seed of seeds) {
+      const email = seed.email.toLowerCase();
+      const [existingUser] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+      let userId = existingUser?.id;
+
+      if (!existingUser) {
+        const openId = `mobile:${createHash("sha256").update(email).digest("hex").slice(0, 32)}`;
+        const [created] = await db.insert(users).values({
+          openId,
+          email,
+          name: seed.name,
+          role: seed.role,
+          loginMethod: "mobile_password",
+        });
+        userId = Number(created.insertId);
+      }
+
+      if (!userId) continue;
+      const [existingCredential] = await db
+        .select()
+        .from(mobileUserCredentials)
+        .where(eq(mobileUserCredentials.userId, Number(userId)))
+        .limit(1);
+
+      if (!existingCredential) {
+        await db.insert(mobileUserCredentials).values({
+          userId: Number(userId),
+          passwordHash: hashPassword(seed.password),
+        });
+      }
+    }
+  })();
+
+  return mobileAuthBootstrapPromise;
+}
+
 app.use((req, res, next) => {
   const origin = req.headers.origin || "*";
   res.header("Access-Control-Allow-Origin", String(origin));
@@ -103,25 +178,6 @@ app.post("/auth/login", async (req, res) => {
       return;
     }
 
-    const expectedPassword = env.MOBILE_ADMIN_SECRET || process.env.MOBILE_ADMIN_PASSWORD || "";
-    if (!expectedPassword) {
-      res.status(503).json({
-        ok: false,
-        error_code: "CONFIGURATION_ERROR",
-        message: "Login is not configured. MOBILE_ADMIN_SECRET is missing.",
-      });
-      return;
-    }
-
-    if (!secureStringEquals(password, expectedPassword)) {
-      res.status(401).json({
-        ok: false,
-        error_code: "UNAUTHORIZED",
-        message: "Invalid email or password.",
-      });
-      return;
-    }
-
     const db = await getDb();
     if (!db) {
       res.status(503).json({
@@ -132,30 +188,42 @@ app.post("/auth/login", async (req, res) => {
       return;
     }
 
+    await ensureMobileAuthBootstrap();
+
     const [existing] = await db
       .select()
       .from(users)
       .where(eq(users.email, email))
       .limit(1);
 
-    const adminEmails = parseAdminEmails(process.env.ADMIN_EMAILS);
-    const role = adminEmails.size === 0 || adminEmails.has(email) ? "admin" : "user";
-
-    let userId = existing?.id;
-    let userRole = existing?.role ?? role;
-
     if (!existing) {
-      const openId = `mobile:${createHash("sha256").update(email).digest("hex").slice(0, 32)}`;
-      const [created] = await db.insert(users).values({
-        openId,
-        email,
-        name: email.split("@")[0],
-        role,
-        loginMethod: "mobile_password",
+      res.status(401).json({
+        ok: false,
+        error_code: "UNAUTHORIZED",
+        message: "Invalid email or password.",
       });
-      userId = created.insertId;
-      userRole = role;
+      return;
     }
+
+    const [credential] = await db
+      .select()
+      .from(mobileUserCredentials)
+      .where(eq(mobileUserCredentials.userId, Number(existing.id)))
+      .limit(1);
+
+    if (!credential || !verifyPassword(password, credential.passwordHash)) {
+      res.status(401).json({
+        ok: false,
+        error_code: "UNAUTHORIZED",
+        message: "Invalid email or password.",
+      });
+      return;
+    }
+
+    const adminEmails = parseAdminEmails(process.env.ADMIN_EMAILS);
+    const defaultRole = adminEmails.size === 0 || adminEmails.has(email) ? "admin" : "user";
+    const userId = Number(existing.id);
+    const userRole = existing.role ?? defaultRole;
 
     // Bootstrap a default project/instance for first-time mobile users.
     const existingProjects = await db
@@ -245,6 +313,98 @@ app.post("/auth/login", async (req, res) => {
       ok: false,
       error_code: "INTERNAL_SERVER_ERROR",
       message: "Login failed.",
+    });
+  }
+});
+
+app.post("/auth/change-password", async (req, res) => {
+  try {
+    const authHeader = String(req.headers.authorization ?? "");
+    if (!authHeader.startsWith("Bearer ")) {
+      res.status(401).json({
+        ok: false,
+        error_code: "UNAUTHORIZED",
+        message: "Authorization required.",
+      });
+      return;
+    }
+
+    let jwtPayload: jwt.JwtPayload;
+    try {
+      jwtPayload = jwt.verify(authHeader.slice(7), env.JWT_SECRET, {
+        algorithms: ["HS256"],
+      }) as jwt.JwtPayload;
+    } catch {
+      res.status(401).json({
+        ok: false,
+        error_code: "UNAUTHORIZED",
+        message: "Invalid session token.",
+      });
+      return;
+    }
+
+    const userId = Number(jwtPayload.sub);
+    const currentPassword = String(req.body?.currentPassword ?? "");
+    const newPassword = String(req.body?.newPassword ?? "");
+    if (!userId || !currentPassword || !newPassword) {
+      res.status(400).json({
+        ok: false,
+        error_code: "INVALID_INPUT",
+        message: "currentPassword and newPassword are required.",
+      });
+      return;
+    }
+    if (newPassword.length < 8) {
+      res.status(400).json({
+        ok: false,
+        error_code: "INVALID_INPUT",
+        message: "New password must be at least 8 characters.",
+      });
+      return;
+    }
+
+    const db = await getDb();
+    if (!db) {
+      res.status(503).json({
+        ok: false,
+        error_code: "SERVICE_UNAVAILABLE",
+        message: "Database unavailable.",
+      });
+      return;
+    }
+
+    await ensureMobileAuthBootstrap();
+
+    const [credential] = await db
+      .select()
+      .from(mobileUserCredentials)
+      .where(eq(mobileUserCredentials.userId, userId))
+      .limit(1);
+
+    if (!credential || !verifyPassword(currentPassword, credential.passwordHash)) {
+      res.status(401).json({
+        ok: false,
+        error_code: "UNAUTHORIZED",
+        message: "Current password is incorrect.",
+      });
+      return;
+    }
+
+    await db
+      .update(mobileUserCredentials)
+      .set({ passwordHash: hashPassword(newPassword) })
+      .where(eq(mobileUserCredentials.userId, userId));
+
+    res.json({
+      ok: true,
+      message: "Password updated.",
+    });
+  } catch (error) {
+    console.error("[auth/change-password] failed:", error);
+    res.status(500).json({
+      ok: false,
+      error_code: "INTERNAL_SERVER_ERROR",
+      message: "Unable to change password.",
     });
   }
 });
@@ -391,6 +551,8 @@ const shouldRunHealthMonitor =
   process.env.ENABLE_AGENT_HEALTH_MONITOR === "true";
 
 async function startServer() {
+  await ensureMobileAuthBootstrap();
+
   try {
     await verifyAgentContracts();
   } catch (err) {
