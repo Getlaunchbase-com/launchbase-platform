@@ -69,7 +69,7 @@ export default function AdminConsoleFiles() {
           Uploaded files and agent-generated artifacts
         </p>
 
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "12px", marginBottom: "16px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "12px", marginBottom: "16px" }}>
           <div>
             <label style={labelStyle}>Search</label>
             <input
@@ -93,7 +93,7 @@ export default function AdminConsoleFiles() {
         <section style={{ ...panelStyle, marginBottom: "12px", borderStyle: "dashed", borderWidth: "2px" }}>
           <Upload size={22} style={{ margin: "0 auto 8px", color: "#888" }} />
           <div style={{ fontSize: "14px", color: "#d5d5d5", marginBottom: "8px", textAlign: "center" }}>Quick Upload</div>
-          <div style={{ display: "grid", gridTemplateColumns: "160px 1fr auto", gap: "8px", alignItems: "center" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "8px", alignItems: "center" }}>
             <input
               type="number"
               value={projectId}
@@ -169,7 +169,7 @@ function FileRow({ file }: { file: { id: number; filename: string; type: string;
   const viewHref = `/api/artifacts/${file.id}`;
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr auto auto", gap: "10px", alignItems: "center", border: "1px solid #2d2d2d", borderRadius: "8px", padding: "10px", marginBottom: "8px", backgroundColor: "#111" }}>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr auto auto", gap: "10px", alignItems: "center", border: "1px solid #2d2d2d", borderRadius: "8px", padding: "10px", marginBottom: "8px", backgroundColor: "#111", overflowX: "auto" }}>
       <div>
         <div style={{ fontSize: "12px", fontWeight: 700, color: "#e9e9e9" }}>{file.filename}</div>
         <div style={{ fontSize: "11px", color: "#888", marginTop: "4px" }}>

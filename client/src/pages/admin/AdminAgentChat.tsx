@@ -87,7 +87,7 @@ export default function AdminAgentChat() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "300px 1fr 320px", gap: "12px", minHeight: "calc(100vh - 190px)" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "12px", minHeight: "calc(100vh - 190px)" }}>
         <div
           style={{
             backgroundColor: "#1a1a1a",
@@ -479,9 +479,11 @@ function actionBtn(backgroundColor: string, disabled: boolean): React.CSSPropert
     opacity: disabled ? 0.6 : 1,
     display: "inline-flex",
     alignItems: "center",
+    justifyContent: "center",
     gap: "6px",
     outline: "none",
     minHeight: "40px",
+    flex: "1 1 180px",
   };
 }
 

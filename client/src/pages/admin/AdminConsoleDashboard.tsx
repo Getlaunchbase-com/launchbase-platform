@@ -32,7 +32,7 @@ export default function AdminConsoleDashboard() {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: "12px", marginBottom: "20px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "12px", marginBottom: "20px" }}>
         <StatusCard
           label="System Health"
           value={runtime?.status ?? "offline"}
@@ -59,14 +59,14 @@ export default function AdminConsoleDashboard() {
         />
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: "10px", marginBottom: "20px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "10px", marginBottom: "20px" }}>
         <ActionButton label="New Chat Session" icon={<MessageSquare size={14} />} onClick={() => setLocation("/admin/agent/chat")} primary />
         <ActionButton label="View All Runs" icon={<Zap size={14} />} onClick={() => setLocation("/admin/console/runs")} />
         <ActionButton label="Manage Tools" icon={<TrendingUp size={14} />} onClick={() => setLocation("/admin/console/tools")} />
         <ActionButton label="Settings" icon={<Clock size={14} />} onClick={() => setLocation("/admin/console/settings")} />
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "12px" }}>
         <section style={panelStyle}>
           <h2 style={sectionTitle}>Recent Runs</h2>
           {runsQuery.isLoading && <MetaText text="Loading runs..." />}

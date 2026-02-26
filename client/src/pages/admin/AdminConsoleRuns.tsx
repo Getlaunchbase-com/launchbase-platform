@@ -36,7 +36,7 @@ export default function AdminConsoleRuns() {
           Monitor and inspect agent runs
         </p>
 
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "12px", marginBottom: "18px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "12px", marginBottom: "18px" }}>
           <div>
             <label style={labelStyle}>Search</label>
             <div style={{ position: "relative" }}>
@@ -69,8 +69,8 @@ export default function AdminConsoleRuns() {
           </div>
         </div>
 
-        <section style={{ backgroundColor: "#1a1a1a", border: "1px solid #333", borderRadius: "10px", overflow: "hidden" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "120px 1fr 120px 160px 110px", gap: "12px", padding: "12px 14px", borderBottom: "1px solid #333", fontSize: "10px", color: "#777", fontWeight: 700, textTransform: "uppercase" }}>
+        <section style={{ backgroundColor: "#1a1a1a", border: "1px solid #333", borderRadius: "10px", overflowX: "auto" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "120px 1fr 120px 160px 110px", minWidth: "720px", gap: "12px", padding: "12px 14px", borderBottom: "1px solid #333", fontSize: "10px", color: "#777", fontWeight: 700, textTransform: "uppercase" }}>
             <span>ID</span>
             <span>Goal</span>
             <span>Status</span>
@@ -83,7 +83,7 @@ export default function AdminConsoleRuns() {
           {!runsQuery.isLoading && !runsQuery.error && filteredRuns.length === 0 && <Empty text="No runs match filters." />}
 
           {!runsQuery.isLoading && !runsQuery.error && filteredRuns.map((run) => (
-            <div key={run.id} style={{ display: "grid", gridTemplateColumns: "120px 1fr 120px 160px 110px", gap: "12px", padding: "12px 14px", borderBottom: "1px solid #262626", alignItems: "center" }}>
+            <div key={run.id} style={{ display: "grid", gridTemplateColumns: "120px 1fr 120px 160px 110px", minWidth: "720px", gap: "12px", padding: "12px 14px", borderBottom: "1px solid #262626", alignItems: "center" }}>
               <div style={{ fontSize: "12px", color: "#f0f0f0", fontWeight: 700 }}>#{run.id}</div>
               <div style={{ fontSize: "12px", color: "#cfcfcf" }}>{(run.goal ?? "No goal").slice(0, 90)}</div>
               <Badge text={run.status} />
