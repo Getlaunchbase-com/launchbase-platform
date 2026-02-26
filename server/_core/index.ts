@@ -201,7 +201,16 @@ const PORT = env.PORT;
 let server: ReturnType<typeof app.listen> | null = null;
 
 async function startServer() {
-  await verifyAgentContracts();
+  try {
+    await verifyAgentContracts();
+  } catch (err) {
+    if (env.NODE_ENV === "development") {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn(`[startup] Development mode: continuing despite contract verification failure: ${msg}`);
+    } else {
+      throw err;
+    }
+  }
 
   server = app.listen(PORT, () => {
     console.log(`[server] ====================================`);
