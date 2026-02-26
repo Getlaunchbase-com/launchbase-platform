@@ -63,6 +63,40 @@ function ensureDir(dir: string) {
   }
 }
 
+function shQuote(v: string): string {
+  return `'${v.replace(/'/g, `'\"'\"'`)}'`;
+}
+
+async function loadArtifactBuffer(artifact: {
+  storageBackend: string | null;
+  storagePath: string;
+  filename: string;
+}): Promise<Buffer> {
+  if (artifact.storageBackend === "s3") {
+    const { S3Client, GetObjectCommand } = await import("@aws-sdk/client-s3");
+    const bucket = process.env.ARTIFACTS_S3_BUCKET || "launchbase-artifacts";
+    const s3 = new S3Client({});
+    const out = await s3.send(
+      new GetObjectCommand({
+        Bucket: bucket,
+        Key: artifact.storagePath,
+      })
+    );
+    const bytes = await out.Body?.transformToByteArray();
+    if (!bytes) throw new Error("S3 object body empty");
+    return Buffer.from(bytes);
+  }
+
+  const fullPath = path.resolve(ARTIFACTS_DIR, artifact.storagePath);
+  if (
+    !fullPath.startsWith(path.resolve(ARTIFACTS_DIR) + path.sep) ||
+    !fs.existsSync(fullPath)
+  ) {
+    throw new Error(`Artifact file not found: ${artifact.filename}`);
+  }
+  return fs.readFileSync(fullPath);
+}
+
 type AgentToolResponse = Record<string, unknown>;
 
 function unwrapToolPayload(body: AgentToolResponse): AgentToolResponse {
@@ -605,12 +639,43 @@ export const blueprintIngestionRouter = router({
 
       try {
         // --- 3. Call agent-stack: parse ---
+        const artifactBuffer = await loadArtifactBuffer({
+          storageBackend: artifact.storageBackend ?? "local",
+          storagePath: artifact.storagePath,
+          filename: artifact.filename,
+        });
+        const jobPrefix = `ingest/${doc.projectId}/${input.documentId}_${Date.now()}`;
+        const b64Path = `${jobPrefix}/source.b64`;
+        const pdfPath = `${jobPrefix}/source.pdf`;
+
+        await callAgentTool(
+          AGENT_URL,
+          "workspace_write",
+          {
+            workspace: AGENT_WORKSPACE_ID,
+            path: b64Path,
+            content: artifactBuffer.toString("base64"),
+          },
+          300_000
+        );
+
+        await callAgentTool(
+          AGENT_URL,
+          "sandbox_run",
+          {
+            workspace: AGENT_WORKSPACE_ID,
+            cmd: `mkdir -p ${shQuote(jobPrefix)} && base64 -d ${shQuote(b64Path)} > ${shQuote(pdfPath)}`,
+            timeout_sec: 300,
+          },
+          300_000
+        );
+
         const parseOutput = await callAgentTool(
           AGENT_URL,
           "blueprint_parse_document",
           {
             workspace: AGENT_WORKSPACE_ID,
-            pdf_path: artifact.storagePath,
+            pdf_path: pdfPath,
           },
           AGENT_TIMEOUT
         );
@@ -627,7 +692,7 @@ export const blueprintIngestionRouter = router({
           });
         }
 
-        const parsed = parseOutput as BlueprintParseV1Output;
+        const parsed = parseOutput as unknown as BlueprintParseV1Output;
 
         // Enforce contract identity
         if (parsed.contract.name !== "BlueprintParseV1") {
@@ -747,7 +812,7 @@ export const blueprintIngestionRouter = router({
           "blueprint_detect_symbols",
           {
             workspace: AGENT_WORKSPACE_ID,
-            pdf_path: artifact.storagePath,
+            pdf_path: pdfPath,
           },
           AGENT_TIMEOUT
         );
