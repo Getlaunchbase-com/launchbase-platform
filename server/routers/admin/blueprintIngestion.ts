@@ -67,6 +67,96 @@ function shQuote(v: string): string {
   return `'${v.replace(/'/g, `'\"'\"'`)}'`;
 }
 
+function firstString(values: unknown[]): string | null {
+  for (const v of values) {
+    if (typeof v === "string" && v.trim().length > 0) return v.trim();
+  }
+  return null;
+}
+
+async function stageAgentPageImageToArtifacts(
+  agentUrl: string,
+  agentPath: string,
+  projectId: number,
+  documentId: number,
+  pageNumber: number
+): Promise<string | null> {
+  const workspacePath = String(agentPath || "").replace(/\\/g, "/").trim();
+  if (!workspacePath) return null;
+
+  const ext = path.extname(workspacePath).toLowerCase();
+  const safeExt = ext === ".png" || ext === ".jpg" || ext === ".jpeg" || ext === ".webp"
+    ? ext
+    : ".png";
+
+  const relOut = path
+    .join(
+      "blueprints",
+      String(projectId),
+      "pages",
+      `doc${documentId}_page${pageNumber}_${randomUUID().slice(0, 8)}${safeExt}`
+    )
+    .replace(/\\/g, "/");
+  const absOut = path.resolve(ARTIFACTS_DIR, relOut);
+  ensureDir(path.dirname(absOut));
+
+  const tmpB64 = `tmp/lb_page_${documentId}_${pageNumber}_${Date.now()}.b64`;
+
+  try {
+    await callAgentTool(
+      agentUrl,
+      "sandbox_run",
+      {
+        workspace: AGENT_WORKSPACE_ID,
+        cmd: `mkdir -p tmp && base64 -w 0 ${shQuote(workspacePath)} > ${shQuote(tmpB64)}`,
+        timeout_sec: 120,
+      },
+      180_000
+    );
+
+    const readResp = await callAgentTool(
+      agentUrl,
+      "workspace_read",
+      {
+        workspace: AGENT_WORKSPACE_ID,
+        path: tmpB64,
+      },
+      180_000
+    );
+
+    const b64 = firstString([
+      (readResp as any)?.content,
+      (readResp as any)?.text,
+      (readResp as any)?.data,
+      (readResp as any)?.json?.content,
+      (readResp as any)?.json?.text,
+      (readResp as any)?.result?.content,
+      (readResp as any)?.result?.text,
+    ]);
+    if (!b64) return null;
+
+    fs.writeFileSync(absOut, Buffer.from(b64, "base64"));
+    return relOut;
+  } catch {
+    return null;
+  } finally {
+    try {
+      await callAgentTool(
+        agentUrl,
+        "sandbox_run",
+        {
+          workspace: AGENT_WORKSPACE_ID,
+          cmd: `rm -f ${shQuote(tmpB64)}`,
+          timeout_sec: 30,
+        },
+        60_000
+      );
+    } catch {
+      // best-effort cleanup
+    }
+  }
+}
+
 async function loadArtifactBuffer(artifact: {
   storageBackend: string | null;
   storagePath: string;
@@ -858,7 +948,14 @@ export const blueprintIngestionRouter = router({
           let imageStoragePath: string | null = null;
 
           if (page.image_artifact_path) {
-            imageStoragePath = page.image_artifact_path;
+            const stagedPath = await stageAgentPageImageToArtifacts(
+              AGENT_URL,
+              page.image_artifact_path,
+              Number(doc.projectId),
+              Number(input.documentId),
+              Number(page.page_number)
+            );
+            imageStoragePath = stagedPath ?? page.image_artifact_path;
           }
 
           const [result] = await db.insert(blueprintPages).values({
@@ -1116,12 +1213,20 @@ export const blueprintIngestionRouter = router({
 
       // --- 4. Store pages ---
       const pageIdMap = new Map<number, number>(); // page_number → DB id
+      const AGENT_URL = process.env.AGENT_STACK_URL ?? "http://localhost:4100";
 
       for (const page of parsed.pages) {
         let imageStoragePath: string | null = null;
 
         if (page.image_artifact_path) {
-          imageStoragePath = page.image_artifact_path;
+          const stagedPath = await stageAgentPageImageToArtifacts(
+            AGENT_URL,
+            page.image_artifact_path,
+            Number(doc.projectId),
+            Number(input.documentId),
+            Number(page.page_number)
+          );
+          imageStoragePath = stagedPath ?? page.image_artifact_path;
         }
 
         const [result] = await db.insert(blueprintPages).values({
