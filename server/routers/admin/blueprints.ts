@@ -20,6 +20,8 @@ import {
   agentInstances,
   projects,
   blueprintDocuments,
+  blueprintPages,
+  blueprintDetectionsRaw,
 } from "../../db/schema";
 import { desc, eq, and, count, inArray } from "drizzle-orm";
 import { createHash, randomUUID } from "crypto";
@@ -680,6 +682,81 @@ export const blueprintsRouter = router({
         .where(where);
 
       return { blueprints: rows, total: countResult?.total ?? 0 };
+    }),
+
+  /** Stable mobile-compatible page listing by document id */
+  getPages: adminProcedure
+    .input(z.object({ documentId: z.number().int() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return { pages: [] };
+
+      const rows = await db
+        .select({
+          id: blueprintPages.id,
+          pageNumber: blueprintPages.pageNumber,
+          imageStoragePath: blueprintPages.imageStoragePath,
+          imageWidth: blueprintPages.imageWidth,
+          imageHeight: blueprintPages.imageHeight,
+        })
+        .from(blueprintPages)
+        .where(eq(blueprintPages.documentId, input.documentId))
+        .orderBy(blueprintPages.pageNumber);
+
+      return {
+        pages: rows.map((p) => ({
+          id: p.id,
+          pageNumber: p.pageNumber,
+          imageUrl: p.imageStoragePath
+            ? `/api/artifacts/${encodeURIComponent(p.imageStoragePath)}`
+            : null,
+          width: p.imageWidth ?? null,
+          height: p.imageHeight ?? null,
+        })),
+      };
+    }),
+
+  /** Stable mobile-compatible detection listing by document id */
+  getDetections: adminProcedure
+    .input(z.object({ documentId: z.number().int() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return { detections: [] };
+
+      const pages = await db
+        .select({ id: blueprintPages.id, pageNumber: blueprintPages.pageNumber })
+        .from(blueprintPages)
+        .where(eq(blueprintPages.documentId, input.documentId));
+      const pageNumberById = new Map<number, number>();
+      for (const p of pages) pageNumberById.set(Number(p.id), Number(p.pageNumber));
+
+      const rows = await db
+        .select({
+          pageId: blueprintDetectionsRaw.pageId,
+          x: blueprintDetectionsRaw.x,
+          y: blueprintDetectionsRaw.y,
+          w: blueprintDetectionsRaw.w,
+          h: blueprintDetectionsRaw.h,
+          rawClass: blueprintDetectionsRaw.rawClass,
+          canonicalType: blueprintDetectionsRaw.canonicalType,
+          confidence: blueprintDetectionsRaw.confidence,
+        })
+        .from(blueprintDetectionsRaw)
+        .where(eq(blueprintDetectionsRaw.documentId, input.documentId))
+        .orderBy(desc(blueprintDetectionsRaw.confidence));
+
+      return {
+        detections: rows.map((d) => ({
+          page: pageNumberById.get(Number(d.pageId)) ?? 1,
+          x: d.x ?? 0,
+          y: d.y ?? 0,
+          w: d.w ?? 0,
+          h: d.h ?? 0,
+          rawClass: d.rawClass ?? "unknown",
+          canonicalType: d.canonicalType ?? d.rawClass ?? "unknown",
+          confidence: d.confidence ?? 0,
+        })),
+      };
     }),
 
   /** Get a single blueprint artifact by id */
