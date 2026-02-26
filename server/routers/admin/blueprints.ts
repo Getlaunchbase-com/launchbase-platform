@@ -379,7 +379,13 @@ export const blueprintsRouter = router({
 
       const decodeResp = await callAgentTool("sandbox_run", {
         workspace,
-        cmd: `mkdir -p ${shQuote(jobPrefix)} && base64 -d ${shQuote(b64Path)} > ${shQuote(pdfPath)}`,
+        cmd:
+          `mkdir -p ${shQuote(jobPrefix)} && (` +
+          `base64 -d ${shQuote(b64Path)} > ${shQuote(pdfPath)} ` +
+          `|| python3 -c "import base64,sys;` +
+          `src=open('${b64Path}','rb').read();` +
+          `open('${pdfPath}','wb').write(base64.b64decode(src))"` +
+          `)`,
         timeout_sec: 300,
       }, 300_000);
       if (!decodeResp.ok) {

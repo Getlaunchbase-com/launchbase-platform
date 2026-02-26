@@ -826,7 +826,7 @@ export const mobileFeedbackRouter = router({
   submit: publicProcedure
     .input(
       z.object({
-        token: z.string().min(1),
+        token: z.string().min(1).optional(),
         runId: z.number().int().optional(),
         message: z.string().min(1).max(4000),
         category: z.enum([
@@ -841,18 +841,65 @@ export const mobileFeedbackRouter = router({
         severity: z.enum(["low", "medium", "high", "critical"]).default("medium"),
       })
     )
-    .mutation(async ({ input }) => {
-      const session = await validateMobileToken(input.token);
-      enforceMobileRateLimit(`feedback:${session.userId}`);
-
+    .mutation(async ({ input, ctx }) => {
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable." });
 
+      let feedbackUserId: number;
+      let feedbackProjectId: number;
+      let feedbackInstanceId: number;
+      let feedbackRunId: number | null = null;
+
+      if (input.token) {
+        const session = await validateMobileToken(input.token);
+        feedbackUserId = session.userId;
+        feedbackProjectId = session.projectId;
+        feedbackInstanceId = session.agentInstanceId;
+        feedbackRunId = input.runId ?? session.activeRunId ?? null;
+      } else if (ctx.user?.id) {
+        feedbackUserId = Number(ctx.user.id);
+
+        const [ownedInstance] = await db
+          .select({
+            projectId: agentInstances.projectId,
+            instanceId: agentInstances.id,
+          })
+          .from(agentInstances)
+          .leftJoin(projects, eq(agentInstances.projectId, projects.id))
+          .where(
+            and(
+              eq(projects.ownerId, feedbackUserId),
+              eq(projects.status, "active"),
+              eq(agentInstances.status, "active")
+            )
+          )
+          .orderBy(desc(agentInstances.id))
+          .limit(1);
+
+        if (!ownedInstance) {
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: "No active project/agent found for this user. Create a job first.",
+          });
+        }
+
+        feedbackProjectId = Number(ownedInstance.projectId);
+        feedbackInstanceId = Number(ownedInstance.instanceId);
+        feedbackRunId = input.runId ?? null;
+      } else {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Missing mobile session token or authenticated user context.",
+        });
+      }
+
+      enforceMobileRateLimit(`feedback:${feedbackUserId}`);
+
       const [result] = await db.insert(agentFeedback).values({
-        instanceId: session.agentInstanceId,
-        runId: input.runId ?? session.activeRunId ?? null,
-        projectId: session.projectId,
-        submittedBy: session.userId,
+        instanceId: feedbackInstanceId,
+        runId: feedbackRunId,
+        projectId: feedbackProjectId,
+        submittedBy: feedbackUserId,
         source: "mobile",
         message: input.message,
         category: input.category,
