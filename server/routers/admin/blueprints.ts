@@ -37,7 +37,8 @@ const ARTIFACTS_DIR =
 const S3_ENABLED = !!process.env.ARTIFACTS_S3_BUCKET;
 const S3_BUCKET = process.env.ARTIFACTS_S3_BUCKET || "launchbase-artifacts";
 const AGENT_STACK_URL = process.env.AGENT_STACK_URL || "http://35.188.184.31:8080";
-const AGENT_ROUTER_TOKEN = process.env.AGENT_ROUTER_TOKEN || "";
+const AGENT_ROUTER_TOKEN =
+  process.env.AGENT_ROUTER_TOKEN || process.env.AGENT_STACK_TOKEN || "";
 const AGENT_WORKSPACE_ID = process.env.AGENT_WORKSPACE_ID || "launchbase-platform";
 
 // Max upload size: 50 MB base64 (~37.5 MB raw)

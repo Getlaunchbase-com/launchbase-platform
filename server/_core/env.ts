@@ -36,6 +36,8 @@ const envSchema = z.object({
   REDIS_URL: z.string().optional(),
 
   // External services
+  AIML_API_BASE_URL: z.string().url().optional(),
+  AIML_API_KEY: z.string().default(""),
   OPENAI_API_BASE_URL: z.string().url().default("https://api.openai.com/v1"),
   OPENAI_API_KEY: z.string().default(""),
   STRIPE_SECRET_KEY: z.string().default(""),
@@ -167,8 +169,10 @@ export function logBootConfig(): void {
     AGENT_STACK_URL: parsed.AGENT_STACK_URL,
     JWT_SECRET: maskSecret(parsed.JWT_SECRET),
     SESSION_SECRET: maskSecret(parsed.SESSION_SECRET),
-    OPENAI_API_KEY: parsed.OPENAI_API_KEY ? maskSecret(parsed.OPENAI_API_KEY) : "(not set)",
-    OPENAI_API_BASE_URL: parsed.OPENAI_API_BASE_URL,
+    OPENAI_API_KEY: (parsed.OPENAI_API_KEY || parsed.AIML_API_KEY)
+      ? maskSecret(parsed.OPENAI_API_KEY || parsed.AIML_API_KEY)
+      : "(not set)",
+    OPENAI_API_BASE_URL: parsed.OPENAI_API_BASE_URL || parsed.AIML_API_BASE_URL || "https://api.openai.com/v1",
     STRIPE_SECRET_KEY: parsed.STRIPE_SECRET_KEY ? maskSecret(parsed.STRIPE_SECRET_KEY) : "(not set)",
     MOBILE_ADMIN_SECRET: maskSecret(parsed.MOBILE_ADMIN_SECRET),
     MOBILE_SESSION_TTL_HOURS: parsed.MOBILE_SESSION_TTL_HOURS,
@@ -207,8 +211,8 @@ export const env = {
   AGENT_STACK_URL: parsed.AGENT_STACK_URL,
 
   // External services
-  OPENAI_API_KEY: parsed.OPENAI_API_KEY,
-  OPENAI_API_BASE_URL: parsed.OPENAI_API_BASE_URL,
+  OPENAI_API_KEY: parsed.OPENAI_API_KEY || parsed.AIML_API_KEY,
+  OPENAI_API_BASE_URL: parsed.OPENAI_API_BASE_URL || parsed.AIML_API_BASE_URL || "https://api.openai.com/v1",
   STRIPE_SECRET_KEY: parsed.STRIPE_SECRET_KEY,
 
   // Mobile

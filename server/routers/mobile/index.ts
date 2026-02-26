@@ -59,7 +59,12 @@ const MAX_AUDIO_BASE64_LENGTH = 25 * 1024 * 1024;
 const ARTIFACTS_DIR =
   process.env.ARTIFACTS_DIR || path.resolve(process.cwd(), "artifacts");
 const OPENAI_API_BASE_URL =
-  (process.env.OPENAI_API_BASE_URL || "https://api.openai.com/v1").replace(/\/+$/, "");
+  (
+    process.env.OPENAI_API_BASE_URL ||
+    process.env.AIML_API_BASE_URL ||
+    "https://api.openai.com/v1"
+  ).replace(/\/+$/, "");
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY || process.env.AIML_API_KEY || "";
 const OPENAI_TRANSCRIBE_URL = `${OPENAI_API_BASE_URL}/audio/transcriptions`;
 
 /** S3 config for attachment uploads */
@@ -551,7 +556,7 @@ export const mobileVoiceRouter = router({
       }
 
       // --- Transcription via OpenAI Whisper ---
-      const openaiKey = process.env.OPENAI_API_KEY;
+      const openaiKey = OPENAI_API_KEY;
       if (!openaiKey) {
         throw new TRPCError({
           code: "PRECONDITION_FAILED",
@@ -1037,7 +1042,7 @@ export const mobileTranscribeRouter = router({
       enforceMobileRateLimit(`transcribe:${session.userId}`);
 
       // Attempt transcription — NEVER throw on failure, return degraded result
-      if (!process.env.OPENAI_API_KEY) {
+      if (!OPENAI_API_KEY) {
         return {
           text: "",
           confidence: 0,
@@ -1078,7 +1083,7 @@ export const mobileTranscribeRouter = router({
 
         const whisperResp = await fetch(OPENAI_TRANSCRIBE_URL, {
           method: "POST",
-          headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
+          headers: { Authorization: `Bearer ${OPENAI_API_KEY}` },
           body: formData,
         });
 
