@@ -199,6 +199,9 @@ app.get("*", (_req, res) => {
 
 const PORT = env.PORT;
 let server: ReturnType<typeof app.listen> | null = null;
+const shouldRunHealthMonitor =
+  env.NODE_ENV === "production" ||
+  process.env.ENABLE_AGENT_HEALTH_MONITOR === "true";
 
 async function startServer() {
   try {
@@ -227,7 +230,13 @@ async function startServer() {
       `[server] Handshake: http://localhost:${PORT}/api/contracts/handshake`
     );
 
-    startHealthMonitor();
+    if (shouldRunHealthMonitor) {
+      startHealthMonitor();
+    } else {
+      console.log(
+        "[agentHealthMonitor] Disabled in development (set ENABLE_AGENT_HEALTH_MONITOR=true to enable)"
+      );
+    }
   });
 }
 
@@ -239,7 +248,9 @@ startServer().catch((err) => {
 async function shutdown(signal: string) {
   console.log(`[server] ${signal} received - shutting down gracefully`);
 
-  stopHealthMonitor();
+  if (shouldRunHealthMonitor) {
+    stopHealthMonitor();
+  }
 
   if (!server) {
     process.exit(0);
