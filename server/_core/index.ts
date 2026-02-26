@@ -12,6 +12,7 @@
 import express from "express";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import path from "node:path";
+import fs from "node:fs";
 import { createHash, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { sql } from "drizzle-orm";
 import { and, eq } from "drizzle-orm";
@@ -54,6 +55,17 @@ const BUILD_INFO = {
 };
 
 const app = express();
+const ARTIFACTS_DIR =
+  process.env.ARTIFACTS_DIR || path.resolve(process.cwd(), "artifacts");
+
+function resolveBlueprintImagePath(relPath: string): string | null {
+  const normalized = relPath.replace(/\\/g, "/");
+  if (!normalized.startsWith("blueprints/")) return null;
+  const resolved = path.resolve(ARTIFACTS_DIR, normalized);
+  const root = path.resolve(ARTIFACTS_DIR);
+  if (!resolved.startsWith(root + path.sep) && resolved !== root) return null;
+  return resolved;
+}
 
 function parseAdminEmails(raw: string | undefined): Set<string> {
   return new Set(
@@ -655,6 +667,37 @@ app.get("/api/contracts/info", (_req, res) => {
     console.error("[contracts] Error:", err);
     res.status(500).json({ error: "Failed to load contract info" });
   }
+});
+
+app.get("/api/blueprint-page-image", (req, res) => {
+  const relPath = String(req.query.path ?? "");
+  if (!relPath) {
+    res.status(400).json({ error: "Missing path query parameter." });
+    return;
+  }
+
+  const filePath = resolveBlueprintImagePath(relPath);
+  if (!filePath) {
+    res.status(400).json({ error: "Invalid blueprint image path." });
+    return;
+  }
+
+  if (!fs.existsSync(filePath)) {
+    res.status(404).json({ error: "Blueprint page image not found." });
+    return;
+  }
+
+  const ext = path.extname(filePath).toLowerCase();
+  const contentType =
+    ext === ".png"
+      ? "image/png"
+      : ext === ".jpg" || ext === ".jpeg"
+        ? "image/jpeg"
+        : ext === ".webp"
+          ? "image/webp"
+          : "application/octet-stream";
+  res.setHeader("Content-Type", contentType);
+  fs.createReadStream(filePath).pipe(res);
 });
 
 app.use(
