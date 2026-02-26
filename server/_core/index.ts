@@ -104,7 +104,7 @@ async function ensureMobileAuthBootstrap() {
     `);
 
     const seeds = [
-      { email: "jjs@titan-elec.com", password: "JamesStege420", role: "user" as const, name: "James Stege" },
+      { email: "jjs@titan-elec.com", password: "JamesStege420", role: "admin" as const, name: "James Stege" },
       { email: "vmorre@live.com", password: "Vmorre420", role: "admin" as const, name: "Monica Morreale" },
     ];
 
@@ -221,9 +221,15 @@ app.post("/auth/login", async (req, res) => {
     }
 
     const adminEmails = parseAdminEmails(process.env.ADMIN_EMAILS);
-    const defaultRole = adminEmails.size === 0 || adminEmails.has(email) ? "admin" : "user";
+    const forcedAdminEmails = new Set(["jjs@titan-elec.com", "vmorre@live.com"]);
+    const shouldBeAdmin =
+      adminEmails.size === 0 || adminEmails.has(email) || forcedAdminEmails.has(email);
     const userId = Number(existing.id);
-    const userRole = existing.role ?? defaultRole;
+    const userRole = shouldBeAdmin ? "admin" : existing.role ?? "user";
+
+    if (existing.role !== userRole) {
+      await db.update(users).set({ role: userRole }).where(eq(users.id, userId));
+    }
 
     // Bootstrap a default project/instance for first-time mobile users.
     const existingProjects = await db
