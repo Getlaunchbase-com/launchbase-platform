@@ -106,6 +106,122 @@ function unwrapToolPayload(body: AgentToolResponse): AgentToolResponse {
   return body;
 }
 
+function normalizeAgentParseOutput(raw: AgentToolResponse): AgentToolResponse {
+  // Already in platform-ingestion shape.
+  if (Array.isArray((raw as any).text_blocks) && Array.isArray((raw as any).legend_candidates)) {
+    return raw;
+  }
+
+  const pages = Array.isArray((raw as any).pages) ? ((raw as any).pages as any[]) : [];
+  if (!pages.length) return raw;
+
+  const normalizedPages = pages.map((p) => ({
+    page_number: Number(p?.page_number ?? 0),
+    image_artifact_path: typeof p?.png_path === "string" ? p.png_path : null,
+    width_px: Number(p?.width_px ?? 0),
+    height_px: Number(p?.height_px ?? 0),
+    label: null as string | null,
+  }));
+
+  const textBlocks: Array<{
+    page: number;
+    bbox: { x: number; y: number; w: number; h: number };
+    text: string;
+    confidence: number;
+    type: "title" | "label" | "dimension" | "note" | "legend_text" | "other";
+  }> = [];
+
+  const legendCandidates: Array<{
+    page: number;
+    bbox: { x: number; y: number; w: number; h: number };
+    confidence: number;
+    method: string;
+    raw_label: string | null;
+    symbol_description: string | null;
+  }> = [];
+
+  for (const page of pages) {
+    const pageNum = Number(page?.page_number ?? 0);
+    const width = Math.max(1, Number(page?.width_px ?? 1));
+    const height = Math.max(1, Number(page?.height_px ?? 1));
+
+    const pageText = Array.isArray(page?.text_blocks) ? page.text_blocks : [];
+    for (const tb of pageText) {
+      const bb = Array.isArray(tb?.bbox) ? tb.bbox : [0, 0, 0, 0];
+      const x1 = Number(bb[0] ?? 0);
+      const y1 = Number(bb[1] ?? 0);
+      const x2 = Number(bb[2] ?? 0);
+      const y2 = Number(bb[3] ?? 0);
+      textBlocks.push({
+        page: pageNum,
+        bbox: {
+          x: clampNorm(x1 / width),
+          y: clampNorm(y1 / height),
+          w: clampNorm((x2 - x1) / width),
+          h: clampNorm((y2 - y1) / height),
+        },
+        text: typeof tb?.text === "string" ? tb.text : "",
+        confidence: 1,
+        type: "other",
+      });
+    }
+
+    const pageLegends = Array.isArray(page?.legend_candidates) ? page.legend_candidates : [];
+    for (const lc of pageLegends) {
+      const bb = Array.isArray(lc?.bbox) ? lc.bbox : [0, 0, 0, 0];
+      const x1 = Number(bb[0] ?? 0);
+      const y1 = Number(bb[1] ?? 0);
+      const x2 = Number(bb[2] ?? 0);
+      const y2 = Number(bb[3] ?? 0);
+      legendCandidates.push({
+        page: pageNum,
+        bbox: {
+          x: clampNorm(x1 / width),
+          y: clampNorm(y1 / height),
+          w: clampNorm((x2 - x1) / width),
+          h: clampNorm((y2 - y1) / height),
+        },
+        confidence: Math.max(0, Math.min(1, Number(lc?.confidence ?? 0.5))),
+        method: typeof lc?.method === "string" ? lc.method : "keyword",
+        raw_label: typeof lc?.matched_text === "string" ? lc.matched_text : null,
+        symbol_description: null,
+      });
+    }
+  }
+
+  const contract = (raw as any).contract ?? {
+    name: "BlueprintParseV1",
+    version: "1.0.0",
+    schema_hash: getSchemaHash(),
+    producer: { tool: "blueprint_parse_document", tool_version: "unknown", runtime: "agent-stack", model_version: null },
+  };
+
+  const errors = Array.isArray((raw as any).errors)
+    ? (raw as any).errors.map((e: any) => ({
+        code: typeof e?.code === "string" ? e.code : "parse_error",
+        message: typeof e?.message === "string" ? e.message : String(e ?? "unknown error"),
+        page: typeof e?.page === "number" ? e.page : null,
+        details: null,
+      }))
+    : [];
+
+  return {
+    contract,
+    document: {
+      id: null,
+      page_count: Number((raw as any).page_count ?? pages.length ?? 0),
+      dpi: Number((raw as any).dpi ?? 150),
+      is_vector: true,
+      filename: typeof (raw as any).pdf_path === "string" ? path.basename((raw as any).pdf_path) : null,
+    },
+    pages: normalizedPages,
+    text_blocks: textBlocks,
+    legend_candidates: legendCandidates,
+    scale_candidates: [],
+    errors,
+  };
+}
+
 async function callAgentTool(
   agentUrl: string,
   name: string,
@@ -682,7 +798,7 @@ export const blueprintIngestionRouter = router({
           300_000
         );
 
-        const parseOutput = await callAgentTool(
+        const parseOutputRaw = await callAgentTool(
           AGENT_URL,
           "blueprint_parse_document",
           {
@@ -691,6 +807,7 @@ export const blueprintIngestionRouter = router({
           },
           AGENT_TIMEOUT
         );
+        const parseOutput = normalizeAgentParseOutput(parseOutputRaw);
 
         // --- 4. Validate against BlueprintParseV1 schema ---
         const validation = validateBlueprintParseV1(parseOutput);
