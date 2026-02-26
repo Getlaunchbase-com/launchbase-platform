@@ -40,6 +40,7 @@ const AGENT_STACK_URL = process.env.AGENT_STACK_URL || "http://35.188.184.31:808
 const AGENT_ROUTER_TOKEN =
   process.env.AGENT_ROUTER_TOKEN || process.env.AGENT_STACK_TOKEN || "";
 const AGENT_WORKSPACE_ID = process.env.AGENT_WORKSPACE_ID || "launchbase-platform";
+const AGENT_B64_CHUNK_CHARS = Number(process.env.AGENT_B64_CHUNK_CHARS || 200_000);
 
 // Max upload size: 50 MB base64 (~37.5 MB raw)
 const MAX_BASE64_LENGTH = 50 * 1024 * 1024;
@@ -79,6 +80,15 @@ function normalizeBase64Data(input: string): string {
     value = value + "=".repeat(4 - remainder);
   }
   return value;
+}
+
+function splitIntoChunks(value: string, chunkSize: number): string[] {
+  if (chunkSize <= 0 || value.length <= chunkSize) return [value];
+  const chunks: string[] = [];
+  for (let start = 0; start < value.length; start += chunkSize) {
+    chunks.push(value.slice(start, start + chunkSize));
+  }
+  return chunks;
 }
 
 async function storeLocal(
@@ -385,31 +395,67 @@ export const blueprintsRouter = router({
       const jobPrefix = `intake/${input.projectId}/${uploadedArtifactId}_${Date.now()}`;
       const b64Path = `${jobPrefix}/source.b64`;
       const pdfPath = `${jobPrefix}/source.pdf`;
-
-      const writeResp = await callAgentTool("workspace_write", {
-        workspace,
-        path: b64Path,
-        content: normalizedBase64,
-      }, 300_000);
-      if (!writeResp.ok) {
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Agent workspace write failed", cause: writeResp });
+      const partDir = `${jobPrefix}/b64parts`;
+      const b64Chunks = splitIntoChunks(normalizedBase64, AGENT_B64_CHUNK_CHARS);
+      if (b64Chunks.length === 1) {
+        const writeResp = await callAgentTool("workspace_write", {
+          workspace,
+          path: b64Path,
+          content: normalizedBase64,
+        }, 300_000);
+        if (!writeResp.ok) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: `Agent workspace write failed: ${writeResp.error || "unknown error"}`,
+            cause: writeResp,
+          });
+        }
+      } else {
+        for (let i = 0; i < b64Chunks.length; i += 1) {
+          const partPath = `${partDir}/part_${String(i).padStart(5, "0")}.txt`;
+          const partWrite = await callAgentTool("workspace_write", {
+            workspace,
+            path: partPath,
+            content: b64Chunks[i],
+          }, 300_000);
+          if (!partWrite.ok) {
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: `Agent workspace write failed at chunk ${i + 1}/${b64Chunks.length}: ${partWrite.error || "unknown error"}`,
+              cause: partWrite,
+            });
+          }
+        }
       }
+
+      const composeB64Cmd = b64Chunks.length > 1
+        ? `cat ${shQuote(partDir)}/part_* > ${shQuote(b64Path)} && `
+        : "";
 
       const decodeResp = await callAgentTool("sandbox_run", {
         workspace,
         cmd:
           `mkdir -p ${shQuote(jobPrefix)} && (` +
+          `${composeB64Cmd}` +
           `base64 -d ${shQuote(b64Path)} > ${shQuote(pdfPath)} ` +
-          `|| python3 -c "import base64,sys;` +
-          `src=open('${b64Path}','rb').read();` +
-          `src=b''.join(src.split());` +
-          `src=src+b'='*((4-len(src)%4)%4);` +
+          `|| python3 -c "import base64,re;` +
+          `src=open('${b64Path}','r',encoding='utf-8',errors='ignore').read();` +
+          `src=src.strip();` +
+          `src=src.split(',',1)[1] if src.startswith('data:') and ',' in src else src;` +
+          `src=re.sub(r'[^A-Za-z0-9+/=_-]','',src);` +
+          `src=src.replace('-','+').replace('_','/');` +
+          `src=src+'='*((4-len(src)%4)%4);` +
           `open('${pdfPath}','wb').write(base64.b64decode(src,validate=False))"` +
           `)`,
         timeout_sec: 300,
       }, 300_000);
       if (!decodeResp.ok) {
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Agent PDF decode failed", cause: decodeResp });
+        const detail = decodeResp.error || decodeResp.stderr || decodeResp.stdout || "unknown decode error";
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Agent PDF decode failed: ${String(detail).slice(0, 400)}`,
+          cause: decodeResp,
+        });
       }
 
       const parseResp = await callAgentTool("blueprint_parse_document", {
