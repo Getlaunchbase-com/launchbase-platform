@@ -427,6 +427,121 @@ app.post("/auth/change-password", async (req, res) => {
   }
 });
 
+app.post("/auth/create-job", async (req, res) => {
+  try {
+    const authHeader = String(req.headers.authorization ?? "");
+    if (!authHeader.startsWith("Bearer ")) {
+      res.status(401).json({
+        ok: false,
+        error_code: "UNAUTHORIZED",
+        message: "Authorization required.",
+      });
+      return;
+    }
+
+    let jwtPayload: jwt.JwtPayload;
+    try {
+      jwtPayload = jwt.verify(authHeader.slice(7), env.JWT_SECRET, {
+        algorithms: ["HS256"],
+      }) as jwt.JwtPayload;
+    } catch {
+      res.status(401).json({
+        ok: false,
+        error_code: "UNAUTHORIZED",
+        message: "Invalid session token.",
+      });
+      return;
+    }
+
+    const userId = Number(jwtPayload.sub);
+    const name = String(req.body?.name ?? "").trim();
+    const address = String(req.body?.address ?? "").trim();
+    if (!userId || !name) {
+      res.status(400).json({
+        ok: false,
+        error_code: "INVALID_INPUT",
+        message: "Job name is required.",
+      });
+      return;
+    }
+
+    const db = await getDb();
+    if (!db) {
+      res.status(503).json({
+        ok: false,
+        error_code: "SERVICE_UNAVAILABLE",
+        message: "Database unavailable.",
+      });
+      return;
+    }
+
+    const slug = `ibew-134-${userId}-${Date.now().toString().slice(-6)}`;
+    const [newProject] = await db.insert(projects).values({
+      name,
+      slug,
+      description: address || "Address not set",
+      ownerId: userId,
+      tenant: "launchbase",
+      status: "active",
+    });
+    const projectId = Number(newProject.insertId);
+
+    await db.insert(projectCollaborators).values({
+      projectId,
+      userId,
+      role: "owner",
+      invitedBy: userId,
+    });
+
+    let defaultVertexId: number | null = null;
+    const [existingVertex] = await db
+      .select({ id: vertexProfiles.id })
+      .from(vertexProfiles)
+      .where(eq(vertexProfiles.name, "ibew-134-default"))
+      .limit(1);
+
+    if (existingVertex) {
+      defaultVertexId = Number(existingVertex.id);
+    } else {
+      const [createdVertex] = await db.insert(vertexProfiles).values({
+        name: "ibew-134-default",
+        description: "Default beta vertex profile for IBEW mobile flow.",
+        configJson: {
+          model: "gpt-4o-mini",
+          temperature: 0.2,
+        },
+        toolsAllowlistJson: ["blueprint.parse", "estimate.chain", "gaps.detect"],
+      });
+      defaultVertexId = Number(createdVertex.insertId);
+    }
+
+    await db.insert(agentInstances).values({
+      projectId,
+      vertexId: Number(defaultVertexId),
+      displayName: "IBEW 134 Agent",
+      status: "active",
+      createdBy: userId,
+    });
+
+    res.json({
+      ok: true,
+      project: {
+        id: projectId,
+        name,
+        address: address || null,
+        status: "active",
+      },
+    });
+  } catch (error) {
+    console.error("[auth/create-job] failed:", error);
+    res.status(500).json({
+      ok: false,
+      error_code: "INTERNAL_SERVER_ERROR",
+      message: "Unable to create job.",
+    });
+  }
+});
+
 app.get("/healthz", (_req, res) => {
   res.json({
     status: "ok",
