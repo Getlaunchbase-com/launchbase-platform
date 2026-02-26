@@ -12,11 +12,15 @@
 import express from "express";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import path from "node:path";
+import { createHash, timingSafeEqual } from "node:crypto";
 import { sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
+import jwt from "jsonwebtoken";
 import { env } from "./env";
 import { createContext } from "./trpc";
 import { appRouter } from "../routers/_incoming_routers";
 import { closeDb, getDb } from "../db";
+import { users } from "../db/schema";
 import {
   validateHandshake,
   getAllContractInfo,
@@ -44,6 +48,21 @@ const BUILD_INFO = {
 
 const app = express();
 
+function parseAdminEmails(raw: string | undefined): Set<string> {
+  return new Set(
+    String(raw ?? "")
+      .split(",")
+      .map((email) => email.trim().toLowerCase())
+      .filter(Boolean)
+  );
+}
+
+function secureStringEquals(a: string, b: string): boolean {
+  const ah = createHash("sha256").update(a).digest();
+  const bh = createHash("sha256").update(b).digest();
+  return timingSafeEqual(ah, bh);
+}
+
 app.use((req, res, next) => {
   const origin = req.headers.origin || "*";
   res.header("Access-Control-Allow-Origin", String(origin));
@@ -61,6 +80,110 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.json({ limit: "50mb" }));
+
+app.post("/auth/login", async (req, res) => {
+  try {
+    const email = String(req.body?.email ?? "")
+      .trim()
+      .toLowerCase();
+    const password = String(req.body?.password ?? "");
+
+    if (!email || !password) {
+      res.status(400).json({
+        ok: false,
+        error_code: "INVALID_INPUT",
+        message: "Email and password are required.",
+      });
+      return;
+    }
+
+    const expectedPassword = env.MOBILE_ADMIN_SECRET || process.env.MOBILE_ADMIN_PASSWORD || "";
+    if (!expectedPassword) {
+      res.status(503).json({
+        ok: false,
+        error_code: "CONFIGURATION_ERROR",
+        message: "Login is not configured. MOBILE_ADMIN_SECRET is missing.",
+      });
+      return;
+    }
+
+    if (!secureStringEquals(password, expectedPassword)) {
+      res.status(401).json({
+        ok: false,
+        error_code: "UNAUTHORIZED",
+        message: "Invalid email or password.",
+      });
+      return;
+    }
+
+    const db = await getDb();
+    if (!db) {
+      res.status(503).json({
+        ok: false,
+        error_code: "SERVICE_UNAVAILABLE",
+        message: "Database unavailable.",
+      });
+      return;
+    }
+
+    const [existing] = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+
+    const adminEmails = parseAdminEmails(process.env.ADMIN_EMAILS);
+    const role = adminEmails.size === 0 || adminEmails.has(email) ? "admin" : "user";
+
+    let userId = existing?.id;
+    let userRole = existing?.role ?? role;
+
+    if (!existing) {
+      const openId = `mobile:${createHash("sha256").update(email).digest("hex").slice(0, 32)}`;
+      const [created] = await db.insert(users).values({
+        openId,
+        email,
+        name: email.split("@")[0],
+        role,
+        loginMethod: "mobile_password",
+      });
+      userId = created.insertId;
+      userRole = role;
+    }
+
+    const expiresInHours = Math.max(1, Number(env.MOBILE_SESSION_TTL_HOURS || 24));
+    const expiresAt = new Date(Date.now() + expiresInHours * 60 * 60 * 1000);
+
+    const accessToken = jwt.sign(
+      {
+        sub: String(userId),
+        role: userRole,
+        email,
+        name: email.split("@")[0],
+      },
+      env.JWT_SECRET,
+      { algorithm: "HS256", expiresIn: `${expiresInHours}h` }
+    );
+
+    res.json({
+      ok: true,
+      access_token: accessToken,
+      expires_at: expiresAt.toISOString(),
+      user: {
+        id: userId,
+        role: userRole,
+        email,
+      },
+    });
+  } catch (error) {
+    console.error("[auth/login] failed:", error);
+    res.status(500).json({
+      ok: false,
+      error_code: "INTERNAL_SERVER_ERROR",
+      message: "Login failed.",
+    });
+  }
+});
 
 app.get("/healthz", (_req, res) => {
   res.json({
