@@ -36,6 +36,7 @@ const envSchema = z.object({
   REDIS_URL: z.string().optional(),
 
   // External services
+  OPENAI_API_BASE_URL: z.string().url().default("https://api.openai.com/v1"),
   OPENAI_API_KEY: z.string().default(""),
   STRIPE_SECRET_KEY: z.string().default(""),
   STRIPE_WEBHOOK_SECRET: z.string().default(""),
@@ -167,6 +168,7 @@ export function logBootConfig(): void {
     JWT_SECRET: maskSecret(parsed.JWT_SECRET),
     SESSION_SECRET: maskSecret(parsed.SESSION_SECRET),
     OPENAI_API_KEY: parsed.OPENAI_API_KEY ? maskSecret(parsed.OPENAI_API_KEY) : "(not set)",
+    OPENAI_API_BASE_URL: parsed.OPENAI_API_BASE_URL,
     STRIPE_SECRET_KEY: parsed.STRIPE_SECRET_KEY ? maskSecret(parsed.STRIPE_SECRET_KEY) : "(not set)",
     MOBILE_ADMIN_SECRET: maskSecret(parsed.MOBILE_ADMIN_SECRET),
     MOBILE_SESSION_TTL_HOURS: parsed.MOBILE_SESSION_TTL_HOURS,
@@ -206,6 +208,7 @@ export const env = {
 
   // External services
   OPENAI_API_KEY: parsed.OPENAI_API_KEY,
+  OPENAI_API_BASE_URL: parsed.OPENAI_API_BASE_URL,
   STRIPE_SECRET_KEY: parsed.STRIPE_SECRET_KEY,
 
   // Mobile

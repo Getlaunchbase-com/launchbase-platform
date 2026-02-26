@@ -58,6 +58,9 @@ const MAX_AUDIO_BASE64_LENGTH = 25 * 1024 * 1024;
 
 const ARTIFACTS_DIR =
   process.env.ARTIFACTS_DIR || path.resolve(process.cwd(), "artifacts");
+const OPENAI_API_BASE_URL =
+  (process.env.OPENAI_API_BASE_URL || "https://api.openai.com/v1").replace(/\/+$/, "");
+const OPENAI_TRANSCRIBE_URL = `${OPENAI_API_BASE_URL}/audio/transcriptions`;
 
 /** S3 config for attachment uploads */
 const S3_ENABLED = !!process.env.ARTIFACTS_S3_BUCKET;
@@ -565,7 +568,7 @@ export const mobileVoiceRouter = router({
         formData.append("file", new Blob([audioData], { type: artifact.mimeType ?? "audio/webm" }), artifact.filename);
         formData.append("model", "whisper-1");
 
-        const resp = await fetch("https://api.openai.com/v1/audio/transcriptions", {
+        const resp = await fetch(OPENAI_TRANSCRIBE_URL, {
           method: "POST",
           headers: { Authorization: `Bearer ${openaiKey}` },
           body: formData,
@@ -1073,14 +1076,11 @@ export const mobileTranscribeRouter = router({
         formData.append("model", "whisper-1");
         formData.append("response_format", "verbose_json");
 
-        const whisperResp = await fetch(
-          "https://api.openai.com/v1/audio/transcriptions",
-          {
-            method: "POST",
-            headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
-            body: formData,
-          }
-        );
+        const whisperResp = await fetch(OPENAI_TRANSCRIBE_URL, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
+          body: formData,
+        });
 
         if (!whisperResp.ok) {
           console.error(`[mobile:transcribe] Whisper error: HTTP ${whisperResp.status}`);
