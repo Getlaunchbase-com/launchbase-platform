@@ -36,6 +36,9 @@ import {
 // Storage config
 const ARTIFACTS_DIR =
   process.env.ARTIFACTS_DIR || path.resolve(process.cwd(), "artifacts");
+const AGENT_ROUTER_TOKEN =
+  process.env.AGENT_ROUTER_TOKEN || process.env.AGENT_STACK_TOKEN || "";
+const AGENT_WORKSPACE_ID = process.env.AGENT_WORKSPACE_ID || "launchbase-platform";
 
 /** Clamp a bbox coordinate to normalized 0-1 range */
 function clampNorm(v: number): number {
@@ -57,6 +60,64 @@ async function markFailed(db: any, documentId: number, errorMessage: string) {
 function ensureDir(dir: string) {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
+  }
+}
+
+type AgentToolResponse = Record<string, unknown>;
+
+function unwrapToolPayload(body: AgentToolResponse): AgentToolResponse {
+  if (body.result && typeof body.result === "object") return body.result as AgentToolResponse;
+  if (body.data && typeof body.data === "object") return body.data as AgentToolResponse;
+  if (body.json && typeof body.json === "object") return body.json as AgentToolResponse;
+  return body;
+}
+
+async function callAgentTool(
+  agentUrl: string,
+  name: string,
+  argumentsPayload: Record<string, unknown>,
+  timeoutMs = 120_000
+): Promise<AgentToolResponse> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const resp = await fetch(`${agentUrl.replace(/\/+$/, "")}/tool`, {
+      method: "POST",
+      signal: controller.signal,
+      headers: {
+        "content-type": "application/json",
+        ...(AGENT_ROUTER_TOKEN ? { "x-router-token": AGENT_ROUTER_TOKEN } : {}),
+      },
+      body: JSON.stringify({ name, arguments: argumentsPayload }),
+    });
+
+    const body = (await resp.json().catch(() => ({}))) as AgentToolResponse;
+    if (!resp.ok) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: `Agent tool ${name} failed with HTTP ${resp.status}`,
+        cause: body,
+      });
+    }
+
+    if (body.ok === false) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: typeof body.message === "string" ? body.message : `Agent tool ${name} returned failure`,
+        cause: body,
+      });
+    }
+
+    return unwrapToolPayload(body);
+  } catch (err) {
+    if (err instanceof TRPCError) throw err;
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: `Agent tool ${name} request failed`,
+      cause: err instanceof Error ? err.message : String(err),
+    });
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
@@ -544,38 +605,19 @@ export const blueprintIngestionRouter = router({
 
       try {
         // --- 3. Call agent-stack: parse ---
-        const parseController = new AbortController();
-        const parseTimeout = setTimeout(() => parseController.abort(), AGENT_TIMEOUT);
-
-        let parseResp: Response;
-        try {
-          parseResp = await fetch(`${AGENT_URL}/tools/blueprint-parse`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              document_id: input.documentId,
-              artifact_path: artifact.storagePath,
-              storage_backend: artifact.storageBackend,
-              filename: doc.filename,
-              mime_type: doc.mimeType,
-              project_id: doc.projectId,
-            }),
-            signal: parseController.signal,
-          });
-        } finally {
-          clearTimeout(parseTimeout);
-        }
-
-        if (!parseResp.ok) {
-          const errBody = await parseResp.text().catch(() => "");
-          await markFailed(db, input.documentId, `Agent parse failed: HTTP ${parseResp.status} — ${errBody}`);
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: `Agent blueprint-parse returned ${parseResp.status}`,
-          });
-        }
-
-        const parseOutput = await parseResp.json();
+        const parseOutput = await callAgentTool(
+          AGENT_URL,
+          "blueprint_parse_document",
+          {
+            workspace: AGENT_WORKSPACE_ID,
+            pdf_path: artifact.storagePath,
+            document_id: input.documentId,
+            project_id: doc.projectId,
+            filename: doc.filename,
+            mime_type: doc.mimeType,
+          },
+          AGENT_TIMEOUT
+        );
 
         // --- 4. Validate against BlueprintParseV1 schema ---
         const validation = validateBlueprintParseV1(parseOutput);
@@ -697,9 +739,6 @@ export const blueprintIngestionRouter = router({
           .where(eq(blueprintDocuments.id, input.documentId));
 
         // --- 9. Call agent-stack: symbol detection ---
-        const detectController = new AbortController();
-        const detectTimeout = setTimeout(() => detectController.abort(), AGENT_TIMEOUT);
-
         let detections: Array<{
           page_number: number;
           x: number; y: number; w: number; h: number;
@@ -707,46 +746,21 @@ export const blueprintIngestionRouter = router({
           confidence: number;
         }> = [];
 
-        let detectResp: Response;
-        try {
-          detectResp = await fetch(`${AGENT_URL}/tools/blueprint-detect`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              document_id: input.documentId,
-              pages: parsed.pages.map((p) => ({
-                page_number: p.page_number,
-                image_path: p.image_artifact_path,
-                width_px: p.width_px,
-                height_px: p.height_px,
-              })),
-              project_id: doc.projectId,
-            }),
-            signal: detectController.signal,
-          });
-          clearTimeout(detectTimeout);
-        } catch (detectErr) {
-          clearTimeout(detectTimeout);
-          await markFailed(db, input.documentId, `Detection call failed: ${(detectErr as Error).message}`);
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: `Agent blueprint-detect call failed: ${(detectErr as Error).message}`,
-          });
-        }
-
-        if (!detectResp.ok) {
-          const errBody = await detectResp.text().catch(() => "");
-          await markFailed(db, input.documentId, `Detection failed: HTTP ${detectResp.status} — ${errBody}`);
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: `Agent blueprint-detect returned ${detectResp.status}`,
-          });
-        }
-
-        const detectData = await detectResp.json();
+        const detectData = await callAgentTool(
+          AGENT_URL,
+          "blueprint_detect_symbols",
+          {
+            workspace: AGENT_WORKSPACE_ID,
+            pdf_path: artifact.storagePath,
+            document_id: input.documentId,
+            project_id: doc.projectId,
+          },
+          AGENT_TIMEOUT
+        );
 
         // --- 9b. Validate detection output structure ---
-        if (!detectData || !Array.isArray(detectData.detections)) {
+        const detectList = (detectData as any)?.detections;
+        if (!Array.isArray(detectList)) {
           await markFailed(db, input.documentId, "Detection output missing 'detections' array");
           throw new TRPCError({
             code: "BAD_REQUEST",
@@ -754,8 +768,8 @@ export const blueprintIngestionRouter = router({
           });
         }
 
-        for (let i = 0; i < Math.min(detectData.detections.length, 10); i++) {
-          const d = detectData.detections[i];
+        for (let i = 0; i < Math.min(detectList.length, 10); i++) {
+          const d = detectList[i];
           if (typeof d.page_number !== "number" || typeof d.x !== "number" ||
               typeof d.y !== "number" || typeof d.w !== "number" ||
               typeof d.h !== "number" || typeof d.raw_class !== "string" ||
@@ -769,7 +783,7 @@ export const blueprintIngestionRouter = router({
           }
         }
 
-        detections = detectData.detections;
+        detections = detectList as typeof detections;
 
         // --- 10. Store raw detections with normalized bboxes ---
         if (detections.length > 0) {
@@ -1078,3 +1092,4 @@ export const blueprintIngestionRouter = router({
 });
 
 export type BlueprintIngestionRouter = typeof blueprintIngestionRouter;
+
