@@ -623,7 +623,13 @@ export const blueprintsRouter = router({
         if (!Number.isFinite(pageNumber) || pageNumber <= 0) continue;
 
         let imageStoragePath: string | null = null;
-        const sourceImagePath = String(page?.image_artifact_path ?? page?.imageStoragePath ?? "");
+        const sourceImagePath = String(
+          page?.image_artifact_path ??
+            page?.png_path ??
+            page?.imageStoragePath ??
+            page?.image_path ??
+            ""
+        );
 
         if (sourceImagePath) {
           try {
