@@ -611,10 +611,6 @@ export const blueprintIngestionRouter = router({
           {
             workspace: AGENT_WORKSPACE_ID,
             pdf_path: artifact.storagePath,
-            document_id: input.documentId,
-            project_id: doc.projectId,
-            filename: doc.filename,
-            mime_type: doc.mimeType,
           },
           AGENT_TIMEOUT
         );
@@ -752,8 +748,6 @@ export const blueprintIngestionRouter = router({
           {
             workspace: AGENT_WORKSPACE_ID,
             pdf_path: artifact.storagePath,
-            document_id: input.documentId,
-            project_id: doc.projectId,
           },
           AGENT_TIMEOUT
         );
