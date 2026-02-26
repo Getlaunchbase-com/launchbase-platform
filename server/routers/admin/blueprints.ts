@@ -597,8 +597,8 @@ export const blueprintsRouter = router({
         artifactId: uploadedArtifactId,
         filename: input.filename,
         mimeType: input.mimeType,
-        pageCount: Number(parseResp.page_count ?? 0),
-        status: "parsed",
+        pageCount: 0,
+        status: "parsing",
         uploadedBy: userId,
         parseContractName: parseResp?.contract?.name ?? null,
         parseContractVersion: parseResp?.contract?.version ?? null,
@@ -606,6 +606,101 @@ export const blueprintsRouter = router({
         parseProducerJson: parseResp?.contract?.producer ?? null,
         parsedAt: new Date(),
       });
+
+      const parsedPages = Array.isArray(parseResp?.pages) ? parseResp.pages : [];
+      const persistedPages: Array<{
+        documentId: number;
+        pageNumber: number;
+        label: string | null;
+        imageStoragePath: string | null;
+        imageWidth: number | null;
+        imageHeight: number | null;
+        meta: any;
+      }> = [];
+
+      for (const page of parsedPages) {
+        const pageNumber = Number(page?.page_number ?? page?.pageNumber ?? 0);
+        if (!Number.isFinite(pageNumber) || pageNumber <= 0) continue;
+
+        let imageStoragePath: string | null = null;
+        const sourceImagePath = String(page?.image_artifact_path ?? page?.imageStoragePath ?? "");
+
+        if (sourceImagePath) {
+          try {
+            const readImageResp = await callAgentTool(
+              "sandbox_run",
+              {
+                workspace,
+                cmd: `base64 -w 0 ${shQuote(sourceImagePath)}`,
+                timeout_sec: 120,
+              },
+              180_000
+            );
+            const imageB64 = String(readImageResp?.stdout ?? "").trim();
+            if (readImageResp?.ok && imageB64) {
+              const imgBuffer = Buffer.from(imageB64, "base64");
+              const subdir = path.join("blueprints", String(input.projectId), "pages");
+              const fullDir = path.join(ARTIFACTS_DIR, subdir);
+              ensureDir(fullDir);
+              const imgName = `doc${docIns.insertId}_page${pageNumber}_${randomUUID().slice(0, 8)}.png`;
+              imageStoragePath = path.join(subdir, imgName);
+              fs.writeFileSync(path.join(ARTIFACTS_DIR, imageStoragePath), imgBuffer);
+            }
+          } catch (err) {
+            console.warn(
+              `[blueprints.uploadAndGenerateQuotePackage] failed to persist page image for doc=${docIns.insertId} page=${pageNumber}:`,
+              err
+            );
+          }
+        }
+
+        persistedPages.push({
+          documentId: docIns.insertId,
+          pageNumber,
+          label: String(page?.label ?? "").trim() || null,
+          imageStoragePath,
+          imageWidth: Number.isFinite(Number(page?.width_px))
+            ? Number(page.width_px)
+            : Number.isFinite(Number(page?.imageWidth))
+              ? Number(page.imageWidth)
+              : null,
+          imageHeight: Number.isFinite(Number(page?.height_px))
+            ? Number(page.height_px)
+            : Number.isFinite(Number(page?.imageHeight))
+              ? Number(page.imageHeight)
+              : null,
+          meta: null,
+        });
+      }
+
+      if (persistedPages.length > 0) {
+        await db.insert(blueprintPages).values(persistedPages as any);
+      }
+
+      const effectivePageCount =
+        persistedPages.length > 0
+          ? persistedPages.length
+          : Number(parseResp.page_count ?? 0);
+
+      const parseFailed = effectivePageCount <= 0;
+      await db
+        .update(blueprintDocuments)
+        .set({
+          pageCount: effectivePageCount,
+          status: parseFailed ? "failed" : "parsed",
+          errorMessage: parseFailed
+            ? "Parse completed but no pages were persisted. Verify agent image outputs."
+            : null,
+        })
+        .where(eq(blueprintDocuments.id, docIns.insertId));
+
+      if (parseFailed) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message:
+            "Blueprint parse did not persist any pages. The document was marked failed for operator review.",
+        });
+      }
 
       return {
         ok: true,
@@ -620,7 +715,7 @@ export const blueprintsRouter = router({
           bluebeamArtifactId,
         },
         parse: {
-          pageCount: Number(parseResp.page_count ?? 0),
+          pageCount: effectivePageCount,
           totalBlocks: Number(parseResp.total_blocks ?? 0),
           legendCandidates: Number(parseResp.total_legend_candidates ?? 0),
         },
