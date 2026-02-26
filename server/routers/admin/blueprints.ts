@@ -65,6 +65,22 @@ function ensureDir(dir: string) {
   }
 }
 
+function normalizeBase64Data(input: string): string {
+  // Accept both raw base64 and data-URL formats from mobile/web clients.
+  let value = input.trim();
+  const commaIndex = value.indexOf(",");
+  if (value.startsWith("data:") && commaIndex >= 0) {
+    value = value.slice(commaIndex + 1);
+  }
+  // Remove whitespace/newlines and any non-base64 characters.
+  value = value.replace(/\s+/g, "").replace(/[^A-Za-z0-9+/=]/g, "");
+  const remainder = value.length % 4;
+  if (remainder !== 0) {
+    value = value + "=".repeat(4 - remainder);
+  }
+  return value;
+}
+
 async function storeLocal(
   projectId: number,
   filename: string,
@@ -252,7 +268,8 @@ export const blueprintsRouter = router({
       }
 
       // Decode file
-      const fileBuffer = Buffer.from(input.base64Data, "base64");
+      const normalizedBase64 = normalizeBase64Data(input.base64Data);
+      const fileBuffer = Buffer.from(normalizedBase64, "base64");
       const sizeBytes = fileBuffer.length;
       const checksum = createHash("sha256").update(fileBuffer).digest("hex");
 
@@ -338,7 +355,8 @@ export const blueprintsRouter = router({
       }
 
       const userId = (ctx as any).user?.id ?? 0;
-      const fileBuffer = Buffer.from(input.base64Data, "base64");
+      const normalizedBase64 = normalizeBase64Data(input.base64Data);
+      const fileBuffer = Buffer.from(normalizedBase64, "base64");
       const sizeBytes = fileBuffer.length;
       const checksum = createHash("sha256").update(fileBuffer).digest("hex");
       const uploadedStorage = S3_ENABLED
@@ -371,7 +389,7 @@ export const blueprintsRouter = router({
       const writeResp = await callAgentTool("workspace_write", {
         workspace,
         path: b64Path,
-        content: input.base64Data,
+        content: normalizedBase64,
       }, 300_000);
       if (!writeResp.ok) {
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Agent workspace write failed", cause: writeResp });
@@ -384,7 +402,9 @@ export const blueprintsRouter = router({
           `base64 -d ${shQuote(b64Path)} > ${shQuote(pdfPath)} ` +
           `|| python3 -c "import base64,sys;` +
           `src=open('${b64Path}','rb').read();` +
-          `open('${pdfPath}','wb').write(base64.b64decode(src))"` +
+          `src=b''.join(src.split());` +
+          `src=src+b'='*((4-len(src)%4)%4);` +
+          `open('${pdfPath}','wb').write(base64.b64decode(src,validate=False))"` +
           `)`,
         timeout_sec: 300,
       }, 300_000);

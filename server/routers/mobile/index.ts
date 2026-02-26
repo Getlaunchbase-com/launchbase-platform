@@ -850,7 +850,7 @@ export const mobileFeedbackRouter = router({
       let feedbackInstanceId: number;
       let feedbackRunId: number | null = null;
 
-      if (input.token) {
+      if (input.token && input.token.startsWith("mob_")) {
         const session = await validateMobileToken(input.token);
         feedbackUserId = session.userId;
         feedbackProjectId = session.projectId;
