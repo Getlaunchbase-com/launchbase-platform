@@ -20,7 +20,13 @@ import { env } from "./env";
 import { createContext } from "./trpc";
 import { appRouter } from "../routers/_incoming_routers";
 import { closeDb, getDb } from "../db";
-import { users } from "../db/schema";
+import {
+  users,
+  projects,
+  projectCollaborators,
+  vertexProfiles,
+  agentInstances,
+} from "../db/schema";
 import {
   validateHandshake,
   getAllContractInfo,
@@ -149,6 +155,64 @@ app.post("/auth/login", async (req, res) => {
       });
       userId = created.insertId;
       userRole = role;
+    }
+
+    // Bootstrap a default project/instance for first-time mobile users.
+    const existingProjects = await db
+      .select({ id: projects.id })
+      .from(projects)
+      .where(eq(projects.ownerId, Number(userId)))
+      .limit(1);
+
+    if (existingProjects.length === 0) {
+      const slugBase = `ibew-134-${Number(userId)}`;
+      const [newProject] = await db.insert(projects).values({
+        name: "IBEW 134 Beta Project",
+        slug: slugBase,
+        description: "Auto-provisioned beta project for mobile onboarding.",
+        ownerId: Number(userId),
+        tenant: "launchbase",
+        status: "active",
+      });
+
+      const newProjectId = Number(newProject.insertId);
+
+      await db.insert(projectCollaborators).values({
+        projectId: newProjectId,
+        userId: Number(userId),
+        role: "owner",
+        invitedBy: Number(userId),
+      });
+
+      let defaultVertexId: number | null = null;
+      const [existingVertex] = await db
+        .select({ id: vertexProfiles.id })
+        .from(vertexProfiles)
+        .where(eq(vertexProfiles.name, "ibew-134-default"))
+        .limit(1);
+
+      if (existingVertex) {
+        defaultVertexId = Number(existingVertex.id);
+      } else {
+        const [createdVertex] = await db.insert(vertexProfiles).values({
+          name: "ibew-134-default",
+          description: "Default beta vertex profile for IBEW mobile flow.",
+          configJson: {
+            model: "gpt-4o-mini",
+            temperature: 0.2,
+          },
+          toolsAllowlistJson: ["blueprint.parse", "estimate.chain", "gaps.detect"],
+        });
+        defaultVertexId = Number(createdVertex.insertId);
+      }
+
+      await db.insert(agentInstances).values({
+        projectId: newProjectId,
+        vertexId: Number(defaultVertexId),
+        displayName: "IBEW 134 Agent",
+        status: "active",
+        createdBy: Number(userId),
+      });
     }
 
     const expiresInHours = Math.max(1, Number(env.MOBILE_SESSION_TTL_HOURS || 24));
