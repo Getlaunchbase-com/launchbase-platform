@@ -130,7 +130,14 @@ let _cachedSchemaHash: string | null = null;
 export function getSchemaHash(): string {
   if (_cachedSchemaHash) return _cachedSchemaHash;
 
-  const schemaPath = path.resolve(__dirname, "BlueprintParseV1.schema.json");
+  const candidates = [
+    path.resolve(__dirname, "BlueprintParseV1.schema.json"),
+    path.resolve(process.cwd(), "server/contracts/BlueprintParseV1.schema.json"),
+  ];
+  const schemaPath = candidates.find((p) => fs.existsSync(p));
+  if (!schemaPath) {
+    throw new Error("BlueprintParseV1.schema.json not found in dist or source paths");
+  }
   const content = fs.readFileSync(schemaPath, "utf-8");
   _cachedSchemaHash = createHash("sha256").update(content).digest("hex");
   return _cachedSchemaHash;
