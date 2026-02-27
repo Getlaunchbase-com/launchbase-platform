@@ -1,18 +1,17 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
 import {
-  LayoutDashboard,
-  MessageSquare,
-  Zap,
-  ListTodo,
+  Brain,
   CheckSquare,
   FileText,
-  Wrench,
-  Brain,
-  Settings,
-  ChevronDown,
+  LayoutDashboard,
+  ListTodo,
   Menu,
+  MessageSquare,
+  Settings,
+  Wrench,
   X,
+  Zap,
 } from "./Icons";
 
 const navItems = [
@@ -23,7 +22,6 @@ const navItems = [
   { href: "/admin/console/approvals", label: "Approvals", icon: CheckSquare },
   { href: "/admin/console/files", label: "Files", icon: FileText },
   { href: "/admin/console/tools", label: "Tools", icon: Wrench },
-  { href: "/admin/console/models", label: "Models", icon: Brain },
   { href: "/admin/console/settings", label: "Settings", icon: Settings },
 ];
 
@@ -33,7 +31,7 @@ interface AdminLayoutProps {
 
 export function AdminLayout({ children }: AdminLayoutProps) {
   const [location] = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [buildInfo, setBuildInfo] = useState<{ gitSha: string; buildTime: string } | null>(null);
 
@@ -45,248 +43,145 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   }, []);
 
   useEffect(() => {
-    const onResize = () => {
-      const mobile = window.innerWidth < 768;
-      setIsMobile(mobile);
-      setSidebarOpen(!mobile);
-    };
+    const onResize = () => setIsMobile(window.innerWidth < 960);
     onResize();
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  const isActive = (href: string) => {
-    if (href === "/admin/agent/chat") {
-      return location === "/admin/agent/chat" || location === "/admin/console/agent-chat";
-    }
-    return location === href || location.startsWith(href + "/");
-  };
+  useEffect(() => {
+    if (!isMobile) setMobileOpen(false);
+  }, [isMobile]);
+
+  const routeTitle = useMemo(() => {
+    const hit = navItems.find((n) => location === n.href || location.startsWith(n.href + "/"));
+    return hit?.label ?? "Operator Console";
+  }, [location]);
+
+  const sidebarVisible = !isMobile || mobileOpen;
 
   return (
-    <div style={{ display: "flex", height: "100vh", backgroundColor: "#0f0f0f", color: "#e0e0e0", position: "relative" }}>
-      {isMobile && sidebarOpen && (
+    <div style={{ minHeight: "100vh", background: "#0b0b0d", color: "#f4f4f5", display: "flex" }}>
+      {isMobile && mobileOpen && (
         <button
           aria-label="Close navigation overlay"
-          onClick={() => setSidebarOpen(false)}
-          style={{
-            position: "fixed",
-            inset: 0,
-            border: "none",
-            backgroundColor: "rgba(0, 0, 0, 0.55)",
-            zIndex: 90,
-            cursor: "pointer",
-          }}
+          onClick={() => setMobileOpen(false)}
+          style={{ position: "fixed", inset: 0, border: "none", background: "rgba(0,0,0,0.6)", zIndex: 20 }}
         />
       )}
 
-      {/* Sidebar */}
       <aside
+        aria-label="Admin navigation"
         style={{
-          width: sidebarOpen ? "260px" : "0",
-          minWidth: sidebarOpen ? "260px" : "0",
-          transition: "width 0.25s ease, min-width 0.25s ease",
-          backgroundColor: "#1a1a1a",
-          borderRight: "1px solid #333",
-          display: "flex",
+          width: "272px",
+          background: "#111214",
+          borderRight: "1px solid #23252a",
+          display: sidebarVisible ? "flex" : "none",
           flexDirection: "column",
-          overflow: "hidden",
-          position: isMobile ? "fixed" : "relative",
-          height: "100vh",
-          left: 0,
+          position: isMobile ? "fixed" : "sticky",
           top: 0,
-          zIndex: 100,
+          left: 0,
+          height: "100vh",
+          zIndex: 30,
         }}
       >
-        {/* Header with Logo */}
-        <div
-          style={{
-            padding: "24px 16px",
-            borderBottom: "1px solid #333",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <Brain size={24} style={{ color: "#ff6b35" }} />
-            <span style={{ fontSize: "16px", fontWeight: "700", letterSpacing: "0.2px" }}>LaunchBase</span>
+        <div style={{ height: 72, padding: "0 16px", borderBottom: "1px solid #23252a", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ width: 32, height: 32, borderRadius: 8, background: "#ff6b35", display: "grid", placeItems: "center", color: "#141414" }}>
+              <Brain size={18} />
+            </div>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700 }}>LaunchBase</div>
+              <div style={{ fontSize: 11, color: "#8e9199" }}>OperatorOS</div>
+            </div>
           </div>
           {isMobile && (
             <button
               aria-label="Close sidebar"
-              onClick={() => setSidebarOpen(false)}
-              style={{
-                background: "none",
-                border: "1px solid #333",
-                color: "#bbb",
-                width: "32px",
-                height: "32px",
-                borderRadius: "8px",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              onClick={() => setMobileOpen(false)}
+              style={iconBtnStyle}
             >
               <X size={16} />
             </button>
           )}
         </div>
 
-        {/* Navigation Items */}
-        <nav style={{ flex: 1, padding: "12px 8px", overflow: "auto" }}>
+        <nav style={{ padding: 12, overflow: "auto", flex: 1 }}>
           {navItems.map((item) => {
             const Icon = item.icon;
-            const active = isActive(item.href);
+            const active = location === item.href || location.startsWith(item.href + "/");
             return (
               <Link key={item.href} href={item.href}>
                 <a
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "12px",
-                    padding: "11px 12px",
-                    marginBottom: "6px",
-                    borderRadius: "8px",
+                    gap: 12,
+                    marginBottom: 6,
+                    minHeight: 44,
+                    borderRadius: 10,
+                    border: active ? "1px solid #ff6b35" : "1px solid transparent",
+                    background: active ? "rgba(255,107,53,0.14)" : "transparent",
+                    color: active ? "#ffe2d6" : "#b5b8c0",
+                    padding: "0 12px",
+                    fontSize: 13,
+                    fontWeight: active ? 700 : 500,
                     textDecoration: "none",
-                    color: active ? "#fff" : "#aaa",
-                    backgroundColor: active ? "rgba(255, 255, 255, 0.08)" : "transparent",
-                    cursor: "pointer",
-                    transition: "all 0.2s",
-                    borderLeft: active ? "3px solid #fff" : "3px solid transparent",
-                    paddingLeft: active ? "10px" : "12px",
-                    fontWeight: active ? 600 : 500,
                     outline: "none",
                   }}
-                  onMouseEnter={(e) => {
-                    if (!active) {
-                      e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.04)";
-                      e.currentTarget.style.color = "#ddd";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!active) {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#aaa";
-                    }
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.boxShadow = "0 0 0 2px rgba(255, 107, 53, 0.35)";
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.boxShadow = "none";
-                  }}
+                  onFocus={(e) => (e.currentTarget.style.boxShadow = "0 0 0 2px rgba(255,107,53,0.35)")}
+                  onBlur={(e) => (e.currentTarget.style.boxShadow = "none")}
                 >
-                  <Icon size={20} style={{ flexShrink: 0 }} />
-                  <span style={{ fontSize: "14px" }}>{item.label}</span>
+                  <Icon size={17} />
+                  <span>{item.label}</span>
                 </a>
               </Link>
             );
           })}
         </nav>
 
-        {/* Footer */}
-        <div
-          style={{
-            padding: "14px 16px",
-            borderTop: "1px solid #333",
-            backgroundColor: "#141414",
-            fontSize: "11px",
-            color: "#555",
-          }}
-        >
-          <div style={{ fontWeight: 700, color: "#777", textTransform: "uppercase", letterSpacing: "0.4px" }}>
-            LaunchBase Console
+        <div style={{ padding: 12, borderTop: "1px solid #23252a", fontSize: 11, color: "#8e9199" }}>
+          <div style={{ textTransform: "uppercase", letterSpacing: 0.4, fontWeight: 700 }}>Build</div>
+          <div style={{ marginTop: 6, fontFamily: "monospace", color: "#c7cad1" }}>
+            {buildInfo?.gitSha && buildInfo.gitSha !== "unknown" ? buildInfo.gitSha.slice(0, 7) : "unknown"}
           </div>
-          {buildInfo ? (
-            <>
-              <div style={{ marginTop: "4px", fontFamily: "monospace", color: "#8c8c8c" }}>
-                {buildInfo.gitSha !== "unknown"
-                  ? buildInfo.gitSha.slice(0, 7)
-                  : "dev"}
-              </div>
-              <div style={{ marginTop: "2px" }}>
-                {buildInfo.buildTime !== "unknown"
-                  ? new Date(buildInfo.buildTime).toLocaleDateString()
-                  : ""}
-              </div>
-            </>
-          ) : (
-            <div style={{ marginTop: "4px" }}>Loading...</div>
-          )}
+          <div style={{ marginTop: 2 }}>
+            {buildInfo?.buildTime && buildInfo.buildTime !== "unknown" ? new Date(buildInfo.buildTime).toLocaleString() : "n/a"}
+          </div>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        {/* Top Bar */}
-        <header
-          style={{
-            height: "56px",
-            borderBottom: "1px solid #333",
-            display: "flex",
-            alignItems: "center",
-            padding: "0 16px",
-            backgroundColor: "#1a1a1a",
-            gap: "12px",
-          }}
-        >
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            aria-label="Toggle sidebar"
-            style={{
-              background: "none",
-              border: "1px solid #333",
-              cursor: "pointer",
-              color: "#bbb",
-              padding: "8px",
-              width: "36px",
-              height: "36px",
-              borderRadius: "8px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "all 0.2s",
-              outline: "none",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = "#fff";
-              e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.04)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = "#bbb";
-              e.currentTarget.style.backgroundColor = "transparent";
-            }}
-            onFocus={(e) => {
-              e.currentTarget.style.boxShadow = "0 0 0 2px rgba(255, 107, 53, 0.35)";
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.boxShadow = "none";
-            }}
-          >
-            <Menu size={18} />
-          </button>
-          <div>
-            <div style={{ fontSize: "13px", color: "#f0f0f0", fontWeight: 600 }}>Operator Console</div>
-            <div style={{ fontSize: "11px", color: "#777" }}>Agent Stack Admin</div>
+      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
+        <header style={{ height: 64, borderBottom: "1px solid #23252a", background: "#0f1013", display: "flex", alignItems: "center", gap: 12, padding: "0 16px", position: "sticky", top: 0, zIndex: 10 }}>
+          {isMobile && (
+            <button aria-label="Open sidebar" onClick={() => setMobileOpen(true)} style={iconBtnStyle}>
+              <Menu size={18} />
+            </button>
+          )}
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: "#f5f5f5" }}>{routeTitle}</div>
+            <div style={{ fontSize: 12, color: "#8e9199" }}>Admin route: {location}</div>
           </div>
-          <div style={{ flex: 1 }} />
-          <div style={{ fontSize: "12px", color: "#a0a0a0", border: "1px solid #333", borderRadius: "999px", padding: "4px 10px" }}>
-            System Online
+          <div style={{ marginLeft: "auto", fontSize: 12, color: "#9dc6ff", border: "1px solid #1f3e5f", background: "#0d2238", borderRadius: 999, padding: "4px 10px" }}>
+            Stable Baseline
           </div>
         </header>
 
-        {/* Page Content */}
-        <main
-          style={{
-            flex: 1,
-            overflow: "auto",
-            padding: isMobile ? "14px" : "20px 24px",
-          }}
-        >
-          {children}
-        </main>
+        <main id="main-content" style={{ flex: 1, overflow: "auto", padding: isMobile ? 14 : 20 }}>{children}</main>
       </div>
     </div>
   );
 }
+
+const iconBtnStyle: React.CSSProperties = {
+  width: 36,
+  height: 36,
+  borderRadius: 8,
+  border: "1px solid #30323a",
+  background: "#15171c",
+  color: "#d3d6de",
+  display: "grid",
+  placeItems: "center",
+  cursor: "pointer",
+  outline: "none",
+};

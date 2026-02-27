@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useLocation } from "wouter";
 import { AdminLayout } from "../../components/AdminLayout";
 import { Search } from "../../components/Icons";
@@ -15,104 +15,127 @@ export default function AdminConsoleRuns() {
 
   const filteredRuns = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    let rows = runs.filter((run) => {
-      const statusOk = filterStatus === "all" || run.status === filterStatus;
+    const filtered = runs.filter((run) => {
+      const statusMatch = filterStatus === "all" || run.status === filterStatus;
       const searchText = `${run.id} ${run.goal ?? ""} ${run.model ?? ""}`.toLowerCase();
-      return statusOk && (!q || searchText.includes(q));
+      return statusMatch && (!q || searchText.includes(q));
     });
+
     if (sortBy === "status") {
-      rows = [...rows].sort((a, b) => (a.status < b.status ? -1 : a.status > b.status ? 1 : 0));
-    } else {
-      rows = [...rows].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      return [...filtered].sort((a, b) => a.status.localeCompare(b.status));
     }
-    return rows;
+
+    return [...filtered].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
   }, [runs, filterStatus, searchQuery, sortBy]);
 
   return (
     <AdminLayout>
-      <div>
-        <h1 style={{ fontSize: "28px", fontWeight: 700, letterSpacing: "0.2px", margin: "0 0 8px 0" }}>Runs</h1>
-        <p style={{ fontSize: "14px", color: "#888", margin: "0 0 24px 0" }}>
-          Monitor and inspect agent runs
-        </p>
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-foreground">Runs</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Filter, inspect, and navigate run outputs</p>
+      </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "12px", marginBottom: "18px" }}>
-          <div>
-            <label style={labelStyle}>Search</label>
-            <div style={{ position: "relative" }}>
-              <Search size={14} style={{ position: "absolute", left: "8px", top: "8px", color: "#666" }} />
-              <input
-                type="text"
-                placeholder="Run ID, goal, model..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ ...inputStyle, paddingLeft: "28px" }}
-              />
-            </div>
-          </div>
-          <div>
-            <label style={labelStyle}>Status</label>
-            <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} style={inputStyle}>
-              <option value="all">All</option>
-              <option value="running">Running</option>
-              <option value="success">Completed</option>
-              <option value="failed">Failed</option>
-              <option value="awaiting_approval">Awaiting Approval</option>
-            </select>
-          </div>
-          <div>
-            <label style={labelStyle}>Sort</label>
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value as "recent" | "status")} style={inputStyle}>
-              <option value="recent">Recent</option>
-              <option value="status">Status</option>
-            </select>
+      <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+        <div>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">Search</label>
+          <div className="relative">
+            <Search size={14} style={{ position: "absolute", left: "10px", top: "11px" }} />
+            <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Run ID, goal, model"
+              className="h-10 w-full rounded-lg border border-input bg-background pl-8 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            />
           </div>
         </div>
 
-        <section style={{ backgroundColor: "#1a1a1a", border: "1px solid #333", borderRadius: "10px", overflowX: "auto" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "120px 1fr 120px 160px 110px", minWidth: "720px", gap: "12px", padding: "12px 14px", borderBottom: "1px solid #333", fontSize: "10px", color: "#777", fontWeight: 700, textTransform: "uppercase" }}>
-            <span>ID</span>
-            <span>Goal</span>
-            <span>Status</span>
-            <span>Start Time</span>
-            <span>Actions</span>
-          </div>
+        <div>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">Status</label>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="all">All</option>
+            <option value="running">Running</option>
+            <option value="success">Success</option>
+            <option value="failed">Failed</option>
+            <option value="awaiting_approval">Awaiting Approval</option>
+          </select>
+        </div>
 
-          {runsQuery.isLoading && <Empty text="Loading runs..." />}
-          {runsQuery.error && <Empty text="Failed to load runs." tone="error" />}
-          {!runsQuery.isLoading && !runsQuery.error && filteredRuns.length === 0 && <Empty text="No runs match filters." />}
+        <div>
+          <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">Sort</label>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as "recent" | "status")}
+            className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="recent">Recent</option>
+            <option value="status">Status</option>
+          </select>
+        </div>
+      </div>
 
-          {!runsQuery.isLoading && !runsQuery.error && filteredRuns.map((run) => (
-            <div key={run.id} style={{ display: "grid", gridTemplateColumns: "120px 1fr 120px 160px 110px", minWidth: "720px", gap: "12px", padding: "12px 14px", borderBottom: "1px solid #262626", alignItems: "center" }}>
-              <div style={{ fontSize: "12px", color: "#f0f0f0", fontWeight: 700 }}>#{run.id}</div>
-              <div style={{ fontSize: "12px", color: "#cfcfcf" }}>{(run.goal ?? "No goal").slice(0, 90)}</div>
-              <Badge text={run.status} />
-              <div style={{ fontSize: "11px", color: "#888" }}>{formatDate(run.createdAt)}</div>
-              <button
-                onClick={() => setLocation("/admin/console/files")}
-                style={{ border: "1px solid #3a3a3a", background: "#111", color: "#ddd", borderRadius: "7px", padding: "7px 10px", fontSize: "12px", cursor: "pointer" }}
-              >
-                View
-              </button>
+      <section className="overflow-hidden rounded-lg border border-border bg-background">
+        <div className="grid min-w-[760px] grid-cols-[7rem_1fr_8rem_11rem_8rem] gap-3 border-b border-border bg-muted px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <span>ID</span>
+          <span>Goal</span>
+          <span>Status</span>
+          <span>Created</span>
+          <span className="text-right">Actions</span>
+        </div>
+
+        {runsQuery.isLoading && <RowMessage label="Loading runs..." />}
+        {runsQuery.error && <RowMessage label="Failed to load runs." tone="error" />}
+        {!runsQuery.isLoading && !runsQuery.error && filteredRuns.length === 0 && <RowMessage label="No runs found." />}
+
+        {!runsQuery.isLoading && !runsQuery.error &&
+          filteredRuns.map((run) => (
+            <div
+              key={run.id}
+              className="grid min-w-[760px] grid-cols-[7rem_1fr_8rem_11rem_8rem] gap-3 border-b border-border px-4 py-3"
+            >
+              <span className="text-sm font-semibold text-foreground">#{run.id}</span>
+              <span className="line-clamp-2 text-sm text-foreground">{run.goal ?? "No goal"}</span>
+              <StatusBadge status={run.status} />
+              <span className="text-xs text-muted-foreground">{formatDate(run.createdAt)}</span>
+              <div className="text-right">
+                <button
+                  onClick={() => setLocation("/admin/console/files")}
+                  className="h-10 rounded-lg border border-border bg-secondary px-4 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  View Files
+                </button>
+              </div>
             </div>
           ))}
-        </section>
-      </div>
+      </section>
     </AdminLayout>
   );
 }
 
-function Empty({ text, tone = "muted" }: { text: string; tone?: "muted" | "error" }) {
-  return <div style={{ padding: "24px", color: tone === "error" ? "#ef4444" : "#777", fontSize: "13px", textAlign: "center" }}>{text}</div>;
+function RowMessage({ label, tone = "muted" }: { label: string; tone?: "muted" | "error" }) {
+  return (
+    <div className={`px-4 py-6 text-sm ${tone === "error" ? "text-destructive" : "text-muted-foreground"}`}>
+      {label}
+    </div>
+  );
 }
 
-function Badge({ text }: { text: string }) {
-  const color = text === "running" ? "#22c55e" : text === "failed" ? "#ef4444" : text === "awaiting_approval" ? "#f59e0b" : "#60a5fa";
-  return (
-    <span style={{ width: "fit-content", fontSize: "10px", color, border: `1px solid ${color}66`, background: `${color}1f`, borderRadius: "999px", padding: "2px 8px", textTransform: "uppercase", fontWeight: 700 }}>
-      {text}
-    </span>
-  );
+function StatusBadge({ status }: { status: string }) {
+  const tone =
+    status === "running"
+      ? "bg-info/10 text-info"
+      : status === "success"
+      ? "bg-success/10 text-success"
+      : status === "failed"
+      ? "bg-destructive/10 text-destructive"
+      : "bg-warning/10 text-warning";
+
+  return <span className={`inline-flex w-fit rounded-full px-2 py-1 text-xs font-medium uppercase ${tone}`}>{status}</span>;
 }
 
 function formatDate(value: Date | string | null | undefined) {
@@ -121,24 +144,3 @@ function formatDate(value: Date | string | null | undefined) {
   if (Number.isNaN(d.getTime())) return "n/a";
   return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
 }
-
-const labelStyle: React.CSSProperties = {
-  fontSize: "11px",
-  color: "#777",
-  fontWeight: 700,
-  textTransform: "uppercase",
-  letterSpacing: "0.3px",
-  display: "block",
-  marginBottom: "6px",
-};
-
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  backgroundColor: "#0f0f0f",
-  border: "1px solid #333",
-  borderRadius: "6px",
-  color: "#e0e0e0",
-  fontSize: "12px",
-  padding: "8px",
-  outline: "none",
-};

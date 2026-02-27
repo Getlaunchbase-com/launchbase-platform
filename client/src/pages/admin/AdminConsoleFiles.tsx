@@ -1,4 +1,4 @@
-ï»¿import { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { AdminLayout } from "../../components/AdminLayout";
 import { Download, Eye, Upload } from "../../components/Icons";
 import { trpc } from "../../lib/trpc";
@@ -8,8 +8,8 @@ async function fileToBase64(file: File): Promise<string> {
     const reader = new FileReader();
     reader.onload = () => {
       const data = String(reader.result || "");
-      const i = data.indexOf(",");
-      resolve(i >= 0 ? data.slice(i + 1) : data);
+      const idx = data.indexOf(",");
+      resolve(idx >= 0 ? data.slice(idx + 1) : data);
     };
     reader.onerror = reject;
     reader.readAsDataURL(file);
@@ -25,6 +25,7 @@ export default function AdminConsoleFiles() {
 
   const utils = trpc.useUtils();
   const artifactsQuery = trpc.admin.operatorOS.listArtifacts.useQuery({ limit: 100, offset: 0 });
+
   const uploadMut = trpc.admin.blueprints.upload.useMutation({
     onSuccess: async (data) => {
       setUploadMessage(`Upload complete (artifact #${data.artifactId}).`);
@@ -35,7 +36,22 @@ export default function AdminConsoleFiles() {
       setUploadMessage(err.message || "Upload failed.");
     },
   });
+
   const artifacts = artifactsQuery.data?.artifacts ?? [];
+
+  const { uploads, generated } = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    const filtered = artifacts.filter((item) => {
+      if (!q) return true;
+      return `${item.filename} ${item.type}`.toLowerCase().includes(q);
+    });
+
+    return {
+      uploads: filtered.filter((item) => item.type === "blueprint_input"),
+      generated: filtered.filter((item) => item.type !== "blueprint_input"),
+    };
+  }, [artifacts, searchQuery]);
+
   const canUpload = !!uploadFile && !uploadMut.isPending;
 
   async function onUploadNow() {
@@ -49,148 +65,139 @@ export default function AdminConsoleFiles() {
     });
   }
 
-  const { uploads, generated } = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-    const list = artifacts.filter((file) => {
-      if (!q) return true;
-      return `${file.filename} ${file.type}`.toLowerCase().includes(q);
-    });
-    return {
-      uploads: list.filter((file) => file.type === "blueprint_input"),
-      generated: list.filter((file) => file.type !== "blueprint_input"),
-    };
-  }, [artifacts, searchQuery]);
-
   return (
     <AdminLayout>
-      <div>
-        <h1 style={{ fontSize: "28px", fontWeight: 700, letterSpacing: "0.2px", margin: "0 0 8px 0" }}>Files</h1>
-        <p style={{ fontSize: "14px", color: "#888", margin: "0 0 20px 0" }}>
-          Uploaded files and agent-generated artifacts
-        </p>
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-foreground">Files</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Uploads and generated artifacts with direct actions</p>
+      </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "12px", marginBottom: "16px" }}>
-          <div>
-            <label style={labelStyle}>Search</label>
-            <input
-              type="text"
-              placeholder="Search by filename or type..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={inputStyle}
-            />
-          </div>
-          <div>
-            <label style={labelStyle}>Type</label>
-            <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as "all" | "uploads" | "artifacts")} style={inputStyle}>
+      <section className="mb-4 rounded-lg border border-border border-dashed bg-secondary p-6">
+        <div className="mb-4 flex items-center gap-2 text-foreground">
+          <Upload size={18} />
+          <h2 className="text-lg font-semibold">Quick Upload</h2>
+        </div>
+
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+          <input
+            type="number"
+            min={1}
+            value={projectId}
+            onChange={(e) => setProjectId(Number(e.target.value || 1))}
+            aria-label="Project ID"
+            className="h-12 rounded-lg border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+
+          <input
+            type="file"
+            accept="application/pdf,.pdf"
+            onChange={(e) => setUploadFile(e.target.files?.[0] ?? null)}
+            aria-label="Blueprint PDF"
+            className="h-12 rounded-lg border border-input bg-background px-3 text-sm text-foreground file:mr-3 file:rounded-md file:border-0 file:bg-secondary file:px-3 file:py-2 file:text-sm"
+          />
+
+          <input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search filename or type"
+            className="h-12 rounded-lg border border-input bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+
+          <div className="flex gap-2">
+            <select
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value as "all" | "uploads" | "artifacts")}
+              className="h-12 flex-1 rounded-lg border border-input bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            >
               <option value="all">All</option>
               <option value="uploads">Uploads</option>
               <option value="artifacts">Artifacts</option>
             </select>
-          </div>
-        </div>
-
-        <section style={{ ...panelStyle, marginBottom: "12px", borderStyle: "dashed", borderWidth: "2px" }}>
-          <Upload size={22} style={{ margin: "0 auto 8px", color: "#888" }} />
-          <div style={{ fontSize: "14px", color: "#d5d5d5", marginBottom: "8px", textAlign: "center" }}>Quick Upload</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "8px", alignItems: "center" }}>
-            <input
-              type="number"
-              value={projectId}
-              min={1}
-              onChange={(e) => setProjectId(Number(e.target.value || 1))}
-              style={inputStyle}
-              aria-label="Project ID"
-            />
-            <input
-              type="file"
-              accept="application/pdf,.pdf"
-              onChange={(e) => setUploadFile(e.target.files?.[0] ?? null)}
-              style={{ ...inputStyle, padding: "6px" }}
-              aria-label="Blueprint file"
-            />
             <button
               onClick={onUploadNow}
               disabled={!canUpload}
-              style={{
-                ...actionStyle,
-                justifyContent: "center",
-                cursor: canUpload ? "pointer" : "not-allowed",
-                opacity: canUpload ? 1 : 0.5,
-                minWidth: "110px",
-              }}
-              title={!canUpload ? "Select a file first." : "Upload blueprint"}
+              className="h-12 rounded-lg bg-primary px-6 text-sm font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
             >
               {uploadMut.isPending ? "Uploading..." : "Upload"}
             </button>
           </div>
-          {uploadFile && (
-            <div style={{ marginTop: "8px", fontSize: "12px", color: "#93c5fd" }}>
-              Selected: {uploadFile.name} ({Math.max(1, Math.round(uploadFile.size / 1024))} KB)
-            </div>
-          )}
-          {uploadMessage && (
-            <div style={{ marginTop: "8px", fontSize: "12px", color: uploadMessage.includes("complete") ? "#22c55e" : "#ef4444" }}>
-              {uploadMessage}
-            </div>
-          )}
+        </div>
+
+        {uploadFile && (
+          <p className="mt-2 text-sm text-info">
+            Selected: {uploadFile.name} ({Math.max(1, Math.round(uploadFile.size / 1024))} KB)
+          </p>
+        )}
+        {uploadMessage && (
+          <p className={`mt-2 text-sm ${uploadMessage.includes("complete") ? "text-success" : "text-destructive"}`}>
+            {uploadMessage}
+          </p>
+        )}
+      </section>
+
+      {(typeFilter === "all" || typeFilter === "uploads") && (
+        <section className="mb-4 rounded-lg border border-border bg-background p-6">
+          <h2 className="mb-3 text-lg font-semibold text-foreground">Uploads</h2>
+          {artifactsQuery.isLoading && <StateText label="Loading uploads..." />}
+          {artifactsQuery.error && <StateText label="Failed to load uploads." tone="error" />}
+          {!artifactsQuery.isLoading && !artifactsQuery.error && uploads.length === 0 && <StateText label="No uploads found." />}
+          {uploads.map((file) => (
+            <FileRow key={file.id} file={file} />
+          ))}
         </section>
+      )}
 
-        {(typeFilter === "all" || typeFilter === "uploads") && (
-          <section style={{ ...panelStyle, marginBottom: "12px" }}>
-            <h2 style={sectionTitle}>Uploads</h2>
-            {artifactsQuery.isLoading && <Meta text="Loading uploads..." />}
-            {artifactsQuery.error && <Meta text="Failed to load uploads." tone="error" />}
-            {!artifactsQuery.isLoading && !artifactsQuery.error && uploads.length === 0 && <Meta text="No uploads found." />}
-            {!artifactsQuery.isLoading && !artifactsQuery.error && uploads.map((file) => (
-              <FileRow key={file.id} file={file} />
-            ))}
-          </section>
-        )}
-
-        {(typeFilter === "all" || typeFilter === "artifacts") && (
-          <section style={panelStyle}>
-            <h2 style={sectionTitle}>Generated Artifacts</h2>
-            {artifactsQuery.isLoading && <Meta text="Loading artifacts..." />}
-            {artifactsQuery.error && <Meta text="Failed to load artifacts." tone="error" />}
-            {!artifactsQuery.isLoading && !artifactsQuery.error && generated.length === 0 && <Meta text="No generated artifacts found." />}
-            {!artifactsQuery.isLoading && !artifactsQuery.error && generated.map((file) => (
-              <FileRow key={file.id} file={file} />
-            ))}
-          </section>
-        )}
-      </div>
+      {(typeFilter === "all" || typeFilter === "artifacts") && (
+        <section className="rounded-lg border border-border bg-background p-6">
+          <h2 className="mb-3 text-lg font-semibold text-foreground">Generated Artifacts</h2>
+          {artifactsQuery.isLoading && <StateText label="Loading artifacts..." />}
+          {artifactsQuery.error && <StateText label="Failed to load artifacts." tone="error" />}
+          {!artifactsQuery.isLoading && !artifactsQuery.error && generated.length === 0 && <StateText label="No generated artifacts found." />}
+          {generated.map((file) => (
+            <FileRow key={file.id} file={file} />
+          ))}
+        </section>
+      )}
     </AdminLayout>
   );
 }
 
-function FileRow({ file }: { file: { id: number; filename: string; type: string; sizeBytes: number | null; createdAt: Date | string | null } }) {
-  const hasUrl = file.id != null;
-  const viewHref = `/api/artifacts/${file.id}`;
+function FileRow({
+  file,
+}: {
+  file: {
+    id: number;
+    filename: string;
+    type: string;
+    sizeBytes: number | null;
+    createdAt: Date | string | null;
+  };
+}) {
+  const href = `/api/artifacts/${file.id}`;
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr auto auto", gap: "10px", alignItems: "center", border: "1px solid #2d2d2d", borderRadius: "8px", padding: "10px", marginBottom: "8px", backgroundColor: "#111", overflowX: "auto" }}>
+    <div className="mb-2 grid grid-cols-1 gap-3 rounded-lg border border-border bg-secondary p-4 md:grid-cols-[1fr_auto_auto] md:items-center">
       <div>
-        <div style={{ fontSize: "12px", fontWeight: 700, color: "#e9e9e9" }}>{file.filename}</div>
-        <div style={{ fontSize: "11px", color: "#888", marginTop: "4px" }}>
-          {file.type} | {formatBytes(file.sizeBytes ?? 0)} | {formatDate(file.createdAt)}
-        </div>
+        <p className="text-sm font-medium text-foreground">{file.filename}</p>
+        <p className="text-xs text-muted-foreground">
+          {file.type} • {formatBytes(file.sizeBytes ?? 0)} • {formatDate(file.createdAt)}
+        </p>
       </div>
+
       <a
-        href={hasUrl ? viewHref : undefined}
+        href={href}
         target="_blank"
         rel="noreferrer"
-        style={{ ...actionStyle, opacity: hasUrl ? 1 : 0.45, pointerEvents: hasUrl ? "auto" : "none" }}
-        title={hasUrl ? "View artifact" : "View unavailable"}
+        className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-border bg-background px-4 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
       >
         <Eye size={13} />
         View
       </a>
+
       <a
-        href={hasUrl ? viewHref : undefined}
+        href={href}
         download
-        style={{ ...actionStyle, opacity: hasUrl ? 1 : 0.45, pointerEvents: hasUrl ? "auto" : "none" }}
-        title={hasUrl ? "Download artifact" : "Download unavailable"}
+        className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-border bg-background px-4 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
       >
         <Download size={13} />
         Download
@@ -199,8 +206,8 @@ function FileRow({ file }: { file: { id: number; filename: string; type: string;
   );
 }
 
-function Meta({ text, tone = "muted" }: { text: string; tone?: "muted" | "error" }) {
-  return <div style={{ fontSize: "12px", color: tone === "error" ? "#ef4444" : "#777", marginBottom: "8px" }}>{text}</div>;
+function StateText({ label, tone = "muted" }: { label: string; tone?: "muted" | "error" }) {
+  return <p className={`text-sm ${tone === "error" ? "text-destructive" : "text-muted-foreground"}`}>{label}</p>;
 }
 
 function formatDate(value: Date | string | null | undefined) {
@@ -216,50 +223,3 @@ function formatBytes(size: number) {
   if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
   return `${(size / (1024 * 1024)).toFixed(1)} MB`;
 }
-
-const labelStyle: React.CSSProperties = {
-  fontSize: "11px",
-  color: "#777",
-  fontWeight: 700,
-  textTransform: "uppercase",
-  letterSpacing: "0.3px",
-  display: "block",
-  marginBottom: "6px",
-};
-
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  backgroundColor: "#0f0f0f",
-  border: "1px solid #333",
-  borderRadius: "6px",
-  color: "#e0e0e0",
-  fontSize: "12px",
-  padding: "8px",
-  outline: "none",
-};
-
-const panelStyle: React.CSSProperties = {
-  backgroundColor: "#1a1a1a",
-  border: "1px solid #333",
-  borderRadius: "10px",
-  padding: "14px",
-};
-
-const sectionTitle: React.CSSProperties = {
-  margin: "0 0 10px 0",
-  fontSize: "14px",
-  fontWeight: 700,
-};
-
-const actionStyle: React.CSSProperties = {
-  display: "inline-flex",
-  alignItems: "center",
-  gap: "6px",
-  border: "1px solid #333",
-  borderRadius: "7px",
-  padding: "7px 10px",
-  color: "#ddd",
-  textDecoration: "none",
-  fontSize: "12px",
-  backgroundColor: "#171717",
-};
