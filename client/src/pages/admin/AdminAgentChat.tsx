@@ -23,7 +23,7 @@ export default function AdminAgentChat() {
 
   const launchRunMut = trpc.admin.operatorOS.launchInstanceRun.useMutation({
     onSuccess: async (data) => {
-      setActionMessage(`Run #${data.runId} started.`);
+      setActionMessage(`Session #${data.runId} started.`);
       setComposerText("");
       setRunGoalOverride("");
       await utils.admin.operatorOS.listRuns.invalidate();
@@ -70,7 +70,7 @@ export default function AdminAgentChat() {
 
   async function startRunFromComposer() {
     if (!selectedRun || selectedRun.projectId == null || selectedRun.agentInstanceId == null) {
-      setActionMessage("Select a run with project and instance context.");
+      setActionMessage("Select a conversation with workspace and profile context.");
       return;
     }
 
@@ -93,14 +93,14 @@ export default function AdminAgentChat() {
       <div className="grid min-h-[calc(100vh-12rem)] grid-cols-1 gap-4 lg:grid-cols-[20rem_minmax(0,1fr)_21rem]">
         <aside className="rounded-lg border border-border bg-secondary">
           <div className="border-b border-border p-4">
-            <h2 className="text-sm font-semibold text-foreground">Sessions</h2>
-            <p className="mt-1 text-xs text-muted-foreground">Live runs from operator stack</p>
+            <h2 className="text-sm font-semibold text-foreground">Conversations</h2>
+            <p className="mt-1 text-xs text-muted-foreground">Live conversations from assistant stack</p>
             <div className="relative mt-3">
               <Search size={14} style={{ position: "absolute", left: "10px", top: "11px" }} />
               <input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search runs"
+                placeholder="Search conversations"
                 className="h-10 w-full rounded-lg border border-input bg-background pl-8 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
@@ -125,9 +125,9 @@ export default function AdminAgentChat() {
           </div>
 
           <div className="max-h-[60vh] overflow-auto p-3 lg:max-h-[calc(100vh-18rem)]">
-            {runsQuery.isLoading && <StateText label="Loading runs..." />}
-            {runsQuery.error && <StateText label="Failed to load runs." tone="error" />}
-            {!runsQuery.isLoading && !runsQuery.error && filteredRuns.length === 0 && <StateText label="No runs found." />}
+            {runsQuery.isLoading && <StateText label="Loading conversations..." />}
+            {runsQuery.error && <StateText label="Could not load conversations." tone="error" />}
+            {!runsQuery.isLoading && !runsQuery.error && filteredRuns.length === 0 && <StateText label="No conversations found." />}
             {filteredRuns.map((run) => (
               <button
                 key={run.id}
@@ -139,7 +139,7 @@ export default function AdminAgentChat() {
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-semibold text-foreground">Run #{run.id}</span>
+                  <span className="text-sm font-semibold text-foreground">Conversation #{run.id}</span>
                   <StatusBadge status={run.status} />
                 </div>
                 <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">{run.goal ?? "No goal provided"}</p>
@@ -153,7 +153,7 @@ export default function AdminAgentChat() {
           <header className="border-b border-border p-4">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h1 className="text-lg font-semibold text-foreground">Operator Chat Workspace</h1>
+                <h1 className="text-lg font-semibold text-foreground">Assistant Workspace</h1>
                 <p className="text-sm text-muted-foreground">Active interface with live run execution controls</p>
               </div>
               <StatusBadge status={runtimeStatus} prefix="Runtime" />
@@ -165,7 +165,7 @@ export default function AdminAgentChat() {
               <>
                 <MessageCard
                   role="operator"
-                  title={`Selected Run #${selectedRun.id}`}
+                  title={`Selected Conversation #${selectedRun.id}`}
                   body={selectedRun.goal ?? "No goal provided."}
                   meta={`Model: ${selectedRun.model ?? "default"}`}
                 />
@@ -188,11 +188,11 @@ export default function AdminAgentChat() {
           </div>
 
           <div className="border-t border-border p-4">
-            <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-muted-foreground">Run Goal Override</label>
+            <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-muted-foreground">Message Intent Override</label>
             <input
               value={runGoalOverride}
               onChange={(e) => setRunGoalOverride(e.target.value)}
-              placeholder="Optional explicit goal for Start Run"
+              placeholder="Optional explicit intent for Start Session"
               className="mb-3 h-10 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             />
 
@@ -200,7 +200,7 @@ export default function AdminAgentChat() {
             <textarea
               value={composerText}
               onChange={(e) => setComposerText(e.target.value)}
-              placeholder="Enter operator instruction and press Start Run"
+              placeholder="Type instruction and press Start Session"
               className="min-h-24 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             />
 
@@ -217,7 +217,7 @@ export default function AdminAgentChat() {
                 className="inline-flex h-12 min-w-[10rem] items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <Play size={14} />
-                {launchRunMut.isPending ? "Starting..." : "Start Run"}
+                {launchRunMut.isPending ? "Starting..." : "Start Session"}
               </button>
 
               <button
@@ -228,7 +228,7 @@ export default function AdminAgentChat() {
                 className="inline-flex h-12 min-w-[10rem] items-center justify-center gap-2 rounded-lg bg-secondary px-6 py-3 text-sm font-medium text-foreground"
               >
                 <Square size={14} />
-                Stop Run
+                Stop Session
               </button>
 
               <button
@@ -247,7 +247,7 @@ export default function AdminAgentChat() {
                 className="inline-flex h-12 min-w-[11rem] items-center justify-center gap-2 rounded-lg border border-border bg-background px-6 py-3 text-sm font-medium text-foreground"
               >
                 <Send size={14} />
-                Open Artifacts ({recentArtifacts.length})
+                Open Files ({recentArtifacts.length})
               </button>
 
               <button
@@ -262,16 +262,16 @@ export default function AdminAgentChat() {
         </section>
 
         <aside className="rounded-lg border border-border bg-secondary p-4">
-          <h2 className="text-sm font-semibold text-foreground">Run Context</h2>
+          <h2 className="text-sm font-semibold text-foreground">Conversation Context</h2>
           <p className="mt-1 text-xs text-muted-foreground">Tools, artifacts, approvals</p>
 
           <div className="mt-4 space-y-3">
-            <Panel title="Run Status">
+            <Panel title="Session Status">
               {selectedRun ? (
                 <div className="space-y-1 text-sm text-foreground">
-                  <div>Run #{selectedRun.id}</div>
-                  <div className="text-muted-foreground">Project: {selectedRun.projectId ?? "n/a"}</div>
-                  <div className="text-muted-foreground">Instance: {selectedRun.agentInstanceId ?? "n/a"}</div>
+                  <div>Conversation #{selectedRun.id}</div>
+                  <div className="text-muted-foreground">Workspace: {selectedRun.projectId ?? "n/a"}</div>
+                  <div className="text-muted-foreground">Assistant Profile: {selectedRun.agentInstanceId ?? "n/a"}</div>
                   <div className="text-muted-foreground">Created: {formatDate(selectedRun.createdAt)}</div>
                 </div>
               ) : (

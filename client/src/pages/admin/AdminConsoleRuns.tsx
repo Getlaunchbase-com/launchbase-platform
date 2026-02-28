@@ -33,8 +33,8 @@ export default function AdminConsoleRuns() {
   return (
     <AdminLayout>
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-foreground">Runs</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Filter, inspect, and navigate run outputs</p>
+        <h1 className="text-3xl font-bold text-foreground">Sessions</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Filter, inspect, and open conversation outputs</p>
       </div>
 
       <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-3">
@@ -45,7 +45,7 @@ export default function AdminConsoleRuns() {
             <input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Run ID, goal, model"
+              placeholder="Session ID, goal, model"
               className="h-10 w-full rounded-lg border border-input bg-background pl-8 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>

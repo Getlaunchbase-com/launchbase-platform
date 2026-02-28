@@ -38,7 +38,7 @@ export default function AdminSwarmChat() {
 
   const sendMut = trpc.admin.opsChat.sendMessage.useMutation({
     onSuccess: async (res) => {
-      setInfo(`Message queued on run #${res.runId}.`);
+      setInfo(`Message sent. Session #${res.runId} is now active.`);
       setMessage("");
       setSelectedRunId(res.runId);
       await Promise.all([
@@ -73,21 +73,21 @@ export default function AdminSwarmChat() {
     <AdminLayout>
       <div className="grid min-h-[calc(100vh-12rem)] grid-cols-1 gap-4 lg:grid-cols-[20rem_minmax(0,1fr)_20rem]">
         <aside className="rounded-lg border border-border bg-secondary p-4">
-          <h1 className="text-lg font-semibold text-foreground">Swarm Sessions</h1>
+            <h1 className="text-lg font-semibold text-foreground">Conversations</h1>
           <div className="relative mt-3">
             <Search size={14} style={{ position: "absolute", left: "10px", top: "11px" }} />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search runs"
+              placeholder="Search conversations"
               className="h-10 w-full rounded-lg border border-input bg-background pl-8 pr-3 text-sm text-foreground"
             />
           </div>
 
           <div className="mt-3 max-h-[60vh] space-y-2 overflow-auto lg:max-h-[calc(100vh-18rem)]">
-            {runsQuery.isLoading && <Meta text="Loading runs..." />}
-            {runsQuery.error && <Meta text="Failed to load runs." tone="error" />}
-            {!runsQuery.isLoading && !runsQuery.error && filteredRuns.length === 0 && <Meta text="No runs found." />}
+            {runsQuery.isLoading && <Meta text="Loading conversations..." />}
+            {runsQuery.error && <Meta text="Could not load conversations." tone="error" />}
+            {!runsQuery.isLoading && !runsQuery.error && filteredRuns.length === 0 && <Meta text="No conversations found." />}
             {filteredRuns.map((run) => (
               <button
                 key={run.id}
@@ -97,10 +97,10 @@ export default function AdminSwarmChat() {
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold text-foreground">Run #{run.id}</span>
+                  <span className="text-sm font-semibold text-foreground">Conversation #{run.id}</span>
                   <Badge status={run.status} />
                 </div>
-                <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{run.goal ?? "No goal"}</p>
+                <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{run.goal ?? "No message yet"}</p>
               </button>
             ))}
           </div>
@@ -110,18 +110,18 @@ export default function AdminSwarmChat() {
           <header className="border-b border-border p-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-foreground">Agent Chat</h2>
-                <p className="text-sm text-muted-foreground">Chat to run event to agent tools</p>
+                <h2 className="text-lg font-semibold text-foreground">Assistant Chat</h2>
+                <p className="text-sm text-muted-foreground">Message to session to tools to results</p>
               </div>
               <Badge status={runtimeQuery.data?.status ?? "offline"} prefix="Runtime" />
             </div>
           </header>
 
           <div className="flex-1 space-y-2 overflow-auto p-4">
-            {!selectedRun && <Meta text="No active run selected. Set Project + Instance below and send message to start." />}
+            {!selectedRun && <Meta text="No active conversation selected. Use the two setup fields below to start one." />}
             {selectedRun && messagesQuery.isLoading && <Meta text="Loading messages..." />}
             {selectedRun && messagesQuery.error && <Meta text="Failed to load messages." tone="error" />}
-            {selectedRun && !messagesQuery.isLoading && timeline.length === 0 && <Meta text="No messages yet for this run." />}
+            {selectedRun && !messagesQuery.isLoading && timeline.length === 0 && <Meta text="No messages yet for this conversation." />}
             {timeline.map((evt) => {
               const role = String((evt.payload as Record<string, unknown>)?.role ?? "system");
               const content = String((evt.payload as Record<string, unknown>)?.content ?? "");
@@ -146,7 +146,7 @@ export default function AdminSwarmChat() {
                   value={projectId}
                   onChange={(e) => setProjectId(Number(e.target.value || 1))}
                   className="h-10 rounded-lg border border-input bg-background px-3 text-sm text-foreground"
-                  placeholder="Project ID"
+                  placeholder="Workspace ID (advanced)"
                 />
                 <input
                   type="number"
@@ -154,7 +154,7 @@ export default function AdminSwarmChat() {
                   value={agentInstanceId}
                   onChange={(e) => setAgentInstanceId(Number(e.target.value || 1))}
                   className="h-10 rounded-lg border border-input bg-background px-3 text-sm text-foreground"
-                  placeholder="Agent Instance ID"
+                  placeholder="Assistant Profile ID (advanced)"
                 />
               </div>
             )}
@@ -162,7 +162,7 @@ export default function AdminSwarmChat() {
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Send instruction to agent run"
+              placeholder="Type your message to the assistant"
               className="min-h-24 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground"
             />
             {info && <p className="mt-2 text-sm text-info">{info}</p>}
@@ -174,7 +174,7 @@ export default function AdminSwarmChat() {
                 className="inline-flex h-12 items-center gap-2 rounded-lg bg-primary px-6 text-sm font-medium text-primary-foreground disabled:opacity-50"
               >
                 <Send size={14} />
-                {sendMut.isPending ? "Sending..." : selectedRun ? "Send to Run" : "Start + Send"}
+                {sendMut.isPending ? "Sending..." : selectedRun ? "Send Message" : "Start Conversation"}
               </button>
 
               <button
@@ -182,7 +182,7 @@ export default function AdminSwarmChat() {
                 className="inline-flex h-12 items-center gap-2 rounded-lg border border-border bg-secondary px-6 text-sm font-medium text-foreground"
               >
                 <Square size={14} />
-                Open Runs
+                Open Sessions
               </button>
 
               <button
@@ -190,29 +190,29 @@ export default function AdminSwarmChat() {
                 className="inline-flex h-12 items-center gap-2 rounded-lg border border-border bg-secondary px-6 text-sm font-medium text-foreground"
               >
                 <Play size={14} />
-                Open Artifacts
+                Open Files
               </button>
             </div>
           </div>
         </section>
 
         <aside className="rounded-lg border border-border bg-secondary p-4">
-          <h3 className="text-sm font-semibold text-foreground">Run Context</h3>
+          <h3 className="text-sm font-semibold text-foreground">Conversation Details</h3>
           <div className="mt-3 space-y-2 text-sm text-muted-foreground">
-            <div>Run: {selectedRun?.id ?? "none"}</div>
+            <div>Conversation: {selectedRun?.id ?? "none"}</div>
             <div>Status: {selectedRun?.status ?? "n/a"}</div>
-            <div>Project: {selectedRun?.projectId ?? projectId}</div>
-            <div>Instance: {selectedRun?.agentInstanceId ?? agentInstanceId}</div>
+            <div>Workspace: {selectedRun?.projectId ?? projectId}</div>
+            <div>Assistant Profile: {selectedRun?.agentInstanceId ?? agentInstanceId}</div>
             <div>Messages: {timeline.length}</div>
           </div>
 
           <div className="mt-4 rounded-lg border border-border bg-background p-3">
             <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Layering</div>
             <ul className="space-y-1 text-sm text-muted-foreground">
-              <li>1. UI chat sends intent</li>
-              <li>2. opsChat creates/continues run</li>
+              <li>1. Chat sends your message</li>
+              <li>2. Session is created or continued</li>
               <li>3. Event appended to timeline</li>
-              <li>4. Agent runtime executes tools</li>
+              <li>4. Assistant tools run in background</li>
             </ul>
           </div>
 
