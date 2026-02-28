@@ -2,6 +2,17 @@
 
 ## Tomorrow Checklist (Cloud Marketing Ops)
 
+- [ ] Provision 8B model lanes for scientist handoff:
+  - Main lane (production-governed): `llama-3.1-8b-instruct`
+  - Sandbox lane (isolated testing): `dolphin-llama3-8b`
+  - Runbook: `docs/SCIENTIST_8B_MODEL_LANES.md`
+- [ ] Create/verify model lane folder structure in models bucket:
+  - `gs://lb-ai-models-engaged-style-456320-t4-us/main-8b-governed/`
+  - `gs://lb-ai-models-engaged-style-456320-t4-us/sandbox-8b-isolated/`
+- [ ] Confirm IAM + runtime separation:
+  - Main lane uses production service account + guarded endpoint
+  - Sandbox lane uses separate endpoint and no customer traffic routing
+
 - [ ] Set ADC quota project:
   - `gcloud.cmd auth application-default set-quota-project engaged-style-456320-t4`
 - [ ] Add required GCP project `environment` tag (org policy warning)
