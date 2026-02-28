@@ -75,6 +75,7 @@ async function main(): Promise<void> {
   let feedbackId = 0;
   let proposalId = 0;
   let cycleRunId = "";
+  let thinkingRunId = "";
 
   const okLogin = await runStep(1, "Authenticate admin via /auth/login", async () => {
     const res = await timedFetch(`${BASE_URL}/auth/login`, {
@@ -280,6 +281,40 @@ async function main(): Promise<void> {
     assert(meta?.parallelCompare === true || meta?.parallelComparison?.enabled === true, "parallel compare metadata missing");
   });
 
+  await runStep(9, "Marketing cycle: AI thinking payload shape (primary/reviewer traces)", async () => {
+    const flagsRes = await trpc.admin.marketingAgents.getFeatureFlags.query();
+    const flags = (flagsRes as any)?.flags ?? {};
+    const engine = flags?.enablePiCoderSandbox ? "pi-coder-sandbox" : flags?.enablePiSandbox ? "pi-sandbox" : null;
+    if (!engine) {
+      return;
+    }
+
+    const thinkingCycle = await trpc.admin.marketingAgents.runCycle.mutate({
+      vertical: "small-business-websites",
+      engine: engine as "pi-coder-sandbox" | "pi-sandbox",
+      mode: "research",
+      notes: `Smoke AI thinking ${runTag}`,
+      parallelCompare: true,
+      primaryModel: "anthropic/claude-sonnet-4-6",
+      reviewModel: "anthropic/claude-sonnet-4-6",
+    });
+    thinkingRunId = String((thinkingCycle as any)?.runId ?? "");
+    assert(thinkingRunId.length > 0, "AI thinking runCycle did not return runId");
+
+    const cyclesRes = await trpc.admin.marketingAgents.listCycles.query({ limit: 30 });
+    const rows = (cyclesRes as any)?.rows ?? [];
+    const row = rows.find((r: any) => String(r?.id ?? "") === thinkingRunId);
+    assert(row, `AI thinking run row ${thinkingRunId} not found in listCycles`);
+
+    const meta = (row as any)?.meta ?? {};
+    const aiThinking = meta?.aiThinking ?? null;
+    assert(aiThinking && typeof aiThinking === "object", "meta.aiThinking missing");
+    assert(aiThinking?.primary && typeof aiThinking.primary === "object", "meta.aiThinking.primary missing");
+    assert(typeof aiThinking.primary.thinkingPrompt === "string", "primary.thinkingPrompt missing");
+    assert(typeof aiThinking.primary.thinkingOutput === "string", "primary.thinkingOutput missing");
+    assert("reviewer" in aiThinking, "meta.aiThinking.reviewer field missing");
+  });
+
   return finish(0);
 
   function finish(code: number): void {
@@ -297,6 +332,7 @@ async function main(): Promise<void> {
     if (feedbackId) console.log(`Feedback ID: ${feedbackId}`);
     if (proposalId) console.log(`Proposal ID: ${proposalId}`);
     if (cycleRunId) console.log(`Cycle Run ID: ${cycleRunId}`);
+    if (thinkingRunId) console.log(`Thinking Run ID: ${thinkingRunId}`);
     console.log("=".repeat(68));
     process.exit(code);
   }
