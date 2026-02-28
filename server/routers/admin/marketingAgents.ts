@@ -10,7 +10,7 @@ import {
   marketingSignals,
 } from "../../db/schema";
 
-const Engine = z.enum(["standard", "pi-sandbox", "obliterated-sandbox"]);
+const Engine = z.enum(["standard", "pi-sandbox", "pi-coder-sandbox", "obliterated-sandbox"]);
 const Mode = z.enum(["research", "execute"]);
 const Vertical = z.enum([
   "small-business-websites",
@@ -29,6 +29,7 @@ function envBool(name: string, fallback = false): boolean {
 const ENGINE_COST_ESTIMATE: Record<z.infer<typeof Engine>, number> = {
   standard: 0.018,
   "pi-sandbox": 0.009,
+  "pi-coder-sandbox": 0.011,
   "obliterated-sandbox": 0.012,
 };
 
@@ -40,18 +41,50 @@ const CHANNEL_BY_VERTICAL: Record<z.infer<typeof Vertical>, string> = {
 };
 
 const DEFAULT_PI_SANDBOX_URL = "https://pi-agent-sandbox-6af67etolq-uc.a.run.app";
+const DEFAULT_PI_CODER_SANDBOX_URL = "https://pi-coder-sandbox-6af67etolq-uc.a.run.app";
 const DEFAULT_PI_PRIMARY_MODEL = "openai/gpt-5-2";
 const DEFAULT_PI_REVIEW_MODEL = "claude-sonnet-4-6";
+const DEFAULT_PI_CODER_PRIMARY_MODEL = "anthropic/claude-sonnet-4-6";
+const DEFAULT_PI_CODER_REVIEW_MODEL = "anthropic/claude-sonnet-4-6";
+const DEFAULT_MODELS_BUCKET = "lb-ai-models-engaged-style-456320-t4-us";
 
-function getPiSandboxUrl(): string {
+const ALLOWED_MODEL_IDS = new Set([
+  "anthropic/claude-sonnet-4-6",
+  "openai/gpt-5-2",
+  "openai/gpt-5-2-codex",
+  "openai/gpt-5-1-codex",
+  "openai/gpt-5-1-codex-mini",
+]);
+
+function normalizeModelId(model: string | undefined | null): string | null {
+  if (!model) return null;
+  const clean = model.trim();
+  if (!clean) return null;
+  return ALLOWED_MODEL_IDS.has(clean) ? clean : null;
+}
+
+function getModelsBucket(): string {
+  return (process.env.MARKETING_MODELS_BUCKET || DEFAULT_MODELS_BUCKET).trim();
+}
+
+function getPiSandboxUrl(engine: z.infer<typeof Engine>): string {
+  if (engine === "pi-coder-sandbox") {
+    return (process.env.MARKETING_PI_CODER_SANDBOX_URL || DEFAULT_PI_CODER_SANDBOX_URL).replace(/\/+$/, "");
+  }
   return (process.env.MARKETING_PI_SANDBOX_URL || DEFAULT_PI_SANDBOX_URL).replace(/\/+$/, "");
 }
 
-function getPiPrimaryModel(): string {
+function getPiPrimaryModel(engine: z.infer<typeof Engine>): string {
+  if (engine === "pi-coder-sandbox") {
+    return (process.env.MARKETING_PI_CODER_PRIMARY_MODEL || DEFAULT_PI_CODER_PRIMARY_MODEL).trim();
+  }
   return (process.env.MARKETING_PI_PRIMARY_MODEL || DEFAULT_PI_PRIMARY_MODEL).trim();
 }
 
-function getPiReviewModel(): string {
+function getPiReviewModel(engine: z.infer<typeof Engine>): string {
+  if (engine === "pi-coder-sandbox") {
+    return (process.env.MARKETING_PI_CODER_REVIEW_MODEL || DEFAULT_PI_CODER_REVIEW_MODEL).trim();
+  }
   return (process.env.MARKETING_PI_REVIEW_MODEL || DEFAULT_PI_REVIEW_MODEL).trim();
 }
 
@@ -80,15 +113,17 @@ function normalizePiLines(raw: string | undefined, limit = 3): string[] {
 }
 
 async function callPiSandbox(input: {
+  engine: z.infer<typeof Engine>;
   vertical: z.infer<typeof Vertical>;
   mode: z.infer<typeof Mode>;
   runId: string;
   signalsSummary?: string;
   model?: string;
+  reviewOf?: string;
   promptOverride?: string;
   maxTokens?: number;
 }): Promise<PiSandboxResult> {
-  const url = `${getPiSandboxUrl()}/run`;
+  const url = `${getPiSandboxUrl(input.engine)}/run`;
   const system =
     "You are a senior B2B growth strategist for LaunchBase. Return concise, practical output for SMB demand generation.";
   const prompt = input.promptOverride || (
@@ -114,6 +149,7 @@ async function callPiSandbox(input: {
         "content-type": "application/json",
       },
       body: JSON.stringify({
+        provider: input.engine === "pi-coder-sandbox" ? "aimlapi" : undefined,
         model: input.model || undefined,
         prompt,
         system,
@@ -122,6 +158,7 @@ async function callPiSandbox(input: {
         mode: input.mode,
         vertical: input.vertical,
         trace_id: input.runId,
+        review_of: input.reviewOf || undefined,
       }),
     });
     if (!resp.ok) {
@@ -156,6 +193,9 @@ async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: str
     vertical?: z.infer<typeof Vertical>;
     engine?: z.infer<typeof Engine>;
     mode?: z.infer<typeof Mode>;
+    primaryModel?: string;
+    reviewModel?: string;
+    parallelCompare?: boolean;
   };
   const vertical = meta.vertical ?? "small-business-websites";
   const engine = (meta.engine ?? "standard") as z.infer<typeof Engine>;
@@ -198,19 +238,22 @@ async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: str
       })
       .join("\n");
 
-    const primaryModel = getPiPrimaryModel();
-    const reviewModel = getPiReviewModel();
+    const primaryModel = (meta.primaryModel || getPiPrimaryModel(engine)).trim();
+    const reviewModel = (meta.reviewModel || getPiReviewModel(engine)).trim();
+    const usesPi = engine === "pi-sandbox" || engine === "pi-coder-sandbox";
     const piPrimary =
-      engine === "pi-sandbox"
-        ? await callPiSandbox({ vertical, mode, runId, signalsSummary, model: primaryModel, maxTokens: 900 })
+      usesPi
+        ? await callPiSandbox({ engine, vertical, mode, runId, signalsSummary, model: primaryModel, maxTokens: 900 })
         : null;
     const piReview =
-      engine === "pi-sandbox" && piPrimary?.ok && (piPrimary.output ?? "").trim().length > 0
+      usesPi && piPrimary?.ok && (piPrimary.output ?? "").trim().length > 0
         ? await callPiSandbox({
+            engine,
             vertical,
             mode,
             runId,
             model: reviewModel,
+            reviewOf: piPrimary.model || primaryModel,
             promptOverride: [
               `Vertical: ${vertical}`,
               "Task: Review and refine the primary strategist output into exactly 3 high-quality hypotheses.",
@@ -229,10 +272,9 @@ async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: str
       "Channel-message match for quick qualification",
       "CTA simplification for lower-friction conversion",
     ];
-    const templates =
-      engine === "pi-sandbox"
-        ? normalizePiLines((piReview?.ok ? piReview.output : piPrimary?.output) ?? "", 3)
-        : [];
+    const templates = usesPi
+      ? normalizePiLines((piReview?.ok ? piReview.output : piPrimary?.output) ?? "", 3)
+      : [];
     const finalTemplates = templates.length > 0 ? templates : fallbackTemplates;
 
     const piMeta = piPrimary
@@ -243,6 +285,8 @@ async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: str
             durationMs: piPrimary.duration_ms ?? null,
             usage: piPrimary.usage ?? null,
             error: piPrimary.error ?? null,
+            thinkingPrompt: `VERTICAL=${vertical}\nMODE=${mode}\nTASK=generate_3_hypotheses`,
+            thinkingOutput: (piPrimary.output ?? "").slice(0, 3000),
           },
           reviewer: piReview
             ? {
@@ -251,8 +295,39 @@ async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: str
                 durationMs: piReview.duration_ms ?? null,
                 usage: piReview.usage ?? null,
                 error: piReview.error ?? null,
+                thinkingPrompt: `VERTICAL=${vertical}\nMODE=${mode}\nTASK=review_and_refine`,
+                thinkingOutput: (piReview.output ?? "").slice(0, 3000),
               }
             : null,
+        }
+      : null;
+
+    const parallelCompareEnabled = meta.parallelCompare === true;
+    const standardTemplates = fallbackTemplates;
+    const sandboxTemplates = templates;
+    const selectedTemplates = finalTemplates;
+    const avgLen = (items: string[]) =>
+      items.length ? Math.round(items.reduce((acc, x) => acc + x.length, 0) / items.length) : 0;
+    const recommendation =
+      parallelCompareEnabled && sandboxTemplates.length > 0 && avgLen(sandboxTemplates) > avgLen(standardTemplates)
+        ? "sandbox_variant"
+        : "governed_variant";
+    const breakthroughAlert =
+      parallelCompareEnabled &&
+      recommendation === "sandbox_variant" &&
+      (sandboxTemplates.length >= standardTemplates.length || avgLen(sandboxTemplates) >= avgLen(standardTemplates) + 8);
+    const parallelMeta = parallelCompareEnabled
+      ? {
+          enabled: true,
+          recommendation,
+          breakthroughAlert,
+          compared: {
+            governedCount: standardTemplates.length,
+            sandboxCount: sandboxTemplates.length,
+            governedAvgLength: avgLen(standardTemplates),
+            sandboxAvgLength: avgLen(sandboxTemplates),
+          },
+          selectedVariant: recommendation === "sandbox_variant" ? "sandbox" : "governed",
         }
       : null;
     for (const t of finalTemplates) {
@@ -293,6 +368,18 @@ async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: str
           generatedHypothesisIds: hypothesisIds,
           signalCount: signalIds.length,
           piBridge: piMeta,
+          aiThinking: piMeta
+            ? {
+                primary: piMeta.primary,
+                reviewer: piMeta.reviewer,
+              }
+            : null,
+          parallelComparison: parallelMeta,
+          breakthroughAlert,
+          breakthroughMessage: breakthroughAlert
+            ? `Potential improvement detected: sandbox output appears stronger for ${vertical}`
+            : null,
+          selectedTemplates,
         },
         finishedAt: now,
       })
@@ -312,19 +399,22 @@ async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: str
     .orderBy(desc(marketingHypotheses.updatedAt))
     .limit(1);
 
-  const primaryModel = getPiPrimaryModel();
-  const reviewModel = getPiReviewModel();
+  const primaryModel = (meta.primaryModel || getPiPrimaryModel(engine)).trim();
+  const reviewModel = (meta.reviewModel || getPiReviewModel(engine)).trim();
+  const usesPi = engine === "pi-sandbox" || engine === "pi-coder-sandbox";
   const piExecutePrimary =
-    engine === "pi-sandbox"
-      ? await callPiSandbox({ vertical, mode, runId, model: primaryModel, maxTokens: 500 })
+    usesPi
+      ? await callPiSandbox({ engine, vertical, mode, runId, model: primaryModel, maxTokens: 500 })
       : null;
   const piExecuteReview =
-    engine === "pi-sandbox" && piExecutePrimary?.ok && (piExecutePrimary.output ?? "").trim().length > 0
+    usesPi && piExecutePrimary?.ok && (piExecutePrimary.output ?? "").trim().length > 0
       ? await callPiSandbox({
+          engine,
           vertical,
           mode,
           runId,
           model: reviewModel,
+          reviewOf: piExecutePrimary.model || primaryModel,
           promptOverride: [
             `Vertical: ${vertical}`,
             "Task: Review and tighten this campaign execution brief.",
@@ -386,6 +476,8 @@ async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: str
                   durationMs: piExecutePrimary.duration_ms ?? null,
                   usage: piExecutePrimary.usage ?? null,
                   error: piExecutePrimary.error ?? null,
+                  thinkingPrompt: `VERTICAL=${vertical}\nMODE=${mode}\nTASK=execute_brief`,
+                  thinkingOutput: (piExecutePrimary.output ?? "").slice(0, 3000),
                 },
                 reviewer: piExecuteReview
                   ? {
@@ -394,6 +486,8 @@ async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: str
                       durationMs: piExecuteReview.duration_ms ?? null,
                       usage: piExecuteReview.usage ?? null,
                       error: piExecuteReview.error ?? null,
+                      thinkingPrompt: `VERTICAL=${vertical}\nMODE=${mode}\nTASK=review_execute_brief`,
+                      thinkingOutput: (piExecuteReview.output ?? "").slice(0, 3000),
                     }
                   : null,
               },
@@ -406,8 +500,51 @@ async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: str
 }
 
 export const marketingAgentsRouter = router({
+  getModelLanes: adminProcedure.query(async () => {
+    const bucket = getModelsBucket();
+    const root = `gs://${bucket}`;
+
+    return {
+      ok: true as const,
+      bucket,
+      lanes: [
+        {
+          lane: "main-8b-governed",
+          label: "Main Governed (Llama 3.1 8B)",
+          weightsObject: `${root}/main-8b-governed/weights/main-llama-8b-q4_k_m.gguf`,
+          manifestObject: `${root}/main-8b-governed/manifests/model.manifest.json`,
+          intendedUse: "production_governed",
+          defaultEngine: "standard" as const,
+          defaultPrimaryModel: "anthropic/claude-sonnet-4-6",
+          defaultReviewModel: "anthropic/claude-sonnet-4-6",
+        },
+        {
+          lane: "sandbox-8b-isolated",
+          label: "Sandbox Isolated (Dolphin 8B)",
+          weightsObject: `${root}/sandbox-8b-isolated/weights/sandbox-dolphin-8b-q4_k_m.gguf`,
+          manifestObject: `${root}/sandbox-8b-isolated/manifests/model.manifest.json`,
+          intendedUse: "sandbox_research_only",
+          defaultEngine: "pi-sandbox" as const,
+          defaultPrimaryModel: "anthropic/claude-sonnet-4-6",
+          defaultReviewModel: "anthropic/claude-sonnet-4-6",
+        },
+        {
+          lane: "sandbox-8b-obliterated",
+          label: "Sandbox Obliterated (Llama 3.1 8B Abliterated)",
+          weightsObject: `${root}/sandbox-8b-obliterated/weights/sandbox-obliterated-8b-q4_k_m.gguf`,
+          manifestObject: `${root}/sandbox-8b-obliterated/manifests/model.manifest.json`,
+          intendedUse: "sandbox_abliterated_only",
+          defaultEngine: "obliterated-sandbox" as const,
+          defaultPrimaryModel: "anthropic/claude-sonnet-4-6",
+          defaultReviewModel: "anthropic/claude-sonnet-4-6",
+        },
+      ],
+    };
+  }),
+
   getFeatureFlags: adminProcedure.query(async () => {
     const enablePiSandbox = envBool("MARKETING_ENABLE_PI_SANDBOX", true);
+    const enablePiCoderSandbox = envBool("MARKETING_ENABLE_PI_CODER_SANDBOX", true);
     const enableObliteratedSandbox = envBool("MARKETING_ENABLE_OBLITERATED_SANDBOX", true);
     const allowSandboxExecute = envBool("MARKETING_ALLOW_SANDBOX_EXECUTE", false);
 
@@ -415,6 +552,7 @@ export const marketingAgentsRouter = router({
       ok: true as const,
       flags: {
         enablePiSandbox,
+        enablePiCoderSandbox,
         enableObliteratedSandbox,
         allowSandboxExecute,
       },
@@ -428,6 +566,9 @@ export const marketingAgentsRouter = router({
         engine: Engine,
         mode: Mode,
         notes: z.string().max(2000).optional(),
+        primaryModel: z.string().max(256).optional(),
+        reviewModel: z.string().max(256).optional(),
+        parallelCompare: z.boolean().optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -435,6 +576,7 @@ export const marketingAgentsRouter = router({
       if (!db) throw new Error("Database not available");
 
       const enablePiSandbox = envBool("MARKETING_ENABLE_PI_SANDBOX", true);
+      const enablePiCoderSandbox = envBool("MARKETING_ENABLE_PI_CODER_SANDBOX", true);
       const enableObliteratedSandbox = envBool("MARKETING_ENABLE_OBLITERATED_SANDBOX", true);
       const allowSandboxExecute = envBool("MARKETING_ALLOW_SANDBOX_EXECUTE", false);
       const isSandbox = input.engine !== "standard";
@@ -442,11 +584,23 @@ export const marketingAgentsRouter = router({
       if (input.engine === "pi-sandbox" && !enablePiSandbox) {
         throw new Error("PI sandbox engine is disabled by feature flag.");
       }
+      if (input.engine === "pi-coder-sandbox" && !enablePiCoderSandbox) {
+        throw new Error("PI coder sandbox engine is disabled by feature flag.");
+      }
       if (input.engine === "obliterated-sandbox" && !enableObliteratedSandbox) {
         throw new Error("Obliterated sandbox engine is disabled by feature flag.");
       }
       if (isSandbox && input.mode === "execute" && !allowSandboxExecute) {
         throw new Error("Sandbox execute mode is blocked by policy. Use research mode.");
+      }
+
+      const normalizedPrimaryModel = normalizeModelId(input.primaryModel);
+      const normalizedReviewModel = normalizeModelId(input.reviewModel);
+      if (input.primaryModel && !normalizedPrimaryModel) {
+        throw new Error("Primary model is not in the approved allowlist.");
+      }
+      if (input.reviewModel && !normalizedReviewModel) {
+        throw new Error("Reviewer model is not in the approved allowlist.");
       }
 
       const runId = nanoid(16);
@@ -468,7 +622,15 @@ export const marketingAgentsRouter = router({
           notes: input.notes ?? null,
           actorId,
           actorEmail,
-          lane: isSandbox ? "sandbox-8b-isolated" : "main-8b-governed",
+          lane:
+            input.engine === "obliterated-sandbox"
+              ? "sandbox-8b-obliterated"
+              : isSandbox
+                ? "sandbox-8b-isolated"
+                : "main-8b-governed",
+          primaryModel: normalizedPrimaryModel || null,
+          reviewModel: normalizedReviewModel || null,
+          parallelCompare: input.parallelCompare === true,
         },
         startedAt: now,
         finishedAt: now,
@@ -582,8 +744,8 @@ export const marketingAgentsRouter = router({
         .orderBy(desc(marketingRunLog.startedAt))
         .limit(2000);
 
-      type EngineKey = "standard" | "pi-sandbox" | "obliterated-sandbox";
-      const engines: EngineKey[] = ["standard", "pi-sandbox", "obliterated-sandbox"];
+      type EngineKey = "standard" | "pi-sandbox" | "pi-coder-sandbox" | "obliterated-sandbox";
+      const engines: EngineKey[] = ["standard", "pi-sandbox", "pi-coder-sandbox", "obliterated-sandbox"];
 
       const byEngine = engines.map((engine) => {
         const set = rows.filter((r) => ((r.meta as any)?.engine ?? r.agent) === engine);

@@ -6,6 +6,7 @@ import trpc from "../../lib/trpc";
 export default function AdminConsoleMarketingAgents() {
   const instancesQ = trpc.admin.agentInstances.list.useQuery({}, { retry: false });
   const flagsQ = trpc.admin.marketingAgents.getFeatureFlags.useQuery(undefined, { retry: false });
+  const lanesQ = trpc.admin.marketingAgents.getModelLanes.useQuery(undefined, { retry: false });
   const cyclesQ = trpc.admin.marketingAgents.listCycles.useQuery({ limit: 20 }, { retry: false });
   const scoreQ = trpc.admin.marketingAgents.getScorecard.useQuery({ days: 14 }, { retry: false });
   const promotionQ = trpc.admin.marketingAgents.listPromotionQueue.useQuery({ limit: 25 }, { retry: false });
@@ -15,8 +16,13 @@ export default function AdminConsoleMarketingAgents() {
   const [vertical, setVertical] = useState<
     "small-business-websites" | "quickbooks-integration" | "workflow-automation" | "agents-apps-automation"
   >("small-business-websites");
-  const [engine, setEngine] = useState<"standard" | "pi-sandbox" | "obliterated-sandbox">("standard");
+  const [engine, setEngine] = useState<"standard" | "pi-sandbox" | "pi-coder-sandbox" | "obliterated-sandbox">(
+    "standard"
+  );
   const [mode, setMode] = useState<"research" | "execute">("research");
+  const [primaryModel, setPrimaryModel] = useState("anthropic/claude-sonnet-4-6");
+  const [reviewModel, setReviewModel] = useState("anthropic/claude-sonnet-4-6");
+  const [parallelCompare, setParallelCompare] = useState(true);
   const [notes, setNotes] = useState("");
   const [promotionNotes, setPromotionNotes] = useState<Record<string, string>>({});
 
@@ -48,6 +54,7 @@ export default function AdminConsoleMarketingAgents() {
 
   const flags = (flagsQ.data as any)?.flags ?? {
     enablePiSandbox: true,
+    enablePiCoderSandbox: true,
     enableObliteratedSandbox: true,
     allowSandboxExecute: false,
   };
@@ -57,14 +64,19 @@ export default function AdminConsoleMarketingAgents() {
       [
         { value: "standard", label: "Standard (Governed)" },
         { value: "pi-sandbox", label: "PI Sandbox", disabled: !flags.enablePiSandbox },
+        { value: "pi-coder-sandbox", label: "PI Coder Sandbox", disabled: !flags.enablePiCoderSandbox },
         {
           value: "obliterated-sandbox",
           label: "Obliterated Sandbox",
           disabled: !flags.enableObliteratedSandbox,
         },
       ] as const,
-    [flags.enableObliteratedSandbox, flags.enablePiSandbox]
+    [flags.enableObliteratedSandbox, flags.enablePiCoderSandbox, flags.enablePiSandbox]
   );
+
+  const cycleRows = ((cyclesQ.data as any)?.rows ?? []) as any[];
+  const modelLanes = ((lanesQ.data as any)?.lanes ?? []) as any[];
+  const breakthroughRows = cycleRows.filter((r) => Boolean(r?.meta?.breakthroughAlert));
 
   const toggleExpanded = (id: number) => {
     setExpandedAgent(expandedAgent === id ? null : id);
@@ -126,6 +138,34 @@ export default function AdminConsoleMarketingAgents() {
             </label>
 
             <label style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "12px", color: "#888" }}>
+              Primary Model
+              <select
+                value={primaryModel}
+                onChange={(e) => setPrimaryModel(e.target.value)}
+                style={{ backgroundColor: "#0f0f0f", color: "#ddd", border: "1px solid #333", borderRadius: "6px", padding: "8px" }}
+              >
+                <option value="anthropic/claude-sonnet-4-6">Claude Sonnet 4.6</option>
+                <option value="openai/gpt-5-2">GPT-5.2</option>
+                <option value="openai/gpt-5-2-codex">GPT-5.2 Codex</option>
+                <option value="openai/gpt-5-1-codex">GPT-5.1 Codex</option>
+              </select>
+            </label>
+
+            <label style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "12px", color: "#888" }}>
+              Reviewer Model
+              <select
+                value={reviewModel}
+                onChange={(e) => setReviewModel(e.target.value)}
+                style={{ backgroundColor: "#0f0f0f", color: "#ddd", border: "1px solid #333", borderRadius: "6px", padding: "8px" }}
+              >
+                <option value="anthropic/claude-sonnet-4-6">Claude Sonnet 4.6</option>
+                <option value="openai/gpt-5-2">GPT-5.2</option>
+                <option value="openai/gpt-5-2-codex">GPT-5.2 Codex</option>
+                <option value="openai/gpt-5-1-codex">GPT-5.1 Codex</option>
+              </select>
+            </label>
+
+            <label style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "12px", color: "#888" }}>
               Mode
               <select
                 value={mode}
@@ -170,7 +210,17 @@ export default function AdminConsoleMarketingAgents() {
 
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <button
-              onClick={() => runCycleMut.mutate({ vertical, engine, mode, notes: notes.trim() || undefined })}
+              onClick={() =>
+                runCycleMut.mutate({
+                  vertical,
+                  engine: engine as any,
+                  mode,
+                  notes: notes.trim() || undefined,
+                  primaryModel: primaryModel.trim() || undefined,
+                  reviewModel: reviewModel.trim() || undefined,
+                  parallelCompare,
+                })
+              }
               disabled={runCycleMut.isPending}
               style={{
                 padding: "10px 14px",
@@ -193,7 +243,104 @@ export default function AdminConsoleMarketingAgents() {
                 queued run: {(runCycleMut.data as any).runId}
               </span>
             )}
+            <label style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "6px", color: "#a5a5a5", fontSize: "12px" }}>
+              <input
+                type="checkbox"
+                checked={parallelCompare}
+                onChange={(e) => setParallelCompare(e.target.checked)}
+              />
+              Parallel compare governed vs sandbox
+            </label>
           </div>
+        </div>
+
+        <div
+          style={{
+            marginBottom: "24px",
+            padding: "16px",
+            border: "1px solid #333",
+            borderRadius: "8px",
+            backgroundColor: "#111",
+          }}
+        >
+          <div style={{ fontSize: "14px", fontWeight: "600", marginBottom: "10px", color: "#e0e0e0" }}>
+            Bucket Model Lanes (Staged Weights)
+          </div>
+          {lanesQ.isLoading ? (
+            <div style={{ color: "#777", fontSize: "12px" }}>Loading model lanes...</div>
+          ) : modelLanes.length === 0 ? (
+            <div style={{ color: "#777", fontSize: "12px" }}>No lanes published.</div>
+          ) : (
+            <div style={{ display: "grid", gap: "8px" }}>
+              {modelLanes.map((lane: any) => (
+                <div key={lane.lane} style={{ border: "1px solid #2a2a2a", borderRadius: "6px", padding: "10px", backgroundColor: "#0d0d0d" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: "8px", alignItems: "center" }}>
+                    <div>
+                      <div style={{ color: "#d5d5d5", fontSize: "12px", fontWeight: 700 }}>{lane.label}</div>
+                      <div style={{ color: "#888", fontSize: "11px" }}>{lane.lane} | {lane.intendedUse}</div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setEngine(lane.defaultEngine);
+                        setPrimaryModel(lane.defaultPrimaryModel);
+                        setReviewModel(lane.defaultReviewModel);
+                      }}
+                      style={{
+                        padding: "7px 10px",
+                        backgroundColor: "#1d4ed8",
+                        color: "#eff6ff",
+                        border: "none",
+                        borderRadius: "6px",
+                        fontSize: "12px",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                      }}
+                    >
+                      Use This Lane
+                    </button>
+                  </div>
+                  <div style={{ marginTop: "6px", color: "#6b7280", fontSize: "10px", whiteSpace: "pre-wrap" }}>
+                    weights: {lane.weightsObject}
+                  </div>
+                  <div style={{ marginTop: "2px", color: "#6b7280", fontSize: "10px", whiteSpace: "pre-wrap" }}>
+                    manifest: {lane.manifestObject}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div
+          style={{
+            marginBottom: "24px",
+            padding: "16px",
+            border: "1px solid #333",
+            borderRadius: "8px",
+            backgroundColor: "#111",
+          }}
+        >
+          <div style={{ fontSize: "14px", fontWeight: "600", marginBottom: "10px", color: "#e0e0e0" }}>
+            Breakthrough / Improvement Alerts
+          </div>
+          {cyclesQ.isLoading ? (
+            <div style={{ color: "#777", fontSize: "12px" }}>Loading alerts...</div>
+          ) : breakthroughRows.length === 0 ? (
+            <div style={{ color: "#777", fontSize: "12px" }}>No breakthrough alerts yet.</div>
+          ) : (
+            <div style={{ display: "grid", gap: "8px" }}>
+              {breakthroughRows.slice(0, 8).map((row: any) => (
+                <div key={row.id} style={{ border: "1px solid #2a2a2a", borderRadius: "6px", padding: "10px", backgroundColor: "#0d0d0d" }}>
+                  <div style={{ color: "#93c5fd", fontWeight: 700, fontSize: "12px" }}>
+                    {row.meta?.breakthroughMessage || "Potential sandbox improvement detected"}
+                  </div>
+                  <div style={{ color: "#999", fontSize: "11px", marginTop: "4px" }}>
+                    run {row.id} | engine {row.meta?.engine ?? row.agent} | vertical {row.meta?.vertical ?? "unknown"}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div
@@ -210,12 +357,15 @@ export default function AdminConsoleMarketingAgents() {
           </div>
           {cyclesQ.isLoading ? (
             <div style={{ color: "#777", fontSize: "12px" }}>Loading cycle history...</div>
-          ) : ((cyclesQ.data as any)?.rows ?? []).length === 0 ? (
+          ) : cycleRows.length === 0 ? (
             <div style={{ color: "#777", fontSize: "12px" }}>No cycles logged yet.</div>
           ) : (
             <div style={{ display: "grid", gap: "8px" }}>
-              {((cyclesQ.data as any)?.rows ?? []).map((row: any) => {
+              {cycleRows.map((row: any) => {
                 const meta = row.meta ?? {};
+                const aiThinking = meta?.aiThinking ?? null;
+                const primary = aiThinking?.primary ?? null;
+                const reviewer = aiThinking?.reviewer ?? null;
                 return (
                   <div key={row.id} style={{ border: "1px solid #2a2a2a", borderRadius: "6px", padding: "8px 10px", backgroundColor: "#0d0d0d" }}>
                     <div style={{ fontSize: "12px", color: "#cfcfcf", fontWeight: 600 }}>
@@ -224,6 +374,39 @@ export default function AdminConsoleMarketingAgents() {
                     <div style={{ fontSize: "11px", color: "#888" }}>
                       {row.status} | {new Date(row.startedAt).toLocaleString()}
                     </div>
+                    {(primary || reviewer) && (
+                      <details style={{ marginTop: "8px" }}>
+                        <summary style={{ cursor: "pointer", color: "#93c5fd", fontSize: "12px" }}>
+                          What AI is thinking (prompt + output trace)
+                        </summary>
+                        {primary && (
+                          <div style={{ marginTop: "6px", padding: "8px", border: "1px solid #243447", borderRadius: "6px", background: "#081018" }}>
+                            <div style={{ color: "#a7f3d0", fontSize: "11px", fontWeight: 700 }}>
+                              Primary ({primary.model ?? "unknown"})
+                            </div>
+                            <div style={{ color: "#9ca3af", fontSize: "11px", marginTop: "4px", whiteSpace: "pre-wrap" }}>
+                              {primary.thinkingPrompt ?? "No prompt trace"}
+                            </div>
+                            <div style={{ color: "#d1d5db", fontSize: "11px", marginTop: "6px", whiteSpace: "pre-wrap" }}>
+                              {primary.thinkingOutput ?? "No output trace"}
+                            </div>
+                          </div>
+                        )}
+                        {reviewer && (
+                          <div style={{ marginTop: "6px", padding: "8px", border: "1px solid #3f3f46", borderRadius: "6px", background: "#0a0a0a" }}>
+                            <div style={{ color: "#fde68a", fontSize: "11px", fontWeight: 700 }}>
+                              Reviewer ({reviewer.model ?? "unknown"})
+                            </div>
+                            <div style={{ color: "#9ca3af", fontSize: "11px", marginTop: "4px", whiteSpace: "pre-wrap" }}>
+                              {reviewer.thinkingPrompt ?? "No prompt trace"}
+                            </div>
+                            <div style={{ color: "#d1d5db", fontSize: "11px", marginTop: "6px", whiteSpace: "pre-wrap" }}>
+                              {reviewer.thinkingOutput ?? "No output trace"}
+                            </div>
+                          </div>
+                        )}
+                      </details>
+                    )}
                   </div>
                 );
               })}
