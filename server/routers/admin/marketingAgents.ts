@@ -39,6 +39,93 @@ const CHANNEL_BY_VERTICAL: Record<z.infer<typeof Vertical>, string> = {
   "agents-apps-automation": "direct_outreach",
 };
 
+const DEFAULT_PI_SANDBOX_URL = "https://pi-agent-sandbox-6af67etolq-uc.a.run.app";
+
+function getPiSandboxUrl(): string {
+  return (process.env.MARKETING_PI_SANDBOX_URL || DEFAULT_PI_SANDBOX_URL).replace(/\/+$/, "");
+}
+
+type PiSandboxResult = {
+  ok: boolean;
+  model?: string;
+  output?: string;
+  duration_ms?: number;
+  usage?: {
+    prompt_tokens?: number;
+    completion_tokens?: number;
+    total_tokens?: number;
+  };
+  error?: string;
+};
+
+function normalizePiLines(raw: string | undefined, limit = 3): string[] {
+  if (!raw) return [];
+  const lines = raw
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .map((l) => l.replace(/^[-*•\d.)\s]+/, "").trim())
+    .filter((l) => l.length >= 12 && l.length <= 180);
+  const uniq = Array.from(new Set(lines));
+  return uniq.slice(0, limit);
+}
+
+async function callPiSandbox(input: {
+  vertical: z.infer<typeof Vertical>;
+  mode: z.infer<typeof Mode>;
+  runId: string;
+  signalsSummary?: string;
+}): Promise<PiSandboxResult> {
+  const url = `${getPiSandboxUrl()}/run`;
+  const system =
+    "You are a senior B2B growth strategist for LaunchBase. Return concise, practical output for SMB demand generation.";
+  const prompt =
+    input.mode === "research"
+      ? [
+          `Vertical: ${input.vertical}`,
+          "Task: Generate exactly 3 testable marketing hypotheses for near-term pipeline growth.",
+          "Output format: one hypothesis per line, no numbering, no markdown.",
+          "Each line must include: channel + message angle + expected business outcome.",
+          input.signalsSummary ? `Signals:\n${input.signalsSummary}` : "Signals: none",
+        ].join("\n")
+      : [
+          `Vertical: ${input.vertical}`,
+          "Task: Generate a concise execution brief for one launch campaign.",
+          "Output format: 5 short lines (Goal, Audience, Offer, Channel plan, KPI).",
+        ].join("\n");
+
+  try {
+    const resp = await fetch(url, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        prompt,
+        system,
+        temperature: 0.2,
+        max_tokens: input.mode === "research" ? 700 : 450,
+        mode: input.mode,
+        vertical: input.vertical,
+        trace_id: input.runId,
+      }),
+    });
+    if (!resp.ok) {
+      const txt = await resp.text();
+      return { ok: false, error: `PI sandbox HTTP ${resp.status}: ${txt.slice(0, 300)}` };
+    }
+    const json = (await resp.json()) as PiSandboxResult;
+    return {
+      ok: Boolean(json.ok),
+      model: json.model,
+      output: json.output,
+      duration_ms: json.duration_ms,
+      usage: json.usage,
+    };
+  } catch (err: any) {
+    return { ok: false, error: String(err?.message ?? err) };
+  }
+}
+
 async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: string) {
   if (!db) throw new Error("Database not available");
   const [run] = await db
@@ -89,20 +176,44 @@ async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: str
       .orderBy(desc(marketingSignals.score), desc(marketingSignals.createdAt))
       .limit(5);
     const signalIds = signals.map((s) => s.id);
+    const signalsSummary = signals
+      .map((s) => {
+        const reasons = Array.isArray(s.reasons) ? s.reasons.slice(0, 2).join("; ") : "";
+        return `- ${s.entityName} [${s.sourceType}/${s.jurisdiction}] score=${s.score}${reasons ? ` reasons=${reasons}` : ""}`;
+      })
+      .join("\n");
+
+    const piResult =
+      engine === "pi-sandbox"
+        ? await callPiSandbox({ vertical, mode, runId, signalsSummary })
+        : null;
+
     const hypothesisIds: string[] = [];
-    const templates = [
+    const fallbackTemplates = [
       "Offer clarity lift for SMB operators",
       "Channel-message match for quick qualification",
       "CTA simplification for lower-friction conversion",
     ];
-    for (const t of templates) {
+    const templates = engine === "pi-sandbox" ? normalizePiLines(piResult?.output, 3) : [];
+    const finalTemplates = templates.length > 0 ? templates : fallbackTemplates;
+
+    const piMeta = piResult
+      ? {
+          ok: piResult.ok,
+          model: piResult.model ?? null,
+          durationMs: piResult.duration_ms ?? null,
+          usage: piResult.usage ?? null,
+          error: piResult.error ?? null,
+        }
+      : null;
+    for (const t of finalTemplates) {
       const id = nanoid(16);
       hypothesisIds.push(id);
       await db.insert(marketingHypotheses).values({
         id,
         signalIds,
-        title: `${vertical}: ${t}`,
-        hypothesis: `For ${vertical}, test a focused variant around "${t}" and compare response/booking outcomes against current baseline.`,
+        title: `${vertical}: ${t.slice(0, 180)}`,
+        hypothesis: `For ${vertical}, test "${t}" and compare response/booking outcomes against current baseline.`,
         segment: vertical,
         channel: CHANNEL_BY_VERTICAL[vertical],
         confidence: 66,
@@ -116,7 +227,7 @@ async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: str
         risks: ["message fatigue", "channel mismatch"],
         nextSteps: ["create 3 variants", "run low-budget test", "measure booked-call lift"],
         status: "new",
-        notes: `generated_by=${engine}; run_id=${runId}`,
+        notes: `generated_by=${engine}; run_id=${runId}${piResult?.model ? `; model=${piResult.model}` : ""}`,
       });
     }
 
@@ -132,6 +243,7 @@ async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: str
           durationMs: Date.now() - started,
           generatedHypothesisIds: hypothesisIds,
           signalCount: signalIds.length,
+          piBridge: piMeta,
         },
         finishedAt: now,
       })
@@ -151,6 +263,11 @@ async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: str
     .orderBy(desc(marketingHypotheses.updatedAt))
     .limit(1);
 
+  const piExecuteBrief =
+    engine === "pi-sandbox"
+      ? await callPiSandbox({ vertical, mode, runId })
+      : null;
+
   const inboxId = nanoid(16);
   await db.insert(marketingInboxItem).values({
     id: inboxId,
@@ -169,6 +286,8 @@ async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: str
       engine,
       hypothesisId: candidate?.id ?? null,
       channel: candidate?.channel ?? CHANNEL_BY_VERTICAL[vertical],
+      executionBrief: piExecuteBrief?.output ?? null,
+      executionModel: piExecuteBrief?.model ?? null,
     },
   });
 
@@ -184,6 +303,16 @@ async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: str
         durationMs: Date.now() - started,
         createdInboxId: inboxId,
         usedHypothesisId: candidate?.id ?? null,
+        piBridge:
+          piExecuteBrief == null
+            ? null
+            : {
+                ok: piExecuteBrief.ok,
+                model: piExecuteBrief.model ?? null,
+                durationMs: piExecuteBrief.duration_ms ?? null,
+                usage: piExecuteBrief.usage ?? null,
+                error: piExecuteBrief.error ?? null,
+              },
       },
       finishedAt: now,
     })
