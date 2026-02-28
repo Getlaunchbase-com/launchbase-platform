@@ -1,9 +1,14 @@
 import { z } from "zod";
-import { desc, gte } from "drizzle-orm";
+import { and, desc, eq, gte, inArray } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { router, adminProcedure } from "../../_core/trpc";
 import { getDb } from "../../db";
-import { marketingRunLog } from "../../db/schema";
+import {
+  marketingHypotheses,
+  marketingInboxItem,
+  marketingRunLog,
+  marketingSignals,
+} from "../../db/schema";
 
 const Engine = z.enum(["standard", "pi-sandbox", "obliterated-sandbox"]);
 const Mode = z.enum(["research", "execute"]);
@@ -19,6 +24,172 @@ function envBool(name: string, fallback = false): boolean {
   if (raw === undefined) return fallback;
   const v = raw.trim().toLowerCase();
   return v === "1" || v === "true" || v === "yes" || v === "on";
+}
+
+const ENGINE_COST_ESTIMATE: Record<z.infer<typeof Engine>, number> = {
+  standard: 0.018,
+  "pi-sandbox": 0.009,
+  "obliterated-sandbox": 0.012,
+};
+
+const CHANNEL_BY_VERTICAL: Record<z.infer<typeof Vertical>, string> = {
+  "small-business-websites": "outbound_email",
+  "quickbooks-integration": "linkedin_outreach",
+  "workflow-automation": "content_seo",
+  "agents-apps-automation": "direct_outreach",
+};
+
+async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: string) {
+  if (!db) throw new Error("Database not available");
+  const [run] = await db
+    .select()
+    .from(marketingRunLog)
+    .where(eq(marketingRunLog.id, runId))
+    .limit(1);
+
+  if (!run) throw new Error("Cycle run not found");
+  if (run.status !== "queued") return { ok: true as const, runId, skipped: true as const };
+
+  const meta = ((run.meta as any) ?? {}) as {
+    vertical?: z.infer<typeof Vertical>;
+    engine?: z.infer<typeof Engine>;
+    mode?: z.infer<typeof Mode>;
+  };
+  const vertical = meta.vertical ?? "small-business-websites";
+  const engine = (meta.engine ?? "standard") as z.infer<typeof Engine>;
+  const mode = (meta.mode ?? "research") as z.infer<typeof Mode>;
+  const started = Date.now();
+
+  const now = new Date();
+  const costUsd = ENGINE_COST_ESTIMATE[engine] ?? 0.01;
+  const guardrailPass = !(engine !== "standard" && mode === "execute");
+  if (!guardrailPass) {
+    await db
+      .update(marketingRunLog)
+      .set({
+        status: "failed",
+        message: "Guardrail blocked sandbox execute mode",
+        meta: {
+          ...meta,
+          guardrailPass: false,
+          costUsd,
+          durationMs: Date.now() - started,
+        },
+        finishedAt: now,
+      })
+      .where(eq(marketingRunLog.id, runId));
+    return { ok: true as const, runId, guardrailBlocked: true as const };
+  }
+
+  if (mode === "research") {
+    const signals = await db
+      .select()
+      .from(marketingSignals)
+      .where(inArray(marketingSignals.status, ["new", "triaged", "qualified"]))
+      .orderBy(desc(marketingSignals.score), desc(marketingSignals.createdAt))
+      .limit(5);
+    const signalIds = signals.map((s) => s.id);
+    const hypothesisIds: string[] = [];
+    const templates = [
+      "Offer clarity lift for SMB operators",
+      "Channel-message match for quick qualification",
+      "CTA simplification for lower-friction conversion",
+    ];
+    for (const t of templates) {
+      const id = nanoid(16);
+      hypothesisIds.push(id);
+      await db.insert(marketingHypotheses).values({
+        id,
+        signalIds,
+        title: `${vertical}: ${t}`,
+        hypothesis: `For ${vertical}, test a focused variant around "${t}" and compare response/booking outcomes against current baseline.`,
+        segment: vertical,
+        channel: CHANNEL_BY_VERTICAL[vertical],
+        confidence: 66,
+        impact: 61,
+        effort: 38,
+        reasons: [
+          "signal-backed trend synthesis",
+          "vertical-specific language alignment",
+          `engine:${engine}`,
+        ],
+        risks: ["message fatigue", "channel mismatch"],
+        nextSteps: ["create 3 variants", "run low-budget test", "measure booked-call lift"],
+        status: "new",
+        notes: `generated_by=${engine}; run_id=${runId}`,
+      });
+    }
+
+    await db
+      .update(marketingRunLog)
+      .set({
+        status: "ok",
+        message: `Research cycle completed: ${hypothesisIds.length} hypotheses generated`,
+        meta: {
+          ...meta,
+          guardrailPass: true,
+          costUsd,
+          durationMs: Date.now() - started,
+          generatedHypothesisIds: hypothesisIds,
+          signalCount: signalIds.length,
+        },
+        finishedAt: now,
+      })
+      .where(eq(marketingRunLog.id, runId));
+    return { ok: true as const, runId, hypothesisIds };
+  }
+
+  const [candidate] = await db
+    .select()
+    .from(marketingHypotheses)
+    .where(
+      and(
+        eq(marketingHypotheses.segment, vertical),
+        inArray(marketingHypotheses.status, ["promoted", "approved", "new"])
+      )
+    )
+    .orderBy(desc(marketingHypotheses.updatedAt))
+    .limit(1);
+
+  const inboxId = nanoid(16);
+  await db.insert(marketingInboxItem).values({
+    id: inboxId,
+    status: "queued",
+    priority: "high",
+    score: 85,
+    title: `Execute vertical campaign (${vertical})`,
+    source: "marketing_cycle_execute",
+    sourceKey: runId,
+    summary: candidate
+      ? `Execute promoted hypothesis: ${candidate.title}`
+      : `No promoted hypothesis found; operator review required before execution`,
+    payload: {
+      runId,
+      vertical,
+      engine,
+      hypothesisId: candidate?.id ?? null,
+      channel: candidate?.channel ?? CHANNEL_BY_VERTICAL[vertical],
+    },
+  });
+
+  await db
+    .update(marketingRunLog)
+    .set({
+      status: "ok",
+      message: `Execute cycle completed: inbox task ${inboxId} queued`,
+      meta: {
+        ...meta,
+        guardrailPass: true,
+        costUsd,
+        durationMs: Date.now() - started,
+        createdInboxId: inboxId,
+        usedHypothesisId: candidate?.id ?? null,
+      },
+      finishedAt: now,
+    })
+    .where(eq(marketingRunLog.id, runId));
+
+  return { ok: true as const, runId, inboxId };
 }
 
 export const marketingAgentsRouter = router({
@@ -90,11 +261,79 @@ export const marketingAgentsRouter = router({
         finishedAt: now,
       });
 
+      const bridgeEnabled = envBool("MARKETING_ENABLE_CYCLE_BRIDGE", true);
+      if (bridgeEnabled) {
+        await processCycleRun(db, runId);
+      }
+
       return {
         ok: true as const,
         runId,
         status: "queued" as const,
       };
+    }),
+
+  processQueuedCycles: adminProcedure
+    .input(z.object({ limit: z.number().int().min(1).max(100).default(20) }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      const queued = await db
+        .select({ id: marketingRunLog.id })
+        .from(marketingRunLog)
+        .where(and(eq(marketingRunLog.job, "vertical_learning_cycle"), eq(marketingRunLog.status, "queued")))
+        .orderBy(desc(marketingRunLog.startedAt))
+        .limit(input.limit);
+      const results: Array<{ runId: string; ok: boolean; error?: string }> = [];
+      for (const row of queued) {
+        try {
+          await processCycleRun(db, row.id);
+          results.push({ runId: row.id, ok: true });
+        } catch (err: any) {
+          results.push({ runId: row.id, ok: false, error: String(err?.message ?? err) });
+        }
+      }
+      return { ok: true as const, processed: results.length, results };
+    }),
+
+  listPromotionQueue: adminProcedure
+    .input(z.object({ limit: z.number().int().min(1).max(200).default(25) }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      const rows = await db
+        .select()
+        .from(marketingHypotheses)
+        .where(inArray(marketingHypotheses.status, ["new", "ready_for_review", "approved"]))
+        .orderBy(desc(marketingHypotheses.updatedAt))
+        .limit(input.limit);
+      return { ok: true as const, rows };
+    }),
+
+  reviewPromotion: adminProcedure
+    .input(
+      z.object({
+        id: z.string().min(1),
+        decision: z.enum(["approved", "rejected", "promoted"]),
+        note: z.string().max(2000).optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      const [existing] = await db
+        .select({ notes: marketingHypotheses.notes })
+        .from(marketingHypotheses)
+        .where(eq(marketingHypotheses.id, input.id))
+        .limit(1);
+      const actor = (ctx as any)?.user?.email ?? (ctx as any)?.user?.id ?? "admin";
+      const add = `${new Date().toISOString()} ${actor}: ${input.decision}${input.note ? ` - ${input.note}` : ""}`;
+      const notes = existing?.notes ? `${existing.notes}\n${add}` : add;
+      await db
+        .update(marketingHypotheses)
+        .set({ status: input.decision, notes })
+        .where(eq(marketingHypotheses.id, input.id));
+      return { ok: true as const, id: input.id, status: input.decision };
     }),
 
   listCycles: adminProcedure

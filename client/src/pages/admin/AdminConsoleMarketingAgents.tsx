@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { AdminLayout } from "../../components/AdminLayout";
-import { Play, Pause, Square, FileText, ChevronDown } from "../../components/Icons";
+import { Play, Pause, Square, ChevronDown } from "../../components/Icons";
 import trpc from "../../lib/trpc";
 
 export default function AdminConsoleMarketingAgents() {
@@ -8,6 +8,8 @@ export default function AdminConsoleMarketingAgents() {
   const flagsQ = trpc.admin.marketingAgents.getFeatureFlags.useQuery(undefined, { retry: false });
   const cyclesQ = trpc.admin.marketingAgents.listCycles.useQuery({ limit: 20 }, { retry: false });
   const scoreQ = trpc.admin.marketingAgents.getScorecard.useQuery({ days: 14 }, { retry: false });
+  const promotionQ = trpc.admin.marketingAgents.listPromotionQueue.useQuery({ limit: 25 }, { retry: false });
+
   const instances = (instancesQ.data as any)?.instances ?? [];
   const [expandedAgent, setExpandedAgent] = useState<number | null>(null);
   const [vertical, setVertical] = useState<
@@ -16,14 +18,31 @@ export default function AdminConsoleMarketingAgents() {
   const [engine, setEngine] = useState<"standard" | "pi-sandbox" | "obliterated-sandbox">("standard");
   const [mode, setMode] = useState<"research" | "execute">("research");
   const [notes, setNotes] = useState("");
+  const [promotionNotes, setPromotionNotes] = useState<Record<string, string>>({});
 
   const updateMut = trpc.admin.agentInstances.update.useMutation({
     onSuccess: () => instancesQ.refetch(),
   });
+
   const runCycleMut = trpc.admin.marketingAgents.runCycle.useMutation({
     onSuccess: () => {
       cyclesQ.refetch();
+      scoreQ.refetch();
       setNotes("");
+    },
+  });
+
+  const processQueuedMut = trpc.admin.marketingAgents.processQueuedCycles.useMutation({
+    onSuccess: () => {
+      cyclesQ.refetch();
+      scoreQ.refetch();
+      promotionQ.refetch();
+    },
+  });
+
+  const reviewPromotionMut = trpc.admin.marketingAgents.reviewPromotion.useMutation({
+    onSuccess: () => {
+      promotionQ.refetch();
     },
   });
 
@@ -114,10 +133,7 @@ export default function AdminConsoleMarketingAgents() {
                 style={{ backgroundColor: "#0f0f0f", color: "#ddd", border: "1px solid #333", borderRadius: "6px", padding: "8px" }}
               >
                 <option value="research">Research</option>
-                <option
-                  value="execute"
-                  disabled={engine !== "standard" && !flags.allowSandboxExecute}
-                >
+                <option value="execute" disabled={engine !== "standard" && !flags.allowSandboxExecute}>
                   Execute
                 </option>
               </select>
@@ -203,14 +219,205 @@ export default function AdminConsoleMarketingAgents() {
                 return (
                   <div key={row.id} style={{ border: "1px solid #2a2a2a", borderRadius: "6px", padding: "8px 10px", backgroundColor: "#0d0d0d" }}>
                     <div style={{ fontSize: "12px", color: "#cfcfcf", fontWeight: 600 }}>
-                      {meta.vertical ?? "unknown-vertical"} · {meta.engine ?? row.agent} · {meta.mode ?? "research"}
+                      {meta.vertical ?? "unknown-vertical"} | {meta.engine ?? row.agent} | {meta.mode ?? "research"}
                     </div>
                     <div style={{ fontSize: "11px", color: "#888" }}>
-                      {row.status} · {new Date(row.startedAt).toLocaleString()}
+                      {row.status} | {new Date(row.startedAt).toLocaleString()}
                     </div>
                   </div>
                 );
               })}
+            </div>
+          )}
+        </div>
+
+        <div
+          style={{
+            marginBottom: "24px",
+            padding: "16px",
+            border: "1px solid #333",
+            borderRadius: "8px",
+            backgroundColor: "#111",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", marginBottom: "10px" }}>
+            <div style={{ fontSize: "14px", fontWeight: "600", color: "#e0e0e0" }}>
+              Execution Bridge
+            </div>
+            <button
+              onClick={() => processQueuedMut.mutate({ limit: 20 })}
+              disabled={processQueuedMut.isPending}
+              style={{
+                padding: "8px 12px",
+                backgroundColor: "#2563eb",
+                color: "#eaf1ff",
+                border: "none",
+                borderRadius: "6px",
+                fontWeight: 700,
+                fontSize: "12px",
+                cursor: processQueuedMut.isPending ? "not-allowed" : "pointer",
+                opacity: processQueuedMut.isPending ? 0.6 : 1,
+              }}
+            >
+              {processQueuedMut.isPending ? "Processing..." : "Process Queued Cycles"}
+            </button>
+          </div>
+          <div style={{ color: "#888", fontSize: "12px" }}>
+            Runs queued cycle jobs now and refreshes scorecard plus promotion queue.
+          </div>
+          {processQueuedMut.error && (
+            <div style={{ color: "#ef4444", fontSize: "12px", marginTop: "8px" }}>
+              {processQueuedMut.error.message}
+            </div>
+          )}
+          {processQueuedMut.data && (
+            <div style={{ color: "#22c55e", fontSize: "12px", marginTop: "8px" }}>
+              Processed {(processQueuedMut.data as any).processed} queued run(s).
+            </div>
+          )}
+        </div>
+
+        <div
+          style={{
+            marginBottom: "24px",
+            padding: "16px",
+            border: "1px solid #333",
+            borderRadius: "8px",
+            backgroundColor: "#111",
+          }}
+        >
+          <div style={{ fontSize: "14px", fontWeight: "600", marginBottom: "10px", color: "#e0e0e0" }}>
+            Promotion Queue
+          </div>
+          {promotionQ.isLoading ? (
+            <div style={{ color: "#777", fontSize: "12px" }}>Loading promotion queue...</div>
+          ) : ((promotionQ.data as any)?.rows ?? []).length === 0 ? (
+            <div style={{ color: "#777", fontSize: "12px" }}>No hypotheses pending review.</div>
+          ) : (
+            <div style={{ display: "grid", gap: "8px" }}>
+              {((promotionQ.data as any)?.rows ?? []).map((row: any) => (
+                <div
+                  key={row.id}
+                  style={{
+                    border: "1px solid #2a2a2a",
+                    borderRadius: "6px",
+                    padding: "10px",
+                    backgroundColor: "#0d0d0d",
+                    display: "grid",
+                    gap: "8px",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: "10px", alignItems: "center" }}>
+                    <div>
+                      <div style={{ color: "#d5d5d5", fontSize: "12px", fontWeight: 600 }}>{row.title}</div>
+                      <div style={{ color: "#888", fontSize: "11px" }}>
+                        {row.segment} | {row.channel} | {row.status}
+                      </div>
+                    </div>
+                    <div style={{ color: "#888", fontSize: "11px" }}>
+                      conf {row.confidence ?? "-"} / impact {row.impact ?? "-"} / effort {row.effort ?? "-"}
+                    </div>
+                  </div>
+
+                  <input
+                    value={promotionNotes[row.id] ?? ""}
+                    onChange={(e) =>
+                      setPromotionNotes((prev) => ({
+                        ...prev,
+                        [row.id]: e.target.value,
+                      }))
+                    }
+                    placeholder="Optional review note"
+                    style={{
+                      backgroundColor: "#101010",
+                      color: "#ddd",
+                      border: "1px solid #333",
+                      borderRadius: "6px",
+                      padding: "8px",
+                      fontSize: "12px",
+                    }}
+                  />
+
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button
+                      onClick={() =>
+                        reviewPromotionMut.mutate({
+                          id: row.id,
+                          decision: "approved",
+                          note: promotionNotes[row.id]?.trim() || undefined,
+                        })
+                      }
+                      disabled={reviewPromotionMut.isPending}
+                      style={{
+                        padding: "7px 10px",
+                        backgroundColor: "#15803d",
+                        color: "#ecfdf3",
+                        border: "none",
+                        borderRadius: "6px",
+                        fontSize: "12px",
+                        fontWeight: 700,
+                        cursor: reviewPromotionMut.isPending ? "not-allowed" : "pointer",
+                      }}
+                    >
+                      Approve
+                    </button>
+                    <button
+                      onClick={() =>
+                        reviewPromotionMut.mutate({
+                          id: row.id,
+                          decision: "promoted",
+                          note: promotionNotes[row.id]?.trim() || undefined,
+                        })
+                      }
+                      disabled={reviewPromotionMut.isPending}
+                      style={{
+                        padding: "7px 10px",
+                        backgroundColor: "#1d4ed8",
+                        color: "#eff6ff",
+                        border: "none",
+                        borderRadius: "6px",
+                        fontSize: "12px",
+                        fontWeight: 700,
+                        cursor: reviewPromotionMut.isPending ? "not-allowed" : "pointer",
+                      }}
+                    >
+                      Promote
+                    </button>
+                    <button
+                      onClick={() =>
+                        reviewPromotionMut.mutate({
+                          id: row.id,
+                          decision: "rejected",
+                          note: promotionNotes[row.id]?.trim() || undefined,
+                        })
+                      }
+                      disabled={reviewPromotionMut.isPending}
+                      style={{
+                        padding: "7px 10px",
+                        backgroundColor: "#b91c1c",
+                        color: "#fef2f2",
+                        border: "none",
+                        borderRadius: "6px",
+                        fontSize: "12px",
+                        fontWeight: 700,
+                        cursor: reviewPromotionMut.isPending ? "not-allowed" : "pointer",
+                      }}
+                    >
+                      Reject
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          {reviewPromotionMut.error && (
+            <div style={{ color: "#ef4444", fontSize: "12px", marginTop: "8px" }}>
+              {reviewPromotionMut.error.message}
+            </div>
+          )}
+          {reviewPromotionMut.data && (
+            <div style={{ color: "#22c55e", fontSize: "12px", marginTop: "8px" }}>
+              Updated hypothesis {(reviewPromotionMut.data as any).id} to {(reviewPromotionMut.data as any).status}.
             </div>
           )}
         </div>
@@ -302,19 +509,17 @@ export default function AdminConsoleMarketingAgents() {
               const status = inst.status || "active";
               return (
                 <div key={inst.id} style={{ backgroundColor: "#1a1a1a", borderRadius: "8px", border: `1px solid ${expanded ? color : "#333"}`, overflow: "hidden", transition: "all 0.3s" }}>
-                  {/* Header */}
                   <div onClick={() => toggleExpanded(inst.id)} style={{ padding: "16px", backgroundColor: "#0f0f0f", borderBottom: expanded ? `2px solid ${color}` : "none", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
                         <div style={{ width: "8px", height: "8px", borderRadius: "50%", backgroundColor: statusColor(status) }} />
                         <h3 style={{ fontSize: "16px", fontWeight: "600", margin: 0, color: "#e0e0e0" }}>{inst.displayName || `Instance ${inst.id}`}</h3>
                       </div>
-                      <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>#{inst.id} — {status}</p>
+                      <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>#{inst.id} - {status}</p>
                     </div>
                     <ChevronDown size={16} style={{ transform: expanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", color: "#666" }} />
                   </div>
 
-                  {/* Content */}
                   {expanded && (
                     <div style={{ padding: "16px", borderTop: "1px solid #333" }}>
                       <div style={{ marginBottom: "16px" }}>
