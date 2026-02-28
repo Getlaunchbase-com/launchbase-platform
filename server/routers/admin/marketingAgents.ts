@@ -40,9 +40,19 @@ const CHANNEL_BY_VERTICAL: Record<z.infer<typeof Vertical>, string> = {
 };
 
 const DEFAULT_PI_SANDBOX_URL = "https://pi-agent-sandbox-6af67etolq-uc.a.run.app";
+const DEFAULT_PI_PRIMARY_MODEL = "openai/gpt-5.2-codex";
+const DEFAULT_PI_REVIEW_MODEL = "claude-sonnet-4-6";
 
 function getPiSandboxUrl(): string {
   return (process.env.MARKETING_PI_SANDBOX_URL || DEFAULT_PI_SANDBOX_URL).replace(/\/+$/, "");
+}
+
+function getPiPrimaryModel(): string {
+  return (process.env.MARKETING_PI_PRIMARY_MODEL || DEFAULT_PI_PRIMARY_MODEL).trim();
+}
+
+function getPiReviewModel(): string {
+  return (process.env.MARKETING_PI_REVIEW_MODEL || DEFAULT_PI_REVIEW_MODEL).trim();
 }
 
 type PiSandboxResult = {
@@ -74,11 +84,14 @@ async function callPiSandbox(input: {
   mode: z.infer<typeof Mode>;
   runId: string;
   signalsSummary?: string;
+  model?: string;
+  promptOverride?: string;
+  maxTokens?: number;
 }): Promise<PiSandboxResult> {
   const url = `${getPiSandboxUrl()}/run`;
   const system =
     "You are a senior B2B growth strategist for LaunchBase. Return concise, practical output for SMB demand generation.";
-  const prompt =
+  const prompt = input.promptOverride || (
     input.mode === "research"
       ? [
           `Vertical: ${input.vertical}`,
@@ -91,7 +104,8 @@ async function callPiSandbox(input: {
           `Vertical: ${input.vertical}`,
           "Task: Generate a concise execution brief for one launch campaign.",
           "Output format: 5 short lines (Goal, Audience, Offer, Channel plan, KPI).",
-        ].join("\n");
+        ].join("\n")
+  );
 
   try {
     const resp = await fetch(url, {
@@ -100,10 +114,11 @@ async function callPiSandbox(input: {
         "content-type": "application/json",
       },
       body: JSON.stringify({
+        model: input.model || undefined,
         prompt,
         system,
         temperature: 0.2,
-        max_tokens: input.mode === "research" ? 700 : 450,
+        max_tokens: input.maxTokens ?? (input.mode === "research" ? 700 : 450),
         mode: input.mode,
         vertical: input.vertical,
         trace_id: input.runId,
@@ -183,9 +198,29 @@ async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: str
       })
       .join("\n");
 
-    const piResult =
+    const primaryModel = getPiPrimaryModel();
+    const reviewModel = getPiReviewModel();
+    const piPrimary =
       engine === "pi-sandbox"
-        ? await callPiSandbox({ vertical, mode, runId, signalsSummary })
+        ? await callPiSandbox({ vertical, mode, runId, signalsSummary, model: primaryModel, maxTokens: 900 })
+        : null;
+    const piReview =
+      engine === "pi-sandbox" && piPrimary?.ok && (piPrimary.output ?? "").trim().length > 0
+        ? await callPiSandbox({
+            vertical,
+            mode,
+            runId,
+            model: reviewModel,
+            promptOverride: [
+              `Vertical: ${vertical}`,
+              "Task: Review and refine the primary strategist output into exactly 3 high-quality hypotheses.",
+              "Return one hypothesis per line, no numbering, no markdown, no preface.",
+              "Each line must include: channel + message angle + expected business outcome.",
+              "Primary output:",
+              piPrimary.output ?? "",
+            ].join("\n"),
+            maxTokens: 700,
+          })
         : null;
 
     const hypothesisIds: string[] = [];
@@ -194,16 +229,30 @@ async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: str
       "Channel-message match for quick qualification",
       "CTA simplification for lower-friction conversion",
     ];
-    const templates = engine === "pi-sandbox" ? normalizePiLines(piResult?.output, 3) : [];
+    const templates =
+      engine === "pi-sandbox"
+        ? normalizePiLines((piReview?.ok ? piReview.output : piPrimary?.output) ?? "", 3)
+        : [];
     const finalTemplates = templates.length > 0 ? templates : fallbackTemplates;
 
-    const piMeta = piResult
+    const piMeta = piPrimary
       ? {
-          ok: piResult.ok,
-          model: piResult.model ?? null,
-          durationMs: piResult.duration_ms ?? null,
-          usage: piResult.usage ?? null,
-          error: piResult.error ?? null,
+          primary: {
+            ok: piPrimary.ok,
+            model: piPrimary.model ?? primaryModel,
+            durationMs: piPrimary.duration_ms ?? null,
+            usage: piPrimary.usage ?? null,
+            error: piPrimary.error ?? null,
+          },
+          reviewer: piReview
+            ? {
+                ok: piReview.ok,
+                model: piReview.model ?? reviewModel,
+                durationMs: piReview.duration_ms ?? null,
+                usage: piReview.usage ?? null,
+                error: piReview.error ?? null,
+              }
+            : null,
         }
       : null;
     for (const t of finalTemplates) {
@@ -227,7 +276,7 @@ async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: str
         risks: ["message fatigue", "channel mismatch"],
         nextSteps: ["create 3 variants", "run low-budget test", "measure booked-call lift"],
         status: "new",
-        notes: `generated_by=${engine}; run_id=${runId}${piResult?.model ? `; model=${piResult.model}` : ""}`,
+        notes: `generated_by=${engine}; run_id=${runId}${piPrimary?.model ? `; model=${piPrimary.model}` : ""}`,
       });
     }
 
@@ -263,9 +312,33 @@ async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: str
     .orderBy(desc(marketingHypotheses.updatedAt))
     .limit(1);
 
-  const piExecuteBrief =
+  const primaryModel = getPiPrimaryModel();
+  const reviewModel = getPiReviewModel();
+  const piExecutePrimary =
     engine === "pi-sandbox"
-      ? await callPiSandbox({ vertical, mode, runId })
+      ? await callPiSandbox({ vertical, mode, runId, model: primaryModel, maxTokens: 500 })
+      : null;
+  const piExecuteReview =
+    engine === "pi-sandbox" && piExecutePrimary?.ok && (piExecutePrimary.output ?? "").trim().length > 0
+      ? await callPiSandbox({
+          vertical,
+          mode,
+          runId,
+          model: reviewModel,
+          promptOverride: [
+            `Vertical: ${vertical}`,
+            "Task: Review and tighten this campaign execution brief.",
+            "Return exactly 5 short lines with labels:",
+            "Goal:",
+            "Audience:",
+            "Offer:",
+            "Channel plan:",
+            "KPI:",
+            "Primary brief:",
+            piExecutePrimary.output ?? "",
+          ].join("\n"),
+          maxTokens: 420,
+        })
       : null;
 
   const inboxId = nanoid(16);
@@ -286,8 +359,8 @@ async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: str
       engine,
       hypothesisId: candidate?.id ?? null,
       channel: candidate?.channel ?? CHANNEL_BY_VERTICAL[vertical],
-      executionBrief: piExecuteBrief?.output ?? null,
-      executionModel: piExecuteBrief?.model ?? null,
+      executionBrief: (piExecuteReview?.ok ? piExecuteReview.output : piExecutePrimary?.output) ?? null,
+      executionModel: (piExecuteReview?.ok ? piExecuteReview.model : piExecutePrimary?.model) ?? null,
     },
   });
 
@@ -304,14 +377,25 @@ async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: str
         createdInboxId: inboxId,
         usedHypothesisId: candidate?.id ?? null,
         piBridge:
-          piExecuteBrief == null
+          piExecutePrimary == null
             ? null
             : {
-                ok: piExecuteBrief.ok,
-                model: piExecuteBrief.model ?? null,
-                durationMs: piExecuteBrief.duration_ms ?? null,
-                usage: piExecuteBrief.usage ?? null,
-                error: piExecuteBrief.error ?? null,
+                primary: {
+                  ok: piExecutePrimary.ok,
+                  model: piExecutePrimary.model ?? primaryModel,
+                  durationMs: piExecutePrimary.duration_ms ?? null,
+                  usage: piExecutePrimary.usage ?? null,
+                  error: piExecutePrimary.error ?? null,
+                },
+                reviewer: piExecuteReview
+                  ? {
+                      ok: piExecuteReview.ok,
+                      model: piExecuteReview.model ?? reviewModel,
+                      durationMs: piExecuteReview.duration_ms ?? null,
+                      usage: piExecuteReview.usage ?? null,
+                      error: piExecuteReview.error ?? null,
+                    }
+                  : null,
               },
       },
       finishedAt: now,
