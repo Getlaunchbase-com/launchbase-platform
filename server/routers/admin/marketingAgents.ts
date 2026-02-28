@@ -40,7 +40,7 @@ const CHANNEL_BY_VERTICAL: Record<z.infer<typeof Vertical>, string> = {
 };
 
 const DEFAULT_PI_SANDBOX_URL = "https://pi-agent-sandbox-6af67etolq-uc.a.run.app";
-const DEFAULT_PI_PRIMARY_MODEL = "openai/gpt-5.2-codex";
+const DEFAULT_PI_PRIMARY_MODEL = "openai/gpt-5-2-codex";
 const DEFAULT_PI_REVIEW_MODEL = "claude-sonnet-4-6";
 
 function getPiSandboxUrl(): string {
