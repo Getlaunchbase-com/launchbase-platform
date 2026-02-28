@@ -8,18 +8,18 @@ Owner: Monica / incoming scientist handoff
 1. `launchbase-platform`  
    - Path: `C:\Users\Monica Morreale\Downloads\launchbase-platform`
    - Branch: `main`
-   - HEAD: `872b65d1fbb8e4d6ef10162e29314f5bb02e4ab2`
+   - HEAD: `ef50e266bd940923cc493e5324d0f08290a74b51`
    - Remote: `https://github.com/Getlaunchbase-com/launchbase-platform.git`
-   - Local status: dirty (2 modified files)
-     - `scripts/gcp/worker/main.py`
-     - `scripts/gcp/worker/requirements.txt`
+   - Local status: clean
+   - Sync with origin/main: `ahead 0, behind 0`
 
 2. `launchbase-mobile`  
    - Path: `C:\Users\Monica Morreale\Downloads\launchbase-mobile`
    - Branch: `main`
-   - HEAD: `c18bf424eda7e1169483dbe080db791ba21ed948`
+   - HEAD: `14c860018633a4e33b2a401713f465f6721c7126`
    - Remote: `https://github.com/Getlaunchbase-com/launchbase-mobile.git`
    - Local status: clean
+   - Sync with origin/main: `ahead 0, behind 0`
 
 3. `agent-stack`  
    - Path: `C:\Users\Monica Morreale\Downloads\agent-stack`
@@ -27,6 +27,7 @@ Owner: Monica / incoming scientist handoff
    - HEAD: `c1ddb2d7601295f627af87528ebc4d128d6bef65`
    - Remote: `https://github.com/Getlaunchbase-com/agent-stack.git`
    - Local status: clean
+   - Sync with origin/main: `ahead 0, behind 0`
 
 ## Runtime Status (VM)
 
@@ -87,14 +88,10 @@ Repo `launchbase-mobile` API defaults:
 
 Typecheck run:
 - Command: `npm.cmd test` (script runs `tsc --noEmit`)
-- Result: **FAIL**
-- Primary failure class:
-  - Test typing/runner setup drift (`jest` globals/types missing)
-  - API contract/type mismatches in `lib/api.ts`
-  - Missing module/type references (example: `@sentry/react-native`)
+- Result: **PASS**
 
 Interpretation:
-- Mobile repo compiles are not currently in a clean TS baseline in this environment and need a deliberate typecheck cleanup pass before handoff sign-off.
+- Mobile repo is now in a clean TS baseline for this environment.
 
 ## Scientist Access
 
@@ -114,7 +111,6 @@ Project policy override applied so external domain IAM members are permitted:
 
 ## Immediate Next Actions (Scientist)
 
-1. Resolve/commit or stash the two local dirty files in `launchbase-platform`.
-2. Decide whether `35.188.184.31:3000` and `:8080` should be publicly reachable; if yes, fix ingress/firewall path and re-test externally.
-3. Run a focused mobile TS baseline repair pass so `npm test` is green.
-4. Re-run cross-repo smoke and capture a new locked baseline SHA set.
+1. Decide whether `35.188.184.31:3000` and `:8080` should be publicly reachable; if yes, fix ingress/firewall path and re-test externally.
+2. Add this snapshot SHA trio to team runbooks/change tickets as the handoff touchstone.
+3. Continue with feature work from this baseline.
