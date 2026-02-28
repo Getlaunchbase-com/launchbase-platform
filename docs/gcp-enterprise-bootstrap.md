@@ -27,6 +27,8 @@ Goal: provision Google Cloud once, then drop model/data into buckets and launch 
 - `scripts/gcp/bootstrap_launchbase_gcp.ps1`
 - `scripts/gcp/submit_vertex_marketing_job.ps1`
 - `scripts/gcp/configure_permissions.ps1`
+- `scripts/gcp/marketing_ops_policy.json`
+- `scripts/gcp/bootstrap_marketing_ops.ps1`
 
 ## 1) Pre-reqs
 
@@ -103,14 +105,30 @@ powershell -ExecutionPolicy Bypass -File scripts\gcp\submit_vertex_marketing_job
 powershell -ExecutionPolicy Bypass -File scripts\gcp\configure_permissions.ps1 -ConfigPath ".\scripts\gcp\launchbase_gcp.env" -EngineerEmail "info@marketing-beast.com"
 ```
 
-## 7) Monitor
+## 7) Install Pre-Approved Off-Peak Marketing Schedules
+
+This installs:
+
+- Pub/Sub topics/subscriptions for agent jobs
+- BigQuery tracking tables for learning loop
+- Cloud Scheduler jobs using pre-approved policy windows
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\gcp\bootstrap_marketing_ops.ps1 -ConfigPath ".\scripts\gcp\launchbase_gcp.env" -PolicyPath ".\scripts\gcp\marketing_ops_policy.json"
+```
+
+Default policy timezone: `America/Chicago`.
+
+## 8) Monitor
 
 ```powershell
 gcloud.cmd ai custom-jobs list --region us-central1 --project <PROJECT_ID>
 gcloud.cmd ai custom-jobs stream-logs <JOB_ID> --region us-central1 --project <PROJECT_ID>
+gcloud.cmd scheduler jobs list --location us-central1 --project <PROJECT_ID>
+gcloud.cmd pubsub topics list --project <PROJECT_ID>
 ```
 
-## 8) Secrets
+## 9) Secrets
 
 Bootstrap creates placeholder versions (`CHANGE_ME`) for each configured secret name.
 
@@ -128,7 +146,7 @@ Recommended first secrets:
 - `meta-ads-access-token`
 - `hubspot-api-key`
 
-## 9) Marketing Department Agent Pattern (Cloud)
+## 10) Marketing Department Agent Pattern (Cloud)
 
 Use Vertex for model execution and BigQuery for measurement:
 
@@ -140,7 +158,7 @@ Use Vertex for model execution and BigQuery for measurement:
 
 All external actions require Launchbase approval gates.
 
-## 10) Handoff Checklist
+## 11) Handoff Checklist
 
 1. Bootstrap script completed without failures
 2. Buckets and datasets visible
@@ -149,6 +167,7 @@ All external actions require Launchbase approval gates.
 5. First Vertex custom job submitted and logged
 6. Artifacts written to artifacts bucket
 7. Launchbase platform health + smoke tests green
+8. Off-peak scheduler jobs exist and are enabled
 
 ## Notes
 

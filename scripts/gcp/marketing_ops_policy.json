@@ -1,0 +1,43 @@
+{
+  "version": "1.0.0",
+  "name": "launchbase-marketing-offpeak-policy",
+  "timezone": "America/Chicago",
+  "off_peak_window_local": "22:00-05:59",
+  "rules": [
+    {
+      "job": "fetch-trends",
+      "topic": "lb-marketing-fetch-trends",
+      "schedule": "15 23 * * *",
+      "approved": true,
+      "max_runtime_minutes": 20
+    },
+    {
+      "job": "vertical-research",
+      "topic": "lb-marketing-research-verticals",
+      "schedule": "45 23 * * *",
+      "approved": true,
+      "max_runtime_minutes": 30
+    },
+    {
+      "job": "campaign-generate",
+      "topic": "lb-marketing-generate-campaigns",
+      "schedule": "15 0 * * *",
+      "approved": true,
+      "max_runtime_minutes": 30
+    },
+    {
+      "job": "ab-evaluate",
+      "topic": "lb-marketing-ab-eval",
+      "schedule": "0 4 * * *",
+      "approved": true,
+      "max_runtime_minutes": 20
+    },
+    {
+      "job": "daily-report",
+      "topic": "lb-marketing-daily-report",
+      "schedule": "30 5 * * *",
+      "approved": true,
+      "max_runtime_minutes": 10
+    }
+  ]
+}
