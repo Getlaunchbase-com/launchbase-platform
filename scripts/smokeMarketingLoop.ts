@@ -74,6 +74,7 @@ async function main(): Promise<void> {
   let inboxId = "";
   let feedbackId = 0;
   let proposalId = 0;
+  let cycleRunId = "";
 
   const okLogin = await runStep(1, "Authenticate admin via /auth/login", async () => {
     const res = await timedFetch(`${BASE_URL}/auth/login`, {
@@ -246,6 +247,39 @@ async function main(): Promise<void> {
     assert(count > 0, "No agent instances visible after smoke run");
   });
 
+  const okLanes = await runStep(7, "Marketing lanes: publish/read staged model lanes", async () => {
+    const lanesRes = await trpc.admin.marketingAgents.getModelLanes.query();
+    const lanes = (lanesRes as any)?.lanes ?? [];
+    assert(Array.isArray(lanes), "getModelLanes did not return lanes[]");
+    assert(lanes.length >= 3, `Expected at least 3 lanes, got ${lanes.length}`);
+    const laneIds = new Set(lanes.map((l: any) => String(l?.lane ?? "")));
+    assert(laneIds.has("main-8b-governed"), "Missing lane main-8b-governed");
+    assert(laneIds.has("sandbox-8b-isolated"), "Missing lane sandbox-8b-isolated");
+    assert(laneIds.has("sandbox-8b-obliterated"), "Missing lane sandbox-8b-obliterated");
+  });
+  if (!okLanes) return finish(1);
+
+  await runStep(8, "Marketing cycle: runCycle parallel compare metadata", async () => {
+    const cycle = await trpc.admin.marketingAgents.runCycle.mutate({
+      vertical: "small-business-websites",
+      engine: "standard",
+      mode: "research",
+      notes: `Smoke parallel compare ${runTag}`,
+      parallelCompare: true,
+      primaryModel: "anthropic/claude-sonnet-4-6",
+      reviewModel: "anthropic/claude-sonnet-4-6",
+    });
+    cycleRunId = String((cycle as any)?.runId ?? "");
+    assert(cycleRunId.length > 0, "runCycle did not return runId");
+
+    const cyclesRes = await trpc.admin.marketingAgents.listCycles.query({ limit: 25 });
+    const rows = (cyclesRes as any)?.rows ?? [];
+    const row = rows.find((r: any) => String(r?.id ?? "") === cycleRunId);
+    assert(row, `runCycle row ${cycleRunId} not found in listCycles`);
+    const meta = (row as any)?.meta ?? {};
+    assert(meta?.parallelCompare === true || meta?.parallelComparison?.enabled === true, "parallel compare metadata missing");
+  });
+
   return finish(0);
 
   function finish(code: number): void {
@@ -262,6 +296,7 @@ async function main(): Promise<void> {
     if (inboxId) console.log(`Inbox ID: ${inboxId}`);
     if (feedbackId) console.log(`Feedback ID: ${feedbackId}`);
     if (proposalId) console.log(`Proposal ID: ${proposalId}`);
+    if (cycleRunId) console.log(`Cycle Run ID: ${cycleRunId}`);
     console.log("=".repeat(68));
     process.exit(code);
   }
@@ -271,4 +306,3 @@ main().catch((err) => {
   console.error("Fatal:", err);
   process.exit(1);
 });
-
