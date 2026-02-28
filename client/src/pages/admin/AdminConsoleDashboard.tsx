@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+﻿import { useMemo } from "react";
 import { useLocation } from "wouter";
 import { AdminLayout } from "../../components/AdminLayout";
 import { AlertCircle, CheckCircle, Clock, MessageSquare, Play, Zap } from "../../components/Icons";
@@ -27,8 +27,8 @@ export default function AdminConsoleDashboard() {
   return (
     <AdminLayout>
       <div className="mb-6">
-        <h1 className="text-3xl font-bold leading-tight text-foreground">Operator Console</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Live health, runs, approvals, and artifacts</p>
+        <h1 className="text-3xl font-bold leading-tight text-foreground">Assistant Console</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Live health, conversations, approvals, and files</p>
       </div>
 
       <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -40,7 +40,7 @@ export default function AdminConsoleDashboard() {
           tone={runtime?.status === "healthy" ? "success" : "danger"}
         />
         <MetricCard
-          label="Active Runs"
+          label="Active Conversations"
           value={String(activeRuns)}
           description={`${runs.length} total loaded`}
           icon={<Play size={16} />}
@@ -49,14 +49,14 @@ export default function AdminConsoleDashboard() {
         <MetricCard
           label="Pending Approvals"
           value={String(approvals.length)}
-          description={approvals.length > 0 ? "Needs operator review" : "No approvals waiting"}
+          description={approvals.length > 0 ? "Needs review" : "No approvals waiting"}
           icon={<AlertCircle size={16} />}
           tone={approvals.length > 0 ? "warn" : "success"}
         />
         <MetricCard
           label="Runtime Response"
           value={responseLabel}
-          description={`Failed runs: ${failedRuns}`}
+          description={`Failed conversations: ${failedRuns}`}
           icon={<Clock size={16} />}
           tone="info"
         />
@@ -64,17 +64,17 @@ export default function AdminConsoleDashboard() {
 
       <div className="mb-6 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
         <ActionButton label="Open Agent Chat" icon={<MessageSquare size={14} />} onClick={() => setLocation("/admin/agent/chat")} primary />
-        <ActionButton label="Open Runs" icon={<Zap size={14} />} onClick={() => setLocation("/admin/console/runs")} />
+        <ActionButton label="Open Sessions" icon={<Zap size={14} />} onClick={() => setLocation("/admin/console/runs")} />
         <ActionButton label="Open Files" icon={<Clock size={14} />} onClick={() => setLocation("/admin/console/files")} />
         <ActionButton label="Open Approvals" icon={<AlertCircle size={14} />} onClick={() => setLocation("/admin/console/approvals")} />
       </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <section className="rounded-lg border border-border bg-background p-6">
-          <h2 className="mb-4 text-lg font-semibold text-foreground">Recent Runs</h2>
-          {runsQuery.isLoading && <StateText label="Loading runs..." />}
-          {runsQuery.error && <StateText label="Failed to load runs." tone="error" />}
-          {!runsQuery.isLoading && !runsQuery.error && runs.length === 0 && <StateText label="No runs available." />}
+          <h2 className="mb-4 text-lg font-semibold text-foreground">Recent Conversations</h2>
+          {runsQuery.isLoading && <StateText label="Loading conversations..." />}
+          {runsQuery.error && <StateText label="Could not load conversations." tone="error" />}
+          {!runsQuery.isLoading && !runsQuery.error && runs.length === 0 && <StateText label="No conversations available." />}
           {runs.slice(0, 8).map((run) => (
             <button
               key={run.id}
@@ -82,7 +82,7 @@ export default function AdminConsoleDashboard() {
               className="mb-2 w-full rounded-lg border border-border bg-secondary p-3 text-left hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="text-sm font-semibold text-foreground">Run #{run.id}</span>
+                <span className="text-sm font-semibold text-foreground">Conversation #{run.id}</span>
                 <StatusBadge status={run.status} />
               </div>
               <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{run.goal ?? "No goal provided"}</p>
@@ -92,7 +92,7 @@ export default function AdminConsoleDashboard() {
         </section>
 
         <section className="rounded-lg border border-border bg-background p-6">
-          <h2 className="mb-4 text-lg font-semibold text-foreground">Approvals + Artifacts</h2>
+          <h2 className="mb-4 text-lg font-semibold text-foreground">Approvals + Files</h2>
 
           <h3 className="mb-2 text-sm font-medium text-foreground">Pending Approvals</h3>
           {approvalsQuery.isLoading && <StateText label="Loading approvals..." />}
@@ -105,14 +105,14 @@ export default function AdminConsoleDashboard() {
             </div>
           ))}
 
-          <h3 className="mb-2 mt-4 text-sm font-medium text-foreground">Recent Artifacts</h3>
-          {artifactsQuery.isLoading && <StateText label="Loading artifacts..." />}
-          {artifactsQuery.error && <StateText label="Failed to load artifacts." tone="error" />}
-          {!artifactsQuery.isLoading && !artifactsQuery.error && artifacts.length === 0 && <StateText label="No artifacts available." />}
+          <h3 className="mb-2 mt-4 text-sm font-medium text-foreground">Recent Files</h3>
+          {artifactsQuery.isLoading && <StateText label="Loading files..." />}
+          {artifactsQuery.error && <StateText label="Could not load files." tone="error" />}
+          {!artifactsQuery.isLoading && !artifactsQuery.error && artifacts.length === 0 && <StateText label="No files available." />}
           {artifacts.slice(0, 5).map((artifact) => (
             <div key={artifact.id} className="mb-2 rounded-md border border-border bg-secondary p-3">
               <div className="text-sm font-medium text-foreground">{artifact.filename}</div>
-              <div className="text-xs text-muted-foreground">{artifact.type} � {formatDate(artifact.createdAt)}</div>
+              <div className="text-xs text-muted-foreground">{artifact.type} • {formatDate(artifact.createdAt)}</div>
             </div>
           ))}
         </section>
@@ -204,3 +204,4 @@ function formatDate(value: Date | string | null | undefined) {
   if (Number.isNaN(d.getTime())) return "n/a";
   return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
 }
+

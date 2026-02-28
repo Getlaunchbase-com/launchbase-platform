@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+ï»¿import { useMemo, useState } from "react";
 import { AdminLayout } from "../../components/AdminLayout";
 import { Download, Eye, Upload } from "../../components/Icons";
 import { trpc } from "../../lib/trpc";
@@ -69,7 +69,7 @@ export default function AdminConsoleFiles() {
     <AdminLayout>
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-foreground">Files</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Uploads and generated artifacts with direct actions</p>
+        <p className="mt-1 text-sm text-muted-foreground">Uploads and generated files with direct actions</p>
       </div>
 
       <section className="mb-4 rounded-lg border border-border border-dashed bg-secondary p-6">
@@ -111,7 +111,7 @@ export default function AdminConsoleFiles() {
             >
               <option value="all">All</option>
               <option value="uploads">Uploads</option>
-              <option value="artifacts">Artifacts</option>
+              <option value="artifacts">Generated Files</option>
             </select>
             <button
               onClick={onUploadNow}
@@ -149,10 +149,10 @@ export default function AdminConsoleFiles() {
 
       {(typeFilter === "all" || typeFilter === "artifacts") && (
         <section className="rounded-lg border border-border bg-background p-6">
-          <h2 className="mb-3 text-lg font-semibold text-foreground">Generated Artifacts</h2>
-          {artifactsQuery.isLoading && <StateText label="Loading artifacts..." />}
-          {artifactsQuery.error && <StateText label="Failed to load artifacts." tone="error" />}
-          {!artifactsQuery.isLoading && !artifactsQuery.error && generated.length === 0 && <StateText label="No generated artifacts found." />}
+          <h2 className="mb-3 text-lg font-semibold text-foreground">Generated Files</h2>
+          {artifactsQuery.isLoading && <StateText label="Loading files..." />}
+          {artifactsQuery.error && <StateText label="Could not load files." tone="error" />}
+          {!artifactsQuery.isLoading && !artifactsQuery.error && generated.length === 0 && <StateText label="No generated files found." />}
           {generated.map((file) => (
             <FileRow key={file.id} file={file} />
           ))}
@@ -180,7 +180,7 @@ function FileRow({
       <div>
         <p className="text-sm font-medium text-foreground">{file.filename}</p>
         <p className="text-xs text-muted-foreground">
-          {file.type} • {formatBytes(file.sizeBytes ?? 0)} • {formatDate(file.createdAt)}
+          {file.type} â€¢ {formatBytes(file.sizeBytes ?? 0)} â€¢ {formatDate(file.createdAt)}
         </p>
       </div>
 
@@ -223,3 +223,4 @@ function formatBytes(size: number) {
   if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
   return `${(size / (1024 * 1024)).toFixed(1)} MB`;
 }
+

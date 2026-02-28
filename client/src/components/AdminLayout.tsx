@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
 import {
   Brain,
@@ -16,9 +16,9 @@ import {
 
 const navItems = [
   { href: "/admin/console", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/agent/chat", label: "Agent Chat", icon: MessageSquare },
+  { href: "/admin/agent/chat", label: "Assistant Chat", icon: MessageSquare },
   { href: "/admin/console/marketing-agents", label: "Marketing Agents", icon: Zap },
-  { href: "/admin/console/runs", label: "Runs", icon: ListTodo },
+  { href: "/admin/console/runs", label: "Sessions", icon: ListTodo },
   { href: "/admin/console/approvals", label: "Approvals", icon: CheckSquare },
   { href: "/admin/console/files", label: "Files", icon: FileText },
   { href: "/admin/console/tools", label: "Tools", icon: Wrench },
@@ -55,7 +55,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
   const routeTitle = useMemo(() => {
     const hit = navItems.find((n) => location === n.href || location.startsWith(n.href + "/"));
-    return hit?.label ?? "Operator Console";
+    return hit?.label ?? "Assistant Console";
   }, [location]);
 
   const sidebarVisible = !isMobile || mobileOpen;
@@ -92,7 +92,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             </div>
             <div>
               <div style={{ fontSize: 14, fontWeight: 700 }}>LaunchBase</div>
-              <div style={{ fontSize: 11, color: "#8e9199" }}>OperatorOS</div>
+              <div style={{ fontSize: 11, color: "#8e9199" }}>Assistant Stack</div>
             </div>
           </div>
           {isMobile && (
