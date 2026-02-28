@@ -7,6 +7,7 @@ export default function AdminConsoleMarketingAgents() {
   const instancesQ = trpc.admin.agentInstances.list.useQuery({}, { retry: false });
   const flagsQ = trpc.admin.marketingAgents.getFeatureFlags.useQuery(undefined, { retry: false });
   const cyclesQ = trpc.admin.marketingAgents.listCycles.useQuery({ limit: 20 }, { retry: false });
+  const scoreQ = trpc.admin.marketingAgents.getScorecard.useQuery({ days: 14 }, { retry: false });
   const instances = (instancesQ.data as any)?.instances ?? [];
   const [expandedAgent, setExpandedAgent] = useState<number | null>(null);
   const [vertical, setVertical] = useState<
@@ -210,6 +211,76 @@ export default function AdminConsoleMarketingAgents() {
                   </div>
                 );
               })}
+            </div>
+          )}
+        </div>
+
+        <div
+          style={{
+            marginBottom: "24px",
+            padding: "16px",
+            border: "1px solid #333",
+            borderRadius: "8px",
+            backgroundColor: "#111",
+          }}
+        >
+          <div style={{ fontSize: "14px", fontWeight: "600", marginBottom: "10px", color: "#e0e0e0" }}>
+            Engine Scorecard (Last 14 Days)
+          </div>
+          {scoreQ.isLoading ? (
+            <div style={{ color: "#777", fontSize: "12px" }}>Loading scorecard...</div>
+          ) : !(scoreQ.data as any)?.ok ? (
+            <div style={{ color: "#ef4444", fontSize: "12px" }}>Scorecard unavailable.</div>
+          ) : (
+            <div style={{ display: "grid", gap: "10px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: "8px" }}>
+                {[
+                  { label: "Total Runs", value: (scoreQ.data as any).totals.runs },
+                  { label: "Success", value: (scoreQ.data as any).totals.success },
+                  { label: "Failed", value: (scoreQ.data as any).totals.failed },
+                  { label: "Queued", value: (scoreQ.data as any).totals.queued },
+                ].map((item) => (
+                  <div key={item.label} style={{ border: "1px solid #2b2b2b", borderRadius: "6px", padding: "10px", background: "#0d0d0d" }}>
+                    <div style={{ fontSize: "11px", color: "#888" }}>{item.label}</div>
+                    <div style={{ fontSize: "18px", fontWeight: 700, color: "#e6e6e6" }}>{item.value}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ border: "1px solid #2b2b2b", borderRadius: "6px", overflow: "hidden" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
+                  <thead>
+                    <tr style={{ background: "#0b0b0b", color: "#999" }}>
+                      <th style={{ textAlign: "left", padding: "8px 10px" }}>Engine</th>
+                      <th style={{ textAlign: "right", padding: "8px 10px" }}>Runs</th>
+                      <th style={{ textAlign: "right", padding: "8px 10px" }}>Success %</th>
+                      <th style={{ textAlign: "right", padding: "8px 10px" }}>Research</th>
+                      <th style={{ textAlign: "right", padding: "8px 10px" }}>Execute</th>
+                      <th style={{ textAlign: "right", padding: "8px 10px" }}>Guardrail %</th>
+                      <th style={{ textAlign: "right", padding: "8px 10px" }}>Avg Cost</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {((scoreQ.data as any).byEngine ?? []).map((r: any) => {
+                      const successPct = `${Math.round((r.successRate ?? 0) * 100)}%`;
+                      const guardrailPct =
+                        r.guardrailPassRate == null ? "n/a" : `${Math.round(r.guardrailPassRate * 100)}%`;
+                      const avgCost = r.avgCostUsd == null ? "n/a" : `$${Number(r.avgCostUsd).toFixed(3)}`;
+                      return (
+                        <tr key={r.engine} style={{ borderTop: "1px solid #1f1f1f", color: "#d0d0d0" }}>
+                          <td style={{ padding: "8px 10px", fontWeight: 600 }}>{r.engine}</td>
+                          <td style={{ padding: "8px 10px", textAlign: "right" }}>{r.total}</td>
+                          <td style={{ padding: "8px 10px", textAlign: "right" }}>{successPct}</td>
+                          <td style={{ padding: "8px 10px", textAlign: "right" }}>{r.research}</td>
+                          <td style={{ padding: "8px 10px", textAlign: "right" }}>{r.execute}</td>
+                          <td style={{ padding: "8px 10px", textAlign: "right" }}>{guardrailPct}</td>
+                          <td style={{ padding: "8px 10px", textAlign: "right" }}>{avgCost}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>

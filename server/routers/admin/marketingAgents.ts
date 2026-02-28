@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { desc } from "drizzle-orm";
+import { desc, gte } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { router, adminProcedure } from "../../_core/trpc";
 import { getDb } from "../../db";
@@ -110,5 +110,71 @@ export const marketingAgentsRouter = router({
         .limit(input.limit);
 
       return { ok: true as const, rows };
+    }),
+
+  getScorecard: adminProcedure
+    .input(
+      z.object({
+        days: z.number().int().min(1).max(90).default(14),
+      })
+    )
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      const since = new Date(Date.now() - input.days * 24 * 60 * 60 * 1000);
+      const rows = await db
+        .select()
+        .from(marketingRunLog)
+        .where(gte(marketingRunLog.startedAt, since))
+        .orderBy(desc(marketingRunLog.startedAt))
+        .limit(2000);
+
+      type EngineKey = "standard" | "pi-sandbox" | "obliterated-sandbox";
+      const engines: EngineKey[] = ["standard", "pi-sandbox", "obliterated-sandbox"];
+
+      const byEngine = engines.map((engine) => {
+        const set = rows.filter((r) => ((r.meta as any)?.engine ?? r.agent) === engine);
+        const total = set.length;
+        const queued = set.filter((r) => r.status === "queued").length;
+        const success = set.filter((r) => r.status === "ok" || r.status === "success").length;
+        const failed = set.filter((r) => r.status === "failed").length;
+        const research = set.filter((r) => (r.meta as any)?.mode === "research").length;
+        const execute = set.filter((r) => (r.meta as any)?.mode === "execute").length;
+        const guardrailPass = set.filter((r) => (r.meta as any)?.guardrailPass === true).length;
+        const guardrailChecked = set.filter((r) => typeof (r.meta as any)?.guardrailPass === "boolean").length;
+        const costValues = set
+          .map((r) => Number((r.meta as any)?.costUsd))
+          .filter((n) => Number.isFinite(n) && n >= 0);
+        const avgCostUsd =
+          costValues.length > 0 ? costValues.reduce((a, b) => a + b, 0) / costValues.length : null;
+        return {
+          engine,
+          total,
+          queued,
+          success,
+          failed,
+          successRate: total > 0 ? success / total : 0,
+          research,
+          execute,
+          guardrailPass,
+          guardrailChecked,
+          guardrailPassRate: guardrailChecked > 0 ? guardrailPass / guardrailChecked : null,
+          avgCostUsd,
+        };
+      });
+
+      return {
+        ok: true as const,
+        windowDays: input.days,
+        generatedAt: new Date().toISOString(),
+        totals: {
+          runs: rows.length,
+          success: rows.filter((r) => r.status === "ok" || r.status === "success").length,
+          failed: rows.filter((r) => r.status === "failed").length,
+          queued: rows.filter((r) => r.status === "queued").length,
+        },
+        byEngine,
+      };
     }),
 });
