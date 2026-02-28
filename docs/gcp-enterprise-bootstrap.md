@@ -29,6 +29,9 @@ Goal: provision Google Cloud once, then drop model/data into buckets and launch 
 - `scripts/gcp/configure_permissions.ps1`
 - `scripts/gcp/marketing_ops_policy.json`
 - `scripts/gcp/bootstrap_marketing_ops.ps1`
+- `scripts/gcp/deploy_marketing_ops_worker.ps1`
+- `scripts/gcp/worker/Dockerfile`
+- `scripts/gcp/worker/main.py`
 
 ## 1) Pre-reqs
 
@@ -119,16 +122,31 @@ powershell -ExecutionPolicy Bypass -File scripts\gcp\bootstrap_marketing_ops.ps1
 
 Default policy timezone: `America/Chicago`.
 
-## 8) Monitor
+## 8) Deploy Marketing Ops Worker (Cloud Run)
+
+This deploys a worker service and wires Pub/Sub subscriptions to push messages.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\gcp\deploy_marketing_ops_worker.ps1 -ConfigPath ".\scripts\gcp\launchbase_gcp.env"
+```
+
+Dry run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\gcp\deploy_marketing_ops_worker.ps1 -ConfigPath ".\scripts\gcp\launchbase_gcp.env" -DryRun
+```
+
+## 9) Monitor
 
 ```powershell
 gcloud.cmd ai custom-jobs list --region us-central1 --project <PROJECT_ID>
 gcloud.cmd ai custom-jobs stream-logs <JOB_ID> --region us-central1 --project <PROJECT_ID>
 gcloud.cmd scheduler jobs list --location us-central1 --project <PROJECT_ID>
 gcloud.cmd pubsub topics list --project <PROJECT_ID>
+gcloud.cmd run services list --region us-central1 --project <PROJECT_ID>
 ```
 
-## 9) Secrets
+## 10) Secrets
 
 Bootstrap creates placeholder versions (`CHANGE_ME`) for each configured secret name.
 
@@ -146,7 +164,7 @@ Recommended first secrets:
 - `meta-ads-access-token`
 - `hubspot-api-key`
 
-## 10) Marketing Department Agent Pattern (Cloud)
+## 11) Marketing Department Agent Pattern (Cloud)
 
 Use Vertex for model execution and BigQuery for measurement:
 
@@ -158,7 +176,7 @@ Use Vertex for model execution and BigQuery for measurement:
 
 All external actions require Launchbase approval gates.
 
-## 11) Handoff Checklist
+## 12) Handoff Checklist
 
 1. Bootstrap script completed without failures
 2. Buckets and datasets visible
@@ -168,6 +186,7 @@ All external actions require Launchbase approval gates.
 6. Artifacts written to artifacts bucket
 7. Launchbase platform health + smoke tests green
 8. Off-peak scheduler jobs exist and are enabled
+9. Cloud Run marketing worker deployed and healthy
 
 ## Notes
 

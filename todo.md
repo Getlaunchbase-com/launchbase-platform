@@ -1,5 +1,32 @@
 # LaunchBase TODO
 
+## Tomorrow Checklist (Cloud Marketing Ops)
+
+- [ ] Set ADC quota project:
+  - `gcloud.cmd auth application-default set-quota-project engaged-style-456320-t4`
+- [ ] Add required GCP project `environment` tag (org policy warning)
+- [ ] Replace placeholder secret values (`CHANGE_ME`) with real values:
+  - `aimlapi-key`
+  - `openai-api-key`
+  - `google-ads-dev-token`
+  - `meta-ads-access-token`
+  - `hubspot-api-key`
+  - `resend-api-key`
+- [ ] Build/deploy marketing ops Cloud Run worker:
+  - `powershell -ExecutionPolicy Bypass -File scripts\gcp\deploy_marketing_ops_worker.ps1 -ConfigPath .\scripts\gcp\launchbase_gcp.env.example`
+- [ ] Confirm worker health:
+  - `gcloud.cmd run services list --region us-central1 --project engaged-style-456320-t4`
+- [ ] Confirm scheduler jobs active:
+  - `gcloud.cmd scheduler jobs list --location us-central1 --project engaged-style-456320-t4`
+- [ ] Trigger one manual test publish:
+  - `gcloud.cmd pubsub topics publish lb-marketing-fetch-trends --message "{\"job\":\"fetch-trends\",\"approved\":true}"`
+- [ ] Check logs for successful worker receipt:
+  - `gcloud.cmd logging read "resource.type=cloud_run_revision AND resource.labels.service_name=launchbase-marketing-ops-worker" --limit=50 --project engaged-style-456320-t4`
+- [ ] Upload initial model/data drops:
+  - `gsutil cp <model-file> gs://lb-ai-models-engaged-style-456320-t4-us/models/`
+  - `gsutil cp <dataset-file> gs://lb-ai-data-engaged-style-456320-t4-us/datasets/processed/`
+- [ ] Dry-run Vertex job submission:
+  - `powershell -ExecutionPolicy Bypass -File scripts\gcp\submit_vertex_marketing_job.ps1 -ConfigPath .\scripts\gcp\launchbase_gcp.env.example -DryRun`
 **Status:** ✅ Phase 1 BASELINE TAGGED — Phase 2 Authorized  
 **Version:** a6a0462d (Stable Baseline v1.0)  
 **Last Updated:** January 13, 2026
@@ -6100,3 +6127,4 @@ curl http://AGENT_STACK_HOST:8080/tools
 - [ ] Test approve/reject workflow
 - [ ] Verify hypothesis links back to source signals
 - [ ] Save checkpoint
+
