@@ -24,6 +24,7 @@
     "smoke:swarm-fix": "tsx scripts/smoke/smokeSwarmFix.mjs",
     "smoke:intake": "tsx scripts/smoke/smokeIntakeFlow.mjs",
     "smoke:ui-pressure": "node scripts/smoke/smokeUiPressure.mjs",
+    "smoke:admin-console": "node scripts/smoke/smokeAdminConsoleCoverage.mjs",
     "smoke:marketing-loop": "tsx scripts/smokeMarketingLoop.ts"
   },
   "dependencies": {
