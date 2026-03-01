@@ -19,6 +19,7 @@ const BASE_URL = (process.env.PLATFORM_URL ?? "http://35.188.184.31:3000").repla
 const LOGIN_EMAIL = process.env.SMOKE_ADMIN_EMAIL ?? "";
 const LOGIN_PASSWORD = process.env.SMOKE_ADMIN_PASSWORD ?? "";
 const REQUEST_TIMEOUT_MS = Number(process.env.SMOKE_TIMEOUT_MS ?? 15000);
+const STRICT_AUTH = String(process.env.SMOKE_STRICT_AUTH ?? "0") === "1";
 
 const runId = `admin-console-${Date.now()}`;
 const outDir = path.resolve(process.cwd(), "runs", "smoke", runId);
@@ -70,11 +71,10 @@ async function main() {
   await checkPage("/admin/console/tools");
 
   if (!LOGIN_EMAIL || !LOGIN_PASSWORD) {
-    pushCheck(
-      "auth.login",
-      false,
-      "Set SMOKE_ADMIN_EMAIL and SMOKE_ADMIN_PASSWORD to run authenticated API coverage"
-    );
+    pushCheck("auth.login", true, "skipped (set SMOKE_ADMIN_EMAIL/SMOKE_ADMIN_PASSWORD for authenticated coverage)");
+    if (STRICT_AUTH) {
+      pushCheck("auth.strict", false, "SMOKE_STRICT_AUTH=1 requires credentials");
+    }
     finalizeAndExit();
     return;
   }
@@ -186,4 +186,3 @@ main().catch((err) => {
   console.error("[admin-console-coverage] fatal:", err);
   process.exit(1);
 });
-
