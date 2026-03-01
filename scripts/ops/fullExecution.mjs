@@ -18,6 +18,7 @@ const reportPath = path.join(outDir, `${runId}.json`);
 
 function classify(text) {
   const t = String(text || "");
+  if (/spawnSync .* (EPERM|EACCES|ENOENT|EINVAL)/i.test(t)) return "infra";
   if (/ERR_NAME_NOT_RESOLVED|connect EACCES|fetch failed/i.test(t)) return "infra";
   if (/Unauthorized|HTTP 401/i.test(t)) return "auth";
   return "code";
@@ -33,7 +34,8 @@ function runStep(name, cmd, args, cwd = ROOT) {
   });
   const stdout = String(res.stdout ?? "");
   const stderr = String(res.stderr ?? "");
-  const merged = `${stdout}\n${stderr}`;
+  const errMsg = res.error ? String(res.error.message || res.error) : "";
+  const merged = `${stdout}\n${stderr}\n${errMsg}`;
   const ok = res.status === 0;
   return {
     name,
