@@ -27,7 +27,7 @@ function classify(text) {
 function runStep(name, cmd, args, cwd = ROOT) {
   const res = spawnSync(cmd, args, {
     cwd,
-    shell: false,
+    shell: true,
     encoding: "utf8",
     env: process.env,
     timeout: 10 * 60 * 1000,
