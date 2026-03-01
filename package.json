@@ -25,6 +25,7 @@
     "smoke:intake": "tsx scripts/smoke/smokeIntakeFlow.mjs",
     "smoke:ui-pressure": "node scripts/smoke/smokeUiPressure.mjs",
     "smoke:admin-console": "node scripts/smoke/smokeAdminConsoleCoverage.mjs",
+    "smoke:failure-packet": "node scripts/smoke/generateFailurePacket.mjs",
     "smoke:marketing-loop": "tsx scripts/smokeMarketingLoop.ts"
   },
   "dependencies": {
