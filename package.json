@@ -31,6 +31,7 @@
     "marketing:manage-sources": "node scripts/marketing/manageAgencyCommunityIntel.mjs",
     "marketing:ops-cycle": "node scripts/marketing/runMarketingOpsCycle.mjs",
     "marketing:swarm-improve": "node scripts/marketing/swarmImprovePlan.mjs",
+    "marketing:cli-preflight": "node scripts/marketing/cliPreflight.mjs",
     "smoke:marketing-loop": "tsx scripts/smokeMarketingLoop.ts"
   },
   "dependencies": {
