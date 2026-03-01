@@ -32,6 +32,7 @@
     "marketing:ops-cycle": "node scripts/marketing/runMarketingOpsCycle.mjs",
     "marketing:swarm-improve": "node scripts/marketing/swarmImprovePlan.mjs",
     "marketing:cli-preflight": "node scripts/marketing/cliPreflight.mjs",
+    "ops:full-exec": "node scripts/ops/fullExecution.mjs",
     "smoke:marketing-loop": "tsx scripts/smokeMarketingLoop.ts"
   },
   "dependencies": {
