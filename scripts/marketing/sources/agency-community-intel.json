@@ -1,0 +1,126 @@
+{
+  "generated_for": "launchbase_marketing_agents",
+  "notes": [
+    "Seed list for legal intelligence gathering and pattern extraction.",
+    "Use only public pages, licensed sources, and first-party data.",
+    "Do not collect or store protected/sensitive personal data."
+  ],
+  "top_agencies": [
+    { "name": "Accenture Song", "type": "global_network", "focus": ["experience", "transformation", "performance"] },
+    { "name": "Deloitte Digital", "type": "global_network", "focus": ["digital_transformation", "cx", "analytics"] },
+    { "name": "Publicis Groupe", "type": "holding_company", "focus": ["media", "creative", "data"] },
+    { "name": "Omnicom", "type": "holding_company", "focus": ["creative", "media", "pr"] },
+    { "name": "WPP", "type": "holding_company", "focus": ["media", "creative", "commerce"] },
+    { "name": "Dentsu", "type": "holding_company", "focus": ["media", "digital", "data"] },
+    { "name": "Havas", "type": "holding_company", "focus": ["creative", "media", "health"] },
+    { "name": "Monks", "type": "digital_native", "focus": ["performance", "content", "production"] },
+    { "name": "VaynerMedia", "type": "independent", "focus": ["social", "creative", "brand"] },
+    { "name": "Wieden+Kennedy", "type": "independent", "focus": ["brand", "creative"] },
+    { "name": "R/GA", "type": "network", "focus": ["brand", "innovation", "digital"] },
+    { "name": "BBDO", "type": "network", "focus": ["creative", "brand"] },
+    { "name": "TBWA", "type": "network", "focus": ["creative", "strategy"] },
+    { "name": "DDB", "type": "network", "focus": ["creative", "brand"] },
+    { "name": "Ogilvy", "type": "network", "focus": ["brand", "pr", "performance"] },
+    { "name": "McCann", "type": "network", "focus": ["creative", "global_campaigns"] },
+    { "name": "FCB", "type": "network", "focus": ["creative", "performance"] },
+    { "name": "Droga5", "type": "network", "focus": ["creative", "brand"] },
+    { "name": "Leo Burnett", "type": "network", "focus": ["brand", "creative"] },
+    { "name": "Saatchi & Saatchi", "type": "network", "focus": ["creative", "brand"] },
+    { "name": "AKQA", "type": "network", "focus": ["digital_experience", "innovation"] },
+    { "name": "VML", "type": "network", "focus": ["commerce", "cx", "creative"] },
+    { "name": "Merkle", "type": "network", "focus": ["crm", "performance", "data"] },
+    { "name": "iProspect", "type": "network", "focus": ["search", "performance", "media"] },
+    { "name": "GroupM", "type": "network", "focus": ["media", "measurement"] },
+    { "name": "MediaCom", "type": "network", "focus": ["media", "planning"] },
+    { "name": "Mindshare", "type": "network", "focus": ["media", "strategy"] },
+    { "name": "EssenceMediacom", "type": "network", "focus": ["media", "digital", "measurement"] },
+    { "name": "WebFX", "type": "performance_specialist", "focus": ["seo", "ppc", "web"] },
+    { "name": "Disruptive Advertising", "type": "performance_specialist", "focus": ["ppc", "cro", "paid_social"] }
+  ],
+  "professional_communities": [
+    {
+      "name": "r/marketing",
+      "url": "https://www.reddit.com/r/marketing/",
+      "type": "forum",
+      "collection_method": "manual_or_api_compliant"
+    },
+    {
+      "name": "r/DigitalMarketing",
+      "url": "https://www.reddit.com/r/DigitalMarketing/",
+      "type": "forum",
+      "collection_method": "manual_or_api_compliant"
+    },
+    {
+      "name": "r/digital_marketing",
+      "url": "https://www.reddit.com/r/digital_marketing/",
+      "type": "forum",
+      "collection_method": "manual_or_api_compliant"
+    },
+    {
+      "name": "r/advertising",
+      "url": "https://www.reddit.com/r/advertising/",
+      "type": "forum",
+      "collection_method": "manual_or_api_compliant"
+    },
+    {
+      "name": "r/PPC",
+      "url": "https://www.reddit.com/r/PPC/",
+      "type": "forum",
+      "collection_method": "manual_or_api_compliant"
+    },
+    {
+      "name": "r/SEO",
+      "url": "https://www.reddit.com/r/SEO/",
+      "type": "forum",
+      "collection_method": "manual_or_api_compliant"
+    },
+    {
+      "name": "r/socialmedia",
+      "url": "https://www.reddit.com/r/socialmedia/",
+      "type": "forum",
+      "collection_method": "manual_or_api_compliant"
+    },
+    {
+      "name": "GrowthHackers",
+      "url": "https://growthhackers.com/",
+      "type": "community",
+      "collection_method": "public_content_only"
+    },
+    {
+      "name": "Inbound.org archive and related communities",
+      "url": "https://growth.org/",
+      "type": "community",
+      "collection_method": "public_content_only"
+    },
+    {
+      "name": "CXL community resources",
+      "url": "https://cxl.com/",
+      "type": "education_community",
+      "collection_method": "licensed_or_public_only"
+    },
+    {
+      "name": "Demand Curve resources",
+      "url": "https://www.demandcurve.com/",
+      "type": "education_community",
+      "collection_method": "public_content_only"
+    },
+    {
+      "name": "HubSpot marketing resources",
+      "url": "https://blog.hubspot.com/marketing",
+      "type": "publisher",
+      "collection_method": "public_content_only"
+    }
+  ],
+  "anti_patterns_to_learn": [
+    "vanity_metrics_without_pipeline_impact",
+    "over_targeting_without_message_market_fit",
+    "channel_spend_without_incrementality_test",
+    "creative_without_offer_clarity",
+    "untracked_landing_page_friction",
+    "short_term_lift_with_long_term_brand_damage",
+    "non_compliant_claims_and_deceptive_copy",
+    "audience_fatigue_from_no_frequency_controls",
+    "sales_marketing_misalignment",
+    "failure_to_close_learning_loop"
+  ]
+}

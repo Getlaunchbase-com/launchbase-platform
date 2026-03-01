@@ -27,6 +27,9 @@
     "smoke:admin-console": "node scripts/smoke/smokeAdminConsoleCoverage.mjs",
     "smoke:failure-packet": "node scripts/smoke/generateFailurePacket.mjs",
     "marketing:build-corpus-manifest": "node scripts/marketing/buildMarketingCorpusManifest.mjs",
+    "marketing:build-learning-backlog": "node scripts/marketing/buildAgencyLearningBacklog.mjs",
+    "marketing:manage-sources": "node scripts/marketing/manageAgencyCommunityIntel.mjs",
+    "marketing:ops-cycle": "node scripts/marketing/runMarketingOpsCycle.mjs",
     "smoke:marketing-loop": "tsx scripts/smokeMarketingLoop.ts"
   },
   "dependencies": {
