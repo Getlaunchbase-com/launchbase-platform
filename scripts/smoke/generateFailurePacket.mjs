@@ -41,6 +41,18 @@ const packet = {
     ...((admin?.data?.checks ?? []).filter((c) => String(c.detail || "").includes("skipped"))),
   ],
   recommendations: [],
+  mandatoryQuestions: [
+    "How can we improve this?",
+    "What are we doing wrong?"
+  ],
+  requiredOutputFormat: [
+    "Root cause hypotheses ranked by confidence",
+    "Permanent fix recommendation",
+    "Minimal patch plan",
+    "Verification plan",
+    "Rollback plan",
+    "Residual risks"
+  ]
 };
 
 if (packet.failures.length === 0) {
