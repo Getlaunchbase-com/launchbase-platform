@@ -17,6 +17,7 @@ import { createHash, randomBytes, scryptSync, timingSafeEqual } from "node:crypt
 import { sql } from "drizzle-orm";
 import { and, eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
+import { nanoid } from "nanoid";
 import { env } from "./env";
 import { createContext } from "./trpc";
 import { appRouter } from "../routers/_incoming_routers";
@@ -28,7 +29,10 @@ import {
   projectCollaborators,
   vertexProfiles,
   agentInstances,
+  marketingRunLog,
+  marketingInboxItem,
 } from "../db/schema";
+import { processCycleRun } from "../routers/admin/marketingAgents";
 import {
   validateHandshake,
   getAllContractInfo,
@@ -94,6 +98,58 @@ function parseAdminEmails(raw: string | undefined): Set<string> {
       .map((email) => email.trim().toLowerCase())
       .filter(Boolean)
   );
+}
+
+const OPS_VERTICALS = [
+  "small-business-websites",
+  "quickbooks-integration",
+  "workflow-automation",
+  "agents-apps-automation",
+] as const;
+type OpsVertical = (typeof OPS_VERTICALS)[number];
+const OPS_ENGINES = ["standard", "pi-sandbox", "pi-coder-sandbox"] as const;
+type OpsEngine = (typeof OPS_ENGINES)[number];
+
+function ensureOpsAuth(req: express.Request, res: express.Response): boolean {
+  const token = String(process.env.MARKETING_OPS_TOKEN ?? "").trim();
+  if (!token) return true;
+  const got = String(req.headers["x-ops-token"] ?? "").trim();
+  if (!got || !secureStringEquals(got, token)) {
+    res.status(401).json({ ok: false, error: "UNAUTHORIZED_OPS" });
+    return false;
+  }
+  return true;
+}
+
+async function queueOpsRun(input: {
+  db: NonNullable<Awaited<ReturnType<typeof getDb>>>;
+  vertical: OpsVertical;
+  engine: OpsEngine;
+  mode: "research" | "execute";
+  notes: string;
+  parallelCompare?: boolean;
+}) {
+  const runId = nanoid(16);
+  const now = new Date();
+  await input.db.insert(marketingRunLog).values({
+    id: runId,
+    agent: input.engine,
+    job: "vertical_learning_cycle",
+    status: "queued",
+    message: `Cycle queued (${input.mode}) for ${input.vertical}`,
+    meta: {
+      vertical: input.vertical,
+      engine: input.engine,
+      mode: input.mode,
+      source: "ops_marketing_http",
+      notes: input.notes,
+      lane: input.engine === "standard" ? "main-8b-governed" : "sandbox-8b-isolated",
+      parallelCompare: input.parallelCompare === true,
+    },
+    startedAt: now,
+    finishedAt: now,
+  });
+  return runId;
 }
 
 function secureStringEquals(a: string, b: string): boolean {
@@ -718,6 +774,189 @@ app.get("/api/blueprint-page-image", (req, res) => {
           : "application/octet-stream";
   res.setHeader("Content-Type", contentType);
   fs.createReadStream(filePath).pipe(res);
+});
+
+app.post("/ops/marketing/scrub", async (req, res) => {
+  try {
+    if (!ensureOpsAuth(req, res)) return;
+    const db = await getDb();
+    if (!db) return res.status(503).json({ ok: false, error: "DB_UNAVAILABLE" });
+
+    const verticals = Array.isArray(req.body?.verticals)
+      ? (req.body.verticals as string[]).filter((v) => OPS_VERTICALS.includes(v as OpsVertical))
+      : [...OPS_VERTICALS];
+    const queued: string[] = [];
+
+    for (const vertical of verticals as OpsVertical[]) {
+      const runId = await queueOpsRun({
+        db,
+        vertical,
+        engine: "standard",
+        mode: "research",
+        notes: "ops/scrub daily enqueue",
+        parallelCompare: true,
+      });
+      queued.push(runId);
+    }
+
+    res.json({ ok: true, queuedCount: queued.length, runIds: queued });
+  } catch (err: any) {
+    console.error("[ops/marketing/scrub] failed:", err);
+    res.status(500).json({ ok: false, error: String(err?.message ?? err) });
+  }
+});
+
+app.post("/ops/marketing/score", async (req, res) => {
+  try {
+    if (!ensureOpsAuth(req, res)) return;
+    const db = await getDb();
+    if (!db) return res.status(503).json({ ok: false, error: "DB_UNAVAILABLE" });
+
+    const limit = Math.max(1, Math.min(200, Number(req.body?.limit ?? 50)));
+    const queued = await db
+      .select({ id: marketingRunLog.id })
+      .from(marketingRunLog)
+      .where(and(eq(marketingRunLog.job, "vertical_learning_cycle"), eq(marketingRunLog.status, "queued")))
+      .limit(limit);
+
+    const results: Array<{ runId: string; ok: boolean; error?: string }> = [];
+    for (const row of queued) {
+      try {
+        await processCycleRun(db, row.id);
+        results.push({ runId: row.id, ok: true });
+      } catch (err: any) {
+        results.push({ runId: row.id, ok: false, error: String(err?.message ?? err) });
+      }
+    }
+
+    res.json({ ok: true, processed: results.length, results });
+  } catch (err: any) {
+    console.error("[ops/marketing/score] failed:", err);
+    res.status(500).json({ ok: false, error: String(err?.message ?? err) });
+  }
+});
+
+app.post("/ops/marketing/eval", async (req, res) => {
+  try {
+    if (!ensureOpsAuth(req, res)) return;
+    const db = await getDb();
+    if (!db) return res.status(503).json({ ok: false, error: "DB_UNAVAILABLE" });
+
+    const now = new Date();
+    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const rows = await db
+      .select()
+      .from(marketingRunLog)
+      .where(eq(marketingRunLog.job, "vertical_learning_cycle"))
+      .limit(2000);
+
+    const recent = rows.filter((r) => new Date(r.startedAt).getTime() >= since.getTime());
+    const okCount = recent.filter((r) => r.status === "ok" || r.status === "success").length;
+    const failCount = recent.filter((r) => r.status === "failed").length;
+    const queuedCount = recent.filter((r) => r.status === "queued").length;
+    const successRate = recent.length > 0 ? okCount / recent.length : 0;
+
+    const decision = successRate >= 0.75 && failCount <= 2 ? "promote_candidate" : "hold_candidate";
+    const summary = `weekly_eval successRate=${successRate.toFixed(2)} ok=${okCount} failed=${failCount} queued=${queuedCount} decision=${decision}`;
+
+    await db.insert(marketingInboxItem).values({
+      id: nanoid(16),
+      status: "new",
+      priority: decision === "promote_candidate" ? "high" : "normal",
+      score: Math.round(successRate * 100),
+      title: "Marketing eval decision",
+      source: "ops_marketing_eval",
+      sourceKey: now.toISOString().slice(0, 10),
+      summary,
+      payload: { successRate, okCount, failCount, queuedCount, decision },
+    });
+
+    res.json({ ok: true, successRate, okCount, failCount, queuedCount, decision });
+  } catch (err: any) {
+    console.error("[ops/marketing/eval] failed:", err);
+    res.status(500).json({ ok: false, error: String(err?.message ?? err) });
+  }
+});
+
+app.post("/ops/marketing/dashboard-refresh", async (req, res) => {
+  try {
+    if (!ensureOpsAuth(req, res)) return;
+    const db = await getDb();
+    if (!db) return res.status(503).json({ ok: false, error: "DB_UNAVAILABLE" });
+    const windowDays = Math.max(1, Math.min(60, Number(req.body?.windowDays ?? 7)));
+    const since = new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000);
+    const rows = await db.select().from(marketingRunLog).limit(5000);
+    const recent = rows.filter((r) => new Date(r.startedAt).getTime() >= since.getTime());
+    const byEngine = OPS_ENGINES.map((engine) => {
+      const set = recent.filter((r) => ((r.meta as any)?.engine ?? r.agent) === engine);
+      const ok = set.filter((r) => r.status === "ok" || r.status === "success").length;
+      return { engine, total: set.length, ok, successRate: set.length ? ok / set.length : 0 };
+    });
+    res.json({ ok: true, windowDays, totalRuns: recent.length, byEngine });
+  } catch (err: any) {
+    console.error("[ops/marketing/dashboard-refresh] failed:", err);
+    res.status(500).json({ ok: false, error: String(err?.message ?? err) });
+  }
+});
+
+app.post("/ops/marketing/benchmark-refresh", async (req, res) => {
+  try {
+    if (!ensureOpsAuth(req, res)) return;
+    const db = await getDb();
+    if (!db) return res.status(503).json({ ok: false, error: "DB_UNAVAILABLE" });
+    const maxCases = Math.max(20, Math.min(200, Number(req.body?.maxCases ?? 100)));
+
+    // Queue one focused research run per vertical to refresh benchmark candidates.
+    const queued: string[] = [];
+    for (const vertical of OPS_VERTICALS) {
+      const runId = await queueOpsRun({
+        db,
+        vertical,
+        engine: "standard",
+        mode: "research",
+        notes: `ops/benchmark refresh maxCases=${maxCases}`,
+        parallelCompare: true,
+      });
+      queued.push(runId);
+    }
+    res.json({ ok: true, queuedCount: queued.length, runIds: queued, maxCases });
+  } catch (err: any) {
+    console.error("[ops/marketing/benchmark-refresh] failed:", err);
+    res.status(500).json({ ok: false, error: String(err?.message ?? err) });
+  }
+});
+
+app.post("/ops/marketing/monthly-review", async (req, res) => {
+  try {
+    if (!ensureOpsAuth(req, res)) return;
+    const db = await getDb();
+    if (!db) return res.status(503).json({ ok: false, error: "DB_UNAVAILABLE" });
+    const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const rows = await db.select().from(marketingRunLog).limit(10000);
+    const recent = rows.filter((r) => new Date(r.startedAt).getTime() >= since.getTime());
+    const ok = recent.filter((r) => r.status === "ok" || r.status === "success").length;
+    const failed = recent.filter((r) => r.status === "failed").length;
+    const queued = recent.filter((r) => r.status === "queued").length;
+    const successRate = recent.length ? ok / recent.length : 0;
+    const summary = `monthly_review runs=${recent.length} ok=${ok} failed=${failed} queued=${queued} successRate=${successRate.toFixed(2)}`;
+
+    await db.insert(marketingInboxItem).values({
+      id: nanoid(16),
+      status: "new",
+      priority: "high",
+      score: Math.round(successRate * 100),
+      title: "Monthly marketing AI review",
+      source: "ops_marketing_monthly_review",
+      sourceKey: new Date().toISOString().slice(0, 7),
+      summary,
+      payload: { runs: recent.length, ok, failed, queued, successRate, createTicket: Boolean(req.body?.createTicket) },
+    });
+
+    res.json({ ok: true, runs: recent.length, okCount: ok, failed, queued, successRate });
+  } catch (err: any) {
+    console.error("[ops/marketing/monthly-review] failed:", err);
+    res.status(500).json({ ok: false, error: String(err?.message ?? err) });
+  }
 });
 
 app.use(

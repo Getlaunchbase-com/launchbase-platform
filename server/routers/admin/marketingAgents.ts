@@ -178,7 +178,7 @@ async function callPiSandbox(input: {
   }
 }
 
-async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: string) {
+export async function processCycleRun(db: Awaited<ReturnType<typeof getDb>>, runId: string) {
   if (!db) throw new Error("Database not available");
   const [run] = await db
     .select()
