@@ -106,6 +106,11 @@ function toolOk(payload) {
   return true;
 }
 
+function payloadHasDnsError(payload) {
+  const text = JSON.stringify(payload ?? {});
+  return /ERR_NAME_NOT_RESOLVED/i.test(text);
+}
+
 async function runBrowserFlow(
   label,
   url,
@@ -124,6 +129,10 @@ async function runBrowserFlow(
       url,
     });
     if (!toolOk(gotoRes)) {
+      if (allowDnsSkip && payloadHasDnsError(gotoRes)) {
+        pushSkip(`${label}: flow`, "skipped-dns (public hostname not resolvable from runner)");
+        return;
+      }
       pushCheck(`${label}: browser_goto`, false, JSON.stringify(gotoRes));
       return;
     }
