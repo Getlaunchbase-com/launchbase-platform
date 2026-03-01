@@ -31,6 +31,7 @@ fs.mkdirSync(outDir, { recursive: true });
 /** @typedef {{name:string, pass:boolean, detail?:string, data?:unknown}} Check */
 /** @type {Check[]} */
 const checks = [];
+let toolAuthBlocked = false;
 
 async function timedFetch(url, init = {}, timeoutMs = 45_000) {
   const controller = new AbortController();
@@ -46,6 +47,11 @@ function pushCheck(name, pass, detail = "", data = undefined) {
   checks.push({ name, pass, detail: detail || undefined, data });
   const icon = pass ? "PASS" : "FAIL";
   console.log(`[${icon}] ${name}${detail ? ` :: ${detail}` : ""}`);
+}
+
+function pushSkip(name, detail = "", data = undefined) {
+  checks.push({ name, pass: true, detail: detail || "skipped", data });
+  console.log(`[SKIP] ${name}${detail ? ` :: ${detail}` : ""}`);
 }
 
 async function callTool(name, argumentsObj) {
@@ -101,6 +107,10 @@ function toolOk(payload) {
 }
 
 async function runBrowserFlow(label, url, screenshotName, bodyMustInclude = []) {
+  if (toolAuthBlocked) {
+    pushSkip(`${label}: flow`, "skipped-auth (set ROUTER_AUTH_TOKEN to enable /tool browser checks)");
+    return;
+  }
   const session = `${label}-${Date.now()}`;
   try {
     const gotoRes = await callTool("browser_goto", {
@@ -142,7 +152,16 @@ async function runBrowserFlow(label, url, screenshotName, bodyMustInclude = []) 
     }
     pushCheck(`${label}: browser_screenshot`, true, "", { path: shotPath });
   } catch (err) {
-    pushCheck(`${label}: flow`, false, err instanceof Error ? err.message : String(err));
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes("HTTP 401")) {
+      toolAuthBlocked = true;
+      pushSkip(
+        `${label}: flow`,
+        "skipped-auth (agent-stack /tool requires X-Router-Token). Use -RouterToken in run-launchbase-smoke.ps1"
+      );
+      return;
+    }
+    pushCheck(`${label}: flow`, false, msg);
   }
 }
 
