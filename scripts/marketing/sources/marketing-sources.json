@@ -1,0 +1,52 @@
+{
+  "sources": [
+    {
+      "id": "lb-first-party-analytics",
+      "source_url": "first_party://launchbase/analytics",
+      "license_type": "first_party",
+      "vertical": "small_business_services",
+      "segment": "owner_operator",
+      "channel": "multi",
+      "intent_stage": "all",
+      "content_type": "case_study",
+      "priority": 100,
+      "notes": "Primary learning source from real campaign outcomes."
+    },
+    {
+      "id": "lb-first-party-crm",
+      "source_url": "first_party://launchbase/crm",
+      "license_type": "first_party",
+      "vertical": "small_business_services",
+      "segment": "owner_operator",
+      "channel": "email_sms",
+      "intent_stage": "mid_bottom",
+      "content_type": "case_study",
+      "priority": 95,
+      "notes": "Use lead->meeting->close funnel progression."
+    },
+    {
+      "id": "public-domain-marketing-history",
+      "source_url": "public_domain://marketing-history-corpus",
+      "license_type": "public_domain",
+      "vertical": "general",
+      "segment": "all",
+      "channel": "multi",
+      "intent_stage": "all",
+      "content_type": "principle",
+      "priority": 80,
+      "notes": "Historical principles and anti-pattern extraction."
+    },
+    {
+      "id": "licensed-professional-playbooks",
+      "source_url": "licensed://professional-marketing-playbooks",
+      "license_type": "licensed_commercial",
+      "vertical": "general",
+      "segment": "all",
+      "channel": "multi",
+      "intent_stage": "all",
+      "content_type": "playbook",
+      "priority": 85,
+      "notes": "Only ingest with active licensing records."
+    }
+  ]
+}
