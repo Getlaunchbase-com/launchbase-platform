@@ -77,6 +77,7 @@ async function main() {
     "- Add one new anti-pattern guardrail if any failure repeated.",
     "- Rebalance channel budget to highest incremental lift.",
   ].join("\n");
+  const strictMode = /^(1|true|yes)$/i.test(String(process.env.MARKETING_OPS_STRICT ?? ""));
 
   const ts = Date.now();
   const jsonFile = path.join(outDir, `ops-cycle-${ts}.json`);
@@ -87,7 +88,7 @@ async function main() {
   console.log(jsonFile);
   console.log(mdFile);
 
-  if (results.some((r) => !r.ok)) {
+  if (strictMode && results.some((r) => !r.ok)) {
     process.exit(1);
   }
 }

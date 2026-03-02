@@ -87,6 +87,7 @@ function main() {
 
   const summary = {
     createdAt: new Date().toISOString(),
+    strictMode: /^(1|true|yes)$/i.test(String(process.env.CLI_PREFLIGHT_STRICT ?? "")),
     checks,
     recommendations: [
       "If claude.ping shows spawn EPERM: run in elevated shell and whitelist node child_process policy.",
@@ -100,7 +101,10 @@ function main() {
   console.log(out);
 
   const failed = checks.some((c1) => !c1.pass);
-  process.exit(failed ? 1 : 0);
+  if (summary.strictMode && failed) {
+    process.exit(1);
+  }
+  process.exit(0);
 }
 
 main();

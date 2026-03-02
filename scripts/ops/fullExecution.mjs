@@ -71,6 +71,12 @@ const steps = [
     cwd: ROOT,
   },
   {
+    name: "marketing-build-fine-tune-pack",
+    cmd: "npm.cmd",
+    args: ["run", "marketing:build-fine-tune-pack"],
+    cwd: ROOT,
+  },
+  {
     name: "marketing-cli-preflight",
     cmd: "npm.cmd",
     args: ["run", "marketing:cli-preflight"],
