@@ -47,6 +47,78 @@
       "content_type": "playbook",
       "priority": 85,
       "notes": "Only ingest with active licensing records."
+    },
+    {
+      "id": "google-scholar-marketing",
+      "source_url": "public_index://scholar.google.com/marketing",
+      "license_type": "metadata_only",
+      "vertical": "general",
+      "segment": "all",
+      "channel": "research",
+      "intent_stage": "all",
+      "content_type": "phd_paper",
+      "priority": 90,
+      "notes": "Ingest citation metadata + abstracts where permitted; no full-text rights violations."
+    },
+    {
+      "id": "ssrn-marketing-papers",
+      "source_url": "public_index://ssrn.com/marketing",
+      "license_type": "metadata_only",
+      "vertical": "general",
+      "segment": "all",
+      "channel": "research",
+      "intent_stage": "all",
+      "content_type": "whitepaper",
+      "priority": 88,
+      "notes": "Use abstract-level extraction unless license allows full text."
+    },
+    {
+      "id": "reddit-public-marketing-threads",
+      "source_url": "public_api://reddit.com/r/marketing",
+      "license_type": "platform_terms",
+      "vertical": "general",
+      "segment": "all",
+      "channel": "social",
+      "intent_stage": "all",
+      "content_type": "community_signal",
+      "priority": 78,
+      "notes": "Public thread content only; enforce ToS + attribution + timestamp."
+    },
+    {
+      "id": "linkedin-public-b2b-signals",
+      "source_url": "public_web://linkedin.com/public-posts",
+      "license_type": "platform_terms",
+      "vertical": "b2b_services",
+      "segment": "owner_operator",
+      "channel": "social",
+      "intent_stage": "mid_bottom",
+      "content_type": "operator_signal",
+      "priority": 82,
+      "notes": "Only public posts and summaries; never private content."
+    },
+    {
+      "id": "youtube-marketing-transcripts",
+      "source_url": "public_api://youtube.com/transcripts/marketing",
+      "license_type": "platform_terms",
+      "vertical": "general",
+      "segment": "all",
+      "channel": "video",
+      "intent_stage": "all",
+      "content_type": "operator_signal",
+      "priority": 80,
+      "notes": "Use transcript snippets and attribution; no copyrighted bulk ingestion."
+    },
+    {
+      "id": "hbr-marketing-research",
+      "source_url": "licensed://hbr-marketing",
+      "license_type": "licensed_commercial",
+      "vertical": "general",
+      "segment": "all",
+      "channel": "research",
+      "intent_stage": "all",
+      "content_type": "whitepaper",
+      "priority": 86,
+      "notes": "Use only licensed excerpts and structured summaries."
     }
   ]
 }

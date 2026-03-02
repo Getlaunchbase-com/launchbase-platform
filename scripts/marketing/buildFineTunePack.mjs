@@ -105,6 +105,13 @@ function tierFor(tvs) {
   return "C";
 }
 
+function scrubPii(text) {
+  let out = String(text || "");
+  out = out.replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "[REDACTED_EMAIL]");
+  out = out.replace(/\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/g, "[REDACTED_PHONE]");
+  return out;
+}
+
 function main() {
   fs.mkdirSync(RUNS, { recursive: true });
   const rubric = loadRubric();
@@ -131,17 +138,21 @@ function main() {
   for (const c of corpora) {
     const paras = toParagraphs(c.text);
     for (const p of paras.slice(0, 40)) {
-      const tvs = scoreTvs(p, c.source);
+      const cleaned = scrubPii(p);
+      const tvs = scoreTvs(cleaned, c.source);
       if (tvs < minTvs) continue;
       targetCounter += 1;
       const targetId = `tgt-${String(targetCounter).padStart(5, "0")}`;
       sft.push({
         instruction: "Produce an actionable, compliance-safe marketing execution response for LaunchBase IBEW 134 context.",
         input: `Source: ${path.basename(c.source)}\nTask: Convert this planning context into concrete next steps.`,
-        output: p,
+        output: cleaned,
         meta: {
           target_id: targetId,
           source: c.source,
+          source_url: c.source,
+          captured_at: new Date().toISOString(),
+          license_type: "reviewed_internal_artifact",
           vertical: "ibew-134",
           channel: "swarm_orchestrator_artifact",
           quality: "reviewed_swarm_output",
