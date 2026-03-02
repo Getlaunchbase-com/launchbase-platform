@@ -5,6 +5,7 @@ import path from "node:path";
 const ROOT = process.cwd();
 const RUNS = path.join(ROOT, "runs", "marketing");
 const AGENT_RUNS = process.env.AGENT_RUNS_ROOT || "C:\\Users\\Monica Morreale\\agent-runs";
+const RUBRIC_PATH = path.join(ROOT, "docs", "marketing", "quality-rubric.json");
 
 function latestDir(base, startsWith) {
   if (!fs.existsSync(base)) return "";
@@ -62,8 +63,52 @@ function writeJsonl(file, rows) {
   fs.writeFileSync(file, lines.join("\n"), "utf8");
 }
 
+function loadRubric() {
+  try {
+    return JSON.parse(fs.readFileSync(RUBRIC_PATH, "utf8"));
+  } catch {
+    return {
+      minimum_tvs: 75,
+    };
+  }
+}
+
+function clamp(n, min, max) {
+  return Math.max(min, Math.min(max, n));
+}
+
+function scoreTvs(text, source) {
+  const t = String(text || "").toLowerCase();
+  const s = String(source || "").toLowerCase();
+  const hasKpi = /kpi|conversion|roi|revenue|ctr|cpa|lift/.test(t);
+  const hasAction = /step|checklist|execute|experiment|plan|workflow/.test(t);
+  const hasEvidence = /case|benchmark|result|data|measured|evidence/.test(t);
+  const hasRiskControls = /compliance|risk|rollback|stop-loss|guardrail/.test(t);
+  const audienceFit = /ibew|contractor|union|smb|local/.test(t) ? 1 : 0;
+  const novelty = /source:|round|reviewer|swarm/.test(t) ? 1 : 0;
+  const attribution = s ? 1 : 0;
+
+  let score = 0;
+  score += hasKpi ? 23 : 10; // business impact proxy
+  score += hasEvidence ? 17 : 8; // evidence proxy
+  score += hasAction ? 13 : 6; // actionability proxy
+  score += audienceFit ? 14 : 7; // audience fit proxy
+  score += novelty ? 8 : 4; // novelty proxy
+  score += hasRiskControls ? 9 : 5; // compliance/safety proxy
+  score += attribution ? 5 : 0; // attribution quality
+  return clamp(score, 0, 100);
+}
+
+function tierFor(tvs) {
+  if (tvs >= 85) return "A";
+  if (tvs >= 75) return "B";
+  return "C";
+}
+
 function main() {
   fs.mkdirSync(RUNS, { recursive: true });
+  const rubric = loadRubric();
+  const minTvs = Number(rubric.minimum_tvs ?? 75);
   const ts = Date.now();
   const outDir = path.join(RUNS, `fine-tune-pack-${ts}`);
   fs.mkdirSync(outDir, { recursive: true });
@@ -82,14 +127,27 @@ function main() {
   ].filter((x) => x.text);
 
   const sft = [];
+  let targetCounter = 0;
   for (const c of corpora) {
     const paras = toParagraphs(c.text);
     for (const p of paras.slice(0, 40)) {
+      const tvs = scoreTvs(p, c.source);
+      if (tvs < minTvs) continue;
+      targetCounter += 1;
+      const targetId = `tgt-${String(targetCounter).padStart(5, "0")}`;
       sft.push({
         instruction: "Produce an actionable, compliance-safe marketing execution response for LaunchBase IBEW 134 context.",
         input: `Source: ${path.basename(c.source)}\nTask: Convert this planning context into concrete next steps.`,
         output: p,
-        meta: { source: c.source, vertical: "ibew-134", quality: "reviewed_swarm_output" },
+        meta: {
+          target_id: targetId,
+          source: c.source,
+          vertical: "ibew-134",
+          channel: "swarm_orchestrator_artifact",
+          quality: "reviewed_swarm_output",
+          tvs,
+          tier: tierFor(tvs),
+        },
       });
     }
   }
@@ -149,6 +207,8 @@ function main() {
   const manifest = {
     createdAt: new Date().toISOString(),
     outDir,
+    rubricPath: RUBRIC_PATH,
+    minimumTvs: minTvs,
     counts: { sft: sft.length, preference_pairs: pref.length, eval: evalSet.length },
     sources: corpora.map((c) => c.source),
     notes: [
@@ -163,4 +223,3 @@ function main() {
 }
 
 main();
-

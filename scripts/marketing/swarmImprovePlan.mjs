@@ -52,12 +52,59 @@ function rankActions(failures) {
   return actions;
 }
 
-function roundSection(round, carry, actions) {
+function inferSignals() {
+  const opsPath = latestFile(path.join(RUNS, "marketing"), /^ops-cycle-\d+\.json$/);
+  const corpusPath = latestFile(path.join(RUNS, "marketing"), /^corpus-manifest-\d+\.json$/);
+  const backlogPath = latestFile(path.join(RUNS, "marketing"), /^agency-learning-backlog-\d+\.json$/);
+  let opsFailCount = 0;
+  let corpusSourceCount = 0;
+  let backlogItemCount = 0;
+  try {
+    const ops = JSON.parse(readIfExists(opsPath) || "{}");
+    opsFailCount = Array.isArray(ops.results) ? ops.results.filter((r) => !r.ok).length : 0;
+  } catch {}
+  try {
+    const corpus = JSON.parse(readIfExists(corpusPath) || "{}");
+    corpusSourceCount = Array.isArray(corpus.sources) ? corpus.sources.length : 0;
+  } catch {}
+  try {
+    const backlog = JSON.parse(readIfExists(backlogPath) || "{}");
+    backlogItemCount = Array.isArray(backlog.items) ? backlog.items.length : 0;
+  } catch {}
+  return { opsFailCount, corpusSourceCount, backlogItemCount };
+}
+
+function roundSection(round, carry, actions, signals) {
+  const focus = [
+    "Channel economics and conversion bottlenecks",
+    "Offer/message fit by vertical and segment",
+    "Experiment design quality and holdout discipline",
+    "Dataset quality, labeling policy, and eval reliability",
+    "Promotion gates, rollback criteria, and safety checks",
+    "Execution speed vs quality tradeoffs",
+    "Anti-pattern detection and stop-doing list",
+  ][(round - 1) % 7];
+
+  const signalActions = [];
+  if (signals.opsFailCount > 0) {
+    signalActions.push(
+      `Stabilize marketing ops endpoints first (current failing steps: ${signals.opsFailCount}) before adding new experiments.`
+    );
+  }
+  if (signals.corpusSourceCount === 0) {
+    signalActions.push("Corpus source count is zero. Build source inventory and attribution coverage before training updates.");
+  }
+  if (signals.backlogItemCount === 0) {
+    signalActions.push("Learning backlog is empty. Require top 20 prioritized tasks per weekly cycle.");
+  }
+
   const next = [
     `### Round ${round}`,
     "",
+    `Round focus: ${focus}`,
+    "",
     "Section A: Top strategic upgrades",
-    ...actions.map((a, i) => `${i + 1}. ${a}`),
+    ...[...actions, ...signalActions].map((a, i) => `${i + 1}. ${a}`),
     "",
     "Section B: Tactical experiments",
     "1. Vertical split test: electricians/local contractors vs generic SMB messaging.",
@@ -117,11 +164,12 @@ function main() {
   const failurePacket = readIfExists(failurePacketPath);
   const failures = parseFailures(failurePacket);
   const actions = rankActions(failures);
+  const signals = inferSignals();
 
   let carry = `${mastery}\n\n${knowledge}`.slice(0, 12000);
   const rounds = [];
   for (let i = 1; i <= ROUNDS; i += 1) {
-    const section = roundSection(i, carry, actions);
+    const section = roundSection(i, carry, actions, signals);
     rounds.push(section);
     carry = `${carry}\n${section}`.slice(0, 12000);
   }

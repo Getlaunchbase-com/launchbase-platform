@@ -1,0 +1,38 @@
+{
+  "name": "LaunchBase Target Value Score",
+  "version": "1.0.0",
+  "minimum_tvs": 75,
+  "tiers": {
+    "A": {
+      "min": 85,
+      "max": 100,
+      "label": "immediate-training"
+    },
+    "B": {
+      "min": 75,
+      "max": 84,
+      "label": "training-queue"
+    },
+    "C": {
+      "min": 0,
+      "max": 74,
+      "label": "reject-or-review"
+    }
+  },
+  "weights": {
+    "business_impact": 25,
+    "evidence_strength": 20,
+    "actionability": 15,
+    "audience_fit": 15,
+    "novelty": 10,
+    "compliance_safety": 10,
+    "attribution_quality": 5
+  },
+  "hard_filters": {
+    "require_source": true,
+    "require_timestamp": true,
+    "require_channel": true,
+    "max_duplicate_similarity": 0.9,
+    "critical_compliance_violations_allowed": 0
+  }
+}
