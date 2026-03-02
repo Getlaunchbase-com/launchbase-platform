@@ -1,7 +1,8 @@
 param(
   [string]$RepoRoot = "C:\Users\Monica Morreale\Downloads\launchbase-platform",
   [string]$ConfigPath = "C:\Users\Monica Morreale\Downloads\launchbase-platform\scripts\gcp\launchbase_gcp.env",
-  [switch]$DryRun
+  [switch]$DryRun,
+  [string]$QueueDir = "C:\Users\Monica Morreale\agent-runs\publish-queue"
 )
 
 $ErrorActionPreference = "Stop"
@@ -48,6 +49,38 @@ function Copy-ToGcs([string]$src, [string]$dest) {
   }
 }
 
+function Queue-PublishIntent([object]$intent) {
+  if (-not (Test-Path $QueueDir)) { New-Item -ItemType Directory -Path $QueueDir -Force | Out-Null }
+  $existing = Get-ChildItem $QueueDir -Filter "publish-intent-*.json" -ErrorAction SilentlyContinue
+  foreach ($e in $existing) {
+    try {
+      $parsed = Get-Content $e.FullName -Raw | ConvertFrom-Json
+      if (
+        $parsed.latestPack -eq $intent.latestPack -and
+        $parsed.datasetDest -eq $intent.datasetDest -and
+        $parsed.artifactDest -eq $intent.artifactDest
+      ) {
+        Write-Host "Publish intent already queued: $($e.Name)" -ForegroundColor Yellow
+        return
+      }
+    } catch {
+      # Ignore malformed queue files and continue.
+    }
+  }
+  $file = Join-Path $QueueDir ("publish-intent-" + (Get-Date -Format "yyyyMMdd-HHmmss") + ".json")
+  ($intent | ConvertTo-Json -Depth 8) | Out-File -FilePath $file -Encoding utf8
+  Write-Host "Queued publish intent: $file" -ForegroundColor Yellow
+}
+
+function Test-GcloudReachable {
+  try {
+    $t = Test-NetConnection oauth2.googleapis.com -Port 443 -WarningAction SilentlyContinue
+    return [bool]$t.TcpTestSucceeded
+  } catch {
+    return $false
+  }
+}
+
 $cfg = Load-EnvFile $ConfigPath
 $project = if ($cfg.ContainsKey("PROJECT_ID")) { $cfg["PROJECT_ID"] } else { $env:PROJECT_ID }
 $modelsBucket = if ($cfg.ContainsKey("MODELS_BUCKET")) { $cfg["MODELS_BUCKET"] } else { $env:MODELS_BUCKET }
@@ -58,10 +91,6 @@ if (-not $artifactsBucket) { $artifactsBucket = $modelsBucket }
 
 if (-not $project -or -not $dataBucket -or -not $artifactsBucket) {
   throw "PROJECT_ID, DATA_BUCKET, ARTIFACTS_BUCKET required (via $ConfigPath or process env vars)."
-}
-
-if (-not $DryRun) {
-  & gcloud.cmd config set project $project | Out-Null
 }
 
 $runs = Join-Path $RepoRoot "runs\marketing"
@@ -86,16 +115,7 @@ Write-Host "Pack: $latestPack"
 Write-Host "Dataset dest:  $datasetDest"
 Write-Host "Artifact dest: $artifactDest"
 
-Copy-ToGcs -src $latestPack -dest $datasetDest
-Copy-ToGcs -src $latestPack -dest $artifactDest
-
-foreach ($f in @($latestSwarm, $latestOps, $latestReflection, $latestCorpus, $latestBacklog)) {
-  if ($f) {
-    Copy-ToGcs -src $f -dest $artifactDest
-  }
-}
-
-$handoff = @{
+ $handoff = @{
   publishedAt = (Get-Date).ToUniversalTime().ToString("o")
   projectId = $project
   datasetBucket = $dataBucket
@@ -112,9 +132,46 @@ $handoff = @{
   }
 } | ConvertTo-Json -Depth 6
 
-$tmp = New-TemporaryFile
-$handoff | Out-File -FilePath $tmp -Encoding utf8
-Copy-ToGcs -src $tmp -dest "$artifactDest/vertex-handoff.json"
-Remove-Item $tmp -Force -ErrorAction SilentlyContinue
+$intent = @{
+  createdAt = (Get-Date).ToUniversalTime().ToString("o")
+  latestPack = $latestPack
+  datasetDest = $datasetDest
+  artifactDest = $artifactDest
+  files = @($latestSwarm, $latestOps, $latestReflection, $latestCorpus, $latestBacklog) | Where-Object { $_ }
+  handoff = ($handoff | ConvertFrom-Json)
+}
 
-Write-Host "Publish complete."
+if (-not $DryRun -and -not (Test-GcloudReachable)) {
+  Write-Host "GCP lane unreachable (oauth2:443). Deferring publish." -ForegroundColor Yellow
+  Queue-PublishIntent -intent $intent
+  exit 0
+}
+
+if (-not $DryRun) {
+  try {
+    & gcloud.cmd config set project $project | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+      throw "gcloud config set project failed"
+    }
+  } catch {
+    Write-Host "Unable to set gcloud project. Deferring publish." -ForegroundColor Yellow
+    Queue-PublishIntent -intent $intent
+    exit 0
+  }
+}
+
+try {
+  Copy-ToGcs -src $latestPack -dest $datasetDest
+  Copy-ToGcs -src $latestPack -dest $artifactDest
+  foreach ($f in @($latestSwarm, $latestOps, $latestReflection, $latestCorpus, $latestBacklog)) {
+    if ($f) { Copy-ToGcs -src $f -dest $artifactDest }
+  }
+  $tmp = New-TemporaryFile
+  $handoff | Out-File -FilePath $tmp -Encoding utf8
+  Copy-ToGcs -src $tmp -dest "$artifactDest/vertex-handoff.json"
+  Remove-Item $tmp -Force -ErrorAction SilentlyContinue
+  Write-Host "Publish complete."
+} catch {
+  Write-Host "Publish failed; deferring to queue: $($_.Exception.Message)" -ForegroundColor Yellow
+  Queue-PublishIntent -intent $intent
+}
