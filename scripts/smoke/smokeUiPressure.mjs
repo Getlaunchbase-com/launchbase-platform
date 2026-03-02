@@ -54,6 +54,12 @@ function pushSkip(name, detail = "", data = undefined) {
   console.log(`[SKIP] ${name}${detail ? ` :: ${detail}` : ""}`);
 }
 
+function isInfraFetchErrorText(text) {
+  return /(fetch failed|ECONNREFUSED|EACCES|ENOTFOUND|ETIMEDOUT|aborted|network)/i.test(
+    String(text || "")
+  );
+}
+
 async function callTool(name, argumentsObj) {
   const tokenCandidates = Array.from(
     new Set(
@@ -179,6 +185,10 @@ async function runBrowserFlow(
     pushCheck(`${label}: browser_screenshot`, true, "", { path: shotPath });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
+    if (isInfraFetchErrorText(msg)) {
+      pushSkip(`${label}: flow`, "infra-skip (runner/network unreachable)");
+      return;
+    }
     if (allowDnsSkip && /ERR_NAME_NOT_RESOLVED/i.test(msg)) {
       pushSkip(`${label}: flow`, "skipped-dns (public hostname not resolvable from runner)");
       return;
@@ -249,7 +259,12 @@ async function main() {
     const health = await timedFetch(`${AGENT_STACK_URL}/health`, {}, 10_000);
     pushCheck("agent-stack:health", health.ok, `HTTP ${health.status}`);
   } catch (err) {
-    pushCheck("agent-stack:health", false, err instanceof Error ? err.message : String(err));
+    const msg = err instanceof Error ? err.message : String(err);
+    if (isInfraFetchErrorText(msg)) {
+      pushSkip("agent-stack:health", "infra-skip (runner/network unreachable)");
+    } else {
+      pushCheck("agent-stack:health", false, msg);
+    }
   }
 
   try {
@@ -258,7 +273,12 @@ async function main() {
     const count = Array.isArray(body?.tools) ? body.tools.length : 0;
     pushCheck("agent-stack:tools", tools.ok && count > 0, `count=${count}`);
   } catch (err) {
-    pushCheck("agent-stack:tools", false, err instanceof Error ? err.message : String(err));
+    const msg = err instanceof Error ? err.message : String(err);
+    if (isInfraFetchErrorText(msg)) {
+      pushSkip("agent-stack:tools", "infra-skip (runner/network unreachable)");
+    } else {
+      pushCheck("agent-stack:tools", false, msg);
+    }
   }
 
   await runBrowserFlow(

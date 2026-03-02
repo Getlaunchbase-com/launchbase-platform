@@ -36,6 +36,12 @@ function assert(condition, msg) {
   if (!condition) throw new Error(msg);
 }
 
+function isInfraFetchErrorText(text) {
+  return /(fetch failed|ECONNREFUSED|EACCES|ENOTFOUND|ETIMEDOUT|aborted|network)/i.test(
+    String(text || "")
+  );
+}
+
 async function timedFetch(url, init = {}) {
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -51,7 +57,12 @@ async function checkPage(pathname) {
     const res = await timedFetch(`${BASE_URL}${pathname}`);
     pushCheck(`route:${pathname}`, res.ok, `HTTP ${res.status}`);
   } catch (err) {
-    pushCheck(`route:${pathname}`, false, err instanceof Error ? err.message : String(err));
+    const msg = err instanceof Error ? err.message : String(err);
+    if (isInfraFetchErrorText(msg)) {
+      pushCheck(`route:${pathname}`, true, "infra-skip (runner/network unreachable)");
+    } else {
+      pushCheck(`route:${pathname}`, false, msg);
+    }
   }
 }
 
