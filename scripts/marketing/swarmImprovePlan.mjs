@@ -56,22 +56,66 @@ function inferSignals() {
   const opsPath = latestFile(path.join(RUNS, "marketing"), /^ops-cycle-\d+\.json$/);
   const corpusPath = latestFile(path.join(RUNS, "marketing"), /^corpus-manifest-\d+\.json$/);
   const backlogPath = latestFile(path.join(RUNS, "marketing"), /^agency-learning-backlog-\d+\.json$/);
+  const gatePath = latestFile(path.join(RUNS, "marketing", "gates"), /^fine-tune-gate-\d+\.json$/);
+  const uiPath = latestFile(path.join(RUNS, "smoke"), /^ui-pressure-\d+$/);
+  const adminPath = latestFile(path.join(RUNS, "smoke"), /^admin-console-\d+$/);
+  const queueDir = path.resolve("C:\\Users\\Monica Morreale\\agent-runs\\publish-queue");
   let opsFailCount = 0;
+  let opsSkipCount = 0;
   let corpusSourceCount = 0;
   let backlogItemCount = 0;
+  let gatePass = false;
+  let gateCounts = { sft: 0, pref: 0, eval: 0 };
+  let smokeSkipCount = 0;
+  let publishQueueCount = 0;
   try {
     const ops = JSON.parse(readIfExists(opsPath) || "{}");
     opsFailCount = Array.isArray(ops.results) ? ops.results.filter((r) => !r.ok).length : 0;
+    opsSkipCount = Array.isArray(ops.results) ? ops.results.filter((r) => r.skipped === true).length : 0;
   } catch {}
   try {
     const corpus = JSON.parse(readIfExists(corpusPath) || "{}");
-    corpusSourceCount = Array.isArray(corpus.sources) ? corpus.sources.length : 0;
+    const totalsValid = Number(corpus?.totals?.valid ?? 0);
+    corpusSourceCount = totalsValid > 0 ? totalsValid : Array.isArray(corpus.valid) ? corpus.valid.length : 0;
   } catch {}
   try {
     const backlog = JSON.parse(readIfExists(backlogPath) || "{}");
-    backlogItemCount = Array.isArray(backlog.items) ? backlog.items.length : 0;
+    backlogItemCount = Number(backlog?.counts?.totalTasks ?? 0) || (Array.isArray(backlog.tasks) ? backlog.tasks.length : 0);
   } catch {}
-  return { opsFailCount, corpusSourceCount, backlogItemCount };
+  try {
+    const gate = JSON.parse(readIfExists(gatePath) || "{}");
+    gatePass = gate?.pass === true;
+    gateCounts = {
+      sft: Number(gate?.counts?.sft ?? 0),
+      pref: Number(gate?.counts?.pref ?? 0),
+      eval: Number(gate?.counts?.eval ?? 0),
+    };
+  } catch {}
+  try {
+    if (uiPath) {
+      const ui = JSON.parse(readIfExists(path.join(uiPath, "summary.json")) || "{}");
+      smokeSkipCount += Array.isArray(ui.checks) ? ui.checks.filter((c) => /skip/i.test(String(c?.detail ?? ""))).length : 0;
+    }
+    if (adminPath) {
+      const admin = JSON.parse(readIfExists(path.join(adminPath, "summary.json")) || "{}");
+      smokeSkipCount += Number(admin?.skipped ?? 0);
+    }
+  } catch {}
+  try {
+    publishQueueCount = fs.existsSync(queueDir)
+      ? fs.readdirSync(queueDir).filter((f) => /^publish-intent-.*\.json$/.test(f)).length
+      : 0;
+  } catch {}
+  return {
+    opsFailCount,
+    opsSkipCount,
+    corpusSourceCount,
+    backlogItemCount,
+    gatePass,
+    gateCounts,
+    smokeSkipCount,
+    publishQueueCount,
+  };
 }
 
 function roundSection(round, carry, actions, signals) {
@@ -91,11 +135,33 @@ function roundSection(round, carry, actions, signals) {
       `Stabilize marketing ops endpoints first (current failing steps: ${signals.opsFailCount}) before adding new experiments.`
     );
   }
+  if (signals.opsSkipCount > 0) {
+    signalActions.push(
+      `Infra-blocked ops steps detected (${signals.opsSkipCount} skipped). Route critical ops checks to VM lane with stable network access.`
+    );
+  }
   if (signals.corpusSourceCount === 0) {
     signalActions.push("Corpus source count is zero. Build source inventory and attribution coverage before training updates.");
   }
   if (signals.backlogItemCount === 0) {
     signalActions.push("Learning backlog is empty. Require top 20 prioritized tasks per weekly cycle.");
+  }
+  if (signals.publishQueueCount > 0) {
+    signalActions.push(
+      `Cloud publish queue has ${signals.publishQueueCount} pending intents. Add automated flush from a network-reachable runner.`
+    );
+  }
+  if (!signals.gatePass) {
+    signalActions.push("Fine-tune gate is not passing. Freeze promotion and repair dataset quality before next training cycle.");
+  } else {
+    signalActions.push(
+      `Fine-tune gate passing with counts sft=${signals.gateCounts.sft}, pref=${signals.gateCounts.pref}, eval=${signals.gateCounts.eval}. Increase sample depth before raising training cadence.`
+    );
+  }
+  if (signals.smokeSkipCount > 0) {
+    signalActions.push(
+      `Smoke coverage has ${signals.smokeSkipCount} skipped checks. Keep skips non-blocking but require at least one network-valid lane to avoid blind spots.`
+    );
   }
 
   const next = [
@@ -120,6 +186,7 @@ function roundSection(round, carry, actions, signals) {
     "",
     "Section D: Assumptions/confidence",
     `- Carry-forward assumptions length: ${carry.length}`,
+    `- Signals: corpusSources=${signals.corpusSourceCount}, backlogTasks=${signals.backlogItemCount}, publishQueue=${signals.publishQueueCount}`,
     "- Confidence baseline: 72% (requires live model/market feedback to increase).",
     "",
     "Section E: Rollback",
