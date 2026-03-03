@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_DIR="${REPO_DIR:-/home/info/launchbase-platform}"
+REPO_DIR="${REPO_DIR:-/home/info/launchbase-platform-publish}"
 LOG_DIR="${LOG_DIR:-/home/info/agent-runs}"
 LOCK_FILE="${LOCK_FILE:-/tmp/launchbase-marketing-nightly.lock}"
 
@@ -23,12 +23,12 @@ fi
   git pull --ff-only origin main || true
 
   # Deep pass: more swarm rounds and marketing ops cycle.
-  npm run marketing:ops-cycle
-  SWARM_ROUNDS=7 npm run marketing:swarm-improve
-  npm run marketing:build-fine-tune-pack
-  npm run marketing:evaluate-fine-tune-pack
-  npm run marketing:publish-artifacts
-  npm run marketing:flush-publish-queue
+  pnpm run marketing:ops-cycle
+  SWARM_ROUNDS=7 pnpm run marketing:swarm-improve
+  pnpm run marketing:build-fine-tune-pack
+  pnpm run marketing:evaluate-fine-tune-pack
+  pnpm run marketing:publish-artifacts
+  pnpm run marketing:flush-publish-queue
   echo "[$(date -Is)] nightly done"
 } >>"$LOG_FILE" 2>&1
 

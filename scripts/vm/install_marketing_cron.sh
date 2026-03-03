@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_DIR="${1:-/home/info/launchbase-platform}"
+REPO_DIR="${1:-/home/info/launchbase-platform-publish}"
 LOG_DIR="${2:-/home/info/agent-runs}"
 CRON_FILE="/etc/cron.d/launchbase-marketing"
 USER_NAME="${SUDO_USER:-$USER}"
@@ -11,8 +11,8 @@ if [[ ! -d "$REPO_DIR" ]]; then
   exit 1
 fi
 
-if ! command -v npm >/dev/null 2>&1; then
-  echo "npm is required on VM"
+if ! command -v pnpm >/dev/null 2>&1; then
+  echo "pnpm is required on VM"
   exit 1
 fi
 
