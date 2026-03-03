@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
+import os from "node:os";
 
 const ROOT = process.cwd();
 const RUNS = path.join(ROOT, "runs", "marketing");
-const AGENT_RUNS = process.env.AGENT_RUNS_ROOT || "C:\\Users\\Monica Morreale\\agent-runs";
+const AGENT_RUNS = process.env.AGENT_RUNS_ROOT || path.join(os.homedir(), "agent-runs");
 const RUBRIC_PATH = path.join(ROOT, "docs", "marketing", "quality-rubric.json");
 
 function latestDir(base, startsWith) {

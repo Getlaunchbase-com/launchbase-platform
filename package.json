@@ -33,6 +33,8 @@
     "marketing:swarm-improve": "node scripts/marketing/swarmImprovePlan.mjs",
     "marketing:build-fine-tune-pack": "node scripts/marketing/buildFineTunePack.mjs",
     "marketing:evaluate-fine-tune-pack": "node scripts/marketing/evaluateFineTunePack.mjs",
+    "marketing:publish-artifacts": "node scripts/gcp/publishMarketingArtifacts.mjs",
+    "marketing:flush-publish-queue": "node scripts/gcp/flushMarketingPublishQueue.mjs",
     "marketing:cli-preflight": "node scripts/marketing/cliPreflight.mjs",
     "ops:full-exec": "node scripts/ops/fullExecution.mjs",
     "ops:swarm-unify": "node scripts/ops/swarmUnifyOrchestration.mjs",

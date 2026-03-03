@@ -33,6 +33,9 @@ Goal: provision Google Cloud once, then drop model/data into buckets and launch 
 - `scripts/gcp/worker/Dockerfile`
 - `scripts/gcp/worker/main.py`
 
+For persistent runnerless scheduling on VM, see:
+- `docs/vm-runnerless-automation.md`
+
 ## 1) Pre-reqs
 
 Install and auth:

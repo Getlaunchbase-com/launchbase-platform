@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 
 const ROOT = process.cwd();
@@ -59,7 +60,7 @@ function inferSignals() {
   const gatePath = latestFile(path.join(RUNS, "marketing", "gates"), /^fine-tune-gate-\d+\.json$/);
   const uiPath = latestFile(path.join(RUNS, "smoke"), /^ui-pressure-\d+$/);
   const adminPath = latestFile(path.join(RUNS, "smoke"), /^admin-console-\d+$/);
-  const queueDir = path.resolve("C:\\Users\\Monica Morreale\\agent-runs\\publish-queue");
+  const queueDir = process.env.PUBLISH_QUEUE_DIR || path.join(os.homedir(), "agent-runs", "publish-queue");
   let opsFailCount = 0;
   let opsSkipCount = 0;
   let corpusSourceCount = 0;
@@ -225,7 +226,10 @@ function buildFinal(rounds, failures, packetPath) {
 }
 
 function main() {
-  const mastery = readIfExists(path.resolve("C:\\Users\\Monica Morreale\\MARKETING_AI_MASTERY_PLAN.md"));
+  const masteryPath =
+    process.env.MARKETING_AI_MASTERY_PLAN ||
+    path.resolve(ROOT, "docs", "marketing", "MARKETING_AI_MASTERY_PLAN.md");
+  const mastery = readIfExists(masteryPath);
   const knowledge = readIfExists(path.resolve(ROOT, "docs", "marketing", "KnowledgeIngestionPlan.md"));
   const failurePacketPath = latestFile(path.join(RUNS, "swarm-input"), /^failure-packet-\d+\.json$/);
   const failurePacket = readIfExists(failurePacketPath);
