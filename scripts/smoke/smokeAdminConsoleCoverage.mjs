@@ -32,6 +32,11 @@ function pushCheck(name, pass, detail = "", data = undefined) {
   console.log(`[${pass ? "PASS" : "FAIL"}] ${name}${detail ? ` :: ${detail}` : ""}`);
 }
 
+function pushSkip(name, detail = "", data = undefined) {
+  checks.push({ name, pass: true, skipped: true, detail: detail || "skipped", data });
+  console.log(`[SKIP] ${name}${detail ? ` :: ${detail}` : ""}`);
+}
+
 function assert(condition, msg) {
   if (!condition) throw new Error(msg);
 }
@@ -59,7 +64,7 @@ async function checkPage(pathname) {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (isInfraFetchErrorText(msg)) {
-      pushCheck(`route:${pathname}`, true, "infra-skip (runner/network unreachable)");
+      pushSkip(`route:${pathname}`, "infra-skip (runner/network unreachable)");
     } else {
       pushCheck(`route:${pathname}`, false, msg);
     }
@@ -186,6 +191,7 @@ function finalizeAndExit() {
     checks,
     failed: checks.filter((c) => !c.pass).length,
     passed: checks.filter((c) => c.pass).length,
+    skipped: checks.filter((c) => c.skipped === true).length,
   };
   const out = path.join(outDir, "summary.json");
   fs.writeFileSync(out, JSON.stringify(summary, null, 2), "utf8");
