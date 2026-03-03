@@ -1,5 +1,5 @@
 param(
-  [string]$QueueDir = "C:\Users\Monica Morreale\agent-runs\publish-queue"
+  [string]$QueueDir = (Join-Path $env:USERPROFILE "agent-runs\publish-queue")
 )
 
 $ErrorActionPreference = "Continue"

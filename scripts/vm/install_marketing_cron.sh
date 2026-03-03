@@ -2,6 +2,7 @@
 set -euo pipefail
 
 REPO_DIR="${1:-/home/info/launchbase-platform}"
+LOG_DIR="${2:-/home/info/agent-runs}"
 CRON_FILE="/etc/cron.d/launchbase-marketing"
 USER_NAME="${SUDO_USER:-$USER}"
 
@@ -23,10 +24,10 @@ SHELL=/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # LaunchBase marketing hourly cycle (at minute 7)
-7 * * * * $USER_NAME REPO_DIR=$REPO_DIR $REPO_DIR/scripts/vm/marketing_hourly.sh
+7 * * * * $USER_NAME REPO_DIR="$REPO_DIR" LOG_DIR="$LOG_DIR" "$REPO_DIR/scripts/vm/marketing_hourly.sh"
 
 # LaunchBase marketing nightly deep cycle (01:10 UTC/local VM time)
-10 1 * * * $USER_NAME REPO_DIR=$REPO_DIR $REPO_DIR/scripts/vm/marketing_nightly.sh
+10 1 * * * $USER_NAME REPO_DIR="$REPO_DIR" LOG_DIR="$LOG_DIR" "$REPO_DIR/scripts/vm/marketing_nightly.sh"
 EOF
 
 if [[ "$EUID" -ne 0 ]]; then

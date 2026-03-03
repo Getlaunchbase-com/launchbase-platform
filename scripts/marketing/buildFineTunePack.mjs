@@ -164,27 +164,58 @@ function main() {
     }
   }
 
+  // Triple DPO comparison: compare ALL model pairs (Claude vs Gemini, Codex vs Gemini, Codex vs Claude)
   const r2c = readIf(path.join(latestCritique, "round2-codex.txt"));
   const r2a = readIf(path.join(latestCritique, "round2-claude.txt"));
   const r1g = readIf(path.join(latestCritique, "round1-gemini.txt"));
+  const r1c = readIf(path.join(latestCritique, "round1-codex.txt"));
+  const r1a = readIf(path.join(latestCritique, "round1-claude.txt"));
+
   const pref = [];
-  if (r2c && r1g) {
-    pref.push({
-      prompt: "Generate next-day LaunchBase marketing execution order.",
-      chosen: toParagraphs(r2c, 120, 1200)[0] || r2c.slice(0, 1200),
-      rejected: toParagraphs(r1g, 120, 1200)[0] || r1g.slice(0, 1200),
-      rationale: "Chosen response is more execution-concrete and aligned to operator constraints.",
-      meta: { source: "swarm_critique", chosen_model: "codex", rejected_model: "gemini" },
-    });
-  }
-  if (r2a && r1g) {
-    pref.push({
-      prompt: "Identify what we are doing wrong and how to improve quickly.",
-      chosen: toParagraphs(r2a, 120, 1200)[0] || r2a.slice(0, 1200),
-      rejected: toParagraphs(r1g, 120, 1200)[0] || r1g.slice(0, 1200),
-      rationale: "Chosen response has stronger risk controls and clearer improvement sequencing.",
-      meta: { source: "swarm_critique", chosen_model: "claude", rejected_model: "gemini" },
-    });
+  const dpoPrompts = [
+    { prompt: "Generate next-day LaunchBase marketing execution order.", rationale_focus: "execution-concrete" },
+    { prompt: "Identify what we are doing wrong and how to improve quickly.", rationale_focus: "risk controls" },
+    { prompt: "Design a 7-day marketing experiment with measurable KPIs.", rationale_focus: "measurability" },
+  ];
+
+  // Build model outputs map (prefer round2 over round1 for quality ordering)
+  const modelOutputs = {
+    codex: { text: r2c || r1c, round: r2c ? 2 : 1 },
+    claude: { text: r2a || r1a, round: r2a ? 2 : 1 },
+    gemini: { text: r1g, round: 1 },
+  };
+
+  // Quality ordering heuristic: round2 > round1, claude >= codex > gemini
+  const qualityOrder = ["claude", "codex", "gemini"];
+
+  // Generate preference pairs for all model combinations
+  for (const dp of dpoPrompts) {
+    for (let i = 0; i < qualityOrder.length; i++) {
+      for (let j = i + 1; j < qualityOrder.length; j++) {
+        const winner = qualityOrder[i];
+        const loser = qualityOrder[j];
+        const winText = modelOutputs[winner]?.text;
+        const loseText = modelOutputs[loser]?.text;
+        if (!winText || !loseText) continue;
+        // Skip if both are the same round (less informative)
+        const winPara = toParagraphs(winText, 120, 1200)[0] || winText.slice(0, 1200);
+        const losePara = toParagraphs(loseText, 120, 1200)[0] || loseText.slice(0, 1200);
+        if (winPara === losePara) continue;
+        pref.push({
+          prompt: dp.prompt,
+          chosen: winPara,
+          rejected: losePara,
+          rationale: `Chosen (${winner} r${modelOutputs[winner].round}) has stronger ${dp.rationale_focus} than rejected (${loser} r${modelOutputs[loser].round}).`,
+          meta: {
+            source: "swarm_critique_triple",
+            chosen_model: winner,
+            chosen_round: modelOutputs[winner].round,
+            rejected_model: loser,
+            rejected_round: modelOutputs[loser].round,
+          },
+        });
+      }
+    }
   }
 
   const evalSet = [

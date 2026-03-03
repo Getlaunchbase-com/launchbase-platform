@@ -19,7 +19,7 @@ import { gapDetectionRouter } from "./admin/gapDetection";
 import { pipelineApprovalsRouter } from "./admin/pipelineApprovals";
 import { projectsRouter } from "./admin/projects";
 import { marketingAgentsRouter } from "./admin/marketingAgents";
-import { mobileSessionRouter, mobileVoiceRouter, mobileChatRouter, mobileFeedbackRouter, mobileAttachmentRouter, mobileTranscribeRouter } from "./mobile";
+import { mobileSessionRouter, mobileVoiceRouter, mobileChatRouter, mobileFeedbackRouter, mobileAttachmentRouter, mobileTranscribeRouter, mobileConversationRouter, mobileVerticalRouter, mobileBetaRouter } from "./mobile";
 import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -489,7 +489,7 @@ export const appRouter = router({
       }),
   }),
 
-  // Mobile voice API (token-scoped, rate-limited)
+  // Mobile API (token-scoped, rate-limited)
   mobile: router({
     session: mobileSessionRouter,
     voice: mobileVoiceRouter,
@@ -497,6 +497,9 @@ export const appRouter = router({
     feedback: mobileFeedbackRouter,
     uploadAttachment: mobileAttachmentRouter,
     transcribeVoice: mobileTranscribeRouter,
+    conversation: mobileConversationRouter,
+    vertical: mobileVerticalRouter,
+    beta: mobileBetaRouter,
   }),
 
   // Admin routes (protected)

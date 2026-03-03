@@ -37,11 +37,17 @@ import {
   projects,
   users,
   vertexProfiles,
+  userMemory,
+  verticalPacks,
+  userVerticals,
+  betaFrictionEvents,
+  betaWorkflowSteps,
 } from "../../db/schema";
 import { desc, eq, and, gt, gte, count } from "drizzle-orm";
 import { randomBytes, createHash } from "crypto";
 import path from "node:path";
 import fs from "node:fs";
+import { runAiInference } from "../../services/aiInference";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -708,6 +714,16 @@ export const mobileChatRouter = router({
         },
       });
 
+      // Fire-and-forget AI inference — response comes via poll
+      void runAiInference(runId, {
+        userId: session.userId,
+        agentInstanceId: session.agentInstanceId,
+        projectId: session.projectId,
+        id: session.id,
+      }).catch((err) => {
+        console.error("[mobile:chat:send] Inference error:", err);
+      });
+
       return {
         runId,
         eventAppended: true,
@@ -1173,5 +1189,419 @@ export const mobileTranscribeRouter = router({
         // Hard rule: NEVER block feedback if transcription fails
         return { text: "", confidence: 0 };
       }
+    }),
+});
+
+// ---------------------------------------------------------------------------
+// Conversation Router — list, get, new, approve actions
+// ---------------------------------------------------------------------------
+
+export const mobileConversationRouter = router({
+  /**
+   * List all conversations for the current user (grouped by agentRun).
+   */
+  list: publicProcedure
+    .input(
+      z.object({
+        token: z.string().min(1),
+        limit: z.number().int().min(1).max(50).default(20),
+        offset: z.number().int().min(0).default(0),
+      })
+    )
+    .query(async ({ input }) => {
+      const session = await validateMobileToken(input.token);
+      enforceMobileRateLimit(`conv:list:${session.userId}`);
+
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable." });
+
+      const runs = await db
+        .select({
+          id: agentRuns.id,
+          goal: agentRuns.goal,
+          status: agentRuns.status,
+          createdAt: agentRuns.createdAt,
+          finishedAt: agentRuns.finishedAt,
+          model: agentRuns.model,
+        })
+        .from(agentRuns)
+        .where(eq(agentRuns.createdBy, session.userId))
+        .orderBy(desc(agentRuns.createdAt))
+        .limit(input.limit)
+        .offset(input.offset);
+
+      return {
+        conversations: runs.map((r) => ({
+          id: r.id,
+          title: r.goal?.slice(0, 100) || "New conversation",
+          status: r.status,
+          createdAt: r.createdAt,
+          finishedAt: r.finishedAt,
+          model: r.model,
+        })),
+      };
+    }),
+
+  /**
+   * Get full conversation history for a run.
+   */
+  get: publicProcedure
+    .input(
+      z.object({
+        token: z.string().min(1),
+        runId: z.number().int(),
+      })
+    )
+    .query(async ({ input }) => {
+      const session = await validateMobileToken(input.token);
+      enforceMobileRateLimit(`conv:get:${session.userId}`);
+
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable." });
+
+      // Verify user owns this run
+      const [run] = await db
+        .select()
+        .from(agentRuns)
+        .where(and(eq(agentRuns.id, input.runId), eq(agentRuns.createdBy, session.userId)))
+        .limit(1);
+
+      if (!run) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Conversation not found." });
+      }
+
+      const events = await db
+        .select()
+        .from(agentEvents)
+        .where(eq(agentEvents.runId, input.runId))
+        .orderBy(agentEvents.id);
+
+      return {
+        run: {
+          id: run.id,
+          goal: run.goal,
+          status: run.status,
+          createdAt: run.createdAt,
+        },
+        events,
+      };
+    }),
+
+  /**
+   * Start a new conversation (creates fresh agentRun, clears activeRunId).
+   */
+  new: publicProcedure
+    .input(z.object({ token: z.string().min(1) }))
+    .mutation(async ({ input }) => {
+      const session = await validateMobileToken(input.token);
+      enforceMobileRateLimit(`conv:new:${session.userId}`);
+
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable." });
+
+      // Clear the active run so next chat.send creates a fresh one
+      await db
+        .update(mobileSessions)
+        .set({ activeRunId: null })
+        .where(eq(mobileSessions.id, session.id));
+
+      return { cleared: true };
+    }),
+
+  /**
+   * Approve or deny a pending AI action (email send, etc.).
+   */
+  approveAction: publicProcedure
+    .input(
+      z.object({
+        token: z.string().min(1),
+        eventId: z.number().int(),
+        approved: z.boolean(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const session = await validateMobileToken(input.token);
+      enforceMobileRateLimit(`conv:approve:${session.userId}`);
+
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable." });
+
+      // Find the approval_request event
+      const [event] = await db
+        .select()
+        .from(agentEvents)
+        .where(and(eq(agentEvents.id, input.eventId), eq(agentEvents.type, "approval_request")))
+        .limit(1);
+
+      if (!event) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Approval request not found." });
+      }
+
+      // Write approval result
+      await db.insert(agentEvents).values({
+        runId: event.runId,
+        type: "approval_result",
+        payload: {
+          approvalEventId: input.eventId,
+          approved: input.approved,
+          decidedBy: session.userId,
+          decidedAt: new Date().toISOString(),
+        },
+      });
+
+      return { recorded: true, approved: input.approved };
+    }),
+});
+
+// ---------------------------------------------------------------------------
+// Vertical Router — vertical pack management for users
+// ---------------------------------------------------------------------------
+
+export const mobileVerticalRouter = router({
+  /**
+   * List available vertical packs.
+   */
+  list: publicProcedure
+    .input(z.object({ token: z.string().min(1) }))
+    .query(async ({ input }) => {
+      const session = await validateMobileToken(input.token);
+
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable." });
+
+      const packs = await db
+        .select({
+          id: verticalPacks.id,
+          slug: verticalPacks.slug,
+          name: verticalPacks.name,
+          description: verticalPacks.description,
+          status: verticalPacks.status,
+          uiExtensions: verticalPacks.uiExtensions,
+        })
+        .from(verticalPacks)
+        .where(eq(verticalPacks.status, "active"));
+
+      // Also get user's current selection
+      const [current] = await db
+        .select({ verticalPackId: userVerticals.verticalPackId })
+        .from(userVerticals)
+        .where(and(eq(userVerticals.userId, session.userId), eq(userVerticals.isPrimary, true)))
+        .limit(1);
+
+      return {
+        packs,
+        activePackId: current?.verticalPackId ?? null,
+      };
+    }),
+
+  /**
+   * Activate a vertical pack for the current user.
+   */
+  activate: publicProcedure
+    .input(
+      z.object({
+        token: z.string().min(1),
+        verticalPackId: z.number().int(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const session = await validateMobileToken(input.token);
+
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable." });
+
+      // Verify pack exists
+      const [pack] = await db
+        .select()
+        .from(verticalPacks)
+        .where(eq(verticalPacks.id, input.verticalPackId))
+        .limit(1);
+
+      if (!pack) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Vertical pack not found." });
+      }
+
+      // Deactivate all current primaries
+      const existing = await db
+        .select()
+        .from(userVerticals)
+        .where(and(eq(userVerticals.userId, session.userId), eq(userVerticals.isPrimary, true)));
+
+      for (const uv of existing) {
+        await db
+          .update(userVerticals)
+          .set({ isPrimary: false })
+          .where(eq(userVerticals.id, uv.id));
+      }
+
+      // Upsert the new selection
+      const [existingSelection] = await db
+        .select()
+        .from(userVerticals)
+        .where(
+          and(
+            eq(userVerticals.userId, session.userId),
+            eq(userVerticals.verticalPackId, input.verticalPackId),
+          )
+        )
+        .limit(1);
+
+      if (existingSelection) {
+        await db
+          .update(userVerticals)
+          .set({ isPrimary: true })
+          .where(eq(userVerticals.id, existingSelection.id));
+      } else {
+        await db.insert(userVerticals).values({
+          userId: session.userId,
+          verticalPackId: input.verticalPackId,
+          isPrimary: true,
+        });
+      }
+
+      return { activated: true, packSlug: pack.slug, packName: pack.name };
+    }),
+
+  /**
+   * Get current active vertical and its quick actions.
+   */
+  getCurrent: publicProcedure
+    .input(z.object({ token: z.string().min(1) }))
+    .query(async ({ input }) => {
+      const session = await validateMobileToken(input.token);
+
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable." });
+
+      const [result] = await db
+        .select({
+          packId: verticalPacks.id,
+          slug: verticalPacks.slug,
+          name: verticalPacks.name,
+          uiExtensions: verticalPacks.uiExtensions,
+          toolsConfig: verticalPacks.toolsConfig,
+        })
+        .from(userVerticals)
+        .innerJoin(verticalPacks, eq(userVerticals.verticalPackId, verticalPacks.id))
+        .where(and(eq(userVerticals.userId, session.userId), eq(userVerticals.isPrimary, true)))
+        .limit(1);
+
+      if (!result) {
+        return { active: false, pack: null };
+      }
+
+      return {
+        active: true,
+        pack: result,
+      };
+    }),
+});
+
+// ---------------------------------------------------------------------------
+// Beta R&D Router — friction logging, wish tracking, workflow recording
+// ---------------------------------------------------------------------------
+
+export const mobileBetaRouter = router({
+  /**
+   * Log a user action for workflow tracking.
+   */
+  logAction: publicProcedure
+    .input(
+      z.object({
+        token: z.string().min(1),
+        workflowId: z.string().max(64),
+        stepNumber: z.number().int(),
+        action: z.string().max(128),
+        screen: z.string().max(128).optional(),
+        metadata: z.record(z.unknown()).optional(),
+        durationMs: z.number().int().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const session = await validateMobileToken(input.token);
+
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable." });
+
+      await db.insert(betaWorkflowSteps).values({
+        userId: session.userId,
+        workflowId: input.workflowId,
+        stepNumber: input.stepNumber,
+        action: input.action,
+        screen: input.screen,
+        metadata: input.metadata,
+        durationMs: input.durationMs,
+      });
+
+      return { logged: true };
+    }),
+
+  /**
+   * Submit a "I wish I could..." request from the beta user.
+   */
+  wish: publicProcedure
+    .input(
+      z.object({
+        token: z.string().min(1),
+        message: z.string().min(1).max(2000),
+        screen: z.string().max(128).optional(),
+        actionSequence: z.array(z.string()).optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const session = await validateMobileToken(input.token);
+
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable." });
+
+      await db.insert(betaFrictionEvents).values({
+        userId: session.userId,
+        sessionToken: input.token.slice(0, 16), // partial for correlation, not full for security
+        type: "wish",
+        context: {
+          screen: input.screen || "unknown",
+          actionSequence: input.actionSequence || [],
+          timestamp: new Date().toISOString(),
+        },
+        userMessage: input.message,
+        status: "new",
+      });
+
+      return { submitted: true };
+    }),
+
+  /**
+   * Log a friction event (auto-detected or manual).
+   */
+  logFriction: publicProcedure
+    .input(
+      z.object({
+        token: z.string().min(1),
+        type: z.enum(["pause", "backtrack", "repeat", "error", "slow_response"]),
+        screen: z.string().max(128),
+        durationMs: z.number().int().optional(),
+        actionSequence: z.array(z.string()).optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const session = await validateMobileToken(input.token);
+
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable." });
+
+      await db.insert(betaFrictionEvents).values({
+        userId: session.userId,
+        sessionToken: input.token.slice(0, 16),
+        type: input.type,
+        context: {
+          screen: input.screen,
+          actionSequence: input.actionSequence || [],
+          timestamp: new Date().toISOString(),
+          durationMs: input.durationMs,
+        },
+        status: "new",
+      });
+
+      return { logged: true };
     }),
 });

@@ -45,20 +45,39 @@ const pref = jsonlCount(path.join(pack, "preference_pairs.jsonl"));
 const evalRows = jsonlCount(path.join(pack, "eval_set.jsonl"));
 
 const rules = {
-  minSft: Number(process.env.GATE_MIN_SFT ?? 5),
-  minPref: Number(process.env.GATE_MIN_PREF ?? 2),
-  minEval: Number(process.env.GATE_MIN_EVAL ?? 10),
+  minSft: Number(process.env.GATE_MIN_SFT ?? 100),
+  minPref: Number(process.env.GATE_MIN_PREF ?? 50),
+  minEval: Number(process.env.GATE_MIN_EVAL ?? 50),
+  minTvsAvg: Number(process.env.GATE_MIN_TVS_AVG ?? 80),
+  minTierAPct: Number(process.env.GATE_TIER_A_PCT ?? 30),
 };
 
-const pass = sft >= rules.minSft && pref >= rules.minPref && evalRows >= rules.minEval;
+// Compute TVS stats from SFT file
+let tvsAvg = 0;
+let tierAPct = 0;
+try {
+  const sftLines = fs.readFileSync(path.join(pack, "sft_marketing_examples.jsonl"), "utf8")
+    .split(/\r?\n/).filter(Boolean).map((l) => JSON.parse(l));
+  const scores = sftLines.map((r) => r.meta?.tvs ?? 0);
+  tvsAvg = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+  const tierACount = sftLines.filter((r) => r.meta?.tier === "A").length;
+  tierAPct = sftLines.length ? (tierACount / sftLines.length) * 100 : 0;
+} catch { /* SFT file missing or malformed */ }
+
+const passVolume = sft >= rules.minSft && pref >= rules.minPref && evalRows >= rules.minEval;
+const passQuality = tvsAvg >= rules.minTvsAvg && tierAPct >= rules.minTierAPct;
+const pass = passVolume && passQuality;
 const result = {
   createdAt: new Date().toISOString(),
   pack,
   manifest,
   counts: { sft, pref, eval: evalRows },
+  quality: { tvsAvg: Math.round(tvsAvg * 10) / 10, tierAPct: Math.round(tierAPct * 10) / 10 },
   rules,
+  passVolume,
+  passQuality,
   pass,
-  classification: pass ? "done" : "blocked(code)",
+  classification: pass ? "done" : `blocked(${!passVolume ? "volume" : "quality"})`,
 };
 
 const outFile = path.join(outDir, `fine-tune-gate-${Date.now()}.json`);

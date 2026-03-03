@@ -1,0 +1,171 @@
+{
+  "version": "NEC 2023",
+  "source": "NFPA 70 National Electrical Code 2023 Edition",
+  "sections": {
+    "NEC 110.14": {
+      "title": "Electrical Connections",
+      "requirement": "Terminals for more than one conductor must be identified. Conductors must be compatible with terminal material.",
+      "category": "general",
+      "keywords": ["connections", "terminals", "conductors", "lugs"]
+    },
+    "NEC 210.8": {
+      "title": "GFCI Protection",
+      "requirement": "GFCI protection required for 125V through 250V receptacles in bathrooms, kitchens, garages, outdoors, crawl spaces, unfinished basements, laundry areas, and within 6 ft of sinks.",
+      "category": "receptacles",
+      "keywords": ["gfci", "ground fault", "bathroom", "kitchen", "garage", "outdoor", "receptacle"]
+    },
+    "NEC 210.11": {
+      "title": "Branch Circuit Requirements",
+      "requirement": "Minimum branch circuits: 2 small-appliance circuits (20A) for kitchen/dining, 1 bathroom circuit (20A), 1 laundry circuit (20A).",
+      "category": "branch_circuits",
+      "keywords": ["branch circuit", "kitchen", "bathroom", "laundry", "small appliance", "20 amp"]
+    },
+    "NEC 210.12": {
+      "title": "AFCI Protection",
+      "requirement": "Arc-fault circuit-interrupter protection required for 120V, 15A and 20A branch circuits supplying outlets in dwelling unit bedrooms, living rooms, dining rooms, family rooms, closets, hallways, sunrooms.",
+      "category": "branch_circuits",
+      "keywords": ["afci", "arc fault", "bedroom", "living room", "dwelling"]
+    },
+    "NEC 210.52": {
+      "title": "Dwelling Unit Receptacle Outlets",
+      "requirement": "Receptacles required so no point along floor line in any wall space is more than 6 ft from an outlet. Kitchen countertop: every 4 ft, GFCI protected. Island countertops 12 inches or wider need at least one outlet.",
+      "category": "receptacles",
+      "keywords": ["receptacle", "outlet", "spacing", "countertop", "island", "dwelling"]
+    },
+    "NEC 220.12": {
+      "title": "General Lighting Loads",
+      "requirement": "General lighting load: 3 VA per sq ft for dwellings, 3.5 VA/sqft for office, 2 VA/sqft for warehouse.",
+      "category": "load_calculations",
+      "keywords": ["lighting load", "VA per square foot", "dwelling", "office", "load calculation"]
+    },
+    "NEC 220.82": {
+      "title": "Optional Dwelling Load Calculation",
+      "requirement": "First 10 kVA of general loads at 100%, remainder at 40%. Add largest motor at 125%. AC/heat at largest value.",
+      "category": "load_calculations",
+      "keywords": ["optional calculation", "dwelling", "10 kva", "demand factor", "service size"]
+    },
+    "NEC 230.42": {
+      "title": "Service-Entrance Conductor Sizing",
+      "requirement": "Service-entrance conductors must have ampacity not less than the maximum load per Article 220. Minimum 100A for single dwelling.",
+      "category": "service",
+      "keywords": ["service entrance", "conductor", "sizing", "100 amp", "ampacity"]
+    },
+    "NEC 230.70": {
+      "title": "Service Disconnect Location",
+      "requirement": "Service disconnecting means must be installed at a readily accessible location nearest the point of entrance of the service conductors.",
+      "category": "service",
+      "keywords": ["service disconnect", "main breaker", "location", "readily accessible"]
+    },
+    "NEC 230.79": {
+      "title": "Service Disconnect Rating",
+      "requirement": "Minimum 100A for single dwelling. Must be rated for the calculated load per Article 220.",
+      "category": "service",
+      "keywords": ["200 amp", "100 amp", "service", "residential", "disconnect rating", "main breaker"]
+    },
+    "NEC 240.4": {
+      "title": "Conductor Overcurrent Protection",
+      "requirement": "Conductors must be protected against overcurrent per their ampacity. #14 AWG max 15A, #12 AWG max 20A, #10 AWG max 30A.",
+      "category": "overcurrent",
+      "keywords": ["overcurrent", "breaker", "wire size", "14 awg", "12 awg", "10 awg", "ampacity"]
+    },
+    "NEC 250.66": {
+      "title": "Grounding Electrode Conductor Sizing",
+      "requirement": "GEC sized per Table 250.66. For 1/0 AWG copper service: #6 AWG copper GEC. For 3/0 or larger: #4 AWG copper GEC.",
+      "category": "grounding",
+      "keywords": ["grounding electrode", "conductor", "sizing", "GEC", "ground rod"]
+    },
+    "NEC 300.5": {
+      "title": "Underground Installation Burial Depth",
+      "requirement": "Direct burial cable: 24 inches. Rigid metal conduit: 6 inches. PVC conduit: 18 inches. Under dwelling driveway: 18 inches for RMC.",
+      "category": "underground",
+      "keywords": ["burial depth", "underground", "direct burial", "conduit", "trench"]
+    },
+    "NEC 310.16": {
+      "title": "Conductor Ampacity Table (75C)",
+      "requirement": "Copper conductor ampacities at 75C: #14=15A, #12=20A, #10=30A, #8=40A, #6=55A, #4=70A, #3=85A, #2=95A, #1=110A, 1/0=125A, 2/0=145A, 3/0=165A, 4/0=195A.",
+      "category": "conductors",
+      "keywords": ["ampacity", "wire size", "conductor", "copper", "awg", "temperature rating"]
+    },
+    "NEC 334.80": {
+      "title": "NM Cable (Romex) Ampacity",
+      "requirement": "NM cable ampacity based on 60C column of Table 310.16. Maximum 3 current-carrying conductors without derating.",
+      "category": "conductors",
+      "keywords": ["romex", "nm cable", "nonmetallic", "sheathed cable", "60 degree"]
+    },
+    "NEC 344.30": {
+      "title": "Rigid Metal Conduit Support",
+      "requirement": "RMC must be supported within 3 ft of each box/enclosure and at intervals not exceeding 10 ft.",
+      "category": "conduit",
+      "keywords": ["rigid metal conduit", "rmc", "support", "spacing", "straps"]
+    },
+    "NEC 348.22": {
+      "title": "Flexible Metal Conduit Fill",
+      "requirement": "Maximum conductor fill: 53% for 1 conductor, 31% for 2 conductors, 40% for 3+ conductors (same as Chapter 9 Table 1).",
+      "category": "conduit",
+      "keywords": ["flex", "fmc", "conduit fill", "conductor fill", "percentage"]
+    },
+    "NEC 358.30": {
+      "title": "EMT Support and Securing",
+      "requirement": "EMT must be supported within 3 ft of each box and every 10 ft. For conduit larger than 1-1/4 inch: straps within 3 ft, every 10 ft.",
+      "category": "conduit",
+      "keywords": ["emt", "electrical metallic tubing", "support", "straps", "securing"]
+    },
+    "NEC 422.11": {
+      "title": "Appliance Overcurrent Protection",
+      "requirement": "Branch circuit rating for individual appliance: not exceed 150% of appliance rated amperage. Continuous load: 125% of rated current.",
+      "category": "appliances",
+      "keywords": ["appliance", "overcurrent", "branch circuit", "continuous load"]
+    },
+    "NEC 430.52": {
+      "title": "Motor Branch Circuit Protection",
+      "requirement": "Motor branch circuit short-circuit protection: dual-element fuse max 175% of motor FLA, inverse-time breaker max 250% of motor FLA.",
+      "category": "motors",
+      "keywords": ["motor", "branch circuit", "fuse", "breaker", "fla", "overload"]
+    },
+    "NEC 680.22": {
+      "title": "Swimming Pool Lighting",
+      "requirement": "Underwater luminaires must operate at 15V or less, or be listed for the purpose with GFCI protection. No junction boxes within 4 ft of pool edge.",
+      "category": "pools",
+      "keywords": ["swimming pool", "underwater", "lighting", "gfci", "junction box"]
+    }
+  },
+  "tables": {
+    "conduit_fill": {
+      "description": "Chapter 9 Table 1 — Percent Fill",
+      "rules": {
+        "1_conductor": 53,
+        "2_conductors": 31,
+        "3_or_more": 40
+      }
+    },
+    "wire_ampacity_75c": {
+      "description": "Table 310.16 — Copper at 75°C",
+      "awg": {
+        "14": 15, "12": 20, "10": 30, "8": 40,
+        "6": 55, "4": 70, "3": 85, "2": 95,
+        "1": 110, "1/0": 125, "2/0": 145,
+        "3/0": 165, "4/0": 195
+      }
+    },
+    "conduit_area_sqin": {
+      "description": "Chapter 9 Table 4 — Conduit Internal Area (sq in)",
+      "emt": {
+        "1/2": 0.304, "3/4": 0.533, "1": 0.864,
+        "1-1/4": 1.496, "1-1/2": 2.036, "2": 3.356
+      },
+      "pvc_40": {
+        "1/2": 0.285, "3/4": 0.508, "1": 0.832,
+        "1-1/4": 1.453, "1-1/2": 1.986, "2": 3.291
+      }
+    },
+    "wire_area_sqin": {
+      "description": "Chapter 9 Table 5 — Conductor Area (sq in) THHN/THWN",
+      "thhn": {
+        "14": 0.0097, "12": 0.0133, "10": 0.0211, "8": 0.0366,
+        "6": 0.0507, "4": 0.0824, "3": 0.0973, "2": 0.1158,
+        "1": 0.1562, "1/0": 0.1855, "2/0": 0.2223,
+        "3/0": 0.2679, "4/0": 0.3237
+      }
+    }
+  }
+}

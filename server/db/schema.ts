@@ -2769,3 +2769,157 @@ export const pipelineApprovals = mysqlTable(
 
 export type PipelineApproval = typeof pipelineApprovals.$inferSelect;
 export type InsertPipelineApproval = typeof pipelineApprovals.$inferInsert;
+
+// ===========================================================================
+// USER MEMORY — persistent AI memory per user (key/value with categories)
+// ===========================================================================
+
+export const userMemory = mysqlTable(
+  "user_memory",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("userId").notNull(), // FK to users.id
+    memoryKey: varchar("memoryKey", { length: 255 }).notNull(),
+    memoryValue: text("memoryValue").notNull(),
+    category: mysqlEnum("category", [
+      "contact",     // e.g. "contact:karen" → "Karen Smith, wife, karen@email.com"
+      "preference",  // e.g. "pref:comm_style" → "brief, no jargon"
+      "pattern",     // e.g. "pattern:morning" → "checks email first, then proposals"
+      "context",     // e.g. "ctx:project_a" → "residential rewire, 2000 sq ft"
+      "schedule",    // e.g. "sched:workdays" → "Mon-Fri 6AM-4PM"
+    ]).notNull(),
+    confidence: float("confidence").default(1.0),
+    source: mysqlEnum("source", ["user_stated", "ai_inferred", "system"]).default("user_stated").notNull(),
+    lastAccessedAt: timestamp("lastAccessedAt"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (t) => ({
+    userKeyIdx: uniqueIndex("um_user_key_idx").on(t.userId, t.memoryKey),
+    userCategoryIdx: index("um_user_category_idx").on(t.userId, t.category),
+  })
+);
+
+export type UserMemory = typeof userMemory.$inferSelect;
+export type InsertUserMemory = typeof userMemory.$inferInsert;
+
+// ===========================================================================
+// VERTICAL PACKS — knowledge pack definitions for trade verticals
+// ===========================================================================
+
+export const verticalPacks = mysqlTable(
+  "vertical_packs",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    slug: varchar("slug", { length: 64 }).notNull().unique(),
+    name: varchar("name", { length: 255 }).notNull(),
+    description: text("description"),
+    systemPromptTemplate: text("systemPromptTemplate").notNull(),
+    toolsConfig: json("toolsConfig").$type<{
+      enabled: string[];
+      config: Record<string, unknown>;
+    }>(),
+    knowledgeBaseRefs: json("knowledgeBaseRefs").$type<string[]>(),
+    uiExtensions: json("uiExtensions").$type<{
+      tabs?: Array<{ id: string; label: string; icon: string }>;
+      quickActions?: Array<{ id: string; label: string; intent: string; icon: string }>;
+    }>(),
+    status: mysqlEnum("status", ["active", "beta", "archived"]).default("beta").notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (t) => ({
+    slugIdx: uniqueIndex("vp_slug_idx").on(t.slug),
+    statusIdx: index("vp_status_idx").on(t.status),
+  })
+);
+
+export type VerticalPack = typeof verticalPacks.$inferSelect;
+export type InsertVerticalPack = typeof verticalPacks.$inferInsert;
+
+// ===========================================================================
+// USER VERTICALS — maps users to their active vertical packs
+// ===========================================================================
+
+export const userVerticals = mysqlTable(
+  "user_verticals",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("userId").notNull(), // FK to users.id
+    verticalPackId: int("verticalPackId").notNull(), // FK to vertical_packs.id
+    isPrimary: boolean("isPrimary").default(true).notNull(),
+    activatedAt: timestamp("activatedAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    userVerticalIdx: uniqueIndex("uv_user_vertical_idx").on(t.userId, t.verticalPackId),
+    userPrimaryIdx: index("uv_user_primary_idx").on(t.userId, t.isPrimary),
+  })
+);
+
+export type UserVertical = typeof userVerticals.$inferSelect;
+export type InsertUserVertical = typeof userVerticals.$inferInsert;
+
+// ===========================================================================
+// BETA FRICTION EVENTS — R&D friction detection from beta users
+// ===========================================================================
+
+export const betaFrictionEvents = mysqlTable(
+  "beta_friction_events",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("userId").notNull(), // FK to users.id
+    sessionToken: varchar("sessionToken", { length: 128 }),
+    type: mysqlEnum("type", [
+      "pause",        // user paused >10s in normally-fast flow
+      "backtrack",    // user navigated forward then back
+      "repeat",       // user repeated same action sequence
+      "error",        // user hit an error
+      "wish",         // user said "I wish I could..."
+      "slow_response", // AI response took too long
+    ]).notNull(),
+    context: json("context").$type<{
+      screen: string;
+      actionSequence: string[];
+      timestamp: string;
+      durationMs?: number;
+    }>(),
+    userMessage: text("userMessage"), // "Wish I could..." text
+    status: mysqlEnum("status", ["new", "reviewed", "actionable", "resolved"]).default("new").notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    userTypeIdx: index("bfe_user_type_idx").on(t.userId, t.type),
+    statusIdx: index("bfe_status_idx").on(t.status),
+    createdIdx: index("bfe_created_idx").on(t.createdAt),
+  })
+);
+
+export type BetaFrictionEvent = typeof betaFrictionEvents.$inferSelect;
+export type InsertBetaFrictionEvent = typeof betaFrictionEvents.$inferInsert;
+
+// ===========================================================================
+// BETA WORKFLOW STEPS — step-by-step user action recording
+// ===========================================================================
+
+export const betaWorkflowSteps = mysqlTable(
+  "beta_workflow_steps",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("userId").notNull(), // FK to users.id
+    workflowId: varchar("workflowId", { length: 64 }).notNull(),
+    stepNumber: int("stepNumber").notNull(),
+    action: varchar("action", { length: 128 }).notNull(), // e.g. "tap:upload_blueprint", "voice:run_estimate"
+    screen: varchar("screen", { length: 128 }),
+    metadata: json("metadata").$type<Record<string, unknown>>(),
+    durationMs: int("durationMs"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    workflowIdx: index("bws_workflow_idx").on(t.workflowId),
+    userIdx: index("bws_user_idx").on(t.userId),
+    createdIdx: index("bws_created_idx").on(t.createdAt),
+  })
+);
+
+export type BetaWorkflowStep = typeof betaWorkflowSteps.$inferSelect;
+export type InsertBetaWorkflowStep = typeof betaWorkflowSteps.$inferInsert;

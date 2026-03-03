@@ -1,8 +1,8 @@
 param(
-  [string]$RepoRoot = "C:\Users\Monica Morreale\Downloads\launchbase-platform",
-  [string]$ConfigPath = "C:\Users\Monica Morreale\Downloads\launchbase-platform\scripts\gcp\launchbase_gcp.env",
+  [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path,
+  [string]$ConfigPath = (Join-Path $PSScriptRoot "launchbase_gcp.env"),
   [switch]$DryRun,
-  [string]$QueueDir = "C:\Users\Monica Morreale\agent-runs\publish-queue"
+  [string]$QueueDir = (Join-Path $env:USERPROFILE "agent-runs\publish-queue")
 )
 
 $ErrorActionPreference = "Stop"

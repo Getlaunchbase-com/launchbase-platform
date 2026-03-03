@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 
@@ -45,10 +46,20 @@ function checkCmd(label, cmdPath, args = ["--help"]) {
   return { ...r, text, policyBlocked };
 }
 
+function resolveGlobalCmd(name) {
+  const isWin = process.platform === "win32";
+  if (isWin) {
+    const appData = process.env.APPDATA || path.join(os.homedir(), "AppData", "Roaming");
+    return path.join(appData, "npm", `${name}.cmd`);
+  }
+  const which = spawnSync("which", [name], { encoding: "utf8", timeout: 5_000, shell: false });
+  return which.stdout?.trim() || name;
+}
+
 function main() {
-  const claudePath = path.resolve("C:\\Users\\Monica Morreale\\AppData\\Roaming\\npm\\claude.cmd");
-  const geminiPath = path.resolve("C:\\Users\\Monica Morreale\\AppData\\Roaming\\npm\\gemini.cmd");
-  const codexPath = path.resolve("C:\\Users\\Monica Morreale\\AppData\\Roaming\\npm\\codex.cmd");
+  const claudePath = resolveGlobalCmd("claude");
+  const geminiPath = resolveGlobalCmd("gemini");
+  const codexPath = resolveGlobalCmd("codex");
 
   const c = checkCmd("claude.cmd", claudePath, ["--help"]);
   const g = checkCmd("gemini.cmd", geminiPath, ["--help"]);
