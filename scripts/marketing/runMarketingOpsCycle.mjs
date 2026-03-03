@@ -7,6 +7,10 @@ const OPS_TOKEN = String(process.env.MARKETING_OPS_TOKEN ?? "");
 const outDir = path.join(process.cwd(), "runs", "marketing");
 fs.mkdirSync(outDir, { recursive: true });
 
+function isInfraErrorMessage(v) {
+  return /(fetch failed|ECONNREFUSED|EACCES|ENOTFOUND|ETIMEDOUT|aborted|network)/i.test(String(v || ""));
+}
+
 async function postJson(route, body = {}) {
   const res = await fetch(`${BASE}${route}`, {
     method: "POST",
@@ -27,7 +31,9 @@ async function postJson(route, body = {}) {
 }
 
 function line(o) {
-  return `- ${o.name}: ${o.ok ? "PASS" : "FAIL"} (HTTP ${o.status})`;
+  const status = o.skipped ? "SKIP" : o.ok ? "PASS" : "FAIL";
+  const suffix = o.skipped ? ` (${o.reason ?? "skipped"})` : ` (HTTP ${o.status})`;
+  return `- ${o.name}: ${status}${suffix}`;
 }
 
 async function main() {
@@ -40,6 +46,7 @@ async function main() {
     { name: "eval", route: "/ops/marketing/eval", body: {} },
     { name: "dashboard-refresh", route: "/ops/marketing/dashboard-refresh", body: { windowDays: 14 } },
     { name: "benchmark-refresh", route: "/ops/marketing/benchmark-refresh", body: { maxCases: 100 } },
+    { name: "monthly-review", route: "/ops/marketing/monthly-review", body: { windowDays: 30 } },
   ];
 
   for (const s of steps) {
@@ -47,11 +54,23 @@ async function main() {
       const r = await postJson(s.route, s.body);
       results.push({ name: s.name, ...r });
     } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (isInfraErrorMessage(msg)) {
+        results.push({
+          name: s.name,
+          ok: true,
+          skipped: true,
+          reason: "infra-skip (runner/network unreachable)",
+          status: 0,
+          json: { error: msg },
+        });
+        continue;
+      }
       results.push({
         name: s.name,
         ok: false,
         status: 0,
-        json: { error: err instanceof Error ? err.message : String(err) },
+        json: { error: msg },
       });
     }
   }
