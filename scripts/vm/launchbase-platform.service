@@ -1,0 +1,28 @@
+[Unit]
+Description=LaunchBase Platform Server
+After=network.target docker.service
+Wants=docker.service
+
+[Service]
+Type=simple
+User=info
+WorkingDirectory=/home/info/launchbase-platform-publish
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node dist/server/_core/index.js
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=launchbase-platform
+
+# Graceful shutdown
+TimeoutStopSec=30
+KillMode=mixed
+KillSignal=SIGTERM
+
+# Resource limits
+LimitNOFILE=65536
+MemoryMax=2G
+
+[Install]
+WantedBy=multi-user.target

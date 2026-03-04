@@ -28,6 +28,7 @@ import {
   aiPreferences,
   userLearningProfiles,
 } from "../db/schema";
+import { logUsage, checkRateLimit } from "./costTracker";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -209,13 +210,31 @@ export async function runAiInference(
     // 3. Determine model: user preference → vertex profile → default
     const model = await resolveModel(db, session.agentInstanceId, session.modelPreference);
 
-    // 4. Call LLM
+    // 4. Rate limit check
+    const rateCheck = await checkRateLimit(session.userId);
+    if (!rateCheck.allowed) {
+      await db.insert(agentEvents).values({
+        runId,
+        type: "message",
+        payload: {
+          role: "assistant",
+          content: `You've reached your daily message limit (${rateCheck.limit} messages). Your limit resets at midnight. Contact support if you need more.`,
+          source: "rate_limit",
+        },
+      });
+      return;
+    }
+
+    // 5. Call LLM
     const fullMessages: ChatMessage[] = [
       { role: "system", content: systemPrompt },
       ...messages.slice(-MAX_HISTORY),
     ];
 
     const result = await callLLM(fullMessages, model);
+
+    // Log usage (fire-and-forget)
+    void logUsage(session.userId, model, result.usage, "chat");
 
     if (!result.ok || !result.content) {
       console.error("[aiInference] LLM call failed:", result.error);

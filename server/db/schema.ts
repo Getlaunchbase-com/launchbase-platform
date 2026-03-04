@@ -2967,6 +2967,7 @@ export const shadowResponses = mysqlTable(
     primaryResponse: text("primaryResponse").notNull(),
     shadowResponse: text("shadowResponse").notNull(),
     userPreference: mysqlEnum("userPreference", ["primary", "shadow"]),
+    shadowModelLane: varchar("shadowModelLane", { length: 64 }).default("main"), // "main" or "sandbox" for A/B
     systemPrompt: text("systemPrompt"), // snapshot for reproducibility
     createdAt: timestamp("createdAt").defaultNow().notNull(),
   },
@@ -3178,3 +3179,31 @@ export const pgDeviceHeartbeats = mysqlTable(
 
 export type PgDeviceHeartbeat = typeof pgDeviceHeartbeats.$inferSelect;
 export type InsertPgDeviceHeartbeat = typeof pgDeviceHeartbeats.$inferInsert;
+
+// ═══════════════════════════════════════════════════════════════════════
+// AI Cost Tracking & Rate Limiting
+// ═══════════════════════════════════════════════════════════════════════
+
+export const apiUsageLog = mysqlTable(
+  "api_usage_log",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("userId").notNull(),
+    model: varchar("model", { length: 128 }).notNull(),
+    inputTokens: int("inputTokens").default(0).notNull(),
+    outputTokens: int("outputTokens").default(0).notNull(),
+    totalTokens: int("totalTokens").default(0).notNull(),
+    estimatedCostUsd: decimal("estimatedCostUsd", { precision: 10, scale: 6 }).default("0"),
+    endpoint: varchar("endpoint", { length: 64 }).default("chat"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    userIdx: index("aul_user_idx").on(t.userId),
+    modelIdx: index("aul_model_idx").on(t.model),
+    createdIdx: index("aul_created_idx").on(t.createdAt),
+    userDateIdx: index("aul_user_date_idx").on(t.userId, t.createdAt),
+  })
+);
+
+export type ApiUsageLog = typeof apiUsageLog.$inferSelect;
+export type InsertApiUsageLog = typeof apiUsageLog.$inferInsert;

@@ -1819,4 +1819,17 @@ export const mobileUserRouter = router({
 
       return { recorded: true };
     }),
+
+  /** Get usage summary and rate limit status */
+  getUsageSummary: publicProcedure
+    .input(z.object({ token: z.string().min(1) }))
+    .query(async ({ input }) => {
+      const session = await validateMobileToken(input.token);
+      const { getUserUsageSummary, checkRateLimit } = await import("../../services/costTracker");
+      const [usage, rateLimit] = await Promise.all([
+        getUserUsageSummary(session.userId),
+        checkRateLimit(session.userId),
+      ]);
+      return { ...usage, rateLimit };
+    }),
 });

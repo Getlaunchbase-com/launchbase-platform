@@ -745,6 +745,16 @@ app.get("/api/contracts/info", (_req, res) => {
   }
 });
 
+app.get("/api/ollama/health", async (_req, res) => {
+  try {
+    const { getOllamaHealth } = await import("../services/ollamaHealthMonitor");
+    const status = await getOllamaHealth();
+    res.json(status);
+  } catch (err) {
+    res.status(500).json({ healthy: false, error: String(err) });
+  }
+});
+
 app.get("/api/blueprint-page-image", (req, res) => {
   const relPath = String(req.query.path ?? "");
   if (!relPath) {
