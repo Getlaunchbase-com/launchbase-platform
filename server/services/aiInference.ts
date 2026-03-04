@@ -3,10 +3,13 @@
  *
  * Core service powering the personal AI assistant. Handles:
  *   1. Loading conversation history from agentEvents
- *   2. Building system prompt from vertical pack + user memory
- *   3. Calling AIMLAPI (OpenAI-compatible) for LLM inference
- *   4. Writing assistant response back as agentEvent
- *   5. Tool call execution (email, memory, calculators)
+ *   2. Building system prompt from vertical pack + user memory + learning profile
+ *   3. Multi-model routing: user preference → vertex profile → default
+ *   4. Calling AIMLAPI (OpenAI-compatible) for LLM inference
+ *   5. Writing assistant response back as agentEvent
+ *   6. Tool call execution (email, memory, calculators)
+ *   7. Shadow inference (fires async after primary response)
+ *   8. Automatic memory extraction from conversations
  *
  * Called fire-and-forget from mobile.chat.send — client polls via chat.poll.
  */
@@ -22,6 +25,8 @@ import {
   userVerticals,
   agentInstances,
   vertexProfiles,
+  aiPreferences,
+  userLearningProfiles,
 } from "../db/schema";
 
 // ---------------------------------------------------------------------------
@@ -43,6 +48,16 @@ const DEFAULT_MODEL = process.env.ASSISTANT_MODEL || "anthropic/claude-sonnet-4-
 const MAX_HISTORY = 50; // max messages to include in context
 const MAX_TOKENS = 2000;
 const TEMPERATURE = 0.7;
+
+// ---------------------------------------------------------------------------
+// Available models — maps friendly keys to AIMLAPI model IDs
+// ---------------------------------------------------------------------------
+
+export const AVAILABLE_MODELS: Record<string, string> = {
+  "claude-sonnet": "anthropic/claude-sonnet-4-6",
+  "gpt-5": "openai/gpt-5.2-chat",
+  "deepseek": "deepseek/deepseek-chat-v3.1",
+};
 
 // ---------------------------------------------------------------------------
 // Types
@@ -69,6 +84,15 @@ interface InferenceResult {
     total_tokens?: number;
   };
   error?: string;
+}
+
+interface InferenceSession {
+  userId: number;
+  agentInstanceId: number;
+  projectId: number;
+  id: number;
+  modelPreference?: string;
+  responseMode?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -146,7 +170,7 @@ Key behaviors:
 
 export async function runAiInference(
   runId: number,
-  session: { userId: number; agentInstanceId: number; projectId: number; id: number }
+  session: InferenceSession
 ): Promise<void> {
   const db = await getDb();
   if (!db) {
@@ -179,11 +203,11 @@ export async function runAiInference(
       return;
     }
 
-    // 2. Build system prompt (base + vertical + memory)
+    // 2. Build system prompt (base + vertical + memory + learning profile)
     const systemPrompt = await buildSystemPrompt(db, session.userId);
 
-    // 3. Determine model from vertex profile or default
-    const model = await resolveModel(db, session.agentInstanceId);
+    // 3. Determine model: user preference → vertex profile → default
+    const model = await resolveModel(db, session.agentInstanceId, session.modelPreference);
 
     // 4. Call LLM
     const fullMessages: ChatMessage[] = [
@@ -212,7 +236,7 @@ export async function runAiInference(
     // The LLM response content is always written as a message event
 
     // 6. Write assistant response
-    await db.insert(agentEvents).values({
+    const [primaryEvent] = await db.insert(agentEvents).values({
       runId,
       type: "message",
       payload: {
@@ -239,6 +263,22 @@ export async function runAiInference(
       })
       .where(eq(agentRuns.id, runId));
 
+    // 8. Fire shadow inference (non-blocking) if shadow learning enabled
+    const shouldShadow = session.responseMode === "compare" || await isShadowEnabled(db, session.userId);
+    if (shouldShadow) {
+      void runShadowInference(
+        db, runId, primaryEvent.insertId, session, fullMessages,
+        systemPrompt, result.content, result.model || model
+      ).catch((err) => {
+        console.warn("[aiInference] Shadow inference failed (non-critical):", err);
+      });
+    }
+
+    // 9. Auto-extract memories (non-blocking)
+    void extractMemories(db, session.userId, messages, result.content).catch((err) => {
+      console.warn("[aiInference] Memory extraction failed (non-critical):", err);
+    });
+
   } catch (err) {
     console.error("[aiInference] Unexpected error:", err);
     try {
@@ -255,7 +295,7 @@ export async function runAiInference(
 }
 
 // ---------------------------------------------------------------------------
-// Build system prompt from vertical pack + user memory
+// Build system prompt from vertical pack + user memory + learning profile
 // ---------------------------------------------------------------------------
 
 async function buildSystemPrompt(db: any, userId: number): Promise<string> {
@@ -279,6 +319,29 @@ async function buildSystemPrompt(db: any, userId: number): Promise<string> {
     }
   } catch { /* no vertical pack yet */ }
 
+  // Load user learning profile (structured context)
+  try {
+    const [profile] = await db
+      .select({ profile: userLearningProfiles.profile })
+      .from(userLearningProfiles)
+      .where(eq(userLearningProfiles.userId, userId))
+      .limit(1);
+
+    if (profile?.profile) {
+      const p = profile.profile as Record<string, unknown>;
+      const profileParts: string[] = [];
+      if (p.industry) profileParts.push(`Industry: ${p.industry}`);
+      if (p.role) profileParts.push(`Role: ${p.role}`);
+      if (p.communicationStyle) profileParts.push(`Communication style: ${p.communicationStyle}`);
+      if (p.technicalLevel) profileParts.push(`Technical level: ${p.technicalLevel}`);
+      if (p.preferredResponseLength) profileParts.push(`Preferred response length: ${p.preferredResponseLength}`);
+      if (p.timezone) profileParts.push(`Timezone: ${p.timezone}`);
+      if (profileParts.length > 0) {
+        parts.push(`\n--- User Profile ---\n${profileParts.join("\n")}`);
+      }
+    }
+  } catch { /* no learning profile yet */ }
+
   // Load user memory (most recent 30 entries)
   try {
     const memories = await db
@@ -286,6 +349,7 @@ async function buildSystemPrompt(db: any, userId: number): Promise<string> {
         memoryKey: userMemory.memoryKey,
         memoryValue: userMemory.memoryValue,
         category: userMemory.category,
+        source: userMemory.source,
       })
       .from(userMemory)
       .where(eq(userMemory.userId, userId))
@@ -293,7 +357,12 @@ async function buildSystemPrompt(db: any, userId: number): Promise<string> {
       .limit(30);
 
     if (memories.length > 0) {
-      const memoryText = memories
+      // Explicit memories first, then auto-extracted
+      const explicit = memories.filter((m: any) => m.source !== "ai_inferred");
+      const auto = memories.filter((m: any) => m.source === "ai_inferred");
+      const sorted = [...explicit, ...auto];
+
+      const memoryText = sorted
         .map((m: any) => `- [${m.category}] ${m.memoryKey}: ${m.memoryValue}`)
         .join("\n");
       parts.push(`\n--- What you know about this user ---\n${memoryText}`);
@@ -304,10 +373,20 @@ async function buildSystemPrompt(db: any, userId: number): Promise<string> {
 }
 
 // ---------------------------------------------------------------------------
-// Resolve model from agent instance → vertex profile → default
+// Resolve model: user preference → vertex profile → default
 // ---------------------------------------------------------------------------
 
-async function resolveModel(db: any, agentInstanceId: number): Promise<string> {
+async function resolveModel(
+  db: any,
+  agentInstanceId: number,
+  modelPreference?: string,
+): Promise<string> {
+  // 1. User's model preference (from mobile request)
+  if (modelPreference && AVAILABLE_MODELS[modelPreference]) {
+    return AVAILABLE_MODELS[modelPreference];
+  }
+
+  // 2. Vertex profile model
   try {
     const [instance] = await db
       .select({ vertexId: agentInstances.vertexId })
@@ -327,14 +406,134 @@ async function resolveModel(db: any, agentInstanceId: number): Promise<string> {
     }
   } catch { /* fall through to default */ }
 
+  // 3. System default
   return DEFAULT_MODEL;
+}
+
+// ---------------------------------------------------------------------------
+// Check if shadow learning is enabled for user
+// ---------------------------------------------------------------------------
+
+async function isShadowEnabled(db: any, userId: number): Promise<boolean> {
+  try {
+    const [prefs] = await db
+      .select({ shadowLearningEnabled: aiPreferences.shadowLearningEnabled })
+      .from(aiPreferences)
+      .where(eq(aiPreferences.userId, userId))
+      .limit(1);
+    return prefs?.shadowLearningEnabled ?? true; // default enabled
+  } catch {
+    return true;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Shadow inference — runs Ollama (or fallback) in parallel after primary
+// ---------------------------------------------------------------------------
+
+async function runShadowInference(
+  db: any,
+  runId: number,
+  primaryEventId: number,
+  session: InferenceSession,
+  fullMessages: ChatMessage[],
+  systemPrompt: string,
+  primaryContent: string,
+  primaryModel: string,
+): Promise<void> {
+  // Lazy import to avoid circular deps and keep shadow optional
+  const { runShadow } = await import("./shadowInference");
+  await runShadow({
+    db,
+    runId,
+    primaryEventId,
+    userId: session.userId,
+    fullMessages,
+    systemPrompt,
+    primaryContent,
+    primaryModel,
+    responseMode: session.responseMode,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Auto-extract memories from conversations
+// ---------------------------------------------------------------------------
+
+async function extractMemories(
+  db: any,
+  userId: number,
+  conversationMessages: ChatMessage[],
+  assistantResponse: string,
+): Promise<void> {
+  // Only extract every few messages to avoid excessive API calls
+  const userMessages = conversationMessages.filter((m) => m.role === "user");
+  if (userMessages.length < 2) return; // need enough context
+
+  // Use a lightweight prompt to extract facts
+  const lastUserMsg = userMessages[userMessages.length - 1]?.content || "";
+  const extractionPrompt = `Based on this conversation exchange, extract any facts about the user that should be remembered for future conversations. Only extract concrete, useful facts (names, preferences, schedules, projects, contacts).
+
+User said: "${lastUserMsg}"
+Assistant responded: "${assistantResponse.slice(0, 500)}"
+
+Return a JSON array of objects with keys: key (string, like "contact:karen"), value (string), category (one of: contact, preference, pattern, context, schedule). Return [] if nothing worth remembering.`;
+
+  try {
+    const result = await callLLM(
+      [{ role: "system", content: "You extract structured facts from conversations. Return only valid JSON arrays." },
+       { role: "user", content: extractionPrompt }],
+      "deepseek/deepseek-chat-v3.1", // Use cheapest model for extraction
+    );
+
+    if (!result.ok || !result.content) return;
+
+    // Parse the JSON array from the response
+    const content = result.content.trim();
+    const jsonMatch = content.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) return;
+
+    const facts = JSON.parse(jsonMatch[0]) as Array<{ key: string; value: string; category: string }>;
+    if (!Array.isArray(facts) || facts.length === 0) return;
+
+    // Store each extracted fact
+    for (const fact of facts.slice(0, 5)) { // max 5 per extraction
+      if (!fact.key || !fact.value || !fact.category) continue;
+      const validCategories = ["contact", "preference", "pattern", "context", "schedule"];
+      if (!validCategories.includes(fact.category)) continue;
+
+      try {
+        const [existing] = await db
+          .select()
+          .from(userMemory)
+          .where(and(eq(userMemory.userId, userId), eq(userMemory.memoryKey, fact.key)))
+          .limit(1);
+
+        if (existing) {
+          await db
+            .update(userMemory)
+            .set({ memoryValue: fact.value, category: fact.category as any })
+            .where(eq(userMemory.id, existing.id));
+        } else {
+          await db.insert(userMemory).values({
+            userId,
+            memoryKey: fact.key,
+            memoryValue: fact.value,
+            category: fact.category as any,
+            source: "ai_inferred",
+            confidence: 0.7,
+          });
+        }
+      } catch { /* skip individual memory failures */ }
+    }
+  } catch { /* extraction is best-effort */ }
 }
 
 // ---------------------------------------------------------------------------
 // Call AIMLAPI (OpenAI-compatible endpoint)
 // ---------------------------------------------------------------------------
 
-async function callLLM(
+export async function callLLM(
   messages: ChatMessage[],
   model: string,
 ): Promise<InferenceResult> {
