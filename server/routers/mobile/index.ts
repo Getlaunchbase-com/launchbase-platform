@@ -25,6 +25,9 @@ import { z } from "zod";
 import { router, publicProcedure } from "../../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getDb } from "../../db";
+
+// Re-export Parental Guardian router
+export { mobileParentalGuardianRouter } from "./parentalGuardian";
 import { getFreezeStatus, isContractFrozen } from "../../contracts/freeze_governance";
 import { getExecutionGate } from "../../services/agentHealthMonitor";
 import {
@@ -42,12 +45,15 @@ import {
   userVerticals,
   betaFrictionEvents,
   betaWorkflowSteps,
+  aiPreferences,
+  shadowResponses,
 } from "../../db/schema";
 import { desc, eq, and, gt, gte, count } from "drizzle-orm";
 import { randomBytes, createHash } from "crypto";
 import path from "node:path";
 import fs from "node:fs";
 import { runAiInference } from "../../services/aiInference";
+import { generateBriefing } from "../../services/briefingEngine";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -644,6 +650,8 @@ export const mobileChatRouter = router({
         token: z.string().min(1),
         message: z.string().min(1).max(10_000),
         model: z.string().max(128).optional(),
+        modelPreference: z.string().max(64).optional(),
+        responseMode: z.enum(["primary_only", "compare", "launchbase_only"]).optional(),
       })
     )
     .mutation(async ({ input }) => {
@@ -720,6 +728,8 @@ export const mobileChatRouter = router({
         agentInstanceId: session.agentInstanceId,
         projectId: session.projectId,
         id: session.id,
+        modelPreference: input.modelPreference,
+        responseMode: input.responseMode,
       }).catch((err) => {
         console.error("[mobile:chat:send] Inference error:", err);
       });
@@ -1603,5 +1613,210 @@ export const mobileBetaRouter = router({
       });
 
       return { logged: true };
+    }),
+});
+
+// =========================================================================
+// Briefing Router
+// =========================================================================
+
+export const mobileBriefingRouter = router({
+  /**
+   * Get personalized morning briefing for the authenticated user.
+   */
+  get: publicProcedure
+    .input(z.object({ token: z.string().min(1) }))
+    .query(async ({ input }) => {
+      const session = await validateMobileToken(input.token);
+      enforceMobileRateLimit(`briefing:get:${session.userId}`);
+
+      const briefing = await generateBriefing(session.userId);
+      if (!briefing) {
+        return {
+          greeting: "Hello!",
+          items: [{ type: "tip" as const, summary: "Start a conversation to get personalized briefings.", actionable: false }],
+          generatedAt: new Date().toISOString(),
+        };
+      }
+      return briefing;
+    }),
+});
+
+// =========================================================================
+// User AI Preferences & Memory Router
+// =========================================================================
+
+export const mobileUserRouter = router({
+  /** Get AI preferences for the authenticated user */
+  getAiPreferences: publicProcedure
+    .input(z.object({ token: z.string().min(1) }))
+    .query(async ({ input }) => {
+      const session = await validateMobileToken(input.token);
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable." });
+
+      const [prefs] = await db
+        .select()
+        .from(aiPreferences)
+        .where(eq(aiPreferences.userId, session.userId))
+        .limit(1);
+
+      return prefs || {
+        preferredModel: "claude-sonnet",
+        responseMode: "primary_only",
+        shadowLearningEnabled: true,
+      };
+    }),
+
+  /** Update AI preferences */
+  updateAiPreferences: publicProcedure
+    .input(
+      z.object({
+        token: z.string().min(1),
+        preferredModel: z.string().max(128).optional(),
+        responseMode: z.enum(["primary_only", "compare", "launchbase_only"]).optional(),
+        shadowLearningEnabled: z.boolean().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const session = await validateMobileToken(input.token);
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable." });
+
+      const [existing] = await db
+        .select()
+        .from(aiPreferences)
+        .where(eq(aiPreferences.userId, session.userId))
+        .limit(1);
+
+      const updates: Record<string, unknown> = {};
+      if (input.preferredModel !== undefined) updates.preferredModel = input.preferredModel;
+      if (input.responseMode !== undefined) updates.responseMode = input.responseMode;
+      if (input.shadowLearningEnabled !== undefined) updates.shadowLearningEnabled = input.shadowLearningEnabled;
+
+      if (existing) {
+        await db
+          .update(aiPreferences)
+          .set(updates)
+          .where(eq(aiPreferences.id, existing.id));
+      } else {
+        await db.insert(aiPreferences).values({
+          userId: session.userId,
+          preferredModel: input.preferredModel || "claude-sonnet",
+          responseMode: input.responseMode || "primary_only",
+          shadowLearningEnabled: input.shadowLearningEnabled ?? true,
+        });
+      }
+
+      return { updated: true };
+    }),
+
+  /** Get user memories with pagination */
+  getMemories: publicProcedure
+    .input(
+      z.object({
+        token: z.string().min(1),
+        limit: z.number().int().min(1).max(100).default(30),
+        category: z.string().max(64).optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      const session = await validateMobileToken(input.token);
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable." });
+
+      const conditions = [eq(userMemory.userId, session.userId)];
+      if (input.category) {
+        conditions.push(eq(userMemory.category, input.category as any));
+      }
+
+      const items = await db
+        .select({
+          id: userMemory.id,
+          key: userMemory.memoryKey,
+          value: userMemory.memoryValue,
+          category: userMemory.category,
+          source: userMemory.source,
+          updatedAt: userMemory.updatedAt,
+        })
+        .from(userMemory)
+        .where(and(...conditions))
+        .orderBy(desc(userMemory.updatedAt))
+        .limit(input.limit);
+
+      const [totalRow] = await db
+        .select({ total: count() })
+        .from(userMemory)
+        .where(eq(userMemory.userId, session.userId));
+
+      return { items, total: totalRow?.total || 0 };
+    }),
+
+  /** Delete a specific memory */
+  deleteMemory: publicProcedure
+    .input(z.object({
+      token: z.string().min(1),
+      memoryId: z.number().int(),
+    }))
+    .mutation(async ({ input }) => {
+      const session = await validateMobileToken(input.token);
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable." });
+
+      await db
+        .delete(userMemory)
+        .where(and(
+          eq(userMemory.id, input.memoryId),
+          eq(userMemory.userId, session.userId),
+        ));
+
+      return { deleted: true };
+    }),
+
+  /** Clear all memories for the user */
+  clearMemories: publicProcedure
+    .input(z.object({ token: z.string().min(1) }))
+    .mutation(async ({ input }) => {
+      const session = await validateMobileToken(input.token);
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable." });
+
+      await db
+        .delete(userMemory)
+        .where(eq(userMemory.userId, session.userId));
+
+      return { cleared: true };
+    }),
+
+  /** Submit model preference vote (compare mode) */
+  submitModelPreference: publicProcedure
+    .input(z.object({
+      token: z.string().min(1),
+      eventId: z.number().int().optional(),
+      runId: z.number().int().optional(),
+      preferredModel: z.string().max(128),
+      rejectedModel: z.string().max(128),
+    }))
+    .mutation(async ({ input }) => {
+      const session = await validateMobileToken(input.token);
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable." });
+
+      // Find the shadow response record for this event and update preference
+      if (input.eventId) {
+        const preference = input.preferredModel.includes("launchbase") || input.preferredModel.includes("llama")
+          ? "shadow" as const
+          : "primary" as const;
+
+        await db
+          .update(shadowResponses)
+          .set({ userPreference: preference })
+          .where(and(
+            eq(shadowResponses.eventId, input.eventId),
+            eq(shadowResponses.userId, session.userId),
+          ));
+      }
+
+      return { recorded: true };
     }),
 });

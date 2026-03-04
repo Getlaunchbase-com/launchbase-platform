@@ -2923,3 +2923,258 @@ export const betaWorkflowSteps = mysqlTable(
 
 export type BetaWorkflowStep = typeof betaWorkflowSteps.$inferSelect;
 export type InsertBetaWorkflowStep = typeof betaWorkflowSteps.$inferInsert;
+
+// ===========================================================================
+// AI PREFERENCES — per-user model selection and response mode
+// ===========================================================================
+
+export const aiPreferences = mysqlTable(
+  "ai_preferences",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("userId").notNull(), // FK to users.id
+    preferredModel: varchar("preferredModel", { length: 128 }).default("claude-sonnet").notNull(),
+    responseMode: mysqlEnum("responseMode", [
+      "primary_only",
+      "compare",
+      "launchbase_only",
+    ]).default("primary_only").notNull(),
+    shadowLearningEnabled: boolean("shadowLearningEnabled").default(true).notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (t) => ({
+    userIdx: uniqueIndex("ap_user_idx").on(t.userId),
+  })
+);
+
+export type AiPreference = typeof aiPreferences.$inferSelect;
+export type InsertAiPreference = typeof aiPreferences.$inferInsert;
+
+// ===========================================================================
+// SHADOW RESPONSES — paired primary/shadow responses for training
+// ===========================================================================
+
+export const shadowResponses = mysqlTable(
+  "shadow_responses",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    runId: int("runId").notNull(), // FK to agent_runs.id
+    eventId: int("eventId"), // FK to agent_events.id (primary response)
+    userId: int("userId").notNull(), // FK to users.id
+    primaryModel: varchar("primaryModel", { length: 128 }).notNull(),
+    shadowModel: varchar("shadowModel", { length: 128 }).notNull(),
+    primaryResponse: text("primaryResponse").notNull(),
+    shadowResponse: text("shadowResponse").notNull(),
+    userPreference: mysqlEnum("userPreference", ["primary", "shadow"]),
+    systemPrompt: text("systemPrompt"), // snapshot for reproducibility
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    runIdx: index("sr_run_idx").on(t.runId),
+    userIdx: index("sr_user_idx").on(t.userId),
+    prefIdx: index("sr_pref_idx").on(t.userPreference),
+    createdIdx: index("sr_created_idx").on(t.createdAt),
+  })
+);
+
+export type ShadowResponse = typeof shadowResponses.$inferSelect;
+export type InsertShadowResponse = typeof shadowResponses.$inferInsert;
+
+// ===========================================================================
+// USER LEARNING PROFILES — aggregated user personality/preferences
+// ===========================================================================
+
+export const userLearningProfiles = mysqlTable(
+  "user_learning_profiles",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("userId").notNull(), // FK to users.id
+    profile: json("profile").$type<{
+      industry?: string;
+      role?: string;
+      communicationStyle?: string;
+      commonTopics?: string[];
+      preferredResponseLength?: "brief" | "moderate" | "detailed";
+      technicalLevel?: "beginner" | "intermediate" | "expert";
+      timezone?: string;
+      activeHours?: string;
+    }>(),
+    conversationCount: int("conversationCount").default(0).notNull(),
+    lastUpdatedAt: timestamp("lastUpdatedAt").defaultNow().notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    userIdx: uniqueIndex("ulp_user_idx").on(t.userId),
+  })
+);
+
+export type UserLearningProfile = typeof userLearningProfiles.$inferSelect;
+export type InsertUserLearningProfile = typeof userLearningProfiles.$inferInsert;
+
+// ═══════════════════════════════════════════════════════════════════════
+// Parental Guardian — Family & Device Management
+// ═══════════════════════════════════════════════════════════════════════
+
+export const pgFamilies = mysqlTable("pg_families", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PgFamily = typeof pgFamilies.$inferSelect;
+export type InsertPgFamily = typeof pgFamilies.$inferInsert;
+
+export const pgFamilyMembers = mysqlTable(
+  "pg_family_members",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    familyId: int("familyId").notNull(),
+    userId: int("userId").notNull(),
+    role: mysqlEnum("role", ["guardian", "ward"]).notNull(),
+    deviceId: varchar("deviceId", { length: 128 }),
+    deviceName: varchar("deviceName", { length: 255 }),
+    pushToken: varchar("pushToken", { length: 512 }),
+    status: mysqlEnum("status", ["active", "inactive"]).default("active").notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    familyIdx: index("pgfm_family_idx").on(t.familyId),
+    userIdx: index("pgfm_user_idx").on(t.userId),
+    familyUserIdx: uniqueIndex("pgfm_family_user_idx").on(t.familyId, t.userId),
+  })
+);
+
+export type PgFamilyMember = typeof pgFamilyMembers.$inferSelect;
+export type InsertPgFamilyMember = typeof pgFamilyMembers.$inferInsert;
+
+// ═══════════════════════════════════════════════════════════════════════
+// Parental Guardian — Policies & Schedules
+// ═══════════════════════════════════════════════════════════════════════
+
+export const pgPolicies = mysqlTable(
+  "pg_policies",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    familyId: int("familyId").notNull(),
+    type: mysqlEnum("type", ["allowlist", "blocklist", "category", "schedule"]).notNull(),
+    name: varchar("name", { length: 255 }).notNull(),
+    rules: json("rules").$type<{
+      target: string;
+      action: "allow" | "block" | "require_approval";
+      ttl?: number;
+      expiresAt?: string;
+      reason?: string;
+    }[]>().notNull(),
+    isActive: boolean("isActive").default(true).notNull(),
+    createdBy: mysqlEnum("createdBy", ["guardian", "system"]).default("guardian").notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (t) => ({
+    familyIdx: index("pgp_family_idx").on(t.familyId),
+    familyActiveIdx: index("pgp_family_active_idx").on(t.familyId, t.isActive),
+  })
+);
+
+export type PgPolicy = typeof pgPolicies.$inferSelect;
+export type InsertPgPolicy = typeof pgPolicies.$inferInsert;
+
+export const pgSchedules = mysqlTable(
+  "pg_schedules",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    familyId: int("familyId").notNull(),
+    name: varchar("name", { length: 255 }).notNull(),
+    days: json("days").$type<number[]>().notNull(),
+    startTime: varchar("startTime", { length: 5 }).notNull(), // "HH:MM"
+    endTime: varchar("endTime", { length: 5 }).notNull(),
+    policyOverrides: json("policyOverrides").$type<{
+      target: string;
+      action: "allow" | "block" | "require_approval";
+      reason?: string;
+    }[]>().notNull(),
+    isActive: boolean("isActive").default(true).notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  (t) => ({
+    familyIdx: index("pgs_family_idx").on(t.familyId),
+  })
+);
+
+export type PgSchedule = typeof pgSchedules.$inferSelect;
+export type InsertPgSchedule = typeof pgSchedules.$inferInsert;
+
+// ═══════════════════════════════════════════════════════════════════════
+// Parental Guardian — Approval Requests
+// ═══════════════════════════════════════════════════════════════════════
+
+export const pgApprovalRequests = mysqlTable(
+  "pg_approval_requests",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    familyId: int("familyId").notNull(),
+    childDeviceId: varchar("childDeviceId", { length: 128 }).notNull(),
+    url: text("url").notNull(),
+    category: varchar("category", { length: 64 }).notNull(),
+    reason: text("reason"),
+    status: mysqlEnum("status", ["pending", "approved", "denied", "expired"]).default("pending").notNull(),
+    ttl: int("ttl"), // approved duration in minutes
+    resolvedBy: varchar("resolvedBy", { length: 128 }),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    resolvedAt: timestamp("resolvedAt"),
+  },
+  (t) => ({
+    familyIdx: index("pgar_family_idx").on(t.familyId),
+    familyStatusIdx: index("pgar_family_status_idx").on(t.familyId, t.status),
+    deviceIdx: index("pgar_device_idx").on(t.childDeviceId),
+  })
+);
+
+export type PgApprovalRequest = typeof pgApprovalRequests.$inferSelect;
+export type InsertPgApprovalRequest = typeof pgApprovalRequests.$inferInsert;
+
+// ═══════════════════════════════════════════════════════════════════════
+// Parental Guardian — Activity Log & Heartbeats
+// ═══════════════════════════════════════════════════════════════════════
+
+export const pgActivityLog = mysqlTable(
+  "pg_activity_log",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    familyId: int("familyId").notNull(),
+    deviceId: varchar("deviceId", { length: 128 }).notNull(),
+    eventType: varchar("eventType", { length: 64 }).notNull(),
+    metadata: json("metadata").$type<Record<string, unknown>>(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  (t) => ({
+    familyIdx: index("pgal_family_idx").on(t.familyId),
+    deviceIdx: index("pgal_device_idx").on(t.deviceId),
+    eventIdx: index("pgal_event_idx").on(t.eventType),
+  })
+);
+
+export type PgActivityLog = typeof pgActivityLog.$inferSelect;
+export type InsertPgActivityLog = typeof pgActivityLog.$inferInsert;
+
+export const pgDeviceHeartbeats = mysqlTable(
+  "pg_device_heartbeats",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    deviceId: varchar("deviceId", { length: 128 }).notNull(),
+    familyId: int("familyId").notNull(),
+    lastSeen: timestamp("lastSeen").defaultNow().notNull(),
+    protectionStatus: mysqlEnum("protectionStatus", ["active", "warning", "disabled"]).default("active").notNull(),
+    appState: varchar("appState", { length: 32 }),
+  },
+  (t) => ({
+    deviceIdx: uniqueIndex("pgdh_device_idx").on(t.deviceId),
+    familyIdx: index("pgdh_family_idx").on(t.familyId),
+  })
+);
+
+export type PgDeviceHeartbeat = typeof pgDeviceHeartbeats.$inferSelect;
+export type InsertPgDeviceHeartbeat = typeof pgDeviceHeartbeats.$inferInsert;

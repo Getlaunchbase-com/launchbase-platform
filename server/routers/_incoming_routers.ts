@@ -19,7 +19,7 @@ import { gapDetectionRouter } from "./admin/gapDetection";
 import { pipelineApprovalsRouter } from "./admin/pipelineApprovals";
 import { projectsRouter } from "./admin/projects";
 import { marketingAgentsRouter } from "./admin/marketingAgents";
-import { mobileSessionRouter, mobileVoiceRouter, mobileChatRouter, mobileFeedbackRouter, mobileAttachmentRouter, mobileTranscribeRouter, mobileConversationRouter, mobileVerticalRouter, mobileBetaRouter } from "./mobile";
+import { mobileSessionRouter, mobileVoiceRouter, mobileChatRouter, mobileFeedbackRouter, mobileAttachmentRouter, mobileTranscribeRouter, mobileConversationRouter, mobileVerticalRouter, mobileBetaRouter, mobileBriefingRouter, mobileUserRouter, mobileParentalGuardianRouter } from "./mobile";
 import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -500,6 +500,9 @@ export const appRouter = router({
     conversation: mobileConversationRouter,
     vertical: mobileVerticalRouter,
     beta: mobileBetaRouter,
+    briefing: mobileBriefingRouter,
+    user: mobileUserRouter,
+    parentalGuardian: mobileParentalGuardianRouter,
   }),
 
   // Admin routes (protected)
