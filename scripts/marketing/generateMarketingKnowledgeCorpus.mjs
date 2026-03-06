@@ -222,10 +222,12 @@ CRITICAL: Every response must naturally contain words from these categories:
 - Audience: contractor, smb, local (or industry-specific terms)
 - Risk controls: compliance, risk, rollback, stop-loss, guardrail
 
-Format: Output ONLY a single JSON object (no markdown fences, no extra text) with these fields:
-- "instruction": A specific question from a ${slot.vertical.label} business owner about ${slot.topic} (40-80 words)
-- "input": Business context including budget range, current situation, constraints, and goals (60-120 words)
-- "output": Expert marketing response (400-900 words) incorporating all 6 quality dimensions above`;
+IMPORTANT: Keep the output field CONCISE — 300-500 words maximum. Be dense and specific, not verbose.
+
+Format: Output ONLY a single JSON object (no markdown fences, no backticks, no extra text) with these fields:
+- "instruction": A specific question from a ${slot.vertical.label} business owner about ${slot.topic} (30-60 words)
+- "input": Business context with budget, situation, constraints (40-80 words)
+- "output": Expert marketing response (300-500 words) incorporating all 6 quality dimensions above. Be concise and dense — every sentence must add value.`;
 }
 
 function buildUserPrompt(slot) {
