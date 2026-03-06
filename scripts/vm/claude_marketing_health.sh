@@ -147,7 +147,14 @@ RESPONSE=$(curl -sf --max-time 120 https://api.anthropic.com/v1/messages \
     }')" 2>/dev/null)
 
 if [ -z "$RESPONSE" ]; then
-  echo "[${TIMESTAMP}] ERROR: Claude API call failed" >>"$LOG_FILE"
+  echo "[${TIMESTAMP}] ERROR: Claude API call failed (no response)" >>"$LOG_FILE"
+  exit 1
+fi
+
+# Check for API errors (auth, credits, rate limit)
+API_ERROR=$(echo "$RESPONSE" | jq -r '.error.message // empty' 2>/dev/null)
+if [ -n "$API_ERROR" ]; then
+  echo "[${TIMESTAMP}] ERROR: Claude API error: $API_ERROR" >>"$LOG_FILE"
   exit 1
 fi
 
