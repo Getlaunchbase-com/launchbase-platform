@@ -360,11 +360,23 @@ export async function getExecutionGate(vertex: string): Promise<"allow" | "view_
   const db = await getDb();
   if (!db) return "blocked"; // No DB = fail closed
 
-  const [record] = await db
+  // Try exact vertex name match first
+  let [record] = await db
     .select({ status: agentRuntimeStatus.status })
     .from(agentRuntimeStatus)
     .where(eq(agentRuntimeStatus.vertex, vertex))
     .limit(1);
+
+  // Fallback: vertex profile names (e.g. "ibew-134-default") don't match
+  // agent-stack vertex names (e.g. "IBEW_LV"). If no exact match, check
+  // if ANY healthy agent runtime exists (single-vertex deployments).
+  if (!record) {
+    [record] = await db
+      .select({ status: agentRuntimeStatus.status })
+      .from(agentRuntimeStatus)
+      .where(eq(agentRuntimeStatus.status, "healthy"))
+      .limit(1);
+  }
 
   if (!record) return "blocked"; // No status record = unknown = block
 
