@@ -1,0 +1,259 @@
+{
+  "version": "1.0.0",
+  "description": "PhD-level marketing knowledge taxonomy — 12 domains, 156 topics, 5 content types, 4 verticals = 3,120 unique generation slots",
+  "verticals": [
+    { "id": "ibew-electrical", "label": "IBEW 134 Electrical Contractors", "context": "union electrical contractors, NEC code compliance, prevailing wage projects, commercial/residential electrical" },
+    { "id": "general-contractor", "label": "General Contractors / HVAC / Plumbing", "context": "licensed general contractors, HVAC technicians, plumbers, multi-trade firms" },
+    { "id": "smb-saas", "label": "SMB SaaS & Professional Services", "context": "small business software companies, consultants, agencies, professional service firms" },
+    { "id": "platform-marketplace", "label": "Platform & Marketplace Operators", "context": "two-sided marketplaces, contractor platforms, service booking apps" }
+  ],
+  "contentTypes": [
+    { "id": "strategic_advisory", "label": "Strategic Advisory", "prompt": "A {vertical} business owner asks for strategic guidance on {topic}. Provide a framework-driven response with KPIs, implementation steps, compliance guardrails, and risk assessment." },
+    { "id": "campaign_blueprint", "label": "Campaign Blueprint", "prompt": "Design a complete campaign for a {vertical} business applying {topic} principles. Include channel selection, budget allocation, timeline, A/B test hypotheses, stop-loss criteria, and expected ROI benchmarks." },
+    { "id": "diagnostic_analysis", "label": "Diagnostic Analysis", "prompt": "A {vertical} business is underperforming in the area of {topic}. Provide root cause analysis with evidence-based checklist, industry benchmarks, remediation plan with rollback triggers, and compliance review." },
+    { "id": "content_artifact", "label": "Content Artifact", "prompt": "Create a marketing content piece (blog post, email sequence, ad copy, or case study) for a {vertical} business applying {topic}. Include measurable CTAs, conversion KPIs, and compliance disclaimers." },
+    { "id": "anti_pattern_alert", "label": "Anti-Pattern Alert", "prompt": "A {vertical} business is about to make a common mistake related to {topic}. Identify failure signatures, early warning metrics, historical evidence of what goes wrong, risk assessment, and better alternatives with guardrails." }
+  ],
+  "domains": [
+    {
+      "id": "marketing-strategy-foundations",
+      "name": "Marketing Strategy Foundations",
+      "sourceFrameworks": "Philip Kotler (Marketing Management), Michael Porter (Competitive Strategy, Five Forces)",
+      "topics": [
+        "Marketing mix (4Ps/7Ps) applied to trade services",
+        "STP framework (segmentation-targeting-positioning) for local contractors",
+        "Porter's Five Forces analysis for electrical contracting market",
+        "Competitive advantage through differentiation vs cost leadership",
+        "Value chain analysis for service businesses",
+        "Customer lifetime value modeling for recurring maintenance contracts",
+        "Market penetration vs market development strategies for trades",
+        "Product-market fit assessment frameworks",
+        "Blue ocean strategy applied to underserved trade verticals",
+        "Strategic group mapping for local service providers",
+        "PESTEL analysis for construction and trades industry",
+        "Ansoff matrix decision framework for SMB growth",
+        "Resource-based view of sustainable competitive advantage"
+      ]
+    },
+    {
+      "id": "behavioral-economics-persuasion",
+      "name": "Behavioral Economics & Persuasion",
+      "sourceFrameworks": "Daniel Kahneman (Prospect Theory, Thinking Fast and Slow), Robert Cialdini (Influence: 6 Principles of Persuasion)",
+      "topics": [
+        "Prospect theory: loss aversion in service pricing and proposals",
+        "Anchoring effects in estimate presentation and package pricing",
+        "Social proof deployment for contractor credibility and trust",
+        "Reciprocity principle in lead nurturing sequences",
+        "Scarcity and urgency in seasonal service promotions",
+        "Authority building through certification and union credentials",
+        "Commitment and consistency in customer retention programs",
+        "Choice architecture for service tier selection",
+        "Framing effects in proposal win rates",
+        "Endowment effect in subscription and retainer pricing",
+        "Availability heuristic in safety-focused marketing",
+        "Default bias in package structuring and upsells",
+        "Peak-end rule in customer experience design"
+      ]
+    },
+    {
+      "id": "brand-strategy-positioning",
+      "name": "Brand Strategy & Positioning",
+      "sourceFrameworks": "Al Ries & Jack Trout (Positioning), David Ogilvy (Advertising Principles), Byron Sharp (How Brands Grow)",
+      "topics": [
+        "Positioning theory: owning a category in local markets",
+        "Brand salience and mental availability (Byron Sharp)",
+        "Physical availability and distribution for service businesses",
+        "Distinctive brand assets for trades companies",
+        "Category entry points for electrical HVAC plumbing services",
+        "David Ogilvy advertising principles adapted for digital",
+        "Long copy vs short copy decisions by awareness level",
+        "Brand architecture for multi-service contractors",
+        "Rebranding frameworks and transition playbooks",
+        "Employer branding for skilled trades recruitment",
+        "Community brand building through union partnerships",
+        "Trust signals and credibility hierarchy for local services",
+        "Brand measurement: awareness consideration preference tracking"
+      ]
+    },
+    {
+      "id": "growth-marketing-modern",
+      "name": "Growth Marketing & Modern Tactics",
+      "sourceFrameworks": "Andrew Chen (Growth), Lenny Rachitsky (Product-Led Growth), Seth Godin (Permission Marketing, Purple Cow)",
+      "topics": [
+        "Product-led growth frameworks adapted for service businesses",
+        "Growth loops vs funnels: retention-driven acquisition",
+        "Viral coefficient calculation for referral programs",
+        "Community-led growth for trade professional networks",
+        "Content-led growth: educational marketing for trades",
+        "Bottom-up adoption in multi-location contracting firms",
+        "Activation metrics and aha moment identification",
+        "Growth experiment design and statistical significance",
+        "North star metric selection for different business models",
+        "Network effects in contractor marketplace platforms",
+        "Channel-market fit assessment framework",
+        "Payback period optimization for customer acquisition",
+        "Growth stage diagnosis and appropriate tactics by stage"
+      ]
+    },
+    {
+      "id": "customer-awareness-messaging",
+      "name": "Customer Awareness & Messaging",
+      "sourceFrameworks": "Eugene Schwartz (Breakthrough Advertising, 5 Levels of Awareness), April Dunford (Obviously Awesome), Clayton Christensen (Jobs to Be Done)",
+      "topics": [
+        "Five levels of awareness: unaware through most-aware messaging",
+        "Message-market match by awareness level",
+        "Category design and Obviously Awesome positioning (April Dunford)",
+        "Competitive alternatives analysis framework",
+        "Unique value proposition articulation process",
+        "Customer segmentation by job-to-be-done (Christensen)",
+        "Jobs-to-be-done interview methodology for service businesses",
+        "Outcome-driven innovation for service design",
+        "Customer switching costs and lock-in strategy",
+        "Pain point hierarchy and willingness-to-pay mapping",
+        "Feature vs benefit vs outcome messaging hierarchy",
+        "Objection handling frameworks for sales enablement",
+        "Customer language mining for authentic copy"
+      ]
+    },
+    {
+      "id": "campaign-operations-attribution",
+      "name": "Campaign Operations & Attribution",
+      "sourceFrameworks": "Enterprise marketing operations, multi-touch attribution, lifecycle automation",
+      "topics": [
+        "Multi-touch attribution modeling for local service businesses",
+        "Marketing mix modeling on a small budget",
+        "Incrementality testing frameworks for SMBs",
+        "Campaign budgeting and allocation optimization",
+        "Lead scoring and qualification frameworks",
+        "Sales-marketing alignment and SLA design",
+        "CRM pipeline management for service businesses",
+        "Email marketing automation best practices",
+        "SMS marketing compliance and effectiveness",
+        "Direct mail integration with digital campaigns",
+        "Event marketing and trade show ROI measurement",
+        "Seasonal campaign planning for trades verticals",
+        "Campaign post-mortem and learning extraction"
+      ]
+    },
+    {
+      "id": "digital-channels-tactics",
+      "name": "Digital Channels & Tactics",
+      "sourceFrameworks": "Modern digital marketing channels and platforms for local businesses",
+      "topics": [
+        "Local SEO and Google Business Profile optimization",
+        "Google Ads for service area businesses",
+        "Facebook and Meta ads for local contractor lead generation",
+        "LinkedIn B2B marketing for commercial contracting",
+        "YouTube video marketing for trades demonstrations",
+        "Review generation and reputation management",
+        "Website conversion rate optimization for service pages",
+        "Landing page design principles for lead capture",
+        "Retargeting and remarketing strategy on small budgets",
+        "Content marketing and blogging strategy for trades",
+        "Social media community management for local businesses",
+        "Podcast and audio marketing for niche verticals",
+        "NextDoor and hyperlocal platform strategies"
+      ]
+    },
+    {
+      "id": "content-creation-copywriting",
+      "name": "Content Creation & Copywriting",
+      "sourceFrameworks": "Direct response copywriting (AIDA, PAS, BAB), email marketing, content strategy",
+      "topics": [
+        "Direct response copywriting frameworks AIDA PAS BAB",
+        "Email sequence design: welcome nurture re-engagement",
+        "Case study writing methodology with measurable results",
+        "Testimonial collection and deployment strategy",
+        "Blog content strategy for SEO and thought leadership",
+        "Social media content calendar design and batching",
+        "Ad copy testing methodology and creative rotation",
+        "Landing page copy optimization with split testing",
+        "Proposal and estimate copy that increases close rates",
+        "Video script writing for before-after project showcases",
+        "Press release and media outreach copy",
+        "Newsletter design and engagement optimization",
+        "AI-assisted content creation workflows and guardrails"
+      ]
+    },
+    {
+      "id": "anti-patterns-failure-studies",
+      "name": "Anti-Patterns & Failure Studies",
+      "sourceFrameworks": "Marketing failure analysis, compliance violations, wasted spend patterns",
+      "topics": [
+        "Vanity metrics trap: likes without leads",
+        "Premature scaling: spending before product-market fit",
+        "Channel addiction: over-reliance on single acquisition source",
+        "Shiny object syndrome: chasing trends without strategy",
+        "Competitor copying without understanding context",
+        "Price war initiation and race-to-bottom dynamics",
+        "Compliance violations in advertising claims",
+        "Privacy regulation failures TCPA CAN-SPAM CCPA",
+        "Brand inconsistency across channels and touchpoints",
+        "Customer acquisition without retention planning",
+        "Over-automation: removing human touch from service delivery",
+        "Data hoarding without actionable analysis",
+        "Marketing-sales disconnect and lead handoff failures"
+      ]
+    },
+    {
+      "id": "ibew-electrical-contractor",
+      "name": "IBEW & Electrical Contractor Marketing",
+      "sourceFrameworks": "Trade-specific marketing, union compliance, electrical industry positioning",
+      "topics": [
+        "IBEW union marketing guidelines and compliance requirements",
+        "NEC code marketing: positioning safety expertise",
+        "Electrical contractor licensing requirements by state",
+        "Prevailing wage project marketing and bid positioning",
+        "Apprenticeship program recruitment marketing",
+        "Commercial vs residential electrical service marketing",
+        "Emergency electrical service lead generation",
+        "Electrical safety campaign design for brand building",
+        "Green energy and EV charging station marketing",
+        "Data center and industrial electrical marketing",
+        "Smart home and automation service marketing",
+        "Electrical contractor insurance and bonding as trust signals",
+        "Union vs non-union positioning and competitive messaging"
+      ]
+    },
+    {
+      "id": "smb-saas-platform",
+      "name": "SMB SaaS & Platform Marketing",
+      "sourceFrameworks": "SaaS growth, product-led growth, platform economics",
+      "topics": [
+        "Free trial and freemium conversion optimization",
+        "Self-serve onboarding funnel design",
+        "Customer success as a marketing function",
+        "Expansion revenue and upsell campaign design",
+        "Churn prediction and prevention campaigns",
+        "Partner and integration marketplace marketing",
+        "Product launch playbooks for feature releases",
+        "User community building and advocacy programs",
+        "In-app messaging and product-led nurture sequences",
+        "G2 and Capterra review strategy for SaaS",
+        "Webinar and demo funnel optimization",
+        "Account-based marketing for mid-market SaaS",
+        "Usage-based pricing communication strategies"
+      ]
+    },
+    {
+      "id": "measurement-analytics-experimentation",
+      "name": "Measurement, Analytics & Experimentation",
+      "sourceFrameworks": "Marketing analytics, A/B testing methodology, data-driven decision making",
+      "topics": [
+        "Marketing dashboard design: KPIs that drive decisions",
+        "A/B testing methodology with statistical rigor",
+        "Cohort analysis for customer behavior understanding",
+        "Funnel analysis and conversion bottleneck identification",
+        "Customer acquisition cost calculation and optimization",
+        "Marketing ROI calculation frameworks for non-technical operators",
+        "Survey design for market research and NPS measurement",
+        "Competitive intelligence gathering frameworks",
+        "Marketing budget allocation models 70-20-10 rule",
+        "Predictive analytics for lead prioritization",
+        "Marketing team OKR design and cascading",
+        "Vendor and agency evaluation frameworks",
+        "Marketing technology stack audit and rationalization"
+      ]
+    }
+  ]
+}

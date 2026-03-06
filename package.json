@@ -36,6 +36,9 @@
     "marketing:publish-artifacts": "node scripts/gcp/publishMarketingArtifacts.mjs",
     "marketing:flush-publish-queue": "node scripts/gcp/flushMarketingPublishQueue.mjs",
     "marketing:cli-preflight": "node scripts/marketing/cliPreflight.mjs",
+    "marketing:generate-knowledge-corpus": "node scripts/marketing/generateMarketingKnowledgeCorpus.mjs",
+    "marketing:prepare-ollama-training": "node scripts/marketing/prepareOllamaTraining.mjs",
+    "marketing:consolidate": "node scripts/marketing/consolidateFineTunePacks.mjs",
     "ops:full-exec": "node scripts/ops/fullExecution.mjs",
     "ops:swarm-unify": "node scripts/ops/swarmUnifyOrchestration.mjs",
     "smoke:marketing-loop": "tsx scripts/smokeMarketingLoop.ts"
