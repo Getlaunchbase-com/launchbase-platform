@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0",
-  "description": "PhD-level marketing knowledge taxonomy — 12 domains, 156 topics, 5 content types, 4 verticals = 3,120 unique generation slots",
+  "version": "2.0.0",
+  "description": "PhD-level marketing knowledge taxonomy — 18 domains, 234 topics, 5 content types, 4 verticals = 4,680 unique generation slots",
   "verticals": [
     { "id": "ibew-electrical", "label": "IBEW 134 Electrical Contractors", "context": "union electrical contractors, NEC code compliance, prevailing wage projects, commercial/residential electrical" },
     { "id": "general-contractor", "label": "General Contractors / HVAC / Plumbing", "context": "licensed general contractors, HVAC technicians, plumbers, multi-trade firms" },
@@ -253,6 +253,126 @@
         "Marketing team OKR design and cascading",
         "Vendor and agency evaluation frameworks",
         "Marketing technology stack audit and rationalization"
+      ]
+    },
+    {
+      "id": "x-twitter-mastery",
+      "name": "X/Twitter Platform Mastery",
+      "sourceFrameworks": "X/Twitter algorithm mechanics, viral content engineering, thread strategy, monetization, advertising platform",
+      "topics": [
+        "X algorithm deep-dive: ranking signals, engagement velocity, and distribution tiers",
+        "Thread strategy: hook-body-CTA architecture for 10x organic reach",
+        "X Premium and verification: ROI analysis and blue-check positioning strategy",
+        "X Ads platform mastery: campaign objectives, bidding strategies, and audience targeting",
+        "Viral mechanics on X: quote-tweet chains, ratio dynamics, and controversy-to-credibility conversion",
+        "X Spaces and live audio: audience building, co-host strategy, and lead generation",
+        "Hashtag strategy on X: trending topic participation vs branded hashtag campaigns",
+        "X analytics deep-dive: impressions vs engagements vs profile visits funnel",
+        "Content calendar for X: optimal posting frequency, time-of-day analysis by vertical",
+        "X for B2B: decision-maker targeting, thought leadership positioning, and DM outreach",
+        "Community Notes and trust signals: building credibility through transparency",
+        "X Lists as competitive intelligence and relationship management tools",
+        "Crisis communication and reputation management on X: real-time response playbooks"
+      ]
+    },
+    {
+      "id": "youtube-mastery",
+      "name": "YouTube Platform Mastery",
+      "sourceFrameworks": "YouTube algorithm, search/suggested optimization, retention analytics, monetization, YouTube Ads",
+      "topics": [
+        "YouTube algorithm deep-dive: click-through rate, watch time, and session time signals",
+        "Thumbnail design science: contrast, emotion, curiosity gap, and A/B testing methodology",
+        "YouTube SEO: title optimization, description strategy, tags, chapters, and card placement",
+        "Audience retention graph analysis: identifying drop-off patterns and optimizing content structure",
+        "YouTube Shorts strategy: vertical video for discovery, cross-promotion to long-form",
+        "YouTube Ads mastery: TrueView, bumper ads, discovery ads, and remarketing sequences",
+        "Channel architecture: playlists, series, and content pillar strategy for trades businesses",
+        "YouTube Community tab and engagement: polls, posts, and subscriber nurture strategy",
+        "Video content types for service businesses: tutorials, behind-the-scenes, testimonials, project showcases",
+        "YouTube monetization beyond ads: sponsorships, memberships, merch, and lead generation",
+        "YouTube analytics mastery: real-time, audience demographics, traffic sources, and revenue reports",
+        "Collaboration and cross-promotion: guest appearances, shoutouts, and industry partnerships",
+        "YouTube Live streaming: equipment, scheduling, engagement tactics, and replay optimization"
+      ]
+    },
+    {
+      "id": "facebook-instagram-meta",
+      "name": "Facebook & Instagram / Meta Platform Mastery",
+      "sourceFrameworks": "Meta Business Suite, Facebook/Instagram algorithm, Reels, Stories, Groups, Meta Ads Manager",
+      "topics": [
+        "Facebook algorithm 2024-2026: meaningful interactions, AI-recommended content, and feed ranking",
+        "Instagram algorithm deep-dive: feed, Stories, Reels, and Explore ranking factors",
+        "Meta Ads Manager mastery: campaign structure, Advantage+ campaigns, and attribution windows",
+        "Facebook Groups strategy: community building, moderation, and organic lead generation for local businesses",
+        "Instagram Reels: creation workflow, trending audio, hooks, and cross-posting strategy",
+        "Facebook Marketplace and local services: listing optimization for contractors",
+        "Meta pixel and Conversions API: setup, event tracking, and custom audience building",
+        "Instagram Stories: poll stickers, countdown timers, link stickers, and engagement optimization",
+        "Facebook Lead Ads: form design, instant forms vs website, and CRM integration",
+        "Meta Business Suite scheduling, analytics, and cross-platform content management",
+        "Instagram for visual trades: before-after project showcases, carousels, and aesthetic branding",
+        "Facebook Events and local awareness campaigns for service businesses",
+        "Meta advertising compliance: housing, credit, and employment special ad categories for contractors"
+      ]
+    },
+    {
+      "id": "linkedin-mastery",
+      "name": "LinkedIn Platform Mastery",
+      "sourceFrameworks": "LinkedIn algorithm, B2B content strategy, LinkedIn Ads, Sales Navigator, thought leadership",
+      "topics": [
+        "LinkedIn algorithm deep-dive: dwell time, comments, and distribution to 1st/2nd/3rd connections",
+        "LinkedIn content formats ranked: text posts, carousels, polls, newsletters, and video performance",
+        "LinkedIn Ads mastery: Sponsored Content, InMail, dynamic ads, and lead gen forms",
+        "Sales Navigator for B2B prospecting: lead lists, boolean search, and outreach sequences",
+        "LinkedIn company page optimization: showcase pages, employee advocacy, and follower growth",
+        "LinkedIn thought leadership: personal brand building for executives and business owners",
+        "LinkedIn newsletter strategy: subscriber growth, content cadence, and engagement benchmarks",
+        "LinkedIn Groups and community strategy for industry networking and lead generation",
+        "LinkedIn for recruiting skilled trades: job posts, employer brand, and apprenticeship marketing",
+        "LinkedIn analytics: post-level metrics, follower demographics, and competitor benchmarking",
+        "LinkedIn Live and Events: virtual conferences, webinar promotion, and attendee conversion",
+        "Employee advocacy programs on LinkedIn: amplifying reach through team engagement",
+        "LinkedIn B2B marketing for commercial contractors: targeting facility managers and procurement"
+      ]
+    },
+    {
+      "id": "tiktok-mastery",
+      "name": "TikTok Platform Mastery",
+      "sourceFrameworks": "TikTok algorithm, creator economy, TikTok Ads, trend mechanics, short-form video strategy",
+      "topics": [
+        "TikTok algorithm deep-dive: For You Page ranking signals, completion rate, and content clusters",
+        "TikTok content strategy for service businesses: edutainment, day-in-the-life, and transformation reveals",
+        "TikTok Ads mastery: Spark Ads, In-Feed Ads, TopView, and Branded Hashtag Challenges",
+        "TikTok trend mechanics: sound trends, stitch/duet strategy, and trend-jacking for brands",
+        "TikTok for trades: electrician content that goes viral, safety demos, and project reveals",
+        "TikTok Shop and commerce features: product showcases and lead generation for services",
+        "TikTok analytics: video performance metrics, audience insights, and content optimization",
+        "TikTok creator partnerships: micro-influencer strategy for local business marketing",
+        "TikTok SEO: keyword optimization in captions, hashtags, and text overlay for search discovery",
+        "Vertical video production: lighting, framing, pacing, and hook-first editing for mobile",
+        "TikTok posting strategy: frequency, timing, batch creation, and content repurposing workflows",
+        "TikTok Live: going live for engagement, Q&A sessions, and real-time lead generation",
+        "TikTok compliance and brand safety: FTC disclosures, music licensing, and content moderation"
+      ]
+    },
+    {
+      "id": "cross-platform-social-strategy",
+      "name": "Cross-Platform Social Media Strategy",
+      "sourceFrameworks": "Multi-platform orchestration, content repurposing, social analytics, influencer marketing, social commerce",
+      "topics": [
+        "Cross-platform content repurposing: create once, distribute everywhere framework",
+        "Platform-native adaptation: reformatting content for each algorithm without losing quality",
+        "Social media audit framework: scoring presence, engagement, growth, and ROI across platforms",
+        "Influencer marketing strategy: identification, vetting, contracts, and ROI measurement",
+        "Social commerce integration: shoppable posts, link-in-bio tools, and conversion tracking",
+        "User-generated content strategy: soliciting, curating, and leveraging customer content",
+        "Social listening and sentiment analysis for competitive intelligence and brand monitoring",
+        "Social media crisis management: escalation protocols, response templates, and recovery playbooks",
+        "Social media team structure and workflow: roles, approval chains, and content calendars",
+        "Paid social budget allocation across platforms: testing methodology and diminishing returns analysis",
+        "Social proof orchestration: reviews, testimonials, UGC, and case studies across all platforms",
+        "Dark social and attribution: tracking shares in DMs, email, and private channels",
+        "Social media compliance for regulated industries: TCPA, FTC endorsement guidelines, union rules"
       ]
     }
   ]
