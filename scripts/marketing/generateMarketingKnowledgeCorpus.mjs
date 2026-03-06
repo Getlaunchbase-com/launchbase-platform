@@ -243,16 +243,35 @@ function parseResponse(raw) {
   // Strip markdown fences
   let cleaned = raw.replace(/^```(?:json|jsonl)?\s*\n?/gm, "").replace(/\n?```\s*$/gm, "").trim();
 
+  // Attempt 1: direct parse
   try {
     const obj = JSON.parse(cleaned);
     if (obj.instruction && obj.output) return obj;
-  } catch {
-    // Try to extract JSON from mixed output
-    const match = cleaned.match(/\{[\s\S]*"instruction"[\s\S]*"output"[\s\S]*\}/);
-    if (match) {
-      try { return JSON.parse(match[0]); } catch { /* fall through */ }
-    }
+  } catch { /* try other methods */ }
+
+  // Attempt 2: extract JSON block from mixed output
+  const match = cleaned.match(/\{[\s\S]*"instruction"[\s\S]*"output"[\s\S]*\}/);
+  if (match) {
+    try {
+      const obj = JSON.parse(match[0]);
+      if (obj.instruction && obj.output) return obj;
+    } catch { /* try relaxed parse */ }
   }
+
+  // Attempt 3: find instruction/input/output fields via regex and reconstruct
+  try {
+    const instrMatch = cleaned.match(/"instruction"\s*:\s*"((?:[^"\\]|\\.)*)"/s);
+    const inputMatch = cleaned.match(/"input"\s*:\s*"((?:[^"\\]|\\.)*)"/s);
+    const outputMatch = cleaned.match(/"output"\s*:\s*"((?:[^"\\]|\\[\s\S])*)"\s*\}?\s*$/s);
+    if (instrMatch && outputMatch) {
+      return {
+        instruction: instrMatch[1].replace(/\\n/g, "\n").replace(/\\"/g, '"'),
+        input: inputMatch ? inputMatch[1].replace(/\\n/g, "\n").replace(/\\"/g, '"') : "",
+        output: outputMatch[1].replace(/\\n/g, "\n").replace(/\\"/g, '"'),
+      };
+    }
+  } catch { /* fall through */ }
+
   return null;
 }
 
