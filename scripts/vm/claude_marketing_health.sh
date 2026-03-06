@@ -49,18 +49,18 @@ GATE_DATA=$(cat "$LATEST_GATE" 2>/dev/null || echo '{"error":"no gate file"}')
 # Gate pass/fail history (last 24 hours)
 GATE_HISTORY=""
 for f in $(ls -t "$REPO_DIR/runs/marketing/gates/fine-tune-gate-"*.json 2>/dev/null | head -24); do
-  PASS=$(cat "$f" | grep -o '"pass":[a-z]*' | head -1)
-  CLASS=$(cat "$f" | grep -o '"classification":"[^"]*"' | head -1)
-  GATE_HISTORY="${GATE_HISTORY}$(basename $f): ${PASS}, ${CLASS}\n"
+  PASS=$(jq -r '.pass // "unknown"' "$f" 2>/dev/null || echo "unknown")
+  CLASS=$(jq -r '.classification // "unknown"' "$f" 2>/dev/null || echo "unknown")
+  GATE_HISTORY="${GATE_HISTORY}$(basename $f): pass=${PASS}, ${CLASS}\n"
 done
 
 # Recent hourly log (last 30 lines)
 HOURLY_LOG=$(tail -30 "$LOG_DIR/vm-marketing-hourly.log" 2>/dev/null || echo "no log")
 
 # Run counts
-TOTAL_RUNS=$(ls "$REPO_DIR/runs/marketing/agency-learning-backlog-"*.json 2>/dev/null | wc -l)
-TOTAL_GATES=$(ls "$REPO_DIR/runs/marketing/gates/fine-tune-gate-"*.json 2>/dev/null | wc -l)
-GATES_PASSED=$(grep -l '"pass":true' "$REPO_DIR/runs/marketing/gates/"*.json 2>/dev/null | wc -l)
+TOTAL_RUNS=$(ls "$REPO_DIR/runs/marketing/agency-learning-backlog-"*.json 2>/dev/null | wc -l || echo "0")
+TOTAL_GATES=$(ls "$REPO_DIR/runs/marketing/gates/fine-tune-gate-"*.json 2>/dev/null | wc -l || echo "0")
+GATES_PASSED=$(grep -rl '"pass"' "$REPO_DIR/runs/marketing/gates/"*.json 2>/dev/null | xargs grep -l 'true' 2>/dev/null | wc -l || echo "0")
 
 # Disk usage
 DISK_USAGE=$(du -sh "$REPO_DIR/runs/marketing/" 2>/dev/null | cut -f1)
