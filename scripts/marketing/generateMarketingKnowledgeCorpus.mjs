@@ -314,12 +314,7 @@ async function generateSFT() {
     const promises = batch.map(async (slot) => {
       const systemPrompt = buildSystemPrompt(slot);
       const userPrompt = buildUserPrompt(slot);
-      const raw = await callAnthropic(systemPrompt, userPrompt);
-      if (raw && !parseResponse(raw)) {
-        const fs2 = await import("node:fs");
-        fs2.default.writeFileSync(`/tmp/debug_corpus_${Date.now()}.txt`, raw.slice(0, 500));
-        console.log(`  DEBUG: raw[0:80] = ${JSON.stringify(raw.slice(0, 80))}`);
-      }
+      const raw = await callAnthropic(systemPrompt, userPrompt, 4000);
       return { slot, raw };
     });
 
