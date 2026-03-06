@@ -58,9 +58,9 @@ done
 HOURLY_LOG=$(tail -30 "$LOG_DIR/vm-marketing-hourly.log" 2>/dev/null || echo "no log")
 
 # Run counts
-TOTAL_RUNS=$(ls "$REPO_DIR/runs/marketing/agency-learning-backlog-"*.json 2>/dev/null | wc -l || echo "0")
-TOTAL_GATES=$(ls "$REPO_DIR/runs/marketing/gates/fine-tune-gate-"*.json 2>/dev/null | wc -l || echo "0")
-GATES_PASSED=$(grep -rl '"pass"' "$REPO_DIR/runs/marketing/gates/"*.json 2>/dev/null | xargs grep -l 'true' 2>/dev/null | wc -l || echo "0")
+TOTAL_RUNS=$(ls "$REPO_DIR/runs/marketing/agency-learning-backlog-"*.json 2>/dev/null | wc -l | tr -d ' ' || echo "0")
+TOTAL_GATES=$(ls "$REPO_DIR/runs/marketing/gates/fine-tune-gate-"*.json 2>/dev/null | wc -l | tr -d ' ' || echo "0")
+GATES_PASSED=$(grep -rl '"pass"' "$REPO_DIR/runs/marketing/gates/"*.json 2>/dev/null | xargs grep -l 'true' 2>/dev/null | wc -l | tr -d ' ' || echo "0")
 
 # Disk usage
 DISK_USAGE=$(du -sh "$REPO_DIR/runs/marketing/" 2>/dev/null | cut -f1)
