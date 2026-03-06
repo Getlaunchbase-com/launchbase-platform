@@ -169,16 +169,16 @@ jq -n \
   --arg analysis "$ANALYSIS" \
   --arg platform "$PLATFORM_HEALTH" \
   --arg gateData "$GATE_DATA" \
-  --argjson totalRuns "$TOTAL_RUNS" \
-  --argjson gatesPassed "$GATES_PASSED" \
-  --argjson totalGates "$TOTAL_GATES" \
+  --arg totalRuns "$TOTAL_RUNS" \
+  --arg gatesPassed "$GATES_PASSED" \
+  --arg totalGates "$TOTAL_GATES" \
   '{
     timestamp: $timestamp,
     status: $status,
-    totalRuns: $totalRuns,
-    totalGates: $totalGates,
-    gatesPassed: $gatesPassed,
-    gatePassRate: (if $totalGates > 0 then ($gatesPassed / $totalGates * 100) else 0 end),
+    totalRuns: ($totalRuns | tonumber),
+    totalGates: ($totalGates | tonumber),
+    gatesPassed: ($gatesPassed | tonumber),
+    gatePassRate: (if ($totalGates | tonumber) > 0 then (($gatesPassed | tonumber) / ($totalGates | tonumber) * 100) else 0 end),
     platform: ($platform | fromjson? // $platform),
     latestGate: ($gateData | fromjson? // $gateData),
     analysis: $analysis
